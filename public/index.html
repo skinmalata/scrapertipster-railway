@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScoreCast - Daily Football Predictions TEST</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#f97316',
+            foreground: '#fafafa',
+            'muted-foreground': '#a1a1aa',
+            border: '#2d2d4a',
+            card: '#1a1a2e',
+            'card-foreground': '#fafafa',
+          },
+          fontFamily: {
+            display: ['system-ui', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #ffffff;
+      color: #18181b;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 12px;
+    }
+
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid #e5e5e5;
+      padding: 16px 0;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-icon {
+      width: 24px;
+      height: 24px;
+      color: #f97316;
+    }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: bold;
+      color: #18181b;
+    }
+
+    .logo-text span {
+      color: #f97316;
+    }
+
+    .date-display {
+      font-size: 12px;
+      color: #71717a;
+    }
+
+    main {
+      padding: 24px 12px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .hero h2 {
+      font-size: 28px;
+      font-weight: bold;
+      color: #18181b;
+      margin-bottom: 6px;
+    }
+
+    .hero p {
+      font-size: 15px;
+      color: #71717a;
+    }
+
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      padding: 16px 0;
+      margin-bottom: 24px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: #f97316;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #71717a;
+    }
+
+    .tabs-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid #e5e5e5;
+      background: transparent;
+      color: #71717a;
+    }
+
+    .tab-btn:hover {
+      border-color: #a1a1aa;
+    }
+
+    .tab-btn.active {
+      background: #f97316;
+      color: white;
+      border-color: #f97316;
+    }
+
+    .matches-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .match-card {
+      background: #4a5568;
+      border: 1px solid #2d3748;
+      border-radius: 14px;
+      padding: 24px;
+      color: #fafafa;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .match-card:hover {
+      transform: translateY(-2px);
+      border-color: #4a5568;
+    }
+
+    .match-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+
+    .match-teams {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .team {
+      font-size: 17px;
+      font-weight: 600;
+      flex: 1;
+    }
+
+    .team-home {
+      text-align: right;
+      padding-right: 16px;
+    }
+
+    .team-away {
+      text-align: left;
+      padding-left: 16px;
+    }
+
+    .vs-score {
+      font-size: 14px;
+      color: #94a3b8;
+      padding: 0 16px;
+    }
+
+    .score-display {
+      font-weight: bold;
+      color: #ffffff;
+    }
+
+    .match-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 16px;
+      border-top: 1px solid #3d4a5c;
+    }
+
+    .tip-badge {
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 8px 16px;
+      border-radius: 6px;
+    }
+
+    .probability {
+      font-size: 26px;
+      font-weight: bold;
+      color: #ffffff;
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 48px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e5e5e5;
+      border-top: 3px solid #f97316;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .no-matches {
+      text-align: center;
+      padding: 48px;
+      color: #71717a;
+    }
+
+    .disclaimer {
+      text-align: center;
+      padding: 24px 12px;
+      font-size: 12px;
+      color: #71717a;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+
+/* Responsive */
+    @media (min-width: 640px) {
+      .matches-grid {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 900px;
+      }
+      .hero h2 {
+        font-size: 32px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-content {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+      }
+      .tabs-container {
+        gap: 6px;
+      }
+      .tab-btn {
+        padding: 10px 16px;
+        font-size: 14px;
+      }
+      .stats-bar {
+        gap: 24px;
+      }
+      .stat-value {
+        font-size: 22px;
+      }
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #4a5568;
+      border-radius: 16px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      background: #2d3748;
+      color: white;
+      padding: 20px;
+      border-radius: 16px 16px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 28px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .modal-body {
+      padding: 20px;
+      color: white;
+    }
+
+    .analysis-section {
+      margin-bottom: 20px;
+    }
+
+    .analysis-section h3 {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #f97316;
+    }
+
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .analysis-card {
+      background: #2d3748;
+      padding: 14px;
+      border-radius: 10px;
+    }
+
+    .stats-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 16px;
+    }
+
+    .stats-table th,
+    .stats-table td {
+      padding: 8px 12px;
+      text-align: center;
+      border-bottom: 1px solid #4a5568;
+    }
+
+    .stats-table th {
+      background: #1a202c;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+
+    .stats-table td:first-child {
+      text-align: left;
+      color: #ffffff;
+    }
+
+    .stats-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .stats-table tbody tr:hover {
+      background: #374151;
+    }
+
+    .analysis-card h4 {
+      font-size: 12px;
+      margin-bottom: 8px;
+      color: #cbd5e1;
+    }
+
+    .team-analysis {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .team-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .form-bar {
+      display: flex;
+      gap: 4px;
+    }
+
+    .form-result {
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .form-win { background: #00d9a0; }
+    .form-draw { background: #ffc107; }
+    .form-loss { background: #e94560; }
+
+    .squad-strength {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .strength-item {
+      text-align: center;
+      flex: 1;
+    }
+
+    .strength-value {
+      font-size: 16px;
+      font-weight: bold;
+      color: #f97316;
+    }
+
+    .strength-label {
+      font-size: 10px;
+      color: #94a3b8;
+    }
+
+    .prediction-reason {
+      background: #2d3748;
+      padding: 14px;
+      border-radius: 10px;
+      border-left: 4px solid #f97316;
+    }
+
+    .prediction-reason h4 {
+      color: #f97316;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .prediction-reason p {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #e2e8f0;
+    }
+
+    @media (max-width: 500px) {
+      .analysis-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <header>
+      <div class="header-content">
+        <div class="logo">
+          <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+          <span class="logo-text">Score<span>Cast</span></span>
+        </div>
+        <span class="date-display" id="headerDate"></span>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="hero">
+        <h2>Daily Predictions</h2>
+        <p>AI-powered match predictions updated every day</p>
+      </div>
+
+      <div class="stats-bar" id="statsBar">
+        <div class="stat-item">
+          <div class="stat-value" id="totalMatches">0</div>
+          <div class="stat-label">Matches</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="avgProb">0%</div>
+          <div class="stat-label">Avg Confidence</div>
+        </div>
+      </div>
+
+      <div class="tabs-container" id="dayTabs"></div>
+
+<div class="tabs-container" id="categoryTabs">
+        <button onclick="setCategory('1x2')" id="tab-1x2" class="tab-btn active">1X2</button>
+        <button onclick="setCategory('over15')" id="tab-over15" class="tab-btn">Over 1.5</button>
+        <button onclick="setCategory('over25')" id="tab-over25" class="tab-btn">Over 2.5</button>
+        <button onclick="setCategory('btts')" id="tab-btts" class="tab-btn">BTTS</button>
+      </div>
+
+      <div id="content">
+        <div class="loading"><div class="spinner"></div></div>
+      </div>
+
+      <div class="disclaimer">Predictions are for informational purposes only. Please gamble responsibly.</div>
+    </main>
+  </div>
+
+  <!-- Analysis Modal -->
+  <div id="analysisModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Match Analysis</h2>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <div class="loading"><div class="spinner"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentData = null;
+    let currentCategory = '1x2';
+    let currentDayOffset = 0;
+
+    const today = new Date();
+    document.getElementById('headerDate').textContent = today.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    function getDaysArray() {
+      const days = [];
+      const baseDate = new Date();
+      baseDate.setHours(0, 0, 0, 0);
+      
+      for (let i = -3; i <= 3; i++) {
+        const date = new Date(baseDate);
+        date.setDate(baseDate.getDate() + i);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const dateStr = `${year}-${month}-${day}`;
+        days.push({
+          offset: i,
+          dateStr: dateStr,
+          label: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : i === -1 ? 'Yesterday' : date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+        });
+      }
+      return days;
+    }
+
+    function renderDayTabs() {
+      const days = getDaysArray();
+      const container = document.getElementById('dayTabs');
+      container.innerHTML = days.map(day => `
+        <button onclick="switchDay(${day.offset})" 
+          class="tab-btn ${day.offset === currentDayOffset ? 'active' : ''}">
+          ${day.label}
+        </button>
+      `).join('');
+    }
+
+    function switchDay(offset) {
+      currentDayOffset = offset;
+      renderDayTabs();
+      if (currentData) renderMatches();
+    }
+
+    function setCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        if (btn.id.startsWith('tab-')) {
+          btn.classList.remove('active');
+        }
+      });
+      document.getElementById(`tab-${cat}`).classList.add('active');
+      if (currentData) renderMatches();
+    }
+
+    function getCategoryLabel(cat) {
+      const labels = { '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5', 'btts': 'BTTS' };
+      return labels[cat] || cat;
+    }
+
+    function getTipLabel(tip) {
+      const labels = { '1': 'Home Win', 'X': 'Draw', '2': 'Away Win', 'Over 1.5': 'Over 1.5', 'Over 2.5': 'Over 2.5', 'BTTS': 'BTTS' };
+      return labels[tip] || tip;
+    }
+
+    function renderMatches() {
+      const content = document.getElementById('content');
+      
+      if (!currentData || !currentData.success) {
+        content.innerHTML = `
+          <div class="text-center py-12 text-muted-foreground">
+            <p>No data available</p>
+          </div>
+        `;
+        return;
+      }
+
+      let matches = [];
+      if (currentCategory === '1x2') matches = currentData.matches || [];
+      else if (currentCategory === 'over15') matches = currentData.over15Matches || [];
+      else if (currentCategory === 'over25') matches = currentData.over25Matches || [];
+      else if (currentCategory === 'btts') matches = currentData.bttsMatches || [];
+
+      const targetDate = new Date();
+      targetDate.setHours(0, 0, 0, 0);
+      targetDate.setDate(targetDate.getDate() + currentDayOffset);
+      const year = targetDate.getFullYear();
+      const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+      const day = String(targetDate.getDate()).padStart(2, '0');
+      const targetDateStr = `${year}-${month}-${day}`;
+
+      const filtered = matches.filter(m => m.date === targetDateStr);
+
+      if (filtered.length === 0) {
+        const dayLabel = currentDayOffset === 0 ? 'Today' : currentDayOffset === 1 ? 'Tomorrow' : currentDayOffset === -1 ? 'Yesterday' : `on ${targetDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+        content.innerHTML = `
+          <div class="no-matches">
+            <p>No ${getCategoryLabel(currentCategory)} predictions >60% ${dayLabel}</p>
+          </div>
+        `;
+        document.getElementById('totalMatches').textContent = '0';
+        return;
+      }
+
+      document.getElementById('totalMatches').textContent = filtered.length;
+      const avgProb = Math.round(filtered.reduce((sum, m) => sum + m.probability, 0) / filtered.length);
+      document.getElementById('avgProb').textContent = avgProb + '%';
+
+      const html = filtered.map((match, i) => {
+        const teams = match.match.split(' - ');
+        const home = teams[0]?.trim() || '';
+        const away = teams[1]?.trim() || '';
+        const hasScore = match.score && match.score.home !== undefined;
+        const matchData = encodeURIComponent(JSON.stringify(match));
+
+        return `
+          <div class="match-card fade-in" style="animation-delay: ${i * 50}ms" data-match="${matchData}">
+            <div class="match-header">
+              <span>${[match.country, match.league].filter(Boolean).join(' • ') || 'Unknown'}</span>
+              <span>${match.time}</span>
+            </div>
+            <div class="match-teams">
+              <span class="team team-home">${home}</span>
+              ${hasScore ? 
+                `<span class="vs-score score-display">${match.score.home} - ${match.score.away}</span>` : 
+                `<span class="vs-score">vs</span>`
+              }
+              <span class="team team-away">${away}</span>
+            </div>
+            <div class="match-footer">
+              <span class="tip-badge">${match.tip}</span>
+              <span class="probability">${match.probability}%</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      content.innerHTML = `<div class="matches-grid">${html}</div>`;
+      
+      document.querySelectorAll('.match-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const matchData = JSON.parse(decodeURIComponent(card.dataset.match));
+          showAnalysis(matchData);
+        });
+      });
+    }
+
+    async function loadPredictions() {
+      const content = document.getElementById('content');
+      content.innerHTML = `
+        <div class="loading"><div class="spinner"></div></div>
+      `;
+
+      try {
+        const response = await fetch('/api/predictions');
+        currentData = await response.json();
+        renderMatches();
+      } catch (error) {
+        content.innerHTML = `
+          <div class="no-matches">
+            <p>Error loading predictions: ${error.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('analysisModal').classList.remove('active');
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+
+    async function showAnalysis(match) {
+      const modal = document.getElementById('analysisModal');
+      const modalBody = document.getElementById('modalBody');
+      const modalTitle = document.getElementById('modalTitle');
+      
+      const teams = match.match.split(' - ');
+      const homeTeam = teams[0]?.trim() || '';
+      const awayTeam = teams[1]?.trim() || '';
+      
+      modalTitle.textContent = `${match.match}`;
+      modalBody.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+      
+      modal.classList.add('active');
+      
+      try {
+        const response = await fetch(`/api/analysis?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`);
+        
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        
+        const analysis = await response.json();
+        
+        if (analysis.error) {
+          modalBody.innerHTML = `<div class="no-matches"><p>${analysis.error}</p></div>`;
+          return;
+        }
+        
+        const h2h = analysis.h2h || [];
+        const homeForm = analysis.homeForm || '';
+        const awayForm = analysis.awayForm || '';
+        const homeLast10 = analysis.homeLast10 || {};
+        const awayLast10 = analysis.awayLast10 || {};
+        
+        const getFormClass = (char) => {
+          if (char === 'W') return 'form-win';
+          if (char === 'D') return 'form-draw';
+          if (char === 'L') return 'form-loss';
+          return '';
+        };
+        
+        modalBody.innerHTML = `
+          <div class="analysis-section">
+            <h3>Recent Form</h3>
+            <div class="analysis-grid">
+              <div class="analysis-card">
+                <h4>${homeTeam}</h4>
+                <div class="form-bar">
+                  ${homeForm.slice(-5).split('').map(f => `<span class="form-result ${getFormClass(f)}">${f}</span>`).join('')}
+                </div>
+              </div>
+              <div class="analysis-card">
+                <h4>${awayTeam}</h4>
+                <div class="form-bar">
+                  ${awayForm.slice(-5).split('').map(f => `<span class="form-result ${getFormClass(f)}">${f}</span>`).join('')}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          ${h2h && h2h.length > 0 ? `
+          <div class="analysis-section">
+            <h3>Head to Head</h3>
+            <div class="analysis-grid">
+              ${h2h.slice(0, 5).map(h => `
+                <div class="analysis-card" style="grid-column: 1 / -1;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span style="font-size: 13px; color: #ffffff; font-weight: 500;">${h.date || ''}</span>
+                  </div>
+                  <div style="display: flex; justify-content: center; align-items: center; gap: 15px;">
+                    <span style="text-align: right;">${h.awayTeam || ''}&nbsp;&nbsp;<span style="background: #333; padding: 2px 8px; border-radius: 4px;">${h.awayGoals}</span></span>
+                    <span style="margin: 0 10px;">-</span>
+                    <span style="text-align: left;"><span style="background: #333; padding: 2px 8px; border-radius: 4px;">${h.homeGoals}</span>&nbsp;&nbsp;${h.homeTeam || ''}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          ` : ''}
+          
+          ${(homeLast10.wins > 0 || homeLast10.draws > 0 || homeLast10.losses > 0 || awayLast10.wins > 0 || awayLast10.draws > 0 || awayLast10.losses > 0 || homeLast10.chanceToScore > 0) ? `
+          <div class="analysis-section">
+            <h3>Last 10 Matches Statistics</h3>
+            <table class="stats-table">
+              <thead>
+                <tr>
+                  <th>Statistic</th>
+                  <th>${homeTeam}</th>
+                  <th>${awayTeam}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Wins</td>
+                  <td style="color: white;">${homeLast10.wins || 0}</td>
+                  <td style="color: white;">${awayLast10.wins || 0}</td>
+                </tr>
+                <tr>
+                  <td>Draws</td>
+                  <td style="color: white;">${homeLast10.draws || 0}</td>
+                  <td style="color: white;">${awayLast10.draws || 0}</td>
+                </tr>
+                <tr>
+                  <td>Losses</td>
+                  <td style="color: white;">${homeLast10.losses || 0}</td>
+                  <td style="color: white;">${awayLast10.losses || 0}</td>
+                </tr>
+                <tr>
+                  <td>Avg Scored</td>
+                  <td style="color: white;">${homeLast10.avgScored || 0}</td>
+                  <td style="color: white;">${awayLast10.avgScored || 0}</td>
+                </tr>
+                <tr>
+                  <td>Avg Conceded</td>
+                  <td style="color: white;">${homeLast10.avgConceded || 0}</td>
+                  <td style="color: white;">${awayLast10.avgConceded || 0}</td>
+                </tr>
+                <tr>
+                  <td>Chance to Score</td>
+                  <td style="color: white;">${homeLast10.chanceToScore || 0}%</td>
+                  <td style="color: white;">${awayLast10.chanceToScore || 0}%</td>
+                </tr>
+                <tr>
+                  <td>Chance to Concede</td>
+                  <td style="color: white;">${homeLast10.chanceToConcede || 0}%</td>
+                  <td style="color: white;">${awayLast10.chanceToConcede || 0}%</td>
+                </tr>
+                <tr>
+                  <td>Clean Sheets</td>
+                  <td style="color: white;">${homeLast10.cleanSheets || 0}</td>
+                  <td style="color: white;">${awayLast10.cleanSheets || 0}</td>
+                </tr>
+                <tr>
+                  <td>Failed to Score</td>
+                  <td style="color: white;">${homeLast10.failToScore || 0}</td>
+                  <td style="color: white;">${awayLast10.failToScore || 0}</td>
+                </tr>
+                <tr>
+                  <td>Over 2.5</td>
+                  <td style="color: white;">${homeLast10.over25 || 0}</td>
+                  <td style="color: white;">${awayLast10.over25 || 0}</td>
+                </tr>
+                <tr>
+                  <td>Under 2.5</td>
+                  <td style="color: white;">${homeLast10.under25 || 0}</td>
+                  <td style="color: white;">${awayLast10.under25 || 0}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          ` : ''}
+          
+          <div class="analysis-section">
+            <div class="prediction-reason">
+              <h4>Prediction</h4>
+              <p><strong>Tip:</strong> ${match.tip}</p>
+              <p><strong>Probability:</strong> ${match.probability}%</p>
+            </div>
+          </div>
+        `;
+      } catch (error) {
+        modalBody.innerHTML = `<div class="no-matches"><p>Error loading analysis: ${error.message}</p></div>`;
+      }
+    }
+
+    renderDayTabs();
+    loadPredictions();
+  </script>
+</body>
+</html>
