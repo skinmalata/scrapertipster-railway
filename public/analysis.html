@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Match Analysis</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#ef4444',
+            foreground: '#fafafa',
+            'muted-foreground': '#a1a1aa',
+            border: '#2d2d4a',
+            card: '#1a1a2e',
+            'card-foreground': '#fafafa',
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f5; color: #18181b; padding: 20px; }
+    .container { max-width: 800px; margin: 0 auto; }
+    h1 { font-size: 24px; margin-bottom: 20px; }
+    .back-btn { display: inline-block; padding: 8px 16px; background: #ef4444; color: white; text-decoration: none; border-radius: 6px; margin-bottom: 20px; }
+    .analysis-section { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .analysis-section h3 { font-size: 18px; margin-bottom: 16px; border-bottom: 1px solid #e5e5e5; padding-bottom: 8px; }
+    .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .analysis-card { background: #fafafafaf; border: 1px solid #e5e5e5; border-radius: 8px; padding: 16px; }
+    .analysis-card h4 { font-size: 16px; margin-bottom: 12px; color: #ef4444; font-weight: bold; }
+    .form-bar { display: flex; gap: 4px; }
+    .form-result { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; }
+    .form-win { background: #22c55e; }
+    .form-draw { background: #eab308; }
+    .form-loss { background: #ef4444; }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .stat-item { text-align: center; padding: 12px; background: #f4f4f5; border-radius: 6px; }
+    .stat-label { font-size: 12px; color: #71717a; }
+    .stat-value { font-size: 18px; font-weight: bold; color: #18181b; }
+    .h2h-list { display: flex; flex-direction: column; gap: 8px; }
+    .h2h-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; background: #f4f4f5; border-radius: 4px; font-size: 14px; }
+    .h2h-item span:first-child { text-align: left; flex: 1; }
+    .h2h-item span:nth-child(2) { text-align: center; flex: 0 0 auto; min-width: 60px; font-weight: bold; }
+    .h2h-item span:last-child { text-align: right; flex: 1; }
+    .loading { display: flex; justify-content: center; padding: 40px; }
+    .spinner { width: 32px; height: 32px; border: 3px solid #e5e5e5; border-top-color: #ef4444; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="javascript:window.close()" class="back-btn">Close</a>
+    <h1 id="matchTitle">Loading...</h1>
+    <div id="content">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const homeTeam = params.get('home') || '';
+    const awayTeam = params.get('away') || '';
+
+    document.getElementById('matchTitle').textContent = decodeURIComponent(homeTeam) + ' vs ' + decodeURIComponent(awayTeam);
+
+    async function loadAnalysis() {
+      try {
+        const response = await fetch(`/api/analysis?homeTeam=${encodeURIComponent(decodeURIComponent(homeTeam))}&awayTeam=${encodeURIComponent(decodeURIComponent(awayTeam))}`);
+        const analysis = await response.json();
+
+        if (analysis.error) {
+          document.getElementById('content').innerHTML = `<p>${analysis.error}</p>`;
+          return;
+        }
+
+        const h2h = analysis.h2h || [];
+        const homeForm = analysis.homeForm || '';
+        const awayForm = analysis.awayForm || '';
+        const homeLast10 = analysis.homeLast10 || {};
+        const awayLast10 = analysis.awayLast10 || {};
+
+        const getFormClass = (char) => {
+          if (char === 'W') return 'form-win';
+          if (char === 'D') return 'form-draw';
+          if (char === 'L') return 'form-loss';
+          return '';
+        };
+
+        document.getElementById('content').innerHTML = `
+          <div class="analysis-section">
+            <h3>Recent Form</h3>
+            <div class="analysis-grid">
+              <div class="analysis-card">
+                <h4>${decodeURIComponent(homeTeam)}</h4>
+                <div class="form-bar">
+                  ${homeForm.slice(-5).split('').map(f => `<span class="form-result ${getFormClass(f)}">${f}</span>`).join('')}
+                </div>
+              </div>
+              <div class="analysis-card">
+                <h4>${decodeURIComponent(awayTeam)}</h4>
+                <div class="form-bar">
+                  ${awayForm.slice(-5).split('').map(f => `<span class="form-result ${getFormClass(f)}">${f}</span>`).join('')}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="analysis-section">
+            <h3>Statistics (Last 10 Matches)</h3>
+            <div class="analysis-grid">
+              <div class="analysis-card">
+                <h4>${decodeURIComponent(homeTeam)}</h4>
+                <div class="stats-grid">
+                  <div class="stat-item"><div class="stat-label">W</div><div class="stat-value">${homeLast10.wins || 0}</div></div>
+                  <div class="stat-item"><div class="stat-label">D</div><div class="stat-value">${homeLast10.draws || 0}</div></div>
+                  <div class="stat-item"><div class="stat-label">L</div><div class="stat-value">${homeLast10.losses || 0}</div></div>
+                  <div class="stat-item"><div class="stat-label">Scored</div><div class="stat-value">${homeLast10.avgScored?.toFixed(1) || 0}</div></div>
+                  <div class="stat-item"><div class="stat-label">Conceded</div><div class="stat-value">${homeLast10.avgConceded?.toFixed(1) || 0}</div></div>
+                </div>
+              </div>
+              <div class="analysis-card">
+                <h4>${decodeURIComponent(awayTeam)}</h4>
+                <div class="stats-grid">
+                  <div class="stat-item"><div class="stat-label">W</div><div class="stat-value">${awayLast10.wins || 0}</div></div>
+                  <div class="stat-item"><div class="stat-label">D</div><div class="stat-value">${awayLast10.draws || 0}</div></div>
+                  <div class="stat-item"><div class="stat-label">L</div><div class="stat-value">${awayLast10.losses || 0}</div></div>
+                  <div class="stat-item"><div class="stat-label">Scored</div><div class="stat-value">${awayLast10.avgScored?.toFixed(1) || 0}</div></div>
+                  <div class="stat-item"><div class="stat-label">Conceded</div><div class="stat-value">${awayLast10.avgConceded?.toFixed(1) || 0}</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="analysis-section">
+            <h3>Head to Head</h3>
+            <div class="h2h-list">
+              ${h2h.length > 0 ? h2h.slice(0, 5).map(h => `
+                <div class="h2h-item">
+                  <span>${h.homeTeam || ''}</span>
+                  <span>${h.homeGoals || 0} - ${h.awayGoals || 0}</span>
+                  <span>${h.awayTeam || ''}</span>
+                </div>
+              `).join('') : '<p>No head to head data available</p>'}
+            </div>
+          </div>
+        `;
+      } catch (error) {
+        document.getElementById('content').innerHTML = `<p>Error loading analysis: ${error.message}</p>`;
+      }
+    }
+
+    loadAnalysis();
+  </script>
+</body>
+</html>
