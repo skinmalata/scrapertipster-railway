@@ -40,6 +40,37 @@ if (!CHROME_PATH) {
 const app = express();
 const PORT = process.env.PORT || 3002;
 
+const rateLimit = new Map();
+const RATE_LIMIT = 100;
+const TIME_WINDOW = 60 * 1000;
+
+function rateLimiter(req, res, next) {
+  const ip = req.ip || req.connection.remoteAddress;
+  const now = Date.now();
+  
+  if (!rateLimit.has(ip)) {
+    rateLimit.set(ip, { count: 1, resetTime: now + TIME_WINDOW });
+    return next();
+  }
+  
+  const data = rateLimit.get(ip);
+  
+  if (now > data.resetTime) {
+    rateLimit.set(ip, { count: 1, resetTime: now + TIME_WINDOW });
+    return next();
+  }
+  
+  if (data.count >= RATE_LIMIT) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+  }
+  
+  data.count++;
+  rateLimit.set(ip, data);
+  next();
+}
+
+app.use(rateLimiter);
+
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
