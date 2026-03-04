@@ -1766,14 +1766,28 @@ app.get('/api/predictions', async (req, res) => {
   res.json(data);
 });
 
+let isRefreshing = false;
+
 app.get('/api/refresh', async (req, res) => {
-  try {
-    const data = await fetchAndCachePredictions();
-    saveCachedPredictions(data);
-    res.json({ success: true, message: 'Predictions refreshed', data });
-  } catch (error) {
-    res.json({ success: false, error: error.message });
+  if (isRefreshing) {
+    return res.json({ success: false, message: 'Refresh already in progress' });
   }
+  
+  isRefreshing = true;
+  res.json({ success: true, message: 'Refresh started in background' });
+  
+  (async () => {
+    try {
+      console.log('Background refresh started...');
+      const data = await fetchAndCachePredictions();
+      saveCachedPredictions(data);
+      console.log('Background refresh completed:', data.success ? 'success' : 'failed');
+    } catch (error) {
+      console.error('Background refresh error:', error.message);
+    } finally {
+      isRefreshing = false;
+    }
+  })();
 });
 
 app.get('/api/test-betexplorer', async (req, res) => {
