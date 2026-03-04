@@ -1218,7 +1218,7 @@ function getDateRange() {
   const dates = [];
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  for (let i = -3; i <= 3; i++) {
+  for (let i = -3; i <= 7; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
     const year = d.getFullYear();
@@ -1656,6 +1656,86 @@ function parseBetexplorerStreaks(html, streakType = 'win') {
   return matches;
 }
 
+async function filterTeamsThatScoredLast5Games(over25Matches) {
+  const teamsMap = new Map();
+  const analysisCache = getAnalysisCache();
+  
+  console.log('Finding teams that scored in last 5 games from Over 2.5 matches...');
+  
+  for (const match of over25Matches) {
+    const teams = match.match.split(' - ');
+    const homeTeam = teams[0]?.trim();
+    const awayTeam = teams[1]?.trim();
+    const matchDate = match.date;
+    
+    if (!homeTeam || !awayTeam) continue;
+    
+    const homeKey = `${homeTeam}-${awayTeam}`.toLowerCase();
+    const awayKey = `${awayTeam}-${homeTeam}`.toLowerCase();
+    const analysis = analysisCache[homeKey] || analysisCache[awayKey];
+    
+    let homeScored5 = false;
+    let awayScored5 = false;
+    
+    if (analysis) {
+      if (analysis.homeForm && analysis.homeForm.length >= 5) {
+        homeScored5 = checkConsecutiveScoring(analysis.homeForm) || checkScoredAtLeast5(analysis.homeForm);
+      }
+      if (analysis.awayForm && analysis.awayForm.length >= 5) {
+        awayScored5 = checkConsecutiveScoring(analysis.awayForm) || checkScoredAtLeast5(analysis.awayForm);
+      }
+    } else {
+      homeScored5 = true;
+      awayScored5 = true;
+    }
+    
+    if (homeScored5 && !teamsMap.has(homeTeam)) {
+      teamsMap.set(homeTeam, {
+        team: homeTeam,
+        country: match.country || '',
+        nextMatch: match.match,
+        nextMatchDate: matchDate,
+        streak: '5+ scoring'
+      });
+    }
+    
+    if (awayScored5 && !teamsMap.has(awayTeam)) {
+      teamsMap.set(awayTeam, {
+        team: awayTeam,
+        country: match.country || '',
+        nextMatch: match.match,
+        nextMatchDate: matchDate,
+        streak: '5+ scoring'
+      });
+    }
+  }
+  
+  const teamsArray = Array.from(teamsMap.values());
+  console.log(`Team to Score: ${teamsArray.length} teams found`);
+  return teamsArray;
+}
+
+function checkConsecutiveScoring(form) {
+  if (!form || form.length < 5) return false;
+  
+  const last5 = form.slice(-5);
+  
+  for (const char of last5) {
+    if (char === 'L') return false;
+  }
+  
+  return true;
+}
+
+function checkScoredAtLeast5(form) {
+  if (!form || form.length < 5) return false;
+  
+  const last5 = form.slice(-5);
+  const scoredCount = (last5.match(/W|D/g) || []).length;
+  
+  return scoredCount >= 4;
+}
+
 async function fetchAndCachePredictions() {
   try {
     const dateRange = getDateRange();
@@ -1680,13 +1760,14 @@ async function fetchAndCachePredictions() {
     
     const resultsMapByDate = {};
     const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    const yesterday = new Date(now);
-    yesterday.setDate(now.getDate() - 1);
+    const localDate = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
+    localDate.setHours(0, 0, 0, 0);
     
     for (const dateStr of dateRange) {
       const date = new Date(dateStr);
-      if (date.getTime() === yesterday.getTime()) {
+      const targetDate = new Date(localDate);
+      targetDate.setDate(localDate.getDate() - 1);
+      if (date.getTime() <= targetDate.getTime()) {
         try {
           const resultsMap = await fetchMatchResultsByDate(date);
           resultsMapByDate[dateStr] = resultsMap;
@@ -1714,6 +1795,9 @@ async function fetchAndCachePredictions() {
     const losestreakMatches = await scrapeLosingStreak();
     const drawstreakMatches = await scrapeDrawStreak();
     
+    console.log('Filtering over 2.5 matches for teams that scored in last 5 games...');
+    const teamToScoreMatches = await filterTeamsThatScoredLast5Games(allOver25);
+    
     return {
       success: true,
       dates: dateRange,
@@ -1725,13 +1809,15 @@ async function fetchAndCachePredictions() {
       totalWinstreak: winstreakMatches.length,
       totalLosestreak: losestreakMatches.length,
       totalDrawstreak: drawstreakMatches.length,
+      totalTeamToScore: teamToScoreMatches.length,
       matches: enrichWithResults(allMatches),
       over25Matches: enrichWithResults(allOver25),
       over15Matches: enrichWithResults(allOver15),
       bttsMatches: enrichWithResults(allBtts),
       winstreakMatches: winstreakMatches,
       losestreakMatches: losestreakMatches,
-      drawstreakMatches: drawstreakMatches
+      drawstreakMatches: drawstreakMatches,
+      teamToScoreMatches: teamToScoreMatches
     };
   } catch (error) {
     console.error('Error fetching predictions:', error.message);

@@ -593,6 +593,7 @@
         <button onclick="setCategory('winstreak')" id="tab-winstreak" class="tab-btn">B2B Wins</button>
         <button onclick="setCategory('losestreak')" id="tab-losestreak" class="tab-btn">B2B Losses</button>
         <button onclick="setCategory('drawstreak')" id="tab-drawstreak" class="tab-btn">B2B Draws</button>
+        <button onclick="setCategory('teamtoscore')" id="tab-teamtoscore" class="tab-btn">Team to Score</button>
       </div>
 
       <div class="stats-bar" id="statsBar">
@@ -759,6 +760,7 @@
       else if (currentCategory === 'winstreak') matches = currentData.winstreakMatches || [];
       else if (currentCategory === 'losestreak') matches = currentData.losestreakMatches || [];
       else if (currentCategory === 'drawstreak') matches = currentData.drawstreakMatches || [];
+      else if (currentCategory === 'teamtoscore') matches = currentData.teamToScoreMatches || [];
 
       let filtered;
       const targetDate = new Date();
@@ -771,6 +773,8 @@
 
       if (currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak') {
         filtered = matches.filter(m => !m.date || m.date === targetDateStr);
+      } else if (currentCategory === 'teamtoscore') {
+        filtered = matches.filter(m => !m.nextMatchDate || m.nextMatchDate === targetDateStr);
       } else {
         console.log('Target date:', targetDateStr, 'Category:', currentCategory, 'Total matches:', matches.length);
         
@@ -791,13 +795,15 @@
       }
 
       const isStreakTab = currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak';
+      const isTeamToScore = currentCategory === 'teamtoscore';
       let displayMatches = filtered;
       let showLoginMessage = false;
 
       document.getElementById('totalMatches').textContent = filtered.length;
 
       const html = displayMatches.map((match, i) => {
-        const teams = match.match.split(' - ');
+        const matchStr = match.match || match.nextMatch || '';
+        const teams = matchStr.split(' - ');
         const home = teams[0]?.trim() || '';
         const away = teams[1]?.trim() || '';
         const hasScore = match.score && match.score.home !== undefined;
@@ -811,6 +817,7 @@
         if (isWinstreak) streakLabel = `Winning Streak: ${match.streak || ''}`;
         else if (isLosestreak) streakLabel = `Losing Streak: ${match.streak || ''}`;
         else if (isDrawstreak) streakLabel = `Draws Streak: ${match.streak || ''}`;
+        else if (isTeamToScore) streakLabel = match.streak || '5+ Scoring';
 
         return `
           <div class="match-card fade-in" style="animation-delay: ${i * 50}ms" data-match="${matchData}">
@@ -826,6 +833,15 @@
                 <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
                   <span class="tip-badge">${streakLabel}</span>
                   <div class="probability">${match.probability}%</div>
+                </div>
+              </div>
+            ` : isTeamToScore ? `
+              <div class="match-teams" style="justify-content: center;">
+                <span class="team team-home" style="text-align: center; width: 100%;">${match.team}</span>
+              </div>
+              <div class="match-footer">
+                <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+                  <span class="tip-badge">${streakLabel}</span>
                 </div>
               </div>
             ` : `
