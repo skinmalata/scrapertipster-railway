@@ -1736,7 +1736,7 @@ async function filterTeamsThatScored2PlusLast5Games(over25Matches) {
   const teamsMap = new Map();
   const analysisCache = getAnalysisCache();
   
-  console.log('Finding teams that scored 2+ goals in last 5 games...');
+  console.log('Finding teams that scored 2+ goals in at least 4 of last 5 games...');
   
   for (const match of over25Matches) {
     const teams = match.match.split(' - ');
@@ -1753,30 +1753,30 @@ async function filterTeamsThatScored2PlusLast5Games(over25Matches) {
     let homeScored2Count = 0;
     let awayScored2Count = 0;
     
-    if (analysis && analysis.homeLast10 && analysis.homeLast10.avgScored >= 2) {
-      homeScored2Count = 5;
+    if (analysis && analysis.homeLast10) {
+      homeScored2Count = analysis.homeLast10.over25 || 0;
     }
-    if (analysis && analysis.awayLast10 && analysis.awayLast10.avgScored >= 2) {
-      awayScored2Count = 5;
+    if (analysis && analysis.awayLast10) {
+      awayScored2Count = analysis.awayLast10.over25 || 0;
     }
     
-    if (homeScored2Count >= 5 && !teamsMap.has(homeTeam)) {
+    if (homeScored2Count >= 4 && !teamsMap.has(homeTeam)) {
       teamsMap.set(homeTeam, {
         team: homeTeam,
         country: match.country || '',
         nextMatch: match.match,
         nextMatchDate: matchDate,
-        streak: `2+ goals in last 5 matches`
+        streak: `2+ goals in ${homeScored2Count}/10 matches`
       });
     }
     
-    if (awayScored2Count >= 5 && !teamsMap.has(awayTeam)) {
+    if (awayScored2Count >= 4 && !teamsMap.has(awayTeam)) {
       teamsMap.set(awayTeam, {
         team: awayTeam,
         country: match.country || '',
         nextMatch: match.match,
         nextMatchDate: matchDate,
-        streak: `2+ goals in last 5 matches`
+        streak: `2+ goals in ${awayScored2Count}/10 matches`
       });
     }
   }
