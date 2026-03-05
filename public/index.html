@@ -721,17 +721,13 @@
       document.getElementById(`tab-${cat}`).classList.add('active');
       
       const dayTabs = document.getElementById('dayTabs');
-      if (cat === 'winstreak' || cat === 'losestreak' || cat === 'drawstreak') {
-        dayTabs.style.display = 'none';
-      } else {
-        dayTabs.style.display = '';
-      }
+      dayTabs.style.display = '';
       
       if (currentData) renderMatches();
     }
 
     function getCategoryLabel(cat) {
-      const labels = { '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5', 'btts': 'BTTS', 'winstreak': 'B2B Wins', 'losestreak': 'B2B Losses', 'drawstreak': 'B2B Draws' };
+      const labels = { '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5', 'btts': 'BTTS', 'winstreak': 'B2B Wins', 'losestreak': 'B2B Losses', 'drawstreak': 'B2B Draws', 'teamtoscore': 'Team to Score', 'teamtoscore2plus': 'Team to Score 2+' };
       return labels[cat] || cat;
     }
 
