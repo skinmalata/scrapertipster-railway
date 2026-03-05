@@ -1748,7 +1748,7 @@ async function filterTeamsThatScored2PlusLast5Games(over25Matches) {
     const homeProb = match.probabilities?.over25 || match.probability || 0;
     const awayProb = match.probabilities?.over25 || match.probability || 0;
     
-    if (homeProb >= 60 && !teamsMap.has(homeTeam)) {
+    if (homeProb >= 80 && !teamsMap.has(homeTeam)) {
       teamsMap.set(homeTeam, {
         team: homeTeam,
         country: match.country || '',
@@ -1758,7 +1758,7 @@ async function filterTeamsThatScored2PlusLast5Games(over25Matches) {
       });
     }
     
-    if (awayProb >= 60 && !teamsMap.has(awayTeam)) {
+    if (awayProb >= 80 && !teamsMap.has(awayTeam)) {
       teamsMap.set(awayTeam, {
         team: awayTeam,
         country: match.country || '',
