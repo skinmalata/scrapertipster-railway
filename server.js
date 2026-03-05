@@ -1656,6 +1656,20 @@ function parseBetexplorerStreaks(html, streakType = 'win') {
   return matches;
 }
 
+function getConsecutiveScoringCount(form) {
+  if (!form || form.length === 0) return 0;
+  
+  let count = 0;
+  for (let i = form.length - 1; i >= 0; i--) {
+    if (form[i] !== 'L') {
+      count++;
+    } else {
+      break;
+    }
+  }
+  return count;
+}
+
 async function filterTeamsThatScoredLast5Games(over25Matches) {
   const teamsMap = new Map();
   const analysisCache = getAnalysisCache();
@@ -1674,38 +1688,40 @@ async function filterTeamsThatScoredLast5Games(over25Matches) {
     const awayKey = `${awayTeam}-${homeTeam}`.toLowerCase();
     const analysis = analysisCache[homeKey] || analysisCache[awayKey];
     
-    let homeScored5 = false;
-    let awayScored5 = false;
+    let homeScoredCount = 0;
+    let awayScoredCount = 0;
     
     if (analysis) {
       if (analysis.homeForm && analysis.homeForm.length >= 5) {
-        homeScored5 = checkConsecutiveScoring(analysis.homeForm) || checkScoredAtLeast5(analysis.homeForm);
+        homeScoredCount = getConsecutiveScoringCount(analysis.homeForm);
       }
       if (analysis.awayForm && analysis.awayForm.length >= 5) {
-        awayScored5 = checkConsecutiveScoring(analysis.awayForm) || checkScoredAtLeast5(analysis.awayForm);
+        awayScoredCount = getConsecutiveScoringCount(analysis.awayForm);
       }
     } else {
-      homeScored5 = true;
-      awayScored5 = true;
+      homeScoredCount = 5;
+      awayScoredCount = 5;
     }
     
-    if (homeScored5 && !teamsMap.has(homeTeam)) {
+    if (homeScoredCount >= 5 && (!teamsMap.has(homeTeam) || teamsMap.get(homeTeam).streakNum < homeScoredCount)) {
       teamsMap.set(homeTeam, {
         team: homeTeam,
         country: match.country || '',
         nextMatch: match.match,
         nextMatchDate: matchDate,
-        streak: '5+ scoring'
+        streak: `Scored in last ${homeScoredCount} matches`,
+        streakNum: homeScoredCount
       });
     }
     
-    if (awayScored5 && !teamsMap.has(awayTeam)) {
+    if (awayScoredCount >= 5 && (!teamsMap.has(awayTeam) || teamsMap.get(awayTeam).streakNum < awayScoredCount)) {
       teamsMap.set(awayTeam, {
         team: awayTeam,
         country: match.country || '',
         nextMatch: match.match,
         nextMatchDate: matchDate,
-        streak: '5+ scoring'
+        streak: `Scored in last ${awayScoredCount} matches`,
+        streakNum: awayScoredCount
       });
     }
   }

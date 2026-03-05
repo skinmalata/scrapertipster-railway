@@ -817,7 +817,7 @@
         if (isWinstreak) streakLabel = `Winning Streak: ${match.streak || ''}`;
         else if (isLosestreak) streakLabel = `Losing Streak: ${match.streak || ''}`;
         else if (isDrawstreak) streakLabel = `Draws Streak: ${match.streak || ''}`;
-        else if (isTeamToScore) streakLabel = match.streak || '5+ Scoring';
+        else if (isTeamToScore) streakLabel = match.streak || 'Scored in last 5 matches';
 
         return `
           <div class="match-card fade-in" style="animation-delay: ${i * 50}ms" data-match="${matchData}">
