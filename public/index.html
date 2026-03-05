@@ -594,6 +594,7 @@
         <button onclick="setCategory('losestreak')" id="tab-losestreak" class="tab-btn">B2B Losses</button>
         <button onclick="setCategory('drawstreak')" id="tab-drawstreak" class="tab-btn">B2B Draws</button>
         <button onclick="setCategory('teamtoscore')" id="tab-teamtoscore" class="tab-btn">Team to Score</button>
+        <button onclick="setCategory('teamtoscore2plus')" id="tab-teamtoscore2plus" class="tab-btn">Team to Score 2+</button>
       </div>
 
       <div class="stats-bar" id="statsBar">
@@ -761,6 +762,7 @@
       else if (currentCategory === 'losestreak') matches = currentData.losestreakMatches || [];
       else if (currentCategory === 'drawstreak') matches = currentData.drawstreakMatches || [];
       else if (currentCategory === 'teamtoscore') matches = currentData.teamToScoreMatches || [];
+      else if (currentCategory === 'teamtoscore2plus') matches = currentData.teamToScore2PlusMatches || [];
 
       let filtered;
       const targetDate = new Date();
@@ -773,7 +775,7 @@
 
       if (currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak') {
         filtered = matches.filter(m => !m.date || m.date === targetDateStr);
-      } else if (currentCategory === 'teamtoscore') {
+      } else if (currentCategory === 'teamtoscore' || currentCategory === 'teamtoscore2plus') {
         filtered = matches.filter(m => !m.nextMatchDate || m.nextMatchDate === targetDateStr);
       } else {
         console.log('Target date:', targetDateStr, 'Category:', currentCategory, 'Total matches:', matches.length);
@@ -795,7 +797,7 @@
       }
 
       const isStreakTab = currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak';
-      const isTeamToScore = currentCategory === 'teamtoscore';
+      const isTeamToScore = currentCategory === 'teamtoscore' || currentCategory === 'teamtoscore2plus';
       let displayMatches = filtered;
       let showLoginMessage = false;
 

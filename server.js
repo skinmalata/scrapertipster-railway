@@ -1727,7 +1727,62 @@ async function filterTeamsThatScoredLast5Games(over25Matches) {
   }
   
   const teamsArray = Array.from(teamsMap.values());
+  
   console.log(`Team to Score: ${teamsArray.length} teams found`);
+  return teamsArray;
+}
+
+async function filterTeamsThatScored2PlusLast5Games(over25Matches) {
+  const teamsMap = new Map();
+  const analysisCache = getAnalysisCache();
+  
+  console.log('Finding teams that scored 2+ goals in last 5 games...');
+  
+  for (const match of over25Matches) {
+    const teams = match.match.split(' - ');
+    const homeTeam = teams[0]?.trim();
+    const awayTeam = teams[1]?.trim();
+    const matchDate = match.date;
+    
+    if (!homeTeam || !awayTeam) continue;
+    
+    const homeKey = `${homeTeam}-${awayTeam}`.toLowerCase();
+    const awayKey = `${awayTeam}-${homeTeam}`.toLowerCase();
+    const analysis = analysisCache[homeKey] || analysisCache[awayKey];
+    
+    let homeScored2Count = 0;
+    let awayScored2Count = 0;
+    
+    if (analysis && analysis.homeLast10 && analysis.homeLast10.avgScored >= 2) {
+      homeScored2Count = 5;
+    }
+    if (analysis && analysis.awayLast10 && analysis.awayLast10.avgScored >= 2) {
+      awayScored2Count = 5;
+    }
+    
+    if (homeScored2Count >= 5 && !teamsMap.has(homeTeam)) {
+      teamsMap.set(homeTeam, {
+        team: homeTeam,
+        country: match.country || '',
+        nextMatch: match.match,
+        nextMatchDate: matchDate,
+        streak: `2+ goals in last 5 matches`
+      });
+    }
+    
+    if (awayScored2Count >= 5 && !teamsMap.has(awayTeam)) {
+      teamsMap.set(awayTeam, {
+        team: awayTeam,
+        country: match.country || '',
+        nextMatch: match.match,
+        nextMatchDate: matchDate,
+        streak: `2+ goals in last 5 matches`
+      });
+    }
+  }
+  
+  const teamsArray = Array.from(teamsMap.values());
+  console.log(`Team to Score 2+: ${teamsArray.length} teams found`);
   return teamsArray;
 }
 
@@ -1813,6 +1868,7 @@ async function fetchAndCachePredictions() {
     
     console.log('Filtering over 2.5 matches for teams that scored in last 5 games...');
     const teamToScoreMatches = await filterTeamsThatScoredLast5Games(allOver25);
+    const teamToScore2PlusMatches = await filterTeamsThatScored2PlusLast5Games(allOver25);
     
     return {
       success: true,
@@ -1826,6 +1882,7 @@ async function fetchAndCachePredictions() {
       totalLosestreak: losestreakMatches.length,
       totalDrawstreak: drawstreakMatches.length,
       totalTeamToScore: teamToScoreMatches.length,
+      totalTeamToScore2Plus: teamToScore2PlusMatches.length,
       matches: enrichWithResults(allMatches),
       over25Matches: enrichWithResults(allOver25),
       over15Matches: enrichWithResults(allOver15),
@@ -1833,7 +1890,8 @@ async function fetchAndCachePredictions() {
       winstreakMatches: winstreakMatches,
       losestreakMatches: losestreakMatches,
       drawstreakMatches: drawstreakMatches,
-      teamToScoreMatches: teamToScoreMatches
+      teamToScoreMatches: teamToScoreMatches,
+      teamToScore2PlusMatches: teamToScore2PlusMatches
     };
   } catch (error) {
     console.error('Error fetching predictions:', error.message);
