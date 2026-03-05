@@ -1671,7 +1671,7 @@ function getConsecutiveScoringCount(form) {
 }
 
 async function filterTeamsThatScoredLast5Games(over25Matches) {
-  const teamsMap = new Map();
+  const matchesMap = new Map();
   const analysisCache = getAnalysisCache();
   
   console.log('Finding teams that scored in last 5 games from Over 2.5 matches...');
@@ -1681,6 +1681,7 @@ async function filterTeamsThatScoredLast5Games(over25Matches) {
     const homeTeam = teams[0]?.trim();
     const awayTeam = teams[1]?.trim();
     const matchDate = match.date;
+    const matchKey = match.match;
     
     if (!homeTeam || !awayTeam) continue;
     
@@ -1703,37 +1704,31 @@ async function filterTeamsThatScoredLast5Games(over25Matches) {
       awayScoredCount = 5;
     }
     
-    if (homeScoredCount >= 5 && (!teamsMap.has(homeTeam) || teamsMap.get(homeTeam).streakNum < homeScoredCount)) {
-      teamsMap.set(homeTeam, {
-        team: homeTeam,
-        country: match.country || '',
-        nextMatch: match.match,
-        nextMatchDate: matchDate,
-        streak: `Scored in last ${homeScoredCount} matches`,
-        streakNum: homeScoredCount
-      });
-    }
+    // Determine the better team (higher scored count)
+    const betterTeam = homeScoredCount >= awayScoredCount 
+      ? { name: homeTeam, count: homeScoredCount } 
+      : { name: awayTeam, count: awayScoredCount };
     
-    if (awayScoredCount >= 5 && (!teamsMap.has(awayTeam) || teamsMap.get(awayTeam).streakNum < awayScoredCount)) {
-      teamsMap.set(awayTeam, {
-        team: awayTeam,
+    if (betterTeam.count >= 5 && !matchesMap.has(matchKey)) {
+      matchesMap.set(matchKey, {
+        team: betterTeam.name,
         country: match.country || '',
         nextMatch: match.match,
         nextMatchDate: matchDate,
-        streak: `Scored in last ${awayScoredCount} matches`,
-        streakNum: awayScoredCount
+        streak: `Scored in last ${betterTeam.count} matches`,
+        streakNum: betterTeam.count
       });
     }
   }
   
-  const teamsArray = Array.from(teamsMap.values());
+  const teamsArray = Array.from(matchesMap.values());
   
   console.log(`Team to Score: ${teamsArray.length} teams found`);
   return teamsArray;
 }
 
 async function filterTeamsThatScored2PlusLast5Games(over25Matches) {
-  const teamsMap = new Map();
+  const matchesMap = new Map();
   
   console.log('Finding teams that scored 2+ goals frequently (from over 2.5 stats)...');
   
@@ -1742,34 +1737,28 @@ async function filterTeamsThatScored2PlusLast5Games(over25Matches) {
     const homeTeam = teams[0]?.trim();
     const awayTeam = teams[1]?.trim();
     const matchDate = match.date;
+    const matchKey = match.match;
     
     if (!homeTeam || !awayTeam) continue;
     
     const homeProb = match.probabilities?.over25 || match.probability || 0;
     const awayProb = match.probabilities?.over25 || match.probability || 0;
     
-    if (homeProb >= 70 && !teamsMap.has(homeTeam)) {
-      teamsMap.set(homeTeam, {
-        team: homeTeam,
-        country: match.country || '',
-        nextMatch: match.match,
-        nextMatchDate: matchDate,
-        streak: `2+ goals: ${homeProb}%`
-      });
-    }
+    // Determine the better team (higher probability)
+    const betterTeam = homeProb >= awayProb ? { name: homeTeam, prob: homeProb } : { name: awayTeam, prob: awayProb };
     
-    if (awayProb >= 70 && !teamsMap.has(awayTeam)) {
-      teamsMap.set(awayTeam, {
-        team: awayTeam,
+    if (betterTeam.prob >= 70 && !matchesMap.has(matchKey)) {
+      matchesMap.set(matchKey, {
+        team: betterTeam.name,
         country: match.country || '',
         nextMatch: match.match,
         nextMatchDate: matchDate,
-        streak: `2+ goals: ${awayProb}%`
+        streak: `2+ goals: ${betterTeam.prob}%`
       });
     }
   }
   
-  const teamsArray = Array.from(teamsMap.values());
+  const teamsArray = Array.from(matchesMap.values());
   console.log(`Team to Score 2+: ${teamsArray.length} teams found`);
   return teamsArray;
 }
