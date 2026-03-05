@@ -16,7 +16,7 @@ function debugLog(...args) {
 }
 
 let CHROME_PATH = process.env.CHROME_PATH || process.env.PUPPETEER_EXECUTABLE_PATH;
-const SKIP_INITIAL_FETCH = true; //process.env.SKIP_INITIAL_FETCH === 'true' || process.argv.includes('--skip-fetch');
+const SKIP_INITIAL_FETCH = false; //process.env.SKIP_INITIAL_FETCH === 'true' || process.argv.includes('--skip-fetch');
 if (!CHROME_PATH) {
   if (process.platform === 'win32') {
     const possiblePaths = [
@@ -1734,9 +1734,8 @@ async function filterTeamsThatScoredLast5Games(over25Matches) {
 
 async function filterTeamsThatScored2PlusLast5Games(over25Matches) {
   const teamsMap = new Map();
-  const analysisCache = getAnalysisCache();
   
-  console.log('Finding teams that scored 2+ goals in at least 4 of last 5 games...');
+  console.log('Finding teams that scored 2+ goals frequently (from over 2.5 stats)...');
   
   for (const match of over25Matches) {
     const teams = match.match.split(' - ');
@@ -1746,37 +1745,26 @@ async function filterTeamsThatScored2PlusLast5Games(over25Matches) {
     
     if (!homeTeam || !awayTeam) continue;
     
-    const homeKey = `${homeTeam}-${awayTeam}`.toLowerCase();
-    const awayKey = `${awayTeam}-${homeTeam}`.toLowerCase();
-    const analysis = analysisCache[homeKey] || analysisCache[awayKey];
+    const homeProb = match.probabilities?.over25 || match.probability || 0;
+    const awayProb = match.probabilities?.over25 || match.probability || 0;
     
-    let homeScored2Count = 0;
-    let awayScored2Count = 0;
-    
-    if (analysis && analysis.homeLast10) {
-      homeScored2Count = analysis.homeLast10.over25 || 0;
-    }
-    if (analysis && analysis.awayLast10) {
-      awayScored2Count = analysis.awayLast10.over25 || 0;
-    }
-    
-    if (homeScored2Count >= 4 && !teamsMap.has(homeTeam)) {
+    if (homeProb >= 60 && !teamsMap.has(homeTeam)) {
       teamsMap.set(homeTeam, {
         team: homeTeam,
         country: match.country || '',
         nextMatch: match.match,
         nextMatchDate: matchDate,
-        streak: `2+ goals in ${homeScored2Count}/10 matches`
+        streak: `2+ goals: ${homeProb}%`
       });
     }
     
-    if (awayScored2Count >= 4 && !teamsMap.has(awayTeam)) {
+    if (awayProb >= 60 && !teamsMap.has(awayTeam)) {
       teamsMap.set(awayTeam, {
         team: awayTeam,
         country: match.country || '',
         nextMatch: match.match,
         nextMatchDate: matchDate,
-        streak: `2+ goals in ${awayScored2Count}/10 matches`
+        streak: `2+ goals: ${awayProb}%`
       });
     }
   }
