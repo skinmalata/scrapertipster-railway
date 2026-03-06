@@ -159,7 +159,7 @@ async function preFetchAnalysis(predictionsData) {
         console.log(`Pre-fetched ${fetched} analyses...`);
       }
       
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
     } catch (error) {
       console.error(`Error fetching analysis for ${homeTeam} vs ${awayTeam}:`, error.message);
     }
@@ -1259,7 +1259,7 @@ function saveCachedPredictions(data) {
   console.log('Predictions cached successfully');
 }
 
-async function scrapeDate(dateStr) {
+async function scrapeDate(dateStr, retryCount = 0) {
   const url = `${STATAREA_URL}/date/${dateStr}`;
   
   let html;
@@ -1267,22 +1267,58 @@ async function scrapeDate(dateStr) {
   console.log(`Scraping predictions for ${dateStr}...`);
   const browserOptions = {
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      '--single-process',
+      '--disable-extensions',
+      '--disable-background-networking',
+      '--disable-default-apps',
+      '--disable-sync',
+      '--disable-translate',
+      '--metrics-recording-only',
+      '--mute-audio',
+      '--no-first-run',
+      '--safebrowsing-disable-auto-update'
+    ]
   };
   if (CHROME_PATH) {
     browserOptions.executablePath = CHROME_PATH;
   }
-  const browser = await puppeteer.launch(browserOptions);
   
   try {
-    const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await page.waitForSelector('.match', { timeout: 15000 }).catch(() => {});
-    html = await page.content();
-    console.log(`Page loaded for ${dateStr}`);
-  } finally {
-    await browser.close();
+    const browser = await puppeteer.launch(browserOptions);
+    
+    try {
+      const page = await browser.newPage();
+      await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+      await page.waitForSelector('.match', { timeout: 15000 }).catch(() => {});
+      html = await page.content();
+      console.log(`Page loaded for ${dateStr}`);
+    } finally {
+      await browser.close();
+    }
+  } catch (err) {
+    console.error(`Puppeteer error for ${dateStr}:`, err.message);
+    if (retryCount < 2) {
+      console.log(`Retrying ${dateStr} in ${(retryCount + 1) * 5000}ms...`);
+      await new Promise(resolve => setTimeout(resolve, (retryCount + 1) * 5000));
+      return scrapeDate(dateStr, retryCount + 1);
+    }
+    console.log(`Trying fallback axios for ${dateStr}...`);
+    try {
+      const response = await axios.get(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
+        timeout: 30000
+      });
+      html = response.data;
+    } catch (axiosErr) {
+      console.error(`Fallback axios also failed for ${dateStr}:`, axiosErr.message);
+      return { matches: [], over25Matches: [], over15Matches: [], bttsMatches: [] };
+    }
   }
 
   const $ = cheerio.load(html);
@@ -1804,6 +1840,7 @@ async function fetchAndCachePredictions() {
       } catch (err) {
         console.error(`Error fetching ${dateStr}:`, err.message);
       }
+      await new Promise(resolve => setTimeout(resolve, 3000));
     }
     
     const resultsMapByDate = {};
@@ -1822,6 +1859,7 @@ async function fetchAndCachePredictions() {
         } catch (err) {
           console.error(`Error fetching results for ${dateStr}:`, err.message);
         }
+        await new Promise(resolve => setTimeout(resolve, 2000));
       }
     }
     
