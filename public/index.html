@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Win-GPT - Free AI Football Predictions Today | 1X2, O/U, BTTS, Team To Score</title>
-  <meta name="description" content="Get free AI-powered football predictions daily. Expert tips for 1X2, Over/Under, BTTS, and Team to Score. Updated every day with accurate match predictions.">
+  <title>WinFulltime - Free AI Football Predictions Today | 1X2, O/U, BTTS, Team To Score</title>
+  <meta name="description" content="WinFulltime - Free football predictions for today. 1x2, over 1.5, over 2.5, BTTS, Team to Score, Winning Streak, Losing Streak, Draws Streak. Get winning stats now.">
   <meta name="keywords" content="football predictions, betting tips, soccer tips, 1X2 predictions, over/under tips, BTTS, team to score, daily predictions, AI football tips">
-  <meta property="og:title" content="Win-GPT - Free AI Football Predictions Today">
+  <meta property="og:title" content="Win Fulltime - Free AI Football Predictions Today">
   <meta property="og:description" content="Get free AI-powered football predictions daily. Expert tips for 1X2, Over/Under, BTTS, and Team to Score.">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Win-GPT - Free AI Football Predictions Today">
+  <meta name="twitter:title" content="Win Fulltime - Free AI Football Predictions Today">
   <meta name="twitter:description" content="Get free AI-powered football predictions daily. Expert tips for 1X2, Over/Under, BTTS, and Team to Score.">
-  <link rel="canonical" href="https://win-gpt.com/">
+  <link rel="canonical" href="https://winfulltime.com/">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff0000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 10V3L4 14h7v7l9-11h-7z'/%3E%3C/svg%3E">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -75,13 +76,13 @@
     }
 
     .logo-icon {
-      width: 24px;
-      height: 24px;
+      width: 36px;
+      height: 36px;
       color: #ff0000;
     }
 
     .logo-text {
-      font-size: 20px;
+      font-size: 28px;
       font-weight: bold;
       color: #18181b;
     }
@@ -318,6 +319,74 @@
       font-size: 12px;
       color: #71717a;
     }
+
+    .faq-section {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 12px;
+    }
+
+    .faq-section h2 {
+      font-size: 34px;
+      text-align: center;
+      margin-bottom: 32px;
+      color: #18181b;
+    }
+
+    .faq-item {
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .faq-question {
+      padding: 20px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      color: #18181b;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      font-size: 18px;
+    }
+
+    .faq-question:hover {
+      background: #f9fafb;
+    }
+
+    .faq-answer {
+      padding: 0 20px 20px;
+      color: #52525b;
+      line-height: 1.7;
+      display: none;
+      font-size: 16px;
+    }
+
+    .faq-item.active .faq-answer {
+      display: block;
+    }
+
+    .faq-item.active .faq-icon {
+      transform: rotate(180deg);
+    }
+
+    .faq-icon {
+      transition: transform 0.3s;
+      color: #ff0000;
+    }
+
+    footer { background: #f4f4f5; padding: 32px 12px; border-top: 1px solid #e5e5e5; margin-top: auto; }
+    .footer-content { max-width: 900px; margin: 0 auto; text-align: center; }
+    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
+    .footer-links a { color: #52525b; text-decoration: none; font-weight: 500; }
+    .footer-links a:hover { color: #ff0000; }
+    .footer-copyright { color: #71717a; font-size: 14px; }
 
     @keyframes spin {
       0% { transform: rotate(0deg); }
@@ -574,22 +643,20 @@
           <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
           </svg>
-          <span class="logo-text">Win-GPT</span>
+          <span class="logo-text">Win Fulltime</span>
           <span id="headerDate" class="date-display" style="margin-left: 12px;"></span>
         </div>
         <nav>
           <a href="/">Home</a>
           <a href="/about.html">About</a>
           <a href="/contact.html">Contact</a>
-          <a href="#" id="authBtn" onclick="handleAuthBtn(event)">Login</a>
         </nav>
       </div>
     </header>
 
     <main class="container">
       <div class="hero">
-        <h2>Daily Predictions</h2>
-        <p>AI-powered match predictions updated every day</p>
+        <h2>Free Football Predictions Today: 1x2, Over/Under, BTTS, To Score</h2>
       </div>
 
       <div class="tabs-container" id="dayTabs"></div>
@@ -617,7 +684,134 @@
         <div class="loading"><div class="spinner"></div></div>
       </div>
 
-      <div class="disclaimer">Predictions are for informational purposes only. Please gamble responsibly.</div>
+      <!-- FAQ Section -->
+      <div class="faq-section">
+        <h2>Frequently Asked Questions</h2>
+        
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            What is WinFulltime and how does it work?
+            <span class="faq-icon">▼</span>
+          </button>
+          <div class="faq-answer">
+            <p>WinFulltime is a free football prediction platform that helps you make informed betting decisions. We analyze thousands of matches across major leagues worldwide using advanced algorithms and data analysis. Our predictions cover various markets including 1X2, Over/Under goals, BTTS (Both Teams To Score), and winning/losing streaks.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Are the predictions really free?
+            <span class="faq-icon">▼</span>
+          </button>
+          <div class="faq-answer">
+            <p>Yes, absolutely! All predictions on WinFulltime are completely free. We believe in making quality sports predictions accessible to everyone. There's no registration required, no subscription fees, and no hidden costs.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            What prediction markets do you offer?
+            <span class="faq-icon">▼</span>
+          </button>
+          <div class="faq-answer">
+            <p>We offer multiple prediction markets:</p>
+            <ul style="margin: 12px 0 12px 20px;">
+              <li><strong>1X2</strong> - Predict home win, draw, or away win</li>
+              <li><strong>Over 1.5</strong> - Match with more than 1.5 goals</li>
+              <li><strong>Over 2.5</strong> - Match with more than 2.5 goals</li>
+              <li><strong>BTTS</strong> - Both teams to score</li>
+              <li><strong>B2B Wins</strong> - Teams on winning streaks</li>
+              <li><strong>B2B Losses</strong> - Teams on losing streaks</li>
+              <li><strong>B2B Draws</strong> - Teams on drawing streaks</li>
+              <li><strong>Team to Score</strong> - Teams likely to score</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            How accurate are your predictions?
+            <span class="faq-icon">▼</span>
+          </button>
+          <div class="faq-answer">
+            <p>Our predictions are based on comprehensive data analysis including team form, head-to-head records, home/away performance, and various statistical factors. While we strive for accuracy, remember that football is unpredictable and all predictions are for entertainment purposes only. We provide probability percentages to help you gauge confidence levels.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Which leagues do you cover?
+            <span class="faq-icon">▼</span>
+          </button>
+          <div class="faq-answer">
+            <p>We cover major football leagues from around the world including Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, and many more. Our predictions are updated daily to include upcoming matches across multiple competitions.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Can I view detailed match analysis?
+            <span class="faq-icon">▼</span>
+          </button>
+          <div class="faq-answer">
+            <p>Yes! Click on any match card to view detailed analysis including recent form, head-to-head statistics, team statistics from the last 10 matches, and our AI-powered predictions. This helps you make more informed decisions.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Is gambling safe? What if I have a problem?
+            <span class="faq-icon">▼</span>
+          </button>
+          <div class="faq-answer">
+            <p>Gambling can be addictive and involves financial risk. Our predictions are for informational purposes only. If you or someone you know has a gambling problem, please seek help from professional organizations. <a href="/contact.html" style="color:#ff0000;">Contact us</a> for support resources or visit our <a href="/terms.html" style="color:#ff0000;">Terms and Conditions</a> for more information on responsible gambling.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            How often are predictions updated?
+            <span class="faq-icon">▼</span>
+          </button>
+          <div class="faq-answer">
+            <p>Predictions are updated daily, typically before the start of each day's matches. We continuously monitor form, injuries, and other factors that might affect match outcomes. Check back regularly for the latest predictions.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Do you offer betting tips for beginners?
+            <span class="faq-icon">▼</span>
+          </button>
+          <div class="faq-answer">
+            <p>Absolutely! Start with understanding basic markets like 1X2 and Over/Under 2.5. Always research before betting, never bet more than you can afford to lose, and remember our predictions are just one factor to consider. Check our <a href="/about.html" style="color:#ff0000;">About page</a> for more tips on making informed predictions.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            How can I contact WinFulltime?
+            <span class="faq-icon">▼</span>
+          </button>
+          <div class="faq-answer">
+            <p>We'd love to hear from you! Visit our <a href="/contact.html" style="color:#ff0000;">Contact page</a> to send us a message. We respond to all inquiries within 24-48 hours. You can also reach us via email for general questions or support.</p>
+          </div>
+        </div>
+        
+      </div>
+
+      <script>
+        function toggleFaq(btn) {
+          const item = btn.parentElement;
+          item.classList.toggle('active');
+        }
+      </script>
+
+      <div class="disclaimer">
+        <p><strong>18+ Only</strong></p>
+        <p>Predictions are for informational purposes only. Please gamble responsibly.</p>
+        <p> gambling involves financial risk and may lead to addiction. If you or someone you know has a gambling problem, please seek help from a professional organization.</p>
+      </div>
     </main>
   </div>
 
@@ -652,30 +846,14 @@
       });
     }
 
-    function updateAuthBtn() {
-      const user = localStorage.getItem('user');
-      const authBtn = document.getElementById('authBtn');
-      if (user) {
-        authBtn.textContent = 'Logout';
-        authBtn.href = '#';
-      } else {
-        authBtn.textContent = 'Login';
-        authBtn.href = '/login.html';
-      }
+    function getDateStr(offset) {
+      const date = new Date();
+      date.setDate(date.getDate() + offset);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
     }
-
-    function handleAuthBtn(e) {
-      e.preventDefault();
-      const user = localStorage.getItem('user');
-      if (user) {
-        localStorage.removeItem('user');
-        window.location.href = '/';
-      } else {
-        window.location.href = '/login.html';
-      }
-    }
-
-    updateAuthBtn();
 
     function getDaysArray() {
       const days = [];
@@ -779,7 +957,10 @@
       const targetDateStr = `${year}-${month}-${day}`;
 
       if (currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak') {
-        filtered = matches.filter(m => !m.date || m.date === targetDateStr);
+        const today = getDateStr(0);
+        const tomorrow = getDateStr(1);
+        const dayAfter = getDateStr(2);
+        filtered = matches.filter(m => !m.nextMatchDate || [today, tomorrow, dayAfter].includes(m.nextMatchDate));
       } else if (currentCategory === 'teamtoscore' || currentCategory === 'teamtoscore2plus') {
         filtered = matches.filter(m => !m.nextMatchDate || m.nextMatchDate === targetDateStr);
       } else {
@@ -813,7 +994,7 @@
         const teams = matchStr.split(' - ');
         const home = teams[0]?.trim() || '';
         const away = teams[1]?.trim() || '';
-        const hasScore = match.score && match.score.home !== undefined;
+        const hasScore = match.score && match.score.home != null && match.score.away != null;
         const matchData = encodeURIComponent(JSON.stringify(match));
         
         const isWinstreak = currentCategory === 'winstreak';
@@ -1118,5 +1299,17 @@
       alert('Script error: ' + error.message);
     }
   </script>
+  <footer>
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/terms.html">Terms</a>
+        <a href="/privacy.html">Privacy</a>
+      </div>
+      <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
+    </div>
+  </footer>
 </body>
 </html>

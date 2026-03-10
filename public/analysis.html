@@ -25,7 +25,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f5; color: #18181b; padding: 20px; }
     .container { max-width: 800px; margin: 0 auto; }
-    h1 { font-size: 24px; margin-bottom: 20px; }
+    h1 { font-size: 24px; margin-bottom: 20px; font-weight: 900; }
     .back-btn { display: inline-block; padding: 8px 16px; background: #ef4444; color: white; text-decoration: none; border-radius: 6px; margin-bottom: 20px; }
     .analysis-section { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
     .analysis-section h3 { font-size: 18px; margin-bottom: 16px; border-bottom: 1px solid #e5e5e5; padding-bottom: 8px; }
@@ -49,6 +49,16 @@
     .loading { display: flex; justify-content: center; padding: 40px; }
     .spinner { width: 32px; height: 32px; border: 3px solid #e5e5e5; border-top-color: #ef4444; border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    .disclaimer { background: #fef2f2; border: 1px solid #fecaca; padding: 16px; border-radius: 8px; margin-top: 20px; text-align: center; }
+    .disclaimer p { margin-bottom: 8px; color: #dc2626; font-size: 13px; }
+    .disclaimer strong { color: #991b1b; }
+
+    footer { background: #f4f4f5; padding: 24px 12px; border-top: 1px solid #e5e5e5; margin-top: 20px; text-align: center; }
+    .footer-links { display: flex; justify-content: center; gap: 20px; margin-bottom: 12px; flex-wrap: wrap; }
+    .footer-links a { color: #52525b; text-decoration: none; font-size: 14px; }
+    .footer-links a:hover { color: #ef4444; }
+    .footer-copyright { color: #71717a; font-size: 12px; }
 
     /* Responsive Styles */
     @media (max-width: 640px) {
@@ -98,11 +108,16 @@
     const awayTeam = params.get('away') || '';
 
     document.getElementById('matchTitle').textContent = decodeURIComponent(homeTeam) + ' vs ' + decodeURIComponent(awayTeam);
+    document.title = decodeURIComponent(homeTeam) + ' vs ' + decodeURIComponent(awayTeam) + ' Analysis';
 
     async function loadAnalysis() {
       try {
-        const response = await fetch(`/api/analysis?homeTeam=${encodeURIComponent(decodeURIComponent(homeTeam))}&awayTeam=${encodeURIComponent(decodeURIComponent(awayTeam))}`);
+        const url = `/api/analysis?homeTeam=${encodeURIComponent(decodeURIComponent(homeTeam))}&awayTeam=${encodeURIComponent(decodeURIComponent(awayTeam))}`;
+        console.log('Fetching:', url);
+        const response = await fetch(url);
+        console.log('Response status:', response.status);
         const analysis = await response.json();
+        console.log('Analysis data:', JSON.stringify(analysis).slice(0, 500));
 
         if (analysis.error) {
           document.getElementById('content').innerHTML = `<p>${analysis.error}</p>`;
@@ -114,6 +129,10 @@
         const awayForm = analysis.awayForm || '';
         const homeLast10 = analysis.homeLast10 || {};
         const awayLast10 = analysis.awayLast10 || {};
+
+        console.log('homeForm:', homeForm, 'awayForm:', awayForm);
+        console.log('homeLast10:', homeLast10, 'awayLast10:', awayLast10);
+        console.log('h2h:', h2h);
 
         const getFormClass = (char) => {
           if (char === 'W') return 'form-win';
@@ -179,6 +198,11 @@
               `).join('') : '<p>No head to head data available</p>'}
             </div>
           </div>
+
+          <div class="disclaimer">
+            <p><strong>18+ Only</strong></p>
+            <p>Predictions are for informational purposes only. Gambling involves financial risk and may lead to addiction. Please play responsibly.</p>
+          </div>
         `;
       } catch (error) {
         document.getElementById('content').innerHTML = `<p>Error loading analysis: ${error.message}</p>`;
@@ -187,5 +211,15 @@
 
     loadAnalysis();
   </script>
+  <footer>
+    <div class="footer-links">
+      <a href="/">Home</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/terms.html">Terms</a>
+      <a href="/privacy.html">Privacy</a>
+    </div>
+    <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
+  </footer>
 </body>
 </html>
