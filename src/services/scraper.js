@@ -17,8 +17,7 @@ function loadCachedPredictions() {
   try {
     if (fs.existsSync(CACHE_FILE)) {
       const data = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8'));
-      const today = getLocalDateStr();
-      if (data.date === today && data.matches && data.matches.length > 0) {
+      if (data.matches && data.matches.length > 0) {
         return data;
       }
     }
@@ -492,11 +491,14 @@ function calculateTeamToScore(matches, winstreakMatches, over25Matches) {
       id: i,
       streak: t.probability >= 80 ? `Scored 2+ in recent matches` : 'High scoring potential'
     }));
+
+  const uniqueTeamToScore = [...new Map(teamToScoreResult.map(m => [m.match, m])).values()];
+  const uniqueTeamToScore2Plus = [...new Map(teamToScore2PlusResult.map(m => [m.match, m])).values()];
   
-  console.log(`Calculated ${teamToScoreResult.length} Team to Score matches`);
-  console.log(`Calculated ${teamToScore2PlusResult.length} Team to Score 2+ matches`);
+  console.log(`Calculated ${uniqueTeamToScore.length} Team to Score matches`);
+  console.log(`Calculated ${uniqueTeamToScore2Plus.length} Team to Score 2+ matches`);
   
-  return { teamToScore: teamToScoreResult, teamToScore2Plus: teamToScore2PlusResult };
+  return { teamToScore: uniqueTeamToScore, teamToScore2Plus: uniqueTeamToScore2Plus };
 }
 
 async function scrapeStreak(type, retryCount = 0) {

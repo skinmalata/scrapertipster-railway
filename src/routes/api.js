@@ -2,12 +2,64 @@ const express = require('express');
 const router = express.Router();
 const scraperService = require('../services/scraper');
 
-let isRefreshing = false;
+let supabase = null;
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+
+if (supabaseUrl && supabaseKey) {
+  try {
+    const { createClient } = require('@supabase/supabase-js');
+    supabase = createClient(supabaseUrl, supabaseKey);
+  } catch (e) {
+    console.log('Supabase not available:', e.message);
+  }
+}
+
+const FREE_LIMITS = {
+  btts: 8,
+  winstreak: 2,
+  losestreak: 2,
+  drawstreak: 2,
+  teamtoscore: 4,
+  teamtoscore2plus: 4
+};
+
+async function checkUserVipStatus(userId) {
+  if (!userId || !supabase) return { isVip: false };
+  
+  try {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('vip_status, vip_expires_at')
+      .eq('id', userId)
+      .single();
+    
+    if (profile && profile.vip_status === 'vip') {
+      const expiresAt = new Date(profile.vip_expires_at);
+      const isValid = expiresAt > new Date();
+      if (isValid) return { isVip: true };
+    }
+  } catch (e) {
+    console.log('VIP check error:', e.message);
+  }
+  
+  return { isVip: false };
+}
+
+function applyLimits(data, isVip) {
+  // All users get full access - no restrictions
+  return { ...data, isVip: true, isFreeLimited: false };
+}
 
 router.get('/predictions', async (req, res) => {
   try {
+    const userId = req.headers['x-user-id'];
+    const { isVip } = await checkUserVipStatus(userId);
+    
     const data = await scraperService.fetchPredictions();
-    res.json(data);
+    const limitedData = applyLimits(data, isVip);
+    
+    res.json(limitedData);
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

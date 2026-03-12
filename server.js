@@ -4,11 +4,62 @@ const cors = require('cors');
 const path = require('path');
 const cron = require('node-cron');
 const apiRoutes = require('./src/routes/api');
-const authRoutes = require('./src/routes/auth');
 const scraperService = require('./src/services/scraper');
 
 const app = express();
 const PORT = process.env.PORT || 3002;
+
+// Visitor Analytics (in-memory storage)
+const visitorData = {
+  visits: [],
+  dailyStats: {},
+  pageViews: {}
+};
+
+function trackVisit(req, res, next) {
+  const today = new Date().toISOString().split('T')[0];
+  const page = req.path || '/';
+  const ip = req.ip || req.connection.remoteAddress || 'unknown';
+  const referer = req.get('referer') || 'direct';
+  const userAgent = req.get('user-agent') || 'unknown';
+  
+  // Track unique daily visitors
+  const dateKey = today;
+  if (!visitorData.dailyStats[dateKey]) {
+    visitorData.dailyStats[dateKey] = {
+      visitors: new Set(),
+      pageViews: 0,
+      pages: {}
+    };
+  }
+  
+  visitorData.dailyStats[dateKey].visitors.add(ip);
+  visitorData.dailyStats[dateKey].pageViews++;
+  
+  if (!visitorData.dailyStats[dateKey].pages[page]) {
+    visitorData.dailyStats[dateKey].pages[page] = 0;
+  }
+  visitorData.dailyStats[dateKey].pages[page]++;
+  
+  // Track all visits for detailed analysis (last 1000)
+  visitorData.visits.push({
+    ip,
+    page,
+    referer,
+    userAgent,
+    timestamp: new Date().toISOString()
+  });
+  
+  // Keep only last 5000 visits
+  if (visitorData.visits.length > 5000) {
+    visitorData.visits = visitorData.visits.slice(-5000);
+  }
+  
+  next();
+}
+
+// Make visitorData available to routes
+app.set('visitorData', visitorData);
 
 // Rate Limiter
 const rateLimit = new Map();
@@ -42,27 +93,15 @@ function rateLimiter(req, res, next) {
 app.use(cors());
 app.use(express.json());
 app.use(rateLimiter);
+app.use(trackVisit);
 
 // Static files
 app.use(express.static('public'));
 
 // API Routes
 app.use('/api', apiRoutes);
-app.use('/api', authRoutes); // Auth routes are also under /api based on original server.js
 
 // Frontend Routes
-app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
-});
-
-app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
-});
-
-app.get('/activate', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'activate.html'));
-});
-
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
