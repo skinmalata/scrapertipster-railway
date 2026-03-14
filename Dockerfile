@@ -14,6 +14,7 @@ COPY . .
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 ENV CHROME_PATH=/usr/bin/chromium
 ENV NODE_OPTIONS="--max-old-space-size=512"
+ENV SKIP_INITIAL_FETCH=true
 
 EXPOSE 3000
 
