@@ -698,8 +698,15 @@ async function fetchAndCachePredictions() {
       teamToScore2PlusMatches
     };
    
-    console.log('Starting batch analysis scraping...');
-    const analysisCache = await batchScrapeAnalysis(matchesData);
+    const ENABLE_BACKGROUND = process.env.ENABLE_BACKGROUND_SCRAPING === 'true';
+    let analysisCache = {};
+    
+    if (ENABLE_BACKGROUND) {
+      console.log('Starting batch analysis scraping...');
+      analysisCache = await batchScrapeAnalysis(matchesData);
+    } else {
+      console.log('Skipping batch analysis scraping (ENABLE_BACKGROUND_SCRAPING not set to true)');
+    }
    
     const enrichedData = {
       success: true,
@@ -874,7 +881,16 @@ async function scrapeMissingAnalysis() {
     const matchupsToScrape = missingMatchups.slice(0, MAX_SCRAPES_PER_RUN);
     console.log(`[Analysis Scraper] Will scrape up to ${matchupsToScrape.length} matchups this run`);
     
+    // 90 second timeout for background scraping
+    const TIMEOUT_MS = 90 * 1000; // 90 seconds
+    const startTime = Date.now();
+    
     for (let i = 0; i < matchupsToScrape.length; i++) {
+      // Check if we've exceeded the time limit
+      if (Date.now() - startTime > TIMEOUT_MS) {
+        console.log(`[Analysis Scraper] Timeout reached (3 minutes). Stopping after ${i} matches.`);
+        break;
+      }
       const [homeTeam, awayTeam] = matchupsToScrape[i].split('|');
       
       console.log(`[Analysis Scraper] [${i+1}/${matchupsToScrape.length}] Scraping: ${homeTeam} vs ${awayTeam}`);
@@ -1041,7 +1057,16 @@ async function batchScrapeAnalysis(matchesData) {
   const matchupsArray = Array.from(matchups);
   const analysisResults = {};
   
+  // 90 second timeout for batch scraping
+  const TIMEOUT_MS = 90 * 1000; // 90 seconds
+  const startTime = Date.now();
+  
   for (let i = 0; i < matchupsArray.length; i++) {
+    // Check if we've exceeded the time limit
+    if (Date.now() - startTime > TIMEOUT_MS) {
+      console.log(`Batch scraping timeout reached (3 minutes). Stopping after ${i} matches.`);
+      break;
+    }
     const [homeTeam, awayTeam] = matchupsArray[i].split('|');
     
     console.log(`[${i+1}/${matchupsArray.length}] Analyzing: ${homeTeam} vs ${awayTeam}`);
