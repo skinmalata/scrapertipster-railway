@@ -112,7 +112,9 @@ router.get('/analysis', async (req, res) => {
     
     const analysis = await scraperService.scrapeSingleAnalysis(homeTeam, awayTeam);
     
-    scraperService.triggerBackgroundScraping();
+    if (process.env.ENABLE_BACKGROUND_SCRAPING === 'true') {
+      scraperService.triggerBackgroundScraping();
+    }
     
     console.log(`[API] Returning scraped analysis for: ${homeTeam} vs ${awayTeam}`);
     return res.json(analysis);

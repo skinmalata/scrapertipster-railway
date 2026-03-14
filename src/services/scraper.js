@@ -16,6 +16,34 @@ const RESULTS_CACHE_FILE = path.join(process.cwd(), 'results-cache.json');
 const SCRAPER_LOCK_FILE = path.join(process.cwd(), '.scraper-lock');
 
 let isScraping = false;
+let browserLaunchQueue = [];
+let isBrowserLaunchInProgress = false;
+
+async function launchBrowserWithQueue(browserOptions) {
+  return new Promise((resolve, reject) => {
+    browserLaunchQueue.push({ resolve, reject, browserOptions });
+    processBrowserQueue();
+  });
+}
+
+async function processBrowserQueue() {
+  if (isBrowserLaunchInProgress || browserLaunchQueue.length === 0) {
+    return;
+  }
+  
+  isBrowserLaunchInProgress = true;
+  const { resolve, reject, browserOptions } = browserLaunchQueue.shift();
+  
+  try {
+    const browser = await puppeteer.launch(browserOptions);
+    resolve(browser);
+  } catch (err) {
+    reject(err);
+  } finally {
+    isBrowserLaunchInProgress = false;
+    processBrowserQueue();
+  }
+}
 
 async function acquireScraperLock() {
   let attempts = 0;
@@ -125,7 +153,7 @@ async function scrapeDate(dateStr, retryCount = 0) {
   };
   
   const scrape = async () => {
-    const browser = await puppeteer.launch(browserOptions);
+    const browser = await launchBrowserWithQueue(browserOptions);
     try {
       const page = await browser.newPage();
       await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
@@ -372,7 +400,7 @@ async function scrapeTeamToScore(type, retryCount = 0) {
   console.log(`Scraping ${label}...`);
   
   const scrape = async () => {
-    const browser = await puppeteer.launch({
+    const browser = await launchBrowserWithQueue({
       executablePath: executablePath,
       headless: true,
       args: args
@@ -596,7 +624,7 @@ async function scrapeStreak(type, retryCount = 0) {
   console.log(`Scraping ${type} streaks...`);
   
   const scrape = async () => {
-    const browser = await puppeteer.launch({
+    const browser = await launchBrowserWithQueue({
       executablePath: executablePath,
       headless: true,
       args: args
@@ -842,10 +870,14 @@ async function scrapeMissingAnalysis() {
     
     console.log(`[Analysis Scraper] Found ${missingMatchups.length} matchups missing analysis data`);
     
-    for (let i = 0; i < missingMatchups.length; i++) {
-      const [homeTeam, awayTeam] = missingMatchups[i].split('|');
+    const MAX_SCRAPES_PER_RUN = parseInt(process.env.MAX_SCRAPES_PER_RUN) || 50;
+    const matchupsToScrape = missingMatchups.slice(0, MAX_SCRAPES_PER_RUN);
+    console.log(`[Analysis Scraper] Will scrape up to ${matchupsToScrape.length} matchups this run`);
+    
+    for (let i = 0; i < matchupsToScrape.length; i++) {
+      const [homeTeam, awayTeam] = matchupsToScrape[i].split('|');
       
-      console.log(`[Analysis Scraper] [${i+1}/${missingMatchups.length}] Scraping: ${homeTeam} vs ${awayTeam}`);
+      console.log(`[Analysis Scraper] [${i+1}/${matchupsToScrape.length}] Scraping: ${homeTeam} vs ${awayTeam}`);
       
       try {
         const analysis = await getTeamAnalysis(homeTeam, awayTeam);
@@ -859,7 +891,7 @@ async function scrapeMissingAnalysis() {
         
         console.log(`[Analysis Scraper] Saved analysis for ${homeTeam} vs ${awayTeam}`);
         
-        if (i < missingMatchups.length - 1) {
+        if (i < matchupsToScrape.length - 1) {
           await sleep(4000);
         }
       } catch (error) {
@@ -1057,7 +1089,7 @@ async function getTeamAnalysis(homeTeam, awayTeam) {
     
     console.log(`Scraping statarea.com for analysis: ${homeClean} vs ${awayClean}`);
     
-    const browser = await puppeteer.launch(browserOptions);
+    const browser = await launchBrowserWithQueue(browserOptions);
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
     await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' });

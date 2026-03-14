@@ -118,6 +118,18 @@ cron.schedule('0 1 * * *', async () => {
   }
 });
 
+// Run background analysis scraping daily at 2:00 AM (only if enabled)
+if (process.env.ENABLE_BACKGROUND_SCRAPING === 'true') {
+  cron.schedule('0 2 * * *', async () => {
+    console.log('Running scheduled background analysis scraping...');
+    try {
+      scraperService.triggerBackgroundScraping();
+    } catch (error) {
+      console.error('Background scraping error:', error.message);
+    }
+  });
+}
+
 // Use a flag to track if initial fetch is running
 let initialFetchRunning = false;
 
