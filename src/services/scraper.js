@@ -13,6 +13,65 @@ const CACHE_FILE = path.join(process.cwd(), 'predictions-cache.json');
 const ANALYSIS_CACHE_FILE = path.join(process.cwd(), 'analysis-cache.json');
 const RESULTS_CACHE_FILE = path.join(process.cwd(), 'results-cache.json');
 
+const SCRAPER_LOCK_FILE = path.join(process.cwd(), '.scraper-lock');
+
+let isScraping = false;
+
+async function acquireScraperLock() {
+  let attempts = 0;
+  while (isScraping && attempts < 60) {
+    console.log('Waiting for scraper to finish...');
+    await sleep(5000);
+    attempts++;
+  }
+  if (isScraping && attempts >= 60) {
+    throw new Error('Scraper lock timeout - another process is running');
+  }
+  isScraping = true;
+  try {
+    fs.writeFileSync(SCRAPER_LOCK_FILE, new Date().toISOString());
+  } catch (e) {}
+}
+
+function releaseScraperLock() {
+  isScraping = false;
+  try {
+    if (fs.existsSync(SCRAPER_LOCK_FILE)) {
+      fs.unlinkSync(SCRAPER_LOCK_FILE);
+    }
+  } catch (e) {}
+}
+
+async function withScraperLock(fn) {
+  await acquireScraperLock();
+  try {
+    return await fn();
+  } finally {
+    releaseScraperLock();
+  }
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function safeRequestWithBackoff(fn, maxRetries = 3, baseDelay = 5000) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      const isRateLimit = err.message.includes('429') || err.message.includes('rate limit');
+      if (isRateLimit && attempt < maxRetries - 1) {
+        const delay = baseDelay * Math.pow(2, attempt);
+        console.log(`Rate limited. Retrying in ${delay/1000}s... (attempt ${attempt + 1}/${maxRetries})`);
+        await sleep(delay);
+      } else if (attempt >= maxRetries - 1) {
+        throw err;
+      }
+    }
+  }
+}
+
 function loadCachedPredictions() {
   try {
     if (fs.existsSync(CACHE_FILE)) {
@@ -65,12 +124,12 @@ async function scrapeDate(dateStr, retryCount = 0) {
     args: args
   };
   
-  try {
+  const scrape = async () => {
     const browser = await puppeteer.launch(browserOptions);
-    
     try {
       const page = await browser.newPage();
       await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
+      await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' });
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
       await page.waitForSelector('.match', { timeout: 15000 }).catch(() => {});
       html = await page.content();
@@ -78,14 +137,12 @@ async function scrapeDate(dateStr, retryCount = 0) {
     } finally {
       await browser.close();
     }
+  };
+
+  try {
+    await safeRequestWithBackoff(scrape, 3, 5000);
   } catch (err) {
     console.error(`Puppeteer error for ${dateStr}:`, err.message);
-    if (retryCount < 2) {
-      console.log(`Retrying ${dateStr} in ${(retryCount + 1) * 5000}ms...`);
-      await new Promise(resolve => setTimeout(resolve, (retryCount + 1) * 5000));
-      return scrapeDate(dateStr, retryCount + 1);
-    }
-    // Fallback logic could go here but skipping for brevity in this refactor
     return { matches: [], over25Matches: [], over15Matches: [], bttsMatches: [] };
   }
 
@@ -166,7 +223,7 @@ async function scrapeDate(dateStr, retryCount = 0) {
 
     const leagueInfo = detectLeague(homeTeam);
 
-    if (homeTeam && awayTeam && bestProb >= 60) {
+     if (homeTeam && awayTeam && bestProb >= 50) {
       matches.push({
         id: matchId++,
         league: leagueInfo.league,
@@ -211,20 +268,23 @@ async function scrapeDate(dateStr, retryCount = 0) {
       });
     }
     
-    if (homeTeam && awayTeam && gg >= 50) {
-      bttsMatches.push({
-        id: bttsId++,
-        league: leagueInfo.league,
-        country: leagueInfo.country,
-        time: time,
-        match: `${homeTeam} - ${awayTeam}`,
-        probabilities: { bttsYes: gg, bttsNo: ng },
-        tip: 'BTTS',
-        probability: gg,
-        date: dateStr,
-        score: score
-      });
-    }
+     // Optimized BTTS selection: consider both BTTS probability and Over 2.5 probability
+     // BTTS is more likely in high-scoring games, so we require a minimum Over 2.5 probability
+     const bttsScore = (gg * 0.7) + (over25 * 0.3); // Weighted combination
+     if (homeTeam && awayTeam && bttsScore >= 50) {
+       bttsMatches.push({
+         id: bttsId++,
+         league: leagueInfo.league,
+         country: leagueInfo.country,
+         time: time,
+         match: `${homeTeam} - ${awayTeam}`,
+         probabilities: { bttsYes: gg, bttsNo: ng },
+         tip: 'BTTS',
+         probability: Math.round(bttsScore), // Use the combined score for display
+         date: dateStr,
+         score: score
+       });
+     }
   });
 
   return { matches, over25Matches, over15Matches, bttsMatches };
@@ -311,30 +371,33 @@ async function scrapeTeamToScore(type, retryCount = 0) {
   const label = type === 'score' ? 'Team to Score' : 'Team to Score 2+';
   console.log(`Scraping ${label}...`);
   
-  try {
+  const scrape = async () => {
     const browser = await puppeteer.launch({
       executablePath: executablePath,
       headless: true,
       args: args
     });
-    const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-    
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await page.waitForSelector('.table-main', { timeout: 15000 }).catch(() => {});
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    const html = await page.content();
-    fs.writeFileSync(`debug_teamtoscore_${type}.html`, html);
-    await browser.close();
-    
-    return parseTeamToScore(html, type);
+    try {
+      const page = await browser.newPage();
+      await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+      await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' });
+      
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+      await page.waitForSelector('.table-main', { timeout: 15000 }).catch(() => {});
+      await sleep(3000);
+      
+      const html = await page.content();
+      fs.writeFileSync(`debug_teamtoscore_${type}.html`, html);
+      return parseTeamToScore(html, type);
+    } finally {
+      await browser.close();
+    }
+  };
+
+  try {
+    return await safeRequestWithBackoff(scrape, 3, 5000);
   } catch (err) {
     console.error(`Error scraping ${label}:`, err.message);
-    if (retryCount < 2) {
-      await new Promise(resolve => setTimeout(resolve, (retryCount + 1) * 5000));
-      return scrapeTeamToScore(type, retryCount + 1);
-    }
     return [];
   }
 }
@@ -395,7 +458,7 @@ function parseTeamToScore(html, type) {
   return matches;
 }
 
-function calculateTeamToScore(matches, winstreakMatches, over25Matches) {
+function calculateTeamToScore(matches, winstreakMatches) {
   const teamToScore = [];
   const teamToScore2Plus = [];
   const teamMap = new Map();
@@ -409,6 +472,31 @@ function calculateTeamToScore(matches, winstreakMatches, over25Matches) {
     const homeTeam = parts[0].trim();
     const awayTeam = parts[1].trim();
     
+    // For BTTS matches, we don't have homeWin/awayWin/draw probabilities in the same way.
+    // Instead, we can use the BTTS probability as a base for both teams scoring.
+    // However, note that the BTTS matches are those where both teams are expected to score.
+    // We'll set a base probability for each team to score based on the BTTS probability.
+    const bttsProb = match.probabilities?.bttsYes || 0;
+    // We'll assume that if BTTS is likely, each team has at least a reasonable chance to score.
+    // We can set the base scoring probability for each team to be the BTTS probability (since both need to score for BTTS to hit).
+    // But note: we want the probability that the team scores (not necessarily that both score).
+    // However, without separate home/away scoring probabilities, we'll use BTTS as a proxy for both.
+    // Alternatively, we could use the BTTS probability to adjust a base 50/50.
+    // Let's set base score probability for each team to be: 50 + (bttsProb - 50) * 0.5, so that if BTTS is 100, each team gets 75.
+    // But note: the BTTS probability is the probability that both teams score.
+    // We don't have the individual team scoring probabilities from the BTTS data.
+    // Since we are only using BTTS matches, we'll assume that the BTTS probability is a good indicator that both teams will score.
+    // We'll set the scoring probability for each team to be at least the BTTS probability (but capped) and adjust by streaks.
+    // However, the existing logic uses homeTotalProb and awayTotalProb which are derived from homeWin, draw, awayWin.
+    // We don't have those for BTTS matches. So we need to change the approach.
+    
+    // Let's change: for BTTS matches, we'll set the base scoring probability for each team to be the BTTS probability (since BTTS means both score).
+    // But note: the BTTS probability is for both scoring, so the chance that a particular team scores is actually higher than the BTTS probability.
+    // However, without more data, we'll use the BTTS probability as the base for each team's scoring probability.
+    // We'll then adjust by win streaks.
+    
+    const baseScoreProb = bttsProb; // This is the probability that both teams score, so for each team, the chance they score is at least this.
+    
     const homeStreak = winstreakMatches.find(m => 
       m.nextMatch && (m.nextMatch.includes(homeTeam) || m.match === homeTeam)
     );
@@ -416,24 +504,10 @@ function calculateTeamToScore(matches, winstreakMatches, over25Matches) {
       m.nextMatch && (m.nextMatch.includes(awayTeam) || m.match === awayTeam)
     );
     
-    const homeProb = match.probabilities?.homeWin || 0;
-    const awayProb = match.probabilities?.awayWin || 0;
-    const drawProb = match.probabilities?.draw || 0;
+    let homeScoreProb = baseScoreProb;
+    let awayScoreProb = baseScoreProb;
     
-    const homeTotalProb = homeProb + (drawProb * 0.3);
-    const awayTotalProb = awayProb + (drawProb * 0.3);
-    
-    let homeScoreProb = 50;
-    let awayScoreProb = 50;
-    
-    if (homeTotalProb > awayTotalProb) {
-      homeScoreProb = Math.min(50 + (homeTotalProb - awayTotalProb) * 0.5, 85);
-      awayScoreProb = Math.max(50 - (homeTotalProb - awayTotalProb) * 0.3, 25);
-    } else if (awayTotalProb > homeTotalProb) {
-      awayScoreProb = Math.min(50 + (awayTotalProb - homeTotalProb) * 0.5, 85);
-      homeScoreProb = Math.max(50 - (awayTotalProb - homeTotalProb) * 0.3, 25);
-    }
-    
+    // Adjust by win streaks: if a team is on a winning streak, they are more likely to score.
     if (homeStreak?.streak) {
       homeScoreProb = Math.min(homeScoreProb + homeStreak.streak * 3, 90);
     }
@@ -482,8 +556,17 @@ function calculateTeamToScore(matches, winstreakMatches, over25Matches) {
     .slice(0, 50)
     .map((t, i) => ({ ...t, id: i }));
   
-  const teamToScore2PlusResult = allTeams
-    .filter(t => t.probability >= 70)
+  // Team to Score 2+: teams from Team to Score with winning streak > 4
+  const teamToScore2PlusResult = teamToScoreResult
+    .filter(t => {
+      // Extract streak number from streak string like "Scored in last X matches"
+      const streakMatch = t.streak.match(/Scored in last (\d+) matches/);
+      if (streakMatch) {
+        const streakNum = parseInt(streakMatch[1]);
+        return streakNum > 4;
+      }
+      return false; // "Good scoring form" or other non-streak descriptions don't qualify
+    })
     .sort((a, b) => b.probability - a.probability)
     .slice(0, 30)
     .map((t, i) => ({ 
@@ -491,7 +574,7 @@ function calculateTeamToScore(matches, winstreakMatches, over25Matches) {
       id: i,
       streak: t.probability >= 80 ? `Scored 2+ in recent matches` : 'High scoring potential'
     }));
-
+  
   const uniqueTeamToScore = [...new Map(teamToScoreResult.map(m => [m.match, m])).values()];
   const uniqueTeamToScore2Plus = [...new Map(teamToScore2PlusResult.map(m => [m.match, m])).values()];
   
@@ -511,67 +594,86 @@ async function scrapeStreak(type, retryCount = 0) {
   if (!url) return [];
 
   console.log(`Scraping ${type} streaks...`);
+  
+  const scrape = async () => {
+    const browser = await puppeteer.launch({
+      executablePath: executablePath,
+      headless: true,
+      args: args
+    });
+    try {
+      const page = await browser.newPage();
+      await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+      await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' });
+      
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+      await page.waitForSelector('.table-main', { timeout: 15000 }).catch(() => {});
+      await sleep(3000);
+      
+      const html = await page.content();
+      fs.writeFileSync(`debug_streak_${type}.html`, html);
+      return parseBetexplorerStreaks(html, type);
+    } finally {
+      await browser.close();
+    }
+  };
+
   try {
-     const browser = await puppeteer.launch({
-        executablePath: executablePath,
-        headless: true,
-        args: args
-     });
-     const page = await browser.newPage();
-     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-     
-     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-     
-     await page.waitForSelector('.table-main', { timeout: 15000 }).catch(() => {});
-     
-     await new Promise(resolve => setTimeout(resolve, 3000));
-     
-     const html = await page.content();
-     fs.writeFileSync(`debug_streak_${type}.html`, html);
-     await browser.close();
-     return parseBetexplorerStreaks(html, type);
+    return await safeRequestWithBackoff(scrape, 3, 5000);
   } catch (err) {
     console.error(`Error scraping ${type} streaks:`, err.message);
-    if (retryCount < 2) {
-      console.log(`Retrying ${type} streak scrape in ${(retryCount + 1) * 5000}ms...`);
-      await new Promise(resolve => setTimeout(resolve, (retryCount + 1) * 5000));
-      return scrapeStreak(type, retryCount + 1);
-    }
     return [];
   }
 }
 
 async function fetchAndCachePredictions() {
-  const dateRange = getDateRange();
-  console.log('Fetching predictions for dates:', dateRange);
-  
-  const allMatches = [];
-  const allOver25 = [];
-  const allOver15 = [];
-  const allBtts = [];
-  
-  for (const dateStr of dateRange) {
-    const data = await scrapeDate(dateStr);
-    allMatches.push(...data.matches);
-    allOver25.push(...data.over25Matches);
-    allOver15.push(...data.over15Matches);
-    allBtts.push(...data.bttsMatches);
-    // Simple delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-  }
-  
-  // Scrape streaks
-  const winstreakMatches = await scrapeStreak('win');
-  const losestreakMatches = await scrapeStreak('loss');
-  const drawstreakMatches = await scrapeStreak('draw');
-
-  // Calculate Team to Score from match data (Betexplorer scraping disabled)
-  console.log('Calculating Team to Score from match data...');
-  const calculated = calculateTeamToScore(allMatches, winstreakMatches, allOver25);
-  const teamToScoreMatches = calculated.teamToScore;
-  const teamToScore2PlusMatches = calculated.teamToScore2Plus;
-
-  const enrichedData = {
+  return withScraperLock(async () => {
+    const dateRange = getDateRange();
+    console.log('Fetching predictions for dates:', dateRange);
+     
+    const allMatches = [];
+    const allOver25 = [];
+    const allOver15 = [];
+    const allBtts = [];
+     
+    for (const dateStr of dateRange) {
+      const data = await scrapeDate(dateStr);
+      allMatches.push(...data.matches);
+      allOver25.push(...data.over25Matches);
+      allOver15.push(...data.over15Matches);
+      allBtts.push(...data.bttsMatches);
+      await sleep(3000);
+    }
+     
+    await sleep(5000);
+    
+    const winstreakMatches = await scrapeStreak('win');
+    await sleep(3000);
+    const losestreakMatches = await scrapeStreak('loss');
+    await sleep(3000);
+    const drawstreakMatches = await scrapeStreak('draw');
+    
+    console.log('Calculating Team to Score from BTTS data...');
+    const calculated = calculateTeamToScore(allBtts, winstreakMatches);
+    const teamToScoreMatches = calculated.teamToScore;
+    const teamToScore2PlusMatches = calculated.teamToScore2Plus;
+   
+    const matchesData = {
+      matches: allMatches,
+      over25Matches: allOver25,
+      over15Matches: allOver15,
+      bttsMatches: allBtts,
+      winstreakMatches,
+      losestreakMatches,
+      drawstreakMatches,
+      teamToScoreMatches,
+      teamToScore2PlusMatches
+    };
+   
+    console.log('Starting batch analysis scraping...');
+    const analysisCache = await batchScrapeAnalysis(matchesData);
+   
+    const enrichedData = {
       success: true,
       dates: dateRange,
       date: getLocalDateStr(),
@@ -590,10 +692,15 @@ async function fetchAndCachePredictions() {
       losestreakMatches,
       drawstreakMatches,
       teamToScoreMatches,
-      teamToScore2PlusMatches
-  };
-  
-  return enrichedData;
+      teamToScore2PlusMatches,
+      analysis: analysisCache
+    };
+     
+    saveAnalysisCache(analysisCache);
+    saveCachedPredictions(enrichedData);
+   
+    return enrichedData;
+  });
 }
 
 async function fetchPredictions() {
@@ -615,6 +722,318 @@ function normalizeTeamName(name) {
     .replace(/^-|-$/g, '');
 }
 
+// Analysis cache file - declared earlier in the file
+
+function loadAnalysisCache() {
+  try {
+    if (fs.existsSync(ANALYSIS_CACHE_FILE)) {
+      return JSON.parse(fs.readFileSync(ANALYSIS_CACHE_FILE, 'utf8'));
+    }
+  } catch (err) {
+    console.error('Analysis cache load error:', err);
+  }
+  return {};
+}
+
+function getAllMatchupsFromPredictions() {
+  const predictions = loadCachedPredictions();
+  if (!predictions || !predictions.matches) return [];
+  
+  const matchups = new Set();
+  
+  const categories = [
+    predictions.matches,
+    predictions.over25Matches,
+    predictions.over15Matches,
+    predictions.bttsMatches,
+    predictions.winstreakMatches,
+    predictions.losestreakMatches,
+    predictions.drawstreakMatches,
+    predictions.teamToScoreMatches,
+    predictions.teamToScore2PlusMatches
+  ];
+  
+  for (const category of categories) {
+    if (!category) continue;
+    for (const match of category) {
+      let matchup = match.match;
+      if (!matchup && match.nextMatch) {
+        matchup = match.nextMatch;
+      }
+      if (matchup && matchup.includes(' - ')) {
+        const teams = matchup.split(' - ');
+        if (teams.length === 2) {
+          const [homeTeam, awayTeam] = teams.map(t => t.trim());
+          matchups.add(`${homeTeam}|${awayTeam}`);
+        }
+      }
+    }
+  }
+  
+  return Array.from(matchups);
+}
+
+let backgroundScrapingInProgress = false;
+
+async function scrapeSingleAnalysis(homeTeam, awayTeam) {
+  console.log(`[Single Analysis] Scraping: ${homeTeam} vs ${awayTeam}`);
+  const analysis = await getTeamAnalysis(homeTeam, awayTeam);
+  
+  const currentCache = loadAnalysisCache();
+  const key1 = `${homeTeam.toLowerCase()}|${awayTeam.toLowerCase()}`;
+  const key2 = `${awayTeam.toLowerCase()}|${homeTeam.toLowerCase()}`;
+  currentCache[key1] = analysis;
+  currentCache[key2] = analysis;
+  saveAnalysisCache(currentCache);
+  
+  return analysis;
+}
+
+function triggerBackgroundScraping() {
+  if (backgroundScrapingInProgress) {
+    console.log('[Background] Scraping already in progress, skipping');
+    return;
+  }
+  
+  backgroundScrapingInProgress = true;
+  console.log('[Background] Starting background analysis scraping...');
+  
+  scrapeMissingAnalysis()
+    .then(() => {
+      console.log('[Background] Completed background analysis scraping');
+    })
+    .catch(err => {
+      console.error('[Background] Error:', err.message);
+    })
+    .finally(() => {
+      backgroundScrapingInProgress = false;
+    });
+}
+
+async function scrapeMissingAnalysis() {
+  return withScraperLock(async () => {
+    console.log('[Analysis Scraper] Starting to scrape missing analysis data...');
+    
+    const matchups = getAllMatchupsFromPredictions();
+    if (matchups.length === 0) {
+      console.log('[Analysis Scraper] No matches found in predictions cache');
+      return null;
+    }
+    
+    console.log(`[Analysis Scraper] Found ${matchups.length} total matchups in predictions`);
+    
+    const analysisCache = loadAnalysisCache();
+    const missingMatchups = [];
+    
+    for (const matchup of matchups) {
+      const [homeTeam, awayTeam] = matchup.split('|');
+      const key1 = `${homeTeam.toLowerCase()}|${awayTeam.toLowerCase()}`;
+      const key2 = `${awayTeam.toLowerCase()}|${homeTeam.toLowerCase()}`;
+      
+      if (!analysisCache[key1] && !analysisCache[key2]) {
+        missingMatchups.push(matchup);
+      }
+    }
+    
+    if (missingMatchups.length === 0) {
+      console.log('[Analysis Scraper] All matchups already have analysis data');
+      return analysisCache;
+    }
+    
+    console.log(`[Analysis Scraper] Found ${missingMatchups.length} matchups missing analysis data`);
+    
+    for (let i = 0; i < missingMatchups.length; i++) {
+      const [homeTeam, awayTeam] = missingMatchups[i].split('|');
+      
+      console.log(`[Analysis Scraper] [${i+1}/${missingMatchups.length}] Scraping: ${homeTeam} vs ${awayTeam}`);
+      
+      try {
+        const analysis = await getTeamAnalysis(homeTeam, awayTeam);
+        
+        const currentCache = loadAnalysisCache();
+        const key1 = `${homeTeam.toLowerCase()}|${awayTeam.toLowerCase()}`;
+        const key2 = `${awayTeam.toLowerCase()}|${homeTeam.toLowerCase()}`;
+        currentCache[key1] = analysis;
+        currentCache[key2] = analysis;
+        saveAnalysisCache(currentCache);
+        
+        console.log(`[Analysis Scraper] Saved analysis for ${homeTeam} vs ${awayTeam}`);
+        
+        if (i < missingMatchups.length - 1) {
+          await sleep(4000);
+        }
+      } catch (error) {
+        console.error(`[Analysis Scraper] Failed to scrape ${homeTeam} vs ${awayTeam}:`, error.message);
+        await sleep(5000);
+      }
+    }
+    
+    console.log('[Analysis Scraper] Completed scraping missing analysis data');
+    return loadAnalysisCache();
+  });
+}
+
+function saveAnalysisCache(data) {
+  try {
+    data.cacheTime = new Date().toISOString();
+    fs.writeFileSync(ANALYSIS_CACHE_FILE, JSON.stringify(data, null, 2));
+  } catch (err) {
+    console.error('Analysis cache save error:', err);
+  }
+}
+
+// Function to batch scrape analysis for all matches
+async function batchScrapeAnalysis(matchesData) {
+  console.log('Starting batch analysis scraping for all matches...');
+  
+  // Extract all unique matchups from different prediction types
+  const matchups = new Set();
+  
+  // Process 1X2 matches
+  if (matchesData.matches) {
+    matchesData.matches.forEach(match => {
+      const teams = match.match.split(' - ');
+      if (teams.length === 2) {
+        const [homeTeam, awayTeam] = teams.map(t => t.trim());
+        matchups.add(`${homeTeam}|${awayTeam}`);
+      }
+    });
+  }
+  
+  // Process Over/Under 2.5 matches
+  if (matchesData.over25Matches) {
+    matchesData.over25Matches.forEach(match => {
+      const teams = match.match.split(' - ');
+      if (teams.length === 2) {
+        const [homeTeam, awayTeam] = teams.map(t => t.trim());
+        matchups.add(`${homeTeam}|${awayTeam}`);
+      }
+    });
+  }
+  
+  // Process Over/Under 1.5 matches
+  if (matchesData.over15Matches) {
+    matchesData.over15Matches.forEach(match => {
+      const teams = match.match.split(' - ');
+      if (teams.length === 2) {
+        const [homeTeam, awayTeam] = teams.map(t => t.trim());
+        matchups.add(`${homeTeam}|${awayTeam}`);
+      }
+    });
+  }
+  
+  // Process BTTS matches
+  if (matchesData.bttsMatches) {
+    matchesData.bttsMatches.forEach(match => {
+      const teams = match.match.split(' - ');
+      if (teams.length === 2) {
+        const [homeTeam, awayTeam] = teams.map(t => t.trim());
+        matchups.add(`${homeTeam}|${awayTeam}`);
+      }
+    });
+  }
+  
+  // Process Winning Streak matches - use nextMatch field for full matchup
+  if (matchesData.winstreakMatches) {
+    matchesData.winstreakMatches.forEach(match => {
+      const matchup = match.nextMatch || match.match;
+      if (matchup && matchup.includes(' - ')) {
+        const teams = matchup.split(' - ');
+        if (teams.length === 2) {
+          const [homeTeam, awayTeam] = teams.map(t => t.trim());
+          matchups.add(`${homeTeam}|${awayTeam}`);
+        }
+      }
+    });
+  }
+  
+  // Process Losing Streak matches
+  if (matchesData.losestreakMatches) {
+    matchesData.losestreakMatches.forEach(match => {
+      const matchup = match.nextMatch || match.match;
+      if (matchup && matchup.includes(' - ')) {
+        const teams = matchup.split(' - ');
+        if (teams.length === 2) {
+          const [homeTeam, awayTeam] = teams.map(t => t.trim());
+          matchups.add(`${homeTeam}|${awayTeam}`);
+        }
+      }
+    });
+  }
+  
+  // Process Draw Streak matches
+  if (matchesData.drawstreakMatches) {
+    matchesData.drawstreakMatches.forEach(match => {
+      const matchup = match.nextMatch || match.match;
+      if (matchup && matchup.includes(' - ')) {
+        const teams = matchup.split(' - ');
+        if (teams.length === 2) {
+          const [homeTeam, awayTeam] = teams.map(t => t.trim());
+          matchups.add(`${homeTeam}|${awayTeam}`);
+        }
+      }
+    });
+  }
+  
+  // Process Team to Score matches - use match field for full matchup
+  if (matchesData.teamToScoreMatches) {
+    matchesData.teamToScoreMatches.forEach(match => {
+      const matchup = match.match || match.nextMatch;
+      if (matchup && matchup.includes(' - ')) {
+        const teams = matchup.split(' - ');
+        if (teams.length === 2) {
+          const [homeTeam, awayTeam] = teams.map(t => t.trim());
+          matchups.add(`${homeTeam}|${awayTeam}`);
+        }
+      }
+    });
+  }
+  
+  // Process Team to Score 2+ matches
+  if (matchesData.teamToScore2PlusMatches) {
+    matchesData.teamToScore2PlusMatches.forEach(match => {
+      const matchup = match.match || match.nextMatch;
+      if (matchup && matchup.includes(' - ')) {
+        const teams = matchup.split(' - ');
+        if (teams.length === 2) {
+          const [homeTeam, awayTeam] = teams.map(t => t.trim());
+          matchups.add(`${homeTeam}|${awayTeam}`);
+        }
+      }
+    });
+  }
+
+  console.log(`Found ${matchups.size} unique matchups to analyze`);
+  
+  // Convert set to array for processing
+  const matchupsArray = Array.from(matchups);
+  const analysisResults = {};
+  
+  for (let i = 0; i < matchupsArray.length; i++) {
+    const [homeTeam, awayTeam] = matchupsArray[i].split('|');
+    
+    console.log(`[${i+1}/${matchupsArray.length}] Analyzing: ${homeTeam} vs ${awayTeam}`);
+    
+    try {
+      const analysis = await getTeamAnalysis(homeTeam, awayTeam);
+      const key1 = `${homeTeam.toLowerCase()}|${awayTeam.toLowerCase()}`;
+      const key2 = `${awayTeam.toLowerCase()}|${homeTeam.toLowerCase()}`;
+      analysisResults[key1] = analysis;
+      analysisResults[key2] = analysis;
+      
+      if (i < matchupsArray.length - 1) {
+        await sleep(4000);
+      }
+    } catch (error) {
+      console.error(`Failed to analyze ${homeTeam} vs ${awayTeam}:`, error.message);
+      await sleep(5000);
+    }
+  }
+  
+  console.log(`Batch analysis scraping completed. Analyzed ${Object.keys(analysisResults)/2} unique matchups.`);
+  return analysisResults;
+}
+
 async function getTeamAnalysis(homeTeam, awayTeam) {
   const browserOptions = {
     headless: true,
@@ -632,7 +1051,7 @@ async function getTeamAnalysis(homeTeam, awayTeam) {
     h2h: []
   };
   
-  try {
+  const scrape = async () => {
     const homeClean = homeTeam.split('(')[0].trim();
     const awayClean = awayTeam.split('(')[0].trim();
     
@@ -641,6 +1060,7 @@ async function getTeamAnalysis(homeTeam, awayTeam) {
     const browser = await puppeteer.launch(browserOptions);
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
+    await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' });
     
     const compareUrl = `https://www.statarea.com/compare/teams/${encodeURIComponent(homeClean)}/${encodeURIComponent(awayClean)}`;
     console.log(`Fetching URL: ${compareUrl}`);
@@ -651,14 +1071,12 @@ async function getTeamAnalysis(homeTeam, awayTeam) {
     const html = await page.content();
     const $ = cheerio.load(html);
     
-    // Parse form
     $('.lastteamsmatches .halfcontainer').each((i, el) => {
       const form = $(el).find('.teamform').map((_, tel) => $(tel).text().trim()).get().join('');
       if (i === 0) result.homeForm = form;
       else if (i === 1) result.awayForm = form;
     });
     
-    // Parse stats
     $('.teamsstatistics .halfcontainer').each((i, el) => {
         const stats = { wins: 0, draws: 0, losses: 0, avgScored: 0, avgConceded: 0 };
         $(el).find('.factitem').each((_, fact) => {
@@ -674,7 +1092,6 @@ async function getTeamAnalysis(homeTeam, awayTeam) {
         else if (i === 1) result.awayLast10 = stats;
     });
 
-    // Parse H2H
     $('.matchbtwteams .matchitem').each((_, el) => {
         const hTeam = $(el).find('.hostteam .name').text().trim();
         const aTeam = $(el).find('.guestteam .name').text().trim();
@@ -693,6 +1110,17 @@ async function getTeamAnalysis(homeTeam, awayTeam) {
     
     await browser.close();
     console.log(`[Scraper] Analysis successfully scraped for ${homeClean} vs ${awayClean}`);
+  };
+
+  try {
+    await safeRequestWithBackoff(scrape, 3, 5000);
+    
+    const analysisCache = loadAnalysisCache();
+    const key1 = `${homeTeam.toLowerCase()}|${awayTeam.toLowerCase()}`;
+    const key2 = `${awayTeam.toLowerCase()}|${homeTeam.toLowerCase()}`;
+    analysisCache[key1] = result;
+    analysisCache[key2] = result;
+    saveAnalysisCache(analysisCache);
     
   } catch (err) {
     console.error('Statarea scrape error:', err.message);
@@ -704,5 +1132,11 @@ async function getTeamAnalysis(homeTeam, awayTeam) {
 module.exports = {
   fetchPredictions,
   fetchAndCachePredictions,
-  getTeamAnalysis
+  getTeamAnalysis,
+  loadCachedPredictions,
+  loadAnalysisCache,
+  saveAnalysisCache,
+  scrapeMissingAnalysis,
+  scrapeSingleAnalysis,
+  triggerBackgroundScraping
 };

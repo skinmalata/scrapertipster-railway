@@ -7,7 +7,7 @@ const apiRoutes = require('./src/routes/api');
 const scraperService = require('./src/services/scraper');
 
 const app = express();
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3000;
 
 // Visitor Analytics (in-memory storage)
 const visitorData = {
@@ -118,20 +118,31 @@ cron.schedule('0 1 * * *', async () => {
   }
 });
 
+// Use a flag to track if initial fetch is running
+let initialFetchRunning = false;
+
 // Initial Fetch
 setTimeout(async () => {
+  if (initialFetchRunning) {
+    console.log('Initial fetch already in progress, skipping');
+    return;
+  }
+  
   const SKIP_INITIAL_FETCH = process.env.SKIP_INITIAL_FETCH === 'true' || process.argv.includes('--skip-fetch');
   if (SKIP_INITIAL_FETCH) {
     console.log('Skipping initial fetch');
     return;
   }
   
+  initialFetchRunning = true;
   console.log('Running initial prediction fetch...');
   try {
     const data = await scraperService.fetchAndCachePredictions();
     console.log('Initial fetch completed. Matches found:', data.totalMatches);
   } catch (error) {
     console.error('Initial fetch error:', error.message);
+  } finally {
+    initialFetchRunning = false;
   }
 }, 5000);
 

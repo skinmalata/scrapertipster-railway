@@ -92,15 +92,31 @@ router.get('/refresh-results', async (req, res) => {
 router.get('/analysis', async (req, res) => {
   const { homeTeam, awayTeam } = req.query;
   console.log(`[API] Analysis requested: ${homeTeam} vs ${awayTeam}`);
-  
+   
   if (!homeTeam || !awayTeam) {
     return res.json({ success: false, message: 'Missing team parameters' });
   }
-  
+   
   try {
-    const analysis = await scraperService.getTeamAnalysis(homeTeam, awayTeam);
-    console.log(`[API] Analysis result:`, JSON.stringify(analysis).slice(0, 200));
-    res.json(analysis);
+    const analysisCache = scraperService.loadAnalysisCache();
+    const key1 = `${homeTeam.toLowerCase()}|${awayTeam.toLowerCase()}`;
+    const key2 = `${awayTeam.toLowerCase()}|${homeTeam.toLowerCase()}`;
+    
+    const cachedAnalysis = analysisCache[key1] || analysisCache[key2];
+    if (cachedAnalysis) {
+      console.log(`[API] Serving analysis from cache for: ${homeTeam} vs ${awayTeam}`);
+      return res.json(cachedAnalysis);
+    }
+    
+    console.log(`[API] Not in cache. Scraping single match first: ${homeTeam} vs ${awayTeam}`);
+    
+    const analysis = await scraperService.scrapeSingleAnalysis(homeTeam, awayTeam);
+    
+    scraperService.triggerBackgroundScraping();
+    
+    console.log(`[API] Returning scraped analysis for: ${homeTeam} vs ${awayTeam}`);
+    return res.json(analysis);
+    
   } catch (err) {
     console.error(`[API] Analysis error:`, err.message);
     res.status(500).json({ success: false, message: err.message });
