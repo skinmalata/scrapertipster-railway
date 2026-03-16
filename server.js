@@ -16,6 +16,18 @@ const visitorData = {
   pageViews: {}
 };
 
+setInterval(() => {
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const cutoffDate = thirtyDaysAgo.toISOString().split('T')[0];
+  
+  for (const dateKey of Object.keys(visitorData.dailyStats)) {
+    if (dateKey < cutoffDate) {
+      delete visitorData.dailyStats[dateKey];
+    }
+  }
+}, 60 * 60 * 1000);
+
 function trackVisit(req, res, next) {
   const today = new Date().toISOString().split('T')[0];
   const page = req.path || '/';
@@ -66,6 +78,15 @@ const rateLimit = new Map();
 const RATE_LIMIT = 100;
 const TIME_WINDOW = 60 * 1000;
 
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, data] of rateLimit.entries()) {
+    if (now > data.resetTime) {
+      rateLimit.delete(ip);
+    }
+  }
+}, 60 * 1000);
+
 function rateLimiter(req, res, next) {
   const ip = req.ip || req.connection.remoteAddress;
   const now = Date.now();
@@ -90,8 +111,14 @@ function rateLimiter(req, res, next) {
   next();
 }
 
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : false
+}));
+app.use((req, res, next) => {
+  res.setHeader('Content-Security-Policy', "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com;");
+  next();
+});
+app.use(express.json({ limit: '10kb' }));
 app.use(rateLimiter);
 app.use(trackVisit);
 
@@ -158,9 +185,11 @@ setTimeout(async () => {
   }
 }, 5000);
 
-app.listen(PORT, '0.0.0.0', () => {
+const HOST = process.env.HOST || 'localhost';
+
+app.listen(PORT, HOST, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`Access at http://localhost:${PORT}`);
+  console.log(`Access at http://${HOST}:${PORT}`);
 });
 
 module.exports = app;

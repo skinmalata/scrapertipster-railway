@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
+Disallow: /api/
+Disallow: /server-
+Disallow: /*.json$
+
 Sitemap: https://winfulltime.com/sitemap.xml

@@ -18,8 +18,13 @@ const SCRAPER_LOCK_FILE = path.join(process.cwd(), '.scraper-lock');
 let isScraping = false;
 let browserLaunchQueue = [];
 let isBrowserLaunchInProgress = false;
+const MAX_QUEUE_SIZE = 10;
 
 async function launchBrowserWithQueue(browserOptions) {
+  if (browserLaunchQueue.length >= MAX_QUEUE_SIZE) {
+    throw new Error('Browser queue full, please try again later');
+  }
+  
   return new Promise((resolve, reject) => {
     browserLaunchQueue.push({ resolve, reject, browserOptions });
     processBrowserQueue();

@@ -17,25 +17,47 @@
   <link rel="canonical" href="https://winfulltime.com/">
    <link rel="icon" href="/logo.png" type="image/png">
    <script src="https://cdn.tailwindcss.com"></script>
-   <script>
-     tailwind.config = {
-       theme: {
-         extend: {
-           colors: {
-             primary: '#ef4444',
-             foreground: '#fafafa',
-             'muted-foreground': '#a1a1aa',
-             border: '#2d2d4a',
-             card: '#1a1a2e',
-             'card-foreground': '#fafafa',
-           },
-           fontFamily: {
-             display: ['system-ui', 'sans-serif'],
-           },
-         },
-       },
-     }
-   </script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#ef4444',
+              foreground: '#fafafa',
+              'muted-foreground': '#a1a1aa',
+              border: '#2d2d4a',
+              card: '#1a1a2e',
+              'card-foreground': '#fafafa',
+            },
+            fontFamily: {
+              display: ['system-ui', 'sans-serif'],
+            },
+          },
+        },
+      }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "WinFulltime",
+      "url": "https://winfulltime.com",
+      "description": "Free football predictions for today. Expert tips for 1X2, Over/Under, BTTS, and Team to Score.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "WinFulltime",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://winfulltime.com/logo.png"
+        }
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://winfulltime.com/analysis.html?home={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
  <style>
      * {
        margin: 0;
@@ -653,10 +675,10 @@
   <div>
     <header>
       <div class="header-content">
-         <div class="logo">
-           <div class="logo-icon"></div>
-            <span class="logo-text">WinFulltime</span>
-         </div>
+       <div class="logo">
+            <div class="logo-icon" role="img" aria-label="WinFulltime Logo"></div>
+             <span class="logo-text">WinFulltime</span>
+          </div>
         <nav>
           <a href="/">Home</a>
           <a href="/about.html">About</a>
@@ -1302,6 +1324,7 @@
         <a href="/contact.html">Contact</a>
         <a href="/terms.html">Terms</a>
         <a href="/privacy.html">Privacy</a>
+        <a href="/sitemap.xml">Sitemap</a>
       </div>
       <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
     </div>
