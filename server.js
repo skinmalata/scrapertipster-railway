@@ -135,8 +135,12 @@ app.use(express.json({ limit: '10kb' }));
 app.use(rateLimiter);
 app.use(trackVisit);
 
-// Static files
-app.use(express.static('public'));
+// Static files with no cache
+app.use(express.static('public', {
+  maxAge: 0,
+  etag: false,
+  lastModified: false
+}));
 
 // Redirect www to non-www
 app.use((req, res, next) => {
