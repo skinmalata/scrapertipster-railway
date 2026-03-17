@@ -1,6 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const scraperService = require('../services/scraper');
+
+let scraperService = null;
+function getScraperService() {
+  if (!scraperService) {
+    scraperService = require('../services/scraper');
+  }
+  return scraperService;
+}
 
 let supabase = null;
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -58,12 +65,28 @@ router.get('/predictions', async (req, res) => {
     const userId = req.headers['x-user-id'];
     const { isVip } = await checkUserVipStatus(userId);
     
-    const data = await scraperService.fetchPredictions();
+    const data = await getScraperService().fetchPredictions();
     const limitedData = applyLimits(data, isVip);
     
     res.json(limitedData);
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('Predictions error:', err.message);
+    const fallbackData = {
+      success: true,
+      date: new Date().toISOString().split('T')[0],
+      totalMatches: 0,
+      matches: [],
+      over25Matches: [],
+      over15Matches: [],
+      bttsMatches: [],
+      winstreakMatches: [],
+      losestreakMatches: [],
+      drawstreakMatches: [],
+      teamToScoreMatches: [],
+      teamToScore2PlusMatches: [],
+      message: 'Predictions currently unavailable. Please try again later.'
+    };
+    res.json(fallbackData);
   }
 });
 
@@ -77,7 +100,7 @@ router.get('/refresh', async (req, res) => {
   
   try {
     console.log('Manual refresh triggered');
-    await scraperService.fetchAndCachePredictions();
+    await getScraperService().fetchAndCachePredictions();
     console.log('Manual refresh completed');
   } catch (error) {
     console.error('Manual refresh error:', error.message);
@@ -109,7 +132,7 @@ router.get('/analysis', async (req, res) => {
   }
    
   try {
-    const analysisCache = scraperService.loadAnalysisCache();
+    const analysisCache = getScraperService().loadAnalysisCache();
     const key1 = `${homeTeam.toLowerCase()}|${awayTeam.toLowerCase()}`;
     const key2 = `${awayTeam.toLowerCase()}|${homeTeam.toLowerCase()}`;
     
@@ -121,10 +144,10 @@ router.get('/analysis', async (req, res) => {
     
     console.log(`[API] Not in cache. Scraping single match first: ${homeTeam} vs ${awayTeam}`);
     
-    const analysis = await scraperService.scrapeSingleAnalysis(homeTeam, awayTeam);
+    const analysis = await getScraperService().scrapeSingleAnalysis(homeTeam, awayTeam);
     
     if (process.env.ENABLE_BACKGROUND_SCRAPING === 'true') {
-      scraperService.triggerBackgroundScraping();
+      getScraperService().triggerBackgroundScraping();
     }
     
     console.log(`[API] Returning scraped analysis for: ${homeTeam} vs ${awayTeam}`);

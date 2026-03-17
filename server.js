@@ -4,7 +4,20 @@ const cors = require('cors');
 const path = require('path');
 const cron = require('node-cron');
 const apiRoutes = require('./src/routes/api');
-const scraperService = require('./src/services/scraper');
+
+let scraperService;
+try {
+  scraperService = require('./src/services/scraper');
+} catch (e) {
+  console.log('Scraper service will load lazily:', e.message);
+}
+
+function getScraperService() {
+  if (!scraperService) {
+    scraperService = require('./src/services/scraper');
+  }
+  return scraperService;
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -147,7 +160,7 @@ app.get('/', (req, res) => {
 cron.schedule('0 1 * * *', async () => {
   console.log('Running scheduled daily prediction fetch...');
   try {
-    const data = await scraperService.fetchAndCachePredictions();
+    const data = await getScraperService().fetchAndCachePredictions();
     console.log('Scheduled fetch completed. Matches found:', data.totalMatches);
   } catch (error) {
     console.error('Scheduled fetch error:', error.message);
@@ -159,7 +172,7 @@ if (process.env.ENABLE_BACKGROUND_SCRAPING === 'true') {
   cron.schedule('0 2 * * *', async () => {
     console.log('Running scheduled background analysis scraping...');
     try {
-      scraperService.triggerBackgroundScraping();
+      getScraperService().triggerBackgroundScraping();
     } catch (error) {
       console.error('Background scraping error:', error.message);
     }
@@ -185,7 +198,7 @@ setTimeout(async () => {
   initialFetchRunning = true;
   console.log('Running initial prediction fetch...');
   try {
-    const data = await scraperService.fetchAndCachePredictions();
+    const data = await getScraperService().fetchAndCachePredictions();
     console.log('Initial fetch completed. Matches found:', data.totalMatches);
   } catch (error) {
     console.error('Initial fetch error:', error.message);
@@ -194,9 +207,13 @@ setTimeout(async () => {
   }
 }, 5000);
 
-const HOST = process.env.HOST || 'localhost';
+const HOST = process.env.HOST || '0.0.0.0';
 
-app.listen(PORT, HOST, () => {
+const server = app.listen(PORT, HOST, (err) => {
+  if (err) {
+    console.error('Server failed to start:', err.message);
+    process.exit(1);
+  }
   console.log(`Server running on port ${PORT}`);
   console.log(`Access at http://${HOST}:${PORT}`);
 });
