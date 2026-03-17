@@ -67,6 +67,14 @@ router.get('/predictions', async (req, res) => {
     
     let data = await getScraperService().fetchPredictions();
     
+    // Load corners data
+    const cornersData = getScraperService().loadCornersCache();
+    if (cornersData) {
+      data.cornersMatches = cornersData.matches || [];
+    } else {
+      data.cornersMatches = [];
+    }
+    
     if (!data.over15Matches || data.over15Matches.length === 0) {
       data.over15Matches = data.matches ? data.matches.filter(m => m.tip === 'Over 1.5') : [];
     }
@@ -177,6 +185,22 @@ router.get('/analysis', async (req, res) => {
 
 router.post('/ai-summary', async (req, res) => {
   res.status(503).json({ success: false, message: 'AI summary service is currently disabled' });
+});
+
+router.get('/corners', async (req, res) => {
+  try {
+    let cornersData = getScraperService().loadCornersCache();
+    
+    if (!cornersData) {
+      console.log('[API] No corners cache, triggering scrape...');
+      cornersData = await getScraperService().scrapeCorners();
+    }
+    
+    res.json(cornersData);
+  } catch (err) {
+    console.error('Corners error:', err.message);
+    res.json({ success: true, totalMatches: 0, matches: [] });
+  }
 });
 
 module.exports = router;

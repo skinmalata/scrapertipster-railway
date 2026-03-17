@@ -1191,7 +1191,155 @@ async function getTeamAnalysis(homeTeam, awayTeam) {
   return result;
 }
 
+async function scrapeCorners() {
+  const CORNERS_URL = 'https://afriscores.com/en-ng/tips/corners';
+  const cornersCacheFile = path.join(process.cwd(), 'corners-cache.json');
+  
+  try {
+    console.log('[Corners] Starting corners scrape from afriscores...');
+    
+    const browser = await launchBrowserWithQueue({
+      executablePath,
+      args: [...args, '--headless', '--no-sandbox']
+    });
+    
+    const page = await browser.newPage();
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    
+    await page.goto(CORNERS_URL, { waitUntil: 'networkidle2', timeout: 30000 });
+    
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    
+    const html = await page.content();
+    await browser.close();
+    
+    const $ = cheerio.load(html);
+    const cornersMatches = [];
+    let matchId = 0;
+    
+    const pageText = $('body').text();
+    console.log('[Corners] Page text length:', pageText.length);
+    
+    // Find all match sections by looking for odds (1.XX pattern) near team names
+    const matchPattern = /([A-Za-z][A-Za-z\s\.']{2,40})\s+(?:vs|[-–])\s+([A-Za-z][A-Za-z\s\.']{2,40})[^0-9]*?(\d+\.\d+)/g;
+    let matchInfo;
+    
+    while ((matchInfo = matchPattern.exec(pageText)) !== null && matchId < 50) {
+      const home = matchInfo[1].trim();
+      const away = matchInfo[2].trim();
+      const odds = parseFloat(matchInfo[3]);
+      
+      if (home.length < 4 || away.length < 3) continue;
+      if (!odds || odds < 1.1 || odds > 10) continue;
+      
+      // Find the context around this match to get insights
+      const startPos = Math.max(0, matchInfo.index - 500);
+      const endPos = Math.min(pageText.length, matchInfo.index + 500);
+      const context = pageText.substring(startPos, endPos);
+      
+      // Extract insights from context - look for patterns like "10 of the last 12 games had over 8.5 corners"
+      const insights = [];
+      const lines = context.split(/\n|,|\.|;/);
+      
+      for (const line of lines) {
+        const lowerLine = line.toLowerCase();
+        if (lowerLine.includes('corners') && /of the last \d+/i.test(line)) {
+          console.log('[Corners] Found insight line:', line.substring(0, 100));
+          // Extract count and total
+          const countMatch = line.match(/(\d+)\s+of\s+(?:the\s+)?last\s+(\d+)/i);
+          if (countMatch) {
+            const count = parseInt(countMatch[1]);
+            const total = parseInt(countMatch[2]);
+            const pct = Math.round((count / total) * 100);
+            
+            // Find if it's home or away
+            let location = '';
+            if (/home games/i.test(line)) location = 'home';
+            else if (/away games/i.test(line)) location = 'away';
+            
+            // Find team name before the count
+            let teamName = '';
+            const teamMatch = line.match(/([A-Za-z]+(?:\s+[A-Za-z]+)?)\s+\d+\s+of/i);
+            if (teamMatch) teamName = teamMatch[1];
+            
+            let insight = '';
+            if (teamName && location) {
+              insight = `${teamName}: ${count}/${total} ${location} (${pct}%)`;
+            } else if (teamName) {
+              insight = `${teamName}: ${count}/${total} (${pct}%)`;
+            } else {
+              insight = `${count}/${total} games (${pct}%)`;
+            }
+            
+            if (insight.length > 5 && insight.length < 100) {
+              insights.push(insight);
+            }
+          }
+        }
+      }
+      
+      const matchKey = `${home} vs ${away}`;
+      if (cornersMatches.find(cm => cm.match === matchKey)) continue;
+      
+      // Calculate probability from insight or odds
+      let probability = Math.round((1 / odds) * 100);
+      if (insights.length > 0) {
+        const pctMatch = insights[0].match(/\((\d+)%\)/);
+        if (pctMatch) probability = parseInt(pctMatch[1]);
+      }
+      
+      cornersMatches.push({
+        id: matchId++,
+        match: matchKey,
+        tip: 'Over 8.5 Corners',
+        insights: insights.slice(0, 1), // Only the most significant insight
+        probability: probability,
+        league: 'Various',
+        date: new Date().toISOString().split('T')[0]
+      });
+    }
+    
+    console.log('[Corners] Found matches:', cornersMatches.length);
+    
+    const result = {
+      success: true,
+      date: new Date().toISOString().split('T')[0],
+      totalMatches: cornersMatches.length,
+      matches: cornersMatches.slice(0, 50)
+    };
+    
+    fs.writeFileSync(cornersCacheFile, JSON.stringify(result, null, 2));
+    console.log('[Corners] Scraped', cornersMatches.length, 'corners tips');
+    
+    return result;
+  } catch (error) {
+    console.error('[Corners] Scraping error:', error.message);
+    
+    try {
+      if (fs.existsSync(cornersCacheFile)) {
+        const cached = JSON.parse(fs.readFileSync(cornersCacheFile, 'utf8'));
+        console.log('[Corners] Returning cached data');
+        return cached;
+      }
+    } catch (e) {}
+    
+    return { success: true, totalMatches: 0, matches: [], message: 'Corners data unavailable' };
+  }
+}
+
+function loadCornersCache() {
+  const cornersCacheFile = path.join(process.cwd(), 'corners-cache.json');
+  try {
+    if (fs.existsSync(cornersCacheFile)) {
+      return JSON.parse(fs.readFileSync(cornersCacheFile, 'utf8'));
+    }
+  } catch (e) {}
+  return null;
+}
+
 module.exports = {
+  scrapeCorners,
+  loadCornersCache,
   fetchPredictions,
   fetchAndCachePredictions,
   getTeamAnalysis,

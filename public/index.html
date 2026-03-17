@@ -344,8 +344,8 @@
     .disclaimer {
       text-align: center;
       padding: 24px 12px;
-      font-size: 12px;
-      color: #71717a;
+      font-size: 18px;
+      color: #000;
     }
 
     .faq-section {
@@ -407,6 +407,61 @@
     .faq-icon {
       transition: transform 0.3s;
       color: #ff0000;
+    }
+
+    .streak-buttons {
+      display: flex;
+      gap: 12px;
+      padding: 20px 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .streak-btn {
+      flex: 1;
+      min-width: 200px;
+      padding: 20px 16px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .streak-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .streak-btn.winstreak {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+    }
+
+    .streak-btn.losestreak {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+    }
+
+    .streak-btn.drawstreak {
+      background: linear-gradient(135deg, #6b7280, #4b5563);
+      color: white;
+    }
+
+    .streak-icon {
+      font-size: 24px;
+    }
+
+    .streak-text {
+      font-size: 15px;
     }
 
     footer { background: #f4f4f5; padding: 32px 12px; border-top: 1px solid #e5e5e5; margin-top: auto; }
@@ -699,9 +754,7 @@
         <button onclick="setCategory('over15')" id="tab-over15" class="tab-btn">Over 1.5</button>
         <button onclick="setCategory('over25')" id="tab-over25" class="tab-btn">Over 2.5</button>
         <button onclick="setCategory('btts')" id="tab-btts" class="tab-btn">BTTS</button>
-        <button onclick="setCategory('winstreak')" id="tab-winstreak" class="tab-btn">Winning Streak</button>
-        <button onclick="setCategory('losestreak')" id="tab-losestreak" class="tab-btn">Losing Streak</button>
-        <button onclick="setCategory('drawstreak')" id="tab-drawstreak" class="tab-btn">Draws Streak</button>
+        <button onclick="setCategory('corners')" id="tab-corners" class="tab-btn">Corners</button>
         <button onclick="setCategory('teamtoscore')" id="tab-teamtoscore" class="tab-btn">To Score</button>
         <button onclick="setCategory('teamtoscore2plus')" id="tab-teamtoscore2plus" class="tab-btn">To Score 2+</button>
       </div>
@@ -715,6 +768,22 @@
 
       <div id="content">
         <div class="loading"><div class="spinner"></div></div>
+      </div>
+
+      <!-- Streak Buttons -->
+      <div class="streak-buttons">
+        <a href="/?category=winstreak" target="_blank" class="streak-btn winstreak">
+          <span class="streak-icon">🔥</span>
+          <span class="streak-text">Winning Streak</span>
+        </a>
+        <a href="/?category=losestreak" target="_blank" class="streak-btn losestreak">
+          <span class="streak-icon">📉</span>
+          <span class="streak-text">Losing Streak</span>
+        </a>
+        <a href="/?category=drawstreak" target="_blank" class="streak-btn drawstreak">
+          <span class="streak-icon">➖</span>
+          <span class="streak-text">Draws Streak</span>
+        </a>
       </div>
 
       <!-- FAQ Section -->
@@ -868,6 +937,15 @@
     let currentCategory = '1x2';
     let currentDayOffset = 0;
 
+    // Check URL for category parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlCategory = urlParams.get('category');
+    if (urlCategory && ['winstreak', 'losestreak', 'drawstreak'].includes(urlCategory)) {
+      currentCategory = urlCategory;
+      const dayTabs = document.getElementById('dayTabs');
+      if (dayTabs) dayTabs.style.display = 'none';
+    }
+
     const today = new Date();
     const headerDateEl = document.getElementById('headerDate');
     if (headerDateEl) {
@@ -938,16 +1016,21 @@
           btn.classList.remove('active');
         }
       });
-      document.getElementById(`tab-${cat}`).classList.add('active');
+      const tabBtn = document.getElementById(`tab-${cat}`);
+      if (tabBtn) tabBtn.classList.add('active');
       
       const dayTabs = document.getElementById('dayTabs');
-      dayTabs.style.display = '';
+      if (cat === 'winstreak' || cat === 'losestreak' || cat === 'drawstreak') {
+        dayTabs.style.display = 'none';
+      } else {
+        dayTabs.style.display = '';
+      }
       
       if (currentData) renderMatches();
     }
 
     function getCategoryLabel(cat) {
-      const labels = { '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5', 'btts': 'BTTS', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak', 'teamtoscore': 'To Score', 'teamtoscore2plus': 'To Score 2+' };
+      const labels = { '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5', 'btts': 'BTTS', 'corners': 'Corners', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak', 'teamtoscore': 'To Score', 'teamtoscore2plus': 'To Score 2+' };
       return labels[cat] || cat;
     }
 
@@ -974,6 +1057,7 @@
       else if (currentCategory === 'over15') matches = currentData.over15Matches || [];
       else if (currentCategory === 'over25') matches = currentData.over25Matches || [];
       else if (currentCategory === 'btts') matches = currentData.bttsMatches || [];
+      else if (currentCategory === 'corners') matches = currentData.cornersMatches || [];
       else if (currentCategory === 'winstreak') matches = currentData.winstreakMatches || [];
       else if (currentCategory === 'losestreak') matches = currentData.losestreakMatches || [];
       else if (currentCategory === 'drawstreak') matches = currentData.drawstreakMatches || [];
@@ -1020,7 +1104,7 @@
 
       const html = displayMatches.map((match, i) => {
         const matchStr = match.match || match.nextMatch || '';
-        const teams = matchStr.split(' - ');
+        const teams = matchStr.includes(' - ') ? matchStr.split(' - ') : matchStr.split(' vs ');
         const home = teams[0]?.trim() || '';
         const away = teams[1]?.trim() || '';
         const hasScore = match.score && match.score.home != null && match.score.away != null;
@@ -1073,7 +1157,8 @@
               <div class="match-footer">
                 <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
                   <span class="tip-badge">${match.tip}</span>
-                  <div class="probability">${match.probability}%</div>
+                  ${currentCategory === 'corners' && match.insights && match.insights[0] ? `<div class="probability" style="font-size: 18px; max-width: 280px; line-height: 1.4; color: #fff; font-weight: 600;">${match.insights[0]}</div>` : ''}
+                  ${currentCategory !== 'corners' ? `<div class="probability">${match.probability}%</div>` : ''}
                 </div>
               </div>
             `}
@@ -1087,7 +1172,8 @@
         card.addEventListener('click', () => {
           const matchData = JSON.parse(decodeURIComponent(card.dataset.match));
           if (currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak') return;
-          const teams = matchData.match.split(' - ');
+          const matchStr = matchData.match || '';
+          const teams = matchStr.includes(' - ') ? matchStr.split(' - ') : matchStr.split(' vs ');
           const homeTeam = encodeURIComponent(teams[0]?.trim() || '');
           const awayTeam = encodeURIComponent(teams[1]?.trim() || '');
           window.open(`/analysis.html?home=${homeTeam}&away=${awayTeam}`, '_blank');
@@ -1147,7 +1233,8 @@
       const modalBody = document.getElementById('modalBody');
       const modalTitle = document.getElementById('modalTitle');
       
-      const teams = match.match.split(' - ');
+      const matchStr = match.match || '';
+      const teams = matchStr.includes(' - ') ? matchStr.split(' - ') : matchStr.split(' vs ');
       const homeTeam = teams[0]?.trim() || '';
       const awayTeam = teams[1]?.trim() || '';
       
