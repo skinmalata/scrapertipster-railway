@@ -65,7 +65,23 @@ router.get('/predictions', async (req, res) => {
     const userId = req.headers['x-user-id'];
     const { isVip } = await checkUserVipStatus(userId);
     
-    const data = await getScraperService().fetchPredictions();
+    let data = await getScraperService().fetchPredictions();
+    
+    if (!data.over15Matches || data.over15Matches.length === 0) {
+      data.over15Matches = data.matches ? data.matches.filter(m => m.tip === 'Over 1.5') : [];
+    }
+    if (!data.over25Matches || data.over25Matches.length === 0) {
+      data.over25Matches = data.matches ? data.matches.filter(m => m.tip === 'Over 2.5') : [];
+    }
+    if (!data.bttsMatches || data.bttsMatches.length === 0) {
+      data.bttsMatches = data.matches ? data.matches.filter(m => m.tip === 'BTTS') : [];
+    }
+    if (!data.winstreakMatches) data.winstreakMatches = [];
+    if (!data.losestreakMatches) data.losestreakMatches = [];
+    if (!data.drawstreakMatches) data.drawstreakMatches = [];
+    if (!data.teamToScoreMatches) data.teamToScoreMatches = [];
+    if (!data.teamToScore2PlusMatches) data.teamToScore2PlusMatches = [];
+    
     const limitedData = applyLimits(data, isVip);
     
     res.json(limitedData);
