@@ -106,6 +106,8 @@ async function safeRequestWithBackoff(fn, maxRetries = 3, baseDelay = 5000) {
 }
 
 function loadCachedPredictions() {
+  console.log('[Debug] CWD:', process.cwd());
+  console.log('[Debug] Cache file exists:', fs.existsSync(CACHE_FILE));
   try {
     if (fs.existsSync(CACHE_FILE)) {
       const data = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8'));
