@@ -1,7 +1,9 @@
 node_modules/
 debug_*.html
-*.json
 !package.json
 !package-lock.json
+!predictions-cache.json
+!analysis-cache.json
 .env
 .DS_Store
+*.log

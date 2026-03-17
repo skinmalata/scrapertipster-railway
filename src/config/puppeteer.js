@@ -30,6 +30,7 @@ module.exports = {
     '--disable-setuid-sandbox',
     '--disable-dev-shm-usage',
     '--disable-gpu',
+    '--disable-software-rasterizer',
     '--disable-extensions',
     '--disable-background-networking',
     '--disable-default-apps',
@@ -38,6 +39,9 @@ module.exports = {
     '--metrics-recording-only',
     '--mute-audio',
     '--no-first-run',
-    '--safebrowsing-disable-auto-update'
+    '--safebrowsing-disable-auto-update',
+    '--single-process',
+    '--disable-web-security',
+    '--disable-features=IsolateOrigins,site-per-process'
   ]
 };
