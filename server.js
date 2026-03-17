@@ -182,19 +182,14 @@ if (process.env.ENABLE_BACKGROUND_SCRAPING === 'true') {
 // Use a flag to track if initial fetch is running
 let initialFetchRunning = false;
 
-// Initial Fetch
+// Initial Fetch - always try to load from cache first
 setTimeout(async () => {
   if (initialFetchRunning) {
     console.log('Initial fetch already in progress, skipping');
     return;
   }
   
-  const SKIP_INITIAL_FETCH = process.env.SKIP_INITIAL_FETCH === 'true' || process.argv.includes('--skip-fetch');
-  if (SKIP_INITIAL_FETCH) {
-    console.log('Skipping initial fetch');
-    return;
-  }
-  
+  // Always try to load from cache, don't skip
   initialFetchRunning = true;
   console.log('Running initial prediction fetch...');
   try {
