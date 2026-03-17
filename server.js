@@ -125,6 +125,15 @@ app.use(trackVisit);
 // Static files
 app.use(express.static('public'));
 
+// Redirect www to non-www
+app.use((req, res, next) => {
+  if (req.hostname && req.hostname.startsWith('www.')) {
+    const newUrl = 'https://' + req.hostname.slice(4) + req.originalUrl;
+    return res.redirect(301, newUrl);
+  }
+  next();
+});
+
 // API Routes
 app.use('/api', apiRoutes);
 
