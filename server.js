@@ -142,9 +142,9 @@ app.use(express.static('public', {
   lastModified: false
 }));
 
-// Redirect www to non-www
+// Redirect www to non-www (but not for API routes)
 app.use((req, res, next) => {
-  if (req.hostname && req.hostname.startsWith('www.')) {
+  if (req.hostname && req.hostname.startsWith('www.') && !req.originalUrl.startsWith('/api')) {
     const newUrl = 'https://' + req.hostname.slice(4) + req.originalUrl;
     return res.redirect(301, newUrl);
   }
