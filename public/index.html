@@ -1075,8 +1075,8 @@
 
       if (currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak') {
         filtered = matches;
-      } else if (currentCategory === 'teamtoscore' || currentCategory === 'teamtoscore2plus') {
-        filtered = matches.filter(m => !m.nextMatchDate || m.nextMatchDate === targetDateStr);
+      } else if (currentCategory === 'corners' || currentCategory === 'teamtoscore' || currentCategory === 'teamtoscore2plus') {
+        filtered = matches;
       } else {
         console.log('Target date:', targetDateStr, 'Category:', currentCategory, 'Total matches:', matches.length);
         
