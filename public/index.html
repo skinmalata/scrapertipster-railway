@@ -1204,7 +1204,7 @@
           throw new Error(`HTTP error: ${response.status}`);
         }
         currentData = await response.json();
-        console.log('Data received:', currentData.success ? 'success' : 'failed', 'matches:', currentData.matches?.length);
+        console.log('Data received:', JSON.stringify(currentData).substring(0, 500));
         console.log('Calling renderMatches...');
         renderMatches();
         console.log('renderMatches completed');
