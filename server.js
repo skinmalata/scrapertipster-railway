@@ -3,7 +3,13 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const cron = require('node-cron');
+const axios = require('axios');
 const apiRoutes = require('./src/routes/api');
+
+const YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@winfulltime/videos';
+
+let youtubeVideosCache = { videos: [], lastFetched: null };
+const YOUTUBE_CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
 let scraperService;
 try {
@@ -154,6 +160,59 @@ app.use((req, res, next) => {
 // API Routes
 app.use('/api', apiRoutes);
 
+// YouTube Videos API - using official YouTube Data API
+const YOUTUBE_CHANNEL_ID = 'UCyDIjH4CQiITAGnjZ_ZTTYg'; // @winfulltime channel ID
+const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
+
+app.get('/api/youtube-videos', async (req, res) => {
+  const now = Date.now();
+  
+  if (youtubeVideosCache.videos.length > 0 && 
+      youtubeVideosCache.lastFetched && 
+      (now - youtubeVideosCache.lastFetched) < YOUTUBE_CACHE_DURATION) {
+    return res.json({ success: true, videos: youtubeVideosCache.videos });
+  }
+
+  if (!YOUTUBE_API_KEY) {
+    console.error('YouTube API key not configured');
+    if (youtubeVideosCache.videos.length > 0) {
+      return res.json({ success: true, videos: youtubeVideosCache.videos, cached: true });
+    }
+    return res.status(500).json({ success: false, error: 'YouTube API not configured' });
+  }
+
+  try {
+    const response = await axios.get(`https://www.googleapis.com/youtube/v3/search`, {
+      params: {
+        key: YOUTUBE_API_KEY,
+        channelId: YOUTUBE_CHANNEL_ID,
+        part: 'snippet',
+        order: 'date',
+        maxResults: 4,
+        type: 'video'
+      },
+      timeout: 15000
+    });
+
+    const videos = response.data.items.map(item => ({
+      id: item.id.videoId,
+      title: item.snippet.title,
+      thumbnail: item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url,
+      publishDate: item.snippet.publishedAt,
+      youtubeUrl: `https://www.youtube.com/watch?v=${item.id.videoId}`
+    }));
+
+    youtubeVideosCache = { videos, lastFetched: now };
+    res.json({ success: true, videos });
+  } catch (error) {
+    console.error('Error fetching YouTube videos:', error.message);
+    if (youtubeVideosCache.videos.length > 0) {
+      return res.json({ success: true, videos: youtubeVideosCache.videos, cached: true });
+    }
+    res.status(500).json({ success: false, error: 'Failed to fetch videos' });
+  }
+});
+
 // Frontend Routes
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -166,6 +225,10 @@ cron.schedule('0 1 * * *', async () => {
   try {
     const data = await getScraperService().fetchAndCachePredictions();
     console.log('Scheduled fetch completed. Matches found:', data.totalMatches);
+    
+    console.log('Running scheduled corners scraping...');
+    const cornersData = await getScraperService().scrapeCorners();
+    console.log('Scheduled corners scrape completed. Matches found:', cornersData.totalMatches);
   } catch (error) {
     console.error('Scheduled fetch error:', error.message);
   }
@@ -183,17 +246,6 @@ if (process.env.ENABLE_BACKGROUND_SCRAPING === 'true') {
   });
 }
 
-// Run corners scraping daily at 6:00 AM
-cron.schedule('0 6 * * *', async () => {
-  console.log('Running scheduled corners scraping...');
-  try {
-    const cornersData = await getScraperService().scrapeCorners();
-    console.log('Scheduled corners scrape completed. Matches found:', cornersData.totalMatches);
-  } catch (error) {
-    console.error('Scheduled corners scrape error:', error.message);
-  }
-});
-
 // Use a flag to track if initial fetch is running
 let initialFetchRunning = false;
 
@@ -210,6 +262,10 @@ setTimeout(async () => {
   try {
     const data = await getScraperService().fetchAndCachePredictions();
     console.log('Initial fetch completed. Matches found:', data.totalMatches);
+    
+    console.log('Running initial corners scraping...');
+    const cornersData = await getScraperService().scrapeCorners();
+    console.log('Initial corners scrape completed. Matches found:', cornersData.totalMatches);
   } catch (error) {
     console.error('Initial fetch error:', error.message);
   } finally {

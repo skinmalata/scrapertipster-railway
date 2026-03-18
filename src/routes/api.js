@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 let scraperService = null;
+let cornersLastScrape = null;
+const SCRAPE_INTERVAL_MS = 2 * 60 * 60 * 1000;
 function getScraperService() {
   if (!scraperService) {
     scraperService = require('../services/scraper');
@@ -191,10 +193,20 @@ router.get('/corners', async (req, res) => {
   try {
     let cornersData = getScraperService().loadCornersCache();
     
-    if (!cornersData) {
-      console.log('[API] No corners cache, triggering scrape...');
-      cornersData = await getScraperService().scrapeCorners();
+    if (cornersData) {
+      const now = Date.now();
+      const timeSinceLastScrape = cornersLastScrape ? now - cornersLastScrape : 0;
+      const isWithinInterval = timeSinceLastScrape < SCRAPE_INTERVAL_MS;
+      
+      if (isWithinInterval) {
+        console.log('[API] Using cached corners data (within 2-hour window)');
+        return res.json(cornersData);
+      }
     }
+    
+    console.log('[API] Scraping corners... (no cache or stale)');
+    cornersData = await getScraperService().scrapeCorners();
+    cornersLastScrape = Date.now();
     
     res.json(cornersData);
   } catch (err) {

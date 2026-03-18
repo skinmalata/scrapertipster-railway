@@ -1211,9 +1211,9 @@ async function scrapeCorners() {
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
     
-    await page.goto(CORNERS_URL, { waitUntil: 'networkidle2', timeout: 30000 });
+    await page.goto(CORNERS_URL, { waitUntil: 'networkidle2', timeout: 60000 });
     
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await new Promise(resolve => setTimeout(resolve, 8000));
     
     const html = await page.content();
     await browser.close();
@@ -1245,6 +1245,14 @@ async function scrapeCorners() {
       // Extract insights from context - look for patterns like "10 of the last 12 games had over 8.5 corners"
       const insights = [];
       const lines = context.split(/\n|,|\.|;/);
+      
+      // Debug: show sample lines
+      if (matchId < 3) {
+        console.log('[Corners] Sample context lines for match:', `${home} vs ${away}`);
+        for (let i = 0; i < Math.min(10, lines.length); i++) {
+          if (lines[i].length > 10) console.log('[Corners]  Line:', lines[i].substring(0, 150));
+        }
+      }
       
       for (const line of lines) {
         const lowerLine = line.toLowerCase();
@@ -1336,7 +1344,11 @@ function loadCornersCache() {
   const cornersCacheFile = path.join(process.cwd(), 'corners-cache.json');
   try {
     if (fs.existsSync(cornersCacheFile)) {
-      return JSON.parse(fs.readFileSync(cornersCacheFile, 'utf8'));
+      const cached = JSON.parse(fs.readFileSync(cornersCacheFile, 'utf8'));
+      const today = new Date().toISOString().split('T')[0];
+      if (cached.date === today) {
+        return cached;
+      }
     }
   } catch (e) {}
   return null;

@@ -464,6 +464,72 @@
       font-size: 15px;
     }
 
+    .youtube-section {
+      max-width: 900px;
+      margin: 32px auto;
+      padding: 0 12px;
+    }
+
+    .youtube-section h3 {
+      font-size: 22px;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #18181b;
+    }
+
+    .youtube-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .youtube-video {
+      background: #f4f4f5;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: block;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .youtube-video:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .youtube-video iframe {
+      width: 100%;
+      aspect-ratio: 16/9;
+      border: none;
+    }
+
+    .video-info {
+      padding: 12px;
+    }
+
+    .video-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #18181b;
+      margin-bottom: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .video-meta {
+      font-size: 12px;
+      color: #71717a;
+    }
+
+    @media (max-width: 600px) {
+      .youtube-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     footer { background: #f4f4f5; padding: 32px 12px; border-top: 1px solid #e5e5e5; margin-top: auto; }
     .footer-content { max-width: 900px; margin: 0 auto; text-align: center; }
     .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
@@ -784,6 +850,14 @@
           <span class="streak-icon">➖</span>
           <span class="streak-text">Draws Streak</span>
         </a>
+      </div>
+
+      <!-- YouTube Videos Section -->
+      <div class="youtube-section">
+        <h3>Latest Videos</h3>
+        <div class="youtube-grid" id="youtubeGrid">
+          <div class="loading"><div class="spinner"></div></div>
+        </div>
       </div>
 
       <!-- FAQ Section -->
@@ -1173,7 +1247,7 @@
       document.querySelectorAll('.match-card').forEach(card => {
         card.addEventListener('click', () => {
           const matchData = JSON.parse(decodeURIComponent(card.dataset.match));
-          if (currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak') return;
+          if (currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak' || currentCategory === 'corners') return;
           const matchStr = matchData.match || '';
           const teams = matchStr.includes(' - ') ? matchStr.split(' - ') : matchStr.split(' vs ');
           const homeTeam = encodeURIComponent(teams[0]?.trim() || '');
@@ -1396,10 +1470,36 @@
       }
     }
 
-    renderDayTabs();
-    console.log('Calling loadPredictions...');
+renderDayTabs();
     loadPredictions();
+    loadYoutubeVideos();
     console.log('loadPredictions called, waiting...');
+async function loadYoutubeVideos() {
+      try {
+        const response = await fetch('/api/youtube-videos');
+        const data = await response.json();
+        
+        if (!data.success || !data.videos || data.videos.length === 0) {
+          document.getElementById('youtubeGrid').innerHTML = '<p class="no-matches">No videos available</p>';
+          return;
+        }
+
+        const html = data.videos.map(video => `
+          <a href="${video.youtubeUrl}" target="_blank" rel="noopener noreferrer" class="youtube-video">
+            <img src="${video.thumbnail}" alt="${video.title}" style="width:100%;aspect-ratio:16/9;object-fit:cover;">
+            <div class="video-info">
+              <div class="video-title">${video.title}</div>
+            </div>
+          </a>
+        `).join('');
+
+        document.getElementById('youtubeGrid').innerHTML = html;
+      } catch (error) {
+        console.error('Error loading YouTube videos:', error);
+        document.getElementById('youtubeGrid').innerHTML = '<p class="no-matches">Failed to load videos</p>';
+      }
+    }
+
     } catch (error) {
       console.error('Script error:', error);
       alert('Script error: ' + error.message);
