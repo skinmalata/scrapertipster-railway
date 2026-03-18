@@ -183,6 +183,17 @@ if (process.env.ENABLE_BACKGROUND_SCRAPING === 'true') {
   });
 }
 
+// Run corners scraping daily at 6:00 AM
+cron.schedule('0 6 * * *', async () => {
+  console.log('Running scheduled corners scraping...');
+  try {
+    const cornersData = await getScraperService().scrapeCorners();
+    console.log('Scheduled corners scrape completed. Matches found:', cornersData.totalMatches);
+  } catch (error) {
+    console.error('Scheduled corners scrape error:', error.message);
+  }
+});
+
 // Use a flag to track if initial fetch is running
 let initialFetchRunning = false;
 
