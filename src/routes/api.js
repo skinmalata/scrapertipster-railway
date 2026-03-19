@@ -12,6 +12,7 @@ function getScraperService() {
 }
 
 let supabase = null;
+let isRefreshing = false;
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
 

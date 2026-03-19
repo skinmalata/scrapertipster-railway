@@ -67,9 +67,92 @@
 
     body {
       font-family: system-ui, -apple-system, sans-serif;
-      background: #ffffff;
+      background: #f8fafc;
       color: #18181b;
       min-height: 100vh;
+    }
+
+    .cookie-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      color: #1f2937;
+      padding: 24px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      z-index: 9999;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .cookie-banner p {
+      margin: 0;
+      font-size: 15px;
+      color: #1f2937;
+      flex: 1;
+      min-width: 280px;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    .cookie-banner a {
+      color: #2563eb;
+      text-decoration: underline;
+    }
+
+    .cookie-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .cookie-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .cookie-accept {
+      background: #2563eb;
+      color: white;
+    }
+
+    .cookie-accept:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+    }
+
+    .cookie-reject {
+      background: #f3f4f6;
+      color: #374151;
+      border: 1px solid #d1d5db;
+    }
+
+    .cookie-reject:hover {
+      background: #e5e7eb;
+    }
+
+    @media (max-width: 640px) {
+      .cookie-banner {
+        padding: 20px;
+        flex-direction: column;
+        text-align: center;
+      }
+      .cookie-banner p {
+        min-width: 100%;
+      }
+      .cookie-buttons {
+        width: 100%;
+        justify-content: center;
+      }
     }
 
     .container {
@@ -78,10 +161,10 @@
       padding: 0 12px;
     }
 
-    header {
-      background: #ffffff;
-      border-bottom: 1px solid #e5e5e5;
-      padding: 24px 0;
+header {
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 12px 0;
     }
 
     .header-content {
@@ -99,14 +182,21 @@
        gap: 8px;
      }
 
-      .logo-icon {
-        width: 48px;
-        height: 48px;
-        background-image: url('/logo.png');
+       .logo-icon {
+        width: 200px;
+        height: 80px;
+        background-image: url('/logonew.png');
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
         flex-shrink: 0;
+      }
+
+      @media (max-width: 640px) {
+        .logo-icon {
+          width: 150px;
+          height: 60px;
+        }
       }
 
      .logo-text {
@@ -128,7 +218,7 @@
       color: #71717a;
       text-decoration: none;
       font-weight: 500;
-      font-size: 14px;
+      font-size: 16px;
     }
 
     nav a:hover {
@@ -154,6 +244,13 @@
       font-weight: bold;
       color: #18181b;
       margin-bottom: 6px;
+    }
+
+    .hero-subtext {
+      font-size: 15px;
+      color: #71717a;
+      margin-top: 4px;
+      font-style: italic;
     }
 
     .hero p {
@@ -530,7 +627,7 @@
       }
     }
 
-    footer { background: #f4f4f5; padding: 32px 12px; border-top: 1px solid #e5e5e5; margin-top: auto; }
+    footer { background: #f8fafc; padding: 32px 12px; border-top: 1px solid #e2e8f0; margin-top: auto; }
     .footer-content { max-width: 900px; margin: 0 auto; text-align: center; }
     .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
     .footer-links a { color: #52525b; text-decoration: none; font-weight: 500; }
@@ -559,6 +656,9 @@
       }
       .hero h2 {
         font-size: 32px;
+      }
+      .hero-subtext {
+        font-size: 14px;
       }
     }
 
@@ -782,24 +882,22 @@
         grid-template-columns: 1fr;
       }
     }
-   </style>
-   <!-- Google tag (gtag.js) -->
-   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>
-   <script>
-     window.dataLayer = window.dataLayer || [];
-     function gtag(){dataLayer.push(arguments);}
-     gtag('js', new Date());
-     gtag('config', 'G-HMGZMW9EDP');
-   </script>
- </head>
+    </style>
+  </head>
 <body>
+  <div id="cookie-banner" class="cookie-banner">
+    <p>We use cookies to analyze traffic and improve your experience. By clicking "Accept", you consent to our use of cookies.</p>
+    <div class="cookie-buttons">
+      <button id="cookie-accept" class="cookie-btn cookie-accept">Accept</button>
+      <button id="cookie-reject" class="cookie-btn cookie-reject">Reject</button>
+    </div>
+  </div>
   <div>
     <header>
       <div class="header-content">
        <div class="logo">
-            <div class="logo-icon" role="img" aria-label="WinFulltime Logo"></div>
-             <span class="logo-text">WinFulltime</span>
-          </div>
+             <div class="logo-icon" role="img" aria-label="WinFulltime Logo"></div>
+           </div>
         <nav>
           <a href="/">Home</a>
           <a href="/about.html">About</a>
@@ -811,6 +909,7 @@
     <main class="container">
       <div class="hero">
         <h2>Best Football Predictions Today</h2>
+        <p class="hero-subtext">1x2, over 1.5, over 2.5, corners, BTTS, team to score, win streak</p>
       </div>
 
       <div class="tabs-container" id="dayTabs"></div>
@@ -1518,5 +1617,44 @@ async function loadYoutubeVideos() {
       <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
     </div>
   </footer>
+  <script>
+    function loadGoogleAnalytics() {
+      var script = document.createElement('script');
+      script.src = 'https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP';
+      script.async = true;
+      document.head.appendChild(script);
+      
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      window.gtag = gtag;
+      gtag('js', new Date());
+      gtag('config', 'G-HMGZMW9EDP');
+    }
+    
+    function getCookie(name) {
+      var value = "; " + document.cookie;
+      var parts = value.split("; " + name + "=");
+      if (parts.length === 2) return parts.pop().split(";").shift();
+    }
+    
+    var consent = getCookie('cookie_consent');
+    if (consent === 'accepted') {
+      loadGoogleAnalytics();
+      document.getElementById('cookie-banner').style.display = 'none';
+    } else if (consent === 'rejected') {
+      document.getElementById('cookie-banner').style.display = 'none';
+    }
+    
+    document.getElementById('cookie-accept').addEventListener('click', function() {
+      document.cookie = 'cookie_consent=accepted; path=/; max-age=31536000';
+      document.getElementById('cookie-banner').style.display = 'none';
+      loadGoogleAnalytics();
+    });
+    
+    document.getElementById('cookie-reject').addEventListener('click', function() {
+      document.cookie = 'cookie_consent=rejected; path=/; max-age=31536000';
+      document.getElementById('cookie-banner').style.display = 'none';
+    });
+  </script>
 </body>
 </html>

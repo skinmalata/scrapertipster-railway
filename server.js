@@ -131,10 +131,10 @@ function rateLimiter(req, res, next) {
 }
 
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : false
+  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : true
 }));
 app.use((req, res, next) => {
-  res.setHeader('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; connect-src 'self' https:;");
+  res.setHeader('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: https://cdn.tailwindcss.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https: https://cdn.tailwindcss.com; img-src 'self' data: https: https://i.ytimg.com https://yt3.ggpht.com; connect-src 'self' https: https://www.google-analytics.com; frame-src https://www.youtube.com https://youtube.com;");
   next();
 });
 app.use(express.json({ limit: '10kb' }));
@@ -148,14 +148,14 @@ app.use(express.static('public', {
   lastModified: false
 }));
 
-// Redirect www to non-www (but not for API routes)
-app.use((req, res, next) => {
-  if (req.hostname && req.hostname.startsWith('www.') && !req.originalUrl.startsWith('/api')) {
-    const newUrl = 'https://' + req.hostname.slice(4) + req.originalUrl;
-    return res.redirect(301, newUrl);
-  }
-  next();
-});
+// WWW redirect disabled for Railway compatibility
+// app.use((req, res, next) => {
+//   if (req.hostname && req.hostname.startsWith('www.') && !req.originalUrl.startsWith('/api')) {
+//     const newUrl = 'https://' + req.hostname.slice(4) + req.originalUrl;
+//     return res.redirect(301, newUrl);
+//   }
+//   next();
+// });
 
 // API Routes
 app.use('/api', apiRoutes);
