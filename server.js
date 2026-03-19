@@ -164,6 +164,9 @@ app.use('/api', apiRoutes);
 const YOUTUBE_CHANNEL_ID = 'UCyDIjH4CQiITAGnjZ_ZTTYg'; // @winfulltime channel ID
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 
+console.log('YouTube API Key loaded:', YOUTUBE_API_KEY ? 'Yes (' + YOUTUBE_API_KEY.substring(0, 10) + '...)' : 'No');
+console.log('YouTube Channel ID:', YOUTUBE_CHANNEL_ID);
+
 app.get('/api/youtube-videos', async (req, res) => {
   const now = Date.now();
   
@@ -206,10 +209,11 @@ app.get('/api/youtube-videos', async (req, res) => {
     res.json({ success: true, videos });
   } catch (error) {
     console.error('Error fetching YouTube videos:', error.message);
+    console.error('Error details:', error.response?.data || error.code || 'Unknown error');
     if (youtubeVideosCache.videos.length > 0) {
       return res.json({ success: true, videos: youtubeVideosCache.videos, cached: true });
     }
-    res.status(500).json({ success: false, error: 'Failed to fetch videos' });
+    res.status(500).json({ success: false, error: 'Failed to fetch videos', details: error.message });
   }
 });
 
