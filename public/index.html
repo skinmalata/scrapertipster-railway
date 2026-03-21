@@ -375,7 +375,8 @@ header {
 
     .score-display {
       font-weight: bold;
-      color: #ffffff;
+      color: #fbbf24;
+      font-size: 20px;
     }
 
     .match-footer {
@@ -1326,6 +1327,7 @@ header {
               <div class="match-footer">
                 <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
                   <span class="tip-badge">${streakLabel}</span>
+                  <div class="probability">${match.probability}%</div>
                 </div>
               </div>
             ` : `
@@ -1340,8 +1342,7 @@ header {
               <div class="match-footer">
                 <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
                   <span class="tip-badge">${match.tip}</span>
-                  ${currentCategory === 'corners' && match.insights && match.insights[0] ? `<div class="probability" style="font-size: 18px; max-width: 280px; line-height: 1.4; color: #fff; font-weight: 600;">${match.insights[0]}</div>` : ''}
-                  ${currentCategory !== 'corners' ? `<div class="probability">${match.probability}%</div>` : ''}
+                  <div class="probability">${match.probability}%</div>
                 </div>
               </div>
             `}
