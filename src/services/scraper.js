@@ -360,7 +360,7 @@ async function scrapeDate(dateStr, retryCount = 0) {
 
     const leagueInfo = detectLeague(homeTeam);
 
-     if (homeTeam && awayTeam && bestProb >= 50) {
+     if (homeTeam && awayTeam && bestProb >= 65) {
       matches.push({
         id: matchId++,
         league: leagueInfo.league,
@@ -390,7 +390,7 @@ async function scrapeDate(dateStr, retryCount = 0) {
       });
     }
 
-    if (homeTeam && awayTeam && over15 >= 55) {
+    if (homeTeam && awayTeam && over15 >= 80) {
       over15Matches.push({
         id: over15Id++,
         league: leagueInfo.league,
