@@ -70,12 +70,82 @@ router.get('/predictions', async (req, res) => {
     
     let data = await getScraperService().fetchPredictions();
     
+    // Load results cache and match with predictions
+    let resultsCache = {};
+    try {
+      if (getScraperService().getResultsCache) {
+        resultsCache = getScraperService().getResultsCache();
+        console.log('[API] Results cache dates:', Object.keys(resultsCache));
+      }
+    } catch (e) {
+      console.error('Error loading results cache:', e.message);
+    }
+    
+    // Enrich predictions with results
+    const enrichWithResults = (matches) => {
+      if (!matches) return [];
+      return matches.map(match => {
+        const matchKey = match.match;
+        let result = null;
+        
+        // Search through all dates in results cache
+        for (const dateKey of Object.keys(resultsCache)) {
+          const dateResults = resultsCache[dateKey];
+          for (const [resultKey, score] of Object.entries(dateResults)) {
+            const normalizedMatch = matchKey.toLowerCase().replace(/\s+/g, ' ').trim();
+            const normalizedResult = resultKey.toLowerCase().replace(/\s+/g, ' ').trim();
+            
+            const matchTeams = normalizedMatch.split(/ - | vs /);
+            const resultTeams = normalizedResult.split(/ - | vs /);
+            
+            if (matchTeams.length === 2 && resultTeams.length === 2) {
+              const [home1, away1] = matchTeams;
+              const [home2, away2] = resultTeams;
+              
+              // Check if teams match (partial match allowed)
+              const homeMatch = home1.includes(home2) || home2.includes(home1);
+              const awayMatch = away1.includes(away2) || away2.includes(away1);
+              
+              if (homeMatch && awayMatch) {
+                result = score;
+                break;
+              }
+            }
+          }
+          if (result) break;
+        }
+        
+        return { ...match, result };
+      });
+    };
+    
+    data.matches = enrichWithResults(data.matches);
+    data.over25Matches = enrichWithResults(data.over25Matches);
+    data.over15Matches = enrichWithResults(data.over15Matches);
+    data.bttsMatches = enrichWithResults(data.bttsMatches);
+    
     // Load corners data
     const cornersData = getScraperService().loadCornersCache();
     if (cornersData) {
       data.cornersMatches = cornersData.matches || [];
     } else {
       data.cornersMatches = [];
+    }
+    
+    // Load cards data
+    const cardsData = getScraperService().loadCardsCache();
+    if (cardsData) {
+      data.cardsMatches = cardsData.matches || [];
+    } else {
+      data.cardsMatches = [];
+    }
+    
+    // Load both halves data (replaces Team to Score 2+)
+    const bothHalvesData = getScraperService().loadBothHalvesCache();
+    if (bothHalvesData) {
+      data.teamToScore2PlusMatches = bothHalvesData.matches || [];
+    } else {
+      data.teamToScore2PlusMatches = [];
     }
     
     if (!data.over15Matches || data.over15Matches.length === 0) {
@@ -212,6 +282,34 @@ router.get('/corners', async (req, res) => {
     res.json(cornersData);
   } catch (err) {
     console.error('Corners error:', err.message);
+    res.json({ success: true, totalMatches: 0, matches: [] });
+  }
+});
+
+let cardsLastScrape = null;
+
+router.get('/cards', async (req, res) => {
+  try {
+    let cardsData = getScraperService().loadCardsCache();
+    
+    if (cardsData) {
+      const now = Date.now();
+      const timeSinceLastScrape = cardsLastScrape ? now - cardsLastScrape : 0;
+      const isWithinInterval = timeSinceLastScrape < SCRAPE_INTERVAL_MS;
+      
+      if (isWithinInterval) {
+        console.log('[API] Using cached cards data (within 2-hour window)');
+        return res.json(cardsData);
+      }
+    }
+    
+    console.log('[API] Scraping cards... (no cache or stale)');
+    cardsData = await getScraperService().scrapeCards();
+    cardsLastScrape = Date.now();
+    
+    res.json(cardsData);
+  } catch (err) {
+    console.error('Cards error:', err.message);
     res.json({ success: true, totalMatches: 0, matches: [] });
   }
 });

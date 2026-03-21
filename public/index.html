@@ -16,6 +16,7 @@
    <meta name="twitter:image" content="/logo.png">
   <link rel="canonical" href="https://winfulltime.com/">
    <link rel="icon" href="/logo.png" type="image/png">
+   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6975707128100932" crossorigin="anonymous"></script>
    <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -906,6 +907,10 @@ header {
       </div>
     </header>
 
+    <div class="text-center py-2">
+      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-6975707128100932" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    </div>
+
     <main class="container">
       <div class="hero">
         <h2>Best Football Predictions Today</h2>
@@ -920,8 +925,9 @@ header {
         <button onclick="setCategory('over25')" id="tab-over25" class="tab-btn">Over 2.5</button>
         <button onclick="setCategory('btts')" id="tab-btts" class="tab-btn">BTTS</button>
         <button onclick="setCategory('corners')" id="tab-corners" class="tab-btn">Corners</button>
-        <button onclick="setCategory('teamtoscore')" id="tab-teamtoscore" class="tab-btn">To Score</button>
+
         <button onclick="setCategory('teamtoscore2plus')" id="tab-teamtoscore2plus" class="tab-btn">To Score 2+</button>
+        <button onclick="setCategory('cards')" id="tab-cards" class="tab-btn">Cards</button>
       </div>
 
       <div class="stats-bar" id="statsBar">
@@ -1144,7 +1150,7 @@ header {
       const baseDate = new Date();
       baseDate.setHours(0, 0, 0, 0);
       
-      for (let i = -3; i <= 3; i++) {
+      for (let i = -1; i <= 3; i++) {
         const date = new Date(baseDate);
         date.setDate(baseDate.getDate() + i);
         const year = date.getFullYear();
@@ -1203,7 +1209,7 @@ header {
     }
 
     function getCategoryLabel(cat) {
-      const labels = { '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5', 'btts': 'BTTS', 'corners': 'Corners', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak', 'teamtoscore': 'To Score', 'teamtoscore2plus': 'To Score 2+' };
+      const labels = { '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5', 'btts': 'BTTS', 'corners': 'Corners', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak', 'teamtoscore2plus': 'To Score 2+', 'cards': 'Cards' };
       return labels[cat] || cat;
     }
 
@@ -1234,8 +1240,8 @@ header {
       else if (currentCategory === 'winstreak') matches = currentData.winstreakMatches || [];
       else if (currentCategory === 'losestreak') matches = currentData.losestreakMatches || [];
       else if (currentCategory === 'drawstreak') matches = currentData.drawstreakMatches || [];
-      else if (currentCategory === 'teamtoscore') matches = currentData.teamToScoreMatches || [];
       else if (currentCategory === 'teamtoscore2plus') matches = currentData.teamToScore2PlusMatches || [];
+      else if (currentCategory === 'cards') matches = currentData.cardsMatches || [];
 
       let filtered;
       const targetDate = new Date();
@@ -1250,7 +1256,7 @@ header {
         filtered = matches;
       } else if (currentCategory === 'corners') {
         filtered = matches.filter(m => m.date === targetDateStr);
-      } else if (currentCategory === 'teamtoscore' || currentCategory === 'teamtoscore2plus') {
+      } else if (currentCategory === 'teamtoscore2plus' || currentCategory === 'cards') {
         filtered = matches;
       } else {
         console.log('Target date:', targetDateStr, 'Category:', currentCategory, 'Total matches:', matches.length);
@@ -1272,7 +1278,7 @@ header {
       }
 
       const isStreakTab = currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak';
-      const isTeamToScore = currentCategory === 'teamtoscore' || currentCategory === 'teamtoscore2plus';
+      const isTeamToScore = currentCategory === 'teamtoscore2plus' || currentCategory === 'cards';
       let displayMatches = filtered;
 
       document.getElementById('totalMatches').textContent = filtered.length;
@@ -1282,7 +1288,9 @@ header {
         const teams = matchStr.includes(' - ') ? matchStr.split(' - ') : matchStr.split(' vs ');
         const home = teams[0]?.trim() || '';
         const away = teams[1]?.trim() || '';
-        const hasScore = match.score && match.score.home != null && match.score.away != null;
+        const hasScore = (match.score && match.score.home != null && match.score.away != null) || 
+                         (match.result && match.result.home != null && match.result.away != null);
+        const displayScore = match.result || match.score;
         const matchData = encodeURIComponent(JSON.stringify(match));
         
         const isWinstreak = currentCategory === 'winstreak';
@@ -1293,7 +1301,7 @@ header {
         if (isWinstreak) streakLabel = `Winning Streak: ${match.streak || ''}`;
         else if (isLosestreak) streakLabel = `Losing Streak: ${match.streak || ''}`;
         else if (isDrawstreak) streakLabel = `Draws Streak: ${match.streak || ''}`;
-        else if (isTeamToScore) streakLabel = match.streak || 'Scored in last 5 matches';
+        else if (isTeamToScore) streakLabel = match.tip || 'Score 2+ Goals';
 
         return `
           <div class="match-card fade-in" style="animation-delay: ${i * 50}ms" data-match="${matchData}">
@@ -1313,7 +1321,7 @@ header {
               </div>
             ` : isTeamToScore ? `
               <div class="match-teams" style="justify-content: center;">
-                <span class="team team-home" style="text-align: center; width: 100%;">${match.team}</span>
+                <span class="team team-home" style="text-align: center; width: 100%;">${match.match}</span>
               </div>
               <div class="match-footer">
                 <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
@@ -1324,7 +1332,7 @@ header {
               <div class="match-teams">
                 <span class="team team-home">${home}</span>
                 ${hasScore ? 
-                  `<span class="vs-score score-display">${match.score.home} - ${match.score.away}</span>` : 
+                  `<span class="vs-score score-display">${displayScore.home} - ${displayScore.away}</span>` : 
                   `<span class="vs-score">vs</span>`
                 }
                 <span class="team team-away">${away}</span>
@@ -1346,7 +1354,7 @@ header {
       document.querySelectorAll('.match-card').forEach(card => {
         card.addEventListener('click', () => {
           const matchData = JSON.parse(decodeURIComponent(card.dataset.match));
-          if (currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak' || currentCategory === 'corners') return;
+          if (currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak' || currentCategory === 'corners' || currentCategory === 'cards') return;
           const matchStr = matchData.match || '';
           const teams = matchStr.includes(' - ') ? matchStr.split(' - ') : matchStr.split(' vs ');
           const homeTeam = encodeURIComponent(teams[0]?.trim() || '');
@@ -1656,5 +1664,8 @@ async function loadYoutubeVideos() {
       document.getElementById('cookie-banner').style.display = 'none';
     });
   </script>
-</body>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+  </body>
 </html>

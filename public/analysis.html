@@ -12,6 +12,7 @@
   <meta property="og:image" content="/logo.png">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="robots" content="index, follow">
   <link rel="icon" href="/logo.png" type="image/png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -100,8 +101,24 @@
       .stat-value { font-size: 18px; }
       .form-result { width: 32px; height: 32px; font-size: 14px; }
     }
-   </style>
-   <!-- Google tag (gtag.js) -->
+    </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Match Analysis - WinFulltime",
+      "description": "Detailed football match analysis including recent form, head-to-head statistics, team performance metrics, and predictions.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "WinFulltime"
+      },
+      "mainEntity": {
+        "@type": "SportsEvent",
+        "name": "Football Match Analysis"
+      }
+    }
+    </script>
+    <!-- Google tag (gtag.js) -->
    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>
    <script>
      window.dataLayer = window.dataLayer || [];
@@ -115,6 +132,12 @@
     <a href="javascript:window.close()" class="back-btn">Close</a>
     <h1 id="matchTitle">Loading...</h1>
     <div id="content">
+      <noscript>
+        <div class="analysis-section">
+          <h3>Match Analysis</h3>
+          <p>This page provides detailed football match analysis including recent form, head-to-head statistics, team performance metrics, and predictions. Please enable JavaScript to view the analysis.</p>
+        </div>
+      </noscript>
       <div class="loading"><div class="spinner"></div></div>
     </div>
   </div>

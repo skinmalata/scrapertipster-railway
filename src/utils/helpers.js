@@ -4,7 +4,7 @@ function getDateRange() {
   const dates = [];
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  for (let i = -3; i <= 7; i++) {
+  for (let i = -1; i <= 3; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
     const year = d.getFullYear();
