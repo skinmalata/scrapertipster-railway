@@ -149,32 +149,33 @@ app.use(express.static('public', {
 }));
 
 // Redirect HTTP to HTTPS and www to non-www for SEO (skip for localhost development)
-const BASE_URL = process.env.BASE_URL || 'https://winfulltime.com';
 const isLocalhost = (host) => host === 'localhost' || host === '127.0.0.1' || host.includes('192.168.') || host.includes('10.0.0.');
 app.use((req, res, next) => {
-  let host = req.hostname;
-  let updated = false;
-  let newUrl;
-
+  const host = req.hostname || '';
+  
   // Skip redirect for local development
   if (isLocalhost(host)) {
     return next();
   }
-
-  // Redirect HTTP to HTTPS
-  if (!req.secure && req.protocol !== 'https') {
-    newUrl = 'https://' + host + req.originalUrl;
-    updated = true;
+  
+  // Only apply redirects for the main domain
+  const mainDomain = 'winfulltime.com';
+  const isMainDomain = host === mainDomain || host === 'www.' + mainDomain;
+  
+  if (!isMainDomain) {
+    return next();
   }
+
   // Redirect www to non-www
-  else if (host && host.startsWith('www.')) {
-    newUrl = 'https://' + host.slice(4) + req.originalUrl;
-    updated = true;
+  if (host === 'www.' + mainDomain) {
+    return res.redirect(301, 'https://' + mainDomain + req.originalUrl);
   }
-
-  if (updated && newUrl) {
-    return res.redirect(301, newUrl);
+  
+  // Redirect HTTP to HTTPS (only if not already HTTPS)
+  if (req.protocol !== 'https') {
+    return res.redirect(301, 'https://' + mainDomain + req.originalUrl);
   }
+  
   next();
 });
 

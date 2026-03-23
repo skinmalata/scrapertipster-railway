@@ -68,7 +68,36 @@ router.get('/predictions', async (req, res) => {
     const userId = req.headers['x-user-id'];
     const { isVip } = await checkUserVipStatus(userId);
     
-    let data = await getScraperService().fetchPredictions();
+    let data;
+    try {
+      data = await getScraperService().fetchPredictions();
+    } catch (scraperError) {
+      console.error('Scraper error:', scraperError.message);
+      // Return empty data structure instead of failing
+      return res.json({
+        success: true,
+        dates: [],
+        matches: [],
+        over15Matches: [],
+        over25Matches: [],
+        bttsMatches: [],
+        winstreakMatches: [],
+        losestreakMatches: [],
+        drawstreakMatches: [],
+        teamToScoreMatches: [],
+        teamToScore2PlusMatches: [],
+        cardsMatches: [],
+        cornersMatches: [],
+        totalMatches: 0,
+        totalOver15: 0,
+        totalOver25: 0,
+        totalBtts: 0,
+        totalWinstreak: 0,
+        totalLosestreak: 0,
+        totalDrawstreak: 0,
+        error: 'Data temporarily unavailable'
+      });
+    }
     
     // Load results cache and match with predictions
     let resultsCache = {};
