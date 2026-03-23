@@ -148,14 +148,29 @@ app.use(express.static('public', {
   lastModified: false
 }));
 
-// WWW redirect disabled for Railway compatibility
-// app.use((req, res, next) => {
-//   if (req.hostname && req.hostname.startsWith('www.') && !req.originalUrl.startsWith('/api')) {
-//     const newUrl = 'https://' + req.hostname.slice(4) + req.originalUrl;
-//     return res.redirect(301, newUrl);
-//   }
-//   next();
-// });
+// Redirect HTTP to HTTPS and www to non-www for SEO
+const BASE_URL = process.env.BASE_URL || 'https://winfulltime.com';
+app.use((req, res, next) => {
+  let host = req.hostname;
+  let updated = false;
+  let newUrl;
+
+  // Redirect HTTP to HTTPS
+  if (!req.secure && req.protocol !== 'https') {
+    newUrl = 'https://' + host + req.originalUrl;
+    updated = true;
+  }
+  // Redirect www to non-www
+  else if (host && host.startsWith('www.')) {
+    newUrl = 'https://' + host.slice(4) + req.originalUrl;
+    updated = true;
+  }
+
+  if (updated && newUrl) {
+    return res.redirect(301, newUrl);
+  }
+  next();
+});
 
 // API Routes
 app.use('/api', apiRoutes);
@@ -233,6 +248,14 @@ cron.schedule('0 1 * * *', async () => {
     console.log('Running scheduled corners scraping...');
     const cornersData = await getScraperService().scrapeCorners();
     console.log('Scheduled corners scrape completed. Matches found:', cornersData.totalMatches);
+    
+    console.log('Running scheduled cards scraping...');
+    const cardsData = await getScraperService().scrapeCards();
+    console.log('Scheduled cards scrape completed. Matches found:', cardsData.totalMatches);
+    
+    console.log('Running scheduled both halves (To Score 2+) scraping...');
+    const bothHalvesData = await getScraperService().scrapeBothHalves();
+    console.log('Scheduled both halves scrape completed. Matches found:', bothHalvesData.totalMatches);
   } catch (error) {
     console.error('Scheduled fetch error:', error.message);
   }
@@ -270,6 +293,14 @@ setTimeout(async () => {
     console.log('Running initial corners scraping...');
     const cornersData = await getScraperService().scrapeCorners();
     console.log('Initial corners scrape completed. Matches found:', cornersData.totalMatches);
+    
+    console.log('Running initial cards scraping...');
+    const cardsData = await getScraperService().scrapeCards();
+    console.log('Initial cards scrape completed. Matches found:', cardsData.totalMatches);
+    
+    console.log('Running initial both halves (To Score 2+) scraping...');
+    const bothHalvesData = await getScraperService().scrapeBothHalves();
+    console.log('Initial both halves scrape completed. Matches found:', bothHalvesData.totalMatches);
   } catch (error) {
     console.error('Initial fetch error:', error.message);
   } finally {
