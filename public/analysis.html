@@ -40,6 +40,11 @@
     .h2h-item span:first-child { text-align: left; flex: 1; }
     .h2h-item span:nth-child(2) { text-align: center; flex: 0 0 auto; min-width: 60px; font-weight: bold; }
     .h2h-item span:last-child { text-align: right; flex: 1; }
+    .summary-section { background: white; border-radius: 8px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .summary-section h3 { font-size: 18px; margin-bottom: 16px; border-bottom: 2px solid #ef4444; padding-bottom: 10px; }
+    .summary-text { line-height: 1.8; color: #3f3f46; font-size: 15px; }
+    .summary-text p { margin-bottom: 14px; }
+    .summary-text p:last-child { margin-bottom: 0; }
     .loading { display: flex; justify-content: center; padding: 40px; }
     .spinner { width: 32px; height: 32px; border: 3px solid #e5e5e5; border-top-color: #ef4444; border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -72,6 +77,9 @@
       .h2h-item { padding: 12px; font-size: 16px; }
       .h2h-item span:first-child, .h2h-item span:last-child { font-size: 14px; }
       .h2h-item span:nth-child(2) { min-width: 60px; font-size: 16px; }
+      .summary-section { padding: 16px; margin-bottom: 16px; }
+      .summary-section h3 { font-size: 18px; }
+      .summary-text { font-size: 14px; line-height: 1.7; }
     }
 
     @media (max-width: 400px) {
@@ -84,6 +92,9 @@
       .stat-label { font-size: 12px; }
       .stat-value { font-size: 18px; }
       .form-result { width: 32px; height: 32px; font-size: 14px; }
+      .summary-section { padding: 16px; }
+      .summary-section h3 { font-size: 16px; }
+      .summary-text { font-size: 14px; line-height: 1.7; }
     }
     </style>
     <script type="application/ld+json">
@@ -192,10 +203,12 @@
         const awayForm = analysis.awayForm || '';
         const homeLast10 = analysis.homeLast10 || {};
         const awayLast10 = analysis.awayLast10 || {};
+        const summary = analysis.summary || '';
 
         console.log('homeForm:', homeForm, 'awayForm:', awayForm);
         console.log('homeLast10:', homeLast10, 'awayLast10:', awayLast10);
         console.log('h2h:', h2h);
+        console.log('summary:', summary ? summary.substring(0, 100) + '...' : 'none');
 
         const getFormClass = (char) => {
           if (char === 'W') return 'form-win';
@@ -261,6 +274,15 @@
               `).join('') : '<p>No head to head data available</p>'}
             </div>
           </div>
+
+          ${summary ? `
+          <div class="summary-section">
+            <h3>Match Summary</h3>
+            <div class="summary-text">
+              ${summary.split('. ').filter(s => s.trim()).map(s => s.trim().endsWith('.') ? `<p>${s}</p>` : `<p>${s}.</p>`).join('')}
+            </div>
+          </div>
+          ` : ''}
 
           <div class="disclaimer">
             <p><strong>18+ Only</strong></p>

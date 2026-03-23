@@ -1236,7 +1236,8 @@ async function getTeamAnalysis(homeTeam, awayTeam) {
     awayForm: '',
     homeLast10: { wins: 0, draws: 0, losses: 0, avgScored: 0, avgConceded: 0 },
     awayLast10: { wins: 0, draws: 0, losses: 0, avgScored: 0, avgConceded: 0 },
-    h2h: []
+    h2h: [],
+    summary: ''
   };
   
   const scrape = async () => {
@@ -1302,6 +1303,8 @@ async function getTeamAnalysis(homeTeam, awayTeam) {
 
   try {
     await safeRequestWithBackoff(scrape, 3, 5000);
+    
+    result.summary = generateMatchSummary(result);
     
     const analysisCache = loadAnalysisCache();
     const key1 = `${homeTeam.toLowerCase()}|${awayTeam.toLowerCase()}`;
@@ -1512,6 +1515,113 @@ async function scrapeCards() {
     
     return { success: true, totalMatches: 0, matches: [], message: 'Cards data unavailable' };
   }
+}
+
+function generateMatchSummary(analysis) {
+  const { homeTeam, awayTeam, homeForm, awayForm, homeLast10, awayLast10, h2h } = analysis;
+  
+  const homeClean = homeTeam.split('(')[0].trim();
+  const awayClean = awayTeam.split('(')[0].trim();
+  
+  const formAnalysis = [];
+  const homeWins = (homeForm.match(/W/g) || []).length;
+  const homeDraws = (homeForm.match(/D/g) || []).length;
+  const homeLosses = (homeForm.match(/L/g) || []).length;
+  const awayWins = (awayForm.match(/W/g) || []).length;
+  const awayDraws = (awayForm.match(/D/g) || []).length;
+  const awayLosses = (awayForm.match(/L/g) || []).length;
+  
+  formAnalysis.push(`${homeClean} enters this match showing mixed form in their recent five outings, with ${homeWins} wins, ${homeDraws} draws, and ${homeLosses} losses. Their attacking output has been decent, averaging ${homeLast10.avgScored?.toFixed(1) || 0} goals per game while conceding ${homeLast10.avgConceded?.toFixed(1) || 0} goals.`);
+  
+  formAnalysis.push(`${awayClean} comes into this fixture with ${awayWins} wins from their last five matches, alongside ${awayDraws} draws and ${awayLosses} losses. Their goal-scoring capability stands at ${awayLast10.avgScored?.toFixed(1) || 0} goals per match, though they have been leaky defensively, shipping ${awayLast10.avgConceded?.toFixed(1) || 0} goals on average.`);
+  
+  let formVerdict = '';
+  if (homeWins > awayWins) {
+    formVerdict = `${homeClean} appears to hold a slight edge in terms of current form, which could prove decisive in this encounter.`;
+  } else if (awayWins > homeWins) {
+    formVerdict = `${awayClean} seems to be in better shape heading into this match, potentially giving them the upper hand.`;
+  } else {
+    formVerdict = `Both teams enter this match with comparable recent form, setting up what could be a tightly contested affair.`;
+  }
+  formAnalysis.push(formVerdict);
+  
+  if (h2h && h2h.length > 0) {
+    const totalH2H = h2h.length;
+    const homeH2HWins = h2h.filter(h => h.homeGoals > h.awayGoals).length;
+    const awayH2HWins = h2h.filter(h => h.awayGoals > h.homeGoals).length;
+    const draws = totalH2H - homeH2HWins - awayH2HWins;
+    
+    const avgGoals = h2h.reduce((sum, h) => sum + (h.homeGoals + h.awayGoals), 0) / totalH2H;
+    
+    let h2hInsight = `Looking at their head-to-head history spanning ${totalH2H} encounters, ${homeClean} has secured victory in ${homeH2HWins} of those meetings, while ${awayClean} has come out on top ${awayH2HWins} times, with ${draws} ending in a draw.`;
+    
+    if (homeH2HWins > awayH2HWins) {
+      h2hInsight += ` ${homeClean} has historically dominated this matchup.`;
+    } else if (awayH2HWins > homeH2HWins) {
+      h2hInsight += ` ${awayClean} holds the psychological edge from previous meetings.`;
+    } else {
+      h2hInsight += ` The historical record suggests an evenly poised contest.`;
+    }
+    
+    h2hInsight += ` Average goals per meeting stand at ${avgGoals.toFixed(1)}, indicating ${avgGoals > 2.5 ? 'these fixtures tend to be high-scoring affairs' : avgGoals > 1.5 ? 'a reasonable expectation of goals in this matchup' : 'tight, low-scoring encounters between these sides'}.`;
+    
+    formAnalysis.push(h2hInsight);
+  }
+  
+  const homeStrengths = [];
+  const homeWeaknesses = [];
+  const awayStrengths = [];
+  const awayWeaknesses = [];
+  
+  if (homeLast10.avgScored >= 1.5) homeStrengths.push('strong attacking play');
+  if (homeLast10.avgConceded <= 1.0) homeStrengths.push('solid defensive organization');
+  if (homeWins >= 3) homeStrengths.push('impressive recent winning run');
+  if (homeLast10.avgScored < 1.0) homeWeaknesses.push('struggles to find the net consistently');
+  if (homeLast10.avgConceded >= 1.5) homeWeaknesses.push('vulnerabilities at the back');
+  if (homeLosses >= 3) homeWeaknesses.push('inconsistent results lately');
+  
+  if (awayLast10.avgScored >= 1.5) awayStrengths.push('potent attacking threat');
+  if (awayLast10.avgConceded <= 1.0) awayStrengths.push('well-drilled defense');
+  if (awayWins >= 3) awayStrengths.push('good momentum from recent victories');
+  if (awayLast10.avgScored < 1.0) awayWeaknesses.push('goal-scoring difficulties');
+  if (awayLast10.avgConceded >= 1.5) awayWeaknesses.push('defensive frailties');
+  if (awayLosses >= 3) awayWeaknesses.push('patchy recent form');
+  
+  if (homeStrengths.length > 0) {
+    formAnalysis.push(`${homeClean} will look to leverage their ${homeStrengths.join(' and ')} in this matchup.`);
+  }
+  if (awayStrengths.length > 0) {
+    formAnalysis.push(`Meanwhile, ${awayClean} may rely on their ${awayStrengths.join(' and ')} to pose problems for the opposition.`);
+  }
+  if (homeWeaknesses.length > 0) {
+    formAnalysis.push(`However, ${homeClean} must address their ${homeWeaknesses.join(' and ')} if they are to get a positive result.`);
+  }
+  if (awayWeaknesses.length > 0) {
+    formAnalysis.push(`${awayClean} will need to work on their ${awayWeaknesses.join(' and ')} to avoid disappointment here.`);
+  }
+  
+  const predictionFactors = [];
+  
+  if (homeLast10.avgScored + awayLast10.avgScored > 3) {
+    predictionFactors.push('both sides demonstrated goal-scoring capabilities in recent matches');
+  }
+  if (homeLast10.avgConceded + awayLast10.avgConceded > 3) {
+    predictionFactors.push('defensive struggles from both teams suggest goals could flow at either end');
+  }
+  if (Math.abs(homeWins - awayWins) >= 2) {
+    predictionFactors.push('the form guide indicates a clear favorite for this fixture');
+  }
+  if (h2h && h2h.length > 2) {
+    predictionFactors.push('historical meetings provide valuable insight into how these sides match up');
+  }
+  
+  if (predictionFactors.length > 0) {
+    formAnalysis.push(`Key factors to consider include ${predictionFactors.join(', ')}. These elements combine to paint a picture of what promises to be an intriguing contest.`);
+  }
+  
+  formAnalysis.push('Our analysis suggests backing the outcome with the highest probability based on current form, historical data, and scoring patterns. As always, please gamble responsibly.');
+  
+  return formAnalysis.join(' ');
 }
 
 function loadBothHalvesCache() {
