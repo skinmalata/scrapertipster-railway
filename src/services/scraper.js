@@ -285,6 +285,7 @@ async function scrapeDate(dateStr, retryCount = 0) {
 
   const $ = cheerio.load(html);
   const matches = [];
+  const fallbackMatches = [];
   const over25Matches = [];
   const over15Matches = [];
   const bttsMatches = [];
@@ -373,6 +374,19 @@ async function scrapeDate(dateStr, retryCount = 0) {
         date: dateStr,
         score: score
       });
+    } else if (homeTeam && awayTeam && bestProb >= 60) {
+      fallbackMatches.push({
+        id: matchId++,
+        league: leagueInfo.league,
+        country: leagueInfo.country,
+        time: time,
+        match: `${homeTeam} - ${awayTeam}`,
+        probabilities: { homeWin: prob1, draw: probX, awayWin: prob2 },
+        tip: bestPick,
+        probability: bestProb,
+        date: dateStr,
+        score: score
+      });
     }
 
     if (homeTeam && awayTeam && over25 >= 60) {
@@ -424,6 +438,11 @@ async function scrapeDate(dateStr, retryCount = 0) {
      }
   });
 
+  if (matches.length < 6 && fallbackMatches.length > 0) {
+    console.log(`Only ${matches.length} matches with 65%+, adding ${fallbackMatches.length} matches with 60-64%`);
+    matches.push(...fallbackMatches);
+  }
+  
   return { matches, over25Matches, over15Matches, bttsMatches };
 }
 
