@@ -14,23 +14,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="robots" content="index, follow">
   <link rel="icon" href="/logo.png" type="image/png">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#ef4444',
-            foreground: '#fafafa',
-            'muted-foreground': '#a1a1aa',
-            border: '#2d2d4a',
-            card: '#1a1a2e',
-            'card-foreground': '#fafafa',
-          },
-        },
-      },
-    }
-  </script>
+  <link rel="stylesheet" href="/styles.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f5; color: #18181b; padding: 20px; }
@@ -129,15 +113,47 @@
  </head>
 <body>
   <div class="container">
-    <a href="javascript:window.close()" class="back-btn">Close</a>
-    <h1 id="matchTitle">Loading...</h1>
-    <div id="content">
-      <noscript>
-        <div class="analysis-section">
-          <h3>Match Analysis</h3>
-          <p>This page provides detailed football match analysis including recent form, head-to-head statistics, team performance metrics, and predictions. Please enable JavaScript to view the analysis.</p>
+    <a href="/" class="back-btn">Back to Home</a>
+    <div id="staticContent">
+      <h1 style="font-size: 28px; margin-bottom: 20px;">Football Match Analysis</h1>
+      <div class="analysis-section">
+        <h3>What is Match Analysis?</h3>
+        <p style="margin-bottom: 16px; line-height: 1.6;">WinFulltime provides detailed football match analysis to help you make informed betting decisions. Our analysis includes:</p>
+        <ul style="margin-left: 20px; line-height: 2;">
+          <li><strong>Recent Form</strong> - Last 5 match results for each team</li>
+          <li><strong>Head-to-Head</strong> - Historical results between the two teams</li>
+          <li><strong>Team Statistics</strong> - Goals scored, conceded, win rates, and more</li>
+          <li><strong>Predictions</strong> - AI-generated tips with probability percentages</li>
+        </ul>
+      </div>
+      <div class="analysis-section">
+        <h3>How to View Analysis</h3>
+        <p style="margin-bottom: 16px; line-height: 1.6;">Click on any match from the <a href="/" style="color: #ef4444;">home page</a> to view detailed analysis for that specific fixture. Analysis is available for 1X2, Over/Under, and BTTS predictions.</p>
+      </div>
+      <div class="analysis-section">
+        <h3>Available Prediction Markets</h3>
+        <div class="analysis-grid">
+          <div class="analysis-card">
+            <h4>1X2 Predictions</h4>
+            <p>Home win, draw, or away win predictions with probability percentages.</p>
+          </div>
+          <div class="analysis-card">
+            <h4>Over/Under Goals</h4>
+            <p>Predictions for matches with over 1.5, over 2.5, or over 3.5 goals.</p>
+          </div>
+          <div class="analysis-card">
+            <h4>BTTS Predictions</h4>
+            <p>Both Teams To Score tips - whether both teams will find the net.</p>
+          </div>
+          <div class="analysis-card">
+            <h4>Corners & Cards</h4>
+            <p>Specialized predictions for corner kicks and yellow/red cards.</p>
+          </div>
         </div>
-      </noscript>
+      </div>
+    </div>
+    <h1 id="matchTitle" style="display: none;">Loading...</h1>
+    <div id="content" style="display: none;">
       <div class="loading"><div class="spinner"></div></div>
     </div>
   </div>
@@ -147,8 +163,15 @@
     const homeTeam = params.get('home') || '';
     const awayTeam = params.get('away') || '';
 
-    document.getElementById('matchTitle').textContent = decodeURIComponent(homeTeam) + ' vs ' + decodeURIComponent(awayTeam);
-    document.title = decodeURIComponent(homeTeam) + ' vs ' + decodeURIComponent(awayTeam) + ' Analysis';
+    if (homeTeam && awayTeam) {
+      document.getElementById('staticContent').style.display = 'none';
+      document.getElementById('matchTitle').style.display = 'block';
+      document.getElementById('content').style.display = 'block';
+      document.getElementById('matchTitle').textContent = decodeURIComponent(homeTeam) + ' vs ' + decodeURIComponent(awayTeam);
+      document.title = decodeURIComponent(homeTeam) + ' vs ' + decodeURIComponent(awayTeam) + ' Analysis';
+
+      loadAnalysis();
+    }
 
     async function loadAnalysis() {
       try {
