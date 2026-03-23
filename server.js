@@ -134,7 +134,7 @@ app.use(cors({
   origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : true
 }));
 app.use((req, res, next) => {
-  res.setHeader('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: https://cdn.tailwindcss.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https: https://cdn.tailwindcss.com; img-src 'self' data: https: https://i.ytimg.com https://yt3.ggpht.com; connect-src 'self' https: https://www.google-analytics.com; frame-src https://www.youtube.com https://youtube.com;");
+  res.setHeader('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https: https://i.ytimg.com https://yt3.ggpht.com; connect-src 'self' https: http://localhost http://127.0.0.1 ws://localhost ws://127.0.0.1 https://www.google-analytics.com; frame-src https://www.youtube.com https://youtube.com;");
   next();
 });
 app.use(express.json({ limit: '10kb' }));
@@ -148,12 +148,18 @@ app.use(express.static('public', {
   lastModified: false
 }));
 
-// Redirect HTTP to HTTPS and www to non-www for SEO
+// Redirect HTTP to HTTPS and www to non-www for SEO (skip for localhost development)
 const BASE_URL = process.env.BASE_URL || 'https://winfulltime.com';
+const isLocalhost = (host) => host === 'localhost' || host === '127.0.0.1' || host.includes('192.168.') || host.includes('10.0.0.');
 app.use((req, res, next) => {
   let host = req.hostname;
   let updated = false;
   let newUrl;
+
+  // Skip redirect for local development
+  if (isLocalhost(host)) {
+    return next();
+  }
 
   // Redirect HTTP to HTTPS
   if (!req.secure && req.protocol !== 'https') {
@@ -276,36 +282,33 @@ if (process.env.ENABLE_BACKGROUND_SCRAPING === 'true') {
 // Use a flag to track if initial fetch is running
 let initialFetchRunning = false;
 
-// Initial Fetch - always try to load from cache first
+// Initial Fetch - run in background, don't block
 setTimeout(async () => {
   if (initialFetchRunning) {
     console.log('Initial fetch already in progress, skipping');
     return;
   }
   
-  // Always try to load from cache, don't skip
   initialFetchRunning = true;
-  console.log('Running initial prediction fetch...');
-  try {
-    const data = await getScraperService().fetchAndCachePredictions();
-    console.log('Initial fetch completed. Matches found:', data.totalMatches);
-    
-    console.log('Running initial corners scraping...');
-    const cornersData = await getScraperService().scrapeCorners();
-    console.log('Initial corners scrape completed. Matches found:', cornersData.totalMatches);
-    
-    console.log('Running initial cards scraping...');
-    const cardsData = await getScraperService().scrapeCards();
-    console.log('Initial cards scrape completed. Matches found:', cardsData.totalMatches);
-    
-    console.log('Running initial both halves (To Score 2+) scraping...');
-    const bothHalvesData = await getScraperService().scrapeBothHalves();
-    console.log('Initial both halves scrape completed. Matches found:', bothHalvesData.totalMatches);
-  } catch (error) {
-    console.error('Initial fetch error:', error.message);
-  } finally {
-    initialFetchRunning = false;
-  }
+  console.log('Running initial prediction fetch in background...');
+  
+  // Fire and forget - don't await
+  getScraperService().fetchAndCachePredictions()
+    .then(data => console.log('Initial fetch completed. Matches found:', data.totalMatches))
+    .catch(err => console.error('Initial fetch error:', err.message));
+  
+  getScraperService().scrapeCorners()
+    .then(data => console.log('Initial corners scrape completed. Matches found:', data.totalMatches))
+    .catch(err => console.error('Initial corners error:', err.message));
+  
+  getScraperService().scrapeCards()
+    .then(data => console.log('Initial cards scrape completed. Matches found:', data.totalMatches))
+    .catch(err => console.error('Initial cards error:', err.message));
+  
+  getScraperService().scrapeBothHalves()
+    .then(data => console.log('Initial both halves scrape completed. Matches found:', data.totalMatches))
+    .catch(err => console.error('Initial both halves error:', err.message))
+    .finally(() => { initialFetchRunning = false; });
 }, 5000);
 
 const HOST = process.env.HOST || '0.0.0.0';
