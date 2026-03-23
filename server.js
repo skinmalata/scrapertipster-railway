@@ -148,36 +148,7 @@ app.use(express.static('public', {
   lastModified: false
 }));
 
-// Redirect HTTP to HTTPS and www to non-www for SEO (skip for localhost development)
-const isLocalhost = (host) => host === 'localhost' || host === '127.0.0.1' || host.includes('192.168.') || host.includes('10.0.0.');
-app.use((req, res, next) => {
-  const host = req.hostname || '';
-  
-  // Skip redirect for local development
-  if (isLocalhost(host)) {
-    return next();
-  }
-  
-  // Only apply redirects for the main domain
-  const mainDomain = 'winfulltime.com';
-  const isMainDomain = host === mainDomain || host === 'www.' + mainDomain;
-  
-  if (!isMainDomain) {
-    return next();
-  }
-
-  // Redirect www to non-www
-  if (host === 'www.' + mainDomain) {
-    return res.redirect(301, 'https://' + mainDomain + req.originalUrl);
-  }
-  
-  // Redirect HTTP to HTTPS (only if not already HTTPS)
-  if (req.protocol !== 'https') {
-    return res.redirect(301, 'https://' + mainDomain + req.originalUrl);
-  }
-  
-  next();
-});
+// Railway handles HTTPS redirect at proxy level, skip in app
 
 // API Routes
 app.use('/api', apiRoutes);
