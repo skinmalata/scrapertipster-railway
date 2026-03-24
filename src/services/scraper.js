@@ -1421,6 +1421,10 @@ function loadCornersCache() {
       if (cached.date === today) {
         return cached;
       }
+      if (cached.matches && cached.matches.length > 0) {
+        console.log('[Corners] Using yesterday\'s cache (date:', cached.date, ')');
+        return cached;
+      }
     }
   } catch (e) {}
   return null;
@@ -1433,6 +1437,10 @@ function loadCardsCache() {
       const cached = JSON.parse(fs.readFileSync(cardsCacheFile, 'utf8'));
       const today = new Date().toISOString().split('T')[0];
       if (cached.date === today) {
+        return cached;
+      }
+      if (cached.matches && cached.matches.length > 0) {
+        console.log('[Cards] Using yesterday\'s cache (date:', cached.date, ')');
         return cached;
       }
     }
@@ -1631,6 +1639,10 @@ function loadBothHalvesCache() {
       const cached = JSON.parse(fs.readFileSync(bothHalvesCacheFile, 'utf8'));
       const today = new Date().toISOString().split('T')[0];
       if (cached.date === today) {
+        return cached;
+      }
+      if (cached.matches && cached.matches.length > 0) {
+        console.log('[BothHalves] Using yesterday\'s cache (date:', cached.date, ')');
         return cached;
       }
     }
