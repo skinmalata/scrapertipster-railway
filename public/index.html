@@ -896,7 +896,8 @@ header {
 
     <main class="container">
       <div class="hero">
-        <h1 style="font-size: 48px; font-weight: 800; margin-bottom: 16px;">Free AI Soccer Predictions Today</h1>
+        <h1 style="font-size: 48px; font-weight: 800; margin-bottom: 16px;">Football Predictions Today</h1>
+        <p id="currentDate" style="font-size: 20px; color: black; margin-bottom: 24px;"></p>
       </div>
 
       <div class="tabs-container" id="dayTabs"></div>
@@ -906,10 +907,9 @@ header {
         <button onclick="setCategory('over15')" id="tab-over15" class="tab-btn">Over 1.5</button>
         <button onclick="setCategory('over25')" id="tab-over25" class="tab-btn">Over 2.5</button>
         <button onclick="setCategory('btts')" id="tab-btts" class="tab-btn">BTTS</button>
-        <button onclick="setCategory('corners')" id="tab-corners" class="tab-btn">Corners</button>
-
+        <!-- <button onclick="setCategory('corners')" id="tab-corners" class="tab-btn">Corners</button>
         <button onclick="setCategory('teamtoscore2plus')" id="tab-teamtoscore2plus" class="tab-btn">To Score 2+</button>
-        <button onclick="setCategory('cards')" id="tab-cards" class="tab-btn">Cards</button>
+        <button onclick="setCategory('cards')" id="tab-cards" class="tab-btn">Cards</button> -->
       </div>
 
       <div class="stats-bar" id="statsBar">
@@ -948,7 +948,7 @@ header {
       </div>
 
       <p style="text-align:center; margin: 20px auto; max-width:800px; font-size:16px; color:#333333;">
-        We analyze historical data, team form, and head-to-head records to provide winning football analysis and predictions for 1X2, over 1.5, over 2.5, corners, BTTS, team to score, and win streak tips across major football leagues worldwide.
+        Get <strong>free football predictions</strong> and <strong>betting tips</strong> for today's matches. We analyze <strong>historical data</strong>, <strong>team form</strong>, and <strong>head-to-head records</strong> to provide winning football analysis and predictions for <strong>1X2</strong>, <strong>over 1.5</strong>, <strong>over 2.5</strong>, <strong>corners</strong>, <strong>BTTS</strong>, <strong>team to score</strong>, and <strong>win streak tips</strong> across major football leagues worldwide. Our advanced algorithm processes thousands of data points from each match, including recent performance trends, home and away statistics, goal-scoring patterns, defensive records, and previous encounters between the teams. We cover major football leagues including the English Premier League, Spanish La Liga, Italian Serie A, German Bundesliga, French Ligue 1, Champions League, and many more competitions from around the globe. Our <strong>daily predictions</strong> are updated every morning to ensure you have the latest information before placing your bets. Whether you're looking for conservative accumulator tips or high-risk single bets, our comprehensive analysis helps you make smarter betting decisions. We also track winning, losing, and drawing streaks to identify teams in form or struggling at the moment. Our <strong>free soccer predictions</strong> are updated daily for <strong>today's football matches</strong> and tomorrow's games.
       </p>
 
       <!-- FAQ Section -->
@@ -1102,6 +1102,11 @@ header {
     let currentCategory = '1x2';
     let currentDayOffset = 0;
 
+    // Set today's date
+    const today = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('currentDate').textContent = today.toLocaleDateString('en-US', options);
+
     // Check URL for category parameter
     const urlParams = new URLSearchParams(window.location.search);
     const urlCategory = urlParams.get('category');
@@ -1111,7 +1116,6 @@ header {
       if (dayTabs) dayTabs.style.display = 'none';
     }
 
-    const today = new Date();
     const headerDateEl = document.getElementById('headerDate');
     if (headerDateEl) {
       headerDateEl.textContent = today.toLocaleDateString('en-US', {

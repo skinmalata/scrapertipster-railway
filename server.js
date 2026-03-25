@@ -12,8 +12,16 @@ let youtubeVideosCache = { videos: [], lastFetched: null };
 const YOUTUBE_CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
 let scraperService;
+let predictionsCache = null;
 try {
   scraperService = require('./src/services/scraper');
+  console.log('Preloading predictions cache...');
+  predictionsCache = scraperService.loadCachedPredictions();
+  if (predictionsCache) {
+    console.log('Cache preloaded successfully, matches:', predictionsCache.matches?.length);
+  } else {
+    console.log('No cache found, will fetch on first request');
+  }
 } catch (e) {
   console.log('Scraper service will load lazily:', e.message);
 }
@@ -23,6 +31,10 @@ function getScraperService() {
     scraperService = require('./src/services/scraper');
   }
   return scraperService;
+}
+
+function getPredictionsCache() {
+  return predictionsCache;
 }
 
 const app = express();
@@ -223,17 +235,18 @@ cron.schedule('0 1 * * *', async () => {
     const data = await getScraperService().fetchAndCachePredictions();
     console.log('Scheduled fetch completed. Matches found:', data.totalMatches);
     
-    console.log('Running scheduled corners scraping...');
-    const cornersData = await getScraperService().scrapeCorners();
-    console.log('Scheduled corners scrape completed. Matches found:', cornersData.totalMatches);
-    
-    console.log('Running scheduled cards scraping...');
-    const cardsData = await getScraperService().scrapeCards();
-    console.log('Scheduled cards scrape completed. Matches found:', cardsData.totalMatches);
-    
-    console.log('Running scheduled both halves (To Score 2+) scraping...');
-    const bothHalvesData = await getScraperService().scrapeBothHalves();
-    console.log('Scheduled both halves scrape completed. Matches found:', bothHalvesData.totalMatches);
+    // Corners, cards, and both halves scraping disabled
+    // console.log('Running scheduled corners scraping...');
+    // const cornersData = await getScraperService().scrapeCorners();
+    // console.log('Scheduled corners scrape completed. Matches found:', cornersData.totalMatches);
+    // 
+    // console.log('Running scheduled cards scraping...');
+    // const cardsData = await getScraperService().scrapeCards();
+    // console.log('Scheduled cards scrape completed. Matches found:', cardsData.totalMatches);
+    // 
+    // console.log('Running scheduled both halves (To Score 2+) scraping...');
+    // const bothHalvesData = await getScraperService().scrapeBothHalves();
+    // console.log('Scheduled both halves scrape completed. Matches found:', bothHalvesData.totalMatches);
   } catch (error) {
     console.error('Scheduled fetch error:', error.message);
   }
@@ -266,21 +279,25 @@ setTimeout(async () => {
   
   // Fire and forget - don't await
   getScraperService().fetchAndCachePredictions()
-    .then(data => console.log('Initial fetch completed. Matches found:', data.totalMatches))
+    .then(data => {
+      console.log('Initial fetch completed. Matches found:', data.totalMatches);
+      predictionsCache = data;
+    })
     .catch(err => console.error('Initial fetch error:', err.message));
   
-  getScraperService().scrapeCorners()
-    .then(data => console.log('Initial corners scrape completed. Matches found:', data.totalMatches))
-    .catch(err => console.error('Initial corners error:', err.message));
-  
-  getScraperService().scrapeCards()
-    .then(data => console.log('Initial cards scrape completed. Matches found:', data.totalMatches))
-    .catch(err => console.error('Initial cards error:', err.message));
-  
-  getScraperService().scrapeBothHalves()
-    .then(data => console.log('Initial both halves scrape completed. Matches found:', data.totalMatches))
-    .catch(err => console.error('Initial both halves error:', err.message))
-    .finally(() => { initialFetchRunning = false; });
+  // Corners, cards, and both halves scraping disabled
+  // getScraperService().scrapeCorners()
+  //   .then(data => console.log('Initial corners scrape completed. Matches found:', data.totalMatches))
+  //   .catch(err => console.error('Initial corners error:', err.message));
+  // 
+  // getScraperService().scrapeCards()
+  //   .then(data => console.log('Initial cards scrape completed. Matches found:', data.totalMatches))
+  //   .catch(err => console.error('Initial cards error:', err.message));
+  // 
+  // getScraperService().scrapeBothHalves()
+  //   .then(data => console.log('Initial both halves scrape completed. Matches found:', data.totalMatches))
+  //   .catch(err => console.error('Initial both halves error:', err.message))
+  //   .finally(() => { initialFetchRunning = false; });
 }, 5000);
 
 const HOST = process.env.HOST || '0.0.0.0';

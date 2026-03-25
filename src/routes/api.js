@@ -69,34 +69,39 @@ router.get('/predictions', async (req, res) => {
     const { isVip } = await checkUserVipStatus(userId);
     
     let data;
-    try {
-      data = await getScraperService().fetchPredictions();
-    } catch (scraperError) {
-      console.error('Scraper error:', scraperError.message);
-      // Return empty data structure instead of failing
-      return res.json({
-        success: true,
-        dates: [],
-        matches: [],
-        over15Matches: [],
-        over25Matches: [],
-        bttsMatches: [],
-        winstreakMatches: [],
-        losestreakMatches: [],
-        drawstreakMatches: [],
-        teamToScoreMatches: [],
-        teamToScore2PlusMatches: [],
-        cardsMatches: [],
-        cornersMatches: [],
-        totalMatches: 0,
-        totalOver15: 0,
-        totalOver25: 0,
-        totalBtts: 0,
-        totalWinstreak: 0,
-        totalLosestreak: 0,
-        totalDrawstreak: 0,
-        error: 'Data temporarily unavailable'
-      });
+    const cached = getScraperService().loadCachedPredictions();
+    if (cached) {
+      console.log('[API] Serving from preloaded cache');
+      data = cached;
+    } else {
+      try {
+        data = await getScraperService().fetchPredictions();
+      } catch (scraperError) {
+        console.error('Scraper error:', scraperError.message);
+        return res.json({
+          success: true,
+          dates: [],
+          matches: [],
+          over15Matches: [],
+          over25Matches: [],
+          bttsMatches: [],
+          winstreakMatches: [],
+          losestreakMatches: [],
+          drawstreakMatches: [],
+          teamToScoreMatches: [],
+          teamToScore2PlusMatches: [],
+          cardsMatches: [],
+          cornersMatches: [],
+          totalMatches: 0,
+          totalOver15: 0,
+          totalOver25: 0,
+          totalBtts: 0,
+          totalWinstreak: 0,
+          totalLosestreak: 0,
+          totalDrawstreak: 0,
+          error: 'Data temporarily unavailable'
+        });
+      }
     }
     
     // Load results cache and match with predictions
