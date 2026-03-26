@@ -427,7 +427,7 @@ async function scrapeDate(dateStr, retryCount = 0) {
     }
      
       // BTTS YES - use the raw BTS probability (gg value)
-      if (homeTeam && awayTeam && gg >= 45) {
+      if (homeTeam && awayTeam && gg >= 55) {
        bttsMatches.push({
          id: bttsId++,
          league: leagueInfo.league,
