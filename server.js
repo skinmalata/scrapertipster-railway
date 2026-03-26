@@ -143,6 +143,18 @@ function rateLimiter(req, res, next) {
 }
 
 // HTTPS redirect (only in production)
+const isProduction = process.env.RAILWAY_PUBLIC_DOMAIN || process.env.NODE_ENV === 'production';
+
+if (isProduction) {
+  app.use((req, res, next) => {
+    const host = req.headers.host;
+    if (host && host.startsWith('www.')) {
+      return res.redirect(301, 'https://winfulltime.com' + req.originalUrl);
+    }
+    next();
+  });
+}
+
 app.use(cors({
   origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : true
 }));
