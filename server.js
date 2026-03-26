@@ -142,6 +142,7 @@ function rateLimiter(req, res, next) {
   next();
 }
 
+// HTTPS redirect (only in production)
 app.use(cors({
   origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : true
 }));
