@@ -280,7 +280,7 @@ async function scrapeDate(dateStr, retryCount = 0) {
     await safeRequestWithBackoff(scrape, 3, 5000);
   } catch (err) {
     console.error(`Puppeteer error for ${dateStr}:`, err.message);
-    return { matches: [], over25Matches: [], over15Matches: [], bttsMatches: [] };
+    return { matches: [], over25Matches: [], over15Matches: [], bttsMatches: [], bttsNoMatches: [] };
   }
 
   const $ = cheerio.load(html);
@@ -289,11 +289,12 @@ async function scrapeDate(dateStr, retryCount = 0) {
   const over25Matches = [];
   const over15Matches = [];
   const bttsMatches = [];
+  const bttsNoMatches = [];
   
   const matchElements = $('.match');
   console.log(`Found ${matchElements.length} match elements for ${dateStr}`);
 
-  let matchId = 0, over25Id = 0, over15Id = 0, bttsId = 0;
+  let matchId = 0, over25Id = 0, over15Id = 0, bttsId = 0, bttsNoId = 0;
   
   matchElements.each((i, el) => {
     const $match = $(el);
@@ -352,6 +353,12 @@ async function scrapeDate(dateStr, retryCount = 0) {
       gg = parseInt(gValues[0].txt) || 0;
       ng = 0;
     }
+
+    // OTS column is immediately after BTS column
+    // Based on statarea format: values 12,13 = BTS (gg, ng), values 14,15,16 = OTS
+    // OTS = "One Team Scores" = probability that NOT both teams score = BTTS NO
+    // The second BTS value (ng) represents OTS
+    let ots = ng; // OTS is the second value in BTS column (ng probability)
 
     const bestProb = Math.max(prob1, probX, prob2);
     let bestPick = '';
@@ -418,32 +425,47 @@ async function scrapeDate(dateStr, retryCount = 0) {
         score: score
       });
     }
-    
-     // Optimized BTTS selection: consider both BTTS probability and Over 2.5 probability
-     // BTTS is more likely in high-scoring games, so we require a minimum Over 2.5 probability
-     const bttsScore = (gg * 0.7) + (over25 * 0.3); // Weighted combination
-     if (homeTeam && awayTeam && bttsScore >= 50) {
+     
+      // BTTS YES - use the raw BTS probability (gg value)
+      if (homeTeam && awayTeam && gg >= 45) {
        bttsMatches.push({
          id: bttsId++,
          league: leagueInfo.league,
          country: leagueInfo.country,
          time: time,
          match: `${homeTeam} - ${awayTeam}`,
-         probabilities: { bttsYes: gg, bttsNo: ng },
-         tip: 'BTTS',
-         probability: Math.round(bttsScore), // Use the combined score for display
+         probabilities: { bttsYes: gg, bttsNo: ng, ots: ots },
+         tip: 'BTTS YES',
+         probability: gg,
          date: dateStr,
          score: score
        });
      }
-  });
+
+      // BTTS NO - based on OTS (One Team Scores / No Both Teams To Score)
+      // OTS is immediately after BTS column (h class)
+      if (homeTeam && awayTeam && ots >= 60) {
+        bttsNoMatches.push({
+          id: bttsNoId++,
+          league: leagueInfo.league,
+          country: leagueInfo.country,
+          time: time,
+          match: `${homeTeam} - ${awayTeam}`,
+          probabilities: { bttsYes: gg, bttsNo: ng, ots: ots },
+          tip: 'BTTS NO',
+          probability: ots,
+          date: dateStr,
+          score: score
+        });
+      }
+    });
 
   if (matches.length < 6 && fallbackMatches.length > 0) {
     console.log(`Only ${matches.length} matches with 65%+, adding ${fallbackMatches.length} matches with 60-64%`);
     matches.push(...fallbackMatches);
   }
   
-  return { matches, over25Matches, over15Matches, bttsMatches };
+  return { matches, over25Matches, over15Matches, bttsMatches, bttsNoMatches };
 }
 
 function parseBetexplorerStreaks(html, streakType = 'win') {
@@ -794,6 +816,7 @@ async function fetchAndCachePredictions() {
     const allOver25 = [];
     const allOver15 = [];
     const allBtts = [];
+    const allBttsNo = [];
      
     for (const dateStr of dateRange) {
       const data = await scrapeDate(dateStr);
@@ -801,6 +824,7 @@ async function fetchAndCachePredictions() {
       allOver25.push(...data.over25Matches);
       allOver15.push(...data.over15Matches);
       allBtts.push(...data.bttsMatches);
+      allBttsNo.push(...data.bttsNoMatches);
       await sleep(3000);
     }
      
@@ -822,6 +846,7 @@ async function fetchAndCachePredictions() {
       over25Matches: allOver25,
       over15Matches: allOver15,
       bttsMatches: allBtts,
+      bttsNoMatches: allBttsNo,
       winstreakMatches,
       losestreakMatches,
       drawstreakMatches,
@@ -847,6 +872,7 @@ async function fetchAndCachePredictions() {
       totalOver25: allOver25.length,
       totalOver15: allOver15.length,
       totalBtts: allBtts.length,
+      totalBttsNo: allBttsNo.length,
       totalWinstreak: winstreakMatches.length,
       totalLosestreak: losestreakMatches.length,
       totalDrawstreak: drawstreakMatches.length,
@@ -854,6 +880,7 @@ async function fetchAndCachePredictions() {
       over25Matches: allOver25,
       over15Matches: allOver15,
       bttsMatches: allBtts,
+      bttsNoMatches: allBttsNo,
       winstreakMatches,
       losestreakMatches,
       drawstreakMatches,

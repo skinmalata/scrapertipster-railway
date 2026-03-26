@@ -884,6 +884,7 @@ header {
             </div>
         <nav>
           <a href="/">Home</a>
+          <a href="/news.html">Latest News</a>
           <a href="/about.html">About</a>
           <a href="/contact.html">Contact</a>
         </nav>
@@ -906,7 +907,8 @@ header {
         <button onclick="setCategory('1x2')" id="tab-1x2" class="tab-btn active">1X2</button>
         <button onclick="setCategory('over15')" id="tab-over15" class="tab-btn">Over 1.5</button>
         <button onclick="setCategory('over25')" id="tab-over25" class="tab-btn">Over 2.5</button>
-        <button onclick="setCategory('btts')" id="tab-btts" class="tab-btn">BTTS</button>
+        <button onclick="setCategory('btts')" id="tab-btts" class="tab-btn">BTTS YES</button>
+        <button onclick="setCategory('bttsno')" id="tab-bttsno" class="tab-btn">BTTS NO</button>
         <!-- <button onclick="setCategory('corners')" id="tab-corners" class="tab-btn">Corners</button>
         <button onclick="setCategory('teamtoscore2plus')" id="tab-teamtoscore2plus" class="tab-btn">To Score 2+</button>
         <button onclick="setCategory('cards')" id="tab-cards" class="tab-btn">Cards</button> -->
@@ -948,7 +950,15 @@ header {
       </div>
 
       <p style="text-align:center; margin: 20px auto; max-width:800px; font-size:16px; color:#333333;">
-        Get <strong>free football predictions</strong> and <strong>betting tips</strong> for today's matches. We analyze <strong>historical data</strong>, <strong>team form</strong>, and <strong>head-to-head records</strong> to provide winning football analysis and predictions for <strong>1X2</strong>, <strong>over 1.5</strong>, <strong>over 2.5</strong>, <strong>corners</strong>, <strong>BTTS</strong>, <strong>team to score</strong>, and <strong>win streak tips</strong> across major football leagues worldwide. Our advanced algorithm processes thousands of data points from each match, including recent performance trends, home and away statistics, goal-scoring patterns, defensive records, and previous encounters between the teams. We cover major football leagues including the English Premier League, Spanish La Liga, Italian Serie A, German Bundesliga, French Ligue 1, Champions League, and many more competitions from around the globe. Our <strong>daily predictions</strong> are updated every morning to ensure you have the latest information before placing your bets. Whether you're looking for conservative accumulator tips or high-risk single bets, our comprehensive analysis helps you make smarter betting decisions. We also track winning, losing, and drawing streaks to identify teams in form or struggling at the moment. Our <strong>free soccer predictions</strong> are updated daily for <strong>today's football matches</strong> and tomorrow's games.
+        Get <strong>free football predictions</strong> and <strong>betting tips</strong> for today's matches. We analyze <strong>historical data</strong>, <strong>team form</strong>, and <strong>head-to-head records</strong> to provide winning football analysis and predictions for <strong>1X2</strong>, <strong>over 1.5</strong>, <strong>over 2.5</strong>, <strong>corners</strong>, <strong>BTTS</strong>, <strong>team to score</strong>, and <strong>win streak tips</strong> across major football leagues worldwide.
+      </p>
+
+      <p style="text-align:center; margin: 20px auto; max-width:800px; font-size:16px; color:#333333;">
+        Our advanced algorithm processes thousands of data points from each match, including recent performance trends, home and away statistics, goal-scoring patterns, defensive records, and previous encounters between the teams. We cover major football leagues including the English Premier League, Spanish La Liga, Italian Serie A, German Bundesliga, French Ligue 1, Champions League, and many more competitions from around the globe. Our <strong>daily predictions</strong> are updated every morning to ensure you have the latest information before placing your bets.
+      </p>
+
+      <p style="text-align:center; margin: 20px auto; max-width:800px; font-size:16px; color:#333333;">
+        Whether you're looking for conservative accumulator tips or high-risk single bets, our comprehensive analysis helps you make smarter betting decisions. We also track winning, losing, and drawing streaks to identify teams in form or struggling at the moment. Our <strong>free soccer predictions</strong> are updated daily for <strong>today's football matches</strong> and tomorrow's games.
       </p>
 
       <!-- FAQ Section -->
@@ -1199,12 +1209,12 @@ header {
     }
 
     function getCategoryLabel(cat) {
-      const labels = { '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5', 'btts': 'BTTS', 'corners': 'Corners', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak', 'teamtoscore2plus': 'To Score 2+', 'cards': 'Cards' };
+      const labels = { '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5', 'btts': 'BTTS YES', 'bttsno': 'BTTS NO', 'corners': 'Corners', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak', 'teamtoscore2plus': 'To Score 2+', 'cards': 'Cards' };
       return labels[cat] || cat;
     }
 
     function getTipLabel(tip) {
-      const labels = { '1': 'Home Win', 'X': 'Draw', '2': 'Away Win', 'Over 1.5': 'Over 1.5', 'Over 2.5': 'Over 2.5', 'BTTS': 'BTTS', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak' };
+      const labels = { '1': 'Home Win', 'X': 'Draw', '2': 'Away Win', 'Over 1.5': 'Over 1.5', 'Over 2.5': 'Over 2.5', 'BTTS YES': 'BTTS YES', 'BTTS NO': 'BTTS NO', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak' };
       return labels[tip] || tip;
     }
 
@@ -1226,6 +1236,7 @@ header {
       else if (currentCategory === 'over15') matches = currentData.over15Matches || [];
       else if (currentCategory === 'over25') matches = currentData.over25Matches || [];
       else if (currentCategory === 'btts') matches = currentData.bttsMatches || [];
+      else if (currentCategory === 'bttsno') matches = currentData.bttsNoMatches || [];
       else if (currentCategory === 'corners') matches = currentData.cornersMatches || [];
       else if (currentCategory === 'winstreak') matches = currentData.winstreakMatches || [];
       else if (currentCategory === 'losestreak') matches = currentData.losestreakMatches || [];
@@ -1248,6 +1259,8 @@ header {
         filtered = matches.filter(m => m.date === targetDateStr);
       } else if (currentCategory === 'teamtoscore2plus' || currentCategory === 'cards') {
         filtered = matches;
+      } else if (currentCategory === 'bttsno') {
+        filtered = matches.filter(m => m.date === targetDateStr);
       } else {
         console.log('Target date:', targetDateStr, 'Category:', currentCategory, 'Total matches:', matches.length);
         
@@ -1606,6 +1619,7 @@ async function loadYoutubeVideos() {
     <div class="footer-content">
       <div class="footer-links">
         <a href="/">Home</a>
+        <a href="/news.html">Latest News</a>
         <a href="/about.html">About</a>
         <a href="/options.html">Betting Guide</a>
         <a href="/contact.html">Contact</a>

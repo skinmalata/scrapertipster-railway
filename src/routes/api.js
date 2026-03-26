@@ -322,6 +322,83 @@ router.get('/corners', async (req, res) => {
 
 let cardsLastScrape = null;
 
+const NEWS_SOURCES = [
+  { name: 'BBC Sport', url: 'https://feeds.bbci.co.uk/sport/rss.xml' },
+  { name: 'The Guardian', url: 'https://www.theguardian.com/football/rss' },
+  { name: 'ESPN', url: 'https://www.espn.com/espn/rss/soccer/news' }
+];
+
+let newsCache = { articles: [], lastFetched: null };
+const NEWS_CACHE_DURATION = 15 * 60 * 1000;
+
+async function fetchFootballNews() {
+  const axios = require('axios');
+  const Parser = require('rss-parser');
+  const parser = new Parser();
+  
+  const allArticles = [];
+  const seenUrls = new Set();
+  
+  for (const source of NEWS_SOURCES) {
+    try {
+      const feed = await parser.parseURL(source.url);
+      feed.items.forEach(item => {
+        const title = item.title || '';
+        if (!seenUrls.has(item.link) && 
+            (title.toLowerCase().includes('football') || 
+             title.toLowerCase().includes('soccer') ||
+             title.toLowerCase().includes('premier league') ||
+             title.toLowerCase().includes('champions league') ||
+             title.toLowerCase().includes('liga') ||
+             title.toLowerCase().includes('world cup') ||
+             title.toLowerCase().includes('transfer'))) {
+          seenUrls.add(item.link);
+          allArticles.push({
+            title: title,
+            description: item.contentSnippet || item.content || '',
+            url: item.link,
+            source: source.name,
+            image: item.enclosure?.url || null,
+            publishedAt: item.pubDate || item.isoDate || null
+          });
+        }
+      });
+    } catch (err) {
+      console.log(`Error fetching from ${source.name}:`, err.message);
+    }
+  }
+  
+  allArticles.sort((a, b) => {
+    const dateA = new Date(a.publishedAt || 0);
+    const dateB = new Date(b.publishedAt || 0);
+    return dateB - dateA;
+  });
+  
+  return allArticles.slice(0, 20);
+}
+
+router.get('/news', async (req, res) => {
+  const now = Date.now();
+  
+  if (newsCache.articles.length > 0 && 
+      newsCache.lastFetched && 
+      (now - newsCache.lastFetched) < NEWS_CACHE_DURATION) {
+    return res.json({ success: true, articles: newsCache.articles, cached: true });
+  }
+  
+  try {
+    const articles = await fetchFootballNews();
+    newsCache = { articles, lastFetched: now };
+    res.json({ success: true, articles });
+  } catch (error) {
+    console.error('News error:', error.message);
+    if (newsCache.articles.length > 0) {
+      return res.json({ success: true, articles: newsCache.articles, cached: true });
+    }
+    res.json({ success: false, articles: [], error: 'Failed to fetch news' });
+  }
+});
+
 router.get('/cards', async (req, res) => {
   try {
     let cardsData = getScraperService().loadCardsCache();

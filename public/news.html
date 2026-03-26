@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Latest Football News - WinFulltime</title>
+  <meta name="description" content="Latest football news from trusted sources. Get updates on Premier League, La Liga, Serie A, Champions League and more.">
+  <meta name="keywords" content="football news, soccer news, Premier League news, La Liga news, Champions League news">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://winfulltime.com/news.html">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f8fafc;
+      color: #18181b;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 12px;
+    }
+
+    header {
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 12px 0;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-icon {
+      width: 200px;
+      height: 80px;
+      background-image: url('/logonew.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 640px) {
+      .logo-icon {
+        width: 150px;
+        height: 60px;
+      }
+    }
+
+    nav {
+      display: flex;
+      gap: 20px;
+    }
+
+    nav a {
+      color: #71717a;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 16px;
+    }
+
+    nav a:hover {
+      color: #ff0000;
+    }
+
+    main {
+      padding: 24px 12px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      font-size: 32px;
+      font-weight: bold;
+      color: #18181b;
+      margin-bottom: 8px;
+    }
+
+    .hero p {
+      font-size: 15px;
+      color: #71717a;
+    }
+
+    .news-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 640px) {
+      .news-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .news-card {
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .news-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .news-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background: #e5e5e5;
+    }
+
+    .news-content {
+      padding: 16px;
+    }
+
+    .news-source {
+      font-size: 12px;
+      color: #ff0000;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .news-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #18181b;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .news-description {
+      font-size: 14px;
+      color: #52525b;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .news-date {
+      font-size: 12px;
+      color: #71717a;
+      margin-top: 12px;
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 48px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e5e5e5;
+      border-top: 3px solid #ff0000;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .no-news {
+      text-align: center;
+      padding: 48px;
+      color: #71717a;
+    }
+
+    footer {
+      background: #f8fafc;
+      padding: 32px 12px;
+      border-top: 1px solid #e2e8f0;
+      margin-top: auto;
+    }
+
+    .footer-content {
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: #52525b;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .footer-links a:hover {
+      color: #ff0000;
+    }
+
+    .footer-copyright {
+      color: #71717a;
+      font-size: 14px;
+    }
+
+    @media (max-width: 480px) {
+      .header-content {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+      }
+      nav {
+        gap: 12px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .hero h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="logo">
+        <a href="/">
+          <div class="logo-icon" role="img" aria-label="WinFulltime Logo"></div>
+        </a>
+      </div>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/news.html">Latest News</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="hero">
+      <h1>Latest Football News</h1>
+      <p>Stay updated with the latest football news from trusted sources</p>
+    </div>
+
+    <div id="newsGrid" class="news-grid">
+      <div class="loading">
+        <div class="spinner"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/news.html">Latest News</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/terms.html">Terms</a>
+        <a href="/privacy.html">Privacy</a>
+      </div>
+      <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    async function loadNews() {
+      const newsGrid = document.getElementById('newsGrid');
+      
+      try {
+        const response = await fetch('/api/news');
+        const data = await response.json();
+        
+        if (!data.success || !data.articles || data.articles.length === 0) {
+          newsGrid.innerHTML = '<div class="no-news">No news available at the moment</div>';
+          return;
+        }
+        
+        const html = data.articles.map(article => `
+          <div class="news-card" onclick="window.open('${article.url}', '_blank')">
+            ${article.image ? `<img src="${article.image}" alt="${article.title}" class="news-image" onerror="this.style.display='none'">` : ''}
+            <div class="news-content">
+              <div class="news-source">${article.source}</div>
+              <div class="news-title">${article.title}</div>
+              <div class="news-description">${article.description || ''}</div>
+              <div class="news-date">${article.publishedAt ? new Date(article.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}</div>
+            </div>
+          </div>
+        `).join('');
+        
+        newsGrid.innerHTML = html;
+      } catch (error) {
+        console.error('Error loading news:', error);
+        newsGrid.innerHTML = '<div class="no-news">Failed to load news. Please try again later.</div>';
+      }
+    }
+
+    loadNews();
+  </script>
+</body>
+</html>
