@@ -2,7 +2,8 @@ const { normalizeTeamName } = require('../data/leagues');
 
 function getDateRange() {
   const dates = [];
-  const today = new Date();
+  const now = new Date();
+  const today = new Date(now.toLocaleString('en-US', { timeZone: 'Africa/Lagos' }));
   today.setHours(0, 0, 0, 0);
   for (let i = -1; i <= 3; i++) {
     const d = new Date(today);
@@ -17,9 +18,10 @@ function getDateRange() {
 
 function getLocalDateStr() {
   const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
+  const localDate = new Date(now.toLocaleString('en-US', { timeZone: 'Africa/Lagos' }));
+  const year = localDate.getFullYear();
+  const month = String(localDate.getMonth() + 1).padStart(2, '0');
+  const day = String(localDate.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
 

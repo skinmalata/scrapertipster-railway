@@ -1,9 +1,56 @@
-Alternate page with proper canonical tag
-These pages aren't indexed or served on Google
-First detected: 3/15/26
-Done fixing?
-Affected pages
-
-
-URL	Last crawled
-https://www.winfulltime.com/
+2026-03-26T14:37:02.212137838Z [inf]  Starting Container
+2026-03-26T14:37:02.596284724Z [inf]  [Debug] loadCachedPredictions called
+2026-03-26T14:37:02.596292337Z [inf]  [Debug] CWD: /app
+2026-03-26T14:37:02.596296494Z [inf]  [Debug] Cache file: /app/predictions-cache.json
+2026-03-26T14:37:02.596300940Z [inf]  [Debug] Cache file exists: true
+2026-03-26T14:37:02.596304610Z [inf]  [Debug] Loaded cache, matches: 25
+2026-03-26T14:37:02.596308503Z [inf]  Cache preloaded successfully, matches: 25
+2026-03-26T14:37:02.596311617Z [inf]  YouTube API Key loaded: Yes (AIzaSyCZnD...)
+2026-03-26T14:37:02.596314870Z [inf]  YouTube Channel ID: UCyDIjH4CQiITAGnjZ_ZTTYg
+2026-03-26T14:37:02.596318551Z [inf]  Server running on port 3002
+2026-03-26T14:37:02.596322579Z [inf]  Access at http://0.0.0.0:3002
+2026-03-26T14:37:02.596365754Z [inf]  [dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+2026-03-26T14:37:02.596368759Z [inf]  Preloading predictions cache...
+2026-03-26T14:37:07.136172422Z [inf]  Running initial prediction fetch in background...
+2026-03-26T14:37:07.136177431Z [inf]  Fetching predictions for dates: [
+2026-03-26T14:37:07.136182755Z [inf]    '2026-03-25',
+2026-03-26T14:37:07.136186011Z [inf]    '2026-03-26',
+2026-03-26T14:37:07.136189783Z [inf]    '2026-03-27',
+2026-03-26T14:37:07.136193480Z [inf]    '2026-03-28',
+2026-03-26T14:37:07.136197454Z [inf]    '2026-03-29'
+2026-03-26T14:37:07.136201283Z [inf]  ]
+2026-03-26T14:37:07.136204677Z [inf]  Scraping yesterday results...
+2026-03-26T14:37:07.136208195Z [inf]  Scraping results for 2026-03-25...
+2026-03-26T14:37:11.069839703Z [inf]  Results cache updated
+2026-03-26T14:37:11.069843127Z [inf]  Found 538 results for 2026-03-25
+2026-03-26T14:37:11.069846098Z [inf]  Scraping predictions for 2026-03-25...
+2026-03-26T14:37:12.726402254Z [inf]  Page loaded for 2026-03-25
+2026-03-26T14:37:12.855362368Z [inf]  Found 54 match elements for 2026-03-25
+2026-03-26T14:37:12.881857787Z [inf]  Only 2 matches with 65%+, adding 2 matches with 60-64%
+2026-03-26T14:37:15.886546632Z [inf]  Scraping predictions for 2026-03-26...
+2026-03-26T14:37:17.323773474Z [inf]  Page loaded for 2026-03-26
+2026-03-26T14:37:17.676387423Z [inf]  Found 24 match elements for 2026-03-26
+2026-03-26T14:37:20.692925568Z [inf]  Scraping predictions for 2026-03-27...
+2026-03-26T14:37:22.028816694Z [inf]  Page loaded for 2026-03-27
+2026-03-26T14:37:22.202033257Z [inf]  Found 96 match elements for 2026-03-27
+2026-03-26T14:37:25.240402494Z [inf]  Scraping predictions for 2026-03-28...
+2026-03-26T14:37:27.000693593Z [inf]  Page loaded for 2026-03-28
+2026-03-26T14:37:27.160890711Z [inf]  Found 202 match elements for 2026-03-28
+2026-03-26T14:37:30.249417696Z [inf]  Scraping predictions for 2026-03-29...
+2026-03-26T14:37:32.031595619Z [inf]  Page loaded for 2026-03-29
+2026-03-26T14:37:32.154000039Z [inf]  Found 87 match elements for 2026-03-29
+2026-03-26T14:37:32.207161386Z [inf]  Only 4 matches with 65%+, adding 5 matches with 60-64%
+2026-03-26T14:37:40.204418718Z [inf]  Scraping win streaks...
+2026-03-26T14:37:49.609310437Z [inf]  Found 103 table rows for win streaks
+2026-03-26T14:37:49.609313012Z [inf]  Parsed 100 win streak matches
+2026-03-26T14:37:50.312547446Z [inf]  Scraping loss streaks...
+2026-03-26T14:37:56.421071982Z [inf]  Found 103 table rows for loss streaks
+2026-03-26T14:37:56.421078380Z [inf]  Parsed 100 loss streak matches
+2026-03-26T14:37:59.549759190Z [inf]  Scraping draw streaks...
+2026-03-26T14:38:04.790107683Z [inf]  Found 61 table rows for draw streaks
+2026-03-26T14:38:05.115180388Z [inf]  Calculating Team to Score from BTTS data...
+2026-03-26T14:38:05.115188951Z [inf]  Calculated 26 Team to Score matches
+2026-03-26T14:38:05.115193141Z [inf]  Calculated 3 Team to Score 2+ matches
+2026-03-26T14:38:05.115196366Z [inf]  Skipping batch analysis scraping (ENABLE_BACKGROUND_SCRAPING not set to true)
+2026-03-26T14:38:05.115200298Z [inf]  Initial fetch completed. Matches found: 44
+2026-03-26T14:38:05.115260721Z [inf]  Parsed 58 draw streak matches
