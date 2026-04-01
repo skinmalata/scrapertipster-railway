@@ -898,14 +898,27 @@ async function fetchAndCachePredictions() {
 
 async function fetchPredictions() {
   const cached = loadCachedPredictions();
+  console.log('No cache found, fetching new data...');
+  const freshData = await fetchAndCachePredictions();
+  
+  const MIN_MATCHES_THRESHOLD = 20;
+  const hasEnoughMatches = freshData.totalMatches >= MIN_MATCHES_THRESHOLD;
+  const hasBetterOrEqualMatches = !cached || freshData.totalMatches >= cached.totalMatches;
+  
+  if (hasEnoughMatches && hasBetterOrEqualMatches) {
+    console.log(`Fresh scrape has ${freshData.totalMatches} matches (threshold: ${MIN_MATCHES_THRESHOLD}), using fresh data`);
+    saveCachedPredictions(freshData);
+    return freshData;
+  }
+  
   if (cached) {
-    console.log('Serving predictions from cache...');
+    console.log(`Fresh scrape has only ${freshData.totalMatches} matches, using cached data (${cached.totalMatches} matches)`);
     return cached;
   }
-  console.log('No cache found, fetching new data...');
-  const data = await fetchAndCachePredictions();
-  saveCachedPredictions(data);
-  return data;
+  
+  console.log(`No cached data available, using fresh scrape result (${freshData.totalMatches} matches)`);
+  saveCachedPredictions(freshData);
+  return freshData;
 }
 
 function normalizeTeamName(name) {
