@@ -243,21 +243,22 @@ cron.schedule('0 1 * * *', async () => {
   try {
     const data = await getScraperService().fetchAndCachePredictions();
     console.log('Scheduled fetch completed. Matches found:', data.totalMatches);
-    
-    // Corners, cards, and both halves scraping disabled
-    // console.log('Running scheduled corners scraping...');
-    // const cornersData = await getScraperService().scrapeCorners();
-    // console.log('Scheduled corners scrape completed. Matches found:', cornersData.totalMatches);
-    // 
-    // console.log('Running scheduled cards scraping...');
-    // const cardsData = await getScraperService().scrapeCards();
-    // console.log('Scheduled cards scrape completed. Matches found:', cardsData.totalMatches);
-    // 
-    // console.log('Running scheduled both halves (To Score 2+) scraping...');
-    // const bothHalvesData = await getScraperService().scrapeBothHalves();
-    // console.log('Scheduled both halves scrape completed. Matches found:', bothHalvesData.totalMatches);
   } catch (error) {
     console.error('Scheduled fetch error:', error.message);
+  }
+});
+
+// Run secondary scrape at 6:00 PM to catch late-appearing matches
+cron.schedule('0 18 * * *', async () => {
+  console.log('Running secondary scrape to capture missed matches...');
+  try {
+    const data = await getScraperService().fetchPredictions();
+    console.log('Secondary scrape completed. Total matches:', data.totalMatches);
+    if (data.recoveredMatches) {
+      console.log(`Recovered ${data.recoveredMatches} missed matches from previous scrape`);
+    }
+  } catch (error) {
+    console.error('Secondary scrape error:', error.message);
   }
 });
 

@@ -907,6 +907,20 @@ async function fetchPredictions() {
   
   if (hasEnoughMatches && hasBetterOrEqualMatches) {
     console.log(`Fresh scrape has ${freshData.totalMatches} matches (threshold: ${MIN_MATCHES_THRESHOLD}), using fresh data`);
+    
+    if (cached) {
+      const missedMatches = findMissedMatches(cached, freshData);
+      if (missedMatches.length > 0) {
+        console.log(`⚠️ ${missedMatches.length} matches from cache NOT in fresh scrape:`);
+        missedMatches.forEach(m => console.log(`  - ${m.match} (${m.date})`));
+        
+        const mergedData = mergeMissedMatches(freshData, missedMatches, cached);
+        console.log(`✅ Merged ${missedMatches.length} missed matches into fresh data`);
+        saveCachedPredictions(mergedData);
+        return mergedData;
+      }
+    }
+    
     saveCachedPredictions(freshData);
     return freshData;
   }
@@ -919,6 +933,46 @@ async function fetchPredictions() {
   console.log(`No cached data available, using fresh scrape result (${freshData.totalMatches} matches)`);
   saveCachedPredictions(freshData);
   return freshData;
+}
+
+function findMissedMatches(cached, fresh) {
+  const missed = [];
+  const freshKeys = new Set(fresh.matches.map(m => `${m.match}|${m.date}`));
+  
+  for (const match of cached.matches) {
+    const key = `${match.match}|${match.date}`;
+    if (!freshKeys.has(key)) {
+      missed.push(match);
+    }
+  }
+  return missed;
+}
+
+function mergeMissedMatches(freshData, missedMatches, cached) {
+  const merged = { ...freshData };
+  
+  merged.matches = [...missedMatches, ...freshData.matches].sort((a, b) => {
+    if (a.date === b.date) return 0;
+    return new Date(a.date) - new Date(b.date);
+  });
+  merged.totalMatches = merged.matches.length;
+  
+  const missedOver25 = missedMatches.filter(m => m.over25 || (m.tip && m.tip.includes('Over 2.5')));
+  const missedOver15 = missedMatches.filter(m => m.over15 || (m.tip && m.tip.includes('Over 1.5')));
+  const missedBtts = missedMatches.filter(m => m.btts || (m.tip && m.tip.includes('BTTS')));
+  
+  merged.over25Matches = [...missedOver25, ...freshData.over25Matches];
+  merged.over15Matches = [...missedOver15, ...freshData.over15Matches];
+  merged.bttsMatches = [...missedBtts, ...freshData.bttsMatches];
+  
+  merged.totalOver25 = merged.over25Matches.length;
+  merged.totalOver15 = merged.over15Matches.length;
+  merged.totalBtts = merged.bttsMatches.length;
+  
+  merged.lastUpdated = new Date().toISOString();
+  merged.recoveredMatches = missedMatches.length;
+  
+  return merged;
 }
 
 function normalizeTeamName(name) {
