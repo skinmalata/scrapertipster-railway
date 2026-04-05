@@ -70,7 +70,22 @@ router.get('/predictions', async (req, res) => {
     
     let data;
     const cached = getScraperService().loadCachedPredictions();
-    if (cached) {
+    
+    // Auto-refresh if cache is stale (older than 12 hours)
+    if (cached && cached.isStale) {
+      console.log('[API] Cache is stale, triggering background refresh...');
+      // Fire and forget - serve stale data but refresh in background
+      setImmediate(async () => {
+        try {
+          await getScraperService().fetchPredictions();
+          console.log('[API] Background refresh completed');
+        } catch (e) {
+          console.error('[API] Background refresh failed:', e.message);
+        }
+      });
+      delete cached.isStale;
+      data = cached;
+    } else if (cached) {
       console.log('[API] Serving from preloaded cache');
       data = cached;
     } else {

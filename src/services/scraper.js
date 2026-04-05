@@ -114,7 +114,20 @@ function loadCachedPredictions() {
     if (fs.existsSync(CACHE_FILE)) {
       const data = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8'));
       console.log('[Debug] Loaded cache, matches:', data.matches?.length);
+      
       if (data.matches && data.matches.length > 0) {
+        const cacheDate = new Date(data.fetchTime || data.date);
+        const now = new Date();
+        const hoursOld = (now - cacheDate) / (1000 * 60 * 60);
+        
+        console.log('[Debug] Cache age:', hoursOld.toFixed(1), 'hours');
+        
+        const MAX_CACHE_AGE_HOURS = 12;
+        if (hoursOld > MAX_CACHE_AGE_HOURS) {
+          console.log('[Debug] Cache is stale (>' + MAX_CACHE_AGE_HOURS + ' hours old), marking for refresh');
+          data.isStale = true;
+        }
+        
         return data;
       }
     }

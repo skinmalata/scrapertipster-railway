@@ -2,7 +2,10 @@ FROM node:20-bookworm
 
 RUN apt-get update && apt-get install -y \
     chromium \
-    && rm -rf /var/lib/apt/lists/*
+    tzdata \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -fs /usr/share/zoneinfo/Africa/Lagos /etc/localtime \
+    && dpkg-reconfigure -f noninteractive tzdata
 
 WORKDIR /app
 
