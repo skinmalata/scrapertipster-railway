@@ -18,8 +18,7 @@
   <link rel="canonical" href="https://winfulltime.com/">
   <meta name="p:domain_verify" content="ea6fdcfb1731666c03500a5d385f306f"/>
   <link rel="icon" href="/logo.png" type="image/png">
-   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6975707128100932" crossorigin="anonymous"></script>
-   <link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/styles.css">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -902,9 +901,7 @@ header {
       </div>
     </header>
 
-    <div class="text-center py-2">
-      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-6975707128100932" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></ins>
-    </div>
+
 
     <main class="container">
       <div class="hero">
@@ -1152,11 +1149,28 @@ header {
     let currentData = null;
     let currentCategory = '1x2';
     let currentDayOffset = 0;
+    let serverToday = null;
 
-    // Set today's date
-    const today = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('currentDate').textContent = today.toLocaleDateString('en-US', options);
+    function setServerToday(dateStr) {
+      serverToday = dateStr;
+    }
+
+    function getServerDate() {
+      if (serverToday) {
+        const [year, month, day] = serverToday.split('-');
+        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      }
+      const now = new Date();
+      return new Date(now.toLocaleString('en-US', { timeZone: 'Africa/Lagos' }));
+    }
+
+    function formatServerDate(date, options) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
+      return new Date(`${year}-${month}-${day}T12:00:00`).toLocaleDateString('en-US', options);
+    }
 
     // Check URL for category parameter
     const urlParams = new URLSearchParams(window.location.search);
@@ -1178,17 +1192,17 @@ header {
     }
 
     function getDateStr(offset) {
-      const date = new Date();
-      date.setDate(date.getDate() + offset);
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
+      const baseDate = getServerDate();
+      baseDate.setDate(baseDate.getDate() + offset);
+      const year = baseDate.getFullYear();
+      const month = String(baseDate.getMonth() + 1).padStart(2, '0');
+      const day = String(baseDate.getDate()).padStart(2, '0');
       return `${year}-${month}-${day}`;
     }
 
     function getDaysArray() {
       const days = [];
-      const baseDate = new Date();
+      const baseDate = getServerDate();
       baseDate.setHours(0, 0, 0, 0);
       
       for (let i = -1; i <= 3; i++) {
@@ -1286,7 +1300,7 @@ header {
       else if (currentCategory === 'cards') matches = currentData.cardsMatches || [];
 
       let filtered;
-      const targetDate = new Date();
+      const targetDate = getServerDate();
       targetDate.setHours(0, 0, 0, 0);
       targetDate.setDate(targetDate.getDate() + currentDayOffset);
       const year = targetDate.getFullYear();
@@ -1436,6 +1450,16 @@ header {
           throw new Error(`HTTP error: ${response.status}`);
         }
         currentData = await response.json();
+        if (currentData.date) {
+          setServerToday(currentData.date);
+          renderDayTabs();
+          const dateDisplay = document.getElementById('currentDate');
+          if (dateDisplay) {
+            const serverDate = getServerDate();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateDisplay.textContent = serverDate.toLocaleDateString('en-US', options);
+          }
+        }
         console.log('Data received:', JSON.stringify(currentData).substring(0, 500));
         console.log('Calling renderMatches...');
         renderMatches();
@@ -1709,8 +1733,5 @@ renderDayTabs();
     gtag('js', new Date());
     gtag('config', 'G-HMGZMW9EDP');
   </script>
-  <script>
-    (adsbygoogle = window.adsbygoogle || []).push({});
-  </script>
-  </body>
+</body>
 </html>
