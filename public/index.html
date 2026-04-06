@@ -76,30 +76,35 @@ header {
       margin: 0 auto;
     }
 
-     .logo {
-       display: flex;
-       align-items: center;
-       gap: 8px;
-     }
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
 
-       .logo-icon {
-        width: 200px;
-        height: 80px;
-        background-image: url('/logonew.png');
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-        flex-shrink: 0;
-      }
+    .logo a { 
+      color: #18181b; 
+      text-decoration: none; 
+    }
+
+    .logo span { 
+      color: #ff0000; 
+    }
+
+    .logo .win {
+      color: #18181b;
+    }
+
+    .logo .fulltime {
+      color: #ff0000;
+    }
 
       @media (max-width: 640px) {
-        .logo-icon {
-          width: 150px;
-          height: 60px;
-        }
+        .logo { font-size: 18px; }
       }
 
-     .logo-text {
+      .logo-text {
        font-size: 28px;
        font-weight: bold;
        color: #18181b;
@@ -823,11 +828,12 @@ header {
   <div>
     <header>
       <div class="header-content">
-       <div class="logo">
-              <a href="/"><div class="logo-icon" role="img" aria-label="WinFulltime Logo"></div></a>
-            </div>
+          <div class="logo">
+            <a href="/" class="logo"><span class="win">Win</span><span class="fulltime">Fulltime</span></a>
+          </div>
         <nav>
           <a href="/">Home</a>
+          <a href="/blog/">Blog</a>
           <a href="/news.html">Latest News</a>
           <a href="/about.html">About</a>
           <a href="/contact.html">Contact</a>

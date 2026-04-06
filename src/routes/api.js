@@ -130,38 +130,56 @@ router.get('/predictions', async (req, res) => {
       console.error('Error loading results cache:', e.message);
     }
     
+    // Build results lookup map for faster matching
+    const resultsMap = new Map();
+    for (const dateKey of Object.keys(resultsCache)) {
+      const dateResults = resultsCache[dateKey];
+      for (const [resultKey, score] of Object.entries(dateResults)) {
+        const normalizedResult = resultKey.toLowerCase().replace(/\s+/g, ' ').trim();
+        const resultTeams = normalizedResult.split(/ - | vs /);
+        if (resultTeams.length === 2) {
+          const [home, away] = resultTeams;
+          const homeKey = home.trim();
+          const awayKey = away.trim();
+          if (!resultsMap.has(homeKey)) resultsMap.set(homeKey, new Map());
+          resultsMap.get(homeKey).set(awayKey, score);
+        }
+      }
+    }
+    
     // Enrich predictions with results
     const enrichWithResults = (matches) => {
       if (!matches) return [];
+      
+      const currentDate = (data.date || '').trim();
+      const today = new Date().toISOString().split('T')[0];
+      
       return matches.map(match => {
         const matchKey = match.match;
+        const matchDateStr = (match.date || '').trim();
+        
+        // Skip if match is for today or later (no results yet for matches not played)
+        if (matchDateStr >= today) {
+          return { ...match, result: null };
+        }
+        
         let result = null;
         
-        // Search through all dates in results cache
-        for (const dateKey of Object.keys(resultsCache)) {
-          const dateResults = resultsCache[dateKey];
-          for (const [resultKey, score] of Object.entries(dateResults)) {
-            const normalizedMatch = matchKey.toLowerCase().replace(/\s+/g, ' ').trim();
-            const normalizedResult = resultKey.toLowerCase().replace(/\s+/g, ' ').trim();
-            
-            const matchTeams = normalizedMatch.split(/ - | vs /);
-            const resultTeams = normalizedResult.split(/ - | vs /);
-            
-            if (matchTeams.length === 2 && resultTeams.length === 2) {
-              const [home1, away1] = matchTeams;
-              const [home2, away2] = resultTeams;
-              
-              // Check if teams match (partial match allowed)
-              const homeMatch = home1.includes(home2) || home2.includes(home1);
-              const awayMatch = away1.includes(away2) || away2.includes(away1);
-              
-              if (homeMatch && awayMatch) {
-                result = score;
-                break;
+        // Use pre-built map for faster lookup
+        const matchTeams = matchKey.toLowerCase().replace(/\s+/g, ' ').trim().split(/ - | vs /);
+        if (matchTeams.length === 2) {
+          const [home1, away1] = matchTeams;
+          for (const [homeKey, awayMap] of resultsMap) {
+            if (home1.includes(homeKey) || homeKey.includes(home1)) {
+              for (const [awayKey, score] of awayMap) {
+                if (away1.includes(awayKey) || awayKey.includes(away1)) {
+                  result = score;
+                  break;
+                }
               }
+              if (result) break;
             }
           }
-          if (result) break;
         }
         
         return { ...match, result };

@@ -8,6 +8,7 @@
   <meta name="keywords" content="football news, soccer news, Premier League news, La Liga news, Champions League news">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://winfulltime.com/news.html">
+  <link rel="icon" href="/favicon.ico">
   <link rel="stylesheet" href="/styles.css">
   <style>
     * {
@@ -47,24 +48,14 @@
     .logo {
       display: flex;
       align-items: center;
-      gap: 8px;
+      font-size: 20px;
+      font-weight: bold;
     }
-
-    .logo-icon {
-      width: 200px;
-      height: 80px;
-      background-image: url('/logonew.png');
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-      flex-shrink: 0;
-    }
+    .logo a { color: #18181b; text-decoration: none; }
+    .logo span { color: #ff0000; }
 
     @media (max-width: 640px) {
-      .logo-icon {
-        width: 150px;
-        height: 60px;
-      }
+      .logo { font-size: 16px; }
     }
 
     nav {
@@ -256,12 +247,11 @@
   <header>
     <div class="header-content">
       <div class="logo">
-        <a href="/">
-          <div class="logo-icon" role="img" aria-label="WinFulltime Logo"></div>
-        </a>
+        <a href="/" class="logo">Win<span>Fulltime</span></a>
       </div>
       <nav>
         <a href="/">Home</a>
+        <a href="/blog/">Blog</a>
         <a href="/news.html">Latest News</a>
         <a href="/about.html">About</a>
         <a href="/contact.html">Contact</a>
