@@ -236,6 +236,22 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Handle blog posts - try both with and without .html extension
+app.get('/blog/:slug', (req, res) => {
+  const slug = req.params.slug;
+  const fs = require('fs');
+  
+  // First try without .html (if already exists as static file)
+  let filePath = path.join(__dirname, 'public', 'blog', slug + '.html');
+  
+  if (fs.existsSync(filePath)) {
+    return res.sendFile(filePath, { maxAge: 0 });
+  }
+  
+  // If not found, redirect to blog index
+  res.redirect('/blog/');
+});
+
 // Scheduled Tasks
 // Run daily at 1:00 AM
 cron.schedule('0 1 * * *', async () => {

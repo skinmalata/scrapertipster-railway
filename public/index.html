@@ -509,6 +509,97 @@ header {
       color: #18181b;
     }
 
+    .blog-section {
+      max-width: 1000px;
+      margin: 48px auto;
+      padding: 0 12px;
+    }
+
+    .blog-section h2 {
+      font-size: 28px;
+      text-align: center;
+      margin-bottom: 8px;
+      color: #18181b;
+    }
+
+    .blog-subtitle {
+      text-align: center;
+      color: #71717a;
+      font-size: 16px;
+      margin-bottom: 32px;
+    }
+
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .blog-card {
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 16px;
+      padding: 24px;
+      text-decoration: none;
+      display: block;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .blog-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      border-color: #ff0000;
+    }
+
+    .blog-card .news-category {
+      font-size: 11px;
+      font-weight: 700;
+      color: #ff0000;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .blog-card h4 {
+      font-size: 18px;
+      color: #18181b;
+      margin: 12px 0 8px;
+      line-height: 1.3;
+      font-weight: 600;
+    }
+
+    .blog-card p {
+      font-size: 14px;
+      color: #71717a;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: #ff0000;
+      color: white;
+      padding: 12px 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #cc0000;
+    }
+
+    @media (max-width: 768px) {
+      .blog-grid {
+        grid-template-columns: 1fr;
+      }
+      .blog-section h2 {
+        font-size: 24px;
+      }
+    }
+
     .news-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -834,7 +925,6 @@ header {
         <nav>
           <a href="/">Home</a>
           <a href="/blog/">Blog</a>
-          <a href="/news.html">Latest News</a>
           <a href="/about.html">About</a>
           <a href="/contact.html">Contact</a>
         </nav>
@@ -894,34 +984,20 @@ header {
         </a>
       </div>
 
-      <!-- News Section -->
-      <div class="news-section">
-        <h3>Latest Football News</h3>
-        <div id="homeNewsGrid" class="news-grid">
-          <div class="loading">
-            <div class="progress-bar-container">
-              <div class="progress-bar"></div>
-            </div>
-            <span class="loading-text">Loading news...</span>
-          </div>
-        </div>
-        <div style="text-align: center; margin-top: 16px;">
-          <a href="/news.html" class="view-all-link">View All News</a>
+      <!-- Blog Section -->
+      <div class="blog-section">
+        <h2>Betting Guides</h2>
+        <p class="blog-subtitle">Learn how to bet smarter with our expert guides</p>
+        <div id="homeBlogGrid" class="blog-grid"></div>
+        <div style="text-align: center; margin-top: 24px;">
+          <a href="/blog/" class="btn-primary">View All Guides</a>
         </div>
       </div>
 
 
 
-      <p style="text-align:center; margin: 20px auto; max-width:800px; font-size:16px; color:#333333;">
-        Get <strong>free football predictions</strong> and <strong>betting tips</strong> for today's matches. We analyze <strong>historical data</strong>, <strong>team form</strong>, and <strong>head-to-head records</strong> to provide winning football analysis and predictions for <strong>1X2</strong>, <strong>over 1.5</strong>, <strong>over 2.5</strong>, <strong>corners</strong>, <strong>BTTS</strong>, <strong>team to score</strong>, and <strong>win streak tips</strong> across major football leagues worldwide.
-      </p>
-
-      <p style="text-align:center; margin: 20px auto; max-width:800px; font-size:16px; color:#333333;">
-        Our advanced algorithm processes thousands of data points from each match, including recent performance trends, home and away statistics, goal-scoring patterns, defensive records, and previous encounters between the teams. We cover major football leagues including the English Premier League, Spanish La Liga, Italian Serie A, German Bundesliga, French Ligue 1, Champions League, and many more competitions from around the globe. Our <strong>daily predictions</strong> are updated every morning to ensure you have the latest information before placing your bets.
-      </p>
-
-      <p style="text-align:center; margin: 20px auto; max-width:800px; font-size:16px; color:#333333;">
-        Whether you're looking for conservative accumulator tips or high-risk single bets, our comprehensive analysis helps you make smarter betting decisions. We also track winning, losing, and drawing streaks to identify teams in form or struggling at the moment. Our <strong>free soccer predictions</strong> are updated daily for <strong>today's football matches</strong> and tomorrow's games.
+      <p style="text-align:center; margin: 20px auto; max-width:700px; font-size:16px; color:#333333;">
+        Get free football predictions for today's matches. We analyze team form, head-to-head records, and stats to provide betting tips across major leagues worldwide.
       </p>
 
       <!-- FAQ Section -->
@@ -1582,33 +1658,46 @@ header {
 
 renderDayTabs();
     loadPredictions();
-    loadHomeNews();
+    loadRandomBlogPosts();
     console.log('loadPredictions called, waiting...');
     
-    async function loadHomeNews() {
-      const newsGrid = document.getElementById('homeNewsGrid');
-      try {
-        const response = await fetch('/api/news');
-        const data = await response.json();
-        
-        if (!data.success || !data.articles || data.articles.length === 0) {
-          newsGrid.innerHTML = '<p class="no-matches">No news available</p>';
-          return;
-        }
-        
-        const html = data.articles.slice(0, 4).map(article => `
-          <div class="news-card" onclick="window.open('${article.url}', '_blank')">
-            <div class="news-title">${article.title}</div>
-          </div>
-        `).join('');
-        
-        newsGrid.innerHTML = html;
-      } catch (error) {
-        console.error('Error loading news:', error);
-        newsGrid.innerHTML = '<p class="no-matches">Failed to load news</p>';
-      }
+    async function loadRandomBlogPosts() {
+      const blogGrid = document.getElementById('homeBlogGrid');
+      const blogPosts = [
+        { url: '/blog/1x2-betting-guide', category: 'Beginner', title: 'Understanding 1X2 Betting', desc: 'Learn the most popular football betting market' },
+        { url: '/blog/what-is-over-under-betting', category: 'Beginner', title: 'Over/Under Betting Guide', desc: 'Master the goal total markets' },
+        { url: '/blog/value-betting-explained', category: 'Strategy', title: 'Value Betting Explained', desc: 'Find odds better than they should be' },
+        { url: '/blog/premier-league-betting-guide', category: 'League Guide', title: 'Premier League Betting', desc: 'Complete EPL betting guide' },
+        { url: '/blog/btts-betting-guide', category: 'Beginner', title: 'BTTS Betting Guide', desc: 'Both Teams to Score explained' },
+        { url: '/blog/bankroll-management-guide', category: 'Strategy', title: 'Bankroll Management', desc: 'Protect your money with proven strategies' },
+        { url: '/blog/asian-handicap-betting-guide', category: 'Strategy', title: 'Asian Handicap Guide', desc: 'Master the Asian handicap market' },
+        { url: '/blog/football-betting-strategies', category: 'Strategy', title: 'Betting Strategies That Work', desc: 'Proven techniques for better bets' },
+        { url: '/blog/how-to-read-football-betting-odds', category: 'Beginner', title: 'How to Read Odds', desc: 'Understanding decimal, fractional, American odds' },
+        { url: '/blog/expected-goals-xg-betting', category: 'Analysis', title: 'Using xG for Better Bets', desc: 'Expected Goals explained simply' },
+        { url: '/blog/using-statistics-for-betting', category: 'Analysis', title: 'Statistical Analysis for Betting', desc: 'What stats actually matter' },
+        { url: '/blog/analyze-football-match-betting', category: 'Analysis', title: 'How to Analyze a Match', desc: 'Step-by-step match analysis' },
+        { url: '/blog/inplay-betting-strategies', category: 'Strategy', title: 'In-Play Betting Strategies', desc: 'Live betting done right' },
+        { url: '/blog/betting-on-draws', category: 'Strategy', title: 'Betting on Draws', desc: 'Find value in the draw market' },
+        { url: '/blog/responsible-gambling-guide', category: 'Responsible', title: 'Responsible Gambling', desc: 'Betting should be fun' },
+        { url: '/blog/la-liga-betting-guide', category: 'League Guide', title: 'La Liga Betting Guide', desc: 'Barcelona, Real Madrid & more' },
+        { url: '/blog/serie-a-betting-guide', category: 'League Guide', title: 'Serie A Betting Guide', desc: 'Italian football explained' },
+        { url: '/blog/bundesliga-betting-guide', category: 'League Guide', title: 'Bundesliga Betting Guide', desc: 'German football coverage' }
+      ];
+      
+      const shuffled = blogPosts.sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, 4);
+      
+      const html = selected.map(post => `
+        <a href="${post.url}" class="blog-card">
+          <span class="news-category">${post.category}</span>
+          <h4>${post.title}</h4>
+          <p>${post.desc}</p>
+        </a>
+      `).join('');
+      
+      blogGrid.innerHTML = html;
     }
-
+    
     } catch (error) {
       console.error('Script error:', error);
       alert('Script error: ' + error.message);
@@ -1618,7 +1707,7 @@ renderDayTabs();
     <div class="footer-content">
       <div class="footer-links">
         <a href="/">Home</a>
-        <a href="/news.html">Latest News</a>
+        <a href="/blog/">Blog</a>
         <a href="/about.html">About</a>
         <a href="/options.html">Betting Guide</a>
         <a href="/contact.html">Contact</a>
