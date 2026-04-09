@@ -290,6 +290,57 @@ if (process.env.ENABLE_BACKGROUND_SCRAPING === 'true') {
   });
 }
 
+// Auto-publish scheduled articles daily at 6:00 AM
+const fs = require('fs');
+const ARTICLES_FILE = path.join(__dirname, 'articles-manifest.json');
+
+function loadArticlesManifest() {
+  try {
+    const data = fs.readFileSync(ARTICLES_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch (e) {
+    console.log('No articles manifest found:', e.message);
+    return [];
+  }
+}
+
+function saveArticlesManifest(articles) {
+  fs.writeFileSync(ARTICLES_FILE, JSON.stringify(articles, null, 2));
+}
+
+function publishScheduledArticles() {
+  console.log('Checking for scheduled articles to publish...');
+  const articles = loadArticlesManifest();
+  const today = new Date().toISOString().split('T')[0];
+  
+  let published = 0;
+  const updatedArticles = articles.map(article => {
+    if (!article.published && article.publishDate === today) {
+      console.log(`Publishing article: ${article.title}`);
+      published++;
+      return { ...article, published: true };
+    }
+    return article;
+  });
+  
+  if (published > 0) {
+    saveArticlesManifest(updatedArticles);
+    console.log(`Published ${published} article(s) today`);
+  } else {
+    console.log('No articles scheduled for today');
+  }
+}
+
+// Run at 6:00 AM daily to check for articles to publish
+cron.schedule('0 6 * * *', () => {
+  publishScheduledArticles();
+});
+
+// Also check on server startup
+setTimeout(() => {
+  publishScheduledArticles();
+}, 10000);
+
 // Use a flag to track if initial fetch is running
 let initialFetchRunning = false;
 

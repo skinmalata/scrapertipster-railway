@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poisson Distribution for Football Predictions: Mathematical Edge | WinFulltime</title>
+  <meta name="description" content="Learn to use Poisson distribution for football predictions. Build mathematical models to predict match scores and identify value.">
+  <meta name="keywords" content="poisson distribution, football predictions, mathematical model, expected goals, probability model">
+  <meta property="og:title" content="Poisson Distribution for Football Predictions: Mathematical Edge">
+  <meta property="og:description" content="Learn to use Poisson distribution for football predictions.">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://winfulltime.com/blog/poisson-distribution-football-predictions">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #18181b; line-height: 1.7; }
+    .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+    h1 { font-size: 2.5rem; margin-bottom: 10px; }
+    h2 { font-size: 1.8rem; margin: 30px 0 15px; }
+    h3 { font-size: 1.3rem; margin: 20px 0 10px; }
+    .meta { color: #71717a; font-size: 0.9rem; margin-bottom: 20px; }
+    .intro { font-size: 1.1rem; color: #3f3f46; margin-bottom: 30px; }
+    .formula { background: #f1f5f9; padding: 20px; border-radius: 8px; font-family: monospace; text-align: center; font-size: 1.1rem; margin: 20px 0; }
+    .example { background: white; border-radius: 12px; padding: 20px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .tip { background: #f0fdf4; border-left: 4px solid #22c55e; padding: 15px; margin: 20px 0; }
+    .cta { background: linear-gradient(135deg, #dc2626, #b91c1c); color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 30px 0; }
+    .breadcrumb { font-size: 0.85rem; color: #71717a; margin-bottom: 15px; }
+    code { background: #e2e8f0; padding: 2px 6px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="breadcrumb"><a href="/">Home</a> > <a href="/blog/">Blog</a> > Poisson Distribution</div>
+    
+    <h1>Poisson Distribution for Football Predictions: Mathematical Edge</h1>
+    <p class="meta">Updated April 2026 | By WinFulltime Team | 18 min read</p>
+
+    <p class="intro">The Poisson distribution is a mathematical model that predicts the probability of events occurring over a fixed time period. In football, it can <strong>predict goal distributions</strong> and help you find value in the odds.</p>
+
+    <h2>What is Poisson Distribution?</h2>
+    <p>Poisson models the probability of a given number of events (goals) occurring when the average rate is known. It assumes goals occur independently and at a constant average rate.</p>
+
+    <div class="formula">
+      P(k goals) = (λ^k × e^-λ) / k!<br>
+      <small>λ = expected goals (average), k = number of goals, e = 2.718</small>
+    </div>
+
+    <h2>Building Your Poisson Model</h2>
+
+    <div class="step">
+      <h3>Step 1: Calculate Expected Goals (xG)</h3>
+      <p>Use xG stats to determine each team's average goals per game. Sources: StatsBomb, Understat, SofaScore.</p>
+    </div>
+
+    <div class="example">
+      <h3>Example: Man City vs Arsenal</h3>
+      <ul>
+        <li>Man City home xG: 2.1</li>
+        <li>Arsenal away xG conceded: 1.3</li>
+        <li><strong>Adjusted xG for Man City: (2.1 + 1.3) / 2 = 1.7</strong></li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <h3>Step 2: Calculate Probability for Each Score</h3>
+      <p>Use the Poisson formula to calculate probabilities for 0, 1, 2, 3+ goals.</p>
+      <p>P(0 goals) = e^-1.7 × 1.7^0 / 0! = 18.3%</p>
+      <p>P(1 goal) = e^-1.7 × 1.7^1 / 1! = 31.1%</p>
+    </div>
+
+    <div class="step">
+      <h3>Step 3: Create Scoreboard Matrix</h3>
+      <p>Calculate probabilities for every scoreline (0-0, 1-0, 2-1, etc.) by multiplying home goal probability × away goal probability.</p>
+    </div>
+
+    <div class="step">
+      <h3>Step 4: Derive Market Probabilities</h3>
+      <p>Add up relevant scores to get probabilities for:</p>
+      <ul>
+        <li>1X2: Sum win/draw/loss scores</li>
+        <li>Over 2.5: Sum all scores with 3+ total goals</li>
+        <li>BTTS: Sum scores where both teams score</li>
+      </ul>
+    </div>
+
+    <h2>Comparing Model to Bookmaker Odds</h2>
+    <div class="example">
+      <h3>Your Model vs Bookmaker</h3>
+      <table style="width:100%; border-collapse: collapse; margin:15px 0;">
+        <tr style="background:#f1f5f9;"><th>Outcome</th><th>Your Prob</th><th>Bookmaker</th><th>Value?</th></tr>
+        <tr><td>Over 2.5</td><td>58%</td><td>1.83 (54.6%)</td><td>✅ Yes</td></tr>
+        <tr><td>Man City win</td><td>52%</td><td>1.75 (57%)</td><td>❌ No</td></tr>
+      </table>
+    </div>
+
+    <h2>Improving Your Poisson Model</h2>
+    <ul>
+      <li><strong>Attack/Defense ratings</strong> - Adjust for home/away</li>
+      <li><strong>Recent form weighting</strong> - More weight to recent games</li>
+      <li><strong>Expected vs actual goals</strong> - Look for regression</li>
+      <li><strong>Starting lineups</strong> - Missing players affect xG</li>
+      <li><strong>Rest days</strong> - Fatigue matters</li>
+    </ul>
+
+    <div class="tip">
+      <strong>💡 Key Insight:</strong> The difference between good and great Poisson models is in the xG inputs. Better data = better predictions.
+    </div>
+
+    <h2>Tools for Poisson Betting</h2>
+    <ul>
+      <li><strong>Understat</strong> - Free xG data</li>
+      <li><strong>StatsBomb</strong> - Advanced xG metrics</li>
+      <li><strong>Football-data.co.uk</strong> - Historical stats</li>
+      <li><strong>Oddschecker</strong> - Compare your odds to bookmakers</li>
+    </ul>
+
+    <h2>Limitations of Poisson</h2>
+    <ul>
+      <li>Assumes independence (goals don't affect each other)</li>
+      <li>Doesn't account for key player absences</li>
+      <li>Can miss tactical changes</li>
+      <li>Historical data may not predict future</li>
+    </ul>
+
+    <div class="cta">
+      <p>Use our <a href="/">predictions with xG data</a> to start building your Poisson model.</p>
+    </div>
+
+    <h2>Verdict: Does Poisson Work?</h2>
+    <p><strong>Yes, for probability estimation.</strong> Poisson is the foundation of most professional betting models:</p>
+    <ul>
+      <li>✅ Provides mathematical framework for predictions</li>
+      <li>✅ Can identify genuine value vs bookmaker odds</li>
+      <li>✅ Works well for goal markets</li>
+      <li>⚠️ Requires quality xG data</li>
+      <li>⚠️ Must be combined with proper bankroll management</li>
+    </ul>
+    <p>Start with simple xG inputs and improve your model over time.</p>
+
+  </div>
+</body>
+</html>

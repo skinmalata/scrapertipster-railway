@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const fs = require('fs');
+const path = require('path');
 
 let scraperService = null;
 let cornersLastScrape = null;
@@ -459,3 +461,46 @@ router.get('/cards', async (req, res) => {
 });
 
 module.exports = router;
+
+// Articles API
+const articlesFile = path.join(__dirname, '../../articles-manifest.json');
+
+router.get('/articles', (req, res) => {
+  try {
+    const data = fs.readFileSync(articlesFile, 'utf8');
+    const articles = JSON.parse(data);
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Split into scheduled and published
+    const published = articles.filter(a => a.published);
+    const scheduled = articles.filter(a => !a.published);
+    
+    res.json({ success: true, published, scheduled, all: articles });
+  } catch (e) {
+    res.json({ success: false, error: e.message, published: [], scheduled: [] });
+  }
+});
+
+router.post('/articles/publish', (req, res) => {
+  const { slug } = req.body;
+  if (!slug) {
+    return res.json({ success: false, error: 'Missing slug' });
+  }
+  
+  try {
+    const data = fs.readFileSync(articlesFile, 'utf8');
+    const articles = JSON.parse(data);
+    
+    const updated = articles.map(a => {
+      if (a.slug === slug) {
+        return { ...a, published: true };
+      }
+      return a;
+    });
+    
+    fs.writeFileSync(articlesFile, JSON.stringify(updated, null, 2));
+    res.json({ success: true, message: `Published ${slug}` });
+  } catch (e) {
+    res.json({ success: false, error: e.message });
+  }
+});
