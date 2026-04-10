@@ -325,10 +325,88 @@ function publishScheduledArticles() {
   
   if (published > 0) {
     saveArticlesManifest(updatedArticles);
+    updateSitemap();
     console.log(`Published ${published} article(s) today`);
   } else {
     console.log('No articles scheduled for today');
   }
+}
+
+function updateSitemap() {
+  const fs = require('fs');
+  const articles = loadArticlesManifest();
+  const today = new Date().toISOString().split('T')[0];
+  
+  let blogUrls = '';
+  
+  articles.forEach(article => {
+    if (article.published) {
+      blogUrls += `  <url>
+    <loc>https://winfulltime.com/blog/${article.slug}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+`;
+    }
+  });
+  
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://winfulltime.com/</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://winfulltime.com/options.html</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://winfulltime.com/analysis.html</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://winfulltime.com/about.html</loc>
+    <lastmod>2026-04-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://winfulltime.com/contact.html</loc>
+    <lastmod>2026-04-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://winfulltime.com/privacy.html</loc>
+    <lastmod>2026-04-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://winfulltime.com/terms.html</loc>
+    <lastmod>2026-04-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <!-- Blog Index -->
+  <url>
+    <loc>https://winfulltime.com/blog/</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+${blogUrls}
+</urlset>`;
+  
+  fs.writeFileSync(path.join(__dirname, 'public', 'sitemap.xml'), sitemap);
+  console.log('Sitemap updated with published articles');
 }
 
 // Run at 6:00 AM daily to check for articles to publish
