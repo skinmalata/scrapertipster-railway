@@ -264,8 +264,8 @@ cron.schedule('0 1 * * *', async () => {
   }
 });
 
-// Run secondary scrape at 6:00 PM to catch late-appearing matches
-cron.schedule('0 18 * * *', async () => {
+// Run secondary scrape at 6:00 AM to catch late-appearing matches
+cron.schedule('0 6 * * *', async () => {
   console.log('Running secondary scrape to capture missed matches...');
   try {
     const data = await getScraperService().fetchPredictions();
