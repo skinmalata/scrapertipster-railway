@@ -18,8 +18,13 @@ if (!CHROME_PATH) {
         break;
       }
     }
-  } else {
-    CHROME_PATH = '/usr/bin/chromium';
+  }
+  if (!CHROME_PATH) {
+    try {
+      CHROME_PATH = require('puppeteer').executablePath();
+    } catch (e) {
+      CHROME_PATH = '/usr/bin/chromium';
+    }
   }
 }
 
