@@ -1130,9 +1130,19 @@ header {
 
       if (filtered.length === 0) {
         let dayLabel = currentDayOffset === 0 ? 'Today' : currentDayOffset === 1 ? 'Tomorrow' : currentDayOffset === -1 ? 'Yesterday' : `on ${targetDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+        let available = [];
+        if (currentData.dates) {
+          available = currentData.dates.filter(d => matches.some(m => m.date === d));
+        }
+        let fallbackHtml = `<p>No ${getCategoryLabel(currentCategory)} predictions ${dayLabel}</p>`;
+        if (available.length > 0 && currentDayOffset === 0) {
+          const nextDate = available[0];
+          const d = new Date(nextDate + 'T12:00:00');
+          fallbackHtml += `<p style="margin-top: 12px; font-size: 14px;">Try <a href="#" onclick="switchDay(${Math.ceil((d - getServerDate()) / 86400000)}); return false;" style="color: #ff0000;">${d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</a> (${available.length} matches available)</p>`;
+        }
         content.innerHTML = `
           <div class="no-matches">
-            <p>No ${getCategoryLabel(currentCategory)} predictions ${dayLabel}</p>
+            ${fallbackHtml}
           </div>
         `;
         document.getElementById('totalMatches').textContent = '0';
