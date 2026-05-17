@@ -900,16 +900,6 @@ async function fetchAndCachePredictions() {
       teamToScore2PlusMatches
     };
    
-    const ENABLE_BACKGROUND = process.env.ENABLE_BACKGROUND_SCRAPING === 'true';
-    let analysisCache = {};
-    
-    if (ENABLE_BACKGROUND) {
-      console.log('Starting batch analysis scraping...');
-      analysisCache = await batchScrapeAnalysis(matchesData);
-    } else {
-      console.log('Skipping batch analysis scraping (ENABLE_BACKGROUND_SCRAPING not set to true)');
-    }
-   
     const enrichedData = {
       success: true,
       dates: dateRange,
@@ -931,11 +921,9 @@ async function fetchAndCachePredictions() {
       losestreakMatches,
       drawstreakMatches,
       teamToScoreMatches,
-      teamToScore2PlusMatches,
-      analysis: analysisCache
+      teamToScore2PlusMatches
     };
      
-    saveAnalysisCache(analysisCache);
     saveCachedPredictions(enrichedData);
    
     return enrichedData;
