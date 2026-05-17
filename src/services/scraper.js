@@ -185,18 +185,26 @@ async function scrapeYesterdayResults() {
   
   console.log(`Scraping results for ${dateStr}...`);
   
-  // Try betexplorer for results
   const url = `https://www.betexplorer.com/results/soccer/?date=${dateStr}`;
   let html;
   
-  const browserOptions = {
-    headless: true,
-    executablePath,
-    args
+  const tryAxios = async () => {
+    const res = await axios.get(url, {
+      timeout: 30000,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9'
+      }
+    });
+    html = res.data;
+    console.log(`Axios loaded results, length: ${html.length}`);
   };
-  
-  const scrape = async () => {
-    const browser = await launchBrowserWithQueue(browserOptions);
+
+  const tryPuppeteer = async () => {
+    const browser = await launchBrowserWithQueue({
+      headless: true, executablePath, args
+    });
     try {
       const page = await browser.newPage();
       await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
@@ -207,13 +215,15 @@ async function scrapeYesterdayResults() {
       await browser.close();
     }
   };
-  
-  try {
-    await safeRequestWithBackoff(scrape, 3, 5000);
-  } catch (err) {
-    console.error(`Results scrape error:`, err.message);
-    return {};
-  }
+
+  await tryAxios().catch(async () => {
+    console.log('Axios failed for results, trying Puppeteer...');
+    await safeRequestWithBackoff(tryPuppeteer, 2, 5000).catch(err => {
+      console.error('Puppeteer also failed for results:', err.message);
+    });
+  });
+
+  if (!html) return {};
   
   const $ = cheerio.load(html);
   const results = {};
@@ -268,14 +278,23 @@ async function scrapeDate(dateStr, retryCount = 0) {
   let html;
   
   console.log(`Scraping predictions for ${dateStr}...`);
-  const browserOptions = {
-    headless: true,
-    executablePath: executablePath,
-    args: args
+
+  const tryAxios = async () => {
+    const res = await axios.get(url, {
+      timeout: 30000,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+      }
+    });
+    html = res.data;
+    console.log(`Axios loaded page for ${dateStr}, length: ${html.length}`);
   };
-  
-  const scrape = async () => {
-    const browser = await launchBrowserWithQueue(browserOptions);
+
+  const tryPuppeteer = async () => {
+    const browser = await launchBrowserWithQueue({
+      headless: true, executablePath, args
+    });
     try {
       const page = await browser.newPage();
       await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
@@ -283,18 +302,21 @@ async function scrapeDate(dateStr, retryCount = 0) {
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
       await page.waitForSelector('.match', { timeout: 15000 }).catch(() => {});
       html = await page.content();
-      console.log(`Page loaded for ${dateStr}`);
+      console.log(`Puppeteer loaded page for ${dateStr}`);
     } finally {
       await browser.close();
     }
   };
 
-  try {
-    await safeRequestWithBackoff(scrape, 3, 5000);
-  } catch (err) {
-    console.error(`Puppeteer error for ${dateStr}:`, err.message);
-    return { matches: [], over25Matches: [], over15Matches: [], bttsMatches: [], bttsNoMatches: [] };
-  }
+  await tryAxios().catch(async () => {
+    console.log(`Axios failed for ${dateStr}, trying Puppeteer...`);
+    try {
+      await safeRequestWithBackoff(tryPuppeteer, 2, 5000);
+    } catch (err) {
+      console.error(`Puppeteer also failed for ${dateStr}:`, err.message);
+      html = '';
+    }
+  });
 
   const $ = cheerio.load(html);
   const matches = [];
@@ -785,36 +807,47 @@ async function scrapeStreak(type, retryCount = 0) {
   if (!url) return [];
 
   console.log(`Scraping ${type} streaks...`);
+  let html;
   
-  const scrape = async () => {
+  const tryAxios = async () => {
+    const res = await axios.get(url, {
+      timeout: 30000,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9'
+      }
+    });
+    html = res.data;
+    console.log(`Axios loaded streaks ${type}, length: ${html.length}`);
+  };
+
+  const tryPuppeteer = async () => {
     const browser = await launchBrowserWithQueue({
-      executablePath: executablePath,
-      headless: true,
-      args: args
+      executablePath, headless: true, args
     });
     try {
       const page = await browser.newPage();
-      await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+      await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
       await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' });
-      
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
       await page.waitForSelector('.table-main', { timeout: 15000 }).catch(() => {});
       await sleep(3000);
-      
-      const html = await page.content();
-      fs.writeFileSync(`debug_streak_${type}.html`, html);
-      return parseBetexplorerStreaks(html, type);
+      html = await page.content();
     } finally {
       await browser.close();
     }
   };
 
-  try {
-    return await safeRequestWithBackoff(scrape, 3, 5000);
-  } catch (err) {
-    console.error(`Error scraping ${type} streaks:`, err.message);
-    return [];
-  }
+  await tryAxios().catch(async () => {
+    console.log(`Axios failed for streaks ${type}, trying Puppeteer...`);
+    await safeRequestWithBackoff(tryPuppeteer, 2, 5000).catch(err => {
+      console.error(`Puppeteer failed for streaks ${type}:`, err.message);
+    });
+  });
+
+  if (!html) return [];
+  return parseBetexplorerStreaks(html, type);
 }
 
 async function fetchAndCachePredictions() {
