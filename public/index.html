@@ -1214,15 +1214,7 @@ header {
       content.innerHTML = `<div class="matches-grid">${html}</div>`;
       
       document.querySelectorAll('.match-card').forEach(card => {
-        card.addEventListener('click', () => {
-          const matchData = JSON.parse(decodeURIComponent(card.dataset.match));
-          if (currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak' || currentCategory === 'corners' || currentCategory === 'cards' || currentCategory === 'teamtoscore2plus') return;
-          const matchStr = matchData.match || '';
-          const teams = matchStr.includes(' - ') ? matchStr.split(' - ') : matchStr.split(' vs ');
-          const homeTeam = encodeURIComponent(teams[0]?.trim() || '');
-          const awayTeam = encodeURIComponent(teams[1]?.trim() || '');
-          window.open(`/analysis.html?home=${homeTeam}&away=${awayTeam}`, '_blank');
-        });
+        card.style.cursor = 'default';
       });
       } catch (error) {
         console.error('Error rendering matches:', error);

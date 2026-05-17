@@ -175,75 +175,21 @@
       document.getElementById('matchTitle').style.display = 'block';
       document.getElementById('content').style.display = 'block';
       document.getElementById('matchTitle').textContent = decodeURIComponent(homeTeam) + ' vs ' + decodeURIComponent(awayTeam);
-      document.title = decodeURIComponent(homeTeam) + ' vs ' + decodeURIComponent(awayTeam) + ' Analysis';
+      document.title = decodeURIComponent(homeTeam) + ' vs ' + decodeURIComponent(awayTeam) + ' - WinFulltime';
 
-      loadAnalysis();
-    }
-
-    async function loadAnalysis() {
-      const contentEl = document.getElementById('content');
-      const home = decodeURIComponent(homeTeam);
-      const away = decodeURIComponent(awayTeam);
-
-      try {
-        const response = await fetch('/data/predictions.json');
-        if (response.ok) {
-          const data = await response.json();
-          const match = (data.matches || []).find(m => {
-            const teams = (m.match || '').split(' - ');
-            return teams.length === 2 &&
-              teams[0].toLowerCase().includes(home.toLowerCase()) &&
-              teams[1].toLowerCase().includes(away.toLowerCase());
-          });
-
-          if (match) {
-            contentEl.innerHTML = `
-              <div class="analysis-section">
-                <h3>Prediction</h3>
-                <div style="text-align: center; padding: 20px;">
-                  <div style="font-size: 48px; font-weight: bold; color: #ef4444; margin-bottom: 8px;">${match.tip}</div>
-                  <div style="font-size: 24px; color: #18181b;">${match.probability}% probability</div>
-                  <div style="margin-top: 16px; color: #71717a;">League: ${match.league || 'N/A'} | ${match.country || ''}</div>
-                  <div style="margin-top: 8px; color: #71717a;">Time: ${match.time || 'N/A'}</div>
-                </div>
-              </div>
-              <div class="analysis-section" style="background: #fef2f2; border: 1px solid #fecaca;">
-                <h3 style="color: #dc2626;">Analysis Unavailable</h3>
-                <p style="margin-bottom: 12px; line-height: 1.6;">
-                  Detailed live analysis (recent form, head-to-head, team statistics) is not available in static mode.
-                  View predictions on the <a href="/" style="color: #ef4444;">home page</a> for all available matches.
-                </p>
-              </div>
-              <div class="disclaimer">
-                <p><strong>18+ Only</strong></p>
-                <p>Predictions are for informational purposes only. Gambling involves financial risk and may lead to addiction. Please play responsibly.</p>
-              </div>
-            `;
-          } else {
-            contentEl.innerHTML = `
-              <div class="analysis-section" style="background: #fef2f2; border: 1px solid #fecaca;">
-                <h3 style="color: #dc2626;">Match Not Found</h3>
-                <p style="margin-bottom: 12px; line-height: 1.6;">No prediction found for ${home} vs ${away}. Check the <a href="/" style="color: #ef4444;">home page</a> for available matches.</p>
-              </div>
-            `;
-          }
-        } else {
-          throw new Error('No predictions data available');
-        }
-      } catch (error) {
-        contentEl.innerHTML = `
-          <div class="analysis-section" style="background: #fef2f2; border: 1px solid #fecaca;">
-            <h3 style="color: #dc2626;">Data Unavailable</h3>
-            <p style="margin-bottom: 12px; line-height: 1.6;">
-              ${error.message}. Predictions are currently being generated. Check back soon or visit the <a href="/" style="color: #ef4444;">home page</a>.
-            </p>
-          </div>
-        `;
-      }
-    }
-
-    if (homeTeam && awayTeam) {
-      loadAnalysis();
+      document.getElementById('content').innerHTML = `
+        <div class="analysis-section" style="background: #fef2f2; border: 1px solid #fecaca;">
+          <h3 style="color: #dc2626;">Analysis Unavailable</h3>
+          <p style="margin-bottom: 12px; line-height: 1.6;">
+            Match analysis is not available in static mode. View all predictions on the
+            <a href="/" style="color: #ef4444;">home page</a>.
+          </p>
+        </div>
+        <div class="disclaimer">
+          <p><strong>18+ Only</strong></p>
+          <p>Predictions are for informational purposes only. Gambling involves financial risk and may lead to addiction. Please play responsibly.</p>
+        </div>
+      `;
     }
   </script>
   <footer>
