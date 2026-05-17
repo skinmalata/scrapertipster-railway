@@ -1,104 +1,50 @@
-[dotenv@17.3.1] injecting env (3) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.3.1] injecting env (3) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
 Preloading predictions cache...
 [Debug] loadCachedPredictions called
 [Debug] CWD: C:\Users\Toks\Documents\Apps\winfulltime
 [Debug] Cache file: C:\Users\Toks\Documents\Apps\winfulltime\predictions-cache.json
 [Debug] Cache file exists: true
-[Debug] Loaded cache, matches: 49
-[Debug] Cache age: 0.2 hours
-Cache preloaded successfully, matches: 49
+[Debug] Loaded cache, matches: 36
+[Debug] Cache age: 111.7 hours
+[Debug] Cache is stale (>12 hours old), marking for refresh
+Cache preloaded successfully, matches: 36
 YouTube API Key loaded: Yes (AIzaSyCGjk...)
 YouTube Channel ID: UCyDIjH4CQiITAGnjZ_ZTTYg
 Server running on port 3000
 Access at http://0.0.0.0:3000
 Running initial prediction fetch in background...
 Fetching predictions for dates: [
-  '2026-04-05',
-  '2026-04-06',
-  '2026-04-07',
-  '2026-04-08',
-  '2026-04-09'
+  '2026-04-27',
+  '2026-04-28',
+  '2026-04-29',
+  '2026-04-30',
+  '2026-05-01'
 ]
 Scraping yesterday results...
-Scraping results for 2026-04-05...
-[Debug] loadCachedPredictions called
-[Debug] CWD: C:\Users\Toks\Documents\Apps\winfulltime
-[Debug] Cache file: C:\Users\Toks\Documents\Apps\winfulltime\predictions-cache.json
-[Debug] Cache file exists: true
-[Debug] Loaded cache, matches: 49
-[Debug] Cache age: 0.2 hours
-[API] Serving from preloaded cache
-[API] Results cache dates: [
-  '2026-03-05', '2026-03-06',
-  '2026-03-07', '2026-03-20',
-  '2026-03-22', '2026-03-23',
-  '2026-03-24', '2026-03-25',
-  '2026-03-28', '2026-03-30',
-  '2026-03-31', '2026-04-04',
-  '2026-04-05'
-]
-[Corners] Using yesterday's cache (date: 2026-03-24 )
-[Cards] Using yesterday's cache (date: 2026-03-24 )
-[BothHalves] Using yesterday's cache (date: 2026-03-24 )
+Scraping results for 2026-04-27...
+Checking for scheduled articles to publish...
+No articles scheduled for today
 Results cache updated
-Found 967 results for 2026-04-05
-Scraping predictions for 2026-04-05...
-[Debug] loadCachedPredictions called
-[Debug] CWD: C:\Users\Toks\Documents\Apps\winfulltime
-[Debug] Cache file: C:\Users\Toks\Documents\Apps\winfulltime\predictions-cache.json
-[Debug] Cache file exists: true
-[Debug] Loaded cache, matches: 49
-[Debug] Cache age: 0.3 hours
-[API] Serving from preloaded cache
-[API] Results cache dates: [
-  '2026-03-05', '2026-03-06',
-  '2026-03-07', '2026-03-20',
-  '2026-03-22', '2026-03-23',
-  '2026-03-24', '2026-03-25',
-  '2026-03-28', '2026-03-30',
-  '2026-03-31', '2026-04-04',
-  '2026-04-05'
-]
-[Corners] Using yesterday's cache (date: 2026-03-24 )
-[Cards] Using yesterday's cache (date: 2026-03-24 )
-[BothHalves] Using yesterday's cache (date: 2026-03-24 )
-[Debug] loadCachedPredictions called
-[Debug] CWD: C:\Users\Toks\Documents\Apps\winfulltime
-[Debug] Cache file: C:\Users\Toks\Documents\Apps\winfulltime\predictions-cache.json
-[Debug] Cache file exists: true
-[Debug] Loaded cache, matches: 49
-[Debug] Cache age: 0.3 hours
-[API] Serving from preloaded cache
-[API] Results cache dates: [
-  '2026-03-05', '2026-03-06',
-  '2026-03-07', '2026-03-20',
-  '2026-03-22', '2026-03-23',
-  '2026-03-24', '2026-03-25',
-  '2026-03-28', '2026-03-30',
-  '2026-03-31', '2026-04-04',
-  '2026-04-05'
-]
-[Corners] Using yesterday's cache (date: 2026-03-24 )
-[Cards] Using yesterday's cache (date: 2026-03-24 )
-[BothHalves] Using yesterday's cache (date: 2026-03-24 )
-Page loaded for 2026-04-05
-Found 363 match elements for 2026-04-05
-Scraping predictions for 2026-04-06...
-Page loaded for 2026-04-06
-Found 40 match elements for 2026-04-06
-Only 1 matches with 65%+, adding 5 matches with 60-64%
-Scraping predictions for 2026-04-07...
-Page loaded for 2026-04-07
-Found 48 match elements for 2026-04-07
-Only 4 matches with 65%+, adding 2 matches with 60-64%
-Scraping predictions for 2026-04-08...
-Page loaded for 2026-04-08
-Found 44 match elements for 2026-04-08
-Only 2 matches with 65%+, adding 4 matches with 60-64%
-Scraping predictions for 2026-04-09...
-Page loaded for 2026-04-09
-Found 35 match elements for 2026-04-09
-Only 2 matches with 65%+, adding 2 matches with 60-64%
+Found 1712 results for 2026-04-27
+Scraping predictions for 2026-04-27...
+Page loaded for 2026-04-27
+Found 64 match elements for 2026-04-27
+Scraping predictions for 2026-04-28...
+Page loaded for 2026-04-28
+Found 50 match elements for 2026-04-28
+Only 5 matches with 65%+, adding 5 matches with 60-64%
+Scraping predictions for 2026-04-29...
+Page loaded for 2026-04-29
+Found 44 match elements for 2026-04-29
+Only 1 matches with 65%+, adding 1 matches with 60-64%
+Scraping predictions for 2026-04-30...
+Page loaded for 2026-04-30
+Found 34 match elements for 2026-04-30
+Only 3 matches with 65%+, adding 5 matches with 60-64%
+Scraping predictions for 2026-05-01...
+Page loaded for 2026-05-01
+Found 46 match elements for 2026-05-01
+Only 4 matches with 65%+, adding 4 matches with 60-64%
 Scraping win streaks...
 Found 103 table rows for win streaks
 Parsed 100 win streak matches
@@ -109,16 +55,16 @@ Scraping draw streaks...
 Found 103 table rows for draw streaks
 Parsed 100 draw streak matches
 Calculating Team to Score from BTTS data...
-Calculated 29 Team to Score matches
+Calculated 31 Team to Score matches
 Calculated 6 Team to Score 2+ matches
 Skipping batch analysis scraping (ENABLE_BACKGROUND_SCRAPING not set to true)
-Initial fetch completed. Matches found: 47
+Initial fetch completed. Matches found: 35
 [Debug] loadCachedPredictions called
 [Debug] CWD: C:\Users\Toks\Documents\Apps\winfulltime
 [Debug] Cache file: C:\Users\Toks\Documents\Apps\winfulltime\predictions-cache.json
 [Debug] Cache file exists: true
-[Debug] Loaded cache, matches: 47
-[Debug] Cache age: 0.0 hours
+[Debug] Loaded cache, matches: 35
+[Debug] Cache age: 5.2 hours
 [API] Serving from preloaded cache
 [API] Results cache dates: [
   '2026-03-05', '2026-03-06',
@@ -127,141 +73,71 @@ Initial fetch completed. Matches found: 47
   '2026-03-24', '2026-03-25',
   '2026-03-28', '2026-03-30',
   '2026-03-31', '2026-04-04',
-  '2026-04-05'
+  '2026-04-05', '2026-04-07',
+  '2026-04-20', '2026-04-22',
+  '2026-04-27'
 ]
 [Corners] Using yesterday's cache (date: 2026-03-24 )
 [Cards] Using yesterday's cache (date: 2026-03-24 )
 [BothHalves] Using yesterday's cache (date: 2026-03-24 )
+Running secondary scrape to capture missed matches...
 [Debug] loadCachedPredictions called
 [Debug] CWD: C:\Users\Toks\Documents\Apps\winfulltime
 [Debug] Cache file: C:\Users\Toks\Documents\Apps\winfulltime\predictions-cache.json
 [Debug] Cache file exists: true
-[Debug] Loaded cache, matches: 47
-[Debug] Cache age: 0.1 hours
-[API] Serving from preloaded cache
-[API] Results cache dates: [
-  '2026-03-05', '2026-03-06',
-  '2026-03-07', '2026-03-20',
-  '2026-03-22', '2026-03-23',
-  '2026-03-24', '2026-03-25',
-  '2026-03-28', '2026-03-30',
-  '2026-03-31', '2026-04-04',
-  '2026-04-05'
+[Debug] Loaded cache, matches: 35
+[Debug] Cache age: 7.5 hours
+No cache found, fetching new data...
+Fetching predictions for dates: [
+  '2026-04-27',
+  '2026-04-28',
+  '2026-04-29',
+  '2026-04-30',
+  '2026-05-01'
 ]
-[Corners] Using yesterday's cache (date: 2026-03-24 )
-[Cards] Using yesterday's cache (date: 2026-03-24 )
-[BothHalves] Using yesterday's cache (date: 2026-03-24 )
-[Debug] loadCachedPredictions called
-[Debug] CWD: C:\Users\Toks\Documents\Apps\winfulltime
-[Debug] Cache file: C:\Users\Toks\Documents\Apps\winfulltime\predictions-cache.json
-[Debug] Cache file exists: true
-[Debug] Loaded cache, matches: 47
-[Debug] Cache age: 0.1 hours
-[API] Serving from preloaded cache
-[API] Results cache dates: [
-  '2026-03-05', '2026-03-06',
-  '2026-03-07', '2026-03-20',
-  '2026-03-22', '2026-03-23',
-  '2026-03-24', '2026-03-25',
-  '2026-03-28', '2026-03-30',
-  '2026-03-31', '2026-04-04',
-  '2026-04-05'
-]
-[Corners] Using yesterday's cache (date: 2026-03-24 )
-[Cards] Using yesterday's cache (date: 2026-03-24 )
-[BothHalves] Using yesterday's cache (date: 2026-03-24 )
-[Debug] loadCachedPredictions called
-[Debug] CWD: C:\Users\Toks\Documents\Apps\winfulltime
-[Debug] Cache file: C:\Users\Toks\Documents\Apps\winfulltime\predictions-cache.json
-[Debug] Cache file exists: true
-[Debug] Loaded cache, matches: 47
-[Debug] Cache age: 0.3 hours
-[API] Serving from preloaded cache
-[API] Results cache dates: [
-  '2026-03-05', '2026-03-06',
-  '2026-03-07', '2026-03-20',
-  '2026-03-22', '2026-03-23',
-  '2026-03-24', '2026-03-25',
-  '2026-03-28', '2026-03-30',
-  '2026-03-31', '2026-04-04',
-  '2026-04-05'
-]
-[Corners] Using yesterday's cache (date: 2026-03-24 )
-[Cards] Using yesterday's cache (date: 2026-03-24 )
-[BothHalves] Using yesterday's cache (date: 2026-03-24 )
-[Debug] loadCachedPredictions called
-[Debug] CWD: C:\Users\Toks\Documents\Apps\winfulltime
-[Debug] Cache file: C:\Users\Toks\Documents\Apps\winfulltime\predictions-cache.json
-[Debug] Cache file exists: true
-[Debug] Loaded cache, matches: 47
-[Debug] Cache age: 0.3 hours
-[API] Serving from preloaded cache
-[API] Results cache dates: [
-  '2026-03-05', '2026-03-06',
-  '2026-03-07', '2026-03-20',
-  '2026-03-22', '2026-03-23',
-  '2026-03-24', '2026-03-25',
-  '2026-03-28', '2026-03-30',
-  '2026-03-31', '2026-04-04',
-  '2026-04-05'
-]
-[Corners] Using yesterday's cache (date: 2026-03-24 )
-[Cards] Using yesterday's cache (date: 2026-03-24 )
-[BothHalves] Using yesterday's cache (date: 2026-03-24 )
-[Debug] loadCachedPredictions called
-[Debug] CWD: C:\Users\Toks\Documents\Apps\winfulltime
-[Debug] Cache file: C:\Users\Toks\Documents\Apps\winfulltime\predictions-cache.json
-[Debug] Cache file exists: true
-[Debug] Loaded cache, matches: 47
-[Debug] Cache age: 0.4 hours
-[API] Serving from preloaded cache
-[API] Results cache dates: [
-  '2026-03-05', '2026-03-06',
-  '2026-03-07', '2026-03-20',
-  '2026-03-22', '2026-03-23',
-  '2026-03-24', '2026-03-25',
-  '2026-03-28', '2026-03-30',
-  '2026-03-31', '2026-04-04',
-  '2026-04-05'
-]
-[Corners] Using yesterday's cache (date: 2026-03-24 )
-[Cards] Using yesterday's cache (date: 2026-03-24 )
-[BothHalves] Using yesterday's cache (date: 2026-03-24 )
-[Debug] loadCachedPredictions called
-[Debug] CWD: C:\Users\Toks\Documents\Apps\winfulltime
-[Debug] Cache file: C:\Users\Toks\Documents\Apps\winfulltime\predictions-cache.json
-[Debug] Cache file exists: true
-[Debug] Loaded cache, matches: 47
-[Debug] Cache age: 0.4 hours
-[API] Serving from preloaded cache
-[API] Results cache dates: [
-  '2026-03-05', '2026-03-06',
-  '2026-03-07', '2026-03-20',
-  '2026-03-22', '2026-03-23',
-  '2026-03-24', '2026-03-25',
-  '2026-03-28', '2026-03-30',
-  '2026-03-31', '2026-04-04',
-  '2026-04-05'
-]
-[Corners] Using yesterday's cache (date: 2026-03-24 )
-[Cards] Using yesterday's cache (date: 2026-03-24 )
-[BothHalves] Using yesterday's cache (date: 2026-03-24 )
-[Debug] loadCachedPredictions called
-[Debug] CWD: C:\Users\Toks\Documents\Apps\winfulltime
-[Debug] Cache file: C:\Users\Toks\Documents\Apps\winfulltime\predictions-cache.json
-[Debug] Cache file exists: true
-[Debug] Loaded cache, matches: 47
-[Debug] Cache age: 0.4 hours
-[API] Serving from preloaded cache
-[API] Results cache dates: [
-  '2026-03-05', '2026-03-06',
-  '2026-03-07', '2026-03-20',
-  '2026-03-22', '2026-03-23',
-  '2026-03-24', '2026-03-25',
-  '2026-03-28', '2026-03-30',
-  '2026-03-31', '2026-04-04',
-  '2026-04-05'
-]
-[Corners] Using yesterday's cache (date: 2026-03-24 )
-[Cards] Using yesterday's cache (date: 2026-03-24 )
-[BothHalves] Using yesterday's cache (date: 2026-03-24 )
+Scraping yesterday results...
+Scraping results for 2026-04-27...
+Results cache updated
+Found 1767 results for 2026-04-27
+Scraping predictions for 2026-04-27...
+Page loaded for 2026-04-27
+Found 51 match elements for 2026-04-27
+Only 4 matches with 65%+, adding 3 matches with 60-64%
+Scraping predictions for 2026-04-28...
+Page loaded for 2026-04-28
+Found 51 match elements for 2026-04-28
+Only 5 matches with 65%+, adding 6 matches with 60-64%
+Scraping predictions for 2026-04-29...
+Page loaded for 2026-04-29
+Found 45 match elements for 2026-04-29
+Scraping predictions for 2026-04-30...
+Page loaded for 2026-04-30
+Found 38 match elements for 2026-04-30
+Only 3 matches with 65%+, adding 5 matches with 60-64%
+Scraping predictions for 2026-05-01...
+Page loaded for 2026-05-01
+Found 67 match elements for 2026-05-01
+Only 5 matches with 65%+, adding 5 matches with 60-64%
+Scraping win streaks...
+Found 103 table rows for win streaks
+Parsed 100 win streak matches
+Scraping loss streaks...
+Found 103 table rows for loss streaks
+Parsed 100 loss streak matches
+Scraping draw streaks...
+Found 103 table rows for draw streaks
+Parsed 100 draw streak matches
+Calculating Team to Score from BTTS data...
+Calculated 31 Team to Score matches
+Calculated 7 Team to Score 2+ matches
+Skipping batch analysis scraping (ENABLE_BACKGROUND_SCRAPING not set to true)
+Fresh scrape has 37 matches (threshold: 20), using fresh data
+⚠️ 5 matches from cache NOT in fresh scrape:
+  - Oriente Petrolero - Real Potosi (2026-04-27)
+  - Sabah FK - FK Karvan (2026-04-27)
+  - Olimpo Bahia Blanca - Circulo Deportivo (2026-04-27)
+  - Caracas FC - Racing Club (2026-04-29)
+  - Colorado Rapids - Colorado Switchbacks (2026-04-30)
+✅ Merged 5 missed matches into fresh data
+Secondary scrape completed. Total matches: 42
+Recovered 5 missed matches from previous scrape

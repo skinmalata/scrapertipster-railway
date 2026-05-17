@@ -886,9 +886,7 @@ header {
         <button onclick="setCategory('over25')" id="tab-over25" class="tab-btn">Over 2.5</button>
         <button onclick="setCategory('btts')" id="tab-btts" class="tab-btn">BTTS YES</button>
         <button onclick="setCategory('bttsno')" id="tab-bttsno" class="tab-btn">BTTS NO</button>
-        <!-- <button onclick="setCategory('corners')" id="tab-corners" class="tab-btn">Corners</button>
         <button onclick="setCategory('teamtoscore2plus')" id="tab-teamtoscore2plus" class="tab-btn">To Score 2+</button>
-        <button onclick="setCategory('cards')" id="tab-cards" class="tab-btn">Cards</button> -->
       </div>
 
       <div class="stats-bar" id="statsBar">
@@ -947,23 +945,7 @@ header {
     </main>
   </div>
 
-  <!-- Analysis Modal -->
-  <div id="analysisModal" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="modalTitle">Match Analysis</h2>
-        <button class="modal-close" onclick="closeModal()">&times;</button>
-      </div>
-      <div class="modal-body" id="modalBody">
-        <div class="loading">
-          <div class="progress-bar-container">
-            <div class="progress-bar"></div>
-          </div>
-          <span class="loading-text">Loading analysis...</span>
-        </div>
-      </div>
-    </div>
-  </div>
+
 
   <script>
     console.log('Script starting...');
@@ -1234,7 +1216,7 @@ header {
       document.querySelectorAll('.match-card').forEach(card => {
         card.addEventListener('click', () => {
           const matchData = JSON.parse(decodeURIComponent(card.dataset.match));
-          if (currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak' || currentCategory === 'corners' || currentCategory === 'cards') return;
+          if (currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak' || currentCategory === 'corners' || currentCategory === 'cards' || currentCategory === 'teamtoscore2plus') return;
           const matchStr = matchData.match || '';
           const teams = matchStr.includes(' - ') ? matchStr.split(' - ') : matchStr.split(' vs ');
           const homeTeam = encodeURIComponent(teams[0]?.trim() || '');
@@ -1266,8 +1248,7 @@ header {
 
       try {
         console.log('Fetching predictions...');
-        const response = await fetch('/api/predictions');
-        console.log('Response status:', response.status);
+        const response = await fetch('/data/predictions.json');
         if (!response.ok) {
           throw new Error(`HTTP error: ${response.status}`);
         }
@@ -1290,187 +1271,13 @@ header {
         console.error('Error loading predictions:', error);
         content.innerHTML = `
           <div class="no-matches">
-            <p>Error loading predictions: ${error.message}</p>
+            <p>Predictions currently unavailable. The data may still be generating. Check back soon.</p>
           </div>
         `;
       }
     }
 
-    function closeModal() {
-      document.getElementById('analysisModal').classList.remove('active');
-    }
 
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        closeModal();
-      }
-    });
-
-    async function showAnalysis(match) {
-      const modal = document.getElementById('analysisModal');
-      const modalBody = document.getElementById('modalBody');
-      const modalTitle = document.getElementById('modalTitle');
-      
-      const matchStr = match.match || '';
-      const teams = matchStr.includes(' - ') ? matchStr.split(' - ') : matchStr.split(' vs ');
-      const homeTeam = teams[0]?.trim() || '';
-      const awayTeam = teams[1]?.trim() || '';
-      
-      modalTitle.textContent = `${match.match}`;
-      modalBody.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-      
-      modal.classList.add('active');
-      
-      try {
-        const response = await fetch(`/api/analysis?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`);
-        
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        
-        const analysis = await response.json();
-        
-        if (analysis.error) {
-          modalBody.innerHTML = `<div class="no-matches"><p>${analysis.error}</p></div>`;
-          return;
-        }
-        
-        const h2h = analysis.h2h || [];
-        const homeForm = analysis.homeForm || '';
-        const awayForm = analysis.awayForm || '';
-        const homeLast10 = analysis.homeLast10 || {};
-        const awayLast10 = analysis.awayLast10 || {};
-        
-        const getFormClass = (char) => {
-          if (char === 'W') return 'form-win';
-          if (char === 'D') return 'form-draw';
-          if (char === 'L') return 'form-loss';
-          return '';
-        };
-        
-        modalBody.innerHTML = `
-          <div class="analysis-section">
-            <h3>Recent Form</h3>
-            <div class="analysis-grid">
-              <div class="analysis-card">
-                <h4>${homeTeam}</h4>
-                <div class="form-bar">
-                  ${homeForm.slice(-5).split('').map(f => `<span class="form-result ${getFormClass(f)}">${f}</span>`).join('')}
-                </div>
-              </div>
-              <div class="analysis-card">
-                <h4>${awayTeam}</h4>
-                <div class="form-bar">
-                  ${awayForm.slice(-5).split('').map(f => `<span class="form-result ${getFormClass(f)}">${f}</span>`).join('')}
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          ${h2h && h2h.length > 0 ? `
-          <div class="analysis-section">
-            <h3>Head to Head</h3>
-            <div class="analysis-grid">
-              ${h2h.slice(0, 5).map(h => `
-                <div class="analysis-card" style="grid-column: 1 / -1;">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <span style="font-size: 13px; color: #ffffff; font-weight: 500;">${h.date || ''}</span>
-                  </div>
-                  <div style="display: flex; justify-content: center; align-items: center; gap: 15px;">
-                    <span style="text-align: right;">${h.awayTeam || ''}&nbsp;&nbsp;<span style="background: #333; padding: 2px 8px; border-radius: 4px;">${h.awayGoals}</span></span>
-                    <span style="margin: 0 10px;">-</span>
-                    <span style="text-align: left;"><span style="background: #333; padding: 2px 8px; border-radius: 4px;">${h.homeGoals}</span>&nbsp;&nbsp;${h.homeTeam || ''}</span>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-          ` : ''}
-          
-          ${(homeLast10.wins > 0 || homeLast10.draws > 0 || homeLast10.losses > 0 || awayLast10.wins > 0 || awayLast10.draws > 0 || awayLast10.losses > 0 || homeLast10.chanceToScore > 0) ? `
-          <div class="analysis-section">
-            <h3>Last 10 Matches Statistics</h3>
-            <table class="stats-table">
-              <thead>
-                <tr>
-                  <th>Statistic</th>
-                  <th>${homeTeam}</th>
-                  <th>${awayTeam}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Wins</td>
-                  <td style="color: white;">${homeLast10.wins || 0}</td>
-                  <td style="color: white;">${awayLast10.wins || 0}</td>
-                </tr>
-                <tr>
-                  <td>Draws</td>
-                  <td style="color: white;">${homeLast10.draws || 0}</td>
-                  <td style="color: white;">${awayLast10.draws || 0}</td>
-                </tr>
-                <tr>
-                  <td>Losses</td>
-                  <td style="color: white;">${homeLast10.losses || 0}</td>
-                  <td style="color: white;">${awayLast10.losses || 0}</td>
-                </tr>
-                <tr>
-                  <td>Avg Scored</td>
-                  <td style="color: white;">${homeLast10.avgScored || 0}</td>
-                  <td style="color: white;">${awayLast10.avgScored || 0}</td>
-                </tr>
-                <tr>
-                  <td>Avg Conceded</td>
-                  <td style="color: white;">${homeLast10.avgConceded || 0}</td>
-                  <td style="color: white;">${awayLast10.avgConceded || 0}</td>
-                </tr>
-                <tr>
-                  <td>Chance to Score</td>
-                  <td style="color: white;">${homeLast10.chanceToScore || 0}%</td>
-                  <td style="color: white;">${awayLast10.chanceToScore || 0}%</td>
-                </tr>
-                <tr>
-                  <td>Chance to Concede</td>
-                  <td style="color: white;">${homeLast10.chanceToConcede || 0}%</td>
-                  <td style="color: white;">${awayLast10.chanceToConcede || 0}%</td>
-                </tr>
-                <tr>
-                  <td>Clean Sheets</td>
-                  <td style="color: white;">${homeLast10.cleanSheets || 0}</td>
-                  <td style="color: white;">${awayLast10.cleanSheets || 0}</td>
-                </tr>
-                <tr>
-                  <td>Failed to Score</td>
-                  <td style="color: white;">${homeLast10.failToScore || 0}</td>
-                  <td style="color: white;">${awayLast10.failToScore || 0}</td>
-                </tr>
-                <tr>
-                  <td>Over 2.5</td>
-                  <td style="color: white;">${homeLast10.over25 || 0}</td>
-                  <td style="color: white;">${awayLast10.over25 || 0}</td>
-                </tr>
-                <tr>
-                  <td>Under 2.5</td>
-                  <td style="color: white;">${homeLast10.under25 || 0}</td>
-                  <td style="color: white;">${awayLast10.under25 || 0}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          ` : ''}
-          
-          <div class="analysis-section">
-            <div class="prediction-reason">
-              <h4>Prediction</h4>
-              <p><strong>Tip:</strong> ${match.tip}</p>
-              <p><strong>Probability:</strong> ${match.probability}%</p>
-            </div>
-          </div>
-        `;
-      } catch (error) {
-        modalBody.innerHTML = `<div class="no-matches"><p>Error loading analysis: ${error.message}</p></div>`;
-      }
-    }
 
 renderDayTabs();
     loadPredictions();

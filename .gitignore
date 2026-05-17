@@ -1,10 +1,12 @@
 node_modules/
+node_modules2/
 debug_*.html
-!package.json
-!package-lock.json
-!predictions-cache.json
-!analysis-cache.json
-!corners-cache.json
 .env
 .DS_Store
 *.log
+.scraper-lock
+
+nul
+
+# Generated in CI for GitHub Pages
+public/data/
