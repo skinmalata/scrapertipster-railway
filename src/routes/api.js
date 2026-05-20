@@ -132,28 +132,100 @@ router.get('/predictions', async (req, res) => {
       console.error('Error loading results cache:', e.message);
     }
     
-    // Build results lookup map for faster matching
-    const resultsMap = new Map();
+    // Build flat results array for matching
+    const allResults = [];
     for (const dateKey of Object.keys(resultsCache)) {
       const dateResults = resultsCache[dateKey];
       for (const [resultKey, score] of Object.entries(dateResults)) {
-        const normalizedResult = resultKey.toLowerCase().replace(/\s+/g, ' ').trim();
-        const resultTeams = normalizedResult.split(/ - | vs /);
-        if (resultTeams.length === 2) {
-          const [home, away] = resultTeams;
-          const homeKey = home.trim();
-          const awayKey = away.trim();
-          if (!resultsMap.has(homeKey)) resultsMap.set(homeKey, new Map());
-          resultsMap.get(homeKey).set(awayKey, score);
+        allResults.push({ key: resultKey, score, date: dateKey });
+      }
+    }
+    console.log('[API] Total results loaded:', allResults.length);
+    
+    // Normalize team name for matching
+    function normalizeTeam(name) {
+      return name.toLowerCase()
+        .replace(/\(w\)/g, '')
+        .replace(/\(u23\)/g, '')
+        .replace(/\(u21\)/g, '')
+        .replace(/\(u20\)/g, '')
+        .replace(/\(u19\)/g, '')
+        .replace(/\(u17\)/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+    
+    // Get significant tokens from team name (filter out common words)
+    function getSignificantTokens(name) {
+      const commonWords = new Set(['fc', 'sc', 'ac', 'rc', 'us', 'ud', 'as', 'ss', 'cf', 'cd', 'de', 'da', 'do', 'el', 'la', 'le', 'il', 'al', 'united', 'city', 'club', 'team', 'sporting', 'athletic', 'association', 'real', 'inter', 'san', 'saint', 'st']);
+      return normalizeTeam(name).split(/\s+/).filter(t => t.length > 2 && !commonWords.has(t));
+    }
+    
+    // Calculate similarity between two team names
+    function teamSimilarity(name1, name2) {
+      const norm1 = normalizeTeam(name1);
+      const norm2 = normalizeTeam(name2);
+      
+      // Exact match
+      if (norm1 === norm2) return 1.0;
+      
+      // One contains the other
+      if (norm1.includes(norm2) || norm2.includes(norm1)) return 0.9;
+      
+      // Token-based similarity
+      const tokens1 = getSignificantTokens(name1);
+      const tokens2 = getSignificantTokens(name2);
+      
+      if (tokens1.length === 0 || tokens2.length === 0) return 0;
+      
+      let matches = 0;
+      for (const t1 of tokens1) {
+        for (const t2 of tokens2) {
+          if (t1.includes(t2) || t2.includes(t1)) {
+            matches++;
+            break;
+          }
         }
       }
+      
+      return matches / Math.max(tokens1.length, tokens2.length);
+    }
+    
+    // Find best matching result for a prediction
+    function findResult(predMatch, predDate, predLeague) {
+      const predTeams = predMatch.split(/ - | vs /);
+      if (predTeams.length !== 2) return null;
+      
+      const [predHome, predAway] = predTeams;
+      let bestMatch = null;
+      let bestScore = 0;
+      
+      for (const result of allResults) {
+        const resultTeams = result.key.split(/ - | vs /);
+        if (resultTeams.length !== 2) continue;
+        
+        const [resHome, resAway] = resultTeams;
+        
+        // Calculate similarity for home and away teams
+        const homeSim = teamSimilarity(predHome, resHome);
+        const awaySim = teamSimilarity(predAway, resAway);
+        
+        // Both teams need to match reasonably well
+        const combined = homeSim * awaySim;
+        
+        if (combined > bestScore && combined > 0.6) {
+          bestScore = combined;
+          bestMatch = result.score;
+        }
+      }
+      
+      return bestMatch;
     }
     
     // Enrich predictions with results
     const enrichWithResults = (matches) => {
       if (!matches) return [];
       
-      const currentDate = (data.date || '').trim();
       const today = new Date().toISOString().split('T')[0];
       
       return matches.map(match => {
@@ -165,25 +237,7 @@ router.get('/predictions', async (req, res) => {
           return { ...match, result: null };
         }
         
-        let result = null;
-        
-        // Use pre-built map for faster lookup
-        const matchTeams = matchKey.toLowerCase().replace(/\s+/g, ' ').trim().split(/ - | vs /);
-        if (matchTeams.length === 2) {
-          const [home1, away1] = matchTeams;
-          for (const [homeKey, awayMap] of resultsMap) {
-            if (home1.includes(homeKey) || homeKey.includes(home1)) {
-              for (const [awayKey, score] of awayMap) {
-                if (away1.includes(awayKey) || awayKey.includes(away1)) {
-                  result = score;
-                  break;
-                }
-              }
-              if (result) break;
-            }
-          }
-        }
-        
+        const result = findResult(matchKey, matchDateStr, match.league);
         return { ...match, result };
       });
     };

@@ -208,8 +208,7 @@ async function scrapeYesterdayResults() {
     try {
       const page = await browser.newPage();
       await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
-      await page.waitForSelector('.table-main', { timeout: 15000 }).catch(() => {});
+      await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
       html = await page.content();
     } finally {
       await browser.close();
@@ -228,13 +227,16 @@ async function scrapeYesterdayResults() {
   const $ = cheerio.load(html);
   const results = {};
   const dateResults = {};
+  let currentLeague = '';
   
-  // Parse betexplorer results - updated selectors for new structure
+  // Parse betexplorer results - track league headers
   $('.table-main tbody tr').each((i, el) => {
     const $row = $(el);
     
-    // Skip header rows (th elements)
-    if ($row.find('th.table-main__tournament').length > 0) {
+    // Check for league header row (th.h-text-left contains a.table-main__tournament)
+    const leagueLink = $row.find('th.h-text-left a.table-main__tournament');
+    if (leagueLink.length > 0) {
+      currentLeague = leagueLink.text().trim();
       return;
     }
     
@@ -243,7 +245,6 @@ async function scrapeYesterdayResults() {
     
     if (teamsEl.length > 0) {
       const matchText = teamsEl.text().trim();
-      // Match format: "Team1 - Team2" or "Team1 - Team2" with bold tags
       const teamsMatch = matchText.replace(/<[^>]*>/g, '').match(/^(.+?)\s*[-–]\s*(.+)$/);
       
       if (teamsMatch) {
@@ -255,9 +256,13 @@ async function scrapeYesterdayResults() {
         if (scoreMatch && homeTeam && awayTeam) {
           const homeScore = parseInt(scoreMatch[1]);
           const awayScore = parseInt(scoreMatch[2]);
-          // Skip postponed matches
-          if (!scoreText.includes('POSTP') && !scoreText.includes('CANCL')) {
-            dateResults[`${homeTeam} - ${awayTeam}`] = { home: homeScore, away: awayScore };
+          // Skip postponed/cancelled matches
+          if (!scoreText.includes('POSTP') && !scoreText.includes('CANCL') && !scoreText.includes('AWA')) {
+            dateResults[`${homeTeam} - ${awayTeam}`] = { 
+              home: homeScore, 
+              away: awayScore,
+              league: currentLeague
+            };
           }
         }
       }
