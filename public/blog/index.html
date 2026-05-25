@@ -22,6 +22,21 @@
     .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
     h1 { font-size: 2.5rem; margin-bottom: 10px; }
     .subtitle { color: #71717a; font-size: 1.1rem; margin-bottom: 40px; }
+    .search-wrap { margin-bottom: 40px; }
+    .search-input { width: 100%; padding: 14px 20px; border: 2px solid #e5e5e5; border-radius: 12px; font-size: 1rem; outline: none; transition: border-color 0.2s; box-sizing: border-box; background: white; }
+    .search-input:focus { border-color: #ff0000; }
+    .no-results { display: none; text-align: center; padding: 60px 20px; color: #71717a; font-size: 1.1rem; }
+    .tab-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+    .tab-btn { padding: 10px 20px; border: 2px solid #e5e5e5; border-radius: 8px; background: white; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; color: #18181b; }
+    .tab-btn:hover { border-color: #ff0000; color: #ff0000; }
+    .tab-btn.active { background: #ff0000; color: white; border-color: #ff0000; }
+    #postsGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+    .pagination { display: flex; justify-content: center; gap: 8px; margin-block: 40px; flex-wrap: wrap; }
+    .page-btn { padding: 8px 16px; border: 2px solid #e5e5e5; border-radius: 8px; background: white; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; color: #18181b; }
+    .page-btn:hover:not(:disabled) { border-color: #ff0000; color: #ff0000; }
+    .page-btn.active { background: #ff0000; color: white; border-color: #ff0000; }
+    .page-btn:disabled { opacity: 0.4; cursor: default; }
+    #staticContent { display: none; }
     .category-section { margin-bottom: 50px; }
     .category-title { font-size: 1.5rem; border-bottom: 2px solid #ff0000; padding-bottom: 10px; margin-bottom: 20px; }
     .posts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
@@ -57,6 +72,18 @@
     <h1>Football Betting Blog</h1>
     <p class="subtitle">Expert guides, strategies, and tips for smarter football betting</p>
 
+    <div class="search-wrap">
+      <input type="text" class="search-input" id="searchInput" placeholder="Search articles by title, category, or keyword..." oninput="filterPosts()">
+    </div>
+    <div class="no-results" id="noResults">No articles match your search. Try different keywords.</div>
+
+    <div class="tab-bar" id="tabBar"></div>
+
+    <div class="posts-grid" id="postsGrid"></div>
+
+    <div class="pagination" id="pagination"></div>
+
+    <div id="staticContent">
     <div class="category-section">
       <h2 class="category-title">💰 Payments & Banking</h2>
       <div class="posts-grid">
@@ -823,11 +850,128 @@
           </div>
         </a>
 
+        <a href="/blog/best-betting-sites.html" class="post-card">
+          <div class="post-card-content">
+            <span class="post-category">Guide</span>
+            <h3 class="post-title">Best Football Betting Sites 2026: Comprehensive Guide & Comparison</h3>
+            <p class="post-excerpt">In-depth comparison of the top football betting sites. Compare odds, markets, bonuses, and payment methods to find your ideal bookmaker.</p>
+            <span class="post-meta">May 26, 2026</span>
+          </div>
+        </a>
+
       </div>
+    </div>
     </div>
 
   </div>
 
+  <script>
+    const POSTS_PER_PAGE = 9;
+    let currentTab = 'All';
+    let currentPage = 1;
+    let posts = [];
+    let filteredPosts = [];
+
+    function initBlog() {
+      const staticContent = document.getElementById('staticContent');
+      const sections = staticContent.querySelectorAll('.category-section');
+      sections.forEach(section => {
+        const catName = section.querySelector('.category-title').textContent;
+        const cards = section.querySelectorAll('.post-card');
+        cards.forEach(card => {
+          posts.push({
+            href: card.getAttribute('href'),
+            category: catName,
+            label: card.querySelector('.post-category').textContent,
+            title: card.querySelector('.post-title').textContent,
+            excerpt: card.querySelector('.post-excerpt').textContent,
+            date: card.querySelector('.post-meta').textContent
+          });
+        });
+      });
+
+      const cats = ['All', ...new Set(posts.map(p => p.category))];
+      const tabBar = document.getElementById('tabBar');
+      cats.forEach((cat, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'tab-btn' + (i === 0 ? ' active' : '');
+        btn.textContent = cat;
+        btn.addEventListener('click', () => switchTab(cat));
+        tabBar.appendChild(btn);
+      });
+
+      switchTab('All');
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      currentPage = 1;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.textContent === tab));
+      filterAndRender();
+    }
+
+    function filterAndRender() {
+      const input = document.getElementById('searchInput');
+      const query = input.value.toLowerCase().trim();
+
+      filteredPosts = posts.filter(p => {
+        if (currentTab !== 'All' && p.category !== currentTab) return false;
+        if (query) {
+          return p.title.toLowerCase().includes(query) ||
+                 p.excerpt.toLowerCase().includes(query) ||
+                 p.label.toLowerCase().includes(query);
+        }
+        return true;
+      });
+
+      const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+      renderPosts();
+      renderPagination(totalPages);
+      document.getElementById('noResults').style.display = filteredPosts.length ? 'none' : '';
+    }
+
+    function renderPosts() {
+      const start = (currentPage - 1) * POSTS_PER_PAGE;
+      const pagePosts = filteredPosts.slice(start, start + POSTS_PER_PAGE);
+      document.getElementById('postsGrid').innerHTML = pagePosts.map(p => `
+        <a href="${p.href}" class="post-card">
+          <div class="post-card-content">
+            <span class="post-category">${p.label}</span>
+            <h3 class="post-title">${p.title}</h3>
+            <p class="post-excerpt">${p.excerpt}</p>
+            <span class="post-meta">${p.date}</span>
+          </div>
+        </a>
+      `).join('');
+    }
+
+    function renderPagination(totalPages) {
+      const pag = document.getElementById('pagination');
+      if (totalPages <= 1) { pag.innerHTML = ''; return; }
+      let html = '<button class="page-btn" onclick="goPage(1)" ' + (currentPage === 1 ? 'disabled' : '') + '>\u00ab<\/button>';
+      html += '<button class="page-btn" onclick="goPage(' + (currentPage - 1) + ')" ' + (currentPage === 1 ? 'disabled' : '') + '>\u2039<\/button>';
+      for (let i = 1; i <= totalPages; i++) {
+        html += '<button class="page-btn' + (i === currentPage ? ' active' : '') + '" onclick="goPage(' + i + ')">' + i + '<\/button>';
+      }
+      html += '<button class="page-btn" onclick="goPage(' + (currentPage + 1) + ')" ' + (currentPage === totalPages ? 'disabled' : '') + '>\u203a<\/button>';
+      html += '<button class="page-btn" onclick="goPage(' + totalPages + ')" ' + (currentPage === totalPages ? 'disabled' : '') + '>\u00bb<\/button>';
+      pag.innerHTML = html;
+    }
+
+    function goPage(page) {
+      currentPage = page;
+      filterAndRender();
+      document.getElementById('tabBar').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function filterPosts() {
+      currentPage = 1;
+      filterAndRender();
+    }
+
+    document.addEventListener('DOMContentLoaded', initBlog);
+  </script>
   <footer>
     <div class="footer-links">
       <a href="/">Home</a>
