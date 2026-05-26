@@ -132,15 +132,17 @@ router.get('/predictions', async (req, res) => {
       console.error('Error loading results cache:', e.message);
     }
     
-    // Build flat results array for matching
-    const allResults = [];
+    // Build results grouped by date for matching
+    const resultsByDate = {};
     for (const dateKey of Object.keys(resultsCache)) {
+      const arr = [];
       const dateResults = resultsCache[dateKey];
       for (const [resultKey, score] of Object.entries(dateResults)) {
-        allResults.push({ key: resultKey, score, date: dateKey });
+        arr.push({ key: resultKey, score });
       }
+      resultsByDate[dateKey] = arr;
     }
-    console.log('[API] Total results loaded:', allResults.length);
+    console.log('[API] Results dates loaded:', Object.keys(resultsCache).length);
     
     // Normalize team name for matching
     function normalizeTeam(name) {
@@ -192,7 +194,7 @@ router.get('/predictions', async (req, res) => {
     }
     
     // Find best matching result for a prediction
-    function findResult(predMatch, predDate, predLeague) {
+    function findResult(predMatch, predDate) {
       const predTeams = predMatch.split(/ - | vs /);
       if (predTeams.length !== 2) return null;
       
@@ -200,17 +202,16 @@ router.get('/predictions', async (req, res) => {
       let bestMatch = null;
       let bestScore = 0;
       
-      for (const result of allResults) {
+      const candidates = resultsByDate[predDate] || [];
+      for (const result of candidates) {
         const resultTeams = result.key.split(/ - | vs /);
         if (resultTeams.length !== 2) continue;
         
         const [resHome, resAway] = resultTeams;
         
-        // Calculate similarity for home and away teams
         const homeSim = teamSimilarity(predHome, resHome);
         const awaySim = teamSimilarity(predAway, resAway);
         
-        // Both teams need to match reasonably well
         const combined = homeSim * awaySim;
         
         if (combined > bestScore && combined > 0.6) {
@@ -226,18 +227,17 @@ router.get('/predictions', async (req, res) => {
     const enrichWithResults = (matches) => {
       if (!matches) return [];
       
-      const today = new Date().toISOString().split('T')[0];
+      const today = data.date || new Date().toISOString().split('T')[0];
       
       return matches.map(match => {
         const matchKey = match.match;
         const matchDateStr = (match.date || '').trim();
         
-        // Skip if match is for today or later (no results yet for matches not played)
-        if (matchDateStr >= today) {
+        if (matchDateStr > today) {
           return { ...match, result: null };
         }
         
-        const result = findResult(matchKey, matchDateStr, match.league);
+        const result = findResult(matchKey, matchDateStr);
         return { ...match, result };
       });
     };

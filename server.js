@@ -252,6 +252,22 @@ app.get('/blog/:slug', (req, res) => {
   res.redirect('/blog/');
 });
 
+// Rebuild static public/data/predictions.json from cache files
+function rebuildStaticPredictions() {
+  try {
+    const ghPagesScraper = require('./scripts/gh-pages-scraper');
+    if (typeof ghPagesScraper.rebuildStatic === 'function') {
+      ghPagesScraper.rebuildStatic();
+    } else {
+      // Fallback: run the script as a child process
+      const { execSync } = require('child_process');
+      execSync('node scripts/gh-pages-scraper.js', { timeout: 120000, cwd: __dirname });
+    }
+  } catch (e) {
+    console.error('Failed to rebuild static predictions:', e.message);
+  }
+}
+
 // Scheduled Tasks
 // Run daily at 1:00 AM
 cron.schedule('0 1 * * *', async () => {
@@ -259,6 +275,7 @@ cron.schedule('0 1 * * *', async () => {
   try {
     const data = await getScraperService().fetchAndCachePredictions();
     console.log('Scheduled fetch completed. Matches found:', data.totalMatches);
+    rebuildStaticPredictions();
   } catch (error) {
     console.error('Scheduled fetch error:', error.message);
   }
@@ -273,6 +290,7 @@ cron.schedule('0 6 * * *', async () => {
     if (data.recoveredMatches) {
       console.log(`Recovered ${data.recoveredMatches} missed matches from previous scrape`);
     }
+    rebuildStaticPredictions();
   } catch (error) {
     console.error('Secondary scrape error:', error.message);
   }

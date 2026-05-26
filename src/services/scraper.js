@@ -176,11 +176,12 @@ function saveResultsCache(results) {
 }
 
 async function scrapeYesterdayResults() {
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const year = yesterday.getFullYear();
-  const month = String(yesterday.getMonth() + 1).padStart(2, '0');
-  const day = String(yesterday.getDate()).padStart(2, '0');
+  const now = new Date();
+  const lagosNow = new Date(now.toLocaleString('en-US', { timeZone: 'Africa/Lagos' }));
+  lagosNow.setDate(lagosNow.getDate() - 1);
+  const year = lagosNow.getFullYear();
+  const month = String(lagosNow.getMonth() + 1).padStart(2, '0');
+  const day = String(lagosNow.getDate()).padStart(2, '0');
   const dateStr = `${year}-${month}-${day}`;
   
   console.log(`Scraping results for ${dateStr}...`);
