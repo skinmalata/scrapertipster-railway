@@ -192,3 +192,4 @@ if (require.main === module) {
   });
 } else {
   module.exports = { enrichWithResults, rebuildStatic, main };
+}
