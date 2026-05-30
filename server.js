@@ -176,6 +176,45 @@ app.use(express.static('public', {
 app.use('/api', apiRoutes);
 app.use('/api', chatRoutes);
 
+// Email subscription endpoint
+const SUBSCRIBERS_FILE = path.join(__dirname, 'subscribers.json');
+app.post('/api/subscribe', (req, res) => {
+  const { email } = req.body;
+  if (!email || !email.includes('@') || email === 'skipped@guest') {
+    return res.json({ success: false });
+  }
+  try {
+    const subscriberFs = require('fs');
+    let subscribers = [];
+    if (subscriberFs.existsSync(SUBSCRIBERS_FILE)) {
+      subscribers = JSON.parse(subscriberFs.readFileSync(SUBSCRIBERS_FILE, 'utf8'));
+    }
+    if (!subscribers.some(s => s.email === email)) {
+      subscribers.push({ email, subscribedAt: new Date().toISOString() });
+      subscriberFs.writeFileSync(SUBSCRIBERS_FILE, JSON.stringify(subscribers, null, 2));
+      console.log('New subscriber:', email);
+    }
+    res.json({ success: true });
+  } catch (e) {
+    console.error('Subscribe error:', e.message);
+    res.json({ success: false });
+  }
+});
+
+// View subscribers (GET for admin)
+app.get('/api/subscribers', (req, res) => {
+  try {
+    const subscriberFs = require('fs');
+    if (subscriberFs.existsSync(SUBSCRIBERS_FILE)) {
+      const data = JSON.parse(subscriberFs.readFileSync(SUBSCRIBERS_FILE, 'utf8'));
+      return res.json({ success: true, count: data.length, subscribers: data });
+    }
+    res.json({ success: true, count: 0, subscribers: [] });
+  } catch (e) {
+    res.json({ success: false, error: e.message });
+  }
+});
+
 // YouTube Videos API - using official YouTube Data API
 const YOUTUBE_CHANNEL_ID = 'UCyDIjH4CQiITAGnjZ_ZTTYg'; // @winfulltime channel ID
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
