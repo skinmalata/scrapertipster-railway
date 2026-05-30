@@ -5,6 +5,7 @@ const path = require('path');
 const cron = require('node-cron');
 const axios = require('axios');
 const apiRoutes = require('./src/routes/api');
+const chatRoutes = require('./src/routes/chat');
 
 const YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@winfulltime/videos';
 
@@ -173,6 +174,7 @@ app.use(express.static('public', {
 
 // API Routes
 app.use('/api', apiRoutes);
+app.use('/api', chatRoutes);
 
 // YouTube Videos API - using official YouTube Data API
 const YOUTUBE_CHANNEL_ID = 'UCyDIjH4CQiITAGnjZ_ZTTYg'; // @winfulltime channel ID
