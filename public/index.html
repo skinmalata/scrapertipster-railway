@@ -907,15 +907,15 @@ header {
 
       <!-- Streak Buttons -->
       <div class="streak-buttons">
-        <a href="/?category=winstreak" target="_blank" class="streak-btn winstreak">
+        <a href="#" onclick="event.preventDefault(); setCategory('winstreak')" class="streak-btn winstreak">
           <span class="streak-icon">🔥</span>
           <span class="streak-text">Winning Streak</span>
         </a>
-        <a href="/?category=losestreak" target="_blank" class="streak-btn losestreak">
+        <a href="#" onclick="event.preventDefault(); setCategory('losestreak')" class="streak-btn losestreak">
           <span class="streak-icon">📉</span>
           <span class="streak-text">Losing Streak</span>
         </a>
-        <a href="/?category=drawstreak" target="_blank" class="streak-btn drawstreak">
+        <a href="#" onclick="event.preventDefault(); setCategory('drawstreak')" class="streak-btn drawstreak">
           <span class="streak-icon">➖</span>
           <span class="streak-text">Draws Streak</span>
         </a>

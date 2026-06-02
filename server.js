@@ -163,6 +163,15 @@ app.use(express.json({ limit: '10kb' }));
 app.use(rateLimiter);
 app.use(trackVisit);
 
+// Redirect /blog/*.html to clean URLs (must be before static middleware)
+app.use('/blog', (req, res, next) => {
+  if (req.path.endsWith('.html')) {
+    const cleanPath = req.path.replace(/\.html$/, '');
+    return res.redirect(301, cleanPath);
+  }
+  next();
+});
+
 // Static files with no cache
 app.use(express.static('public', {
   maxAge: 0,
