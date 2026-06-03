@@ -185,6 +185,52 @@ app.use(express.static('public', {
 app.use('/api', apiRoutes);
 app.use('/api', chatRoutes);
 
+// RSS Feed
+const RSS_FEED_ARTICLES_FILE = path.join(__dirname, 'articles-manifest.json');
+
+app.get('/feed.xml', (req, res) => {
+  try {
+    const rssFs = require('fs');
+    const data = rssFs.readFileSync(RSS_FEED_ARTICLES_FILE, 'utf8');
+    const articles = JSON.parse(data);
+    const published = articles.filter(a => a.published).sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
+    const now = new Date().toUTCString();
+
+    let items = '';
+    for (const article of published) {
+      const pubDate = new Date(article.publishDate).toUTCString();
+      const url = `https://winfulltime.com/blog/${article.slug}`;
+      items += `    <item>
+      <title><![CDATA[${article.title}]]></title>
+      <link>${url}</link>
+      <guid>${url}</guid>
+      <pubDate>${pubDate}</pubDate>
+      <category>${article.category}</category>
+      <description><![CDATA[${article.excerpt}]]></description>
+    </item>
+`;
+    }
+
+    const feed = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>WinFullTime - Football Betting Tips &amp; Predictions</title>
+    <link>https://winfulltime.com/</link>
+    <description>Daily football betting predictions, analysis, and strategy guides. Get BTTS, Over 2.5, Over 1.5, win streak, and draw streak tips.</description>
+    <language>en</language>
+    <lastBuildDate>${now}</lastBuildDate>
+    <atom:link href="https://winfulltime.com/feed.xml" rel="self" type="application/rss+xml"/>
+${items}  </channel>
+</rss>`;
+
+    res.set('Content-Type', 'application/rss+xml; charset=utf-8');
+    res.send(feed);
+  } catch (e) {
+    console.error('RSS feed error:', e.message);
+    res.status(500).send('Failed to generate RSS feed');
+  }
+});
+
 // Email subscription endpoint
 const SUBSCRIBERS_FILE = path.join(__dirname, 'subscribers.json');
 app.post('/api/subscribe', (req, res) => {
