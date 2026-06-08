@@ -1009,7 +1009,7 @@ header {
       const baseDate = getServerDate();
       baseDate.setHours(0, 0, 0, 0);
       
-      for (let i = -1; i <= 3; i++) {
+      for (let i = -1; i <= 1; i++) {
         const date = new Date(baseDate);
         date.setDate(baseDate.getDate() + i);
         const year = date.getFullYear();
