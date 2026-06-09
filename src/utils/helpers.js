@@ -5,7 +5,7 @@ function getDateRange() {
   const now = new Date();
   const today = new Date(now.toLocaleString('en-US', { timeZone: 'Africa/Lagos' }));
   today.setHours(0, 0, 0, 0);
-  for (let i = -1; i <= 3; i++) {
+  for (let i = -1; i <= 1; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
     const year = d.getFullYear();

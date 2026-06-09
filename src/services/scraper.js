@@ -509,6 +509,96 @@ async function scrapeDate(dateStr, retryCount = 0) {
   return { matches, over25Matches, over15Matches, bttsMatches, bttsNoMatches };
 }
 
+const PROSOCCER_BASE_URL = 'https://www.prosoccer.gr/en/football/predictions';
+
+function getProSoccerUrl(dateStr) {
+  const today = getLocalDateStr();
+  if (dateStr === today) return PROSOCCER_BASE_URL + '/';
+
+  const dateObj = new Date(dateStr + 'T12:00:00');
+  const todayObj = new Date(today + 'T12:00:00');
+  const diffDays = Math.round((dateObj - todayObj) / (1000 * 60 * 60 * 24));
+
+  if (diffDays === -1) return PROSOCCER_BASE_URL + '/yesterday.html';
+  if (diffDays === 1) return PROSOCCER_BASE_URL + '/tomorrow.html';
+
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  return PROSOCCER_BASE_URL + '/' + days[dateObj.getDay()] + '.html';
+}
+
+async function scrapeProSoccerDate(dateStr) {
+  const url = getProSoccerUrl(dateStr);
+  let html;
+
+  console.log(`Scraping ProSoccer predictions for ${dateStr}...`);
+
+  try {
+    const res = await axios.get(url, {
+      timeout: 30000,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+      }
+    });
+    html = res.data;
+  } catch (err) {
+    console.error(`ProSoccer fetch failed for ${dateStr}:`, err.message);
+    return [];
+  }
+
+  const $ = cheerio.load(html);
+  const matches = [];
+  let matchId = 0;
+
+  $('#tblPredictions tbody tr').each((i, row) => {
+    const $row = $(row);
+    const tds = $row.find('td');
+    if (tds.length < 7) return;
+
+    const time = $(tds[1]).text().trim();
+    const matchText = $(tds[2]).text().trim();
+    const parts = matchText.replace(/\u00a0/g, ' ').split(' - ');
+    if (parts.length < 2) return;
+    const homeTeam = parts[0].trim();
+    const awayTeam = parts[1].trim();
+    if (!homeTeam || !awayTeam) return;
+
+    const prob1 = parseInt($(tds[3]).text().trim()) || 0;
+    const probX = parseInt($(tds[4]).text().trim()) || 0;
+    const prob2 = parseInt($(tds[5]).text().trim()) || 0;
+
+    const tipEl = $(tds[6]).find('.sctip');
+    let tip = '';
+    if (tipEl.hasClass('tip_p1')) tip = '1';
+    else if (tipEl.hasClass('tip_pX')) tip = 'X';
+    else if (tipEl.hasClass('tip_p2')) tip = '2';
+    if (!tip) return;
+
+    const tipProb = tip === '1' ? prob1 : tip === 'X' ? probX : prob2;
+    if (tipProb <= 70) return;
+
+    const leagueInfo = detectLeague(homeTeam);
+    const matchLabel = `${homeTeam} - ${awayTeam}`;
+
+    matches.push({
+      id: matchId++,
+      source: 'prosoccer',
+      league: leagueInfo.league,
+      country: leagueInfo.country,
+      time: time,
+      match: matchLabel,
+      probabilities: { homeWin: prob1, draw: probX, awayWin: prob2 },
+      tip: tip,
+      probability: tipProb,
+      date: dateStr,
+      score: null
+    });
+  });
+
+  console.log(`ProSoccer: ${matches.length} matches with >70% confidence for ${dateStr}`);
+  return matches;
+}
+
 function parseBetexplorerStreaks(html, streakType = 'win') {
   const matches = [];
   const $ = cheerio.load(html);
@@ -879,7 +969,27 @@ async function fetchAndCachePredictions() {
       allBttsNo.push(...data.bttsNoMatches);
       await sleep(3000);
     }
-     
+    
+    // Scrape ProSoccer for additional 1X2 predictions with >70% confidence
+    console.log('Scraping ProSoccer predictions...');
+    const statareaKeys = new Set(allMatches.map(m => `${m.match.toLowerCase()}|${m.date}`));
+    const proSoccerAll = [];
+    for (const dateStr of dateRange) {
+      const proMatches = await scrapeProSoccerDate(dateStr);
+      for (const pm of proMatches) {
+        const key = `${pm.match.toLowerCase()}|${pm.date}`;
+        if (!statareaKeys.has(key)) {
+          proSoccerAll.push(pm);
+          statareaKeys.add(key);
+        }
+      }
+      await sleep(2000);
+    }
+    if (proSoccerAll.length > 0) {
+      console.log(`Adding ${proSoccerAll.length} unique ProSoccer predictions`);
+      allMatches.push(...proSoccerAll);
+    }
+    
     await sleep(5000);
     
     const winstreakMatches = await scrapeStreak('win');
