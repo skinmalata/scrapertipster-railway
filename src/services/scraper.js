@@ -526,6 +526,19 @@ function getProSoccerUrl(dateStr) {
   return PROSOCCER_BASE_URL + '/' + days[dateObj.getDay()] + '.html';
 }
 
+const MONTH_NAMES = {
+  january: 1, february: 2, march: 3, april: 4, may: 5, june: 6,
+  july: 7, august: 8, september: 9, october: 10, november: 11, december: 12
+};
+
+function parseProSoccerDateFromTitle(title) {
+  const match = title.match(/(\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})/i);
+  if (!match) return null;
+  const day = match[1].padStart(2, '0');
+  const month = String(MONTH_NAMES[match[2].toLowerCase()]).padStart(2, '0');
+  return `${match[3]}-${month}-${day}`;
+}
+
 async function scrapeProSoccerDate(dateStr) {
   const url = getProSoccerUrl(dateStr);
   let html;
@@ -547,6 +560,16 @@ async function scrapeProSoccerDate(dateStr) {
   }
 
   const $ = cheerio.load(html);
+
+  // Parse the actual match date from the page title instead of using the URL-derived date.
+  // ProSoccer's "today" may differ from Lagos timezone, causing a 1-day offset in URLs.
+  const pageTitle = $('h1').first().text();
+  const actualDate = parseProSoccerDateFromTitle(pageTitle);
+  const effectiveDate = actualDate || dateStr;
+  if (actualDate && actualDate !== dateStr) {
+    console.log(`ProSoccer page date mismatch: URL derived ${dateStr}, actual page shows ${actualDate}. Using ${effectiveDate}`);
+  }
+
   const matches = [];
   let matchId = 0;
 
@@ -590,12 +613,12 @@ async function scrapeProSoccerDate(dateStr) {
       probabilities: { homeWin: prob1, draw: probX, awayWin: prob2 },
       tip: tip,
       probability: tipProb,
-      date: dateStr,
+      date: effectiveDate,
       score: null
     });
   });
 
-  console.log(`ProSoccer: ${matches.length} matches with >70% confidence for ${dateStr}`);
+  console.log(`ProSoccer: ${matches.length} matches with >70% confidence for ${effectiveDate}`);
   return matches;
 }
 
@@ -974,9 +997,12 @@ async function fetchAndCachePredictions() {
     console.log('Scraping ProSoccer predictions...');
     const statareaKeys = new Set(allMatches.map(m => `${m.match.toLowerCase()}|${m.date}`));
     const proSoccerAll = [];
+    const dateRangeSet = new Set(dateRange);
     for (const dateStr of dateRange) {
       const proMatches = await scrapeProSoccerDate(dateStr);
       for (const pm of proMatches) {
+        // Only include matches whose date is within our expected range
+        if (!dateRangeSet.has(pm.date)) continue;
         const key = `${pm.match.toLowerCase()}|${pm.date}`;
         if (!statareaKeys.has(key)) {
           proSoccerAll.push(pm);
