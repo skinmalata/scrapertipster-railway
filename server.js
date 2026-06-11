@@ -546,11 +546,11 @@ setTimeout(async () => {
   initialFetchRunning = true;
   console.log('Running initial prediction fetch in background...');
   
-  // Fire and forget - don't await
   getScraperService().fetchAndCachePredictions()
     .then(data => {
       console.log('Initial fetch completed. Matches found:', data.totalMatches);
       predictionsCache = data;
+      rebuildStaticPredictions();
     })
     .catch(err => console.error('Initial fetch error:', err.message));
   

@@ -13,6 +13,8 @@ const CACHE_FILE = path.join(process.cwd(), 'predictions-cache.json');
 const ANALYSIS_CACHE_FILE = path.join(process.cwd(), 'analysis-cache.json');
 const RESULTS_CACHE_FILE = path.join(process.cwd(), 'results-cache.json');
 
+const CACHE_VERSION = '2';
+
 const SCRAPER_LOCK_FILE = path.join(process.cwd(), '.scraper-lock');
 
 let isScraping = false;
@@ -122,8 +124,13 @@ function loadCachedPredictions() {
         
         console.log('[Debug] Cache age:', hoursOld.toFixed(1), 'hours');
         
+        if (data.cacheVersion !== CACHE_VERSION) {
+          console.log('[Debug] Cache version mismatch (cached: ' + data.cacheVersion + ', current: ' + CACHE_VERSION + '), marking for refresh');
+          data.isStale = true;
+        }
+        
         const MAX_CACHE_AGE_HOURS = 12;
-        if (hoursOld > MAX_CACHE_AGE_HOURS) {
+        if (!data.isStale && hoursOld > MAX_CACHE_AGE_HOURS) {
           console.log('[Debug] Cache is stale (>' + MAX_CACHE_AGE_HOURS + ' hours old), marking for refresh');
           data.isStale = true;
         }
@@ -140,6 +147,7 @@ function loadCachedPredictions() {
 function saveCachedPredictions(data) {
   try {
     data.fetchTime = new Date().toISOString();
+    data.cacheVersion = CACHE_VERSION;
     fs.writeFileSync(CACHE_FILE, JSON.stringify(data, null, 2));
   } catch (err) {
     console.error('Cache save error:', err);
