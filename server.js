@@ -167,7 +167,16 @@ app.use(trackVisit);
 app.use('/blog', (req, res, next) => {
   if (req.path.endsWith('.html')) {
     const cleanPath = req.path.replace(/\.html$/, '');
+    res.set('X-Robots-Tag', 'noindex, follow');
     return res.redirect(301, cleanPath);
+  }
+  next();
+});
+
+// Noindex category query params on homepage (must be before static middleware)
+app.use('/', (req, res, next) => {
+  if (req.path === '/' && req.query.category) {
+    res.set('X-Robots-Tag', 'noindex, follow');
   }
   next();
 });
