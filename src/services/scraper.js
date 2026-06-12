@@ -525,17 +525,8 @@ async function scrapeDate(dateStr, retryCount = 0) {
 const PROSOCCER_BASE_URL = 'https://www.prosoccer.gr/en/football/predictions';
 
 function getProSoccerUrl(dateStr) {
-  const today = getLocalDateStr();
-  if (dateStr === today) return PROSOCCER_BASE_URL + '/';
-
-  const dateObj = new Date(dateStr + 'T12:00:00');
-  const todayObj = new Date(today + 'T12:00:00');
-  const diffDays = Math.round((dateObj - todayObj) / (1000 * 60 * 60 * 24));
-
-  if (diffDays === -1) return PROSOCCER_BASE_URL + '/yesterday.html';
-  if (diffDays === 1) return PROSOCCER_BASE_URL + '/tomorrow.html';
-
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const dateObj = new Date(dateStr + 'T12:00:00');
   return PROSOCCER_BASE_URL + '/' + days[dateObj.getDay()] + '.html';
 }
 
