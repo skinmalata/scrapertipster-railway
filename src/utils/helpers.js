@@ -3,11 +3,11 @@ const { normalizeTeamName } = require('../data/leagues');
 function getDateRange() {
   const dates = [];
   const now = new Date();
-  const today = new Date(now.toLocaleString('en-US', { timeZone: 'Africa/Lagos' }));
-  today.setHours(0, 0, 0, 0);
+  const todayStr = getLocalDateStr();
+  const todayDate = new Date(todayStr + 'T12:00:00');
   for (let i = -1; i <= 1; i++) {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
+    const d = new Date(todayDate);
+    d.setDate(todayDate.getDate() + i);
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
@@ -17,12 +17,11 @@ function getDateRange() {
 }
 
 function getLocalDateStr() {
-  const now = new Date();
-  const localDate = new Date(now.toLocaleString('en-US', { timeZone: 'Africa/Lagos' }));
-  const year = localDate.getFullYear();
-  const month = String(localDate.getMonth() + 1).padStart(2, '0');
-  const day = String(localDate.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Africa/Lagos',
+    year: 'numeric', month: '2-digit', day: '2-digit'
+  });
+  return formatter.format(new Date());
 }
 
 function findMatchingResult(matchKey, resultsMap) {
