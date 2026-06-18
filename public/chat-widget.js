@@ -6,10 +6,10 @@
   btn.onmouseout = function () { btn.style.transform = 'scale(1)'; btn.style.boxShadow = '0 4px 20px rgba(244,93,34,.35)'; };
 
   var overlay = document.createElement('div');
-  overlay.style.cssText = 'display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:1000000;justify-content:center;align-items:center;padding:20px';
+  overlay.style.cssText = 'display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:1000000;justify-content:center;align-items:center;padding:12px';
 
   var modal = document.createElement('div');
-  modal.style.cssText = 'background:#fff;border-radius:16px;width:100%;max-width:500px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.25);animation:wfFadeIn .25s ease';
+  modal.style.cssText = 'background:#fff;border-radius:16px;width:100%;max-width:700px;height:min(85vh,750px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.25);animation:wfFadeIn .25s ease';
 
   var hdr = document.createElement('div');
   hdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:#f45d22;color:#fff;flex-shrink:0';
@@ -17,7 +17,7 @@
 
   var iframe = document.createElement('iframe');
   iframe.src = 'https://ko-fi.com/winfulltime/?hidefeed=true&widget=true&embed=true';
-  iframe.style.cssText = 'width:100%;height:480px;border:none;flex:1';
+  iframe.style.cssText = 'width:100%;height:100%;border:none;flex:1;min-height:400px';
   iframe.setAttribute('allowpayment', 'true');
 
   hdr.querySelector('button').onclick = function () { overlay.style.display = 'none'; };
@@ -29,8 +29,10 @@
   overlay.appendChild(modal);
 
   var style = document.createElement('style');
-  style.textContent = '@keyframes wfFadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}';
-  document.head.appendChild(style);
+  style.textContent = '@keyframes wfFadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}@media(max-width:480px){#wf-overlay{padding:0}#wf-modal{border-radius:12px;height:100vh;max-height:100vh;max-width:100%}#wf-modal-header{padding:14px 16px}}';
+  overlay.id = 'wf-overlay';
+  modal.id = 'wf-modal';
+  hdr.id = 'wf-modal-header';
 
   document.body.appendChild(btn);
   document.body.appendChild(overlay);
