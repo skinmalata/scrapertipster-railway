@@ -15,80 +15,37 @@
     description: 'WinFulltime is a free football prediction website that provides AI-driven betting tips across major global football leagues. We combine advanced analytics with comprehensive statistical analysis to deliver accurate predictions.',
     pricing: 'WinFulltime is 100% free. All predictions, analysis, blog content, and features are accessible without any payment or registration.',
     features: {
-      predictions: 'We provide daily football predictions including: 1X2 (match result), Over 1.5 Goals, Over 2.5 Goals, BTTS YES (Both Teams To Score), BTTS NO, Winning Streaks, Losing Streaks, Draw Streaks, Team to Score, Team to Score 2+, Corners, and Cards predictions. Each prediction shows a confidence probability percentage.',
-      leagues: 'We cover 50+ leagues worldwide including: Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, Conference League, Eredivisie, Primeira Liga, Belgian Pro League, Brazilian Serie A, Argentine League, MLS, Liga MX, Saudi Pro League, Turkish Super Lig, Championship, Scottish Premiership, Swiss Super League, Greek Super League, Croatian League, Czech League, Danish Superliga, and many more - covering over 750 teams.',
+      predictions: 'We provide daily football predictions including: 1X2 (match result), Over 1.5 Goals, Over 2.5 Goals, BTTS YES (Both Teams To Score), BTTS NO, Winning Streaks, Losing Streaks, Draw Streaks, Team to Score, Team to Score 2+, Corners, and Cards predictions.',
+      leagues: 'We cover 50+ leagues worldwide including: Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, Eredivisie, Primeira Liga, Belgian Pro League, Brazilian Serie A, Argentine League, MLS, Liga MX, Saudi Pro League, and many more - covering over 750 teams.',
       sources: 'Our predictions are powered by data from trusted sources including Statarea, BetExplorer, and Apwin, combined with our own statistical analysis.',
-      accuracy: 'Our predictions use probability thresholds to identify the strongest picks. Each prediction shows its confidence percentage so you can make informed decisions.',
-      analysis: 'Our analysis page at /analysis.html provides detailed match breakdowns including: recent form guides (last 5 matches), head-to-head (H2H) statistics, team performance metrics, goal statistics, and AI-generated match summaries. Access it by clicking on any prediction on the homepage.',
-      dayNavigation: 'You can browse predictions by day using the tabs at the top of the homepage: Today, Tomorrow, and more. The prediction data is updated daily with the latest football matches.'
+      accuracy: 'Our predictions use probability thresholds to identify the strongest picks. Each prediction shows its confidence percentage so you can make informed decisions.'
     },
     bettingMarkets: {
-      '1x2': '1X2 betting means predicting the match outcome: 1 = Home Win, X = Draw, 2 = Away Win. It is also called match result betting. Our predictions show picks with 65%+ probability.',
-      'over/under': 'Over/Under betting is predicting whether total goals will be over or under a certain number. We cover Over 1.5 (80%+ threshold) and Over 2.5 (60%+ threshold). Over 0.5 is also available for goals markets.',
-      'btts': 'BTTS means Both Teams To Score. BTTS YES predicts both teams will score at least one goal. BTTS NO predicts one or both teams will not score (also called OTS - One Team to Score or clean sheet).',
-      'streaks': 'We track team streaks including: Winning Streak (teams on consecutive wins), Losing Streak (teams on consecutive losses), and Draw Streak (teams on consecutive draws) from BetExplorer data. These help identify teams in exceptional form.',
-      'team to score': 'Team to Score predictions identify teams likely to find the net based on their scoring form and upcoming opposition. Team to Score 2+ predicts a team will score 2 or more goals.',
-      'corners': 'Corner predictions focus on Over 9.5 corners markets, predicting matches likely to have 10+ total corners. Corner betting is popular for live betting.',
-      'cards': 'Card predictions focus on Over 4.5 cards markets, predicting matches likely to have 5+ yellow/red cards. Often used for derby matches or rivalries.',
-      'asian handicap': 'Asian Handicap eliminates the draw by giving one team a virtual advantage or disadvantage. Common lines: -0.5, 0, +0.5, -0.75, +0.75, -1, +1. Visit our blog for detailed Asian Handicap guides.',
-      'correct score': 'Correct Score betting involves predicting the exact final score of a match. It offers high odds but is harder to predict. Our blog has a detailed correct score betting guide.',
-      'double chance': 'Double Chance lets you cover two of three possible outcomes (1X, 12, X2), increasing your chance of winning but with lower odds.',
-      'draw no bet': 'Draw No Bet (DNB) means if the match ends in a draw, your stake is returned. It removes the draw outcome from 1X2 betting.',
-      'both teams to score and win': 'BTTS & Win combines BTTS YES with match result. For example, backing Team A to win and both teams to score.'
+      '1x2': '1X2 betting means predicting the match outcome: 1 = Home Win, X = Draw, 2 = Away Win. Our predictions show picks with 65%+ probability.',
+      'over/under': 'Over/Under betting is predicting whether total goals will be over or under a certain number. We cover Over 1.5 (80%+ threshold) and Over 2.5 (60%+ threshold).',
+      'btts': 'BTTS means Both Teams To Score. BTTS YES predicts both teams will score at least one goal. BTTS NO predicts one or both teams will not score (also called OTS - One Team to Score).',
+      'streaks': 'We track team streaks including: Winning Streak (teams on consecutive wins), Losing Streak (teams on consecutive losses), and Draw Streak (teams on consecutive draws) from BetExplorer data.',
+      'team to score': 'Team to Score predictions identify teams likely to find the net based on their scoring form and upcoming opposition.',
+      'corners': 'Corner predictions focus on Over 9.5 corners markets, predicting matches likely to have 10+ total corners.',
+      'cards': 'Card predictions focus on Over 4.5 cards markets.'
     },
-    howToUse: 'Using WinFulltime is easy:\n1. Visit the homepage at winfulltime.com\n2. Select a day using the day tabs (Today, Tomorrow, etc.)\n3. Choose your market category: 1X2, Over 1.5, Over 2.5, BTTS YES, BTTS NO\n4. Browse the predictions - each shows the match, prediction, and confidence probability\n5. Click on any match for detailed analysis including head-to-head stats and form guides\n\nFor a full guide on all betting markets, visit /options.html. For match analysis, visit /analysis.html.',
-    blog: 'Our blog features 180+ articles organized into categories:\n\u2022 Core Betting Strategies: bankroll management, Kelly criterion, value betting, arbitrage, hedging, matched betting, Martingale, Fibonacci\n\u2022 Betting Markets: Asian handicap, over/under, BTTS, correct score, corners, cards, first goalscorer, half-time/full-time, double chance, draw no bet\n\u2022 Analysis & Statistics: expected goals (xG), Poisson distribution, form analysis, head-to-head statistics\n\u2022 Payments & Banking: M-Pesa, bank transfers, Bet9ja vs SportyBet, cryptocurrency betting, best betting sites by country (Kenya, Nigeria, Ghana, Uganda, UK, USA)\n\u2022 Football Analysis: league guides (Premier League, La Liga, Bundesliga, Champions League), tactics, match previews\n\u2022 Guides & Education: beginner\'s guide, betting glossary, how to read odds, football statistics websites, betting dictionary\n\u2022 World Cup 2026: player profiles, team analysis, tournament previews\n\nVisit https://winfulltime.com/blog/ to explore all articles.',
-    responsible: 'WinFulltime promotes responsible gambling. All predictions are for informational purposes only and do not guarantee results. We strongly recommend: setting strict betting limits, never chasing losses, treating betting as entertainment not income, avoiding alcohol while betting, and seeking professional help (e.g., GamCare, BeGambleAware) if gambling becomes a problem. Must be 18+ to use this site.',
-    contact: 'Reach us at mesigotochukwu@gmail.com or visit https://winfulltime.com/contact.html. We typically respond within 24 hours.',
-    affiliate: 'WinFulltime partners with reputable betting sites and provides reviews of betting platforms across Africa, Europe, and the USA. Our blog features reviews of the best betting sites in Kenya (Betika, SportyBet, Betway, 22Bet), Nigeria (Bet9ja, SportyBet, Betway, 1xBet), Ghana, Uganda, and the UK. Each review covers bonuses, payment methods, odds quality, and user experience.',
-    analysis: 'The analysis page at /analysis.html offers detailed statistics for each match: team form (last 5 matches with W/D/L results), head-to-head history between the two teams, goal statistics (average goals scored/conceded), league position comparison, and an AI-generated written summary of the match. Perfect for making informed betting decisions.',
-    options: 'The betting guide page at /options.html explains all football betting markets in detail with examples: 1X2, Double Chance, Draw No Bet, Over/Under, BTTS, Asian Handicap, Correct Score, Half-Time/Full-Time, First Goalscorer, Both Teams To Score & Win, Corners, Cards, and more. Each market includes a real betting example showing winning and losing scenarios.',
-    predictions: 'Our prediction data includes these categories: 1X2 (match result), Over 1.5 Goals, Over 2.5 Goals, BTTS YES, BTTS NO, Winning Streaks, Losing Streaks, Draw Streaks, Team to Score, Team to Score 2+, Over 9.5 Corners, and Over 4.5 Cards. Predictions are fetched daily from trusted data sources.',
-    search: 'You can search for predictions by team name! Try asking "predictions for Arsenal" or "show me Liverpool matches". The assistant can also tell you how many matches are available for a given day.'
+    howToUse: 'Using WinFulltime is easy:\n1. Visit the homepage at winfulltime.com\n2. Select a day using the day tabs (Today, Tomorrow, etc.)\n3. Choose your market category: 1X2, Over 1.5, Over 2.5, BTTS YES, BTTS NO\n4. Browse the predictions - each shows the match, prediction, and confidence probability\n5. Click on any match for detailed analysis including head-to-head stats and form guides',
+    blog: 'Our blog features 180+ articles on betting strategies, league guides, market explanations, and analysis. Topics include: value betting, bankroll management, Asian handicap, accumulator strategies, Kelly criterion, Poisson distribution, and much more. Visit https://winfulltime.com/blog/',
+    responsible: 'WinFulltime promotes responsible gambling. All predictions are for informational purposes only. We recommend: setting betting limits, never chasing losses, treating betting as entertainment, and seeking help if gambling becomes a problem.',
+    contact: 'Reach us at mesigotochukwu@gmail.com or visit https://winfulltime.com/contact.html'
   };
 
   var faq = [
-    { keywords: ['free', 'cost', 'price', 'pricing', 'pay', 'payment', 'subscription', 'vip', 'premium'], response: knowledge.pricing },
-    { keywords: ['contact', 'email', 'reach', 'message', 'support', 'help', 'mesigo'], response: knowledge.contact },
-    { keywords: ['about', 'what is', 'who are', 'tell me about', 'company', 'winfulltime', 'platform'], response: knowledge.description },
-    { keywords: ['league', 'leagues', 'competition', 'tournament', 'premier league', 'la liga', 'serie a', 'bundesliga', 'champions league', 'eredivisie'], response: knowledge.features.leagues },
-    { keywords: ['how', 'use', 'works', 'work', 'guide', 'start', 'beginner', 'tutorial'], response: knowledge.howToUse },
-    { keywords: ['responsible', 'gamble', 'gambling', 'addict', 'problem', '18+', 'addiction', 'responsible gambling'], response: knowledge.responsible },
-    { keywords: ['accuracy', 'accurate', 'reliable', 'confidence', 'probability', 'percentage', 'trust', 'legit'], response: knowledge.features.accuracy },
-    { keywords: ['source', 'data', 'where', 'api', 'statarea', 'betexplorer', 'apwin', 'scraper'], response: knowledge.features.sources },
-    { keywords: ['youtube', 'video', 'channel', 'watch', 'subscribe'], response: 'Check out our YouTube channel @winfulltime at https://www.youtube.com/@winfulltime/videos for video predictions, match analysis, and betting tips.' },
-    { keywords: ['register', 'sign up', 'signup', 'account', 'login', 'create', 'sign in'], response: 'No registration needed! WinFulltime is completely free and accessible to everyone without creating an account.' },
-    { keywords: ['analysis', 'match analysis', 'h2h', 'head to head', 'statistics', 'form guide', 'stats'], response: knowledge.analysis },
-    { keywords: ['options', 'betting guide', 'markets', 'types of bets', 'betting types', 'explained'], response: knowledge.options },
-    { keywords: ['affiliate', 'partner', 'sponsor', 'betting site', 'bookmaker', 'review'], response: knowledge.affiliate },
-    { keywords: ['blog', 'article', 'guide', 'strategy', 'tips', 'educational', 'learn'], response: knowledge.blog },
-    { keywords: ['prediction', 'predictions', 'tip', 'picks', 'forecast'], response: knowledge.predictions },
-    { keywords: ['asian handicap', 'handicap', 'asian', 'ah'], response: knowledge.bettingMarkets['asian handicap'] },
-    { keywords: ['correct score', 'exact score', 'score prediction'], response: knowledge.bettingMarkets['correct score'] },
-    { keywords: ['double chance', '1x', '12', 'x2'], response: knowledge.bettingMarkets['double chance'] },
-    { keywords: ['draw no bet', 'dnb'], response: knowledge.bettingMarkets['draw no bet'] },
-    { keywords: ['bankroll', 'money management', 'stake', 'staking'], response: 'Bankroll management is crucial for long-term betting success. Key strategies include: the Kelly Criterion (bet a percentage of your bankroll based on perceived edge), flat betting (same stake every time), percentage betting (fixed % of bankroll), and the Fibonacci system. Our blog has detailed guides on bankroll management and the Kelly Criterion.' },
-    { keywords: ['kelly', 'kelly criterion', 'kelly formula'], response: 'The Kelly Criterion is a money management formula that calculates the optimal stake size based on the probability of winning and the odds offered. Formula: f = (bp - q) / b, where f is the fraction of bankroll, b is the decimal odds minus 1, p is the probability of winning, and q is the probability of losing (1-p). Read our full guide at the blog.' },
-    { keywords: ['value', 'value bet', 'value betting', 'overround'], response: 'Value betting means finding odds that are higher than the true probability of an outcome. If you calculate a team has a 50% chance of winning (implied odds of 2.0) but the bookmaker offers 2.2, that is value. Our predictions highlight high-probability picks to help you find value.' },
-    { keywords: ['accumulator', 'acca', 'parlay', 'multi', 'multiple'], response: 'An accumulator (acca) combines multiple selections into one bet. All selections must win for the bet to payout. The total odds are multiplied together, offering higher potential returns but higher risk. Our blog has a guide on accumulator betting strategy.' },
-    { keywords: ['arbitrage', 'arb', 'surebet', 'guaranteed'], response: 'Arbitrage betting (surebet) means placing bets on all possible outcomes across multiple bookmakers to guarantee a profit regardless of the result. It requires quick action and accounts on multiple betting sites. Read our arbitrage betting guide on the blog.' },
-    { keywords: ['in play', 'inplay', 'live betting', 'cash out'], response: 'In-play or live betting allows you to place bets while a match is happening. Odds change dynamically based on match events. Cash-out lets you settle a bet early for a guaranteed return (or reduced loss). Our blog covers in-play betting strategies and cash-out features.' },
-    { keywords: ['over', 'under', 'over under', 'total goals', 'ou', 'o2.5', 'u2.5', 'over 0.5'], response: knowledge.bettingMarkets['over/under'] },
-    { keywords: ['btts', 'both team', 'both to score', 'ots', 'one team'], response: knowledge.bettingMarkets['btts'] },
-    { keywords: ['corner', 'corners', 'corner kick'], response: knowledge.bettingMarkets['corners'] },
-    { keywords: ['card', 'cards', 'yellow', 'red', 'booking'], response: knowledge.bettingMarkets['cards'] },
-    { keywords: ['streak', 'winning', 'losing', 'draw streak', 'form', 'run'], response: knowledge.bettingMarkets['streaks'] },
-    { keywords: ['xg', 'expected goals', 'expected', 'poisson'], response: 'Expected Goals (xG) measures the quality of chances created, assigning a probability value to each shot. It is a key advanced metric for predicting future performance. Poisson distribution is a statistical model used to predict football scores based on average goals scored/conceded. Our blog has detailed guides on xG and Poisson distribution.' },
-    { keywords: ['mpesa', 'm-pesa', 'safaricom', 'kenya payment'], response: 'M-Pesa is the most popular mobile money service for betting deposits and withdrawals in Kenya. Most Kenyan betting sites support M-Pesa deposits and withdrawals. Our blog has a step-by-step guide on using M-Pesa for betting.' },
-    { keywords: ['kenya', 'kenyan', 'betika', 'sportybet'], response: 'For Kenyan bettors, we recommend: Betika, SportyBet, Betway, 22Bet, and Mozzart Bet. Popular payment methods include M-Pesa and Airtel Money. Read our Kenya betting guide on the blog for detailed reviews and bonus offers.' },
-    { keywords: ['nigeria', 'nigerian', 'bet9ja', 'betway nigeria'], response: 'For Nigerian bettors, top sites include Bet9ja, SportyBet, Betway Nigeria, 1xBet, and NairaBet. Payment methods include bank transfers, Quickteller, and Paga. Read our Nigeria betting guide on the blog.' },
-    { keywords: ['ghana', 'ghanaian'], response: 'For Ghanaian bettors, popular sites include Betway Ghana, 1xBet, SportyBet Ghana, and Premier Bet. Payment methods include MTN Mobile Money and AirtelTigo Money.' },
-    { keywords: ['first goal', 'first goalscorer', 'first scorer', 'anyscore'], response: 'First Goalscorer betting involves predicting which player will score the first goal of the match. Anytime Goalscorer means the player will score at any point. Our blog has a first goalscorer betting guide.' },
-    { keywords: ['half time', 'ht', 'full time', 'ht/ft', 'half time full time'], response: 'Half-Time/Full-Time betting involves predicting both the result at half-time AND the result at full-time. Combos: HH, HD, HA, DH, DD, DA, AH, AD, AA. Higher odds but harder to predict.' },
-    { keywords: ['strategy', 'strategies', 'betting strategy', 'system'], response: 'Our blog covers many betting strategies: value betting, the Kelly Criterion, arbitrage, matched betting, accumulator strategy, hedging, Asian handicap strategies, BTTS & Win, corner betting strategy, cards betting strategy, form analysis, home/away advantage, and more. Visit https://winfulltime.com/blog/ to explore.' },
-    { keywords: ['day', 'today', 'tomorrow', 'yesterday', 'daily', 'schedule', 'update'], response: knowledge.features.dayNavigation },
-    { keywords: ['search', 'find', 'team', 'specific', 'lookup'], response: knowledge.search },
-    { keywords: ['news', 'newsletter', 'subscribe', 'email update', 'mail'], response: 'You can subscribe to our newsletter by entering your email in the chat widget. We send occasional updates with predictions and new blog content. Your email is stored securely and never shared with third parties.' }
+    { keywords: ['free', 'cost', 'price', 'pricing', 'pay', 'payment', 'subscription', 'vip'], response: knowledge.pricing },
+    { keywords: ['contact', 'email', 'reach', 'message', 'support', 'help'], response: knowledge.contact },
+    { keywords: ['about', 'what is', 'who are', 'tell me about', 'company'], response: knowledge.description },
+    { keywords: ['league', 'leagues', 'competition', 'tournament'], response: knowledge.features.leagues },
+    { keywords: ['how', 'use', 'works', 'work', 'guide', 'start'], response: knowledge.howToUse },
+    { keywords: ['responsible', 'gamble', 'gambling', 'addict', 'problem', '18+'], response: knowledge.responsible },
+    { keywords: ['accuracy', 'accurate', 'reliable', 'confidence', 'probability', 'percentage'], response: knowledge.features.accuracy },
+    { keywords: ['source', 'data', 'where', 'api', 'statarea', 'betexplorer', 'apwin'], response: knowledge.features.sources },
+    { keywords: ['youtube', 'video', 'channel'], response: 'Check out our YouTube channel @winfulltime at https://www.youtube.com/@winfulltime/videos for video predictions and analysis.' },
+    { keywords: ['register', 'sign up', 'signup', 'account', 'login', 'create'], response: 'No registration needed! WinFulltime is completely free and accessible to everyone without creating an account.' }
   ];
 
   function getTodayStr(data) {
@@ -431,16 +388,4 @@
 
   document.body.appendChild(bubble);
   document.body.appendChild(panel);
-
-  var kofiScript = document.createElement('script');
-  kofiScript.src = 'https://storage.ko-fi.com/cdn/scripts/overlay-widget.js';
-  kofiScript.onload = function () {
-    kofiWidgetOverlay.draw('winfulltime', {
-      'type': 'floating-chat',
-      'floating-chat.donateButton.text': 'Tip Me',
-      'floating-chat.donateButton.background-color': '#f45d22',
-      'floating-chat.donateButton.text-color': '#fff'
-    });
-  };
-  document.body.appendChild(kofiScript);
 })();
