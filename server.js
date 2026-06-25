@@ -163,15 +163,6 @@ app.use(express.json({ limit: '10kb' }));
 app.use(rateLimiter);
 app.use(trackVisit);
 
-// Redirect /blog/*.html to clean URLs (must be before static middleware)
-app.use('/blog', (req, res, next) => {
-  if (req.path.endsWith('.html')) {
-    const cleanPath = req.path.replace(/\.html$/, '');
-    res.set('X-Robots-Tag', 'noindex, follow');
-    return res.redirect(301, cleanPath);
-  }
-  next();
-});
 
 // Noindex category query params on homepage (must be before static middleware)
 app.use('/', (req, res, next) => {
@@ -412,6 +403,53 @@ if (process.env.ENABLE_BACKGROUND_SCRAPING === 'true') {
     }
   });
 }
+
+// Pinterest auto-posting - daily pin generation + posting
+async function runPinterestPipeline() {
+  if (process.env.PINTEREST_AUTO_POST !== 'true') {
+    console.log('Pinterest auto-posting disabled (PINTEREST_AUTO_POST != true)');
+    return;
+  }
+  if (!process.env.PINTEREST_ACCESS_TOKEN || !process.env.PINTEREST_BOARD_ID) {
+    console.log('Pinterest credentials missing, skipping auto-post');
+    return;
+  }
+
+  console.log('Running Pinterest pipeline...');
+
+  try {
+    const { execSync } = require('child_process');
+    const scriptDir = __dirname;
+
+    // Generate fresh pins from predictions cache
+    console.log('Generating daily pins...');
+    execSync('node scripts/generate-daily-pins.js', {
+      cwd: scriptDir,
+      timeout: 180000,
+      stdio: 'pipe'
+    });
+    console.log('Pin generation complete.');
+
+    // Check if we should also post (not just generate)
+    const shouldPost = process.env.PINTEREST_POST === 'true';
+    if (shouldPost) {
+      console.log('Posting pins to Pinterest...');
+      execSync('node scripts/post-to-pinterest.js', {
+        cwd: scriptDir,
+        timeout: 300000,
+        stdio: 'pipe'
+      });
+      console.log('Pinterest posting complete.');
+    }
+  } catch (error) {
+    console.error('Pinterest pipeline error:', error.message);
+  }
+}
+
+// Run Pinterest pipeline daily at 3:00 AM (after prediction fetches)
+cron.schedule('0 3 * * *', () => {
+  runPinterestPipeline();
+});
 
 // Auto-publish scheduled articles daily at 6:00 AM
 const fs = require('fs');

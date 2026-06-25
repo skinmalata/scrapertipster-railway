@@ -7,6 +7,8 @@ const THUMBS_DIR = path.join(__dirname, '..', 'public', 'blog', 'thumbnails');
 const BLOG_DIR = path.join(__dirname, '..', 'public', 'blog');
 
 const missing = [
+  'gainsborough-trinity-never-relegated', 'makana-fa-prison-football', 'reece-wabara-retired-millionaire',
+  'ferenc-puskas-seniors-debut', 'usain-bolt-100m-wind-aided', 'nicolas-jacksons-double-golden-boot', 'aberdeen-bayern-munich-2008',
   '1x2-betting-guide', 'accumulator-betting-strategy', 'asian-handicap-betting-guide',
   'avoid-betting-site-scams', 'bankroll-management-guide', 'bayern-psg-champions-league-preview-may-2026',
   'beginners-guide-football-betting', 'best-football-leagues-to-bet-on', 'best-football-prediction-apps',
@@ -30,6 +32,7 @@ const missing = [
 ];
 
 function slugToCategory(slug) {
+  if (slug.includes('gainsborough') || slug.includes('makana-fa') || slug.includes('wabara') || slug.includes('puskas') || slug.includes('usain-bolt') || slug.includes('jacksons-double') || slug.includes('aberdeen-bayern')) return 'Stories';
   if (slug.includes('guide') && !slug.includes('betting')) return 'Guide';
   if (slug.includes('strategy') || slug.includes('system') || slug.includes('method') || slug.includes('kelly') || slug.includes('matched') || slug.includes('arbitrage') || slug.includes('contrarian') || slug.includes('hedge') || slug.includes('fibonacci') || slug.includes('in-play') || slug.includes('inplay') || slug.includes('motivation')) return 'Strategy';
   if (slug.includes('premier-league') || slug.includes('bayern') || slug.includes('bundesliga') || slug.includes('la-liga') || slug.includes('serie-a') || slug.includes('champions-league') || slug.includes('derby') || slug.includes('european-vs-african') || slug.includes('best-football-leagues') || slug.includes('referee') || slug.includes('research') || slug.includes('set-piece') || slug.includes('fixture') || slug.includes('tactics')) return 'Analysis';
@@ -38,6 +41,13 @@ function slugToCategory(slug) {
 }
 
 function getIcon(slug) {
+  if (slug.includes('gainsborough')) return '🏛️';
+  if (slug.includes('makana-fa')) return '⛓️';
+  if (slug.includes('wabara')) return '👔';
+  if (slug.includes('puskas')) return '🇭🇺';
+  if (slug.includes('usain-bolt')) return '⚡';
+  if (slug.includes('jacksons-double')) return '🥾';
+  if (slug.includes('aberdeen-bayern')) return '🏴󠁧󠁢󠁳󠁣󠁴󠁿';
   if (slug.includes('1x2') || slug.includes('match-result')) return '⚽';
   if (slug.includes('accumulator') || slug.includes('acca')) return '📊';
   if (slug.includes('asian-handicap')) return '📐';
@@ -112,6 +122,7 @@ function getTitleFromHtml(slug) {
 (async () => {
   const browser = await puppeteer.launch({
     headless: 'new',
+    executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
 
