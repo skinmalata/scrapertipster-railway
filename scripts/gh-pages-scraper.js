@@ -214,6 +214,13 @@ function rebuildStatic() {
     fs.copyFileSync(h2hFile, path.join(dataDir, 'h2h-unbeaten.json'));
     console.log('Saved h2h-unbeaten.json');
   }
+
+  // Copy predictions cache for ticket builder
+  const predCache = path.join(process.cwd(), 'predictions-cache.json');
+  if (fs.existsSync(predCache)) {
+    fs.copyFileSync(predCache, path.join(dataDir, 'predictions.json'));
+    console.log('Copied predictions.json for ticket builder');
+  }
 }
 
 if (require.main === module) {

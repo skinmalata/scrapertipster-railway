@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -43,8 +43,8 @@
     <p>Poisson models the probability of a given number of events (goals) occurring when the average rate is known. It assumes goals occur independently and at a constant average rate.</p>
 
     <div class="formula">
-      P(k goals) = (λ^k × e^-λ) / k!<br>
-      <small>λ = expected goals (average), k = number of goals, e = 2.718</small>
+      P(k goals) = (?^k � e^-?) / k!<br>
+      <small>? = expected goals (average), k = number of goals, e = 2.718</small>
     </div>
 
     <h2>Building Your Poisson Model</h2>
@@ -66,13 +66,13 @@
     <div class="step">
       <h3>Step 2: Calculate Probability for Each Score</h3>
       <p>Use the Poisson formula to calculate probabilities for 0, 1, 2, 3+ goals.</p>
-      <p>P(0 goals) = e^-1.7 × 1.7^0 / 0! = 18.3%</p>
-      <p>P(1 goal) = e^-1.7 × 1.7^1 / 1! = 31.1%</p>
+      <p>P(0 goals) = e^-1.7 � 1.7^0 / 0! = 18.3%</p>
+      <p>P(1 goal) = e^-1.7 � 1.7^1 / 1! = 31.1%</p>
     </div>
 
     <div class="step">
       <h3>Step 3: Create Scoreboard Matrix</h3>
-      <p>Calculate probabilities for every scoreline (0-0, 1-0, 2-1, etc.) by multiplying home goal probability × away goal probability.</p>
+      <p>Calculate probabilities for every scoreline (0-0, 1-0, 2-1, etc.) by multiplying home goal probability � away goal probability.</p>
     </div>
 
     <div class="step">
@@ -90,8 +90,8 @@
       <h3>Your Model vs Bookmaker</h3>
       <table style="width:100%; border-collapse: collapse; margin:15px 0;">
         <tr style="background:#f1f5f9;"><th>Outcome</th><th>Your Prob</th><th>Bookmaker</th><th>Value?</th></tr>
-        <tr><td>Over 2.5</td><td>58%</td><td>1.83 (54.6%)</td><td>✅ Yes</td></tr>
-        <tr><td>Man City win</td><td>52%</td><td>1.75 (57%)</td><td>❌ No</td></tr>
+        <tr><td>Over 2.5</td><td>58%</td><td>1.83 (54.6%)</td><td>? Yes</td></tr>
+        <tr><td>Man City win</td><td>52%</td><td>1.75 (57%)</td><td>? No</td></tr>
       </table>
     </div>
 
@@ -105,7 +105,7 @@
     </ul>
 
     <div class="tip">
-      <strong>💡 Key Insight:</strong> The difference between good and great Poisson models is in the xG inputs. Better data = better predictions.
+      <strong>?? Key Insight:</strong> The difference between good and great Poisson models is in the xG inputs. Better data = better predictions.
     </div>
 
     <h2>Tools for Poisson Betting</h2>
@@ -131,11 +131,11 @@
     <h2>Verdict: Does Poisson Work?</h2>
     <p><strong>Yes, for probability estimation.</strong> Poisson is the foundation of most professional betting models:</p>
     <ul>
-      <li>✅ Provides mathematical framework for predictions</li>
-      <li>✅ Can identify genuine value vs bookmaker odds</li>
-      <li>✅ Works well for goal markets</li>
-      <li>⚠️ Requires quality xG data</li>
-      <li>⚠️ Must be combined with proper bankroll management</li>
+      <li>? Provides mathematical framework for predictions</li>
+      <li>? Can identify genuine value vs bookmaker odds</li>
+      <li>? Works well for goal markets</li>
+      <li>?? Requires quality xG data</li>
+      <li>?? Must be combined with proper bankroll management</li>
     </ul>
     <p>Start with simple xG inputs and improve your model over time.</p>
 
@@ -157,5 +157,11 @@
         Donate on Ko-fi
       </a>
     </div>
-  </body>
+    <div style="margin: 0 auto 32px; max-width: 560px; background: linear-gradient(135deg, #0a0e17, #141c2a); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 28px 32px; text-align: center;">
+    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,36,72,0.6); margin-bottom: 8px;">Featured Tool</div>
+    <h3 style="margin: 0 0 10px; font-size: 20px; font-weight: 700; color: #e8edf5;">Build Winning Accumulator Tickets</h3>
+    <p style="margin: 0 auto 16px; font-size: 14px; color: rgba(232,237,245,0.55); line-height: 1.6; max-width: 440px;">Generate optimized accumulator combinations from today's AI-powered predictions. Set your target odds and get instant ticket suggestions.</p>
+    <a href="/ticket-builder.html" style="display: inline-block; background: linear-gradient(135deg, #ff2448, #d41a38); color: #fff; padding: 12px 32px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 15px;">Try Ticket Builder &rarr;</a>
+  </div>
+</body>
 </html>
