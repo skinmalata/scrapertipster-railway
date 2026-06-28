@@ -1,6 +1,13 @@
 const scraper = require('../src/services/scraper');
+const { scrapeUnbeatenStreaks } = require('./scrape-h2h-unbeaten');
 const fs = require('fs');
 const path = require('path');
+
+function getDateStr(offset) {
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  return d.toISOString().split('T')[0];
+}
 
 function normalizeTeam(name) {
   return name.toLowerCase()
@@ -149,6 +156,24 @@ async function main() {
     }
   }
 
+  // H2H Unbeaten streaks
+  console.log('Fetching H2H unbeaten streaks...');
+  try {
+    const today = getDateStr(0);
+    const tomorrow = getDateStr(1);
+    const h2hCache = await scrapeUnbeatenStreaks([today, tomorrow]);
+    fs.writeFileSync(path.join(dataDir, 'h2h-unbeaten.json'), JSON.stringify(h2hCache, null, 2));
+    console.log('Saved h2h-unbeaten.json');
+  } catch (err) {
+    console.error('H2H unbeaten fetch failed:', err.message);
+    const h2hFile = path.join(process.cwd(), 'h2h-unbeaten-cache.json');
+    if (fs.existsSync(h2hFile)) {
+      const h2hData = JSON.parse(fs.readFileSync(h2hFile, 'utf8'));
+      fs.writeFileSync(path.join(dataDir, 'h2h-unbeaten.json'), JSON.stringify(h2hData, null, 2));
+      console.log('Used cached h2h-unbeaten.json');
+    }
+  }
+
   console.log('All data written to public/data/');
 }
 
@@ -182,6 +207,12 @@ function rebuildStatic() {
   if (fs.existsSync(resultsFile)) {
     fs.copyFileSync(resultsFile, path.join(dataDir, 'results.json'));
     console.log('Saved results.json');
+  }
+
+  const h2hFile = path.join(process.cwd(), 'h2h-unbeaten-cache.json');
+  if (fs.existsSync(h2hFile)) {
+    fs.copyFileSync(h2hFile, path.join(dataDir, 'h2h-unbeaten.json'));
+    console.log('Saved h2h-unbeaten.json');
   }
 }
 

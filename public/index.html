@@ -919,9 +919,9 @@ header {
         <button onclick="setCategory('1x2')" id="tab-1x2" class="tab-btn active">1X2</button>
         <button onclick="setCategory('over15')" id="tab-over15" class="tab-btn">Over 1.5</button>
         <button onclick="setCategory('over25')" id="tab-over25" class="tab-btn">Over 2.5</button>
+        <button onclick="setCategory('unbeaten')" id="tab-unbeaten" class="tab-btn">🔥 Unbeaten</button>
         <button onclick="setCategory('btts')" id="tab-btts" class="tab-btn">BTTS YES</button>
         <button onclick="setCategory('bttsno')" id="tab-bttsno" class="tab-btn">BTTS NO</button>
-        <button onclick="setCategory('unbeaten')" id="tab-unbeaten" class="tab-btn">🔥 Unbeaten</button>
 
       </div>
 
@@ -1117,11 +1117,11 @@ header {
 
     async function loadUnbeatenData() {
       try {
-        const res = await fetch('/api/h2h-unbeaten');
+        const res = await fetch('/data/h2h-unbeaten.json');
         if (!res.ok) throw new Error('HTTP ' + res.status);
         unbeatenData = await res.json();
       } catch (e) {
-        console.error('Failed to load unbeaten data:', e);
+        console.error('Failed to load unbeaten data:', e.message);
         unbeatenData = { dates: {} };
       }
       if (currentCategory === 'unbeaten') renderUnbeaten();
