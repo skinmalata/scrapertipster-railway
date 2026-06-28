@@ -452,7 +452,8 @@ cron.schedule('0 3 * * *', () => {
 });
 
 // H2H Unbeaten Streaks Scraper - daily at 4:00 AM
-const { scrapeUnbeatenStreaks } = require('./scripts/scrape-h2h-unbeaten');
+const scrapeH2h = require('./scripts/scrape-h2h-unbeaten');
+const { scrapeUnbeatenStreaks } = scrapeH2h;
 cron.schedule('0 4 * * *', async () => {
   console.log('Running H2H unbeaten streaks scrape...');
   try {
@@ -615,19 +616,16 @@ setTimeout(async () => {
     })
     .catch(err => console.error('Initial fetch error:', err.message));
   
-  // Corners, cards, and both halves scraping disabled
-  // getScraperService().scrapeCorners()
-  //   .then(data => console.log('Initial corners scrape completed. Matches found:', data.totalMatches))
-  //   .catch(err => console.error('Initial corners error:', err.message));
-  // 
-  // getScraperService().scrapeCards()
-  //   .then(data => console.log('Initial cards scrape completed. Matches found:', data.totalMatches))
-  //   .catch(err => console.error('Initial cards error:', err.message));
-  // 
-  // getScraperService().scrapeBothHalves()
-  //   .then(data => console.log('Initial both halves scrape completed. Matches found:', data.totalMatches))
-  //   .catch(err => console.error('Initial both halves error:', err.message))
-  //   .finally(() => { initialFetchRunning = false; });
+  // Initial H2H unbeaten scrape
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+    scrapeUnbeatenStreaks([today, tomorrow])
+      .then(() => console.log('Initial H2H unbeaten scrape completed'))
+      .catch(err => console.error('Initial H2H unbeaten error:', err.message));
+  } catch (err) {
+    console.error('Initial H2H unbeaten error:', err.message);
+  }
 }, 5000);
 
 const HOST = process.env.HOST || '0.0.0.0';
