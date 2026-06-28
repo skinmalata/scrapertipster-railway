@@ -291,6 +291,40 @@ header {
       border-top: 1px solid #3d4a5c;
     }
 
+    .streak-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: #1e2a3a;
+      padding: 8px 12px;
+      border-radius: 6px;
+      width: 100%;
+    }
+    .streak-team {
+      flex: 1;
+      font-weight: 600;
+      color: #e0e0e0;
+      font-size: 13px;
+      text-align: left;
+    }
+    .streak-badge {
+      background: #ff0000;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+    .streak-odds {
+      font-weight: 700;
+      color: #4caf50;
+      font-size: 15px;
+      min-width: 40px;
+      text-align: right;
+    }
+
     .tip-row {
       display: flex;
       align-items: center;
@@ -863,6 +897,7 @@ header {
           </div>
         <nav>
           <a href="/">Home</a>
+          <a href="/?category=unbeaten">Unbeaten</a>
           <a href="/blog/">Blog</a>
           <a href="/about.html">About</a>
           <a href="/contact.html">Contact</a>
@@ -886,6 +921,7 @@ header {
         <button onclick="setCategory('over25')" id="tab-over25" class="tab-btn">Over 2.5</button>
         <button onclick="setCategory('btts')" id="tab-btts" class="tab-btn">BTTS YES</button>
         <button onclick="setCategory('bttsno')" id="tab-bttsno" class="tab-btn">BTTS NO</button>
+        <button onclick="setCategory('unbeaten')" id="tab-unbeaten" class="tab-btn">🔥 Unbeaten</button>
 
       </div>
 
@@ -978,10 +1014,8 @@ header {
     // Check URL for category parameter
     const urlParams = new URLSearchParams(window.location.search);
     const urlCategory = urlParams.get('category');
-    if (urlCategory && ['winstreak', 'losestreak', 'drawstreak'].includes(urlCategory)) {
+    if (urlCategory && ['winstreak', 'losestreak', 'drawstreak', 'unbeaten'].includes(urlCategory)) {
       currentCategory = urlCategory;
-      const dayTabs = document.getElementById('dayTabs');
-      if (dayTabs) dayTabs.style.display = 'none';
     }
 
     const headerDateEl = document.getElementById('headerDate');
@@ -1038,7 +1072,11 @@ header {
     function switchDay(offset) {
       currentDayOffset = offset;
       renderDayTabs();
-      if (currentData) renderMatches();
+      if (currentCategory === 'unbeaten') {
+        renderUnbeaten();
+      } else if (currentData) {
+        renderMatches();
+      }
     }
 
     function checkAuth() {
@@ -1063,12 +1101,78 @@ header {
         dayTabs.style.display = '';
       }
       
-      if (currentData) renderMatches();
+      if (cat === 'unbeaten') {
+        renderUnbeaten();
+      } else if (currentData) {
+        renderMatches();
+      }
     }
 
     function getCategoryLabel(cat) {
       const labels = { '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5', 'btts': 'BTTS YES', 'bttsno': 'BTTS NO', 'corners': 'Corners', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak', 'teamtoscore2plus': 'To Score 2+', 'cards': 'Cards' };
       return labels[cat] || cat;
+    }
+
+    let unbeatenData = null;
+
+    async function loadUnbeatenData() {
+      try {
+        const res = await fetch('/api/h2h-unbeaten');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        unbeatenData = await res.json();
+      } catch (e) {
+        console.error('Failed to load unbeaten data:', e);
+        unbeatenData = { dates: {} };
+      }
+      if (currentCategory === 'unbeaten') renderUnbeaten();
+    }
+
+    function renderUnbeaten() {
+      const content = document.getElementById('content');
+      const targetDate = getServerDate();
+      targetDate.setDate(targetDate.getDate() + currentDayOffset);
+      const y = targetDate.getFullYear();
+      const m = String(targetDate.getMonth() + 1).padStart(2, '0');
+      const d = String(targetDate.getDate()).padStart(2, '0');
+      const dateStr = `${y}-${m}-${d}`;
+      const matches = (unbeatenData && unbeatenData.dates && unbeatenData.dates[dateStr]) || [];
+
+      if (matches.length === 0) {
+        let dayLabel = currentDayOffset === 0 ? 'today' : currentDayOffset === 1 ? 'tomorrow' : currentDayOffset === -1 ? 'yesterday' : `on ${dateStr}`;
+        content.innerHTML = `
+          <div class="no-matches">
+            <p>No unbeaten streak data for ${dayLabel}. Data updates daily at 4:00 AM (WAT).</p>
+          </div>
+        `;
+        document.getElementById('totalMatches').textContent = '0';
+        return;
+      }
+      document.getElementById('totalMatches').textContent = matches.length;
+      const html = matches.map((match, i) => {
+        const streaksHtml = match.streaks.map(s => {
+          const loc = s.location ? ` ${s.location}` : '';
+          return `
+          <div class="streak-row">
+            <span class="streak-team">${s.team}</span>
+            <span class="streak-badge">${s.count} unbeaten${loc}</span>
+          </div>
+        `}).join('');
+        return `
+          <div class="match-card fade-in" style="animation-delay: ${i * 50}ms">
+            <div class="match-header">
+              <span>${match.league}</span>
+              <span>${match.time}</span>
+            </div>
+            <div class="match-teams" style="justify-content: center;">
+              <span class="team team-home" style="text-align: center; width: 100%;">${match.match}</span>
+            </div>
+            <div class="match-footer" style="flex-direction: column; gap: 6px;">
+              ${streaksHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+      content.innerHTML = `<div class="matches-grid">${html}</div>`;
     }
 
     function getTipLabel(tip) {
@@ -1080,6 +1184,11 @@ header {
       try {
       const content = document.getElementById('content');
       
+      if (currentCategory === 'unbeaten') {
+        renderUnbeaten();
+        return;
+      }
+
       if (!currentData || !currentData.success) {
         content.innerHTML = `
           <div class="text-center py-12 text-muted-foreground">
@@ -1112,7 +1221,7 @@ header {
       const targetDateStr = `${year}-${month}-${day}`;
 
       if (currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak') {
-        filtered = matches;
+        filtered = matches.filter(m => m.date === targetDateStr || m.nextMatchDate === targetDateStr);
       } else if (currentCategory === 'corners') {
         filtered = matches.filter(m => m.date === targetDateStr);
       } else if (currentCategory === 'teamtoscore2plus' || currentCategory === 'cards') {
@@ -1225,6 +1334,11 @@ header {
       document.querySelectorAll('.match-card').forEach(card => {
         card.style.cursor = 'default';
       });
+
+      const dt = document.getElementById('dayTabs');
+      if (dt) {
+        dt.style.display = (currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak') ? 'none' : '';
+      }
       } catch (error) {
         console.error('Error rendering matches:', error);
         content.innerHTML = `
@@ -1280,6 +1394,7 @@ header {
 renderDayTabs();
     loadPredictions();
     loadRandomBlogPosts();
+    loadUnbeatenData();
     console.log('loadPredictions called, waiting...');
     
     async function loadRandomBlogPosts() {

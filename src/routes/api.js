@@ -558,3 +558,27 @@ router.post('/articles/publish', (req, res) => {
     res.json({ success: false, error: e.message });
   }
 });
+
+// H2H Unbeaten Streaks (cached from daily scrape)
+const pathH2hCache = path.join(__dirname, '../../h2h-unbeaten-cache.json');
+router.get('/h2h-unbeaten', (req, res) => {
+  try {
+    if (fs.existsSync(pathH2hCache)) {
+      const cache = JSON.parse(fs.readFileSync(pathH2hCache, 'utf8'));
+      // support both legacy { date, matches } and new { dates: { "date": [...] } } formats
+      let dates = cache.dates;
+      if (!dates && cache.date && Array.isArray(cache.matches)) {
+        dates = { [cache.date]: cache.matches };
+      }
+      dates = dates || {};
+      const requestedDate = req.query.date;
+      if (requestedDate && dates[requestedDate]) {
+        return res.json({ success: true, date: requestedDate, matches: dates[requestedDate], allDates: Object.keys(dates) });
+      }
+      return res.json({ success: true, dates, allDates: Object.keys(dates) });
+    }
+    res.json({ success: true, dates: {}, allDates: [], matches: [], message: 'No data yet - first scrape runs at 4 AM' });
+  } catch (e) {
+    res.json({ success: false, error: e.message, matches: [] });
+  }
+});

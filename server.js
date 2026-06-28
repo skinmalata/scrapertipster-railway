@@ -451,6 +451,20 @@ cron.schedule('0 3 * * *', () => {
   runPinterestPipeline();
 });
 
+// H2H Unbeaten Streaks Scraper - daily at 4:00 AM
+const { scrapeUnbeatenStreaks } = require('./scripts/scrape-h2h-unbeaten');
+cron.schedule('0 4 * * *', async () => {
+  console.log('Running H2H unbeaten streaks scrape...');
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+    await scrapeUnbeatenStreaks([today, tomorrow]);
+    console.log('H2H unbeaten streaks scrape completed');
+  } catch (error) {
+    console.error('H2H unbeaten streaks error:', error.message);
+  }
+});
+
 // Auto-publish scheduled articles daily at 6:00 AM
 const fs = require('fs');
 const ARTICLES_FILE = path.join(__dirname, 'articles-manifest.json');
