@@ -740,7 +740,7 @@
           perCategory[p.category].push(p);
         }
         const cats = Object.keys(perCategory);
-        const matchCount = new Map();
+        const poolMatchCount = new Map();
         let catIdx = 0;
         for (let i = 0; i < 80; i++) {
           const cat = cats[catIdx % cats.length];
@@ -748,9 +748,9 @@
           const idx = Math.floor(catIdx / cats.length);
           if (idx < catPicks.length) {
             const pick = catPicks[idx];
-            const mcnt = matchCount.get(pick.match) || 0;
+            const mcnt = poolMatchCount.get(pick.match) || 0;
             if (mcnt < 2) {
-              matchCount.set(pick.match, mcnt + 1);
+              poolMatchCount.set(pick.match, mcnt + 1);
               pool.push(pick);
             }
           }
@@ -826,13 +826,13 @@
         const html = top.map((ticket, ti) => {
           const legsHtml = ticket.selections.map(s => `
             <div class="ticket-leg">
-              <span class="leg-match">${s.match} <span class="leg-tip">${s.tip}</span></span>
-              <span class="leg-cat">${s.category}</span>
+              <span class="leg-match">${s.match}</span>
+              <span class="leg-cat">${s.tip}</span>
             </div>
           `).join('');
 
           const legLines = ticket.selections.map((s, i) =>
-            `${i + 1}. ${s.match} - ${s.tip} (${s.category})`
+            `${i + 1}. ${s.match} - ${s.tip}`
           );
           const copyData = JSON.stringify({
             legs: legLines,
