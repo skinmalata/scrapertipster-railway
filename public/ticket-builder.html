@@ -71,6 +71,12 @@
         <input type="checkbox" id="ticketTodayOnly" checked>
         <label for="ticketTodayOnly">Only Today's Matches</label>
       </div>
+      <div class="form-row" style="margin-bottom:16px">
+        <div>
+          <label for="affiliateLink">Affiliate Link (optional)</label>
+          <input type="url" id="affiliateLink" placeholder="https://betway.com/?a=YOUR_ID" style="font-size:13px">
+        </div>
+      </div>
       <button class="gen-btn" onclick="generateTickets()">Generate Tickets</button>
       <div style="font-size: 12px; color: rgba(255,255,255,0.85); text-align: center; margin-top: 14px; letter-spacing: 0.2px;">Odds are estimated based on prediction probabilities</div>
     </div>
@@ -440,6 +446,59 @@
       font-variant-numeric: tabular-nums;
     }
 
+    .ticket-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .copy-btn, .bet-btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.3s;
+      text-decoration: none;
+      border: none;
+      letter-spacing: 0.2px;
+    }
+
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.08);
+      color: #e8edf5;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+      transform: translateY(-1px);
+    }
+
+    .copy-btn.copied {
+      background: rgba(74, 222, 128, 0.2);
+      color: #4ade80;
+    }
+
+    .copy-icon { font-size: 16px; }
+
+    .bet-btn {
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      color: #0a0e17;
+    }
+
+    .bet-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(74, 222, 128, 0.3);
+    }
+
     .fade-in {
       animation: fadeIn 0.5s ease forwards;
       opacity: 0;
@@ -753,6 +812,8 @@
           top.push(...tickets.slice(0, maxTickets));
         }
 
+        const affUrl = document.getElementById('affiliateLink').value.trim();
+
         const html = top.map((ticket, ti) => {
           const legsHtml = ticket.selections.map(s => `
             <div class="ticket-leg">
@@ -760,6 +821,18 @@
               <span class="leg-odds">${Number(s.odds).toFixed(2)}</span>
             </div>
           `).join('');
+
+          const legLines = ticket.selections.map((s, i) =>
+            `${i + 1}. ${s.match} - ${s.tip} @ ${Number(s.odds).toFixed(2)}`
+          );
+          const copyData = JSON.stringify({
+            legs: legLines,
+            total: ticket.totalOdds,
+            num: ti + 1,
+            target: target,
+            aff: affUrl
+          });
+
           return `
             <div class="ticket-card fade-in" style="animation-delay: ${ti * 80}ms">
               <div class="ticket-header">
@@ -770,6 +843,12 @@
               <div class="ticket-diff" style="margin-top: 8px; text-align: right;">
                 Target: ${target} &mdash; Difference: ${ticket.diff.toFixed(2)}
               </div>
+              <div class="ticket-actions">
+                <button class="copy-btn" data-copy='${copyData}'>
+                  <span class="copy-icon">📋</span> Copy Selections
+                </button>
+                ${affUrl ? `<a href="${affUrl}" target="_blank" rel="noopener" class="bet-btn">🏆 Bet Now</a>` : ''}
+              </div>
             </div>
           `;
         }).join('');
@@ -779,6 +858,27 @@
         results.innerHTML = `<div class="no-matches"><p>Unable to generate tickets. The prediction data may be unavailable. Try again later.</p></div>`;
       }
     }
+
+    document.addEventListener('click', function(e) {
+      const btn = e.target.closest('[data-copy]');
+      if (!btn) return;
+      const data = JSON.parse(btn.dataset.copy);
+      const aff = data.aff ? '\n\n👉 ' + data.aff : '';
+      const text = 'WinFulltime Ticket ' + data.num + ' - ' + data.legs.length + ' Legs @ ' + data.total + ' odds\n\n' +
+        data.legs.join('\n') + '\n\nTotal Odds: ' + data.total + '\nTarget: ' + data.target + aff;
+
+      navigator.clipboard.writeText(text).then(function() {
+        btn.classList.add('copied');
+        var orig = btn.innerHTML;
+        btn.innerHTML = '<span class="copy-icon">✓</span> Copied!';
+        setTimeout(function() {
+          btn.innerHTML = orig;
+          btn.classList.remove('copied');
+        }, 2000);
+      }).catch(function() {
+        alert('Failed to copy. Select and copy manually.');
+      });
+    });
   </script>
   <script src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP" async></script>
   <script>
