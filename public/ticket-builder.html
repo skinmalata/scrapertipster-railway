@@ -853,19 +853,19 @@
 
         tickets.sort((a, b) => a.diff - b.diff);
 
-        // Select diverse top tickets - each match appears in at most 1 ticket
+        // Select diverse top tickets - same match+tip can appear in at most 2 tickets
         const top = [];
-        const matchCount = new Map();
+        const pairCount = new Map();
         for (const t of tickets) {
-          const matchSet = new Set(t.selections.map(s => s.match));
-          const exceedsLimit = [...matchSet].some(m => (matchCount.get(m) || 0) >= 1);
+          const pairs = t.selections.map(s => `${s.match}|${s.tip}`);
+          const exceedsLimit = pairs.some(p => (pairCount.get(p) || 0) >= 2);
           if (!exceedsLimit) {
             top.push(t);
-            for (const m of matchSet) matchCount.set(m, (matchCount.get(m) || 0) + 1);
+            for (const p of pairs) pairCount.set(p, (pairCount.get(p) || 0) + 1);
           }
           if (top.length >= maxTickets) break;
         }
-        // Fallback if too few tickets pass the filter
+        // Fallback if too few tickets pass
         if (top.length < 2 && tickets.length > 0) {
           top.length = 0;
           top.push(...tickets.slice(0, maxTickets));
