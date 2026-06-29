@@ -740,7 +740,7 @@
         }
         const cats = Object.keys(perCategory);
         let catIdx = 0;
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 40; i++) {
           const cat = cats[catIdx % cats.length];
           const catPicks = perCategory[cat];
           const idx = Math.floor(catIdx / cats.length);
@@ -749,14 +749,18 @@
         }
 
         const tickets = [];
-        const seenTickets = new Set();
+        const seenKeys = new Set();
+        let iterations = 0;
+        const MAX_ITER = 50000;
         const maxLegs = 8;
 
         function backtrack(start, current, product, usedMatches) {
+          if (iterations >= MAX_ITER) return;
           if (current.length >= 2) {
+            iterations++;
             const key = current.map(s => `${s.match}|${s.tip}`).sort().join('||');
-            if (!seenTickets.has(key)) {
-              seenTickets.add(key);
+            if (!seenKeys.has(key)) {
+              seenKeys.add(key);
               tickets.push({
                 selections: [...current],
                 totalOdds: parseFloat(product.toFixed(2)),
@@ -767,6 +771,7 @@
           if (current.length >= maxLegs) return;
 
           for (let i = start; i < pool.length; i++) {
+            if (iterations >= MAX_ITER) return;
             const p = pool[i];
             if (usedMatches.has(p.match)) continue;
             const newProduct = product * p.odds;
