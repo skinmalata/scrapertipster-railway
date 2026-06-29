@@ -740,7 +740,7 @@
           perCategory[p.category].push(p);
         }
         const cats = Object.keys(perCategory);
-        const usedKey = new Set();
+        const matchCount = new Map();
         let catIdx = 0;
         for (let i = 0; i < 80; i++) {
           const cat = cats[catIdx % cats.length];
@@ -748,9 +748,9 @@
           const idx = Math.floor(catIdx / cats.length);
           if (idx < catPicks.length) {
             const pick = catPicks[idx];
-            const key = `${pick.match}|${pick.category}`;
-            if (!usedKey.has(key)) {
-              usedKey.add(key);
+            const mcnt = matchCount.get(pick.match) || 0;
+            if (mcnt < 2) {
+              matchCount.set(pick.match, mcnt + 1);
               pool.push(pick);
             }
           }
