@@ -71,12 +71,6 @@
         <input type="checkbox" id="ticketTodayOnly" checked>
         <label for="ticketTodayOnly">Only Today's Matches</label>
       </div>
-      <div class="form-row" style="margin-bottom:16px">
-        <div>
-          <label for="affiliateLink">Affiliate Link (optional)</label>
-          <input type="url" id="affiliateLink" placeholder="https://betway.com/?a=YOUR_ID" style="font-size:13px">
-        </div>
-      </div>
       <button class="gen-btn" onclick="generateTickets()">Generate Tickets</button>
       <div style="font-size: 12px; color: rgba(255,255,255,0.85); text-align: center; margin-top: 14px; letter-spacing: 0.2px;">Odds are estimated based on prediction probabilities</div>
     </div>
@@ -812,7 +806,8 @@
           top.push(...tickets.slice(0, maxTickets));
         }
 
-        const affUrl = document.getElementById('affiliateLink').value.trim();
+        // Set your affiliate link here (or pass via server)
+        const AFFILIATE_URL = '';
 
         const html = top.map((ticket, ti) => {
           const legsHtml = ticket.selections.map(s => `
@@ -830,7 +825,7 @@
             total: ticket.totalOdds,
             num: ti + 1,
             target: target,
-            aff: affUrl
+            aff: AFFILIATE_URL
           });
 
           return `
@@ -847,7 +842,7 @@
                 <button class="copy-btn" data-copy='${copyData}'>
                   <span class="copy-icon">📋</span> Copy Selections
                 </button>
-                ${affUrl ? `<a href="${affUrl}" target="_blank" rel="noopener" class="bet-btn">🏆 Bet Now</a>` : ''}
+                ${AFFILIATE_URL ? `<a href="${AFFILIATE_URL}" target="_blank" rel="noopener" class="bet-btn">🏆 Bet Now</a>` : ''}
               </div>
             </div>
           `;
