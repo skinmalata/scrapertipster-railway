@@ -1,1687 +1,1759 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WinFulltime - Free AI Football Predictions Today | 1X2, O/U, BTTS</title>
-  <meta name="description" content="Get free AI-powered football predictions today. Expert 1X2, over 1.5, over 2.5, BTTS, and team to score tips. Win streak, losing streak stats included.">
-  <meta name="keywords" content="AI football predictions, betting tips, soccer predictions, 1X2 predictions, over/under tips, BTTS, team to score, daily predictions, AI predictions">
-   <meta property="og:title" content="WinFulltime - Free AI Football Predictions Today">
-  <meta property="og:url" content="https://winfulltime.com/">
-   <meta property="og:description" content="Get free AI-powered football predictions daily. Expert tips for 1X2, Over/Under, BTTS, and Team to Score.">
-   <meta property="og:image" content="/winfulltimelogo.png">
-  <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary_large_image">
-   <meta name="twitter:title" content="WinFulltime - Free AI Football Predictions Today">
-    <meta name="twitter:description" content="Get free AI-powered football predictions daily. Expert tips for 1X2, Over/Under, BTTS, and Team to Score.">
-   <meta name="twitter:image" content="/winfulltimelogo.png">
-  <link rel="canonical" href="https://winfulltime.com/">
-  <meta name="p:domain_verify" content="ea6fdcfb1731666c03500a5d385f306f"/>
-  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css">
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "WinFulltime",
-      "url": "https://winfulltime.com",
-      "description": "Free football predictions for today. Expert tips for 1X2, Over/Under, BTTS, and Team to Score.",
-      "publisher": {
-        "@type": "Organization",
-        "name": "WinFulltime",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://winfulltime.com/winfulltimelogo.png"
-        }
-      },
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://winfulltime.com/analysis.html?home={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    }
-    </script>
-  <style>
-    :root {
-      --bg-primary: #0b0f1a;
-      --bg-secondary: #111827;
-      --bg-card: rgba(23, 28, 46, 0.85);
-      --bg-card-hover: rgba(30, 36, 56, 0.95);
-      --bg-elevated: #1a1f2e;
-      --text-primary: #e8edf5;
-      --text-secondary: #c8d0db;
-      --text-muted: #94a3b8;
-      --accent: #ff2448;
-      --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
-      --border: rgba(255,255,255,0.06);
-      --border-hover: rgba(255,255,255,0.12);
-      --glow: rgba(255,36,72,0.12);
-      --radius: 12px;
-      --radius-lg: 16px;
-      --font: 'Inter', system-ui, -apple-system, sans-serif;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: var(--font);
-      background: var(--bg-primary);
-      background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent);
-      color: var(--text-primary);
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 16px;
-    }
-
-    header {
-      background: rgba(11, 15, 26, 0.85);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      padding: 0;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .header-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 16px;
-      max-width: 960px;
-      margin: 0 auto;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-    }
-
-    .logo a {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        color: var(--text-primary);
-        text-decoration: none;
-      }
-    .logo-icon { height: 28px; width: auto; flex-shrink: 0; }
-  
-    .logo .win {
-      color: #ffffff;
-    }
-
-    .logo .fulltime {
-      color: #ffffff;
-    }
-
-    nav {
-      display: flex;
-      gap: 24px;
-    }
-
-    nav a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 14px;
-      transition: color 0.2s;
-      position: relative;
-      padding: 4px 0;
-    }
-
-    nav a:hover {
-      color: var(--text-primary);
-    }
-
-    nav a.active {
-      color: var(--text-primary);
-    }
-
-    nav a.active::after {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: var(--accent-gradient);
-      border-radius: 1px;
-    }
-
-    main {
-      padding: 32px 16px;
-    }
-
-    .hero {
-      text-align: center;
-      margin-bottom: 36px;
-      padding: 0 8px;
-    }
-
-    .hero h1 {
-      font-size: 38px;
-      font-weight: 800;
-      line-height: 1.15;
-      letter-spacing: -0.5px;
-      background: linear-gradient(135deg, #e8edf5 0%, #94a3b8 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 12px;
-    }
-
-    .hero-subtext {
-      font-size: 16px;
-      color: var(--text-secondary);
-      margin-top: 4px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      line-height: 1.6;
-    }
-
-    .hero p {
-      font-size: 16px;
-      color: var(--text-secondary);
-    }
-
-    .hero-date {
-      font-size: 14px;
-      color: var(--text-muted);
-      margin-top: 16px;
-      font-weight: 500;
-    }
-
-    .stats-bar {
-      display: flex;
-      justify-content: center;
-      gap: 48px;
-      padding: 20px 24px;
-      margin-bottom: 28px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .stat-item {
-      text-align: center;
-    }
-
-    .stat-value {
-      font-size: 30px;
-      font-weight: 800;
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      line-height: 1.2;
-    }
-
-    .stat-label {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-weight: 500;
-      letter-spacing: 0.3px;
-    }
-
-    .tabs-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px;
-      margin-bottom: 24px;
-    }
-
-    .tab-btn {
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      border: 1px solid var(--border);
-      background: var(--bg-card);
-      color: var(--text-secondary);
-      font-family: var(--font);
-    }
-
-    .tab-btn:hover {
-      border-color: var(--border-hover);
-      background: var(--bg-card-hover);
-      color: var(--text-primary);
-    }
-
-    .tab-btn.active {
-      background: var(--accent-gradient);
-      color: white;
-      border-color: transparent;
-      box-shadow: 0 4px 15px var(--glow);
-    }
-
-    .matches-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-      max-width: 520px;
-      margin: 0 auto;
-    }
-
-    .match-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 22px 24px;
-      color: var(--text-primary);
-      transition: all 0.25s ease;
-      cursor: default;
-      backdrop-filter: blur(4px);
-    }
-
-    .match-card:hover {
-      transform: translateY(-2px);
-      border-color: rgba(255,255,255,0.1);
-      background: var(--bg-card-hover);
-      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-    }
-
-    .match-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-      font-size: 14px;
-      color: var(--text-muted);
-      font-weight: 500;
-      letter-spacing: 0.3px;
-    }
-
-    .match-teams {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
-    }
-
-    .team {
-      font-size: 18px;
-      font-weight: 600;
-      flex: 1;
-      line-height: 1.3;
-    }
-
-    .team-home {
-      text-align: right;
-      padding-right: 16px;
-    }
-
-    .team-away {
-      text-align: left;
-      padding-left: 16px;
-    }
-
-    .vs-score {
-      font-size: 15px;
-      color: var(--text-muted);
-      padding: 0 14px;
-      font-weight: 500;
-    }
-
-    .score-display {
-      font-weight: 700;
-      color: #fbbf24;
-      font-size: 22px;
-      letter-spacing: 0.5px;
-    }
-
-    .match-footer {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
-    }
-
-    .streak-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      background: rgba(255,255,255,0.03);
-      padding: 8px 12px;
-      border-radius: 8px;
-      width: 100%;
-      border: 1px solid var(--border);
-    }
-
-    .streak-team {
-      flex: 1;
-      font-weight: 600;
-      color: var(--text-primary);
-      font-size: 15px;
-      text-align: left;
-    }
-
-    .streak-badge {
-      background: var(--accent-gradient);
-      color: #fff;
-      font-size: 15px;
-      font-weight: 700;
-      padding: 4px 14px;
-      border-radius: 20px;
-      white-space: nowrap;
-    }
-
-    .streak-odds {
-      font-weight: 700;
-      color: #4caf50;
-      font-size: 15px;
-      min-width: 40px;
-      text-align: right;
-    }
-
-    .tip-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .tip-badge {
-      background: var(--accent-gradient);
-      color: white;
-      font-size: 19px;
-      font-weight: 700;
-      padding: 9px 22px;
-      border-radius: 8px;
-      display: inline-block;
-      letter-spacing: 0.3px;
-    }
-
-    .probability {
-      font-size: 19px;
-      font-weight: 700;
-      color: var(--text-primary);
-      text-align: right;
-    }
-
-    .loading {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 64px 48px;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .progress-bar-container {
-      width: 220px;
-      height: 6px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 3px;
-      overflow: hidden;
-    }
-
-    .progress-bar {
-      height: 100%;
-      background: var(--accent-gradient);
-      border-radius: 3px;
-      width: 0%;
-      animation: progress 1.5s ease-in-out infinite;
-    }
-
-    @keyframes progress {
-      0% { width: 0%; margin-left: 0%; }
-      50% { width: 70%; margin-left: 15%; }
-      100% { width: 0%; margin-left: 100%; }
-    }
-
-    .loading-text {
-      font-size: 14px;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(255,255,255,0.06);
-      border-top: 3px solid var(--accent);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    .no-matches {
-      text-align: center;
-      padding: 48px 24px;
-      color: var(--text-muted);
-    }
-
-    .no-matches a {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .no-matches a:hover {
-      text-decoration: underline;
-    }
-
-    .disclaimer {
-      text-align: center;
-      padding: 28px 16px;
-      font-size: 13px;
-      color: var(--text-muted);
-      max-width: 640px;
-      margin: 0 auto;
-      line-height: 1.7;
-      border-top: 1px solid var(--border);
-    }
-
-    .disclaimer strong {
-      color: var(--text-secondary);
-    }
-
-    .streak-buttons {
-      display: flex;
-      gap: 12px;
-      padding: 20px 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .streak-btn {
-      flex: 1;
-      min-width: 180px;
-      padding: 18px 16px;
-      border: none;
-      border-radius: var(--radius);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      font-size: 15px;
-      font-weight: 600;
-      transition: all 0.25s ease;
-      text-decoration: none;
-      font-family: var(--font);
-    }
-
-    .streak-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-    }
-
-    .streak-btn.winstreak {
-      background: linear-gradient(135deg, #059669, #10b981);
-      color: white;
-    }
-
-    .streak-btn.losestreak {
-      background: linear-gradient(135deg, #dc2626, #ef4444);
-      color: white;
-    }
-
-    .streak-btn.drawstreak {
-      background: linear-gradient(135deg, #52525b, #71717a);
-      color: white;
-    }
-
-    .streak-icon {
-      font-size: 20px;
-    }
-
-    .streak-text {
-      font-size: 14px;
-    }
-
-    .news-section {
-      max-width: 900px;
-      margin: 40px auto;
-      padding: 0 12px;
-    }
-
-    .news-section h3 {
-      font-size: 22px;
-      text-align: center;
-      margin-bottom: 20px;
-      color: var(--text-primary);
-    }
-
-    .blog-section {
-      max-width: 1000px;
-      margin: 56px auto;
-      padding: 0 12px;
-    }
-
-    .blog-section h2 {
-      font-size: 28px;
-      text-align: center;
-      margin-bottom: 8px;
-      font-weight: 800;
-      letter-spacing: -0.3px;
-      background: linear-gradient(135deg, #e8edf5 0%, #94a3b8 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .blog-subtitle {
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 15px;
-      margin-bottom: 32px;
-    }
-
-    .blog-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-    }
-
-    .blog-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      text-decoration: none;
-      display: block;
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-
-    .blog-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-      border-color: rgba(255,36,72,0.3);
-      background: var(--bg-card-hover);
-    }
-
-    .blog-card .news-category {
-      font-size: 11px;
-      font-weight: 700;
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
-
-    .blog-card h4 {
-      font-size: 17px;
-      color: var(--text-primary);
-      margin: 14px 0 8px;
-      line-height: 1.35;
-      font-weight: 600;
-    }
-
-    .blog-card p {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin: 0;
-      line-height: 1.6;
-    }
-
-    .btn-primary {
-      display: inline-block;
-      background: var(--accent-gradient);
-      color: white;
-      padding: 12px 32px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 14px;
-      letter-spacing: 0.3px;
-      transition: all 0.2s;
-      font-family: var(--font);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 15px var(--glow);
-    }
-
-    @media (max-width: 768px) {
-      .blog-grid {
-        grid-template-columns: 1fr;
-      }
-      .blog-section h2 {
-        font-size: 24px;
-      }
-    }
-
-    .news-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-    }
-
-    .news-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      text-decoration: none;
-      display: block;
-      transition: all 0.2s;
-      cursor: pointer;
-    }
-
-    .news-card:hover {
-      transform: translateY(-2px);
-      border-color: var(--border-hover);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-    }
-
-    .news-source {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .news-title {
-      font-size: 14px;
-      color: var(--text-primary);
-      margin: 8px 0 0;
-      line-height: 1.4;
-    }
-
-    .view-all-link {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 14px;
-    }
-
-    .view-all-link:hover {
-      text-decoration: underline;
-    }
-
-    @media (max-width: 768px) {
-      .news-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (max-width: 480px) {
-      .news-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    footer {
-      background: var(--bg-secondary);
-      border-top: 1px solid var(--border);
-      padding: 40px 16px 32px;
-      margin-top: auto;
-    }
-
-    .footer-content {
-      max-width: 960px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .footer-links {
-      display: flex;
-      justify-content: center;
-      gap: 28px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    .footer-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 14px;
-      transition: color 0.2s;
-    }
-
-    .footer-links a:hover {
-      color: var(--accent);
-    }
-
-    .footer-copyright {
-      color: var(--text-muted);
-      font-size: 13px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .fade-in {
-      animation: fadeIn 0.3s ease-in;
-    }
-
-    @media (min-width: 640px) {
-      .matches-grid {
-        grid-template-columns: repeat(2, 1fr);
-        max-width: 900px;
-      }
-      .hero h1 {
-        font-size: 46px;
-      }
-      .hero-subtext {
-        font-size: 17px;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .logo { font-size: 19px; }
-      nav { gap: 16px; }
-      nav a { font-size: 13px; }
-    }
-
-    @media (max-width: 480px) {
-      .header-content {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-      }
-      .hero h1 {
-        font-size: 28px;
-      }
-      .tabs-container {
-        gap: 6px;
-      }
-      .tab-btn {
-        padding: 8px 14px;
-        font-size: 13px;
-      }
-      .stats-bar {
-        gap: 32px;
-        padding: 16px;
-      }
-      .stat-value {
-        font-size: 24px;
-      }
-      .streak-btn {
-        min-width: 140px;
-        padding: 14px 12px;
-        font-size: 13px;
-      }
-    }
-
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.7);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      backdrop-filter: blur(8px);
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal-content {
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      max-width: 600px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    .modal-header {
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      padding: 20px 24px;
-      border-radius: 16px 16px 0 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .modal-header h2 {
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .modal-close {
-      background: none;
-      border: none;
-      color: var(--text-secondary);
-      font-size: 28px;
-      cursor: pointer;
-      padding: 0;
-      line-height: 1;
-      transition: color 0.2s;
-    }
-
-    .modal-close:hover {
-      color: var(--text-primary);
-    }
-
-    .modal-body {
-      padding: 24px;
-      color: var(--text-primary);
-    }
-
-    .analysis-section {
-      margin-bottom: 24px;
-    }
-
-    .analysis-section h3 {
-      font-size: 14px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid var(--accent);
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .analysis-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .analysis-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      padding: 16px;
-      border-radius: var(--radius);
-    }
-
-    .stats-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-
-    .stats-table th,
-    .stats-table td {
-      padding: 10px 14px;
-      text-align: center;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .stats-table th {
-      background: rgba(255,255,255,0.03);
-      color: var(--text-muted);
-      font-weight: 600;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-    }
-
-    .stats-table td:first-child {
-      text-align: left;
-      color: var(--text-primary);
-      font-weight: 500;
-    }
-
-    .stats-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    .stats-table tbody tr:hover {
-      background: rgba(255,255,255,0.02);
-    }
-
-    .analysis-card h4 {
-      font-size: 11px;
-      margin-bottom: 8px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .team-analysis {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .team-name {
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--text-primary);
-    }
-
-    .form-bar {
-      display: flex;
-      gap: 4px;
-    }
-
-    .form-result {
-      width: 22px;
-      height: 22px;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      font-weight: bold;
-      color: white;
-    }
-
-    .form-win { background: #10b981; }
-    .form-draw { background: #f59e0b; }
-    .form-loss { background: #ef4444; }
-
-    .squad-strength {
-      display: flex;
-      gap: 12px;
-      margin-top: 8px;
-    }
-
-    .strength-item {
-      text-align: center;
-      flex: 1;
-    }
-
-    .strength-value {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--accent);
-    }
-
-    .strength-label {
-      font-size: 10px;
-      color: var(--text-muted);
-    }
-
-    .prediction-reason {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      padding: 16px;
-      border-radius: var(--radius);
-      border-left: 4px solid var(--accent);
-    }
-
-    .prediction-reason h4 {
-      color: var(--accent);
-      font-size: 14px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .prediction-reason p {
-      font-size: 13px;
-      line-height: 1.6;
-      color: var(--text-secondary);
-    }
-
-    @media (max-width: 500px) {
-      .analysis-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .featured-cta {
-      margin: 0 auto 40px;
-      max-width: 560px;
-      background: linear-gradient(135deg, rgba(20, 28, 42, 0.95), rgba(11, 15, 26, 0.95));
-      border: 1px solid rgba(255,36,72,0.15);
-      border-radius: var(--radius-lg);
-      padding: 32px 36px;
-      text-align: center;
-    }
-
-    .featured-cta .label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 10px;
-    }
-
-    .featured-cta h3 {
-      margin: 0 0 10px;
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    .featured-cta p {
-      margin: 0 auto 18px;
-      font-size: 14px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      max-width: 440px;
-    }
-
-    .featured-cta a {
-      display: inline-block;
-      background: var(--accent-gradient);
-      color: #fff;
-      padding: 12px 32px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 15px;
-      transition: all 0.2s;
-    }
-
-    .featured-cta a:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 20px var(--glow);
-    }
-  </style>
-  </head>
-<body>
-
-  <div>
-    <header>
-      <div class="header-content">
-          <div class="logo">
-            <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">WinFulltime</a>
-          </div>
-        <nav>
-          <a href="/" class="active">Home</a>
-          <a href="/ticket-builder.html">Ticket Builder</a>
-          <a href="/blog/">Blog</a>
-          <a href="/about.html">About</a>
-          <a href="/contact.html">Contact</a>
-        </nav>
-      </div>
-    </header>
-
-
-
-    <main class="container">
-      <div class="hero">
-        <h1>Football Predictions<br>For Today</h1>
-        <p class="hero-subtext">Data-driven predictions across 1X2, Over/Under, BTTS &amp; unbeaten markets â€” updated daily</p>
-        <p class="hero-date" id="currentDate"></p>
-      </div>
-
-      <div class="tabs-container" id="dayTabs"></div>
-
-      <div class="tabs-container" id="categoryTabs">
-        <button onclick="setCategory('1x2')" id="tab-1x2" class="tab-btn active">1X2</button>
-        <button onclick="setCategory('over15')" id="tab-over15" class="tab-btn">Over 1.5</button>
-        <button onclick="setCategory('over25')" id="tab-over25" class="tab-btn">Over 2.5</button>
-        <button onclick="setCategory('unbeaten')" id="tab-unbeaten" class="tab-btn">ðŸ”¥ Unbeaten</button>
-        <button onclick="setCategory('btts')" id="tab-btts" class="tab-btn">BTTS YES</button>
-        <button onclick="setCategory('bttsno')" id="tab-bttsno" class="tab-btn">BTTS NO</button>
-
-      </div>
-
-      <div class="stats-bar" id="statsBar">
-        <div class="stat-item">
-          <div class="stat-value" id="totalMatches">0</div>
-          <div class="stat-label">Matches</div>
-        </div>
-      </div>
-
-      <div id="content">
-        <div class="loading">
-          <div class="progress-bar-container">
-            <div class="progress-bar"></div>
-          </div>
-          <span class="loading-text">Loading predictions...</span>
-        </div>
-      </div>
-
-      <!-- Streak Buttons -->
-      <div class="streak-buttons">
-        <a href="#" onclick="event.preventDefault(); setCategory('winstreak')" class="streak-btn winstreak">
-          <span class="streak-icon">ðŸ”¥</span>
-          <span class="streak-text">Winning Streak</span>
-        </a>
-        <a href="#" onclick="event.preventDefault(); setCategory('losestreak')" class="streak-btn losestreak">
-          <span class="streak-icon">ðŸ“‰</span>
-          <span class="streak-text">Losing Streak</span>
-        </a>
-        <a href="#" onclick="event.preventDefault(); setCategory('drawstreak')" class="streak-btn drawstreak">
-          <span class="streak-icon">âž–</span>
-          <span class="streak-text">Draws Streak</span>
-        </a>
-      </div>
-
-      <!-- Blog Section -->
-      <div class="blog-section">
-        <h2>Betting Guides</h2>
-        <p class="blog-subtitle">Learn how to bet smarter with our expert guides</p>
-        <div id="homeBlogGrid" class="blog-grid"></div>
-        <div style="text-align: center; margin-top: 24px;">
-          <a href="/blog/" class="btn-primary">View All Guides</a>
-        </div>
-      </div>
-
-
-
-      <div class="featured-cta">
-        <div class="label">Featured Tool</div>
-        <h3>Build Winning Accumulator Tickets</h3>
-        <p>Generate optimized accumulator combinations from today's AI-powered predictions. Set your target odds and get instant ticket suggestions.</p>
-        <a href="/ticket-builder.html">Try Ticket Builder &rarr;</a>
-      </div>
-
-      <div class="disclaimer">
-        <p><strong>18+ Only</strong> â€” Predictions are for informational purposes only. Please gamble responsibly.</p>
-        <p>Gambling involves financial risk and may lead to addiction. If you or someone you know has a gambling problem, please seek help from a professional organization.</p>
-      </div>
-    </main>
-  </div>
-
-  <script>
-    console.log('Script starting...');
-    try {
-    let currentData = null;
-    let currentCategory = '1x2';
-    let currentDayOffset = 0;
-
-    function getServerDate() {
-      const now = new Date();
-      const parts = new Intl.DateTimeFormat('en-CA', {
-        timeZone: 'Africa/Lagos',
-        year: 'numeric', month: '2-digit', day: '2-digit'
-      }).formatToParts(now);
-      return new Date(
-        parseInt(parts.find(p => p.type === 'year').value),
-        parseInt(parts.find(p => p.type === 'month').value) - 1,
-        parseInt(parts.find(p => p.type === 'day').value)
-      );
-    }
-
-    function formatServerDate(date, options) {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const dateStr = `${year}-${month}-${day}`;
-      return new Date(`${year}-${month}-${day}T12:00:00`).toLocaleDateString('en-US', options);
-    }
-
-    // Check URL for category parameter
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlCategory = urlParams.get('category');
-    if (urlCategory && ['winstreak', 'losestreak', 'drawstreak', 'unbeaten'].includes(urlCategory)) {
-      currentCategory = urlCategory;
-    }
-
-    function getDateStr(offset) {
-      const baseDate = getServerDate();
-      baseDate.setDate(baseDate.getDate() + offset);
-      const year = baseDate.getFullYear();
-      const month = String(baseDate.getMonth() + 1).padStart(2, '0');
-      const day = String(baseDate.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
-
-    function getDaysArray() {
-      const days = [];
-      const baseDate = getServerDate();
-      baseDate.setHours(0, 0, 0, 0);
-      
-      for (let i = -1; i <= 1; i++) {
-        const date = new Date(baseDate);
-        date.setDate(baseDate.getDate() + i);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const dateStr = `${year}-${month}-${day}`;
-        days.push({
-          offset: i,
-          dateStr: dateStr,
-          label: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : i === -1 ? 'Yesterday' : date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
-        });
-      }
-      return days;
-    }
-
-    function renderDayTabs() {
-      const days = getDaysArray();
-      const container = document.getElementById('dayTabs');
-      container.innerHTML = days.map(day => `
-        <button onclick="switchDay(${day.offset})" 
-          class="tab-btn ${day.offset === currentDayOffset ? 'active' : ''}">
-          ${day.label}
-        </button>
-      `).join('');
-    }
-
-    function switchDay(offset) {
-      currentDayOffset = offset;
-      renderDayTabs();
-      if (currentCategory === 'unbeaten') {
-        renderUnbeaten();
-      } else if (currentData) {
-        renderMatches();
-      }
-    }
-
-    function checkAuth() {
-      const user = localStorage.getItem('user');
-      return user ? JSON.parse(user) : null;
-    }
-
-    function setCategory(cat) {
-      currentCategory = cat;
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        if (btn.id.startsWith('tab-')) {
-          btn.classList.remove('active');
-        }
-      });
-      const tabBtn = document.getElementById(`tab-${cat}`);
-      if (tabBtn) tabBtn.classList.add('active');
-      
-      const dayTabs = document.getElementById('dayTabs');
-      if (cat === 'winstreak' || cat === 'losestreak' || cat === 'drawstreak') {
-        dayTabs.style.display = 'none';
-      } else {
-        dayTabs.style.display = '';
-      }
-      
-      if (cat === 'unbeaten') {
-        renderUnbeaten();
-      } else if (currentData) {
-        renderMatches();
-      }
-    }
-
-    function getCategoryLabel(cat) {
-      const labels = { '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5', 'btts': 'BTTS YES', 'bttsno': 'BTTS NO', 'corners': 'Corners', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak', 'teamtoscore2plus': 'To Score 2+', 'cards': 'Cards' };
-      return labels[cat] || cat;
-    }
-
-    let unbeatenData = null;
-
-    async function loadUnbeatenData() {
-      try {
-        const res = await fetch('/data/h2h-unbeaten.json');
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        unbeatenData = await res.json();
-      } catch (e) {
-        console.error('Failed to load unbeaten data:', e.message);
-        unbeatenData = { dates: {} };
-      }
-      if (currentCategory === 'unbeaten') renderUnbeaten();
-    }
-
-    function renderUnbeaten() {
-      const content = document.getElementById('content');
-      const targetDate = getServerDate();
-      targetDate.setDate(targetDate.getDate() + currentDayOffset);
-      const y = targetDate.getFullYear();
-      const m = String(targetDate.getMonth() + 1).padStart(2, '0');
-      const d = String(targetDate.getDate()).padStart(2, '0');
-      const dateStr = `${y}-${m}-${d}`;
-      const matches = (unbeatenData && unbeatenData.dates && unbeatenData.dates[dateStr]) || [];
-
-      if (matches.length === 0) {
-        let dayLabel = currentDayOffset === 0 ? 'today' : currentDayOffset === 1 ? 'tomorrow' : currentDayOffset === -1 ? 'yesterday' : `on ${dateStr}`;
-        content.innerHTML = `
-          <div class="no-matches">
-            <p>No unbeaten streak data for ${dayLabel}. Data updates daily at 4:00 AM (WAT).</p>
-          </div>
-        `;
-        document.getElementById('totalMatches').textContent = '0';
-        return;
-      }
-      document.getElementById('totalMatches').textContent = matches.length;
-      const html = matches.map((match, i) => {
-        const streaksHtml = match.streaks.map(s => {
-          const loc = s.location ? ` ${s.location}` : '';
-          return `
-          <div class="streak-row">
-            <span class="streak-team">${s.team}</span>
-            <span class="streak-badge">${s.count} unbeaten${loc}</span>
-          </div>
-        `}).join('');
-        return `
-          <div class="match-card fade-in" style="animation-delay: ${i * 50}ms">
-            <div class="match-header">
-              <span>${match.league}</span>
-              <span>${match.time}</span>
-            </div>
-            <div class="match-teams" style="justify-content: center;">
-              <span class="team team-home" style="text-align: center; width: 100%;">${match.match}</span>
-            </div>
-            <div class="match-footer" style="flex-direction: column; gap: 6px;">
-              ${streaksHtml}
-            </div>
-          </div>
-        `;
-      }).join('');
-      content.innerHTML = `<div class="matches-grid">${html}</div>`;
-    }
-
-    function getTipLabel(tip) {
-      const labels = { '1': 'Home Win', 'X': 'Draw', '2': 'Away Win', 'Over 1.5': 'Over 1.5', 'Over 2.5': 'Over 2.5', 'BTTS YES': 'BTTS YES', 'BTTS NO': 'BTTS NO', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak' };
-      return labels[tip] || tip;
-    }
-
-    function renderMatches() {
-      try {
-      const content = document.getElementById('content');
-      
-      if (currentCategory === 'unbeaten') {
-        renderUnbeaten();
-        return;
-      }
-
-      if (!currentData || !currentData.success) {
-        content.innerHTML = `
-          <div class="text-center py-12 text-muted-foreground">
-            <p>No data available</p>
-          </div>
-        `;
-        return;
-      }
-
-      let matches = [];
-      if (currentCategory === '1x2') matches = currentData.matches || [];
-      else if (currentCategory === 'over15') matches = currentData.over15Matches || [];
-      else if (currentCategory === 'over25') matches = currentData.over25Matches || [];
-      else if (currentCategory === 'btts') matches = currentData.bttsMatches || [];
-      else if (currentCategory === 'bttsno') matches = currentData.bttsNoMatches || [];
-      else if (currentCategory === 'corners') matches = currentData.cornersMatches || [];
-      else if (currentCategory === 'winstreak') matches = currentData.winstreakMatches || [];
-      else if (currentCategory === 'losestreak') matches = currentData.losestreakMatches || [];
-      else if (currentCategory === 'drawstreak') matches = currentData.drawstreakMatches || [];
-      else if (currentCategory === 'teamtoscore2plus') matches = currentData.teamToScore2PlusMatches || [];
-      else if (currentCategory === 'cards') matches = currentData.cardsMatches || [];
-
-      let filtered;
-      const targetDate = getServerDate();
-      targetDate.setHours(0, 0, 0, 0);
-      targetDate.setDate(targetDate.getDate() + currentDayOffset);
-      const year = targetDate.getFullYear();
-      const month = String(targetDate.getMonth() + 1).padStart(2, '0');
-      const day = String(targetDate.getDate()).padStart(2, '0');
-      const targetDateStr = `${year}-${month}-${day}`;
-
-      if (currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak') {
-        filtered = matches.filter(m => m.date === targetDateStr || m.nextMatchDate === targetDateStr);
-      } else if (currentCategory === 'corners') {
-        filtered = matches.filter(m => m.date === targetDateStr);
-      } else if (currentCategory === 'teamtoscore2plus' || currentCategory === 'cards') {
-        filtered = matches;
-      } else if (currentCategory === 'bttsno') {
-        filtered = matches.filter(m => m.date === targetDateStr);
-      } else {
-        console.log('Target date:', targetDateStr, 'Category:', currentCategory, 'Total matches:', matches.length);
-        
-        filtered = matches.filter(m => m.date === targetDateStr);
-        
-        console.log('Filtered matches:', filtered.length, 'Sample dates:', filtered.slice(0,3).map(m=>m.date));
-      }
-
-      if (filtered.length === 0) {
-        let dayLabel = currentDayOffset === 0 ? 'Today' : currentDayOffset === 1 ? 'Tomorrow' : currentDayOffset === -1 ? 'Yesterday' : `on ${targetDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
-        let available = [];
-        if (currentData.dates) {
-          available = currentData.dates.filter(d => matches.some(m => m.date === d));
-        }
-        let fallbackHtml = `<p>No ${getCategoryLabel(currentCategory)} predictions ${dayLabel}</p>`;
-        if (available.length > 0 && currentDayOffset === 0) {
-          const nextDate = available[0];
-          const d = new Date(nextDate + 'T12:00:00');
-          fallbackHtml += `<p style="margin-top: 12px; font-size: 14px;">Try <a href="#" onclick="switchDay(${Math.ceil((d - getServerDate()) / 86400000)}); return false;" style="color: #ff0000;">${d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</a> (${available.length} matches available)</p>`;
-        }
-        content.innerHTML = `
-          <div class="no-matches">
-            ${fallbackHtml}
-          </div>
-        `;
-        document.getElementById('totalMatches').textContent = '0';
-        return;
-      }
-
-      const isStreakTab = currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak';
-      const isTeamToScore = currentCategory === 'teamtoscore2plus' || currentCategory === 'cards';
-      let displayMatches = filtered;
-
-      document.getElementById('totalMatches').textContent = filtered.length;
-
-      const html = displayMatches.map((match, i) => {
-        const matchStr = match.match || match.nextMatch || '';
-        const teams = matchStr.includes(' - ') ? matchStr.split(' - ') : matchStr.split(' vs ');
-        const home = teams[0]?.trim() || '';
-        const away = teams[1]?.trim() || '';
-        const hasScore = (match.score && match.score.home != null && match.score.away != null) || 
-                         (match.result && match.result.home != null && match.result.away != null);
-        const displayScore = match.result || match.score;
-        const matchData = encodeURIComponent(JSON.stringify(match));
-        
-        const isWinstreak = currentCategory === 'winstreak';
-        const isLosestreak = currentCategory === 'losestreak';
-        const isDrawstreak = currentCategory === 'drawstreak';
-        
-        let streakLabel = match.tip;
-        if (isWinstreak) streakLabel = `Winning Streak: ${match.streak || ''}`;
-        else if (isLosestreak) streakLabel = `Losing Streak: ${match.streak || ''}`;
-        else if (isDrawstreak) streakLabel = `Draws Streak: ${match.streak || ''}`;
-        else if (isTeamToScore) streakLabel = match.tip || 'Score 2+ Goals';
-
-        return `
-          <div class="match-card fade-in" style="animation-delay: ${i * 50}ms" data-match="${matchData}">
-            <div class="match-header">
-              <span></span>
-              <span>${match.time}</span>
-            </div>
-            ${(isWinstreak || isLosestreak || isDrawstreak) ? `
-              <div class="match-teams" style="justify-content: center;">
-                <span class="team team-home" style="text-align: center; width: 100%;">${home}</span>
-              </div>
-              <div class="match-footer">
-                <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
-                  <span class="tip-badge">${streakLabel}</span>
-                  <div class="probability">${match.probability}%</div>
-                </div>
-              </div>
-            ` : isTeamToScore ? `
-              <div class="match-teams" style="justify-content: center;">
-                <span class="team team-home" style="text-align: center; width: 100%;">${match.match}</span>
-              </div>
-              <div class="match-footer">
-                <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
-                  <span class="tip-badge">${streakLabel}</span>
-                  <div class="probability">${match.probability}%</div>
-                </div>
-              </div>
-            ` : `
-              <div class="match-teams">
-                <span class="team team-home">${home}</span>
-                ${hasScore ? 
-                  `<span class="vs-score score-display">${displayScore.home} - ${displayScore.away}</span>` : 
-                  `<span class="vs-score">vs</span>`
-                }
-                <span class="team team-away">${away}</span>
-              </div>
-              <div class="match-footer">
-                <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
-                  <span class="tip-badge">${match.tip}</span>
-                  <div class="probability">${match.probability}%</div>
-                </div>
-              </div>
-            `}
-          </div>
-        `;
-      }).join('');
-
-      content.innerHTML = `<div class="matches-grid">${html}</div>`;
-      
-      document.querySelectorAll('.match-card').forEach(card => {
-        card.style.cursor = 'default';
-      });
-
-      const dt = document.getElementById('dayTabs');
-      if (dt) {
-        dt.style.display = (currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak') ? 'none' : '';
-      }
-      } catch (error) {
-        console.error('Error rendering matches:', error);
-        content.innerHTML = `
-          <div class="no-matches">
-            <p>Error rendering matches: ${error.message}</p>
-          </div>
-        `;
-      }
-    }
-
-    async function loadPredictions() {
-      console.log('loadPredictions called');
-      const content = document.getElementById('content');
-      content.innerHTML = `
-        <div class="loading">
-          <div class="progress-bar-container">
-            <div class="progress-bar"></div>
-          </div>
-          <span class="loading-text">Loading predictions...</span>
-        </div>
-      `;
-
-      try {
-        console.log('Fetching predictions...');
-        const response = await fetch('/data/predictions.json');
-        if (!response.ok) {
-          throw new Error(`HTTP error: ${response.status}`);
-        }
-        currentData = await response.json();
-        renderDayTabs();
-        const dateDisplay = document.getElementById('currentDate');
-        if (dateDisplay) {
-          const serverDate = getServerDate();
-          const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-          dateDisplay.textContent = serverDate.toLocaleDateString('en-US', options);
-        }
-        console.log('Data received:', JSON.stringify(currentData).substring(0, 500));
-        console.log('Calling renderMatches...');
-        renderMatches();
-        console.log('renderMatches completed');
-      } catch (error) {
-        console.error('Error loading predictions:', error);
-        content.innerHTML = `
-          <div class="no-matches">
-            <p>Predictions currently unavailable. The data may still be generating. Check back soon.</p>
-          </div>
-        `;
-      }
-    }
-
-
-
-renderDayTabs();
-    loadPredictions();
-    loadRandomBlogPosts();
-    loadUnbeatenData();
-    console.log('loadPredictions called, waiting...');
-    
-    async function loadRandomBlogPosts() {
-      const blogGrid = document.getElementById('homeBlogGrid');
-      const blogPosts = [
-        { url: '/blog/1x2-betting-guide', category: 'Beginner', title: 'Understanding 1X2 Betting', desc: 'Learn the most popular football betting market' },
-        { url: '/blog/what-is-over-under-betting', category: 'Beginner', title: 'Over/Under Betting Guide', desc: 'Master the goal total markets' },
-        { url: '/blog/value-betting-explained', category: 'Strategy', title: 'Value Betting Explained', desc: 'Find odds better than they should be' },
-        { url: '/blog/premier-league-betting-guide', category: 'League Guide', title: 'Premier League Betting', desc: 'Complete EPL betting guide' },
-        { url: '/blog/btts-betting-guide', category: 'Beginner', title: 'BTTS Betting Guide', desc: 'Both Teams to Score explained' },
-        { url: '/blog/bankroll-management-guide', category: 'Strategy', title: 'Bankroll Management', desc: 'Protect your money with proven strategies' },
-        { url: '/blog/asian-handicap-betting-guide', category: 'Strategy', title: 'Asian Handicap Guide', desc: 'Master the Asian handicap market' },
-        { url: '/blog/football-betting-strategies', category: 'Strategy', title: 'Betting Strategies That Work', desc: 'Proven techniques for better bets' },
-        { url: '/blog/how-to-read-football-betting-odds', category: 'Beginner', title: 'How to Read Odds', desc: 'Understanding decimal, fractional, American odds' },
-        { url: '/blog/expected-goals-xg-betting', category: 'Analysis', title: 'Using xG for Better Bets', desc: 'Expected Goals explained simply' },
-        { url: '/blog/using-statistics-for-betting', category: 'Analysis', title: 'Statistical Analysis for Betting', desc: 'What stats actually matter' },
-        { url: '/blog/analyze-football-match-betting', category: 'Analysis', title: 'How to Analyze a Match', desc: 'Step-by-step match analysis' },
-        { url: '/blog/inplay-betting-strategies', category: 'Strategy', title: 'In-Play Betting Strategies', desc: 'Live betting done right' },
-        { url: '/blog/betting-on-draws', category: 'Strategy', title: 'Betting on Draws', desc: 'Find value in the draw market' },
-        { url: '/blog/responsible-gambling-guide', category: 'Responsible', title: 'Responsible Gambling', desc: 'Betting should be fun' },
-        { url: '/blog/la-liga-betting-guide', category: 'League Guide', title: 'La Liga Betting Guide', desc: 'Barcelona, Real Madrid & more' },
-        { url: '/blog/serie-a-betting-guide', category: 'League Guide', title: 'Serie A Betting Guide', desc: 'Italian football explained' },
-        { url: '/blog/bundesliga-betting-guide', category: 'League Guide', title: 'Bundesliga Betting Guide', desc: 'German football coverage' }
-      ];
-      
-      const shuffled = blogPosts.sort(() => 0.5 - Math.random());
-      const selected = shuffled.slice(0, 4);
-      
-      const html = selected.map(post => `
-        <a href="${post.url}" class="blog-card">
-          <span class="news-category">${post.category}</span>
-          <h4>${post.title}</h4>
-          <p>${post.desc}</p>
-        </a>
-      `).join('');
-      
-      blogGrid.innerHTML = html;
-    }
-    
-    } catch (error) {
-      console.error('Script error:', error);
-      alert('Script error: ' + error.message);
-    }
-  </script>
-  <footer>
-    <div class="footer-content">
-      <div style="text-align:center;margin-bottom:24px;">
-        <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">
-          Support WinFulltime &mdash; your donations keep all predictions free.
-        </p>
-        <a href="https://ko-fi.com/winfulltime" target="_blank" rel="noopener" style="display:inline-block;background:var(--accent-gradient);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;transition:all 0.2s;">
-          â˜• Donate on Ko-fi
-        </a>
-      </div>
-      <div class="footer-links">
-        <a href="/">Home</a>
-        <a href="/ticket-builder.html">Ticket Builder</a>
-        <a href="/blog/">Blog</a>
-        <a href="/about.html">About</a>
-        <a href="/advertise.html">Advertise</a>
-        <a href="/contact.html">Contact</a>
-        <a href="/terms.html">Terms</a>
-        <a href="/privacy.html">Privacy</a>
-        <a href="/sitemap.xml">Sitemap</a>
-      </div>
-      <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
-    </div>
-  </footer>
-  <script src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP" async></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-HMGZMW9EDP');
-  </script>
-<script src="/chat-widget.js"></script>
-</body>
-</html>
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>WinFulltime - Free AI Football Predictions Today | 1X2, O/U, BTTS</title>
+ <meta name="description" content="Get free AI-powered football predictions today. Expert 1X2, over 1.5, over 2.5, BTTS, and team to score tips. Win streak, losing streak stats included.">
+ <meta name="keywords" content="AI football predictions, betting tips, soccer predictions, 1X2 predictions, over/under tips, BTTS, team to score, daily predictions, AI predictions">
+ <meta property="og:title" content="WinFulltime - Free AI Football Predictions Today">
+ <meta property="og:url" content="https://winfulltime.com/">
+ <meta property="og:description" content="Get free AI-powered football predictions daily. Expert tips for 1X2, Over/Under, BTTS, and Team to Score.">
+ <meta property="og:image" content="https://winfulltime.com/winfulltimelogo.png">
+ <meta property="og:type" content="website">
+ <meta name="twitter:card" content="summary_large_image">
+ <meta name="twitter:title" content="WinFulltime - Free AI Football Predictions Today">
+ <meta name="twitter:description" content="Get free AI-powered football predictions daily. Expert tips for 1X2, Over/Under, BTTS, and Team to Score.">
+ <meta name="twitter:image" content="https://winfulltime.com/winfulltimelogo.png">
+ <link rel="canonical" href="https://winfulltime.com/">
+ <meta name="p:domain_verify" content="ea6fdcfb1731666c03500a5d385f306f"/>
+ <link rel="icon" href="/winfulltimelogo.png" type="image/png">
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="/styles.css">
+ <script type="application/ld+json">
+ {
+ "@context": "https://schema.org",
+ "@type": "WebSite",
+ "name": "WinFulltime",
+ "url": "https://winfulltime.com",
+ "description": "Free football predictions for today. Expert tips for 1X2, Over/Under, BTTS, and Team to Score.",
+ "publisher": {
+ "@type": "Organization",
+ "name": "WinFulltime",
+ "logo": {
+ "@type": "ImageObject",
+ "url": "https://winfulltime.com/winfulltimelogo.png"
+ }
+ },
+ "potentialAction": {
+ "@type": "SearchAction",
+ "target": "https://winfulltime.com/analysis.html?home={search_term_string}",
+ "query-input": "required name=search_term_string"
+ }
+ }
+</script>
+ <style>
+ :root {
+ --bg-primary: #0b0f1a;
+ --bg-secondary: #111827;
+ --bg-card: rgba(23, 28, 46, 0.85);
+ --bg-card-hover: rgba(30, 36, 56, 0.95);
+ --bg-elevated: #1a1f2e;
+ --text-primary: #e8edf5;
+ --text-secondary: #c8d0db;
+ --text-muted: #94a3b8;
+ --accent: #ff2448;
+ --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+ --border: rgba(255,255,255,0.06);
+ --border-hover: rgba(255,255,255,0.12);
+ --glow: rgba(255,36,72,0.12);
+ --radius: 12px;
+ --radius-lg: 16px;
+ --font: 'Inter', system-ui, -apple-system, sans-serif;
+ }
+
+[data-theme="light"] {
+--bg-primary: #f4f6fa;
+--bg-secondary: #ffffff;
+--bg-card: rgba(255,255,255,0.9);
+--bg-card-hover: rgba(240,242,245,0.95);
+--bg-elevated: #e8ecf1;
+--text-primary: #1a1d23;
+--text-secondary: #4a4f59;
+--text-muted: #6b7280;
+--accent: #ff2448;
+--accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+--border: rgba(0,0,0,0.08);
+--border-hover: rgba(0,0,0,0.14);
+--glow: rgba(255,36,72,0.08);
+--radius: 12px;
+--radius-lg: 16px;
+--font: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+ * {
+ margin: 0;
+ padding: 0;
+ box-sizing: border-box;
+ }
+
+ body {
+ font-family: var(--font);
+ background: var(--bg-primary);
+ background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent);
+ color: var(--text-primary);
+ min-height: 100vh;
+ -webkit-font-smoothing: antialiased;
+ }
+
+ .container {
+ max-width: 960px;
+ margin: 0 auto;
+ padding: 0 16px;
+ }
+
+ header {
+ background: rgba(11, 15, 26, 0.85);
+ backdrop-filter: blur(20px);
+ -webkit-backdrop-filter: blur(20px);
+ border-bottom: 1px solid var(--border);
+ padding: 0;
+ position: sticky;
+ top: 0;
+ z-index: 100;
+ }
+
+ .header-content {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ padding: 14px 16px;
+ max-width: 960px;
+ margin: 0 auto;
+ }
+
+ .logo {
+ display: flex;
+ align-items: center;
+ font-size: 22px;
+ font-weight: 800;
+ letter-spacing: -0.5px;
+ }
+
+ .logo a {
+ display: inline-flex;
+ align-items: center;
+ gap: 8px;
+ color: var(--text-primary);
+ text-decoration: none;
+ }
+ .logo-icon { height: 28px; width: auto; flex-shrink: 0; margin-right: 8px; }
+ .logo span { color: #facc15; }
+ 
+ .logo .win {
+ color: #ffffff;
+ }
+
+ .logo .fulltime {
+ color: #ffffff;
+ }
+
+ nav {
+ display: flex;
+ gap: 24px;
+ }
+
+ nav a {
+ color: var(--text-muted);
+ text-decoration: none;
+ font-weight: 500;
+ font-size: 14px;
+ transition: color 0.2s;
+ position: relative;
+ padding: 4px 0;
+ }
+
+ nav a:hover {
+ color: var(--text-primary);
+ }
+
+ nav a.active {
+ color: var(--text-primary);
+ }
+
+ .theme-toggle {
+ background: none;
+ border: 1px solid var(--border);
+ border-radius: 8px;
+ padding: 4px 8px;
+ cursor: pointer;
+ font-size: 16px;
+ line-height: 1;
+ color: var(--text-muted);
+ transition: all 0.2s;
+ display: inline-flex;
+ align-items: center;
+ justify-content: center;
+ }
+
+.theme-toggle:hover {
+ border-color: var(--border-hover);
+ color: var(--text-primary);
+ }
+
+nav a.active::after {
+ content: '';
+ position: absolute;
+ bottom: -2px;
+ left: 0;
+ right: 0;
+ height: 2px;
+ background: var(--accent-gradient);
+ border-radius: 1px;
+ }
+
+ main {
+ padding: 32px 16px;
+ }
+
+ .hero {
+ text-align: center;
+ margin-bottom: 36px;
+ padding: 0 8px;
+ }
+
+ .hero h1 {
+ font-size: 38px;
+ font-weight: 800;
+ line-height: 1.15;
+ letter-spacing: -0.5px;
+ background: linear-gradient(135deg, #e8edf5 0%, #94a3b8 100%);
+ -webkit-background-clip: text;
+ -webkit-text-fill-color: transparent;
+ background-clip: text;
+ margin-bottom: 12px;
+ }
+
+ .hero-subtext {
+ font-size: 16px;
+ color: var(--text-secondary);
+ margin-top: 4px;
+ max-width: 600px;
+ margin-left: auto;
+ margin-right: auto;
+ line-height: 1.6;
+ }
+
+ .hero p {
+ font-size: 16px;
+ color: var(--text-secondary);
+ }
+
+ .hero-date {
+ font-size: 14px;
+ color: var(--text-muted);
+ margin-top: 16px;
+ font-weight: 500;
+ }
+
+ .stats-bar {
+ display: flex;
+ justify-content: center;
+ gap: 48px;
+ padding: 20px 24px;
+ margin-bottom: 28px;
+ background: var(--bg-card);
+ border: 1px solid var(--border);
+ border-radius: var(--radius-lg);
+ max-width: 500px;
+ margin-left: auto;
+ margin-right: auto;
+ }
+
+ .stat-item {
+ text-align: center;
+ }
+
+ .stat-value {
+ font-size: 30px;
+ font-weight: 800;
+ background: var(--accent-gradient);
+ -webkit-background-clip: text;
+ -webkit-text-fill-color: transparent;
+ background-clip: text;
+ line-height: 1.2;
+ }
+
+ .stat-label {
+ font-size: 12px;
+ color: var(--text-muted);
+ font-weight: 500;
+ letter-spacing: 0.3px;
+ }
+
+ .tabs-container {
+ display: flex;
+ flex-wrap: wrap;
+ justify-content: center;
+ gap: 8px;
+ margin-bottom: 24px;
+ }
+
+ .tab-btn {
+ padding: 10px 20px;
+ border-radius: 8px;
+ font-size: 14px;
+ font-weight: 600;
+ cursor: pointer;
+ transition: all 0.2s;
+ border: 1px solid var(--border);
+ background: var(--bg-card);
+ color: var(--text-secondary);
+ font-family: var(--font);
+ }
+
+ .tab-btn:hover {
+ border-color: var(--border-hover);
+ background: var(--bg-card-hover);
+ color: var(--text-primary);
+ }
+
+ .tab-btn.active {
+ background: var(--accent-gradient);
+ color: white;
+ border-color: transparent;
+ box-shadow: 0 4px 15px var(--glow);
+ }
+
+ .matches-grid {
+ display: grid;
+ grid-template-columns: 1fr;
+ gap: 12px;
+ max-width: 520px;
+ margin: 0 auto;
+ }
+
+ .match-card {
+ background: var(--bg-card);
+ border: 1px solid var(--border);
+ border-radius: var(--radius-lg);
+ padding: 22px 24px;
+ color: var(--text-primary);
+ transition: all 0.25s ease;
+ cursor: default;
+ backdrop-filter: blur(4px);
+ }
+
+ .match-card:hover {
+ transform: translateY(-2px);
+ border-color: rgba(255,255,255,0.1);
+ background: var(--bg-card-hover);
+ box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+ }
+
+ .match-header {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin-bottom: 14px;
+ font-size: 14px;
+ color: var(--text-muted);
+ font-weight: 500;
+ letter-spacing: 0.3px;
+ }
+
+ .match-teams {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin-bottom: 18px;
+ }
+
+ .team {
+ font-size: 18px;
+ font-weight: 600;
+ flex: 1;
+ line-height: 1.3;
+ }
+
+ .team-home {
+ text-align: right;
+ padding-right: 16px;
+ }
+
+ .team-away {
+ text-align: left;
+ padding-left: 16px;
+ }
+
+ .vs-score {
+ font-size: 15px;
+ color: var(--text-muted);
+ padding: 0 14px;
+ font-weight: 500;
+ }
+
+ .score-display {
+ font-weight: 700;
+ color: #fbbf24;
+ font-size: 22px;
+ letter-spacing: 0.5px;
+ }
+
+ .match-footer {
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ padding-top: 16px;
+ border-top: 1px solid var(--border);
+ }
+
+ .streak-row {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 8px;
+ background: rgba(255,255,255,0.03);
+ padding: 8px 12px;
+ border-radius: 8px;
+ width: 100%;
+ border: 1px solid var(--border);
+ }
+
+ .streak-team {
+ flex: 1;
+ font-weight: 600;
+ color: var(--text-primary);
+ font-size: 15px;
+ text-align: left;
+ }
+
+ .streak-badge {
+ background: var(--accent-gradient);
+ color: #fff;
+ font-size: 15px;
+ font-weight: 700;
+ padding: 4px 14px;
+ border-radius: 20px;
+ white-space: nowrap;
+ }
+
+ .streak-odds {
+ font-weight: 700;
+ color: #4caf50;
+ font-size: 15px;
+ min-width: 40px;
+ text-align: right;
+ }
+
+ .tip-row {
+ display: flex;
+ align-items: center;
+ gap: 12px;
+ }
+
+ .tip-badge {
+ background: var(--accent-gradient);
+ color: white;
+ font-size: 19px;
+ font-weight: 700;
+ padding: 9px 22px;
+ border-radius: 8px;
+ display: inline-block;
+ letter-spacing: 0.3px;
+ }
+
+ .probability {
+ font-size: 19px;
+ font-weight: 700;
+ color: var(--text-primary);
+ text-align: right;
+ }
+
+ .loading {
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ padding: 64px 48px;
+ flex-direction: column;
+ gap: 20px;
+ }
+
+ .progress-bar-container {
+ width: 220px;
+ height: 6px;
+ background: rgba(255,255,255,0.06);
+ border-radius: 3px;
+ overflow: hidden;
+ }
+
+ .progress-bar {
+ height: 100%;
+ background: var(--accent-gradient);
+ border-radius: 3px;
+ width: 0%;
+ animation: progress 1.5s ease-in-out infinite;
+ }
+
+ @keyframes progress {
+ 0% { width: 0%; margin-left: 0%; }
+ 50% { width: 70%; margin-left: 15%; }
+ 100% { width: 0%; margin-left: 100%; }
+ }
+
+ .loading-text {
+ font-size: 14px;
+ color: var(--text-muted);
+ font-weight: 500;
+ }
+
+ .spinner {
+ width: 40px;
+ height: 40px;
+ border: 3px solid rgba(255,255,255,0.06);
+ border-top: 3px solid var(--accent);
+ border-radius: 50%;
+ animation: spin 1s linear infinite;
+ }
+
+ .no-matches {
+ text-align: center;
+ padding: 48px 24px;
+ color: var(--text-muted);
+ }
+
+ .no-matches a {
+ color: var(--accent);
+ text-decoration: none;
+ font-weight: 600;
+ }
+
+ .no-matches a:hover {
+ text-decoration: underline;
+ }
+
+ .disclaimer {
+ text-align: center;
+ padding: 28px 16px;
+ font-size: 13px;
+ color: var(--text-muted);
+ max-width: 640px;
+ margin: 0 auto;
+ line-height: 1.7;
+ border-top: 1px solid var(--border);
+ }
+
+ .disclaimer strong {
+ color: var(--text-secondary);
+ }
+
+ .streak-buttons {
+ display: flex;
+ gap: 12px;
+ padding: 20px 12px;
+ flex-wrap: wrap;
+ justify-content: center;
+ max-width: 900px;
+ margin: 0 auto;
+ }
+
+ .streak-btn {
+ flex: 1;
+ min-width: 180px;
+ padding: 18px 16px;
+ border: none;
+ border-radius: var(--radius);
+ cursor: pointer;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ gap: 10px;
+ font-size: 15px;
+ font-weight: 600;
+ transition: all 0.25s ease;
+ text-decoration: none;
+ font-family: var(--font);
+ }
+
+ .streak-btn:hover {
+ transform: translateY(-2px);
+ box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+ }
+
+ .streak-btn.winstreak {
+ background: linear-gradient(135deg, #059669, #10b981);
+ color: white;
+ }
+
+ .streak-btn.losestreak {
+ background: linear-gradient(135deg, #dc2626, #ef4444);
+ color: white;
+ }
+
+ .streak-btn.drawstreak {
+ background: linear-gradient(135deg, #52525b, #71717a);
+ color: white;
+ }
+
+ .streak-icon {
+ font-size: 20px;
+ }
+
+ .streak-text {
+ font-size: 14px;
+ }
+
+ .news-section {
+ max-width: 900px;
+ margin: 40px auto;
+ padding: 0 12px;
+ }
+
+ .news-section h3 {
+ font-size: 22px;
+ text-align: center;
+ margin-bottom: 20px;
+ color: var(--text-primary);
+ }
+
+ .blog-section {
+ max-width: 1000px;
+ margin: 56px auto;
+ padding: 0 12px;
+ }
+
+ .blog-section h2 {
+ font-size: 28px;
+ text-align: center;
+ margin-bottom: 8px;
+ font-weight: 800;
+ letter-spacing: -0.3px;
+ background: linear-gradient(135deg, #e8edf5 0%, #94a3b8 100%);
+ -webkit-background-clip: text;
+ -webkit-text-fill-color: transparent;
+ background-clip: text;
+ }
+
+ .blog-subtitle {
+ text-align: center;
+ color: var(--text-muted);
+ font-size: 15px;
+ margin-bottom: 32px;
+ }
+
+ .blog-grid {
+ display: grid;
+ grid-template-columns: repeat(2, 1fr);
+ gap: 16px;
+ }
+
+ .blog-card {
+ background: var(--bg-card);
+ border: 1px solid var(--border);
+ border-radius: var(--radius-lg);
+ padding: 24px;
+ text-decoration: none;
+ display: block;
+ transition: all 0.3s ease;
+ cursor: pointer;
+ }
+
+ .blog-card:hover {
+ transform: translateY(-3px);
+ box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+ border-color: rgba(255,36,72,0.3);
+ background: var(--bg-card-hover);
+ }
+
+ .blog-card .news-category {
+ font-size: 11px;
+ font-weight: 700;
+ background: var(--accent-gradient);
+ -webkit-background-clip: text;
+ -webkit-text-fill-color: transparent;
+ background-clip: text;
+ text-transform: uppercase;
+ letter-spacing: 0.8px;
+ }
+
+ .blog-card h4 {
+ font-size: 17px;
+ color: var(--text-primary);
+ margin: 14px 0 8px;
+ line-height: 1.35;
+ font-weight: 600;
+ }
+
+ .blog-card p {
+ font-size: 13px;
+ color: var(--text-muted);
+ margin: 0;
+ line-height: 1.6;
+ }
+
+ .btn-primary {
+ display: inline-block;
+ background: var(--accent-gradient);
+ color: white;
+ padding: 12px 32px;
+ border-radius: 10px;
+ text-decoration: none;
+ font-weight: 700;
+ font-size: 14px;
+ letter-spacing: 0.3px;
+ transition: all 0.2s;
+ font-family: var(--font);
+ }
+
+ .btn-primary:hover {
+ transform: translateY(-1px);
+ box-shadow: 0 4px 15px var(--glow);
+ }
+
+ @media (max-width: 768px) {
+ .blog-grid {
+ grid-template-columns: 1fr;
+ }
+ .blog-section h2 {
+ font-size: 24px;
+ }
+ }
+
+ .news-grid {
+ display: grid;
+ grid-template-columns: repeat(4, 1fr);
+ gap: 16px;
+ }
+
+ .news-card {
+ background: var(--bg-card);
+ border: 1px solid var(--border);
+ border-radius: var(--radius);
+ padding: 16px;
+ text-decoration: none;
+ display: block;
+ transition: all 0.2s;
+ cursor: pointer;
+ }
+
+ .news-card:hover {
+ transform: translateY(-2px);
+ border-color: var(--border-hover);
+ box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+ }
+
+ .news-source {
+ font-size: 11px;
+ font-weight: 600;
+ color: var(--accent);
+ text-transform: uppercase;
+ letter-spacing: 0.5px;
+ }
+
+ .news-title {
+ font-size: 14px;
+ color: var(--text-primary);
+ margin: 8px 0 0;
+ line-height: 1.4;
+ }
+
+ .view-all-link {
+ color: var(--accent);
+ text-decoration: none;
+ font-weight: 500;
+ font-size: 14px;
+ }
+
+ .view-all-link:hover {
+ text-decoration: underline;
+ }
+
+ @media (max-width: 768px) {
+ .news-grid {
+ grid-template-columns: repeat(2, 1fr);
+ }
+ }
+
+ @media (max-width: 480px) {
+ .news-grid {
+ grid-template-columns: 1fr;
+ }
+ }
+
+ footer {
+ background: var(--bg-secondary);
+ border-top: 1px solid var(--border);
+ padding: 40px 16px 32px;
+ margin-top: auto;
+ }
+
+ .footer-content {
+ max-width: 960px;
+ margin: 0 auto;
+ text-align: center;
+ }
+
+ .footer-links {
+ display: flex;
+ justify-content: center;
+ gap: 28px;
+ margin-bottom: 20px;
+ flex-wrap: wrap;
+ }
+
+ .footer-links a {
+ color: var(--text-muted);
+ text-decoration: none;
+ font-weight: 500;
+ font-size: 14px;
+ transition: color 0.2s;
+ }
+
+ .footer-links a:hover {
+ color: var(--accent);
+ }
+
+ .footer-copyright {
+ color: var(--text-muted);
+ font-size: 13px;
+ }
+
+ @keyframes spin {
+ 0% { transform: rotate(0deg); }
+ 100% { transform: rotate(360deg); }
+ }
+
+ @keyframes fadeIn {
+ from { opacity: 0; transform: translateY(10px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
+
+ .fade-in {
+ animation: fadeIn 0.3s ease-in;
+ }
+
+ @media (min-width: 640px) {
+ .matches-grid {
+ grid-template-columns: repeat(2, 1fr);
+ max-width: 900px;
+ }
+ .hero h1 {
+ font-size: 46px;
+ }
+ .hero-subtext {
+ font-size: 17px;
+ }
+ }
+
+ @media (max-width: 640px) {
+ .logo { font-size: 19px; }
+ nav { gap: 16px; }
+ nav a { font-size: 13px; }
+ }
+
+ @media (max-width: 480px) {
+ .header-content {
+ flex-direction: column;
+ gap: 10px;
+ text-align: center;
+ }
+ .hero h1 {
+ font-size: 28px;
+ }
+ .tabs-container {
+ gap: 6px;
+ }
+ .tab-btn {
+ padding: 8px 14px;
+ font-size: 13px;
+ }
+ .stats-bar {
+ gap: 32px;
+ padding: 16px;
+ }
+ .stat-value {
+ font-size: 24px;
+ }
+ .streak-btn {
+ min-width: 140px;
+ padding: 14px 12px;
+ font-size: 13px;
+ }
+ }
+
+ .modal-overlay {
+ display: none;
+ position: fixed;
+ top: 0;
+ left: 0;
+ right: 0;
+ bottom: 0;
+ background: rgba(0,0,0,0.7);
+ z-index: 1000;
+ justify-content: center;
+ align-items: center;
+ padding: 20px;
+ backdrop-filter: blur(8px);
+ }
+
+ .modal-overlay.active {
+ display: flex;
+ }
+
+ .modal-content {
+ background: var(--bg-elevated);
+ border: 1px solid var(--border);
+ border-radius: var(--radius-lg);
+ max-width: 600px;
+ width: 100%;
+ max-height: 90vh;
+ overflow-y: auto;
+ }
+
+ .modal-header {
+ background: var(--bg-secondary);
+ color: var(--text-primary);
+ padding: 20px 24px;
+ border-radius: 16px 16px 0 0;
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ border-bottom: 1px solid var(--border);
+ }
+
+ .modal-header h2 {
+ font-size: 18px;
+ font-weight: 700;
+ }
+
+ .modal-close {
+ background: none;
+ border: none;
+ color: var(--text-secondary);
+ font-size: 28px;
+ cursor: pointer;
+ padding: 0;
+ line-height: 1;
+ transition: color 0.2s;
+ }
+
+ .modal-close:hover {
+ color: var(--text-primary);
+ }
+
+ .modal-body {
+ padding: 24px;
+ color: var(--text-primary);
+ }
+
+ .analysis-section {
+ margin-bottom: 24px;
+ }
+
+ .analysis-section h3 {
+ font-size: 14px;
+ font-weight: 700;
+ margin-bottom: 12px;
+ padding-bottom: 8px;
+ border-bottom: 2px solid var(--accent);
+ color: var(--text-secondary);
+ text-transform: uppercase;
+ letter-spacing: 0.5px;
+ }
+
+ .analysis-grid {
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ gap: 12px;
+ }
+
+ .analysis-card {
+ background: var(--bg-card);
+ border: 1px solid var(--border);
+ padding: 16px;
+ border-radius: var(--radius);
+ }
+
+ .stats-table {
+ width: 100%;
+ border-collapse: collapse;
+ font-size: 14px;
+ }
+
+ .stats-table th,
+ .stats-table td {
+ padding: 10px 14px;
+ text-align: center;
+ border-bottom: 1px solid var(--border);
+ }
+
+ .stats-table th {
+ background: rgba(255,255,255,0.03);
+ color: var(--text-muted);
+ font-weight: 600;
+ font-size: 12px;
+ text-transform: uppercase;
+ letter-spacing: 0.3px;
+ }
+
+ .stats-table td:first-child {
+ text-align: left;
+ color: var(--text-primary);
+ font-weight: 500;
+ }
+
+ .stats-table tr:last-child td {
+ border-bottom: none;
+ }
+
+ .stats-table tbody tr:hover {
+ background: rgba(255,255,255,0.02);
+ }
+
+ .analysis-card h4 {
+ font-size: 11px;
+ margin-bottom: 8px;
+ color: var(--text-muted);
+ text-transform: uppercase;
+ letter-spacing: 0.5px;
+ }
+
+ .team-analysis {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin-bottom: 8px;
+ }
+
+ .team-name {
+ font-weight: 600;
+ font-size: 14px;
+ color: var(--text-primary);
+ }
+
+ .form-bar {
+ display: flex;
+ gap: 4px;
+ }
+
+ .form-result {
+ width: 22px;
+ height: 22px;
+ border-radius: 4px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ font-size: 10px;
+ font-weight: bold;
+ color: white;
+ }
+
+ .form-win { background: #10b981; }
+ .form-draw { background: #f59e0b; }
+ .form-loss { background: #ef4444; }
+
+ .squad-strength {
+ display: flex;
+ gap: 12px;
+ margin-top: 8px;
+ }
+
+ .strength-item {
+ text-align: center;
+ flex: 1;
+ }
+
+ .strength-value {
+ font-size: 16px;
+ font-weight: 700;
+ color: var(--accent);
+ }
+
+ .strength-label {
+ font-size: 10px;
+ color: var(--text-muted);
+ }
+
+ .prediction-reason {
+ background: var(--bg-card);
+ border: 1px solid var(--border);
+ padding: 16px;
+ border-radius: var(--radius);
+ border-left: 4px solid var(--accent);
+ }
+
+ .prediction-reason h4 {
+ color: var(--accent);
+ font-size: 14px;
+ font-weight: 700;
+ margin-bottom: 8px;
+ }
+
+ .prediction-reason p {
+ font-size: 13px;
+ line-height: 1.6;
+ color: var(--text-secondary);
+ }
+
+ @media (max-width: 500px) {
+ .analysis-grid {
+ grid-template-columns: 1fr;
+ }
+ }
+
+ .featured-cta {
+ margin: 0 auto 40px;
+ max-width: 560px;
+ background: linear-gradient(135deg, rgba(20, 28, 42, 0.95), rgba(11, 15, 26, 0.95));
+ border: 1px solid rgba(255,36,72,0.15);
+ border-radius: var(--radius-lg);
+ padding: 32px 36px;
+ text-align: center;
+ }
+
+ .featured-cta .label {
+ font-size: 11px;
+ font-weight: 700;
+ text-transform: uppercase;
+ letter-spacing: 1.2px;
+ color: #000;
+ background: var(--accent-gradient);
+ -webkit-background-clip: text;
+ -webkit-text-fill-color: transparent;
+ background-clip: text;
+ margin-bottom: 10px;
+ }
+
+ .featured-cta h3 {
+ margin: 0 0 10px;
+ font-size: 20px;
+ font-weight: 700;
+ color: var(--text-primary);
+ }
+
+ .featured-cta p {
+ margin: 0 auto 18px;
+ font-size: 14px;
+ color: var(--text-secondary);
+ line-height: 1.6;
+ max-width: 440px;
+ }
+
+ .featured-cta a {
+ display: inline-block;
+ background: var(--accent-gradient);
+ color: #fff;
+ padding: 12px 32px;
+ border-radius: 10px;
+ text-decoration: none;
+ font-weight: 700;
+ font-size: 15px;
+ transition: all 0.2s;
+ }
+
+ .featured-cta a:hover {
+ transform: translateY(-1px);
+ box-shadow: 0 6px 20px var(--glow);
+ }
+
+</style>
+</head>
+<body>
+
+ <div>
+ <header>
+ <div class="header-content">
+ <div class="logo">
+ <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a>
+</div>
+ <nav>
+ <a href="/" class="active">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/blog/">Blog</a>
+  <a href="/contact.html">Contact</a>
+ </nav>
+</div>
+</header>
+
+
+
+ <main class="container">
+ <div class="hero">
+ <h1>Football Predictions<br>For Today</h1>
+ <p class="hero-subtext">Data-driven predictions across 1X2, Over/Under, BTTS &amp; unbeaten markets &#8212; updated daily</p>
+ <p class="hero-date" id="currentDate"></p>
+</div>
+
+ <div class="tabs-container" id="dayTabs"></div>
+
+ <div class="tabs-container" id="categoryTabs">
+ <button onclick="setCategory('1x2')" id="tab-1x2" class="tab-btn active">1X2</button>
+ <button onclick="setCategory('over15')" id="tab-over15" class="tab-btn">Over 1.5</button>
+ <button onclick="setCategory('over25')" id="tab-over25" class="tab-btn">Over 2.5</button>
+ <button onclick="setCategory('unbeaten')" id="tab-unbeaten" class="tab-btn">Unbeaten</button>
+ <button onclick="setCategory('btts')" id="tab-btts" class="tab-btn">BTTS YES</button>
+ <button onclick="setCategory('bttsno')" id="tab-bttsno" class="tab-btn">BTTS NO</button>
+
+</div>
+
+ <div class="stats-bar" id="statsBar">
+ <div class="stat-item">
+ <div class="stat-value" id="totalMatches">0</div>
+ <div class="stat-label">Matches</div>
+</div>
+</div>
+
+ <div id="content">
+ <div class="loading">
+ <div class="progress-bar-container">
+ <div class="progress-bar"></div>
+</div>
+ <span class="loading-text">Loading predictions...</span>
+</div>
+</div>
+
+ <!-- Streak Buttons -->
+ <div class="streak-buttons">
+ <a href="#" onclick="event.preventDefault(); setCategory('winstreak')" class="streak-btn winstreak">
+ <span class="streak-icon"></span>
+ <span class="streak-text">Winning Streak</span>
+</a>
+ <a href="#" onclick="event.preventDefault(); setCategory('losestreak')" class="streak-btn losestreak">
+ <span class="streak-icon"></span>
+ <span class="streak-text">Losing Streak</span>
+</a>
+ <a href="#" onclick="event.preventDefault(); setCategory('drawstreak')" class="streak-btn drawstreak">
+ <span class="streak-icon"></span>
+ <span class="streak-text">Draws Streak</span>
+</a>
+</div>
+
+ <!-- Blog Section -->
+ <div class="blog-section">
+ <h2>Betting Guides</h2>
+ <p class="blog-subtitle">Learn how to bet smarter with our expert guides</p>
+ <div id="homeBlogGrid" class="blog-grid"></div>
+ <div style="text-align: center; margin-top: 24px;">
+ <a href="/blog/" class="btn-primary">View All Guides</a>
+</div>
+</div>
+
+
+
+ <div class="featured-cta">
+ <div class="label">Featured Tool</div>
+ <h3>Build Winning Accumulator Tickets</h3>
+ <p>Generate optimized accumulator combinations from today's AI-powered predictions. Set your target odds and get instant ticket suggestions.</p>
+ <a href="/ticket-builder.html">Try Ticket Builder &rarr;</a>
+</div>
+
+ <div class="disclaimer">
+ <p><strong>18+ Only</strong> &#8212; Predictions are for informational purposes only. Please gamble responsibly.</p>
+ <p>Gambling involves financial risk and may lead to addiction. If you or someone you know has a gambling problem, please seek help from a professional organization.</p>
+</div>
+</main>
+</div>
+
+ <script>
+ console.log('Script starting...');
+ try {
+ let currentData = null;
+ let currentCategory = '1x2';
+ let currentDayOffset = 0;
+
+ function getServerDate() {
+ const now = new Date();
+ const parts = new Intl.DateTimeFormat('en-CA', {
+ timeZone: 'Africa/Lagos',
+ year: 'numeric', month: '2-digit', day: '2-digit'
+ }).formatToParts(now);
+ return new Date(
+ parseInt(parts.find(p => p.type === 'year').value),
+ parseInt(parts.find(p => p.type === 'month').value) - 1,
+ parseInt(parts.find(p => p.type === 'day').value)
+ );
+ }
+
+ function formatServerDate(date, options) {
+ const year = date.getFullYear();
+ const month = String(date.getMonth() + 1).padStart(2, '0');
+ const day = String(date.getDate()).padStart(2, '0');
+ const dateStr = `${year}-${month}-${day}`;
+ return new Date(`${year}-${month}-${day}T12:00:00`).toLocaleDateString('en-US', options);
+ }
+
+ // Check URL for category parameter
+ const urlParams = new URLSearchParams(window.location.search);
+ const urlCategory = urlParams.get('category');
+ if (urlCategory && ['winstreak', 'losestreak', 'drawstreak', 'unbeaten'].includes(urlCategory)) {
+ currentCategory = urlCategory;
+ }
+
+ function getDateStr(offset) {
+ const baseDate = getServerDate();
+ baseDate.setDate(baseDate.getDate() + offset);
+ const year = baseDate.getFullYear();
+ const month = String(baseDate.getMonth() + 1).padStart(2, '0');
+ const day = String(baseDate.getDate()).padStart(2, '0');
+ return `${year}-${month}-${day}`;
+ }
+
+ function getDaysArray() {
+ const days = [];
+ const baseDate = getServerDate();
+ baseDate.setHours(0, 0, 0, 0);
+ 
+ for (let i = -1; i <= 1; i++) {
+ const date = new Date(baseDate);
+ date.setDate(baseDate.getDate() + i);
+ const year = date.getFullYear();
+ const month = String(date.getMonth() + 1).padStart(2, '0');
+ const day = String(date.getDate()).padStart(2, '0');
+ const dateStr = `${year}-${month}-${day}`;
+ days.push({
+ offset: i,
+ dateStr: dateStr,
+ label: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : i === -1 ? 'Yesterday' : date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+ });
+ }
+ return days;
+ }
+
+ function renderDayTabs() {
+ const days = getDaysArray();
+ const container = document.getElementById('dayTabs');
+ container.innerHTML = days.map(day => `
+ <button onclick="switchDay(${day.offset})" 
+ class="tab-btn ${day.offset === currentDayOffset ? 'active' : ''}">
+ ${day.label}
+</button>
+ `).join('');
+ }
+
+ function switchDay(offset) {
+ currentDayOffset = offset;
+ renderDayTabs();
+ if (currentCategory === 'unbeaten') {
+ renderUnbeaten();
+ } else if (currentData) {
+ renderMatches();
+ }
+ }
+
+ function checkAuth() {
+ const user = localStorage.getItem('user');
+ return user ? JSON.parse(user) : null;
+ }
+
+ function setCategory(cat) {
+ currentCategory = cat;
+ document.querySelectorAll('.tab-btn').forEach(btn => {
+ if (btn.id.startsWith('tab-')) {
+ btn.classList.remove('active');
+ }
+ });
+ const tabBtn = document.getElementById(`tab-${cat}`);
+ if (tabBtn) tabBtn.classList.add('active');
+ 
+ const dayTabs = document.getElementById('dayTabs');
+ if (cat === 'winstreak' || cat === 'losestreak' || cat === 'drawstreak') {
+ dayTabs.style.display = 'none';
+ } else {
+ dayTabs.style.display = '';
+ }
+ 
+ if (cat === 'unbeaten') {
+ renderUnbeaten();
+ } else if (currentData) {
+ renderMatches();
+ }
+ }
+
+ function getCategoryLabel(cat) {
+ const labels = { '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5', 'btts': 'BTTS YES', 'bttsno': 'BTTS NO', 'corners': 'Corners', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak', 'teamtoscore2plus': 'To Score 2+', 'cards': 'Cards' };
+ return labels[cat] || cat;
+ }
+
+ let unbeatenData = null;
+
+ async function loadUnbeatenData() {
+ try {
+ const res = await fetch('/data/h2h-unbeaten.json');
+ if (!res.ok) throw new Error('HTTP ' + res.status);
+ unbeatenData = await res.json();
+ } catch (e) {
+ console.error('Failed to load unbeaten data:', e.message);
+ unbeatenData = { dates: {} };
+ }
+ if (currentCategory === 'unbeaten') renderUnbeaten();
+ }
+
+ function renderUnbeaten() {
+ const content = document.getElementById('content');
+ const targetDate = getServerDate();
+ targetDate.setDate(targetDate.getDate() + currentDayOffset);
+ const y = targetDate.getFullYear();
+ const m = String(targetDate.getMonth() + 1).padStart(2, '0');
+ const d = String(targetDate.getDate()).padStart(2, '0');
+ const dateStr = `${y}-${m}-${d}`;
+ const matches = (unbeatenData && unbeatenData.dates && unbeatenData.dates[dateStr]) || [];
+
+ if (matches.length === 0) {
+ let dayLabel = currentDayOffset === 0 ? 'today' : currentDayOffset === 1 ? 'tomorrow' : currentDayOffset === -1 ? 'yesterday' : `on ${dateStr}`;
+ content.innerHTML = `
+ <div class="no-matches">
+ <p>No unbeaten streak data for ${dayLabel}. Data updates daily at 4:00 AM (WAT).</p>
+</div>
+ `;
+ document.getElementById('totalMatches').textContent = '0';
+ return;
+ }
+ document.getElementById('totalMatches').textContent = matches.length;
+ const html = matches.map((match, i) => {
+ const streaksHtml = match.streaks.map(s => {
+ const loc = s.location ? ` ${s.location}` : '';
+ return `
+ <div class="streak-row">
+ <span class="streak-team">${s.team}</span>
+ <span class="streak-badge">${s.count} unbeaten${loc}</span>
+</div>
+ `}).join('');
+ return `
+ <div class="match-card fade-in" style="animation-delay: ${i * 50}ms">
+ <div class="match-header">
+ <span>${match.league}</span>
+ <span>${match.time}</span>
+</div>
+ <div class="match-teams" style="justify-content: center;">
+ <span class="team team-home" style="text-align: center; width: 100%;">${match.match}</span>
+</div>
+ <div class="match-footer" style="flex-direction: column; gap: 6px;">
+ ${streaksHtml}
+</div>
+</div>
+ `;
+ }).join('');
+ content.innerHTML = `<div class="matches-grid">${html}</div>`;
+ }
+
+ function getTipLabel(tip) {
+ const labels = { '1': 'Home Win', 'X': 'Draw', '2': 'Away Win', 'Over 1.5': 'Over 1.5', 'Over 2.5': 'Over 2.5', 'BTTS YES': 'BTTS YES', 'BTTS NO': 'BTTS NO', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak' };
+ return labels[tip] || tip;
+ }
+
+ function renderMatches() {
+ try {
+ const content = document.getElementById('content');
+ 
+ if (currentCategory === 'unbeaten') {
+ renderUnbeaten();
+ return;
+ }
+
+ if (!currentData || !currentData.success) {
+ content.innerHTML = `
+ <div class="text-center py-12 text-muted-foreground">
+ <p>No data available</p>
+</div>
+ `;
+ return;
+ }
+
+ let matches = [];
+ if (currentCategory === '1x2') matches = currentData.matches || [];
+ else if (currentCategory === 'over15') matches = currentData.over15Matches || [];
+ else if (currentCategory === 'over25') matches = currentData.over25Matches || [];
+ else if (currentCategory === 'btts') matches = currentData.bttsMatches || [];
+ else if (currentCategory === 'bttsno') matches = currentData.bttsNoMatches || [];
+ else if (currentCategory === 'corners') matches = currentData.cornersMatches || [];
+ else if (currentCategory === 'winstreak') matches = currentData.winstreakMatches || [];
+ else if (currentCategory === 'losestreak') matches = currentData.losestreakMatches || [];
+ else if (currentCategory === 'drawstreak') matches = currentData.drawstreakMatches || [];
+ else if (currentCategory === 'teamtoscore2plus') matches = currentData.teamToScore2PlusMatches || [];
+ else if (currentCategory === 'cards') matches = currentData.cardsMatches || [];
+
+ let filtered;
+ const targetDate = getServerDate();
+ targetDate.setHours(0, 0, 0, 0);
+ targetDate.setDate(targetDate.getDate() + currentDayOffset);
+ const year = targetDate.getFullYear();
+ const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+ const day = String(targetDate.getDate()).padStart(2, '0');
+ const targetDateStr = `${year}-${month}-${day}`;
+
+ if (currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak') {
+ filtered = matches.filter(m => m.date === targetDateStr || m.nextMatchDate === targetDateStr);
+ } else if (currentCategory === 'corners') {
+ filtered = matches.filter(m => m.date === targetDateStr);
+ } else if (currentCategory === 'teamtoscore2plus' || currentCategory === 'cards') {
+ filtered = matches;
+ } else if (currentCategory === 'bttsno') {
+ filtered = matches.filter(m => m.date === targetDateStr);
+ } else {
+ console.log('Target date:', targetDateStr, 'Category:', currentCategory, 'Total matches:', matches.length);
+ 
+ filtered = matches.filter(m => m.date === targetDateStr);
+ 
+ console.log('Filtered matches:', filtered.length, 'Sample dates:', filtered.slice(0,3).map(m=>m.date));
+ }
+
+ if (filtered.length === 0) {
+ let dayLabel = currentDayOffset === 0 ? 'Today' : currentDayOffset === 1 ? 'Tomorrow' : currentDayOffset === -1 ? 'Yesterday' : `on ${targetDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+ let available = [];
+ if (currentData.dates) {
+ available = currentData.dates.filter(d => matches.some(m => m.date === d));
+ }
+ let fallbackHtml = `<p>No ${getCategoryLabel(currentCategory)} predictions ${dayLabel}</p>`;
+ if (available.length > 0 && currentDayOffset === 0) {
+ const nextDate = available[0];
+ const d = new Date(nextDate + 'T12:00:00');
+ fallbackHtml += `<p style="margin-top: 12px; font-size: 14px;">Try <a href="#" onclick="switchDay(${Math.ceil((d - getServerDate()) / 86400000)}); return false;" style="color: #ff0000;">${d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</a> (${available.length} matches available)</p>`;
+ }
+ content.innerHTML = `
+ <div class="no-matches">
+ ${fallbackHtml}
+</div>
+ `;
+ document.getElementById('totalMatches').textContent = '0';
+ return;
+ }
+
+ const isStreakTab = currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak';
+ const isTeamToScore = currentCategory === 'teamtoscore2plus' || currentCategory === 'cards';
+ let displayMatches = filtered;
+
+ document.getElementById('totalMatches').textContent = filtered.length;
+
+ const html = displayMatches.map((match, i) => {
+ const matchStr = match.match || match.nextMatch || '';
+ const teams = matchStr.includes(' - ') ? matchStr.split(' - ') : matchStr.split(' vs ');
+ const home = teams[0]?.trim() || '';
+ const away = teams[1]?.trim() || '';
+ const hasScore = (match.score && match.score.home != null && match.score.away != null) || 
+ (match.result && match.result.home != null && match.result.away != null);
+ const displayScore = match.result || match.score;
+ const matchData = encodeURIComponent(JSON.stringify(match));
+ 
+ const isWinstreak = currentCategory === 'winstreak';
+ const isLosestreak = currentCategory === 'losestreak';
+ const isDrawstreak = currentCategory === 'drawstreak';
+ 
+ let streakLabel = match.tip;
+ if (isWinstreak) streakLabel = `Winning Streak: ${match.streak || ''}`;
+ else if (isLosestreak) streakLabel = `Losing Streak: ${match.streak || ''}`;
+ else if (isDrawstreak) streakLabel = `Draws Streak: ${match.streak || ''}`;
+ else if (isTeamToScore) streakLabel = match.tip || 'Score 2+ Goals';
+
+ return `
+ <div class="match-card fade-in" style="animation-delay: ${i * 50}ms" data-match="${matchData}">
+ <div class="match-header">
+ <span></span>
+ <span>${match.time}</span>
+</div>
+ ${(isWinstreak || isLosestreak || isDrawstreak) ? `
+ <div class="match-teams" style="justify-content: center;">
+ <span class="team team-home" style="text-align: center; width: 100%;">${home}</span>
+</div>
+ <div class="match-footer">
+ <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+ <span class="tip-badge">${streakLabel}</span>
+ <div class="probability">${match.probability}%</div>
+</div>
+</div>
+ ` : isTeamToScore ? `
+ <div class="match-teams" style="justify-content: center;">
+ <span class="team team-home" style="text-align: center; width: 100%;">${match.match}</span>
+</div>
+ <div class="match-footer">
+ <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+ <span class="tip-badge">${streakLabel}</span>
+ <div class="probability">${match.probability}%</div>
+</div>
+</div>
+ ` : `
+ <div class="match-teams">
+ <span class="team team-home">${home}</span>
+ ${hasScore ? 
+ `<span class="vs-score score-display">${displayScore.home} - ${displayScore.away}</span>` : 
+ `<span class="vs-score">vs</span>`
+ }
+ <span class="team team-away">${away}</span>
+</div>
+ <div class="match-footer">
+ <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+ <span class="tip-badge">${match.tip}</span>
+ <div class="probability">${match.probability}%</div>
+</div>
+</div>
+ `}
+</div>
+ `;
+ }).join('');
+
+ content.innerHTML = `<div class="matches-grid">${html}</div>`;
+ 
+ document.querySelectorAll('.match-card').forEach(card => {
+ card.style.cursor = 'default';
+ });
+
+ const dt = document.getElementById('dayTabs');
+ if (dt) {
+ dt.style.display = (currentCategory === 'winstreak' || currentCategory === 'losestreak' || currentCategory === 'drawstreak') ? 'none' : '';
+ }
+ } catch (error) {
+ console.error('Error rendering matches:', error);
+ content.innerHTML = `
+ <div class="no-matches">
+ <p>Error rendering matches: ${error.message}</p>
+</div>
+ `;
+ }
+ }
+
+ async function loadPredictions() {
+ console.log('loadPredictions called');
+ const content = document.getElementById('content');
+ content.innerHTML = `
+ <div class="loading">
+ <div class="progress-bar-container">
+ <div class="progress-bar"></div>
+</div>
+ <span class="loading-text">Loading predictions...</span>
+</div>
+ `;
+
+ try {
+ console.log('Fetching predictions...');
+ const response = await fetch('/data/predictions.json');
+ if (!response.ok) {
+ throw new Error(`HTTP error: ${response.status}`);
+ }
+ currentData = await response.json();
+ renderDayTabs();
+ const dateDisplay = document.getElementById('currentDate');
+ if (dateDisplay) {
+ const serverDate = getServerDate();
+ const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+ dateDisplay.textContent = serverDate.toLocaleDateString('en-US', options);
+ }
+ console.log('Data received:', JSON.stringify(currentData).substring(0, 500));
+ console.log('Calling renderMatches...');
+ renderMatches();
+ console.log('renderMatches completed');
+ } catch (error) {
+ console.error('Error loading predictions:', error);
+ content.innerHTML = `
+ <div class="no-matches">
+ <p>Predictions currently unavailable. The data may still be generating. Check back soon.</p>
+</div>
+ `;
+ }
+ }
+
+
+
+renderDayTabs();
+ loadPredictions();
+ loadRandomBlogPosts();
+ loadUnbeatenData();
+ console.log('loadPredictions called, waiting...');
+ 
+ async function loadRandomBlogPosts() {
+ const blogGrid = document.getElementById('homeBlogGrid');
+ const blogPosts = [
+ { url: '/blog/1x2-betting-guide', category: 'Beginner', title: 'Understanding 1X2 Betting', desc: 'Learn the most popular football betting market' },
+ { url: '/blog/what-is-over-under-betting', category: 'Beginner', title: 'Over/Under Betting Guide', desc: 'Master the goal total markets' },
+ { url: '/blog/value-betting-explained', category: 'Strategy', title: 'Value Betting Explained', desc: 'Find odds better than they should be' },
+ { url: '/blog/premier-league-betting-guide', category: 'League Guide', title: 'Premier League Betting', desc: 'Complete EPL betting guide' },
+ { url: '/blog/btts-betting-guide', category: 'Beginner', title: 'BTTS Betting Guide', desc: 'Both Teams to Score explained' },
+ { url: '/blog/bankroll-management-guide', category: 'Strategy', title: 'Bankroll Management', desc: 'Protect your money with proven strategies' },
+ { url: '/blog/asian-handicap-betting-guide', category: 'Strategy', title: 'Asian Handicap Guide', desc: 'Master the Asian handicap market' },
+ { url: '/blog/football-betting-strategies', category: 'Strategy', title: 'Betting Strategies That Work', desc: 'Proven techniques for better bets' },
+ { url: '/blog/how-to-read-football-betting-odds', category: 'Beginner', title: 'How to Read Odds', desc: 'Understanding decimal, fractional, American odds' },
+ { url: '/blog/expected-goals-xg-betting', category: 'Analysis', title: 'Using xG for Better Bets', desc: 'Expected Goals explained simply' },
+ { url: '/blog/using-statistics-for-betting', category: 'Analysis', title: 'Statistical Analysis for Betting', desc: 'What stats actually matter' },
+ { url: '/blog/analyze-football-match-betting', category: 'Analysis', title: 'How to Analyze a Match', desc: 'Step-by-step match analysis' },
+ { url: '/blog/inplay-betting-strategies', category: 'Strategy', title: 'In-Play Betting Strategies', desc: 'Live betting done right' },
+ { url: '/blog/betting-on-draws', category: 'Strategy', title: 'Betting on Draws', desc: 'Find value in the draw market' },
+ { url: '/blog/responsible-gambling-guide', category: 'Responsible', title: 'Responsible Gambling', desc: 'Betting should be fun' },
+ { url: '/blog/la-liga-betting-guide', category: 'League Guide', title: 'La Liga Betting Guide', desc: 'Barcelona, Real Madrid & more' },
+ { url: '/blog/serie-a-betting-guide', category: 'League Guide', title: 'Serie A Betting Guide', desc: 'Italian football explained' },
+ { url: '/blog/bundesliga-betting-guide', category: 'League Guide', title: 'Bundesliga Betting Guide', desc: 'German football coverage' }
+ ];
+ 
+ const shuffled = blogPosts.sort(() => 0.5 - Math.random());
+ const selected = shuffled.slice(0, 4);
+ 
+ const html = selected.map(post => `
+ <a href="${post.url}" class="blog-card">
+ <span class="news-category">${post.category}</span>
+ <h4>${post.title}</h4>
+ <p>${post.desc}</p>
+</a>
+ `).join('');
+ 
+ blogGrid.innerHTML = html;
+ }
+ 
+ } catch (error) {
+ console.error('Script error:', error);
+ alert('Script error: ' + error.message);
+ }
+</script>
+ <footer>
+ <div class="footer-content">
+ <div style="text-align:center;margin-bottom:24px;">
+ <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">
+ Support WinFulltime &mdash; your donations keep all predictions free.
+</p>
+ <a href="https://ko-fi.com/winfulltime" target="_blank" rel="noopener" style="display:inline-block;background:var(--accent-gradient);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;transition:all 0.2s;">
+ Donate on Ko-fi
+</a>
+</div>
+ <div class="footer-links">
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/blog/">Blog</a>
+ <a href="/advertise.html">Advertise</a>
+ <a href="/contact.html">Contact</a>
+ <a href="/terms.html">Terms</a>
+ <a href="/privacy.html">Privacy</a>
+ <a href="/sitemap.xml">Sitemap</a>
+</div>
+ <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
+</div>
+
+ <div style="text-align:center;padding:12px 0;"><button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">Light</button></div>
+</footer>
+ <script src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP" async></script>
+ <script>
+ window.dataLayer = window.dataLayer || [];
+ function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date());
+ gtag('config', 'G-HMGZMW9EDP');
+</script>
+<script src="/chat-widget.js"></script>
+<script>
+(function() {
+  const saved = localStorage.getItem("wf-theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const theme = saved || (prefersDark ? "dark" : "light");
+  document.documentElement.setAttribute("data-theme", theme === "dark" ? "" : "light");
+  const btn = document.getElementById("themeToggle");
+  if (btn) btn.textContent = theme === "dark" ? "Light" : "Dark";
+})();
+
+document.addEventListener("DOMContentLoaded", function() {
+  const btn = document.getElementById("themeToggle");
+  if (!btn) return;
+  btn.addEventListener("click", function() {
+    const html = document.documentElement;
+    const isLight = html.getAttribute("data-theme") === "light";
+    if (isLight) {
+      html.removeAttribute("data-theme");
+      btn.textContent = "Light";
+      localStorage.setItem("wf-theme", "dark");
+    } else {
+      html.setAttribute("data-theme", "light");
+      btn.textContent = "Dark";
+      localStorage.setItem("wf-theme", "light");
+    }
+  });
+});
+</script>
+
+</body>
+</html></body>
+</html>

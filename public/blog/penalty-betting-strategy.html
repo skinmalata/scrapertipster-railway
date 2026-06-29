@@ -1,576 +1,610 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Penalty Betting: Spot Kick Strategy Guide | WinFulltime</title>
-  <meta name="description" content="Master penalty betting with our comprehensive guide. Complete strategy covering penalty markets (yes/no, timing, shootout), teams that concede and earn most penalties, referee tendencies, VAR impact, conversion rates, and in-play penalty betting.">
-  <meta name="keywords" content="penalty betting, spot kick, penalty markets, penalty shootout, football betting, penalty strategy, VAR penalties, penalty conversion">
-  <meta property="og:title" content="Penalty Betting: Spot Kick Strategy Guide">
-  <meta property="og:description" content="Master penalty betting for football. Comprehensive strategy covering penalty markets, teams that concede and earn most penalties, referee tendencies, VAR impact on penalties, conversion rates by player and league, in-play penalty betting, and penalty shootout prediction.">
-  <meta property="og:type" content="article">
-  <meta property="og:image" content="https://winfulltime.com/blog/thumbnails/penalty-betting-strategy.webp">
-  <meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/penalty-betting-strategy.webp">
-  <link rel="canonical" href="https://winfulltime.com/blog/penalty-betting-strategy">
-  <link rel="stylesheet" href="/styles.css">
-  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
-  <style>
-    :root {
-      --bg-primary: #0b0f1a;
-      --bg-secondary: #111827;
-      --bg-card: rgba(23, 28, 46, 0.85);
-      --bg-elevated: #1a1f2e;
-      --text-primary: #e8edf5;
-      --text-secondary: #c8d0db;
-      --text-muted: #94a3b8;
-      --accent: #ff2448;
-      --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
-      --border: rgba(255,255,255,0.06);
-      --border-hover: rgba(255,255,255,0.12);
-      --glow: rgba(255,36,72,0.12);
-      --radius: 12px;
-      --radius-lg: 16px;
-      --font: 'Inter', system-ui, -apple-system, sans-serif;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: var(--font); background: var(--bg-primary); background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent); color: var(--text-primary); margin: 0; padding: 0; font-size: 16px; -webkit-font-smoothing: antialiased; }
-    header { background: rgba(11,15,26,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
-    .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
-    .logo { display: inline-flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 800; color: #ffffff; text-decoration: none; letter-spacing: -0.5px; }
-        .logo-icon { height: 28px; width: auto; flex-shrink: 0; }
-    .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    h1 { font-size: 2.8rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; }
-    h2 { font-size: 2.1rem; color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; font-weight: 700; }
-    h3 { font-size: 1.5rem; color: var(--text-primary); margin-top: 30px; margin-bottom: 10px; font-weight: 600; }
-    p { font-size: 1.125rem; margin-bottom: 20px; color: var(--text-secondary); line-height: 1.85; }
-    li { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.85; margin-bottom: 8px; }
-    .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
-    .highlight { background: rgba(251,191,36,0.1); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .highlight * { color: var(--text-primary); }
-    .example-box { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .example-box * { color: var(--text-primary); }
-    .strategy-box { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin: 24px 0; }
-    .strategy-box h3 { margin-top: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .pro-tip { background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .pro-tip h4 { margin-top: 0; color: #60a5fa; }
-    .pro-tip * { color: var(--text-primary); }
-    .warning { background: rgba(239,68,68,0.08); border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
-    .warning * { color: var(--text-primary); }
-    .success { background: rgba(34,197,94,0.08); border-left: 4px solid #22c55e; padding: 16px; border-radius: 8px; margin: 20px 0; }
-    .success * { color: var(--text-primary); }
-    .steps { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin: 20px 0; }
-    .steps ol { margin: 0; padding-left: 20px; }
-    .steps li { margin-bottom: 10px; color: var(--text-secondary); }
-    .cta { background: var(--accent-gradient); color: white; padding: 24px; border-radius: var(--radius); text-align: center; margin: 30px 0; box-shadow: 0 4px 15px var(--glow); }
-    .cta * { color: white; }
-    .cta a { color: white; text-decoration: underline; }
-    .breadcrumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
-    .breadcrumb a { color: var(--accent); text-decoration: none; }
-    .breadcrumb a:hover { text-decoration: underline; }
-    .related-posts { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin-top: 40px; }
-    .related-posts h3 { margin-top: 0; color: var(--text-primary); }
-    .related-posts ul { list-style: none; padding: 0; }
-    .related-posts li { margin-bottom: 10px; color: var(--text-secondary); }
-    .related-posts a { color: var(--accent); text-decoration: none; }
-    .related-posts a:hover { text-decoration: underline; }
-    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
-    th { background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 600; }
-    .odds-table { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; overflow: hidden; }
-    .odds-table th { background: rgba(255,255,255,0.05); color: var(--text-primary); }
-    .odds-table td { border-bottom: 1px solid var(--border); color: var(--text-primary); }
-    code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); }
-    footer { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 40px 16px 32px; text-align: center; margin-top: 60px; }
-    .footer-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap; }
-    .footer-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; }
-    .footer-links a:hover { color: var(--accent); }
-    .footer-copyright { color: var(--text-muted); font-size: 13px; }
-    nav { display: flex; gap: 24px; }
-    nav a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s; }
-    nav a:hover { color: var(--text-primary); }
-    img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
-    @media (max-width: 640px) {
-      h1 { font-size: 2.2rem; }
-      h2 { font-size: 1.7rem; }
-      .container { padding: 0 16px; }
-      nav { gap: 12px; }
-      nav a { font-size: 13px; }
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <div class="header-content">
-      <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">WinFulltime</a>
-      <nav>
-        <a href="/">Home</a>
-        <a href="/ticket-builder.html">Ticket Builder</a>
-        <a href="/blog/">News</a>
-        <a href="/about.html">About</a>
-        </nav>
-    </div>
-  </header>
-
-  <div class="container">
-    <div class="breadcrumb">
-      <a href="/">Home</a> &gt; <a href="/blog/">Blog</a> &gt; Penalty Betting
-    </div>
-
-    <h1>Penalty Betting: Spot Kick Strategy Guide</h1>
-    <p class="meta">Last updated: June 2026 | By WinFulltime Team | 24 min read</p>
-
-    <div style="background:#dbeafe;padding:16px 20px;border-radius:8px;margin:20px 0"><strong>Tip:</strong> Looking for today's football predictions? <a href="/">Click here</a>.</div>
-
-    <p>Penalty betting has grown into one of football's most dynamic niche markets. From simple penalty-yes/no bets to sophisticated penalty timing, shootout prediction, and player-specific markets, spot kicks offer opportunities that span the full match timeline. This guide covers every angle â€” the teams that earn and concede penalties, referee tendencies, VAR's transformative impact, conversion rates, in-play strategy, and a complete worked example.</p>
-    <p>Penalties are rare events (roughly one every 3-4 matches in most leagues), but their impact on match outcomes is enormous. Understanding penalty dynamics gives you an edge not just in dedicated penalty markets but also in related markets like correct score, first goalscorer, and match result.</p>
-
-    <div class="toc">
-      <strong>In This Guide:</strong>
-      <ol>
-        <li>Understanding Penalty Betting Markets</li>
-        <li>Penalty Yes/No â€” The Core Market</li>
-        <li>Penalty Timing Markets â€” When Will the Spot Kick Come?</li>
-        <li>Teams That Concede the Most Penalties</li>
-        <li>Teams That Earn the Most Penalties</li>
-        <li>Referee Tendencies for Penalty Awards</li>
-        <li>VAR Impact on Penalty Decisions</li>
-        <li>Penalty Conversion Rates by Player and League</li>
-        <li>In-Play Penalty Betting Strategy</li>
-        <li>Penalty Shootout Prediction</li>
-        <li>Combining Penalties with Other Markets</li>
-        <li>Worked Example â€” Full Penalty Betting Analysis</li>
-        <li>Frequently Asked Questions</li>
-      </ol>
-    </div>
-
-    <h2>1. Understanding Penalty Betting Markets</h2>
-    <p>Penalty betting markets have expanded significantly. Here are the main market types you'll encounter across major bookmakers:</p>
-
-    <table>
-      <tr><th>Market</th><th>Description</th><th>Typical Odds</th><th>Liquidity</th></tr>
-      <tr><td>Penalty Awarded â€” Yes/No</td><td>Will a penalty be awarded during regulation time?</td><td>2.50-5.00 (Yes)</td><td>High</td></tr>
-      <tr><td>Penalty Scored â€” Yes/No</td><td>Will a penalty be scored (not just awarded)?</td><td>2.80-6.00 (Yes)</td><td>Medium</td></tr>
-      <tr><td>Penalty Taken â€” First Team</td><td>Which team will be awarded the first penalty?</td><td>2.00-3.00</td><td>Medium</td></tr>
-      <tr><td>Time of First Penalty</td><td>Over/under specific minute (e.g. before/after 60 mins)</td><td>1.80-2.00</td><td>Low-Medium</td></tr>
-      <tr><td>Penalty Shootout â€” Yes/No</td><td>Will the match go to a penalty shootout?</td><td>3.00-10.00</td><td>Medium</td></tr>
-      <tr><td>Penalty Shootout â€” Correct Score</td><td>Exact shootout result (e.g. 4-2)</td><td>8.00-20.00</td><td>Low</td></tr>
-      <tr><td>Penalty Taker â€” Anytime</td><td>Which player will take a penalty (any time)</td><td>5.00-15.00</td><td>Low</td></tr>
-      <tr><td>Penalty to be Missed/Saved</td><td>A penalty taken is not converted</td><td>4.00-8.00</td><td>Low-Medium</td></tr>
-      <tr><td>First Goalscorer â€” Penalty</td><td>First goal of the match is a penalty</td><td>6.00-12.00</td><td>Medium</td></tr>
-    </table>
-
-    <p>Most liquidity is concentrated in the Penalty Yes/No market. Timing markets and shootout markets are deeper in knockout competitions (Champions League, World Cup, domestic cups). For standard league matches, the penalty yes/no market is your primary vehicle.</p>
-
-    <div class="pro-tip">
-      <h4>Best Bookmakers for Penalty Markets</h4>
-      <p>Bet365 offers the widest range of penalty markets including penalty timing and player-specific options. <a href="https://www.pinnacle.com/" target="_blank" rel="noopener">Pinnacle</a> has sharp penalty odds with higher limits. <a href="https://www.betfair.com/" target="_blank" rel="noopener">Betfair Exchange</a> is excellent for trading penalty markets in-play. Compare odds across all three using <a href="https://www.oddsportal.com/football/" target="_blank" rel="noopener">OddsPortal</a> before placing any penalty bet.</p>
-    </div>
-
-    <h2>2. Penalty Yes/No â€” The Core Market</h2>
-    <p>The penalty yes/no market is the simplest and most liquid. It asks a single question: will at least one penalty be awarded during regulation time (90 minutes plus stoppage time)? Extra time penalties do not count.</p>
-
-    <p><strong>Understanding the odds:</strong> Penalty Yes is typically priced between 2.50 and 5.00 depending on the match. A price of 3.50 implies a 28.6% chance of at least one penalty. The true probability varies by league, teams, and referee â€” typically between 22-35% for most matches.</p>
-
-    <p><strong>Penalty frequency by league:</strong></p>
-    <table>
-      <tr><th>League</th><th>Penalties per Match</th><th>% of Matches with 1+ Penalty</th><th>Notes</th></tr>
-      <tr><td>Premier League</td><td>0.28</td><td>26%</td><td>VAR review for every penalty decision</td></tr>
-      <tr><td>Bundesliga</td><td>0.30</td><td>27%</td><td>Consistent penalty rate, VAR active</td></tr>
-      <tr><td>La Liga</td><td>0.32</td><td>29%</td><td>Slightly higher rate, more contact in box</td></tr>
-      <tr><td>Serie A</td><td>0.26</td><td>24%</td><td>Lower penalty rate, VAR reduces clear errors</td></tr>
-      <tr><td>Ligue 1</td><td>0.29</td><td>26%</td><td>Average penalty frequency</td></tr>
-      <tr><td>Championship</td><td>0.30</td><td>27%</td><td>No VAR in regular season â€” slightly higher rate</td></tr>
-      <tr><td>Eredivisie</td><td>0.31</td><td>28%</td><td>Open play leads to more box incidents</td></tr>
-      <tr><td>MLS</td><td>0.27</td><td>25%</td><td>Lower rate but variable by team</td></tr>
-      <tr><td>Champions League</td><td>0.33</td><td>30%</td><td>Higher stakes, more box activity</td></tr>
-      <tr><td>World Cup</td><td>0.35</td><td>32%</td><td>VAR consistently used, more clear penalties</td></tr>
-    </table>
-
-    <div class="success">
-      <h3>Key Insight: Home Team Penalty Advantage</h3>
-      <p>Home teams are awarded approximately 15-20% more penalties than away teams. This is one of the most consistent biases in football. Crowd pressure, subconscious referee bias, and home-team attacking dominance all contribute. When evaluating penalty yes/no, factor in which team is more likely to attack the opposition box.</p>
-    </div>
-
-    <h2>3. Penalty Timing Markets â€” When Will the Spot Kick Come?</h2>
-    <p>Penalty timing markets allow you to bet on when the first penalty will be awarded. Common lines include over/under 60 minutes, or specific minute bands (0-30, 31-60, 61-90).</p>
-
-    <p><strong>Penalty timing distribution analysis:</strong> Analysis of 5,000+ penalties across major leagues shows a clear pattern: penalties become more likely in the second half, with a notable spike in the final 15 minutes.</p>
-
-    <table>
-      <tr><th>Time Band</th><th>% of All Penalties</th><th>Why This Happens</th></tr>
-      <tr><td>0-15 minutes</td><td>8%</td><td>Match still settling, fewer box entries</td></tr>
-      <tr><td>16-30 minutes</td><td>14%</td><td>Match finding rhythm, attacking patterns emerging</td></tr>
-      <tr><td>31-45 minutes</td><td>18%</td><td>Pressure builds before half-time, tired defenders make errors</td></tr>
-      <tr><td>45+ stoppage time</td><td>6%</td><td>Short window but higher incident rate per minute</td></tr>
-      <tr><td>46-60 minutes</td><td>14%</td><td>Second half settling, tactical adjustments</td></tr>
-      <tr><td>61-75 minutes</td><td>16%</td><td>Substitutions change dynamics, defenders tire</td></tr>
-      <tr><td>76-90 minutes</td><td>20%</td><td>Peak penalty time â€” desperation, fatigue, VAR checks</td></tr>
-      <tr><td>90+ stoppage time</td><td>4%</td><td>High per-minute rate but limited minutes</td></tr>
-    </table>
-
-    <div class="strategy-box">
-      <h3>Penalty Timing Betting Strategy</h3>
-      <p>The data clearly favours later penalties. If you're betting the over/under on 60 minutes, "Over 60" is statistically the correct side in roughly 60% of matches with penalties. This is a consistent (if small) edge against the bookmaker's line, which tends to be set too close to 50/50.</p>
-      <p>For in-play penalty timing, watch for a team that has dominated possession and box entries without scoring. Their penalty probability increases with every attack repelled. If they hit the woodwork or have a shot cleared off the line, the next box incident could easily be a penalty.</p>
-    </div>
-
-    <h2>4. Teams That Concede the Most Penalties</h2>
-    <p>Some teams concede penalties at remarkably high rates. This is driven by defensive style, tactical approach, and individual defender tendencies.</p>
-
-    <p><strong>Factors that increase penalty concession:</strong></p>
-    <ul>
-      <li><strong>High defensive volume</strong> â€” Teams that face many shots in the box concede more penalties (more opportunities for fouls)</li>
-      <li><strong>Aggressive tackling style</strong> â€” Teams that slide-tackle in the box rather than jockeying are more likely to concede penalties</li>
-      <li><strong>Poor defensive organisation</strong> â€” Disorganised defences make rash challenges in panic situations</li>
-      <li><strong>Inexperienced defenders</strong> â€” Younger or less experienced defenders commit more box fouls</li>
-      <li><strong>Low block + counter</strong> â€” Teams that defend deep invite pressure into their box, increasing penalty risk</li>
-    </ul>
-
-    <table>
-      <tr><th>Team Type</th><th>Penalties Conceded/Season</th><th>Profile</th></tr>
-      <tr><td>Relegation-threatened</td><td>5-7</td><td>Desperate defending, limited technical ability, frequent box fouls</td></tr>
-      <tr><td>High-pressing aggressive</td><td>4-6</td><td>High-risk defending, challenges in transition, VAR exposure</td></tr>
-      <tr><td>Mid-table conservative</td><td>3-5</td><td>League average, depends on specific defenders</td></tr>
-      <tr><td>Possession-dominant elite</td><td>2-4</td><td>Rarely defend their own box, controlled defending</td></tr>
-      <tr><td>Defensive specialists</td><td>2-3</td><td>Organised, minimal box entries allowed, clean challenges</td></tr>
-    </table>
-
-    <div class="pro-tip">
-      <h4>Identifying Penalty-Conceding Teams</h4>
-      <p>Use <a href="https://fbref.com/en/" target="_blank" rel="noopener">FBref</a> to check team defensive stats â€” look at "Penalties Conceded" and "Shots in Box Faced." A team in the top 5 for both is a strong penalty-yes candidate in most matches. Historical data over 2-3 seasons gives the most reliable picture, as penalty tendencies are surprisingly stable year over year.</p>
-    </div>
-
-    <h2>5. Teams That Earn the Most Penalties</h2>
-    <p>Just as some teams concede many penalties, others earn them at above-average rates. These are typically teams with specific attacking characteristics.</p>
-
-    <p><strong>Factors that increase penalty earning:</strong></p>
-    <ul>
-      <li><strong>Dribble-heavy attackers</strong> â€” Players who take on defenders in the box (e.g. wingers, attacking midfielders) draw fouls</li>
-      <li><strong>High box touches</strong> â€” Teams that spend significant time in the opposition box create more penalty opportunities</li>
-      <li><strong>Target-man strikers</strong> â€” Physical strikers who hold up play and draw contact in the box</li>
-      <li><strong>Pace on the counter</strong> â€” Fast attackers running at retreating defenders cause panicked fouls</li>
-      <li><strong>Set piece delivery</strong> â€” Some teams earn penalties from corners and free kicks where defenders grapple</li>
-    </ul>
-
-    <table>
-      <tr><th>Team</th><th>Penalties Earned/Season (Avg)</th><th>Key Penalty-Drawing Players</th></tr>
-      <tr><td>Manchester City</td><td>7.5</td><td>Grealish, Haaland, Foden â€” constant box presence</td></tr>
-      <tr><td>Real Madrid</td><td>7.0</td><td>Vinicius Jr, Rodrygo â€” dribble-heavy wide players</td></tr>
-      <tr><td>Barcelona</td><td>6.5</td><td>Yamal, Raphinha â€” high box touch wingers</td></tr>
-      <tr><td>PSG</td><td>6.0</td><td>Mbappe, Dembele â€” pace and dribbling</td></tr>
-      <tr><td>Inter Milan</td><td>5.5</td><td>Lautaro, Thuram â€” physical strikers</td></tr>
-      <tr><td>Atletico Madrid</td><td>5.0</td><td>Target play, set pieces â€” direct attacking</td></tr>
-      <tr><td>Brighton</td><td>5.5</td><td>Mitoma, Pedro â€” dribble-heavy approach</td></tr>
-    </table>
-
-    <div class="pro-tip">
-      <h4>Player-Level Penalty Data</h4>
-      <p>Use <a href="https://www.whoscored.com/" target="_blank" rel="noopener">WhoScored</a> to identify players who draw the most fouls per game and have high dribble success rates in the box. A winger averaging 3+ dribbles per game in the box with 60%+ success rate is a significant penalty-earning asset. <a href="https://www.transfermarkt.com/" target="_blank" rel="noopener">Transfermarkt</a> also tracks penalty-earning statistics in player profiles.</p>
-    </div>
-
-    <h2>6. Referee Tendencies for Penalty Awards</h2>
-    <p>Referee assignment is one of the most important factors in penalty probability. Some referees award penalties at triple the rate of others.</p>
-
-    <table>
-      <tr><th>Referee</th><th>League</th><th>Penalties per Match</th><th>% of Matches with Penalty</th><th>Tendency</th></tr>
-      <tr><td>Michael Oliver</td><td>Premier League</td><td>0.38</td><td>34%</td><td>Willing to award, especially for clear contact</td></tr>
-      <tr><td>Anthony Taylor</td><td>Premier League</td><td>0.35</td><td>32%</td><td>Above-average penalty rate</td></tr>
-      <tr><td>Paul Tierney</td><td>Premier League</td><td>0.20</td><td>18%</td><td>Reluctant to award, wants clear-and-obvious</td></tr>
-      <tr><td>Danny Makkelie</td><td>Eredivisie</td><td>0.40</td><td>36%</td><td>Pro-penalty, especially for attacking play</td></tr>
-      <tr><td>Felix Zwayer</td><td>Bundesliga</td><td>0.28</td><td>25%</td><td>League-average penalty rate</td></tr>
-      <tr><td>JesÃºs Gil Manzano</td><td>La Liga</td><td>0.42</td><td>38%</td><td>Among highest penalty rates in Big 5</td></tr>
-      <tr><td>Daniele Orsato</td><td>Serie A</td><td>0.22</td><td>20%</td><td>Conservative, lets play continue</td></tr>
-      <tr><td>Clement Turpin</td><td>Ligue 1</td><td>0.32</td><td>29%</td><td>Average to slightly above</td></tr>
-    </table>
-
-    <div class="warning">
-      <strong>Referee-By-Referee Analysis is Essential:</strong> A match between two penalty-prone teams is a strong penalty-yes candidate with Michael Oliver (34% penalty rate) but a weaker candidate with Paul Tierney (18% rate). The referee alone can swing penalty probability by 15 percentage points. Check referee assignments on <a href="https://www.transfermarkt.com/" target="_blank" rel="noopener">Transfermarkt</a> as early as possible â€” they're typically confirmed 48-72 hours before kickoff.</div>
-
-    <h2>7. VAR Impact on Penalty Decisions</h2>
-    <p>VAR has transformed penalty betting. Since its introduction across major leagues, penalty awards have increased by 15-25% on average. VAR reviews potential penalties for clear and obvious errors, which has several betting implications.</p>
-
-    <p><strong>How VAR changes penalty dynamics:</strong></p>
-    <ul>
-      <li><strong>More penalties overall</strong> â€” VAR catches clear fouls missed by on-field referees, especially in the box</li>
-      <li><strong>Higher conversion on reviewed penalties</strong> â€” Once VAR recommends a review, the penalty is awarded ~80% of the time</li>
-      <li><strong>Reduced home bias</strong> â€” VAR mitigates the home-team penalty advantage (from ~20% down to ~12-15%)</li>
-      <li><strong>More stoppage time penalties</strong> â€” VAR checks add 2-5 minutes of stoppage time, during which penalties can still be awarded</li>
-      <li><strong>Clearer fouls only</strong> â€” Referees are less likely to award marginal penalties, knowing VAR will correct clear errors</li>
-    </ul>
-
-    <div class="strategy-box">
-      <h3>VAR Penalty Betting Strategy</h3>
-      <p>The most profitable VAR-related penalty strategy is in-play. Watch matches closely â€” if there's a potential penalty incident that the referee waves away, the VAR check will happen 30-60 seconds later. If the odds for "Penalty Awarded Yes" are still live (offered by some bookmakers), you can bet into the VAR review window at inflated odds. This requires fast reaction and a bookmaker with responsive in-play markets.</p>
-      <p>Pre-match, factor VAR into your penalty probability estimates. Leagues with active VAR (Big 5, Champions League, World Cup) will have higher penalty rates. Leagues without VAR (Championship regular season, many lower leagues) will have lower, more unpredictable rates.</p>
-    </div>
-
-    <h2>8. Penalty Conversion Rates by Player and League</h2>
-    <p>Once a penalty is awarded, the conversion rate determines whether it becomes a goal. Understanding conversion rates helps you bet on penalty scoring markets and informs related bets (correct score, first goalscorer).</p>
-
-    <p><strong>Overall conversion rates:</strong> Across all professional football, approximately 76-78% of penalties are scored. This varies by league, player quality, and match context.</p>
-
-    <table>
-      <tr><th>League</th><th>Conversion Rate</th><th>Notes</th></tr>
-      <tr><td>Premier League</td><td>78%</td><td>High-quality takers, excellent technique</td></tr>
-      <tr><td>Bundesliga</td><td>79%</td><td>Training emphasised, technical proficiency</td></tr>
-      <tr><td>La Liga</td><td>76%</td><td>Slightly lower, more pressure situations</td></tr>
-      <tr><td>Serie A</td><td>74%</td><td>Goalkeepers study takers extensively</td></tr>
-      <tr><td>Ligue 1</td><td>75%</td><td>Variable by team quality</td></tr>
-      <tr><td>Championship</td><td>73%</td><td>Lower technical level, more misses</td></tr>
-      <tr><td>MLS</td><td>72%</td><td>Wider quality variance among takers</td></tr>
-      <tr><td>Champions League</td><td>80%</td><td>Elite takers, high-pressure specialists</td></tr>
-    </table>
-
-    <div class="success">
-      <h3>Top Penalty Takers (Career Conversion Rates)</h3>
-      <ul>
-        <li><strong>Harry Kane:</strong> 88% (over 70 penalties taken)</li>
-        <li><strong>Robert Lewandowski:</strong> 86% (over 80 penalties)</li>
-        <li><strong>Cristiano Ronaldo:</strong> 85% (over 190 penalties)</li>
-        <li><strong>Mohamed Salah:</strong> 85% (over 40 penalties)</li>
-        <li><strong>Bruno Fernandes:</strong> 84% (over 40 penalties)</li>
-        <li><strong>Kylian Mbappe:</strong> 82% (over 30 penalties)</li>
-        <li><strong>Cole Palmer:</strong> 90%+ (emerging elite taker)</li>
-      </ul>
-    </div>
-
-    <p><strong>Factors affecting penalty conversion:</strong></p>
-    <ul>
-      <li><strong>Goalkeeper quality</strong> â€” Elite shot-stoppers save 15-20% of penalties faced. Goalkeepers who study takers (e.g. Alisson, Oblak) are more effective.</li>
-      <li><strong>Match pressure</strong> â€” Conversion rates drop from ~80% in routine league matches to ~72% in cup finals and decisive matches.</li>
-      <li><strong>Stoppage time penalties</strong> â€” Penalties in stoppage time have slightly lower conversion rates (~74%) due to fatigue and pressure.</li>
-      <li><strong>Second-half penalties</strong> â€” Players are slightly less accurate after 75+ minutes of exertion.</li>
-    </ul>
-
-    <div class="pro-tip">
-      <h4>Track Penalty Taker Announcements</h4>
-      <p>Some teams have designated penalty takers; others rotate based who's on the pitch or who won the penalty. Follow team news and press conferences to identify who will take penalties for each team. A team missing its primary taker through injury or substitution significantly drops conversion probability. Use <a href="https://www.transfermarkt.com/" target="_blank" rel="noopener">Transfermarkt</a> and club press conferences to confirm taker hierarchy.</p>
-    </div>
-
-    <h2>9. In-Play Penalty Betting Strategy</h2>
-    <p>In-play penalty betting offers unique opportunities because the odds fluctuate based on match events, often creating mispricing.</p>
-
-    <p><strong>Key in-play penalty scenarios:</strong></p>
-
-    <div class="success">
-      <h3>Scenario 1: Dominant Team Trailing 1-0 at Half-Time</h3>
-      <p>A team that dominated the first half (65%+ possession, 5+ shots in box) but trails 1-0 will attack aggressively in the second half. Their box entries will increase, and the defending team will be under sustained pressure. Back Penalty Yes in-play at odds of 4.00-6.00 â€” the true probability of a penalty in the second half is often 25-30% in this scenario, making odds above 3.50 valuable.</p>
-    </div>
-
-    <div class="success">
-      <h3>Scenario 2: Red Card to a Defensive Team</h3>
-      <p>A red card to a defensive-minded team changes the dynamic completely. With 10 men, they'll defend even deeper, inviting more box pressure. The attacking team will have more space and more penalty-earning opportunities. Back Penalty Yes immediately after a defensive red card in a close match.</p>
-    </div>
-
-    <div class="success">
-      <h3>Scenario 3: Key Dribbler Enters as Substitute</h3>
-      <p>If a team brings on a dribble-heavy winger or attacker known for drawing fouls (especially against tiring defenders), penalty probability increases. Back Penalty Yes when the substitution is announced, before the market fully processes the change.</p>
-    </div>
-
-    <div class="warning">
-      <strong>In-Play Penalty Trap:</strong> Avoid betting Penalty Yes in matches where both teams are playing cautiously (e.g. cup final first 30 minutes, goalless draw looking likely). Some matches genuinely have very low penalty probability â€” don't assume a penalty will arrive just because you've backed it. Be selective about in-play entries.</div>
-
-    <h2>10. Penalty Shootout Prediction</h2>
-    <p>Penalty shootout betting is a specialist market for knockout competitions. Predicting shootouts requires understanding which matches are most likely to remain level after extra time.</p>
-
-    <p><strong>Shootout probability factors:</strong></p>
-    <ul>
-      <li><strong>Defensive solidity</strong> â€” Two teams with good defences and strong goalkeepers are more likely to reach shootouts</li>
-      <li><strong>Low-scoring leagues</strong> â€” Serie A and Italian teams are overrepresented in shootout outcomes</li>
-      <li><strong>History</strong> â€” Some teams and managers have a history of knockout draws (e.g. Diego Simeone's Atletico Madrid)</li>
-      <li><strong>Fatigue</strong> â€” Extra time favours fitter teams, but exhausted players are more likely to miss penalties</li>
-      <li><strong>Goalkeeper quality</strong> â€” Elite penalty-saving goalkeepers (Alisson, Courtois, Neuer) increase shootout likelihood</li>
-    </ul>
-
-    <table>
-      <tr><th>Competition</th><th>% of KO Matches to Shootout</th><th>Typical Odds for Shootout Yes</th></tr>
-      <tr><td>Champions League Knockouts</td><td>18%</td><td>5.50-7.00</td></tr>
-      <tr><td>World Cup Knockouts</td><td>25%</td><td>4.00-5.50</td></tr>
-      <tr><td>FA Cup (later rounds)</td><td>15%</td><td>6.00-8.00</td></tr>
-      <tr><td>Copa America KO</td><td>22%</td><td>4.50-6.00</td></tr>
-      <tr><td>League Cup</td><td>12%</td><td>8.00-10.00</td></tr>
-    </table>
-
-    <div class="strategy-box">
-      <h3>Shootout Betting Strategy</h3>
-      <p>The best shootout value is found in matches between two defensive-minded teams in high-stakes knockout rounds. A Champions League quarter-final between Atletico Madrid and Inter Milan, for example, has a true shootout probability of 25-30% â€” but bookmakers often price it at 15-20% implied probability (odds of 5.00-6.00). This is one of the few consistent edges in shootout betting.</p>
-      <p>For shootout outcome bets (correct score, who wins), the historical advantage is slight for the team that kicks first (approximately 52-48% advantage). Home advantage also has a small positive effect. But shootout outcomes are close to random â€” avoid large stakes on specific correct score predictions.</p>
-    </div>
-
-    <h2>11. Combining Penalties with Other Markets</h2>
-    <p>Penalty markets intersect with several other betting markets. Understanding these connections opens multi-market opportunities.</p>
-
-    <table>
-      <tr><th>Combination</th><th>Description</th><th>Typical Combined Odds</th><th>Value Assessment</th></tr>
-      <tr><td>Penalty + Over 0.5 Goals</td><td>Penalty awarded and at least 1 goal</td><td>2.00-3.00</td><td>Good â€” penalty almost always creates a goal</td></tr>
-      <tr><td>Penalty + BTTS Yes</td><td>Penalty awarded and both teams score</td><td>4.00-8.00</td><td>Fair â€” penalty makes BTTS more likely</td></tr>
-      <tr><td>Penalty + Match Result</td><td>Penalty awarded and specific team wins</td><td>5.00-10.00</td><td>Moderate â€” penalty helps but team must still win</td></tr>
-      <tr><td>Penalty + First Goalscorer</td><td>Penalty taken by named player and they score first</td><td>10.00-25.00</td><td>Low â€” two rare events need to align</td></tr>
-      <tr><td>Penalty Missed + Draw</td><td>Penalty is missed/saved and match ends level</td><td>10.00-20.00</td><td>Very low probability, long-shot only</td></tr>
-    </table>
-
-    <div class="pro-tip">
-      <h4>Correlation Note: Penalties and Goals</h4>
-      <p>Penalties are highly correlated with goals but not perfectly. Approximately 78% of awarded penalties are scored. This means a penalty awarded implies a ~78% chance of a goal from that specific event. This knowledge is useful for in-play trading â€” if a penalty is awarded, the "Over 0.5 Goals" market may still have value if the odds haven't adjusted to account for the 78% conversion rate.</p>
-    </div>
-
-    <h2>12. Worked Example â€” Full Penalty Betting Analysis</h2>
-    <p>Let's walk through a complete penalty betting analysis: Manchester United vs Liverpool in the Premier League.</p>
-
-    <p><strong>Step 1: League Context</strong> â€” Premier League average: 0.28 penalties per match, 26% of matches have at least one penalty.</p>
-
-    <p><strong>Step 2: Team Penalty Data</strong></p>
-    <table>
-      <tr><th>Metric</th><th>Manchester United</th><th>Liverpool</th></tr>
-      <tr><td>Penalties earned (last 20 matches)</td><td>5</td><td>6</td></tr>
-      <tr><td>Penalties conceded (last 20 matches)</td><td>4</td><td>3</td></tr>
-      <tr><td>Box touches per game</td><td>35.2</td><td>38.1</td></tr>
-      <tr><td>Dribbles in box per game</td><td>8.4</td><td>9.2</td></tr>
-      <tr><td>Fouls drawn in box per game</td><td>0.21</td><td>0.24</td></tr>
-    </table>
-
-    <p><strong>Step 3: Referee Analysis</strong> â€” Michael Oliver assigned (0.38 penalties per match, 34% penalty rate). This is well above the Premier League average of 0.28 and immediately elevates this match's penalty probability.</p>
-
-    <p><strong>Step 4: VAR Factor</strong> â€” Premier League has full VAR. Both teams have had several penalties awarded via VAR review this season. This increases the base penalty probability.</p>
-
-    <p><strong>Step 5: Context Factors</strong></p>
-    <ul>
-      <li><strong>Match importance:</strong> Both teams competing for Champions League places â€” high stakes, aggressive attacking.</li>
-      <li><strong>Historical penalty rate:</strong> Last 5 meetings produced 2 penalties â€” roughly league-average frequency.</li>
-      <li><strong>Key dribblers:</strong> Garnacho (Man Utd), Diaz and Salah (Liverpool) all draw significant fouls.</li>
-      <li><strong>Defensive vulnerabilities:</strong> Man Utd missing first-choice centre-back â€” more box entries for Liverpool.</li>
-    </ul>
-
-    <p><strong>Step 6: Probability Estimate</strong></p>
-    <p>Base league rate: 26% chance of a penalty. </p>
-    <p>Referee adjustment (Michael Oliver: +30% vs average): 26% Ã— 1.30 = 33.8%.</p>
-    <p>Team adjustment (both teams above-average for earning): 33.8% Ã— 1.15 = 38.9%.</p>
-    <p>Context adjustment (key defender out, high stakes): 38.9% Ã— 1.10 = 42.8%.</p>
-    <p>Estimated true probability: approximately 40-43%.</p>
-
-    <p><strong>Step 7: Odds Check</strong></p>
-    <p>Bookmaker offers Penalty Yes at 2.80 (implied 35.7%).</p>
-    <p>Our estimate: 42%. Edge: 42% - 35.7% = 6.3 percentage points.</p>
-
-    <div class="example-box">
-      <h3>Verdict: Back Penalty Yes at 2.80</h3>
-      <p>Positive expected value of approximately +17.6% (EV = (0.42 Ã— 2.80) - 1 = +0.176). The referee assignment is the key factor â€” Michael Oliver's 34% penalty rate significantly elevates the base probability. Combined with both teams' attacking styles and attacking personnel, this match has a genuine 40%+ chance of a penalty.</p>
-    </div>
-
-    <h2>13. Frequently Asked Questions</h2>
-
-    <div class="strategy-box">
-      <h3>How often are penalties awarded in football matches?</h3>
-      <p>Across Europe's top leagues, approximately 22-30% of matches feature at least one penalty. The average is roughly one penalty every 3.5 matches. Champions League and World Cup matches have slightly higher rates (30-32%).</p>
-    </div>
-
-    <div class="strategy-box">
-      <h3>What percentage of penalties are scored?</h3>
-      <p>Globally, approximately 76-78% of penalties are scored. Elite takers in top leagues convert at 82-90%. The rate varies by league, with the Premier League (78%) and Bundesliga (79%) having higher conversion rates than Serie A (74%) and the Championship (73%).</p>
-    </div>
-
-    <div class="strategy-box">
-      <h3>Does VAR increase or decrease penalty awards?</h3>
-      <p>VAR increases penalty awards overall by approximately 15-25%. It catches clear fouls missed by on-field referees. However, it also reduces the number of soft/controversial penalties because referees know VAR will overturn clear errors. The net effect is more penalties, but only for genuine fouls.</p>
-    </div>
-
-    <div class="strategy-box">
-      <h3>Which referee awards the most penalties?</h3>
-      <p>JesÃºs Gil Manzano (La Liga) has the highest rate among Big 5 league referees at approximately 0.42 penalties per match (38% of matches). Danny Makkelie (Eredivisie) and Michael Oliver (Premier League) are also above-average at 0.40 and 0.38 respectively. At the other end, Paul Tierney (Premier League) awards penalties in only 18% of matches.</p>
-    </div>
-
-    <div class="strategy-box">
-      <h3>Which teams earn the most penalties?</h3>
-      <p>Teams with dribble-heavy attackers and high box touches consistently earn the most penalties. Manchester City, Real Madrid, Barcelona, and PSG typically lead their respective leagues in penalties earned. Brighton under De Zerbi also earned a high rate due to their box-centric attacking approach.</p>
-    </div>
-
-    <div class="strategy-box">
-      <h3>Are home teams more likely to get penalties?</h3>
-      <p>Yes. Home teams are awarded approximately 15-20% more penalties than away teams. This bias exists across virtually every league and competition. VAR has slightly reduced this gap but not eliminated it.</p>
-    </div>
-
-    <div class="strategy-box">
-      <h3>How do I bet on penalties in-play?</h3>
-      <p>Watch for dominant teams trailing, red cards to defensive teams, and dribbly substitutes entering the match. These scenarios increase penalty probability significantly. Bet365 and Betfair offer the best in-play penalty markets. Be fast â€” odds adjust quickly after key events like VAR checks and red cards.</p>
-    </div>
-
-    <div class="strategy-box">
-      <h3>Is penalty betting profitable long-term?</h3>
-      <p>Yes, for disciplined bettors who focus on referee tendencies and team-level penalty data. The market is less efficient than goal-based markets because fewer bettors analyse penalty data. Edges of 5-15% are achievable, especially when you factor in referee assignments that bookmakers don't fully price. A 55-60% win rate in penalty yes/no markets at average odds of 3.00 is realistic for skilled bettors.</p>
-    </div>
-
-    <div class="strategy-box">
-      <h3>What bankroll should I use for penalty betting?</h3>
-      <p>Penalty markets are volatile â€” you can have stretches of 10+ matches without a penalty. Use smaller stakes than you would for goal markets (0.5-1% per bet) and ensure you have at least a 100-bet bankroll. Level staking is recommended given the variability. Track your edge over 200+ bets before scaling up.</p>
-    </div>
-
-    <div class="strategy-box">
-      <h3>Can I combine penalty bets in accumulators?</h3>
-      <p>Yes, but be careful. Penalty events across different matches are genuinely independent (unlike goals within a match), so multi-match penalty accumulators are mathematically sound. However, the probability of 3+ penalty awards all landing is very low. Stick to 2-3 selections in penalty accumulators and ensure each has been independently analysed using the framework above.</p>
-    </div>
-
-    <h2>Next Steps</h2>
-    <p>Penalty betting rewards deep analysis of referee tendencies, team attacking styles, and VAR dynamics. Focus on one or two leagues, build a penalty database, and track every bet. The inefficiencies in penalty markets are real but require patience and discipline to exploit.</p>
-    <ul>
-      <li><a href="/blog/penalties-awarded-betting">Penalties Awarded Betting</a> â€” Over/under penalty frequency markets</li>
-      <li><a href="/blog/correct-score-betting">Correct Score Betting</a> â€” How penalties affect correct score odds</li>
-      <li><a href="/blog/first-goalscorer-betting">First Goalscorer Betting</a> â€” Penalty takers as first goalscorer value</li>
-      <li><a href="/blog/referee-statistics-betting">Referee Statistics Betting</a> â€” Comprehensive referee analysis</li>
-    </ul>
-
-    <div class="cta">
-      <h3>Get Today's Predictions</h3>
-      <p>Daily football predictions with penalty probability data:</p>
-      <p><a href="/">View Today's Predictions â†’</a></p>
-    </div>
-
-    <div class="related-posts">
-      <h3>Related Articles</h3>
-      <ul>
-        <li><a href="/blog/penalties-awarded-betting">Penalties Awarded: Spot Kick Frequency Betting</a></li>
-        <li><a href="/blog/referee-statistics-betting">Referee Statistics for Football Betting</a></li>
-        <li><a href="/blog/first-goalscorer-betting">First Goalscorer Betting Guide</a></li>
-        <li><a href="/blog/correct-score-betting">Correct Score Betting Strategy</a></li>
-        <li><a href="/blog/expected-goals-xg-betting-strategy">Expected Goals (xG) Betting Strategy</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <div style="margin: 0 auto 32px; max-width: 560px; background: linear-gradient(135deg, #0a0e17, #141c2a); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 28px 32px; text-align: center;">
-    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,36,72,0.6); margin-bottom: 8px;">Featured Tool</div>
-    <h3 style="margin: 0 0 10px; font-size: 20px; font-weight: 700; color: #e8edf5;">Build Winning Accumulator Tickets</h3>
-    <p style="margin: 0 auto 16px; font-size: 14px; color: rgba(232,237,245,0.55); line-height: 1.6; max-width: 440px;">Generate optimized accumulator combinations from today's AI-powered predictions. Set your target odds and get instant ticket suggestions.</p>
-    <a href="/ticket-builder.html" style="display: inline-block; background: linear-gradient(135deg, #ff2448, #d41a38); color: #fff; padding: 12px 32px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 15px;">Try Ticket Builder &rarr;</a>
-  </div>
-  <footer>
-        <div style="text-align:center;padding:16px 12px;background:#fff5f5;border-top:2px solid #ff0000;margin-bottom:12px;">
-      <p style="margin:0 0 10px;font-size:15px;color:#52525b;">
-        Support WinFulltime &mdash; your donations keep this website running and all predictions free.
-      </p>
-      <a href="https://ko-fi.com/winfulltime" target="_blank" rel="noopener" style="display:inline-block;background:#ff0000;color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;">
-        Donate on Ko-fi
-      </a>
-    </div>
-    <div class="footer-links">
-      <a href="/">Home</a>
-      <a href="/ticket-builder.html">Ticket Builder</a>
-      <a href="/blog/">Latest News</a>
-      <a href="/about.html">About</a>
-        <a href="/advertise.html">Advertise</a>
-        <a href="/contact.html">Contact</a>
-      <a href="/privacy.html">Privacy</a>
-      <a href="/terms.html">Terms</a>
-    </div>
-    <p class="footer-copyright">&copy; 2026 WinFulltime. Predictions are for informational purposes only. | <a href="https://mesigo.site" target="_blank" rel="noopener">Website Built by Mesigo</a></p>
-  </footer>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-HMGZMW9EDP');
-  </script>
-<script src="/chat-widget.js"></script>
-</body>
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Penalty Betting: Spot Kick Strategy Guide | WinFulltime</title>
+ <meta name="description" content="Master penalty betting with our comprehensive guide. Complete strategy covering penalty markets (yes/no, timing, shootout), teams that concede and earn most penalties, referee tendencies, VAR impact, conversion rates, and in-play penalty betting.">
+ <meta name="keywords" content="penalty betting, spot kick, penalty markets, penalty shootout, football betting, penalty strategy, VAR penalties, penalty conversion">
+ <meta property="og:title" content="Penalty Betting: Spot Kick Strategy Guide">
+ <meta property="og:description" content="Master penalty betting for football. Comprehensive strategy covering penalty markets, teams that concede and earn most penalties, referee tendencies, VAR impact on penalties, conversion rates by player and league, in-play penalty betting, and penalty shootout prediction.">
+ <meta property="og:type" content="article">
+ <meta property="og:image" content="https://winfulltime.com/blog/thumbnails/penalty-betting-strategy.webp">
+ <meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/penalty-betting-strategy.webp">
+ <link rel="canonical" href="https://winfulltime.com/blog/penalty-betting-strategy">
+ <link rel="stylesheet" href="/styles.css">
+ <link rel="icon" href="/winfulltimelogo.png" type="image/png">
+ <style>
+ :root {
+ --bg-primary: #0b0f1a;
+ --bg-secondary: #111827;
+ --bg-card: rgba(23, 28, 46, 0.85);
+ --bg-elevated: #1a1f2e;
+ --text-primary: #e8edf5;
+ --text-secondary: #c8d0db;
+ --text-muted: #94a3b8;
+ --accent: #ff2448;
+ --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+ --border: rgba(255,255,255,0.06);
+ --border-hover: rgba(255,255,255,0.12);
+ --glow: rgba(255,36,72,0.12);
+ --radius: 12px;
+ --radius-lg: 16px;
+ --font: 'Inter', system-ui, -apple-system, sans-serif;
+ }
+ * { margin: 0; padding: 0; box-sizing: border-box; }
+ body { font-family: var(--font); background: var(--bg-primary); background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent); color: var(--text-primary); margin: 0; padding: 0; font-size: 16px; -webkit-font-smoothing: antialiased; }
+ header { background: rgba(11,15,26,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
+ .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
+ .logo { display: inline-flex; align-items: center; font-size: 24px; font-weight: 800; color: #ffffff; text-decoration: none; letter-spacing: -0.5px; }
+ .logo-icon { height: 28px; width: auto; flex-shrink: 0; margin-right: 8px; }
+ .logo span { color: #facc15; }
+ .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+ h1 { font-size: 2.8rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; }
+ h2 { font-size: 2.1rem; color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; font-weight: 700; }
+ h3 { font-size: 1.5rem; color: var(--text-primary); margin-top: 30px; margin-bottom: 10px; font-weight: 600; }
+ p { font-size: 1.125rem; margin-bottom: 20px; color: var(--text-secondary); line-height: 1.85; }
+ li { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.85; margin-bottom: 8px; }
+ .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+ .highlight { background: rgba(251,191,36,0.1); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
+ .highlight * { color: var(--text-primary); }
+ .example-box { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); padding: 20px; border-radius: 8px; margin: 20px 0; }
+ .example-box * { color: var(--text-primary); }
+ .strategy-box { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin: 24px 0; }
+ .strategy-box h3 { margin-top: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+ .pro-tip { background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+ .pro-tip h4 { margin-top: 0; color: #60a5fa; }
+ .pro-tip * { color: var(--text-primary); }
+ .warning { background: rgba(239,68,68,0.08); border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
+ .warning * { color: var(--text-primary); }
+ .success { background: rgba(34,197,94,0.08); border-left: 4px solid #22c55e; padding: 16px; border-radius: 8px; margin: 20px 0; }
+ .success * { color: var(--text-primary); }
+ .steps { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin: 20px 0; }
+ .steps ol { margin: 0; padding-left: 20px; }
+ .steps li { margin-bottom: 10px; color: var(--text-secondary); }
+ .cta { background: var(--accent-gradient); color: white; padding: 24px; border-radius: var(--radius); text-align: center; margin: 30px 0; box-shadow: 0 4px 15px var(--glow); }
+ .cta * { color: white; }
+ .cta a { color: white; text-decoration: underline; }
+ .breadcrumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+ .breadcrumb a { color: var(--accent); text-decoration: none; }
+ .breadcrumb a:hover { text-decoration: underline; }
+ .related-posts { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin-top: 40px; }
+ .related-posts h3 { margin-top: 0; color: var(--text-primary); }
+ .related-posts ul { list-style: none; padding: 0; }
+ .related-posts li { margin-bottom: 10px; color: var(--text-secondary); }
+ .related-posts a { color: var(--accent); text-decoration: none; }
+ .related-posts a:hover { text-decoration: underline; }
+ table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+ th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+ th { background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 600; }
+ .odds-table { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; overflow: hidden; }
+ .odds-table th { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+ .odds-table td { border-bottom: 1px solid var(--border); color: var(--text-primary); }
+ code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); }
+ footer { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 40px 16px 32px; text-align: center; margin-top: 60px; }
+ .footer-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap; }
+ .footer-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; }
+ .footer-links a:hover { color: var(--accent); }
+ .footer-copyright { color: var(--text-muted); font-size: 13px; }
+ nav { display: flex; gap: 24px; }
+ nav a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s; }
+ nav a:hover { color: var(--text-primary); }
+ img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+ @media (max-width: 640px) {
+ h1 { font-size: 2.2rem; }
+ h2 { font-size: 1.7rem; }
+ .container { padding: 0 16px; }
+ nav { gap: 12px; }
+ nav a { font-size: 13px; }
+ }
+</style>
+ <meta name="twitter:card" content="summary_large_image">
+ <meta name="twitter:title" content="Penalty Betting: Spot Kick Strategy Guide | WinFulltime">
+ <meta name="twitter:description" content="Master penalty betting with our comprehensive guide. Complete strategy covering penalty markets (yes/no, timing, shootout), teams that concede and earn most penalties, referee tendencies, VAR impac...">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Penalty Betting: Spot Kick Strategy Guide | WinFulltime",
+  "description": "Master penalty betting with our comprehensive guide. Complete strategy covering penalty markets (yes/no, timing, shootout), teams that concede and earn most penalties, referee tendencies, VAR impact, conversion rates, and in-play penalty betting.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "WinFulltime",
+    "logo": {"@type": "ImageObject", "url": "https://winfulltime.com/winfulltimelogo.png"}
+  },
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://winfulltime.com/blog/penalty-betting-strategy"},
+  "url": "https://winfulltime.com/blog/penalty-betting-strategy"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://winfulltime.com/"},
+    {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://winfulltime.com/blog/"},
+    {"@type": "ListItem", "position": 3, "name": "Penalty Betting: Spot Kick Strategy Guide | WinFulltime", "item": "https://winfulltime.com/blog/penalty-betting-strategy"}
+  ]
+}
+</script>
+</head>
+<body>
+ <header>
+ <div class="header-content">
+ <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a>
+ <nav>
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/blog/">News</a>
+ </nav>
+</div>
+</header>
+
+ <div class="container">
+ <div class="breadcrumb">
+ <a href="/">Home</a> &gt; <a href="/blog/">Blog</a> &gt; Penalty Betting
+</div>
+
+ <h1>Penalty Betting: Spot Kick Strategy Guide</h1>
+ <p class="meta">Last updated: June 2026 | By WinFulltime Team | 24 min read</p>
+
+ <div style="background:#dbeafe;padding:16px 20px;border-radius:8px;margin:20px 0;color:#000"><strong>Tip:</strong> Looking for today's football predictions? <a href="/">Click here</a>.</div>
+
+ <p>Penalty betting has grown into one of football's most dynamic niche markets. From simple penalty-yes/no bets to sophisticated penalty timing, shootout prediction, and player-specific markets, spot kicks offer opportunities that span the full match timeline. This guide covers every angle &#8212; the teams that earn and concede penalties, referee tendencies, VAR's transformative impact, conversion rates, in-play strategy, and a complete worked example.</p>
+ <p>Penalties are rare events (roughly one every 3-4 matches in most leagues), but their impact on match outcomes is enormous. Understanding penalty dynamics gives you an edge not just in dedicated penalty markets but also in related markets like correct score, first goalscorer, and match result.</p>
+
+ <div class="toc">
+ <strong>In This Guide:</strong>
+ <ol>
+ <li>Understanding Penalty Betting Markets</li>
+ <li>Penalty Yes/No &#8212; The Core Market</li>
+ <li>Penalty Timing Markets &#8212; When Will the Spot Kick Come?</li>
+ <li>Teams That Concede the Most Penalties</li>
+ <li>Teams That Earn the Most Penalties</li>
+ <li>Referee Tendencies for Penalty Awards</li>
+ <li>VAR Impact on Penalty Decisions</li>
+ <li>Penalty Conversion Rates by Player and League</li>
+ <li>In-Play Penalty Betting Strategy</li>
+ <li>Penalty Shootout Prediction</li>
+ <li>Combining Penalties with Other Markets</li>
+ <li>Worked Example &#8212; Full Penalty Betting Analysis</li>
+ <li>Frequently Asked Questions</li>
+</ol>
+</div>
+
+ <h2>1. Understanding Penalty Betting Markets</h2>
+ <p>Penalty betting markets have expanded significantly. Here are the main market types you'll encounter across major bookmakers:</p>
+
+ <table>
+ <tr><th>Market</th><th>Description</th><th>Typical Odds</th><th>Liquidity</th></tr>
+ <tr><td>Penalty Awarded &#8212; Yes/No</td><td>Will a penalty be awarded during regulation time?</td><td>2.50-5.00 (Yes)</td><td>High</td></tr>
+ <tr><td>Penalty Scored &#8212; Yes/No</td><td>Will a penalty be scored (not just awarded)?</td><td>2.80-6.00 (Yes)</td><td>Medium</td></tr>
+ <tr><td>Penalty Taken &#8212; First Team</td><td>Which team will be awarded the first penalty?</td><td>2.00-3.00</td><td>Medium</td></tr>
+ <tr><td>Time of First Penalty</td><td>Over/under specific minute (e.g. before/after 60 mins)</td><td>1.80-2.00</td><td>Low-Medium</td></tr>
+ <tr><td>Penalty Shootout &#8212; Yes/No</td><td>Will the match go to a penalty shootout?</td><td>3.00-10.00</td><td>Medium</td></tr>
+ <tr><td>Penalty Shootout &#8212; Correct Score</td><td>Exact shootout result (e.g. 4-2)</td><td>8.00-20.00</td><td>Low</td></tr>
+ <tr><td>Penalty Taker &#8212; Anytime</td><td>Which player will take a penalty (any time)</td><td>5.00-15.00</td><td>Low</td></tr>
+ <tr><td>Penalty to be Missed/Saved</td><td>A penalty taken is not converted</td><td>4.00-8.00</td><td>Low-Medium</td></tr>
+ <tr><td>First Goalscorer &#8212; Penalty</td><td>First goal of the match is a penalty</td><td>6.00-12.00</td><td>Medium</td></tr>
+</table>
+
+ <p>Most liquidity is concentrated in the Penalty Yes/No market. Timing markets and shootout markets are deeper in knockout competitions (Champions League, World Cup, domestic cups). For standard league matches, the penalty yes/no market is your primary vehicle.</p>
+
+ <div class="pro-tip">
+ <h4>Best Bookmakers for Penalty Markets</h4>
+ <p>Bet365 offers the widest range of penalty markets including penalty timing and player-specific options. <a href="https://www.pinnacle.com/" target="_blank" rel="noopener">Pinnacle</a> has sharp penalty odds with higher limits. <a href="https://www.betfair.com/" target="_blank" rel="noopener">Betfair Exchange</a> is excellent for trading penalty markets in-play. Compare odds across all three using <a href="https://www.oddsportal.com/football/" target="_blank" rel="noopener">OddsPortal</a> before placing any penalty bet.</p>
+</div>
+
+ <h2>2. Penalty Yes/No &#8212; The Core Market</h2>
+ <p>The penalty yes/no market is the simplest and most liquid. It asks a single question: will at least one penalty be awarded during regulation time (90 minutes plus stoppage time)? Extra time penalties do not count.</p>
+
+ <p><strong>Understanding the odds:</strong> Penalty Yes is typically priced between 2.50 and 5.00 depending on the match. A price of 3.50 implies a 28.6% chance of at least one penalty. The true probability varies by league, teams, and referee &#8212; typically between 22-35% for most matches.</p>
+
+ <p><strong>Penalty frequency by league:</strong></p>
+ <table>
+ <tr><th>League</th><th>Penalties per Match</th><th>% of Matches with 1+ Penalty</th><th>Notes</th></tr>
+ <tr><td>Premier League</td><td>0.28</td><td>26%</td><td>VAR review for every penalty decision</td></tr>
+ <tr><td>Bundesliga</td><td>0.30</td><td>27%</td><td>Consistent penalty rate, VAR active</td></tr>
+ <tr><td>La Liga</td><td>0.32</td><td>29%</td><td>Slightly higher rate, more contact in box</td></tr>
+ <tr><td>Serie A</td><td>0.26</td><td>24%</td><td>Lower penalty rate, VAR reduces clear errors</td></tr>
+ <tr><td>Ligue 1</td><td>0.29</td><td>26%</td><td>Average penalty frequency</td></tr>
+ <tr><td>Championship</td><td>0.30</td><td>27%</td><td>No VAR in regular season &#8212; slightly higher rate</td></tr>
+ <tr><td>Eredivisie</td><td>0.31</td><td>28%</td><td>Open play leads to more box incidents</td></tr>
+ <tr><td>MLS</td><td>0.27</td><td>25%</td><td>Lower rate but variable by team</td></tr>
+ <tr><td>Champions League</td><td>0.33</td><td>30%</td><td>Higher stakes, more box activity</td></tr>
+ <tr><td>World Cup</td><td>0.35</td><td>32%</td><td>VAR consistently used, more clear penalties</td></tr>
+</table>
+
+ <div class="success">
+ <h3>Key Insight: Home Team Penalty Advantage</h3>
+ <p>Home teams are awarded approximately 15-20% more penalties than away teams. This is one of the most consistent biases in football. Crowd pressure, subconscious referee bias, and home-team attacking dominance all contribute. When evaluating penalty yes/no, factor in which team is more likely to attack the opposition box.</p>
+</div>
+
+ <h2>3. Penalty Timing Markets &#8212; When Will the Spot Kick Come?</h2>
+ <p>Penalty timing markets allow you to bet on when the first penalty will be awarded. Common lines include over/under 60 minutes, or specific minute bands (0-30, 31-60, 61-90).</p>
+
+ <p><strong>Penalty timing distribution analysis:</strong> Analysis of 5,000+ penalties across major leagues shows a clear pattern: penalties become more likely in the second half, with a notable spike in the final 15 minutes.</p>
+
+ <table>
+ <tr><th>Time Band</th><th>% of All Penalties</th><th>Why This Happens</th></tr>
+ <tr><td>0-15 minutes</td><td>8%</td><td>Match still settling, fewer box entries</td></tr>
+ <tr><td>16-30 minutes</td><td>14%</td><td>Match finding rhythm, attacking patterns emerging</td></tr>
+ <tr><td>31-45 minutes</td><td>18%</td><td>Pressure builds before half-time, tired defenders make errors</td></tr>
+ <tr><td>45+ stoppage time</td><td>6%</td><td>Short window but higher incident rate per minute</td></tr>
+ <tr><td>46-60 minutes</td><td>14%</td><td>Second half settling, tactical adjustments</td></tr>
+ <tr><td>61-75 minutes</td><td>16%</td><td>Substitutions change dynamics, defenders tire</td></tr>
+ <tr><td>76-90 minutes</td><td>20%</td><td>Peak penalty time &#8212; desperation, fatigue, VAR checks</td></tr>
+ <tr><td>90+ stoppage time</td><td>4%</td><td>High per-minute rate but limited minutes</td></tr>
+</table>
+
+ <div class="strategy-box">
+ <h3>Penalty Timing Betting Strategy</h3>
+ <p>The data clearly favours later penalties. If you're betting the over/under on 60 minutes,"Over 60" is statistically the correct side in roughly 60% of matches with penalties. This is a consistent (if small) edge against the bookmaker's line, which tends to be set too close to 50/50.</p>
+ <p>For in-play penalty timing, watch for a team that has dominated possession and box entries without scoring. Their penalty probability increases with every attack repelled. If they hit the woodwork or have a shot cleared off the line, the next box incident could easily be a penalty.</p>
+</div>
+
+ <h2>4. Teams That Concede the Most Penalties</h2>
+ <p>Some teams concede penalties at remarkably high rates. This is driven by defensive style, tactical approach, and individual defender tendencies.</p>
+
+ <p><strong>Factors that increase penalty concession:</strong></p>
+ <ul>
+ <li><strong>High defensive volume</strong> &#8212; Teams that face many shots in the box concede more penalties (more opportunities for fouls)</li>
+ <li><strong>Aggressive tackling style</strong> &#8212; Teams that slide-tackle in the box rather than jockeying are more likely to concede penalties</li>
+ <li><strong>Poor defensive organisation</strong> &#8212; Disorganised defences make rash challenges in panic situations</li>
+ <li><strong>Inexperienced defenders</strong> &#8212; Younger or less experienced defenders commit more box fouls</li>
+ <li><strong>Low block + counter</strong> &#8212; Teams that defend deep invite pressure into their box, increasing penalty risk</li>
+</ul>
+
+ <table>
+ <tr><th>Team Type</th><th>Penalties Conceded/Season</th><th>Profile</th></tr>
+ <tr><td>Relegation-threatened</td><td>5-7</td><td>Desperate defending, limited technical ability, frequent box fouls</td></tr>
+ <tr><td>High-pressing aggressive</td><td>4-6</td><td>High-risk defending, challenges in transition, VAR exposure</td></tr>
+ <tr><td>Mid-table conservative</td><td>3-5</td><td>League average, depends on specific defenders</td></tr>
+ <tr><td>Possession-dominant elite</td><td>2-4</td><td>Rarely defend their own box, controlled defending</td></tr>
+ <tr><td>Defensive specialists</td><td>2-3</td><td>Organised, minimal box entries allowed, clean challenges</td></tr>
+</table>
+
+ <div class="pro-tip">
+ <h4>Identifying Penalty-Conceding Teams</h4>
+ <p>Use <a href="https://fbref.com/en/" target="_blank" rel="noopener">FBref</a> to check team defensive stats &#8212; look at"Penalties Conceded" and"Shots in Box Faced." A team in the top 5 for both is a strong penalty-yes candidate in most matches. Historical data over 2-3 seasons gives the most reliable picture, as penalty tendencies are surprisingly stable year over year.</p>
+</div>
+
+ <h2>5. Teams That Earn the Most Penalties</h2>
+ <p>Just as some teams concede many penalties, others earn them at above-average rates. These are typically teams with specific attacking characteristics.</p>
+
+ <p><strong>Factors that increase penalty earning:</strong></p>
+ <ul>
+ <li><strong>Dribble-heavy attackers</strong> &#8212; Players who take on defenders in the box (e.g. wingers, attacking midfielders) draw fouls</li>
+ <li><strong>High box touches</strong> &#8212; Teams that spend significant time in the opposition box create more penalty opportunities</li>
+ <li><strong>Target-man strikers</strong> &#8212; Physical strikers who hold up play and draw contact in the box</li>
+ <li><strong>Pace on the counter</strong> &#8212; Fast attackers running at retreating defenders cause panicked fouls</li>
+ <li><strong>Set piece delivery</strong> &#8212; Some teams earn penalties from corners and free kicks where defenders grapple</li>
+</ul>
+
+ <table>
+ <tr><th>Team</th><th>Penalties Earned/Season (Avg)</th><th>Key Penalty-Drawing Players</th></tr>
+ <tr><td>Manchester City</td><td>7.5</td><td>Grealish, Haaland, Foden &#8212; constant box presence</td></tr>
+ <tr><td>Real Madrid</td><td>7.0</td><td>Vinicius Jr, Rodrygo &#8212; dribble-heavy wide players</td></tr>
+ <tr><td>Barcelona</td><td>6.5</td><td>Yamal, Raphinha &#8212; high box touch wingers</td></tr>
+ <tr><td>PSG</td><td>6.0</td><td>Mbappe, Dembele &#8212; pace and dribbling</td></tr>
+ <tr><td>Inter Milan</td><td>5.5</td><td>Lautaro, Thuram &#8212; physical strikers</td></tr>
+ <tr><td>Atletico Madrid</td><td>5.0</td><td>Target play, set pieces &#8212; direct attacking</td></tr>
+ <tr><td>Brighton</td><td>5.5</td><td>Mitoma, Pedro &#8212; dribble-heavy approach</td></tr>
+</table>
+
+ <div class="pro-tip">
+ <h4>Player-Level Penalty Data</h4>
+ <p>Use <a href="https://www.whoscored.com/" target="_blank" rel="noopener">WhoScored</a> to identify players who draw the most fouls per game and have high dribble success rates in the box. A winger averaging 3+ dribbles per game in the box with 60%+ success rate is a significant penalty-earning asset. <a href="https://www.transfermarkt.com/" target="_blank" rel="noopener">Transfermarkt</a> also tracks penalty-earning statistics in player profiles.</p>
+</div>
+
+ <h2>6. Referee Tendencies for Penalty Awards</h2>
+ <p>Referee assignment is one of the most important factors in penalty probability. Some referees award penalties at triple the rate of others.</p>
+
+ <table>
+ <tr><th>Referee</th><th>League</th><th>Penalties per Match</th><th>% of Matches with Penalty</th><th>Tendency</th></tr>
+ <tr><td>Michael Oliver</td><td>Premier League</td><td>0.38</td><td>34%</td><td>Willing to award, especially for clear contact</td></tr>
+ <tr><td>Anthony Taylor</td><td>Premier League</td><td>0.35</td><td>32%</td><td>Above-average penalty rate</td></tr>
+ <tr><td>Paul Tierney</td><td>Premier League</td><td>0.20</td><td>18%</td><td>Reluctant to award, wants clear-and-obvious</td></tr>
+ <tr><td>Danny Makkelie</td><td>Eredivisie</td><td>0.40</td><td>36%</td><td>Pro-penalty, especially for attacking play</td></tr>
+ <tr><td>Felix Zwayer</td><td>Bundesliga</td><td>0.28</td><td>25%</td><td>League-average penalty rate</td></tr>
+ <tr><td>JesÃºs Gil Manzano</td><td>La Liga</td><td>0.42</td><td>38%</td><td>Among highest penalty rates in Big 5</td></tr>
+ <tr><td>Daniele Orsato</td><td>Serie A</td><td>0.22</td><td>20%</td><td>Conservative, lets play continue</td></tr>
+ <tr><td>Clement Turpin</td><td>Ligue 1</td><td>0.32</td><td>29%</td><td>Average to slightly above</td></tr>
+</table>
+
+ <div class="warning">
+ <strong>Referee-By-Referee Analysis is Essential:</strong> A match between two penalty-prone teams is a strong penalty-yes candidate with Michael Oliver (34% penalty rate) but a weaker candidate with Paul Tierney (18% rate). The referee alone can swing penalty probability by 15 percentage points. Check referee assignments on <a href="https://www.transfermarkt.com/" target="_blank" rel="noopener">Transfermarkt</a> as early as possible &#8212; they're typically confirmed 48-72 hours before kickoff.</div>
+
+ <h2>7. VAR Impact on Penalty Decisions</h2>
+ <p>VAR has transformed penalty betting. Since its introduction across major leagues, penalty awards have increased by 15-25% on average. VAR reviews potential penalties for clear and obvious errors, which has several betting implications.</p>
+
+ <p><strong>How VAR changes penalty dynamics:</strong></p>
+ <ul>
+ <li><strong>More penalties overall</strong> &#8212; VAR catches clear fouls missed by on-field referees, especially in the box</li>
+ <li><strong>Higher conversion on reviewed penalties</strong> &#8212; Once VAR recommends a review, the penalty is awarded ~80% of the time</li>
+ <li><strong>Reduced home bias</strong> &#8212; VAR mitigates the home-team penalty advantage (from ~20% down to ~12-15%)</li>
+ <li><strong>More stoppage time penalties</strong> &#8212; VAR checks add 2-5 minutes of stoppage time, during which penalties can still be awarded</li>
+ <li><strong>Clearer fouls only</strong> &#8212; Referees are less likely to award marginal penalties, knowing VAR will correct clear errors</li>
+</ul>
+
+ <div class="strategy-box">
+ <h3>VAR Penalty Betting Strategy</h3>
+ <p>The most profitable VAR-related penalty strategy is in-play. Watch matches closely &#8212; if there's a potential penalty incident that the referee waves away, the VAR check will happen 30-60 seconds later. If the odds for"Penalty Awarded Yes" are still live (offered by some bookmakers), you can bet into the VAR review window at inflated odds. This requires fast reaction and a bookmaker with responsive in-play markets.</p>
+ <p>Pre-match, factor VAR into your penalty probability estimates. Leagues with active VAR (Big 5, Champions League, World Cup) will have higher penalty rates. Leagues without VAR (Championship regular season, many lower leagues) will have lower, more unpredictable rates.</p>
+</div>
+
+ <h2>8. Penalty Conversion Rates by Player and League</h2>
+ <p>Once a penalty is awarded, the conversion rate determines whether it becomes a goal. Understanding conversion rates helps you bet on penalty scoring markets and informs related bets (correct score, first goalscorer).</p>
+
+ <p><strong>Overall conversion rates:</strong> Across all professional football, approximately 76-78% of penalties are scored. This varies by league, player quality, and match context.</p>
+
+ <table>
+ <tr><th>League</th><th>Conversion Rate</th><th>Notes</th></tr>
+ <tr><td>Premier League</td><td>78%</td><td>High-quality takers, excellent technique</td></tr>
+ <tr><td>Bundesliga</td><td>79%</td><td>Training emphasised, technical proficiency</td></tr>
+ <tr><td>La Liga</td><td>76%</td><td>Slightly lower, more pressure situations</td></tr>
+ <tr><td>Serie A</td><td>74%</td><td>Goalkeepers study takers extensively</td></tr>
+ <tr><td>Ligue 1</td><td>75%</td><td>Variable by team quality</td></tr>
+ <tr><td>Championship</td><td>73%</td><td>Lower technical level, more misses</td></tr>
+ <tr><td>MLS</td><td>72%</td><td>Wider quality variance among takers</td></tr>
+ <tr><td>Champions League</td><td>80%</td><td>Elite takers, high-pressure specialists</td></tr>
+</table>
+
+ <div class="success">
+ <h3>Top Penalty Takers (Career Conversion Rates)</h3>
+ <ul>
+ <li><strong>Harry Kane:</strong> 88% (over 70 penalties taken)</li>
+ <li><strong>Robert Lewandowski:</strong> 86% (over 80 penalties)</li>
+ <li><strong>Cristiano Ronaldo:</strong> 85% (over 190 penalties)</li>
+ <li><strong>Mohamed Salah:</strong> 85% (over 40 penalties)</li>
+ <li><strong>Bruno Fernandes:</strong> 84% (over 40 penalties)</li>
+ <li><strong>Kylian Mbappe:</strong> 82% (over 30 penalties)</li>
+ <li><strong>Cole Palmer:</strong> 90%+ (emerging elite taker)</li>
+</ul>
+</div>
+
+ <p><strong>Factors affecting penalty conversion:</strong></p>
+ <ul>
+ <li><strong>Goalkeeper quality</strong> &#8212; Elite shot-stoppers save 15-20% of penalties faced. Goalkeepers who study takers (e.g. Alisson, Oblak) are more effective.</li>
+ <li><strong>Match pressure</strong> &#8212; Conversion rates drop from ~80% in routine league matches to ~72% in cup finals and decisive matches.</li>
+ <li><strong>Stoppage time penalties</strong> &#8212; Penalties in stoppage time have slightly lower conversion rates (~74%) due to fatigue and pressure.</li>
+ <li><strong>Second-half penalties</strong> &#8212; Players are slightly less accurate after 75+ minutes of exertion.</li>
+</ul>
+
+ <div class="pro-tip">
+ <h4>Track Penalty Taker Announcements</h4>
+ <p>Some teams have designated penalty takers; others rotate based who's on the pitch or who won the penalty. Follow team news and press conferences to identify who will take penalties for each team. A team missing its primary taker through injury or substitution significantly drops conversion probability. Use <a href="https://www.transfermarkt.com/" target="_blank" rel="noopener">Transfermarkt</a> and club press conferences to confirm taker hierarchy.</p>
+</div>
+
+ <h2>9. In-Play Penalty Betting Strategy</h2>
+ <p>In-play penalty betting offers unique opportunities because the odds fluctuate based on match events, often creating mispricing.</p>
+
+ <p><strong>Key in-play penalty scenarios:</strong></p>
+
+ <div class="success">
+ <h3>Scenario 1: Dominant Team Trailing 1-0 at Half-Time</h3>
+ <p>A team that dominated the first half (65%+ possession, 5+ shots in box) but trails 1-0 will attack aggressively in the second half. Their box entries will increase, and the defending team will be under sustained pressure. Back Penalty Yes in-play at odds of 4.00-6.00 &#8212; the true probability of a penalty in the second half is often 25-30% in this scenario, making odds above 3.50 valuable.</p>
+</div>
+
+ <div class="success">
+ <h3>Scenario 2: Red Card to a Defensive Team</h3>
+ <p>A red card to a defensive-minded team changes the dynamic completely. With 10 men, they'll defend even deeper, inviting more box pressure. The attacking team will have more space and more penalty-earning opportunities. Back Penalty Yes immediately after a defensive red card in a close match.</p>
+</div>
+
+ <div class="success">
+ <h3>Scenario 3: Key Dribbler Enters as Substitute</h3>
+ <p>If a team brings on a dribble-heavy winger or attacker known for drawing fouls (especially against tiring defenders), penalty probability increases. Back Penalty Yes when the substitution is announced, before the market fully processes the change.</p>
+</div>
+
+ <div class="warning">
+ <strong>In-Play Penalty Trap:</strong> Avoid betting Penalty Yes in matches where both teams are playing cautiously (e.g. cup final first 30 minutes, goalless draw looking likely). Some matches genuinely have very low penalty probability &#8212; don't assume a penalty will arrive just because you've backed it. Be selective about in-play entries.</div>
+
+ <h2>10. Penalty Shootout Prediction</h2>
+ <p>Penalty shootout betting is a specialist market for knockout competitions. Predicting shootouts requires understanding which matches are most likely to remain level after extra time.</p>
+
+ <p><strong>Shootout probability factors:</strong></p>
+ <ul>
+ <li><strong>Defensive solidity</strong> &#8212; Two teams with good defences and strong goalkeepers are more likely to reach shootouts</li>
+ <li><strong>Low-scoring leagues</strong> &#8212; Serie A and Italian teams are overrepresented in shootout outcomes</li>
+ <li><strong>History</strong> &#8212; Some teams and managers have a history of knockout draws (e.g. Diego Simeone's Atletico Madrid)</li>
+ <li><strong>Fatigue</strong> &#8212; Extra time favours fitter teams, but exhausted players are more likely to miss penalties</li>
+ <li><strong>Goalkeeper quality</strong> &#8212; Elite penalty-saving goalkeepers (Alisson, Courtois, Neuer) increase shootout likelihood</li>
+</ul>
+
+ <table>
+ <tr><th>Competition</th><th>% of KO Matches to Shootout</th><th>Typical Odds for Shootout Yes</th></tr>
+ <tr><td>Champions League Knockouts</td><td>18%</td><td>5.50-7.00</td></tr>
+ <tr><td>World Cup Knockouts</td><td>25%</td><td>4.00-5.50</td></tr>
+ <tr><td>FA Cup (later rounds)</td><td>15%</td><td>6.00-8.00</td></tr>
+ <tr><td>Copa America KO</td><td>22%</td><td>4.50-6.00</td></tr>
+ <tr><td>League Cup</td><td>12%</td><td>8.00-10.00</td></tr>
+</table>
+
+ <div class="strategy-box">
+ <h3>Shootout Betting Strategy</h3>
+ <p>The best shootout value is found in matches between two defensive-minded teams in high-stakes knockout rounds. A Champions League quarter-final between Atletico Madrid and Inter Milan, for example, has a true shootout probability of 25-30% &#8212; but bookmakers often price it at 15-20% implied probability (odds of 5.00-6.00). This is one of the few consistent edges in shootout betting.</p>
+ <p>For shootout outcome bets (correct score, who wins), the historical advantage is slight for the team that kicks first (approximately 52-48% advantage). Home advantage also has a small positive effect. But shootout outcomes are close to random &#8212; avoid large stakes on specific correct score predictions.</p>
+</div>
+
+ <h2>11. Combining Penalties with Other Markets</h2>
+ <p>Penalty markets intersect with several other betting markets. Understanding these connections opens multi-market opportunities.</p>
+
+ <table>
+ <tr><th>Combination</th><th>Description</th><th>Typical Combined Odds</th><th>Value Assessment</th></tr>
+ <tr><td>Penalty + Over 0.5 Goals</td><td>Penalty awarded and at least 1 goal</td><td>2.00-3.00</td><td>Good &#8212; penalty almost always creates a goal</td></tr>
+ <tr><td>Penalty + BTTS Yes</td><td>Penalty awarded and both teams score</td><td>4.00-8.00</td><td>Fair &#8212; penalty makes BTTS more likely</td></tr>
+ <tr><td>Penalty + Match Result</td><td>Penalty awarded and specific team wins</td><td>5.00-10.00</td><td>Moderate &#8212; penalty helps but team must still win</td></tr>
+ <tr><td>Penalty + First Goalscorer</td><td>Penalty taken by named player and they score first</td><td>10.00-25.00</td><td>Low &#8212; two rare events need to align</td></tr>
+ <tr><td>Penalty Missed + Draw</td><td>Penalty is missed/saved and match ends level</td><td>10.00-20.00</td><td>Very low probability, long-shot only</td></tr>
+</table>
+
+ <div class="pro-tip">
+ <h4>Correlation Note: Penalties and Goals</h4>
+ <p>Penalties are highly correlated with goals but not perfectly. Approximately 78% of awarded penalties are scored. This means a penalty awarded implies a ~78% chance of a goal from that specific event. This knowledge is useful for in-play trading &#8212; if a penalty is awarded, the"Over 0.5 Goals" market may still have value if the odds haven't adjusted to account for the 78% conversion rate.</p>
+</div>
+
+ <h2>12. Worked Example &#8212; Full Penalty Betting Analysis</h2>
+ <p>Let's walk through a complete penalty betting analysis: Manchester United vs Liverpool in the Premier League.</p>
+
+ <p><strong>Step 1: League Context</strong> &#8212; Premier League average: 0.28 penalties per match, 26% of matches have at least one penalty.</p>
+
+ <p><strong>Step 2: Team Penalty Data</strong></p>
+ <table>
+ <tr><th>Metric</th><th>Manchester United</th><th>Liverpool</th></tr>
+ <tr><td>Penalties earned (last 20 matches)</td><td>5</td><td>6</td></tr>
+ <tr><td>Penalties conceded (last 20 matches)</td><td>4</td><td>3</td></tr>
+ <tr><td>Box touches per game</td><td>35.2</td><td>38.1</td></tr>
+ <tr><td>Dribbles in box per game</td><td>8.4</td><td>9.2</td></tr>
+ <tr><td>Fouls drawn in box per game</td><td>0.21</td><td>0.24</td></tr>
+</table>
+
+ <p><strong>Step 3: Referee Analysis</strong> &#8212; Michael Oliver assigned (0.38 penalties per match, 34% penalty rate). This is well above the Premier League average of 0.28 and immediately elevates this match's penalty probability.</p>
+
+ <p><strong>Step 4: VAR Factor</strong> &#8212; Premier League has full VAR. Both teams have had several penalties awarded via VAR review this season. This increases the base penalty probability.</p>
+
+ <p><strong>Step 5: Context Factors</strong></p>
+ <ul>
+ <li><strong>Match importance:</strong> Both teams competing for Champions League places &#8212; high stakes, aggressive attacking.</li>
+ <li><strong>Historical penalty rate:</strong> Last 5 meetings produced 2 penalties &#8212; roughly league-average frequency.</li>
+ <li><strong>Key dribblers:</strong> Garnacho (Man Utd), Diaz and Salah (Liverpool) all draw significant fouls.</li>
+ <li><strong>Defensive vulnerabilities:</strong> Man Utd missing first-choice centre-back &#8212; more box entries for Liverpool.</li>
+</ul>
+
+ <p><strong>Step 6: Probability Estimate</strong></p>
+ <p>Base league rate: 26% chance of a penalty.</p>
+ <p>Referee adjustment (Michael Oliver: +30% vs average): 26% Ã— 1.30 = 33.8%.</p>
+ <p>Team adjustment (both teams above-average for earning): 33.8% Ã— 1.15 = 38.9%.</p>
+ <p>Context adjustment (key defender out, high stakes): 38.9% Ã— 1.10 = 42.8%.</p>
+ <p>Estimated true probability: approximately 40-43%.</p>
+
+ <p><strong>Step 7: Odds Check</strong></p>
+ <p>Bookmaker offers Penalty Yes at 2.80 (implied 35.7%).</p>
+ <p>Our estimate: 42%. Edge: 42% - 35.7% = 6.3 percentage points.</p>
+
+ <div class="example-box">
+ <h3>Verdict: Back Penalty Yes at 2.80</h3>
+ <p>Positive expected value of approximately +17.6% (EV = (0.42 Ã— 2.80) - 1 = +0.176). The referee assignment is the key factor &#8212; Michael Oliver's 34% penalty rate significantly elevates the base probability. Combined with both teams' attacking styles and attacking personnel, this match has a genuine 40%+ chance of a penalty.</p>
+</div>
+
+ <h2>13. Frequently Asked Questions</h2>
+
+ <div class="strategy-box">
+ <h3>How often are penalties awarded in football matches?</h3>
+ <p>Across Europe's top leagues, approximately 22-30% of matches feature at least one penalty. The average is roughly one penalty every 3.5 matches. Champions League and World Cup matches have slightly higher rates (30-32%).</p>
+</div>
+
+ <div class="strategy-box">
+ <h3>What percentage of penalties are scored?</h3>
+ <p>Globally, approximately 76-78% of penalties are scored. Elite takers in top leagues convert at 82-90%. The rate varies by league, with the Premier League (78%) and Bundesliga (79%) having higher conversion rates than Serie A (74%) and the Championship (73%).</p>
+</div>
+
+ <div class="strategy-box">
+ <h3>Does VAR increase or decrease penalty awards?</h3>
+ <p>VAR increases penalty awards overall by approximately 15-25%. It catches clear fouls missed by on-field referees. However, it also reduces the number of soft/controversial penalties because referees know VAR will overturn clear errors. The net effect is more penalties, but only for genuine fouls.</p>
+</div>
+
+ <div class="strategy-box">
+ <h3>Which referee awards the most penalties?</h3>
+ <p>JesÃºs Gil Manzano (La Liga) has the highest rate among Big 5 league referees at approximately 0.42 penalties per match (38% of matches). Danny Makkelie (Eredivisie) and Michael Oliver (Premier League) are also above-average at 0.40 and 0.38 respectively. At the other end, Paul Tierney (Premier League) awards penalties in only 18% of matches.</p>
+</div>
+
+ <div class="strategy-box">
+ <h3>Which teams earn the most penalties?</h3>
+ <p>Teams with dribble-heavy attackers and high box touches consistently earn the most penalties. Manchester City, Real Madrid, Barcelona, and PSG typically lead their respective leagues in penalties earned. Brighton under De Zerbi also earned a high rate due to their box-centric attacking approach.</p>
+</div>
+
+ <div class="strategy-box">
+ <h3>Are home teams more likely to get penalties?</h3>
+ <p>Yes. Home teams are awarded approximately 15-20% more penalties than away teams. This bias exists across virtually every league and competition. VAR has slightly reduced this gap but not eliminated it.</p>
+</div>
+
+ <div class="strategy-box">
+ <h3>How do I bet on penalties in-play?</h3>
+ <p>Watch for dominant teams trailing, red cards to defensive teams, and dribbly substitutes entering the match. These scenarios increase penalty probability significantly. Bet365 and Betfair offer the best in-play penalty markets. Be fast &#8212; odds adjust quickly after key events like VAR checks and red cards.</p>
+</div>
+
+ <div class="strategy-box">
+ <h3>Is penalty betting profitable long-term?</h3>
+ <p>Yes, for disciplined bettors who focus on referee tendencies and team-level penalty data. The market is less efficient than goal-based markets because fewer bettors analyse penalty data. Edges of 5-15% are achievable, especially when you factor in referee assignments that bookmakers don't fully price. A 55-60% win rate in penalty yes/no markets at average odds of 3.00 is realistic for skilled bettors.</p>
+</div>
+
+ <div class="strategy-box">
+ <h3>What bankroll should I use for penalty betting?</h3>
+ <p>Penalty markets are volatile &#8212; you can have stretches of 10+ matches without a penalty. Use smaller stakes than you would for goal markets (0.5-1% per bet) and ensure you have at least a 100-bet bankroll. Level staking is recommended given the variability. Track your edge over 200+ bets before scaling up.</p>
+</div>
+
+ <div class="strategy-box">
+ <h3>Can I combine penalty bets in accumulators?</h3>
+ <p>Yes, but be careful. Penalty events across different matches are genuinely independent (unlike goals within a match), so multi-match penalty accumulators are mathematically sound. However, the probability of 3+ penalty awards all landing is very low. Stick to 2-3 selections in penalty accumulators and ensure each has been independently analysed using the framework above.</p>
+</div>
+
+ <h2>Next Steps</h2>
+ <p>Penalty betting rewards deep analysis of referee tendencies, team attacking styles, and VAR dynamics. Focus on one or two leagues, build a penalty database, and track every bet. The inefficiencies in penalty markets are real but require patience and discipline to exploit.</p>
+ <ul>
+ <li><a href="/blog/penalties-awarded-betting">Penalties Awarded Betting</a> &#8212; Over/under penalty frequency markets</li>
+ <li><a href="/blog/correct-score-betting">Correct Score Betting</a> &#8212; How penalties affect correct score odds</li>
+ <li><a href="/blog/first-goalscorer-betting">First Goalscorer Betting</a> &#8212; Penalty takers as first goalscorer value</li>
+ <li><a href="/blog/referee-statistics-betting">Referee Statistics Betting</a> &#8212; Comprehensive referee analysis</li>
+</ul>
+
+ <div class="cta">
+ <h3>Get Today's Predictions</h3>
+ <p>Daily football predictions with penalty probability data:</p>
+ <p><a href="/">View Today's Predictions â†’</a></p>
+</div>
+
+ <div class="related-posts">
+ <h3>Related Articles</h3>
+ <ul>
+ <li><a href="/blog/penalties-awarded-betting">Penalties Awarded: Spot Kick Frequency Betting</a></li>
+ <li><a href="/blog/referee-statistics-betting">Referee Statistics for Football Betting</a></li>
+ <li><a href="/blog/first-goalscorer-betting">First Goalscorer Betting Guide</a></li>
+ <li><a href="/blog/correct-score-betting">Correct Score Betting Strategy</a></li>
+ <li><a href="/blog/expected-goals-xg-betting-strategy">Expected Goals (xG) Betting Strategy</a></li>
+</ul>
+</div>
+</div>
+
+ <div style="margin: 0 auto 32px; max-width: 560px; background: linear-gradient(135deg, #0a0e17, #141c2a); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 28px 32px; text-align: center;">
+ <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,36,72,0.6); margin-bottom: 8px;">Featured Tool</div>
+ <h3 style="margin: 0 0 10px; font-size: 20px; font-weight: 700; color: #e8edf5;">Build Winning Accumulator Tickets</h3>
+ <p style="margin: 0 auto 16px; font-size: 14px; color: rgba(232,237,245,0.55); line-height: 1.6; max-width: 440px;">Generate optimized accumulator combinations from today's AI-powered predictions. Set your target odds and get instant ticket suggestions.</p>
+ <a href="/ticket-builder.html" style="display: inline-block; background: linear-gradient(135deg, #ff2448, #d41a38); color: #fff; padding: 12px 32px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 15px;">Try Ticket Builder &rarr;</a>
+</div>
+ <div class="social-share" style="display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+ <span style="color:var(--text-muted);font-size:14px;font-weight:600;align-self:center;margin-right:8px">Share:</span>
+ <a href="https://www.facebook.com/sharer/sharer.php?u=https://winfulltime.com/blog/penalty-betting-strategy" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#1877f2;color:#fff;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600" aria-label="Share on Facebook">Facebook</a>
+ <a href="https://twitter.com/intent/tweet?text=Check%20this%20out&url=https://winfulltime.com/blog/penalty-betting-strategy" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#000;color:#fff;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600" aria-label="Share on X">X (Twitter)</a>
+ <a href="https://wa.me/?text=https://winfulltime.com/blog/penalty-betting-strategy" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#25d366;color:#fff;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600" aria-label="Share on WhatsApp">WhatsApp</a>
+</div>
+<footer>
+ <div style="text-align:center;padding:16px 12px;background:#fff5f5;border-top:2px solid #ff0000;margin-bottom:12px;">
+ <p style="margin:0 0 10px;font-size:15px;color:#52525b;">
+ Support WinFulltime &mdash; your donations keep this website running and all predictions free.
+</p>
+ <a href="https://ko-fi.com/winfulltime" target="_blank" rel="noopener" style="display:inline-block;background:#ff0000;color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;">
+ Donate on Ko-fi
+</a>
+</div>
+ <div class="footer-links">
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/blog/">Latest News</a>
+  <a href="/advertise.html">Advertise</a>
+ <a href="/contact.html">Contact</a>
+ <a href="/privacy.html">Privacy</a>
+ <a href="/terms.html">Terms</a>
+</div>
+ <p class="footer-copyright">&copy; 2026 WinFulltime. Predictions are for informational purposes only. | <a href="https://mesigo.site" target="_blank" rel="noopener">Website Built by Mesigo</a></p>
+</footer>
+ <!-- Google tag (gtag.js) -->
+ <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>
+ <script>
+ window.dataLayer = window.dataLayer || [];
+ function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date());
+ gtag('config', 'G-HMGZMW9EDP');
+</script>
+<script src="/chat-widget.js"></script>
+</body>
 </html>

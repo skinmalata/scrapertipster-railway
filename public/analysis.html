@@ -1,32 +1,33 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Match Analysis - WinFulltime</title>
-  <meta name="description" content="Detailed football match analysis including recent form, head-to-head statistics, team performance metrics, and predictions.">
-  <meta name="keywords" content="match analysis, football analysis, team statistics, head to head, h2h">
-  <link rel="canonical" href="https://winfulltime.com/analysis.html">
-  <meta property="og:title" content="Match Analysis - WinFulltime">
-  <meta property="og:description" content="Detailed football match analysis with statistics and predictions.">
-  <meta property="og:image" content="/winfulltimelogo.png">
-  <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="robots" content="index, follow">
-  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Match Analysis - WinFulltime</title>
+ <meta name="description" content="Detailed football match analysis including recent form, head-to-head statistics, team performance metrics, and predictions.">
+ <meta name="keywords" content="match analysis, football analysis, team statistics, head to head, h2h">
+ <link rel="canonical" href="https://winfulltime.com/analysis.html">
+ <meta property="og:title" content="Match Analysis - WinFulltime">
+ <meta property="og:description" content="Detailed football match analysis with statistics and predictions.">
+ <meta property="og:image" content="https://winfulltime.com/winfulltimelogo.png">
+ <meta property="og:type" content="website">
+ <meta name="twitter:card" content="summary_large_image">
+ <meta name="robots" content="index, follow">
+ <link rel="icon" href="/winfulltimelogo.png" type="image/png">
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+ <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #0b0f1a; color: #e8edf5; min-height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
 .container { max-width: 800px; margin: 0 auto; padding: 0 12px; flex: 1; }
 header { background: rgba(11,15,26,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
 .header-content { display: flex; align-items: center; justify-content: space-between; max-width: 960px; margin: 0 auto; padding: 0 16px; }
 .logo { display: flex; align-items: center; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-.logo a { display: inline-flex; align-items: center; gap: 8px; color: #ffffff; text-decoration: none; }
+.logo a { display: inline-flex; align-items: center; color: #ffffff; text-decoration: none; }
+.logo span { color: #facc15; }
 @media (max-width: 640px) { .logo { font-size: 18px; } }
-.logo-icon { height: 28px; width: auto; flex-shrink: 0; }
+.logo-icon { height: 28px; width: auto; flex-shrink: 0; margin-right: 8px; }
 nav { display: flex; gap: 24px; }
 nav a { color: #94a3b8; text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s; }
 nav a:hover { color: #e8edf5; }
@@ -77,159 +78,157 @@ footer { background: #111827; border-top: 1px solid rgba(255,255,255,0.06); padd
 .footer-copyright a { color: #94a3b8; text-decoration: none; }
 .footer-copyright a:hover { color: #ff2448; }
 @media (max-width: 640px) {
-  h1 { font-size: 22px; }
-  .back-btn { padding: 10px 20px; font-size: 14px; }
-  .analysis-section { padding: 16px; }
-  .analysis-grid { grid-template-columns: 1fr; gap: 16px; }
-  .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .stat-item { padding: 12px; }
-  .form-result { width: 36px; height: 36px; font-size: 16px; }
-  .h2h-item { padding: 12px; font-size: 16px; }
-  .summary-section { padding: 16px; }
-  .summary-text { font-size: 14px; }
+ h1 { font-size: 22px; }
+ .back-btn { padding: 10px 20px; font-size: 14px; }
+ .analysis-section { padding: 16px; }
+ .analysis-grid { grid-template-columns: 1fr; gap: 16px; }
+ .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+ .stat-item { padding: 12px; }
+ .form-result { width: 36px; height: 36px; font-size: 16px; }
+ .h2h-item { padding: 12px; font-size: 16px; }
+ .summary-section { padding: 16px; }
+ .summary-text { font-size: 14px; }
 }
 @media (max-width: 400px) {
-  h1 { font-size: 18px; }
-  .analysis-section { padding: 12px; }
-  .stats-grid { gap: 8px; }
-  .stat-item { padding: 10px; }
-  .form-result { width: 32px; height: 32px; }
-  .summary-section { padding: 16px; }
-  .summary-text { font-size: 14px; }
+ h1 { font-size: 18px; }
+ .analysis-section { padding: 12px; }
+ .stats-grid { gap: 8px; }
+ .stat-item { padding: 10px; }
+ .form-result { width: 32px; height: 32px; }
+ .summary-section { padding: 16px; }
+ .summary-text { font-size: 14px; }
 }
-</style>
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      "name": "Match Analysis - WinFulltime",
-      "description": "Detailed football match analysis including recent form, head-to-head statistics, team performance metrics, and predictions for major football leagues worldwide.",
-      "publisher": {
-        "@type": "Organization",
-        "name": "WinFulltime"
-      }
-    }
-    </script>
-    <!-- Google tag (gtag.js) -->
-   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>
-   <script>
-     window.dataLayer = window.dataLayer || [];
-     function gtag(){dataLayer.push(arguments);}
-     gtag('js', new Date());
-     gtag('config', 'G-HMGZMW9EDP');
-   </script>
- </head>
+</style>
+ <script type="application/ld+json">
+ {
+ "@context": "https://schema.org",
+ "@type": "WebPage",
+ "name": "Match Analysis - WinFulltime",
+ "description": "Detailed football match analysis including recent form, head-to-head statistics, team performance metrics, and predictions for major football leagues worldwide.",
+ "publisher": {
+ "@type": "Organization",
+ "name": "WinFulltime"
+ }
+ }
+</script>
+ <!-- Google tag (gtag.js) -->
+ <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>
+ <script>
+ window.dataLayer = window.dataLayer || [];
+ function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date());
+ gtag('config', 'G-HMGZMW9EDP');
+</script>
+</head>
 <body>
-  <header>
-    <div class="header-content">
-      <div class="logo">
-        <a href="/"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">WinFulltime</a>
-      </div>
-      <nav>
-        <a href="/">Home</a>
-        <a href="/ticket-builder.html">Ticket Builder</a>
-        <a href="/blog/">Blog</a>
-        <a href="/about.html">About</a>
-        <a href="/contact.html">Contact</a>
-      </nav>
-    </div>
-  </header>
-  <div class="container">
-    <a href="/" class="back-btn">Back to Home</a>
-    <div id="staticContent">
-      <h1 style="font-size: 28px; margin-bottom: 20px;">Football Match Analysis</h1>
-      <div class="analysis-section">
-        <h3>What is Match Analysis?</h3>
-        <p style="margin-bottom: 16px; line-height: 1.6;">WinFulltime provides detailed football match analysis to help you make informed betting decisions. Our analysis includes:</p>
-        <ul style="margin-left: 20px; line-height: 2;">
-          <li><strong>Recent Form</strong> - Last 5 match results for each team</li>
-          <li><strong>Head-to-Head</strong> - Historical results between the two teams</li>
-          <li><strong>Team Statistics</strong> - Goals scored, conceded, win rates, and more</li>
-          <li><strong>Predictions</strong> - AI-generated tips with probability percentages</li>
-        </ul>
-      </div>
-      <div class="analysis-section">
-        <h3>How to View Analysis</h3>
-        <p style="margin-bottom: 16px; line-height: 1.6;">Click on any match from the <a href="/" style="color: #ef4444;">home page</a> to view detailed analysis for that specific fixture. Analysis is available for 1X2, Over/Under, and BTTS predictions.</p>
-      </div>
-      <div class="analysis-section">
-        <h3>Available Prediction Markets</h3>
-        <div class="analysis-grid">
-          <div class="analysis-card">
-            <h4>1X2 Predictions</h4>
-            <p>Home win, draw, or away win predictions with probability percentages.</p>
-          </div>
-          <div class="analysis-card">
-            <h4>Over/Under Goals</h4>
-            <p>Predictions for matches with over 1.5, over 2.5, or over 3.5 goals.</p>
-          </div>
-          <div class="analysis-card">
-            <h4>BTTS Predictions</h4>
-            <p>Both Teams To Score tips - whether both teams will find the net.</p>
-          </div>
-          <div class="analysis-card">
-            <h4>Corners & Cards</h4>
-            <p>Specialized predictions for corner kicks and yellow/red cards.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <h1 id="matchTitle" style="display: none;">Loading...</h1>
-    <div id="content" style="display: none;">
-      <div class="loading"><div class="spinner"></div></div>
-    </div>
-  </div>
-
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const homeTeam = params.get('home') || '';
-    const awayTeam = params.get('away') || '';
-
-    if (homeTeam && awayTeam) {
-      document.getElementById('staticContent').style.display = 'none';
-      document.getElementById('matchTitle').style.display = 'block';
-      document.getElementById('content').style.display = 'block';
-      document.getElementById('matchTitle').textContent = decodeURIComponent(homeTeam) + ' vs ' + decodeURIComponent(awayTeam);
-      document.title = decodeURIComponent(homeTeam) + ' vs ' + decodeURIComponent(awayTeam) + ' - WinFulltime';
-
-      document.getElementById('content').innerHTML = `
-        <div class="analysis-section" style="background: #fef2f2; border: 1px solid #fecaca;">
-          <h3 style="color: #dc2626;">Analysis Unavailable</h3>
-          <p style="margin-bottom: 12px; line-height: 1.6;">
-            Match analysis is not available in static mode. View all predictions on the
-            <a href="/" style="color: #ef4444;">home page</a>.
-          </p>
-        </div>
-        <div class="disclaimer">
-          <p><strong>18+ Only</strong></p>
-          <p>Predictions are for informational purposes only. Gambling involves financial risk and may lead to addiction. Please play responsibly.</p>
-        </div>
-      `;
-    }
-  </script>
-  
-    <h3 style="margin: 0 0 10px; font-size: 20px; font-weight: 700; color: #e8edf5;">Build Winning Accumulator Tickets</h3>
-    <p style="margin: 0 auto 16px; font-size: 14px; color: rgba(232,237,245,0.55); line-height: 1.6; max-width: 440px;">Generate optimized accumulator combinations from today's AI-powered predictions. Set your target odds and get instant ticket suggestions.</p>
-    <a href="/ticket-builder.html" style="display: inline-block; background: linear-gradient(135deg, #ff2448, #d41a38); color: #fff; padding: 12px 32px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 15px;">Try Ticket Builder &rarr;</a>
-  </div>
-    <footer>
-    <div class="footer-content">
-      <div style="text-align:center;margin-bottom:24px;">
-        <p style="margin:0 0 12px;font-size:14px;color:#94a3b8;">Support WinFulltime &mdash; your donations keep all predictions free.</p>
-        <a href="https://ko-fi.com/winfulltime" target="_blank" rel="noopener" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">â˜• Donate on Ko-fi</a>
-      </div>
-      <div class="footer-links">
-        <a href="/">Home</a>
-        <a href="/ticket-builder.html">Ticket Builder</a>
-        <a href="/blog/">Blog</a>
-        <a href="/about.html">About</a>
-        <a href="/advertise.html">Advertise</a>
-        <a href="/contact.html">Contact</a>
-        <a href="/terms.html">Terms</a>
-        <a href="/privacy.html">Privacy</a>
-      </div>
-      <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved. | <a href="https://mesigo.site" target="_blank" rel="noopener">Website Built by Mesigo</a></p>
-    </div>
-  </footer>
-</body>
-</html>
+ <header>
+ <div class="header-content">
+ <div class="logo">
+ <a href="/"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a>
+</div>
+ <nav>
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/blog/">Blog</a>
+  <a href="/contact.html">Contact</a>
+</nav>
+</div>
+</header>
+ <div class="container">
+ <a href="/" class="back-btn">Back to Home</a>
+ <div id="staticContent">
+ <h1 style="font-size: 28px; margin-bottom: 20px;">Football Match Analysis</h1>
+ <div class="analysis-section">
+ <h3>What is Match Analysis?</h3>
+ <p style="margin-bottom: 16px; line-height: 1.6;">WinFulltime provides detailed football match analysis to help you make informed betting decisions. Our analysis includes:</p>
+ <ul style="margin-left: 20px; line-height: 2;">
+ <li><strong>Recent Form</strong> - Last 5 match results for each team</li>
+ <li><strong>Head-to-Head</strong> - Historical results between the two teams</li>
+ <li><strong>Team Statistics</strong> - Goals scored, conceded, win rates, and more</li>
+ <li><strong>Predictions</strong> - AI-generated tips with probability percentages</li>
+</ul>
+</div>
+ <div class="analysis-section">
+ <h3>How to View Analysis</h3>
+ <p style="margin-bottom: 16px; line-height: 1.6;">Click on any match from the <a href="/" style="color: #ef4444;">home page</a> to view detailed analysis for that specific fixture. Analysis is available for 1X2, Over/Under, and BTTS predictions.</p>
+</div>
+ <div class="analysis-section">
+ <h3>Available Prediction Markets</h3>
+ <div class="analysis-grid">
+ <div class="analysis-card">
+ <h4>1X2 Predictions</h4>
+ <p>Home win, draw, or away win predictions with probability percentages.</p>
+</div>
+ <div class="analysis-card">
+ <h4>Over/Under Goals</h4>
+ <p>Predictions for matches with over 1.5, over 2.5, or over 3.5 goals.</p>
+</div>
+ <div class="analysis-card">
+ <h4>BTTS Predictions</h4>
+ <p>Both Teams To Score tips - whether both teams will find the net.</p>
+</div>
+ <div class="analysis-card">
+ <h4>Corners & Cards</h4>
+ <p>Specialized predictions for corner kicks and yellow/red cards.</p>
+</div>
+</div>
+</div>
+</div>
+ <h1 id="matchTitle" style="display: none;">Loading...</h1>
+ <div id="content" style="display: none;">
+ <div class="loading"><div class="spinner"></div></div>
+</div>
+</div>
+
+ <script>
+ const params = new URLSearchParams(window.location.search);
+ const homeTeam = params.get('home') || '';
+ const awayTeam = params.get('away') || '';
+
+ if (homeTeam && awayTeam) {
+ document.getElementById('staticContent').style.display = 'none';
+ document.getElementById('matchTitle').style.display = 'block';
+ document.getElementById('content').style.display = 'block';
+ document.getElementById('matchTitle').textContent = decodeURIComponent(homeTeam) + ' vs ' + decodeURIComponent(awayTeam);
+ document.title = decodeURIComponent(homeTeam) + ' vs ' + decodeURIComponent(awayTeam) + ' - WinFulltime';
+
+ document.getElementById('content').innerHTML = `
+ <div class="analysis-section" style="background: #fef2f2; border: 1px solid #fecaca;">
+ <h3 style="color: #dc2626;">Analysis Unavailable</h3>
+ <p style="margin-bottom: 12px; line-height: 1.6;">
+ Match analysis is not available in static mode. View all predictions on the
+ <a href="/" style="color: #ef4444;">home page</a>.
+</p>
+</div>
+ <div class="disclaimer">
+ <p><strong>18+ Only</strong></p>
+ <p>Predictions are for informational purposes only. Gambling involves financial risk and may lead to addiction. Please play responsibly.</p>
+</div>
+ `;
+ }
+</script>
+ 
+ <h3 style="margin: 0 0 10px; font-size: 20px; font-weight: 700; color: #e8edf5;">Build Winning Accumulator Tickets</h3>
+ <p style="margin: 0 auto 16px; font-size: 14px; color: rgba(232,237,245,0.55); line-height: 1.6; max-width: 440px;">Generate optimized accumulator combinations from today's AI-powered predictions. Set your target odds and get instant ticket suggestions.</p>
+ <a href="/ticket-builder.html" style="display: inline-block; background: linear-gradient(135deg, #ff2448, #d41a38); color: #fff; padding: 12px 32px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 15px;">Try Ticket Builder &rarr;</a>
+</div>
+ <footer>
+ <div class="footer-content">
+ <div style="text-align:center;margin-bottom:24px;">
+ <p style="margin:0 0 12px;font-size:14px;color:#94a3b8;">Support WinFulltime &mdash; your donations keep all predictions free.</p>
+ <a href="https://ko-fi.com/winfulltime" target="_blank" rel="noopener" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;"> Donate on Ko-fi</a>
+</div>
+ <div class="footer-links">
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/blog/">Blog</a>
+  <a href="/advertise.html">Advertise</a>
+ <a href="/contact.html">Contact</a>
+ <a href="/terms.html">Terms</a>
+ <a href="/privacy.html">Privacy</a>
+</div>
+ <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved. | <a href="https://mesigo.site" target="_blank" rel="noopener">Website Built by Mesigo</a></p>
+</div>
+</footer>
+</body>
+</html>
