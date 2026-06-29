@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -13,52 +13,96 @@
   <meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/senegal-2002-world-cup-legends-inspired-generation.webp">
   <link rel="canonical" href="https://winfulltime.com/blog/senegal-2002-world-cup-legends-inspired-generation">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #18181b; margin: 0; padding: 0; }
-    header { background: white; border-bottom: 1px solid #e5e5e5; padding: 16px 0; }
+    :root {
+      --bg-primary: #0b0f1a;
+      --bg-secondary: #111827;
+      --bg-card: rgba(23, 28, 46, 0.85);
+      --bg-elevated: #1a1f2e;
+      --text-primary: #e8edf5;
+      --text-secondary: #c8d0db;
+      --text-muted: #94a3b8;
+      --accent: #ff2448;
+      --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --glow: rgba(255,36,72,0.12);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--bg-primary); background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent); color: var(--text-primary); margin: 0; padding: 0; font-size: 16px; -webkit-font-smoothing: antialiased; }
+    header { background: rgba(11,15,26,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
     .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-size: 24px; font-weight: bold; color: #18181b; text-decoration: none; }
-    .logo span { color: #ff0000; }
+    .logo { display: inline-flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+    .logo span { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .logo-icon { height: 28px; width: auto; flex-shrink: 0; }
     .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    h1 { font-size: 2.5rem; color: #18181b; margin-bottom: 10px; }
-    h2 { font-size: 1.8rem; color: #18181b; margin-top: 40px; margin-bottom: 15px; }
-    h3 { font-size: 1.3rem; color: #18181b; margin-top: 30px; margin-bottom: 10px; }
-    p { margin-bottom: 16px; color: #3f3f46; line-height: 1.8; }
-    .meta { color: #71717a; font-size: 0.9rem; margin-bottom: 30px; }
-    .highlight { background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b; }
-    .cta { background: linear-gradient(135deg, #ff0000, #cc0000); color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0; }
+    h1 { font-size: 2.8rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; }
+    h2 { font-size: 2.1rem; color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; font-weight: 700; }
+    h3 { font-size: 1.5rem; color: var(--text-primary); margin-top: 30px; margin-bottom: 10px; font-weight: 600; }
+    p { font-size: 1.125rem; margin-bottom: 20px; color: var(--text-secondary); line-height: 1.85; }
+    li { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.85; margin-bottom: 8px; }
+    .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+    .highlight { background: rgba(251,191,36,0.1); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .highlight * { color: var(--text-primary); }
+    .example-box { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .example-box * { color: var(--text-primary); }
+    .strategy-box { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin: 24px 0; }
+    .strategy-box h3 { margin-top: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .pro-tip { background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .pro-tip h4 { margin-top: 0; color: #60a5fa; }
+    .pro-tip * { color: var(--text-primary); }
+    .warning { background: rgba(239,68,68,0.08); border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .warning * { color: var(--text-primary); }
+    .success { background: rgba(34,197,94,0.08); border-left: 4px solid #22c55e; padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .success * { color: var(--text-primary); }
+    .steps { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin: 20px 0; }
+    .steps ol { margin: 0; padding-left: 20px; }
+    .steps li { margin-bottom: 10px; color: var(--text-secondary); }
+    .cta { background: var(--accent-gradient); color: white; padding: 24px; border-radius: var(--radius); text-align: center; margin: 30px 0; box-shadow: 0 4px 15px var(--glow); }
     .cta * { color: white; }
-    .breadcrumb { font-size: 0.9rem; color: #71717a; margin-bottom: 20px; }
-    .breadcrumb a { color: #ff0000; text-decoration: none; }
-    .related-posts { background: #f4f4f5; padding: 20px; border-radius: 8px; margin-top: 40px; }
-    .related-posts h3 { margin-top: 0; }
+    .cta a { color: white; text-decoration: underline; }
+    .breadcrumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .related-posts { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin-top: 40px; }
+    .related-posts h3 { margin-top: 0; color: var(--text-primary); }
     .related-posts ul { list-style: none; padding: 0; }
-    .related-posts li { margin-bottom: 10px; color: #3f3f46; }
-    .related-posts a { color: #ff0000; text-decoration: none; }
-    .pullquote { font-size: 1.4rem; font-style: italic; color: #18181b; border-left: 4px solid #ff0000; padding: 20px 24px; margin: 30px 0; background: #fafafa; border-radius: 0 8px 8px 0; }
-    .pullquote cite { display: block; font-size: 0.9rem; color: #71717a; margin-top: 8px; font-style: normal; }
-    .fact-box { background: #18181b; color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
-    .fact-box * { color: white; }
-    .fact-box h3 { color: #ff0000; margin-top: 0; }
-    footer { background: white; border-top: 1px solid #e5e5e5; padding: 40px 0; text-align: center; margin-top: 60px; }
-    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
-    .footer-links a { color: #52525b; text-decoration: none; font-weight: 500; }
-    .footer-links a:hover { color: #ff0000; }
-    .footer-copyright { color: #71717a; font-size: 14px; }
-    nav a { margin-left: 20px; color: #52525b; text-decoration: none; font-weight: 500; }
-    nav a:hover { color: #ff0000; }
-    .gen-compare { display: flex; flex-wrap: wrap; gap: 16px; margin: 24px 0; }
-    .gen-card { flex: 1; min-width: 200px; background: #f4f4f5; padding: 20px; border-radius: 8px; }
-    .gen-card h4 { margin-top: 0; color: #ff0000; }
-    .gen-card ul { margin: 0; padding-left: 16px; }
-    .gen-card li { margin-bottom: 6px; color: #3f3f46; }
+    .related-posts li { margin-bottom: 10px; color: var(--text-secondary); }
+    .related-posts a { color: var(--accent); text-decoration: none; }
+    .related-posts a:hover { text-decoration: underline; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    th { background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 600; }
+    .odds-table { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; overflow: hidden; }
+    .odds-table th { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+    .odds-table td { border-bottom: 1px solid var(--border); color: var(--text-primary); }
+    code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); }
+    footer { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 40px 16px 32px; text-align: center; margin-top: 60px; }
+    .footer-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap; }
+    .footer-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copyright { color: var(--text-muted); font-size: 13px; }
+    nav { display: flex; gap: 24px; }
+    nav a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s; }
+    nav a:hover { color: var(--text-primary); }
+    img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+    @media (max-width: 640px) {
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.7rem; }
+      .container { padding: 0 16px; }
+      nav { gap: 12px; }
+      nav a { font-size: 13px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="header-content">
-      <a href="/" class="logo">Win<span>Fulltime</span></a>
+      <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28"> Win<span>Fulltime</span></a>
       <nav>
         <a href="/">Home</a>
         <a href="/ticket-builder.html">Ticket Builder</a>
@@ -76,24 +120,24 @@
 
     <div style="background:#dbeafe;padding:16px 20px;border-radius:8px;margin:20px 0"><strong>Tip:</strong> Looking for today's football predictions? <a href="/">Click here</a>.</div>
 
-    <p>On May 31, 2002, in Seoul, South Korea, the defending World Cup champions walked onto the pitch to face a team making its tournament debut. France had won the 1998 World Cup and the 2000 European Championship. They had Zinedine Zidane, Thierry Henry, Patrick Vieira, and Claude Makelele — perhaps the greatest generation of French footballers ever assembled. Senegal had none of those things. Senegal had never played in a World Cup. Their coach was a Frenchman named Bruno Metsu who had been hired after they lost their first three qualification matches. The bookmakers had France at 4-1. Senegal were 300-1. Get <a href="/blog/btts-betting-guide">BTTS predictions for Senegal's 2026 matches</a>, a team known for high-scoring World Cup encounters.</p>
+    <p>On May 31, 2002, in Seoul, South Korea, the defending World Cup champions walked onto the pitch to face a team making its tournament debut. France had won the 1998 World Cup and the 2000 European Championship. They had Zinedine Zidane, Thierry Henry, Patrick Vieira, and Claude Makelele â€” perhaps the greatest generation of French footballers ever assembled. Senegal had none of those things. Senegal had never played in a World Cup. Their coach was a Frenchman named Bruno Metsu who had been hired after they lost their first three qualification matches. The bookmakers had France at 4-1. Senegal were 300-1. Get <a href="/blog/btts-betting-guide">BTTS predictions for Senegal's 2026 matches</a>, a team known for high-scoring World Cup encounters.</p>
 
     <p>Thirty minutes into the game, Papa Bouba Diop controlled a pass on the edge of the French box, shifted the ball, and drove it past Fabien Barthez. Senegal 1, France 0. The scoreline held. The biggest upset in World Cup history was complete. And Senegalese football was never the same again.</p>
 
     <div class="pullquote">
       "The work we did in 2002 inspired a lot of kids in Senegal and Africa to step up and really show that we could do much more on a global scale."
-      <cite>— Henri Camara, Senegal 2002 World Cup goalscorer</cite>
+      <cite>â€” Henri Camara, Senegal 2002 World Cup goalscorer</cite>
     </div>
 
     <h2>The Day Everything Changed</h2>
 
-    <p>Senegal's victory over France was not a fluke. They were the better team. They were faster, hungrier, and more organised. France, for all their star power, could not handle the physicality and discipline of Metsu's side. Senegal followed the win over France with a draw against Denmark and a dramatic 3-3 draw with Uruguay — a game in which they led 3-0 and almost threw it away — to top the group. In the Round of 16, Henri Camara scored a golden goal in extra time to beat Sweden 2-1. Senegal became only the second African nation ever to reach a World Cup quarter-final, matching Cameroon's run in 1990.</p>
+    <p>Senegal's victory over France was not a fluke. They were the better team. They were faster, hungrier, and more organised. France, for all their star power, could not handle the physicality and discipline of Metsu's side. Senegal followed the win over France with a draw against Denmark and a dramatic 3-3 draw with Uruguay â€” a game in which they led 3-0 and almost threw it away â€” to top the group. In the Round of 16, Henri Camara scored a golden goal in extra time to beat Sweden 2-1. Senegal became only the second African nation ever to reach a World Cup quarter-final, matching Cameroon's run in 1990.</p>
 
-    <p>They lost to Turkey on another golden goal in the quarter-final. But the damage — in the best possible sense — was done. A generation of Senegalese children had watched their team beat the world champions. They had seen Papa Bouba Diop, El Hadji Diouf, Khalilou Fadiga, and Aliou Cisse become household names. They had watched the team parade through the streets of Dakar, millions lining the roads. And they had decided, in that moment, that they wanted to be footballers.</p>
+    <p>They lost to Turkey on another golden goal in the quarter-final. But the damage â€” in the best possible sense â€” was done. A generation of Senegalese children had watched their team beat the world champions. They had seen Papa Bouba Diop, El Hadji Diouf, Khalilou Fadiga, and Aliou Cisse become household names. They had watched the team parade through the streets of Dakar, millions lining the roads. And they had decided, in that moment, that they wanted to be footballers.</p>
 
     <h2>The Academies</h2>
 
-    <p>The 2002 run did not just inspire — it created infrastructure. In the years after the World Cup, Senegal saw an explosion of football academies. Generation Foot, Diambars, Dakar Sacre-Coeur, and Casa Sports built state-of-the-art facilities with pristine training pitches, dormitories, schools, and medical centres. They were funded by a combination of private investment, European club partnerships, and government support.</p>
+    <p>The 2002 run did not just inspire â€” it created infrastructure. In the years after the World Cup, Senegal saw an explosion of football academies. Generation Foot, Diambars, Dakar Sacre-Coeur, and Casa Sports built state-of-the-art facilities with pristine training pitches, dormitories, schools, and medical centres. They were funded by a combination of private investment, European club partnerships, and government support.</p>
 
     <p>These academies changed the trajectory of Senegalese football. Before 2002, most Senegalese players developed in France, often arriving as teenagers with no formal training. After 2002, players were being developed at home, in Senegalese academies, using Senegalese coaches, and then being exported to Europe at 18 or 19. Of the 28 players Senegal selected for the 2025 Africa Cup of Nations, 13 had come through Senegalese academies.</p>
 
@@ -113,9 +157,9 @@
 
     <h2>The Captain Who Became the Coach</h2>
 
-    <p>The most powerful link between the two generations is Aliou Cisse. In 2002, he captained Senegal to the quarter-finals — a gritty, no-nonsense defensive midfielder who held the team together. In 2015, the Senegalese Football Federation made the bold decision to appoint him head coach. It was a symbolic appointment: the man who had led on the pitch would now lead from the touchline.</p>
+    <p>The most powerful link between the two generations is Aliou Cisse. In 2002, he captained Senegal to the quarter-finals â€” a gritty, no-nonsense defensive midfielder who held the team together. In 2015, the Senegalese Football Federation made the bold decision to appoint him head coach. It was a symbolic appointment: the man who had led on the pitch would now lead from the touchline.</p>
 
-    <p>Cisse's impact has been transformative. He has taken Senegal to three consecutive World Cups — the first time the nation has ever achieved that — and won the Africa Cup of Nations for the first time in 2022. Under his leadership, Senegal have become Africa's most consistent national team. A simple statistic backs that up: over the last decade, Senegal have either won every AFCON they participated in or lost to the eventual champions.</p>
+    <p>Cisse's impact has been transformative. He has taken Senegal to three consecutive World Cups â€” the first time the nation has ever achieved that â€” and won the Africa Cup of Nations for the first time in 2022. Under his leadership, Senegal have become Africa's most consistent national team. A simple statistic backs that up: over the last decade, Senegal have either won every AFCON they participated in or lost to the eventual champions.</p>
 
     <p>"If we're here, it's thanks in part to the 2002 generation," said Cheikhou Kouyate, a veteran of Cisse's squads. "Now, we want to write our own story."</p>
 
@@ -123,40 +167,40 @@
       <div class="gen-card">
         <h4>2002 Legends</h4>
         <ul>
-          <li>Papa Bouba Diop — Fulham, Portsmouth</li>
-          <li>El Hadji Diouf — Liverpool, Bolton</li>
-          <li>Khalilou Fadiga — Auxerre, Inter Milan</li>
-          <li>Aliou Cisse — PSG, Birmingham City</li>
-          <li>Henri Camara — Wolves, Wigan</li>
-          <li>Salif Diao — Liverpool, Stoke</li>
+          <li>Papa Bouba Diop â€” Fulham, Portsmouth</li>
+          <li>El Hadji Diouf â€” Liverpool, Bolton</li>
+          <li>Khalilou Fadiga â€” Auxerre, Inter Milan</li>
+          <li>Aliou Cisse â€” PSG, Birmingham City</li>
+          <li>Henri Camara â€” Wolves, Wigan</li>
+          <li>Salif Diao â€” Liverpool, Stoke</li>
         </ul>
       </div>
       <div class="gen-card">
         <h4>2026 Stars</h4>
         <ul>
-          <li>Sadio Mane — Liverpool, Bayern Munich</li>
-          <li>Kalidou Koulibaly — Napoli, Chelsea</li>
-          <li>Idrissa Gueye — Everton, PSG</li>
-          <li>Pape Matar Sarr — Tottenham</li>
-          <li>Nicolas Jackson — Bayern Munich</li>
-          <li>Iliman Ndiaye — Everton</li>
+          <li>Sadio Mane â€” Liverpool, Bayern Munich</li>
+          <li>Kalidou Koulibaly â€” Napoli, Chelsea</li>
+          <li>Idrissa Gueye â€” Everton, PSG</li>
+          <li>Pape Matar Sarr â€” Tottenham</li>
+          <li>Nicolas Jackson â€” Bayern Munich</li>
+          <li>Iliman Ndiaye â€” Everton</li>
         </ul>
       </div>
     </div>
 
     <h2>The Diaspora Shift</h2>
 
-    <p>Senegal's 2002 team was composed almost entirely of players born and raised in Senegal. Only two squad members were born abroad. The 2026 squad is different. More than a third of Cisse's players were born outside Senegal, primarily in France. Ibrahim Mbaye, an 18-year-old Paris Saint-Germain forward, chose Senegal over France despite playing for France at U20 level. Mamadou Sarr, a Chelsea defender, did the same. Boubakar Kamara of Aston Villa was courted but chose France — a decade ago, Senegal would not have even been in the conversation.</p>
+    <p>Senegal's 2002 team was composed almost entirely of players born and raised in Senegal. Only two squad members were born abroad. The 2026 squad is different. More than a third of Cisse's players were born outside Senegal, primarily in France. Ibrahim Mbaye, an 18-year-old Paris Saint-Germain forward, chose Senegal over France despite playing for France at U20 level. Mamadou Sarr, a Chelsea defender, did the same. Boubakar Kamara of Aston Villa was courted but chose France â€” a decade ago, Senegal would not have even been in the conversation.</p>
 
-    <p>"Senegal's recent success has strengthened the appeal of the project, aligning ambition with identity so that choosing Senegal is both a personal and a sporting advantage," wrote Algerian journalist Maher Mezahi. The shift reflects how far Senegal have come. In 2002, they were the romantic underdogs. In 2026, they are contenders — a nation that players born in France actively choose over the French national team.</p>
+    <p>"Senegal's recent success has strengthened the appeal of the project, aligning ambition with identity so that choosing Senegal is both a personal and a sporting advantage," wrote Algerian journalist Maher Mezahi. The shift reflects how far Senegal have come. In 2002, they were the romantic underdogs. In 2026, they are contenders â€” a nation that players born in France actively choose over the French national team.</p>
 
     <h2>The Unfinished Business</h2>
 
-    <p>Senegal's World Cup history since 2002 has been defined by near-misses and heartbreak. In 2018, they became the first team in tournament history eliminated by the fair play tiebreaker — too many yellow cards. In 2022, they reached the Round of 16 without an injured Sadio Mane but lost 3-0 to England. The 2002 quarter-final remains the furthest Senegal have ever gone. Our <a href="/analysis.html">match analysis tool</a> provides detailed head-to-head stats for Senegal's group stage matches.</p>
+    <p>Senegal's World Cup history since 2002 has been defined by near-misses and heartbreak. In 2018, they became the first team in tournament history eliminated by the fair play tiebreaker â€” too many yellow cards. In 2022, they reached the Round of 16 without an injured Sadio Mane but lost 3-0 to England. The 2002 quarter-final remains the furthest Senegal have ever gone. Our <a href="/analysis.html">match analysis tool</a> provides detailed head-to-head stats for Senegal's group stage matches.</p>
 
-    <p>This generation — the one that grew up watching Diop and Diouf, the one that was shaped by the academies built in the aftermath of that 2002 run — believes it can go further. "My generation grew up on the story of the 2002 team," said Koulibaly. "The younger lads may not know them as well, but we all share the same goal: to do what they did — and hopefully go even further."</p>
+    <p>This generation â€” the one that grew up watching Diop and Diouf, the one that was shaped by the academies built in the aftermath of that 2002 run â€” believes it can go further. "My generation grew up on the story of the 2002 team," said Koulibaly. "The younger lads may not know them as well, but we all share the same goal: to do what they did â€” and hopefully go even further."</p>
 
-    <p>At the 2026 World Cup, Senegal have been drawn in a group with France — a poetic return to the fixture that started everything — along with Norway and one of Bolivia, Suriname, or Iraq. The chance to face France again, 24 years after Diop's goal in Seoul, is the kind of narrative that football could not script if it tried. Cisse, now the coach, will lead his team out against the nation that colonised his country, the nation his 2002 team shocked, carrying the hopes of a generation that exists because of what that 2002 team did.</p>
+    <p>At the 2026 World Cup, Senegal have been drawn in a group with France â€” a poetic return to the fixture that started everything â€” along with Norway and one of Bolivia, Suriname, or Iraq. The chance to face France again, 24 years after Diop's goal in Seoul, is the kind of narrative that football could not script if it tried. Cisse, now the coach, will lead his team out against the nation that colonised his country, the nation his 2002 team shocked, carrying the hopes of a generation that exists because of what that 2002 team did.</p>
 
     <p>"We could have gone to the next stage," Salif Diao said of 2002. "We acted like small winners. We proved something, but we could have proved a lot more. So I always say to the next generation: don't be small winners."</p>
 

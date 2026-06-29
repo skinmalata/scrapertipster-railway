@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -13,64 +13,96 @@
   <meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/fouls-betting.webp">
   <link rel="canonical" href="https://winfulltime.com/blog/fouls-betting">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #18181b; margin: 0; padding: 0; }
-    header { background: white; border-bottom: 1px solid #e5e5e5; padding: 16px 0; }
+    :root {
+      --bg-primary: #0b0f1a;
+      --bg-secondary: #111827;
+      --bg-card: rgba(23, 28, 46, 0.85);
+      --bg-elevated: #1a1f2e;
+      --text-primary: #e8edf5;
+      --text-secondary: #c8d0db;
+      --text-muted: #94a3b8;
+      --accent: #ff2448;
+      --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --glow: rgba(255,36,72,0.12);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--bg-primary); background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent); color: var(--text-primary); margin: 0; padding: 0; font-size: 16px; -webkit-font-smoothing: antialiased; }
+    header { background: rgba(11,15,26,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
     .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-size: 24px; font-weight: bold; color: #18181b; text-decoration: none; }
-    .logo span { color: #ff0000; }
+    .logo { display: inline-flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+    .logo span { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .logo-icon { height: 28px; width: auto; flex-shrink: 0; }
     .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    h1 { font-size: 2.5rem; color: #18181b; margin-bottom: 10px; }
-    h2 { font-size: 1.8rem; color: #18181b; margin-top: 40px; margin-bottom: 15px; }
-    h3 { font-size: 1.3rem; color: #18181b; margin-top: 30px; margin-bottom: 10px; }
-    p { margin-bottom: 16px; color: #3f3f46; line-height: 1.7; }
-    .meta { color: #71717a; font-size: 0.9rem; margin-bottom: 30px; }
-    .highlight { background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b; }
-    .example-box { background: #18181b; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .example-box * { color: white; }
-    .strategy-box { background: white; border: 1px solid #e5e5e5; padding: 24px; border-radius: 12px; margin: 24px 0; }
-    .strategy-box h3 { margin-top: 0; color: #ff0000; }
-    .pro-tip { background: #dbeafe; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .pro-tip h4 { margin-top: 0; color: #1d4ed8; }
-    .warning { background: #fef2f2; border-left: 4px solid #ff0000; padding: 16px; border-radius: 4px; margin: 20px 0; }
-    .success { background: #f0fdf4; border-left: 4px solid #22c55e; padding: 16px; border-radius: 4px; margin: 20px 0; }
-    .steps { background: #f4f4f5; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    h1 { font-size: 2.8rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; }
+    h2 { font-size: 2.1rem; color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; font-weight: 700; }
+    h3 { font-size: 1.5rem; color: var(--text-primary); margin-top: 30px; margin-bottom: 10px; font-weight: 600; }
+    p { font-size: 1.125rem; margin-bottom: 20px; color: var(--text-secondary); line-height: 1.85; }
+    li { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.85; margin-bottom: 8px; }
+    .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+    .highlight { background: rgba(251,191,36,0.1); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .highlight * { color: var(--text-primary); }
+    .example-box { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .example-box * { color: var(--text-primary); }
+    .strategy-box { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin: 24px 0; }
+    .strategy-box h3 { margin-top: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .pro-tip { background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .pro-tip h4 { margin-top: 0; color: #60a5fa; }
+    .pro-tip * { color: var(--text-primary); }
+    .warning { background: rgba(239,68,68,0.08); border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .warning * { color: var(--text-primary); }
+    .success { background: rgba(34,197,94,0.08); border-left: 4px solid #22c55e; padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .success * { color: var(--text-primary); }
+    .steps { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin: 20px 0; }
     .steps ol { margin: 0; padding-left: 20px; }
-    .steps li { margin-bottom: 10px; }
-    .cta { background: linear-gradient(135deg, #ff0000, #cc0000); color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0; }
+    .steps li { margin-bottom: 10px; color: var(--text-secondary); }
+    .cta { background: var(--accent-gradient); color: white; padding: 24px; border-radius: var(--radius); text-align: center; margin: 30px 0; box-shadow: 0 4px 15px var(--glow); }
     .cta * { color: white; }
-    .breadcrumb { font-size: 0.9rem; color: #71717a; margin-bottom: 20px; }
-    .breadcrumb a { color: #ff0000; text-decoration: none; }
-    .related-posts { background: #f4f4f5; padding: 20px; border-radius: 8px; margin-top: 40px; }
-    .related-posts h3 { margin-top: 0; color: #18181b; }
+    .cta a { color: white; text-decoration: underline; }
+    .breadcrumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .related-posts { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin-top: 40px; }
+    .related-posts h3 { margin-top: 0; color: var(--text-primary); }
     .related-posts ul { list-style: none; padding: 0; }
-    .related-posts li { margin-bottom: 10px; color: #3f3f46; }
-    .related-posts a { color: #ff0000; text-decoration: none; }
+    .related-posts li { margin-bottom: 10px; color: var(--text-secondary); }
+    .related-posts a { color: var(--accent); text-decoration: none; }
+    .related-posts a:hover { text-decoration: underline; }
     table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e5e5; }
-    th { background: #f4f4f5; }
-    footer { background: white; border-top: 1px solid #e5e5e5; padding: 40px 0; text-align: center; margin-top: 60px; }
-    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
-    .footer-links a { color: #52525b; text-decoration: none; font-weight: 500; }
-    .footer-links a:hover { color: #ff0000; }
-    .footer-copyright { color: #71717a; font-size: 14px; }
-    footer a { color: #52525b; text-decoration: none; font-weight: 500; }
-    nav a { margin-left: 20px; color: #52525b; text-decoration: none; font-weight: 500; }
-    nav a:hover { color: #ff0000; }
-    table tr:nth-child(even) { background: #fafafa; }
-    .two-col { display: flex; gap: 20px; flex-wrap: wrap; }
-    .two-col > div { flex: 1; min-width: 250px; background: #f9f9f9; padding: 16px; border-radius: 8px; }
-    .toc { background: #f4f4f5; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .toc ol { margin: 0; padding-left: 20px; }
-    .toc li { margin-bottom: 6px; color: #3f3f46; }
-    .formula-box { background: #f0f4ff; padding: 16px; border-radius: 8px; margin: 16px 0; font-family: monospace; text-align: center; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    th { background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 600; }
+    .odds-table { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; overflow: hidden; }
+    .odds-table th { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+    .odds-table td { border-bottom: 1px solid var(--border); color: var(--text-primary); }
+    code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); }
+    footer { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 40px 16px 32px; text-align: center; margin-top: 60px; }
+    .footer-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap; }
+    .footer-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copyright { color: var(--text-muted); font-size: 13px; }
+    nav { display: flex; gap: 24px; }
+    nav a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s; }
+    nav a:hover { color: var(--text-primary); }
+    img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+    @media (max-width: 640px) {
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.7rem; }
+      .container { padding: 0 16px; }
+      nav { gap: 12px; }
+      nav a { font-size: 13px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="header-content">
-      <a href="/" class="logo">Win<span>Fulltime</span></a>
+      <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28"> Win<span>Fulltime</span></a>
       <nav>
         <a href="/">Home</a>
         <a href="/ticket-builder.html">Ticket Builder</a>
@@ -91,7 +123,7 @@
     <div style="background:#dbeafe;padding:16px 20px;border-radius:8px;margin:20px 0"><strong>Tip:</strong> Looking for today's football predictions? <a href="/">Click here</a>.</div>
 
     <p>Fouls betting is one of football's most underutilised niche markets. While most bettors focus on goals, corners, or cards, the fouls market offers consistent opportunities for those who understand the dynamics that drive disciplinary counts. From booking points systems to referee tendencies, this guide covers everything you need to build a profitable foul betting strategy.</p>
-    <p>Unlike goal-based markets where elite talent can override team dynamics, fouls are driven by structural factors — playing style, match context, referee personality, and league culture. These factors are predictable and measurable, making foul betting a fertile ground for disciplined analysts.</p>
+    <p>Unlike goal-based markets where elite talent can override team dynamics, fouls are driven by structural factors â€” playing style, match context, referee personality, and league culture. These factors are predictable and measurable, making foul betting a fertile ground for disciplined analysts.</p>
 
     <div class="toc">
       <strong>In This Guide:</strong>
@@ -124,7 +156,7 @@
       <tr><td>Fouls Handicap</td><td>One team given a foul handicap (e.g. Team A -2.5 fouls)</td><td>1.85-2.00</td></tr>
     </table>
 
-    <p>Foul markets are most liquid in major European leagues — Premier League, Bundesliga, Serie A, La Liga, and Ligue 1. Champions League and Europa League matches also attract solid liquidity. Lower-league and smaller-market matches may have limited foul market options or wider spreads.</p>
+    <p>Foul markets are most liquid in major European leagues â€” Premier League, Bundesliga, Serie A, La Liga, and Ligue 1. Champions League and Europa League matches also attract solid liquidity. Lower-league and smaller-market matches may have limited foul market options or wider spreads.</p>
 
     <div class="pro-tip">
       <h4>Where to Find Foul Markets</h4>
@@ -157,10 +189,10 @@
     <div class="success">
       <h3>When Booking Points Run High</h3>
       <ul>
-        <li><strong>Derby matches</strong> — Local rivalries produce 20-40% more bookings</li>
-        <li><strong>Relegation six-pointers</strong> — High stakes lead to aggressive challenges and tactical fouls</li>
-        <li><strong>Matches with strict referees</strong> — Some referees issue cards for fouls others would let slide</li>
-        <li><strong>Teams with high tackle rates</strong> — Teams averaging 18+ tackles per game produce more cardable offences</li>
+        <li><strong>Derby matches</strong> â€” Local rivalries produce 20-40% more bookings</li>
+        <li><strong>Relegation six-pointers</strong> â€” High stakes lead to aggressive challenges and tactical fouls</li>
+        <li><strong>Matches with strict referees</strong> â€” Some referees issue cards for fouls others would let slide</li>
+        <li><strong>Teams with high tackle rates</strong> â€” Teams averaging 18+ tackles per game produce more cardable offences</li>
       </ul>
     </div>
 
@@ -169,11 +201,11 @@
 
     <p><strong>Core metrics for team foul analysis:</strong></p>
     <ul>
-      <li><strong>Fouls committed per game</strong> — The most basic metric. Teams in the 12-15 fouls/game range are high-volume offenders.</li>
-      <li><strong>Fouls suffered per game</strong> — Teams that draw fouls force opponents into disciplinary danger.</li>
-      <li><strong>Tackles per game</strong> — High tackle counts correlate strongly with fouls. Teams that press aggressively commit more fouls.</li>
-      <li><strong>Possession %</strong> — Lower-possession teams typically commit more fouls (defensive fouling to disrupt play).</li>
-      <li><strong>Yellow/Red cards per game</strong> — Converts foul volume into disciplinary action.</li>
+      <li><strong>Fouls committed per game</strong> â€” The most basic metric. Teams in the 12-15 fouls/game range are high-volume offenders.</li>
+      <li><strong>Fouls suffered per game</strong> â€” Teams that draw fouls force opponents into disciplinary danger.</li>
+      <li><strong>Tackles per game</strong> â€” High tackle counts correlate strongly with fouls. Teams that press aggressively commit more fouls.</li>
+      <li><strong>Possession %</strong> â€” Lower-possession teams typically commit more fouls (defensive fouling to disrupt play).</li>
+      <li><strong>Yellow/Red cards per game</strong> â€” Converts foul volume into disciplinary action.</li>
     </ul>
 
     <table>
@@ -187,20 +219,20 @@
 
     <div class="pro-tip">
       <h4>Data Sources for Team Foul Analysis</h4>
-      <p><a href="https://fbref.com/en/" target="_blank" rel="noopener">FBref</a> provides comprehensive team foul data including fouls committed, suffered, and disciplinary records, all split by competition. <a href="https://www.whoscored.com/" target="_blank" rel="noopener">WhoScored</a> offers match-by-match foul breakdowns with team averages. <a href="https://www.soccerway.com/" target="_blank" rel="noopener">Soccerway</a> has historical foul data going back multiple seasons — invaluable for identifying long-term trends.</p>
+      <p><a href="https://fbref.com/en/" target="_blank" rel="noopener">FBref</a> provides comprehensive team foul data including fouls committed, suffered, and disciplinary records, all split by competition. <a href="https://www.whoscored.com/" target="_blank" rel="noopener">WhoScored</a> offers match-by-match foul breakdowns with team averages. <a href="https://www.soccerway.com/" target="_blank" rel="noopener">Soccerway</a> has historical foul data going back multiple seasons â€” invaluable for identifying long-term trends.</p>
     </div>
 
-    <p><strong>Home/Away splits in foul data:</strong> Teams typically commit 1-2 more fouls per game away from home. This is a well-documented phenomenon — home teams receive more favourable refereeing decisions, which may suppress their foul count. Away teams often resort to tactical fouling to disrupt home momentum. Always check home/away foul splits when analysing a match.</p>
+    <p><strong>Home/Away splits in foul data:</strong> Teams typically commit 1-2 more fouls per game away from home. This is a well-documented phenomenon â€” home teams receive more favourable refereeing decisions, which may suppress their foul count. Away teams often resort to tactical fouling to disrupt home momentum. Always check home/away foul splits when analysing a match.</p>
 
     <h2>4. Referee Impact on Foul Counts</h2>
     <p>No single factor influences foul counts more than the referee. Different referees have vastly different thresholds for what constitutes a foul, and these differences are predictable and measurable.</p>
 
     <p><strong>Referee archetypes for foul betting:</strong></p>
     <ul>
-      <li><strong>Whistle-happy referees</strong> — Award 25-30+ fouls per match. Quick to penalise contact. Examples: Michael Oliver, Anthony Taylor, Danny Makkelie.</li>
-      <li><strong>Let-it-play referees</strong> — Award 15-22 fouls per match. Allow physical contests. Examples: Paul Tierney, Stuart Attwell, Slavko Vincic.</li>
-      <li><strong>Card-happy referees</strong> — Award fouls AND issue cards freely. High booking point totals. Examples: Cüneyt Çakir, Mateu Lahoz.</li>
-      <li><strong>Balanced referees</strong> — Consistent and predictable. Foul counts around league average. Most Bundesliga referees fall here.</li>
+      <li><strong>Whistle-happy referees</strong> â€” Award 25-30+ fouls per match. Quick to penalise contact. Examples: Michael Oliver, Anthony Taylor, Danny Makkelie.</li>
+      <li><strong>Let-it-play referees</strong> â€” Award 15-22 fouls per match. Allow physical contests. Examples: Paul Tierney, Stuart Attwell, Slavko Vincic.</li>
+      <li><strong>Card-happy referees</strong> â€” Award fouls AND issue cards freely. High booking point totals. Examples: CÃ¼neyt Ã‡akir, Mateu Lahoz.</li>
+      <li><strong>Balanced referees</strong> â€” Consistent and predictable. Foul counts around league average. Most Bundesliga referees fall here.</li>
     </ul>
 
     <table>
@@ -209,15 +241,15 @@
       <tr><td>Anthony Taylor</td><td>Premier League</td><td>25.8</td><td>4.3</td><td>Whistle-happy</td></tr>
       <tr><td>Paul Tierney</td><td>Premier League</td><td>21.2</td><td>3.2</td><td>Let-it-play</td></tr>
       <tr><td>Danny Makkelie</td><td>Eredivisie</td><td>27.1</td><td>4.5</td><td>Whistle-happy</td></tr>
-      <tr><td>Cüneyt Çakir</td><td>International</td><td>24.8</td><td>5.2</td><td>Card-happy</td></tr>
+      <tr><td>CÃ¼neyt Ã‡akir</td><td>International</td><td>24.8</td><td>5.2</td><td>Card-happy</td></tr>
       <tr><td>Felix Zwayer</td><td>Bundesliga</td><td>23.5</td><td>3.8</td><td>Balanced</td></tr>
-      <tr><td>Jesús Gil Manzano</td><td>La Liga</td><td>25.6</td><td>4.6</td><td>Whistle-happy</td></tr>
+      <tr><td>JesÃºs Gil Manzano</td><td>La Liga</td><td>25.6</td><td>4.6</td><td>Whistle-happy</td></tr>
       <tr><td>Maurizio Mariani</td><td>Serie A</td><td>22.8</td><td>4.0</td><td>Balanced</td></tr>
     </table>
 
     <div class="strategy-box">
       <h3>How to Use Referee Data</h3>
-      <p>Cross-reference the assigned referee's average foul rate with both teams' average fouls committed. If a whistle-happy referee is assigned to a match between two high-foul teams, the over line should be significantly higher than the default — but bookmakers don't always adjust enough. This creates a consistent edge.</p>
+      <p>Cross-reference the assigned referee's average foul rate with both teams' average fouls committed. If a whistle-happy referee is assigned to a match between two high-foul teams, the over line should be significantly higher than the default â€” but bookmakers don't always adjust enough. This creates a consistent edge.</p>
       <p>Use <a href="https://www.transfermarkt.com/" target="_blank" rel="noopener">Transfermarkt</a> to find the assigned referee for upcoming matches (usually confirmed 2-3 days before kickoff). <a href="https://www.worldfootball.net/" target="_blank" rel="noopener">worldfootball.net</a> maintains extensive referee statistics including fouls per game across multiple seasons.</p>
     </div>
 
@@ -241,18 +273,18 @@
     </table>
 
     <div class="warning">
-      <strong>Cross-League Trap:</strong> Don't apply your home league's foul expectations to unfamiliar competitions. A foul total of 24.5 might be over in the Premier League but under in La Liga. Always calibrate your expectations to the specific league's average. Bookmakers with sharp odds (Pinnacle) do this automatically — their lines will be higher for La Liga matches. You need to identify when they haven't adjusted enough for specific matchups.</div>
+      <strong>Cross-League Trap:</strong> Don't apply your home league's foul expectations to unfamiliar competitions. A foul total of 24.5 might be over in the Premier League but under in La Liga. Always calibrate your expectations to the specific league's average. Bookmakers with sharp odds (Pinnacle) do this automatically â€” their lines will be higher for La Liga matches. You need to identify when they haven't adjusted enough for specific matchups.</div>
 
     <h2>6. Derby Matches and Fouls</h2>
     <p>Derby matches are a special category for foul betting. The heightened emotional stakes, historical rivalries, and intense physicality consistently produce elevated foul counts. This is one of the most reliable patterns in football disciplinary betting.</p>
 
     <p><strong>Why derbies produce more fouls:</strong></p>
     <ul>
-      <li><strong>Emotional intensity</strong> — Players are more aggressive, less restrained, and quicker to retaliate</li>
-      <li><strong>Historical grudges</strong> — Old feuds between players carry over from previous meetings</li>
-      <li><strong>Referee leniency</strong> — Referees often let derbies flow more, which paradoxically leads to more fouls</li>
-      <li><strong>High stakes</strong> — Bragging rights matter as much as points in many derbies</li>
-      <li><strong>Crowd influence</strong> — Loud, partisan crowds drive adrenaline and aggression</li>
+      <li><strong>Emotional intensity</strong> â€” Players are more aggressive, less restrained, and quicker to retaliate</li>
+      <li><strong>Historical grudges</strong> â€” Old feuds between players carry over from previous meetings</li>
+      <li><strong>Referee leniency</strong> â€” Referees often let derbies flow more, which paradoxically leads to more fouls</li>
+      <li><strong>High stakes</strong> â€” Bragging rights matter as much as points in many derbies</li>
+      <li><strong>Crowd influence</strong> â€” Loud, partisan crowds drive adrenaline and aggression</li>
     </ul>
 
     <table>
@@ -269,7 +301,7 @@
 
     <div class="success">
       <h3>Derby Foul Betting Strategy</h3>
-      <p>Back over fouls in derby matches whenever the bookmaker's line is within 1-2 fouls of the league average. Derby matches consistently outperform league averages, and bookmakers often underestimate this effect — especially for mid-tier derbies that receive less analytical attention. The Old Firm derby, Merseyside derby, and Milan derby show the most consistent foul increases.</p>
+      <p>Back over fouls in derby matches whenever the bookmaker's line is within 1-2 fouls of the league average. Derby matches consistently outperform league averages, and bookmakers often underestimate this effect â€” especially for mid-tier derbies that receive less analytical attention. The Old Firm derby, Merseyside derby, and Milan derby show the most consistent foul increases.</p>
     </div>
 
     <p><strong>A note on derby fatigue:</strong> If two teams play each other multiple times in a season (league, cup, possibly playoffs), foul counts tend to decrease slightly in later meetings. Players become familiar with each other's tendencies and may exercise more caution to avoid suspension. This effect is small (2-5%) but worth noting for back-to-back derbies.</p>
@@ -286,7 +318,7 @@
 
     <div class="success">
       <h3>Scenario 2: One Team Falls Behind Early</h3>
-      <p>A team that concedes early in a high-stakes match will foul more aggressively to regain possession. Watch for a trailing team's foul rate to spike 20-30% above their baseline. If you backed the over pre-match, hold. If you didn't, the in-play over odds will have drifted — this is a strong entry point.</p>
+      <p>A team that concedes early in a high-stakes match will foul more aggressively to regain possession. Watch for a trailing team's foul rate to spike 20-30% above their baseline. If you backed the over pre-match, hold. If you didn't, the in-play over odds will have drifted â€” this is a strong entry point.</p>
     </div>
 
     <div class="success">
@@ -302,10 +334,10 @@
 
     <p><strong>The foul-to-card conversion rate:</strong> On average, roughly 15-20% of fouls result in yellow cards. But this rate varies significantly by:</p>
     <ul>
-      <li><strong>Referee</strong> — Some referees card 25% of fouls; others card only 10%.</li>
-      <li><strong>Match context</strong> — Derby matches see higher conversion rates (tactical fouls more cynical).</li>
-      <li><strong>Foul type</strong> — Tactical fouls (pulling shirts, breaking up breaks) are carded more than 50/50 challenges.</li>
-      <li><strong>League culture</strong> — La Liga and Serie A have higher conversion rates; Bundesliga and MLS are lower.</li>
+      <li><strong>Referee</strong> â€” Some referees card 25% of fouls; others card only 10%.</li>
+      <li><strong>Match context</strong> â€” Derby matches see higher conversion rates (tactical fouls more cynical).</li>
+      <li><strong>Foul type</strong> â€” Tactical fouls (pulling shirts, breaking up breaks) are carded more than 50/50 challenges.</li>
+      <li><strong>League culture</strong> â€” La Liga and Serie A have higher conversion rates; Bundesliga and MLS are lower.</li>
     </ul>
 
     <div class="strategy-box">
@@ -314,7 +346,7 @@
       <p>The key insight: bookmakers price fouls and cards markets semi-independently. The correlation between them is real but not always fully reflected in the combined price. When you've identified a high-foul match with a card-happy referee, the multi can offer genuine value.</p>
     </div>
 
-    <p><strong>Booking points as a bridge market:</strong> Booking points straddle fouls and cards. If you're confident in high fouls but uncertain about card volume, booking points can be a better vehicle than pure cards over/under. The points market captures the full disciplinary picture — a match with 25 fouls and 4 yellows (40 points) plus 1 red (25 points) totals 65 booking points, which comfortably clears most 55-60 point lines.</p>
+    <p><strong>Booking points as a bridge market:</strong> Booking points straddle fouls and cards. If you're confident in high fouls but uncertain about card volume, booking points can be a better vehicle than pure cards over/under. The points market captures the full disciplinary picture â€” a match with 25 fouls and 4 yellows (40 points) plus 1 red (25 points) totals 65 booking points, which comfortably clears most 55-60 point lines.</p>
 
     <div class="pro-tip">
       <h4>Cross-Market Arbitrage Opportunity</h4>
@@ -334,11 +366,11 @@
     <h3>Tier 2: Weighted Contextual Model</h3>
     <p>Add weighting for match context factors:</p>
     <ul>
-      <li><strong>Derby match</strong> — Multiply predicted total by 1.15-1.25</li>
-      <li><strong>Relegation six-pointer</strong> — Multiply by 1.10-1.15</li>
-      <li><strong>Cup final</strong> — Multiply by 0.90-0.95 (fewer fouls in cautious finals)</li>
-      <li><strong>Home/Away adjustment</strong> — Away team fouls +1.5, home team fouls -1.0</li>
-      <li><strong>Weather (heavy rain)</strong> — Multiply by 0.90 (fewer tackles, more cautious play)</li>
+      <li><strong>Derby match</strong> â€” Multiply predicted total by 1.15-1.25</li>
+      <li><strong>Relegation six-pointer</strong> â€” Multiply by 1.10-1.15</li>
+      <li><strong>Cup final</strong> â€” Multiply by 0.90-0.95 (fewer fouls in cautious finals)</li>
+      <li><strong>Home/Away adjustment</strong> â€” Away team fouls +1.5, home team fouls -1.0</li>
+      <li><strong>Weather (heavy rain)</strong> â€” Multiply by 0.90 (fewer tackles, more cautious play)</li>
     </ul>
 
     <h3>Tier 3: Advanced Regression Model</h3>
@@ -348,7 +380,7 @@
       <li>Run a linear regression or Poisson regression to identify the most predictive variables</li>
       <li>Weight each variable by its statistical significance</li>
       <li>Generate a predicted foul range (not just a point estimate)</li>
-      <li>Compare to the bookmaker line — bet when your range and the line differ by 2+ fouls</li>
+      <li>Compare to the bookmaker line â€” bet when your range and the line differ by 2+ fouls</li>
     </ol>
 
     <div class="example-box">
@@ -358,9 +390,9 @@
       <p><strong>Leeds fouls:</strong> 14.2/game (last 10)</p>
       <p><strong>Palace fouls:</strong> 12.8/game (last 10)</p>
       <p><strong>Context:</strong> Local derby, both teams in playoff hunt</p>
-      <p><strong>Model prediction:</strong> (14.2 + 12.8 + 26.4) / 3 = 17.8 avg per team × 2 = 35.6 total × 1.20 (derby multiplier) = 42.7 fouls</p>
+      <p><strong>Model prediction:</strong> (14.2 + 12.8 + 26.4) / 3 = 17.8 avg per team Ã— 2 = 35.6 total Ã— 1.20 (derby multiplier) = 42.7 fouls</p>
       <p><strong>Bookmaker line:</strong> Over 26.5 fouls at 1.85</p>
-      <p><strong>Verdict:</strong> Strong over bet. The model predicts 42.7 fouls, and the line is set at 26.5 — a massive gap. Even with conservative adjustments, this is a high-confidence over play.</p>
+      <p><strong>Verdict:</strong> Strong over bet. The model predicts 42.7 fouls, and the line is set at 26.5 â€” a massive gap. Even with conservative adjustments, this is a high-confidence over play.</p>
     </div>
 
     <h2>10. Common Mistakes in Foul Betting</h2>
@@ -394,7 +426,7 @@
 
     <div class="strategy-box">
       <h3>What is the difference between fouls and booking points betting?</h3>
-      <p>Fouls betting counts every foul committed (typically defined as any infringement that results in a free kick). Booking points is a weighted system: 10 points per yellow card, 25 per red card. Fouls capture the volume of infringements; booking points capture their severity. Both markets are available but they measure different things — a match can be high-fouls but low-booking-points if few cards are issued.</p>
+      <p>Fouls betting counts every foul committed (typically defined as any infringement that results in a free kick). Booking points is a weighted system: 10 points per yellow card, 25 per red card. Fouls capture the volume of infringements; booking points capture their severity. Both markets are available but they measure different things â€” a match can be high-fouls but low-booking-points if few cards are issued.</p>
     </div>
 
     <div class="strategy-box">
@@ -409,7 +441,7 @@
 
     <div class="strategy-box">
       <h3>How important is the referee for foul betting?</h3>
-      <p>The referee is arguably the most important single factor. A strict referee can add 5-8 fouls to a match compared to a lenient referee — that's a 20-30% swing. Always check the referee assignment and their historical foul averages before placing any foul bet. This single step will improve your win rate more than any other adjustment.</p>
+      <p>The referee is arguably the most important single factor. A strict referee can add 5-8 fouls to a match compared to a lenient referee â€” that's a 20-30% swing. Always check the referee assignment and their historical foul averages before placing any foul bet. This single step will improve your win rate more than any other adjustment.</p>
     </div>
 
     <div class="strategy-box">
@@ -429,7 +461,7 @@
 
     <div class="strategy-box">
       <h3>Is there a correlation between fouls and goals?</h3>
-      <p>Empirically, no strong correlation exists. Teams that commit many fouls don't necessarily concede more goals (defensive teams foul and defend well). Teams that draw many fouls don't necessarily score more goals (creative players draw fouls but may be isolated). Foul betting and goal betting are largely independent — you can specialise in one without worrying about the other.</p>
+      <p>Empirically, no strong correlation exists. Teams that commit many fouls don't necessarily concede more goals (defensive teams foul and defend well). Teams that draw many fouls don't necessarily score more goals (creative players draw fouls but may be isolated). Foul betting and goal betting are largely independent â€” you can specialise in one without worrying about the other.</p>
     </div>
 
     <div class="strategy-box">
@@ -439,22 +471,22 @@
 
     <div class="strategy-box">
       <h3>What bankroll strategy works best for foul betting?</h3>
-      <p>Level staking at 1-2% per bet is the standard approach for foul betting. The markets are reasonably efficient, so edges are typically in the 2-5% range (not the 10%+ edges sometimes found in obscure markets). Proportional staking using the Kelly Criterion works if you have accurate probability estimates. Never chase losses by increasing stakes — foul markets are volatile day-to-day but profitable over 200+ bet samples with a genuine edge.</p>
+      <p>Level staking at 1-2% per bet is the standard approach for foul betting. The markets are reasonably efficient, so edges are typically in the 2-5% range (not the 10%+ edges sometimes found in obscure markets). Proportional staking using the Kelly Criterion works if you have accurate probability estimates. Never chase losses by increasing stakes â€” foul markets are volatile day-to-day but profitable over 200+ bet samples with a genuine edge.</p>
     </div>
 
     <h2>Next Steps</h2>
     <p>Foul betting rewards preparation, data analysis, and discipline. Focus on one or two leagues where you can build deep knowledge of team tendencies and referee assignments. Track everything, be selective, and scale your stakes only when your data shows a consistent edge.</p>
     <ul>
-      <li><a href="/blog/cards-betting-strategy">Cards Betting Strategy</a> — Yellow and red card markets in detail</li>
-      <li><a href="/blog/referee-statistics-betting">Referee Statistics Betting</a> — How to incorporate referee data into your betting</li>
-      <li><a href="/blog/booking-code-betting">Booking Code Betting</a> — Alternative disciplinary markets explained</li>
-      <li><a href="/blog/statistical-modeling-football-predictions">Statistical Modeling for Football Predictions</a> — Build your own prediction system</li>
+      <li><a href="/blog/cards-betting-strategy">Cards Betting Strategy</a> â€” Yellow and red card markets in detail</li>
+      <li><a href="/blog/referee-statistics-betting">Referee Statistics Betting</a> â€” How to incorporate referee data into your betting</li>
+      <li><a href="/blog/booking-code-betting">Booking Code Betting</a> â€” Alternative disciplinary markets explained</li>
+      <li><a href="/blog/statistical-modeling-football-predictions">Statistical Modeling for Football Predictions</a> â€” Build your own prediction system</li>
     </ul>
 
     <div class="cta">
       <h3>Get Today's Predictions</h3>
       <p>Daily football predictions with foul, card, and booking point data:</p>
-      <p><a href="/">View Today's Predictions →</a></p>
+      <p><a href="/">View Today's Predictions â†’</a></p>
     </div>
 
     <div class="related-posts">

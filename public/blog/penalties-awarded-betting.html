@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -13,64 +13,96 @@
   <meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/penalties-awarded-betting.webp">
   <link rel="canonical" href="https://winfulltime.com/blog/penalties-awarded-betting">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #18181b; margin: 0; padding: 0; }
-    header { background: white; border-bottom: 1px solid #e5e5e5; padding: 16px 0; }
+    :root {
+      --bg-primary: #0b0f1a;
+      --bg-secondary: #111827;
+      --bg-card: rgba(23, 28, 46, 0.85);
+      --bg-elevated: #1a1f2e;
+      --text-primary: #e8edf5;
+      --text-secondary: #c8d0db;
+      --text-muted: #94a3b8;
+      --accent: #ff2448;
+      --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --glow: rgba(255,36,72,0.12);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--bg-primary); background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent); color: var(--text-primary); margin: 0; padding: 0; font-size: 16px; -webkit-font-smoothing: antialiased; }
+    header { background: rgba(11,15,26,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
     .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-size: 24px; font-weight: bold; color: #18181b; text-decoration: none; }
-    .logo span { color: #ff0000; }
+    .logo { display: inline-flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+    .logo span { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .logo-icon { height: 28px; width: auto; flex-shrink: 0; }
     .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    h1 { font-size: 2.5rem; color: #18181b; margin-bottom: 10px; }
-    h2 { font-size: 1.8rem; color: #18181b; margin-top: 40px; margin-bottom: 15px; }
-    h3 { font-size: 1.3rem; color: #18181b; margin-top: 30px; margin-bottom: 10px; }
-    p { margin-bottom: 16px; color: #3f3f46; line-height: 1.7; }
-    .meta { color: #71717a; font-size: 0.9rem; margin-bottom: 30px; }
-    .highlight { background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b; }
-    .example-box { background: #18181b; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .example-box * { color: white; }
-    .strategy-box { background: white; border: 1px solid #e5e5e5; padding: 24px; border-radius: 12px; margin: 24px 0; }
-    .strategy-box h3 { margin-top: 0; color: #ff0000; }
-    .pro-tip { background: #dbeafe; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .pro-tip h4 { margin-top: 0; color: #1d4ed8; }
-    .warning { background: #fef2f2; border-left: 4px solid #ff0000; padding: 16px; border-radius: 4px; margin: 20px 0; }
-    .success { background: #f0fdf4; border-left: 4px solid #22c55e; padding: 16px; border-radius: 4px; margin: 20px 0; }
-    .steps { background: #f4f4f5; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    h1 { font-size: 2.8rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; }
+    h2 { font-size: 2.1rem; color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; font-weight: 700; }
+    h3 { font-size: 1.5rem; color: var(--text-primary); margin-top: 30px; margin-bottom: 10px; font-weight: 600; }
+    p { font-size: 1.125rem; margin-bottom: 20px; color: var(--text-secondary); line-height: 1.85; }
+    li { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.85; margin-bottom: 8px; }
+    .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+    .highlight { background: rgba(251,191,36,0.1); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .highlight * { color: var(--text-primary); }
+    .example-box { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .example-box * { color: var(--text-primary); }
+    .strategy-box { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin: 24px 0; }
+    .strategy-box h3 { margin-top: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .pro-tip { background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .pro-tip h4 { margin-top: 0; color: #60a5fa; }
+    .pro-tip * { color: var(--text-primary); }
+    .warning { background: rgba(239,68,68,0.08); border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .warning * { color: var(--text-primary); }
+    .success { background: rgba(34,197,94,0.08); border-left: 4px solid #22c55e; padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .success * { color: var(--text-primary); }
+    .steps { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin: 20px 0; }
     .steps ol { margin: 0; padding-left: 20px; }
-    .steps li { margin-bottom: 10px; }
-    .cta { background: linear-gradient(135deg, #ff0000, #cc0000); color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0; }
+    .steps li { margin-bottom: 10px; color: var(--text-secondary); }
+    .cta { background: var(--accent-gradient); color: white; padding: 24px; border-radius: var(--radius); text-align: center; margin: 30px 0; box-shadow: 0 4px 15px var(--glow); }
     .cta * { color: white; }
-    .breadcrumb { font-size: 0.9rem; color: #71717a; margin-bottom: 20px; }
-    .breadcrumb a { color: #ff0000; text-decoration: none; }
-    .related-posts { background: #f4f4f5; padding: 20px; border-radius: 8px; margin-top: 40px; }
-    .related-posts h3 { margin-top: 0; color: #18181b; }
+    .cta a { color: white; text-decoration: underline; }
+    .breadcrumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .related-posts { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin-top: 40px; }
+    .related-posts h3 { margin-top: 0; color: var(--text-primary); }
     .related-posts ul { list-style: none; padding: 0; }
-    .related-posts li { margin-bottom: 10px; color: #3f3f46; }
-    .related-posts a { color: #ff0000; text-decoration: none; }
+    .related-posts li { margin-bottom: 10px; color: var(--text-secondary); }
+    .related-posts a { color: var(--accent); text-decoration: none; }
+    .related-posts a:hover { text-decoration: underline; }
     table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e5e5; }
-    th { background: #f4f4f5; }
-    footer { background: white; border-top: 1px solid #e5e5e5; padding: 40px 0; text-align: center; margin-top: 60px; }
-    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
-    .footer-links a { color: #52525b; text-decoration: none; font-weight: 500; }
-    .footer-links a:hover { color: #ff0000; }
-    .footer-copyright { color: #71717a; font-size: 14px; }
-    footer a { color: #52525b; text-decoration: none; font-weight: 500; }
-    nav a { margin-left: 20px; color: #52525b; text-decoration: none; font-weight: 500; }
-    nav a:hover { color: #ff0000; }
-    table tr:nth-child(even) { background: #fafafa; }
-    .two-col { display: flex; gap: 20px; flex-wrap: wrap; }
-    .two-col > div { flex: 1; min-width: 250px; background: #f9f9f9; padding: 16px; border-radius: 8px; }
-    .toc { background: #f4f4f5; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .toc ol { margin: 0; padding-left: 20px; }
-    .toc li { margin-bottom: 6px; color: #3f3f46; }
-    .formula-box { background: #f0f4ff; padding: 16px; border-radius: 8px; margin: 16px 0; font-family: monospace; text-align: center; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    th { background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 600; }
+    .odds-table { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; overflow: hidden; }
+    .odds-table th { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+    .odds-table td { border-bottom: 1px solid var(--border); color: var(--text-primary); }
+    code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); }
+    footer { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 40px 16px 32px; text-align: center; margin-top: 60px; }
+    .footer-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap; }
+    .footer-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copyright { color: var(--text-muted); font-size: 13px; }
+    nav { display: flex; gap: 24px; }
+    nav a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s; }
+    nav a:hover { color: var(--text-primary); }
+    img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+    @media (max-width: 640px) {
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.7rem; }
+      .container { padding: 0 16px; }
+      nav { gap: 12px; }
+      nav a { font-size: 13px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="header-content">
-      <a href="/" class="logo">Win<span>Fulltime</span></a>
+      <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28"> Win<span>Fulltime</span></a>
       <nav>
         <a href="/">Home</a>
         <a href="/ticket-builder.html">Ticket Builder</a>
@@ -86,7 +118,7 @@
     <h1>Penalties Awarded: Spot Kick Frequency Betting</h1>
     <p class="meta">Last updated: June 2026 | By WinFulltime Team | 23 min read</p>
     <div style="background:#dbeafe;padding:16px 20px;border-radius:8px;margin:20px 0"><strong>Tip:</strong> Looking for today's football predictions? <a href="/">Click here</a>.</div>
-    <p>Penalties awarded betting focuses on a specific question: how many penalties will be awarded in a match? Unlike penalty scoring markets, this market is purely about frequency � whether a spot kick is given, regardless of whether it is converted. It is one of football betting's most intriguing niche markets, offering odds that can exceed 3.00 for even modest over lines.</p>
+    <p>Penalties awarded betting focuses on a specific question: how many penalties will be awarded in a match? Unlike penalty scoring markets, this market is purely about frequency ï¿½ whether a spot kick is given, regardless of whether it is converted. It is one of football betting's most intriguing niche markets, offering odds that can exceed 3.00 for even modest over lines.</p>
     <p>With penalties occurring in roughly one in four matches across Europe's top leagues, the over/under penalty market rewards deep analysis of referee tendencies, team defensive styles, attacking profiles, and match context. This guide provides the complete framework for profiting from penalty frequency markets.</p>
     <div class="toc">
       <strong>In This Guide:</strong>
@@ -116,7 +148,7 @@
       <tr><td>Under 1.5 Penalties</td><td>1.5</td><td>1.05-1.12</td><td>One or fewer penalties</td></tr>
       <tr><td>Penalty Match Handicap</td><td>Varies</td><td>1.85-2.00</td><td>One team given penalty handicap</td></tr>
     </table>
-    <p><strong>Multiple penalties:</strong> Two or more penalties in a match is rare � roughly 4-6% of matches across top leagues. When it happens, it creates enormous value for Over 1.5 backers.</p>
+    <p><strong>Multiple penalties:</strong> Two or more penalties in a match is rare ï¿½ roughly 4-6% of matches across top leagues. When it happens, it creates enormous value for Over 1.5 backers.</p>
     <div class="pro-tip">
       <h4>Where to Find Penalties Awarded Markets</h4>
       <p>Bet365 offers the most consistent penalties awarded market coverage across major leagues. <a href="https://www.pinnacle.com/" target="_blank" rel="noopener">Pinnacle</a> offers sharp lines with higher limits. Use <a href="https://www.oddsportal.com/football/" target="_blank" rel="noopener">OddsPortal</a> to compare penalty market odds across bookmakers before placing any bet.</p>
@@ -125,8 +157,8 @@
     <p>The Over/Under 0.5 penalties market is the most common and liquid. Understanding the implied probabilities is essential for finding value.</p>
     <table>
       <tr><th>Odds for Over 0.5</th><th>Implied Probability</th><th>Break-Even Rate</th><th>Market Assessment</th></tr>
-      <tr><td>2.50</td><td>40.0%</td><td>40.0%</td><td>Very high implied probability � rare</td></tr>
-      <tr><td>3.00</td><td>33.3%</td><td>33.3%</td><td>High � penalty-friendly matchup expected</td></tr>
+      <tr><td>2.50</td><td>40.0%</td><td>40.0%</td><td>Very high implied probability ï¿½ rare</td></tr>
+      <tr><td>3.00</td><td>33.3%</td><td>33.3%</td><td>High ï¿½ penalty-friendly matchup expected</td></tr>
       <tr><td>3.50</td><td>28.6%</td><td>28.6%</td><td>Slightly above league average</td></tr>
       <tr><td>4.00</td><td>25.0%</td><td>25.0%</td><td>Around league average</td></tr>
       <tr><td>4.50</td><td>22.2%</td><td>22.2%</td><td>Slightly below average</td></tr>
@@ -160,11 +192,11 @@
     <p>Some teams are significantly more likely to earn penalties than others. Understanding the characteristics of penalty-earning teams is essential.</p>
     <p><strong>Key indicators of high penalty-earning teams:</strong></p>
     <ul>
-      <li><strong>High possession in attacking third</strong> � Teams that camp in the opposition half create more box incidents</li>
-      <li><strong>Dribble-heavy attackers</strong> � Wingers who take on defenders in the box</li>
-      <li><strong>High volume of crosses</strong> � Each cross creates a potential penalty situation</li>
-      <li><strong>Fast transitions</strong> � Counter-attacking teams force reactive challenges</li>
-      <li><strong>Physical target man</strong> � Strikers who draw contact in the box</li>
+      <li><strong>High possession in attacking third</strong> ï¿½ Teams that camp in the opposition half create more box incidents</li>
+      <li><strong>Dribble-heavy attackers</strong> ï¿½ Wingers who take on defenders in the box</li>
+      <li><strong>High volume of crosses</strong> ï¿½ Each cross creates a potential penalty situation</li>
+      <li><strong>Fast transitions</strong> ï¿½ Counter-attacking teams force reactive challenges</li>
+      <li><strong>Physical target man</strong> ï¿½ Strikers who draw contact in the box</li>
     </ul>
     <table>
       <tr><th>Team</th><th>League</th><th>Penalties Earned/Season</th><th>Drivers</th></tr>
@@ -184,11 +216,11 @@
     <p>Equally important is identifying which teams are most likely to concede penalties.</p>
     <p><strong>Key indicators of high penalty-conceding teams:</strong></p>
     <ul>
-      <li><strong>High shots in box conceded</strong> � More defensive actions = more penalty opportunities</li>
-      <li><strong>Aggressive tackling style</strong> � Slide-tackling in the box rather than jockeying</li>
-      <li><strong>Poor defensive organisation</strong> � Disorganised defences make rash challenges</li>
-      <li><strong>Inexperienced defenders</strong> � Younger defenders commit more box fouls</li>
-      <li><strong>High pressing</strong> � Pressing teams get caught out of position</li>
+      <li><strong>High shots in box conceded</strong> ï¿½ More defensive actions = more penalty opportunities</li>
+      <li><strong>Aggressive tackling style</strong> ï¿½ Slide-tackling in the box rather than jockeying</li>
+      <li><strong>Poor defensive organisation</strong> ï¿½ Disorganised defences make rash challenges</li>
+      <li><strong>Inexperienced defenders</strong> ï¿½ Younger defenders commit more box fouls</li>
+      <li><strong>High pressing</strong> ï¿½ Pressing teams get caught out of position</li>
     </ul>
     <table>
       <tr><th>Team Type</th><th>Penalties Conceded/Season</th><th>Primary Cause</th></tr>
@@ -228,18 +260,18 @@
     </table>
     <div class="strategy-box">
       <h3>Referee-Based Penalty Strategy</h3>
-      <p>The difference between the highest and lowest penalty referees is dramatic � Michael Oliver awards penalties at nearly double the rate of Paul Tierney. When a penalty-friendly referee is assigned to a match between two penalty-prone teams, the Over 0.5 line should be significantly shorter than the league average. If the bookmaker has not adjusted fully, you have an edge.</p>
+      <p>The difference between the highest and lowest penalty referees is dramatic ï¿½ Michael Oliver awards penalties at nearly double the rate of Paul Tierney. When a penalty-friendly referee is assigned to a match between two penalty-prone teams, the Over 0.5 line should be significantly shorter than the league average. If the bookmaker has not adjusted fully, you have an edge.</p>
       <p>Check referee assignments on <a href="https://www.transfermarkt.com/" target="_blank" rel="noopener">Transfermarkt</a> as soon as they are announced (typically 48-72 hours before kickoff). Some bookmakers adjust their lines immediately; others are slower.</p>
     </div>
     <h2>8. VAR Impact on Penalty Awards</h2>
     <p>VAR has fundamentally changed penalty frequency since its introduction.</p>
     <p><strong>Empirical effects of VAR on penalties:</strong></p>
     <ul>
-      <li><strong>15-25% increase in total penalties</strong> � VAR catches clear fouls missed on-field</li>
-      <li><strong>Reduced home bias</strong> � Home advantage narrowed from ~20% to ~12-15%</li>
-      <li><strong>Clearer fouls only</strong> � Referees award fewer marginal penalties</li>
-      <li><strong>More second-half penalties</strong> � VAR checks add stoppage time</li>
-      <li><strong>More penalties for attacking teams</strong> � VAR benefits box-dominant sides</li>
+      <li><strong>15-25% increase in total penalties</strong> ï¿½ VAR catches clear fouls missed on-field</li>
+      <li><strong>Reduced home bias</strong> ï¿½ Home advantage narrowed from ~20% to ~12-15%</li>
+      <li><strong>Clearer fouls only</strong> ï¿½ Referees award fewer marginal penalties</li>
+      <li><strong>More second-half penalties</strong> ï¿½ VAR checks add stoppage time</li>
+      <li><strong>More penalties for attacking teams</strong> ï¿½ VAR benefits box-dominant sides</li>
     </ul>
     <div class="success">
       <h3>VAR Betting Edge</h3>
@@ -249,26 +281,26 @@
     <div class="success">
       <h3>When to Bet Over 0.5 Penalties</h3>
       <ul>
-        <li><strong>Penalty-friendly referee</strong> � Oliver, Gil Manzano, Makkelie (34-38% rate)</li>
-        <li><strong>Attacking vs. poor defence</strong> � Top attacker facing relegation-threatened defence</li>
-        <li><strong>Dribble-heavy attackers present</strong> � Key dribblers confirmed in XI</li>
-        <li><strong>High stakes match</strong> � Title deciders, relegation six-pointers</li>
-        <li><strong>Derby match</strong> � Local rivalries produce more box incidents</li>
-        <li><strong>VAR confirmed</strong> � Competition uses VAR</li>
+        <li><strong>Penalty-friendly referee</strong> ï¿½ Oliver, Gil Manzano, Makkelie (34-38% rate)</li>
+        <li><strong>Attacking vs. poor defence</strong> ï¿½ Top attacker facing relegation-threatened defence</li>
+        <li><strong>Dribble-heavy attackers present</strong> ï¿½ Key dribblers confirmed in XI</li>
+        <li><strong>High stakes match</strong> ï¿½ Title deciders, relegation six-pointers</li>
+        <li><strong>Derby match</strong> ï¿½ Local rivalries produce more box incidents</li>
+        <li><strong>VAR confirmed</strong> ï¿½ Competition uses VAR</li>
       </ul>
     </div>
     <div class="warning">
       <h3>When to Bet Under 0.5 Penalties</h3>
       <ul>
-        <li><strong>Conservative referee</strong> � Tierney, Orsato (18-20% rate)</li>
-        <li><strong>Two defensive teams</strong> � Low-box-touch matchup</li>
-        <li><strong>Low stakes</strong> � Mid-table dead rubber</li>
-        <li><strong>Cup final</strong> � Caution dominates</li>
-        <li><strong>No VAR</strong> � Competition without video review</li>
+        <li><strong>Conservative referee</strong> ï¿½ Tierney, Orsato (18-20% rate)</li>
+        <li><strong>Two defensive teams</strong> ï¿½ Low-box-touch matchup</li>
+        <li><strong>Low stakes</strong> ï¿½ Mid-table dead rubber</li>
+        <li><strong>Cup final</strong> ï¿½ Caution dominates</li>
+        <li><strong>No VAR</strong> ï¿½ Competition without video review</li>
       </ul>
     </div>
     <div class="strategy-box">
-      <h3>Multiple Penalties � Over 1.5</h3>
+      <h3>Multiple Penalties ï¿½ Over 1.5</h3>
       <p>Over 1.5 penalties is a rare-event bet (3-6% of matches). Best candidates: penalty-friendly referee, two attacking teams, significant quality disparity, derby match, and teams with high historical penalty rates on both sides.</p>
     </div>
     <h2>10. In-Play Penalty Frequency Strategy</h2>
@@ -295,7 +327,7 @@
       <tr><td>Penalty + Match Result</td><td>Penalty and specific team wins</td><td>5.00-10.00</td><td>Moderate</td></tr>
       <tr><td>2+ Penalties + Over 2.5 Goals</td><td>Multiple penalties and goals</td><td>15.00-40.00</td><td>Long-shot</td></tr>
     </table>
-    <p><strong>Correlation note:</strong> Penalties and goals are correlated. A penalty awarded creates a ~78% chance of a goal, so combining penalty and goal markets can work. However, avoid combining penalty and cards markets � they are negatively correlated (a penalty incident may not result in a card if it is a genuine scoring chance foul).</p>
+    <p><strong>Correlation note:</strong> Penalties and goals are correlated. A penalty awarded creates a ~78% chance of a goal, so combining penalty and goal markets can work. However, avoid combining penalty and cards markets ï¿½ they are negatively correlated (a penalty incident may not result in a card if it is a genuine scoring chance foul).</p>
     <h2>12. Building a Penalty Frequency Model</h2>
     <h3>Tier 1: Basic Probability Model</h3>
     <div class="formula-box">Penalty Probability = League Avg Rate &times; Referee Adjustment &times; Team Adjustments</div>
@@ -334,7 +366,7 @@
     </div>
     <div class="strategy-box">
       <h3>What is the best bankroll strategy for penalty frequency betting?</h3>
-      <p>Use level stakes at 1-2% per bet. Penalty markets are volatile � you can have stretches of 5+ matches without a penalty. Ensure you have a 100-bet bankroll minimum. Track your edge over 200+ bets before scaling up.</p>
+      <p>Use level stakes at 1-2% per bet. Penalty markets are volatile ï¿½ you can have stretches of 5+ matches without a penalty. Ensure you have a 100-bet bankroll minimum. Track your edge over 200+ bets before scaling up.</p>
     </div>
     <div class="strategy-box">
       <h3>Can I combine penalty over/under with other markets?</h3>
@@ -351,10 +383,10 @@
     <h2>Next Steps</h2>
     <p>Penalty frequency betting rewards detailed analysis of referee assignments, team attacking styles, and defensive vulnerabilities. Specialise in one or two leagues, build a database, and track every bet.</p>
     <ul>
-      <li><a href="/blog/penalty-betting-strategy">Penalty Betting Strategy</a> � Full penalty market coverage</li>
-      <li><a href="/blog/referee-statistics-betting">Referee Statistics Betting</a> � Comprehensive referee analysis</li>
-      <li><a href="/blog/correct-score-betting">Correct Score Betting</a> � How penalties affect scorelines</li>
-      <li><a href="/blog/first-goalscorer-betting">First Goalscorer Betting</a> � Penalty takers as value bets</li>
+      <li><a href="/blog/penalty-betting-strategy">Penalty Betting Strategy</a> ï¿½ Full penalty market coverage</li>
+      <li><a href="/blog/referee-statistics-betting">Referee Statistics Betting</a> ï¿½ Comprehensive referee analysis</li>
+      <li><a href="/blog/correct-score-betting">Correct Score Betting</a> ï¿½ How penalties affect scorelines</li>
+      <li><a href="/blog/first-goalscorer-betting">First Goalscorer Betting</a> ï¿½ Penalty takers as value bets</li>
     </ul>
     <div class="cta">
       <h3>Get Today's Predictions</h3>

@@ -1,67 +1,108 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>After Drogba: How Ivory Coast Rebuilt Their Identity Around a Generation Europe Almost Forgot</title>
-  <meta name="description" content="How Ivory Coast rebuilt after Didier Drogba retired, turning to a diaspora generation Europe overlooked — and won AFCON 2024 on home soil with it.">
+  <meta name="description" content="How Ivory Coast rebuilt after Didier Drogba retired, turning to a diaspora generation Europe overlooked â€” and won AFCON 2024 on home soil with it.">
   <meta name="keywords" content="Ivory Coast rebuild, Didier Drogba, AFCON 2024, Sebastien Haller, Franck Kessie, Wilfried Zaha, Ivory Coast diaspora, Elephants 2026 World Cup">
   <meta property="og:title" content="After Drogba: How Ivory Coast Rebuilt Their Identity Around a Generation Europe Almost Forgot">
-  <meta property="og:description" content="When Drogba retired, Ivory Coast looked finished. Instead, they turned to a group of players Europe had overlooked — and built their strongest squad yet.">
+  <meta property="og:description" content="When Drogba retired, Ivory Coast looked finished. Instead, they turned to a group of players Europe had overlooked â€” and built their strongest squad yet.">
   <meta property="og:type" content="article">
   <meta property="og:image" content="https://winfulltime.com/blog/thumbnails/after-drogba-how-ivory-coast-rebuilt-identity.webp">
   <meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/after-drogba-how-ivory-coast-rebuilt-identity.webp">
   <link rel="canonical" href="https://winfulltime.com/blog/after-drogba-how-ivory-coast-rebuilt-identity">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #18181b; margin: 0; padding: 0; }
-    header { background: white; border-bottom: 1px solid #e5e5e5; padding: 16px 0; }
+    :root {
+      --bg-primary: #0b0f1a;
+      --bg-secondary: #111827;
+      --bg-card: rgba(23, 28, 46, 0.85);
+      --bg-elevated: #1a1f2e;
+      --text-primary: #e8edf5;
+      --text-secondary: #c8d0db;
+      --text-muted: #94a3b8;
+      --accent: #ff2448;
+      --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --glow: rgba(255,36,72,0.12);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--bg-primary); background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent); color: var(--text-primary); margin: 0; padding: 0; font-size: 16px; -webkit-font-smoothing: antialiased; }
+    header { background: rgba(11,15,26,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
     .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-size: 24px; font-weight: bold; color: #18181b; text-decoration: none; }
-    .logo span { color: #ff0000; }
+    .logo { display: inline-flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+    .logo span { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .logo-icon { height: 28px; width: auto; flex-shrink: 0; }
     .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    h1 { font-size: 2.5rem; color: #18181b; margin-bottom: 10px; }
-    h2 { font-size: 1.8rem; color: #18181b; margin-top: 40px; margin-bottom: 15px; }
-    h3 { font-size: 1.3rem; color: #18181b; margin-top: 30px; margin-bottom: 10px; }
-    p { margin-bottom: 16px; color: #3f3f46; line-height: 1.8; }
-    .meta { color: #71717a; font-size: 0.9rem; margin-bottom: 30px; }
-    .highlight { background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b; }
-    .cta { background: linear-gradient(135deg, #ff0000, #cc0000); color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0; }
+    h1 { font-size: 2.8rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; }
+    h2 { font-size: 2.1rem; color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; font-weight: 700; }
+    h3 { font-size: 1.5rem; color: var(--text-primary); margin-top: 30px; margin-bottom: 10px; font-weight: 600; }
+    p { font-size: 1.125rem; margin-bottom: 20px; color: var(--text-secondary); line-height: 1.85; }
+    li { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.85; margin-bottom: 8px; }
+    .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+    .highlight { background: rgba(251,191,36,0.1); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .highlight * { color: var(--text-primary); }
+    .example-box { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .example-box * { color: var(--text-primary); }
+    .strategy-box { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin: 24px 0; }
+    .strategy-box h3 { margin-top: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .pro-tip { background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .pro-tip h4 { margin-top: 0; color: #60a5fa; }
+    .pro-tip * { color: var(--text-primary); }
+    .warning { background: rgba(239,68,68,0.08); border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .warning * { color: var(--text-primary); }
+    .success { background: rgba(34,197,94,0.08); border-left: 4px solid #22c55e; padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .success * { color: var(--text-primary); }
+    .steps { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin: 20px 0; }
+    .steps ol { margin: 0; padding-left: 20px; }
+    .steps li { margin-bottom: 10px; color: var(--text-secondary); }
+    .cta { background: var(--accent-gradient); color: white; padding: 24px; border-radius: var(--radius); text-align: center; margin: 30px 0; box-shadow: 0 4px 15px var(--glow); }
     .cta * { color: white; }
-    .breadcrumb { font-size: 0.9rem; color: #71717a; margin-bottom: 20px; }
-    .breadcrumb a { color: #ff0000; text-decoration: none; }
-    .related-posts { background: #f4f4f5; padding: 20px; border-radius: 8px; margin-top: 40px; }
-    .related-posts h3 { margin-top: 0; }
+    .cta a { color: white; text-decoration: underline; }
+    .breadcrumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .related-posts { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin-top: 40px; }
+    .related-posts h3 { margin-top: 0; color: var(--text-primary); }
     .related-posts ul { list-style: none; padding: 0; }
-    .related-posts li { margin-bottom: 10px; color: #3f3f46; }
-    .related-posts a { color: #ff0000; text-decoration: none; }
-    .pullquote { font-size: 1.4rem; font-style: italic; color: #18181b; border-left: 4px solid #ff9900; padding: 20px 24px; margin: 30px 0; background: #fafafa; border-radius: 0 8px 8px 0; }
-    .pullquote cite { display: block; font-size: 0.9rem; color: #71717a; margin-top: 8px; font-style: normal; }
-    .fact-box { background: #18181b; color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
-    .fact-box * { color: white; }
-    .fact-box h3 { color: #ff9900; margin-top: 0; }
-    .timeline { border-left: 3px solid #ff9900; padding-left: 24px; margin: 24px 0; }
-    .timeline-item { margin-bottom: 20px; }
-    .timeline-item .year { font-weight: bold; color: #ff9900; font-size: 1.1rem; }
-    footer { background: white; border-top: 1px solid #e5e5e5; padding: 40px 0; text-align: center; margin-top: 60px; }
-    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
-    .footer-links a { color: #52525b; text-decoration: none; font-weight: 500; }
-    .footer-links a:hover { color: #ff0000; }
-    .footer-copyright { color: #71717a; font-size: 14px; }
-    nav a { margin-left: 20px; color: #52525b; text-decoration: none; font-weight: 500; }
-    nav a:hover { color: #ff0000; }
-    .diaspora-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
-    .diaspora-item { background: #f4f4f5; padding: 16px; border-radius: 8px; }
-    .diaspora-item h4 { margin: 0 0 4px 0; font-size: 1rem; }
-    .diaspora-item p { margin: 0; font-size: 0.9rem; color: #71717a; }
-    @media (max-width: 600px) { .diaspora-grid { grid-template-columns: 1fr; } }
+    .related-posts li { margin-bottom: 10px; color: var(--text-secondary); }
+    .related-posts a { color: var(--accent); text-decoration: none; }
+    .related-posts a:hover { text-decoration: underline; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    th { background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 600; }
+    .odds-table { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; overflow: hidden; }
+    .odds-table th { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+    .odds-table td { border-bottom: 1px solid var(--border); color: var(--text-primary); }
+    code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); }
+    footer { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 40px 16px 32px; text-align: center; margin-top: 60px; }
+    .footer-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap; }
+    .footer-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copyright { color: var(--text-muted); font-size: 13px; }
+    nav { display: flex; gap: 24px; }
+    nav a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s; }
+    nav a:hover { color: var(--text-primary); }
+    img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+    @media (max-width: 640px) {
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.7rem; }
+      .container { padding: 0 16px; }
+      nav { gap: 12px; }
+      nav a { font-size: 13px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="header-content">
-      <a href="/" class="logo">Win<span>Fulltime</span></a>
+      <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28"> Win<span>Fulltime</span></a>
       <nav>
         <a href="/">Home</a>
         <a href="/ticket-builder.html">Ticket Builder</a>
@@ -83,16 +124,16 @@
 
     <p>On April 18, 2015, the Elephants of Ivory Coast gathered in the centre of the Stade de Paoua in Bata, Equatorial Guinea, and lifted the Africa Cup of Nations trophy. They had beaten Ghana 9-8 on penalties in a shootout that lasted 20 kicks. It was their second consecutive AFCON title. It was also the last great triumph of the golden generation. By the time the celebrations ended, the sun was already setting on one of the most remarkable eras in African football history. For <a href="/blog/1x2-betting-guide">1X2 betting predictions</a> on Ivory Coast's World Cup matches, check our free daily picks.</p>
 
-    <p>Didier Drogba had already retired from international football eight months earlier. Yaya Touré, Kolo Touré, and Salomon Kalou would follow within two years. Between 2015 and 2018, Ivory Coast lost the spine of the team that had defined their football for a decade. Drogba was not just a striker. He was the national identity — the man who had made Ivory Coast matter on the world stage, who had stopped a civil war with a goal, who had lifted his country at every turn. His departure was not just a retirement. It was an existential crisis.</p>
+    <p>Didier Drogba had already retired from international football eight months earlier. Yaya TourÃ©, Kolo TourÃ©, and Salomon Kalou would follow within two years. Between 2015 and 2018, Ivory Coast lost the spine of the team that had defined their football for a decade. Drogba was not just a striker. He was the national identity â€” the man who had made Ivory Coast matter on the world stage, who had stopped a civil war with a goal, who had lifted his country at every turn. His departure was not just a retirement. It was an existential crisis.</p>
 
     <div class="pullquote">
       "Our job is to make sure the team that comes after is even better. The history will remain, but we must write new history."
-      <cite>— Didier Drogba, speaking after retiring from international football, 2014</cite>
+      <cite>â€” Didier Drogba, speaking after retiring from international football, 2014</cite>
     </div>
 
     <h2>The Hangover</h2>
 
-    <p>Ivory Coast's post-Drogba era began with denial. They had Yaya Touré for another two years. They had Gervinho, Serge Aurier, and Eric Bailly. They had enough talent to stay competitive, or so the thinking went. They qualified for the 2017 AFCON and finished third. Then they went to the 2019 AFCON and reached the quarter-finals. The decline was gradual, but the warning signs were everywhere.</p>
+    <p>Ivory Coast's post-Drogba era began with denial. They had Yaya TourÃ© for another two years. They had Gervinho, Serge Aurier, and Eric Bailly. They had enough talent to stay competitive, or so the thinking went. They qualified for the 2017 AFCON and finished third. Then they went to the 2019 AFCON and reached the quarter-finals. The decline was gradual, but the warning signs were everywhere.</p>
 
     <p>The biggest alarm bell was 2018. Ivory Coast failed to qualify for the World Cup for the first time since 2006. They finished second in their qualifying group behind Morocco, a team they had beaten in the 2017 AFCON semi-finals. The 2-0 defeat in Casablanca that sealed their fate was a humiliation. The golden generation had carried them through two World Cups (2006, 2014) with competitive performances. Without them, they could not even get out of a group that included Gabon and Mali.</p>
 
@@ -102,9 +143,9 @@
 
     <p>Ivory Coast has one of the largest African diaspora populations in Europe, with an estimated 800,000 Ivorians living in France alone. Many of their children grew up in French football academies, played for French youth national teams, and dreamed of playing for Les Bleus. But the French national team is the deepest talent pool in world football. Most of them never got the call.</p>
 
-    <p>Ivory Coast's football federation began a systematic campaign to recruit these players. It was not a new idea — Drogba himself was born in Abidjan but moved to France at age five. But the post-2015 generation took it to another level. The federation identified dual-nationality players who had fallen through the cracks of the French system and offered them a clear path to playing for the Elephants. The pitch was simple: you will start for us, you will play in AFCON finals, and you will play in the World Cup.</p>
+    <p>Ivory Coast's football federation began a systematic campaign to recruit these players. It was not a new idea â€” Drogba himself was born in Abidjan but moved to France at age five. But the post-2015 generation took it to another level. The federation identified dual-nationality players who had fallen through the cracks of the French system and offered them a clear path to playing for the Elephants. The pitch was simple: you will start for us, you will play in AFCON finals, and you will play in the World Cup.</p>
 
-    <p>The strategy worked because French academies had, in many cases, already done the development work. Players like Sébastien Haller (Ajax, Borussia Dortmund), Evan Ndicka (Eintracht Frankfurt, AS Roma), and Jean-Philippe Krasso (St Etienne, Red Star Belgrade) had been through elite European youth systems. They were already Champions League-calibre players. Europe just did not want them for its national team.</p>
+    <p>The strategy worked because French academies had, in many cases, already done the development work. Players like SÃ©bastien Haller (Ajax, Borussia Dortmund), Evan Ndicka (Eintracht Frankfurt, AS Roma), and Jean-Philippe Krasso (St Etienne, Red Star Belgrade) had been through elite European youth systems. They were already Champions League-calibre players. Europe just did not want them for its national team.</p>
 
     <p>By 2022, when Ivory Coast qualified for the World Cup, more than half of their squad had either been born in France or spent their formative years there. The diaspora had become the identity.</p>
 
@@ -113,7 +154,7 @@
       <p>Key players who developed in Europe but represent Ivory Coast:</p>
       <div class="diaspora-grid">
         <div class="diaspora-item">
-          <h4>Sébastien Haller</h4>
+          <h4>SÃ©bastien Haller</h4>
           <p>Born in France (Ris-Orangis). France U21. Scored in UCL semi-finals, signed for Dortmund, Ajax, Stuttgart.</p>
         </div>
         <div class="diaspora-item">
@@ -121,7 +162,7 @@
           <p>Born in France (Paris). France U21. Started for Eintracht Frankfurt at 20, moved to Roma.</p>
         </div>
         <div class="diaspora-item">
-          <h4>Nicolas Pépé</h4>
+          <h4>Nicolas PÃ©pÃ©</h4>
           <p>Born in France (Mantes-la-Jolie). Developed at Angers, became Lille star, Arsenal record signing.</p>
         </div>
         <div class="diaspora-item">
@@ -133,7 +174,7 @@
           <p>Born in Ivory Coast. Developed at Right to Dream (Ghana) then Brighton. Key in AFCON 2024 win.</p>
         </div>
         <div class="diaspora-item">
-          <h4>Hamad Traoré</h4>
+          <h4>Hamad TraorÃ©</h4>
           <p>Born in Ivory Coast. Played for France U16-U21. Chose Ivory Coast at senior level. AS Monaco midfielder.</p>
         </div>
       </div>
@@ -141,34 +182,34 @@
 
     <h2>The Homecoming: AFCON 2024</h2>
 
-    <p>The gamble paid off in the most dramatic possible way at the 2024 Africa Cup of Nations, hosted by Ivory Coast itself. The tournament was a disaster that became a triumph. Les Éléphants sacked their French coach Jean-Louis Gasset during the group stage after losing two of their first three matches. Emerse Faé, a former Ivorian international who had been an assistant, took over. Under Faé, Ivory Coast scraped through as one of the best third-placed teams, then went on an extraordinary run.</p>
+    <p>The gamble paid off in the most dramatic possible way at the 2024 Africa Cup of Nations, hosted by Ivory Coast itself. The tournament was a disaster that became a triumph. Les Ã‰lÃ©phants sacked their French coach Jean-Louis Gasset during the group stage after losing two of their first three matches. Emerse FaÃ©, a former Ivorian international who had been an assistant, took over. Under FaÃ©, Ivory Coast scraped through as one of the best third-placed teams, then went on an extraordinary run.</p>
 
-    <p>They beat Senegal on penalties in the Round of 16, then came back from a goal down to beat Mali in extra time, and then — memorably — came back from a goal down with 10 men to beat DR Congo in the semi-final. In the final, they faced Nigeria at the Alassane Ouattara Stadium in Abidjan. Nigeria took the lead early in the second half. The home crowd fell silent. But Ivory Coast had not come this far to lose. Franck Kessié equalised in the 62nd minute. Then, in the 81st minute, Sébastien Haller — the diaspora striker France did not want — controlled a cross on his chest and volleyed the ball home. The stadium exploded. Ivory Coast had won the Africa Cup of Nations on home soil, against all odds, with a team that had nearly gone out in the group stage.</p>
+    <p>They beat Senegal on penalties in the Round of 16, then came back from a goal down to beat Mali in extra time, and then â€” memorably â€” came back from a goal down with 10 men to beat DR Congo in the semi-final. In the final, they faced Nigeria at the Alassane Ouattara Stadium in Abidjan. Nigeria took the lead early in the second half. The home crowd fell silent. But Ivory Coast had not come this far to lose. Franck KessiÃ© equalised in the 62nd minute. Then, in the 81st minute, SÃ©bastien Haller â€” the diaspora striker France did not want â€” controlled a cross on his chest and volleyed the ball home. The stadium exploded. Ivory Coast had won the Africa Cup of Nations on home soil, against all odds, with a team that had nearly gone out in the group stage.</p>
 
-    <p>The victory was not just a football triumph. It was a validation of the entire diaspora project. Haller, the French-born son of Ivorian parents, had scored the winning goal. Kessié, who had come through the Ivorian academy system, had scored the equaliser. Simon Adingra, who had been developed at the Right to Dream academy in Ghana and then Brighton, had provided both assists. The team was a hybrid — part homegrown, part European-made — and it was precisely that identity that made it successful.</p>
+    <p>The victory was not just a football triumph. It was a validation of the entire diaspora project. Haller, the French-born son of Ivorian parents, had scored the winning goal. KessiÃ©, who had come through the Ivorian academy system, had scored the equaliser. Simon Adingra, who had been developed at the Right to Dream academy in Ghana and then Brighton, had provided both assists. The team was a hybrid â€” part homegrown, part European-made â€” and it was precisely that identity that made it successful.</p>
 
     <div class="pullquote">
-      "I was born in France, but my heart is from Côte d'Ivoire. When I play for Les Éléphants, I represent my parents, my family, my country. That is everything."
-      <cite>— Sébastien Haller, after scoring the winning goal in the 2024 AFCON final</cite>
+      "I was born in France, but my heart is from CÃ´te d'Ivoire. When I play for Les Ã‰lÃ©phants, I represent my parents, my family, my country. That is everything."
+      <cite>â€” SÃ©bastien Haller, after scoring the winning goal in the 2024 AFCON final</cite>
     </div>
 
     <h2>Why Europe Forgot Them</h2>
 
-    <p>The phrase "a generation Europe almost forgot" is not just a poetic label. It reflects a specific reality of French football's pipeline. The French national team has so much talent that players who might start for any other nation in the world — Haller, Ndicka, Pépé — never got a senior cap. France won the 2018 World Cup with Kylian Mbappé, Antoine Griezmann, and Olivier Giroud. They reached the 2022 final with the same core. There was simply no room for the diaspora players, even though they were Champions League regulars on their club teams.</p>
+    <p>The phrase "a generation Europe almost forgot" is not just a poetic label. It reflects a specific reality of French football's pipeline. The French national team has so much talent that players who might start for any other nation in the world â€” Haller, Ndicka, PÃ©pÃ© â€” never got a senior cap. France won the 2018 World Cup with Kylian MbappÃ©, Antoine Griezmann, and Olivier Giroud. They reached the 2022 final with the same core. There was simply no room for the diaspora players, even though they were Champions League regulars on their club teams.</p>
 
-    <p>Haller scored 11 Champions League goals in the 2020-21 season, including both semi-final legs against Ajax — and then the winner in the final for Dortmund. He has never played a single minute for France. Ndicka was a starter for Eintracht Frankfurt when they won the Europa League in 2022, playing every minute of the knockout rounds. France never called. Pépé was the Ligue 1 top scorer in 2018-19 when Lille finished second. France called him for the U21s, but the senior team never came.</p>
+    <p>Haller scored 11 Champions League goals in the 2020-21 season, including both semi-final legs against Ajax â€” and then the winner in the final for Dortmund. He has never played a single minute for France. Ndicka was a starter for Eintracht Frankfurt when they won the Europa League in 2022, playing every minute of the knockout rounds. France never called. PÃ©pÃ© was the Ligue 1 top scorer in 2018-19 when Lille finished second. France called him for the U21s, but the senior team never came.</p>
 
-    <p>"If you are a French player of African descent, you need to be exceptional to get into the French team — and even then it is not guaranteed," said analyst and former France youth coach Gérard Houllier before his passing. "The competition is so fierce that many very good players will never play for France. Their choice is either to accept that or to represent their parents' country. More and more are choosing the latter."</p>
+    <p>"If you are a French player of African descent, you need to be exceptional to get into the French team â€” and even then it is not guaranteed," said analyst and former France youth coach GÃ©rard Houllier before his passing. "The competition is so fierce that many very good players will never play for France. Their choice is either to accept that or to represent their parents' country. More and more are choosing the latter."</p>
 
     <h2>The 2026 World Cup</h2>
 
     <p>Ivory Coast qualified for the 2026 World Cup comfortably, topping their CAF group. They have been drawn in Group H with Germany, Saudi Arabia, and a play-off winner. The tournament will be the first time the full diaspora generation plays on the world stage. After missing 2018 and making a first-round exit in 2022, the team now has a point to prove. Our <a href="/analysis.html">match analysis tool</a> provides head-to-head stats for every World Cup group, including Group H.</p>
 
-    <p>The squad for 2026 reflects the unique hybrid identity that defines modern Ivorian football. Franck Kessié and Ibrahim Sangaré provide midfield steel. Evan Ndicka and Ousmane Diomande anchor the defence. The attack features some of the best young talent in Europe: Simon Adingra, Amine Gouiri, and the breakout star of the 2025 AFCON, Dès-Hormones... but that is the kind of depth that separates contenders from participants.</p>
+    <p>The squad for 2026 reflects the unique hybrid identity that defines modern Ivorian football. Franck KessiÃ© and Ibrahim SangarÃ© provide midfield steel. Evan Ndicka and Ousmane Diomande anchor the defence. The attack features some of the best young talent in Europe: Simon Adingra, Amine Gouiri, and the breakout star of the 2025 AFCON, DÃ¨s-Hormones... but that is the kind of depth that separates contenders from participants.</p>
 
-    <p>This Ivory Coast team might not have a figure like Drogba — a single player who embodies the nation's hopes. But that is not necessarily a weakness. Drogba was a force of nature, a talisman, a player who could win games almost by himself. The 2026 team is deeper, more balanced, more resilient. They proved that at AFCON 2024, when they lost two of their first three games and still won the tournament. Drogba's generation was brilliant. This generation might be better.</p>
+    <p>This Ivory Coast team might not have a figure like Drogba â€” a single player who embodies the nation's hopes. But that is not necessarily a weakness. Drogba was a force of nature, a talisman, a player who could win games almost by himself. The 2026 team is deeper, more balanced, more resilient. They proved that at AFCON 2024, when they lost two of their first three games and still won the tournament. Drogba's generation was brilliant. This generation might be better.</p>
 
-    <p>"We are not here to replace Drogba or Yaya," said Franck Kessié. "We are here to build something that is our own. The old generation gave us a foundation. Now we are building the house."</p>
+    <p>"We are not here to replace Drogba or Yaya," said Franck KessiÃ©. "We are here to build something that is our own. The old generation gave us a foundation. Now we are building the house."</p>
 
     <div class="cta">
       <h3>Follow the Elephants in 2026</h3>

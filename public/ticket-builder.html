@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -9,14 +9,14 @@
   <meta property="og:title" content="Accumulator Ticket Builder - WinFulltime">
   <meta property="og:url" content="https://winfulltime.com/ticket-builder.html">
   <meta property="og:description" content="Build winning accumulator tickets using AI-powered football predictions. Set target odds, choose markets, and generate optimized betting tickets.">
-  <meta property="og:image" content="/logo.png">
+  <meta property="og:image" content="/winfulltimelogo.png">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Accumulator Ticket Builder - WinFulltime">
   <meta name="twitter:description" content="Build winning accumulator tickets using AI-powered football predictions.">
-  <meta name="twitter:image" content="/logo.png">
+  <meta name="twitter:image" content="/winfulltimelogo.png">
   <link rel="canonical" href="https://winfulltime.com/ticket-builder.html">
-  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
   <link rel="stylesheet" href="/styles.css">
   <script type="application/ld+json">
   {
@@ -25,7 +25,7 @@
     "name": "Accumulator Ticket Builder",
     "description": "Build winning accumulator tickets using AI-powered football predictions.",
     "url": "https://winfulltime.com/ticket-builder.html",
-    "publisher": { "@type": "Organization", "name": "WinFulltime", "logo": { "@type": "ImageObject", "url": "https://winfulltime.com/logo.png" } }
+    "publisher": { "@type": "Organization", "name": "WinFulltime", "logo": { "@type": "ImageObject", "url": "https://winfulltime.com/winfulltimelogo.png" } }
   }
   </script>
 </head>
@@ -34,7 +34,7 @@
   <header>
     <div class="header-content">
       <div class="logo">
-        <a href="/" class="logo"><span class="win">Win</span><span class="fulltime">Fulltime</span></a>
+        <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28"> <span class="win">Win</span><span class="fulltime">Fulltime</span></a>
       </div>
       <nav>
         <a href="/">Home</a>
@@ -85,9 +85,9 @@
       <h2>How the Accumulator Builder Works</h2>
       <p>Our ticket builder algorithm scans all available predictions across 1X2, Over/Under, BTTS, corners, cards, and streak markets to find combinations of selections whose multiplied odds match your target.</p>
       <ul>
-        <li><strong>Target Odds</strong> — The total accumulator odds you want to achieve (e.g., 20.00 for a 20/1 shot).</li>
-        <li><strong>Min/Max Odds per Leg</strong> — Filters individual selections within your preferred odds range.</li>
-        <li><strong>Only Today</strong> — Restrict to today's fixtures or include future matches for more combinations.</li>
+        <li><strong>Target Odds</strong> â€” The total accumulator odds you want to achieve (e.g., 20.00 for a 20/1 shot).</li>
+        <li><strong>Min/Max Odds per Leg</strong> â€” Filters individual selections within your preferred odds range.</li>
+        <li><strong>Only Today</strong> â€” Restrict to today's fixtures or include future matches for more combinations.</li>
       </ul>
       <p>Each generated ticket shows the match, predicted outcome, individual odds, and total accumulator price. The algorithm prioritizes combinations closest to your target odds.</p>
     </div>
@@ -101,6 +101,10 @@
 
   <footer>
     <div class="footer-content">
+      <div style="text-align:center;margin-bottom:24px;">
+        <p style="margin:0 0 12px;font-size:14px;color:rgba(232,237,245,0.35);">Support WinFulltime &mdash; your donations keep all predictions free.</p>
+        <a href="https://ko-fi.com/winfulltime" target="_blank" rel="noopener" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">☕ Donate on Ko-fi</a>
+      </div>
       <div class="footer-links">
         <a href="/">Home</a>
         <a href="/ticket-builder.html">Ticket Builder</a>
@@ -152,7 +156,8 @@
     }
 
     .logo { display: flex; align-items: center; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
-    .logo a { color: #e8edf5; text-decoration: none; }
+    .logo a { display: inline-flex; align-items: center; gap: 8px; color: #e8edf5; text-decoration: none; }
+    .logo-icon { height: 28px; width: auto; flex-shrink: 0; }
     .logo .win { color: #e8edf5; }
     .logo .fulltime { color: #ff2448; }
 
@@ -912,9 +917,9 @@
               ${legsHtml}
               <div class="ticket-actions" style="margin-top: 12px;">
                 <button class="copy-btn" data-copy='${copyData}'>
-                  <span class="copy-icon">📋</span> Copy Selections
+                  <span class="copy-icon">ðŸ“‹</span> Copy Selections
                 </button>
-                ${AFFILIATE_URL ? `<a href="${AFFILIATE_URL}" target="_blank" rel="noopener" class="bet-btn">🏆 Bet Now</a>` : ''}
+                ${AFFILIATE_URL ? `<a href="${AFFILIATE_URL}" target="_blank" rel="noopener" class="bet-btn">ðŸ† Bet Now</a>` : ''}
               </div>
             </div>
           `;
@@ -930,14 +935,14 @@
       const btn = e.target.closest('[data-copy]');
       if (!btn) return;
       const data = JSON.parse(btn.dataset.copy);
-      const aff = data.aff ? '\n\n👉 ' + data.aff : '';
+      const aff = data.aff ? '\n\nðŸ‘‰ ' + data.aff : '';
       const text = 'WinFulltime Ticket ' + data.num + ' - ' + data.legs.length + ' Legs @ ' + data.total + ' odds\n\n' +
         data.legs.join('\n') + '\n\nTotal Odds: ' + data.total + '\nTarget: ' + data.target + aff;
 
       navigator.clipboard.writeText(text).then(function() {
         btn.classList.add('copied');
         var orig = btn.innerHTML;
-        btn.innerHTML = '<span class="copy-icon">✓</span> Copied!';
+        btn.innerHTML = '<span class="copy-icon">âœ“</span> Copied!';
         setTimeout(function() {
           btn.innerHTML = orig;
           btn.classList.remove('copied');

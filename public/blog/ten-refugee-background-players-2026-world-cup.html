@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -13,49 +13,96 @@
   <meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/ten-refugee-background-players-2026-world-cup.webp">
   <link rel="canonical" href="https://winfulltime.com/blog/ten-refugee-background-players-2026-world-cup">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #18181b; margin: 0; padding: 0; }
-    header { background: white; border-bottom: 1px solid #e5e5e5; padding: 16px 0; }
+    :root {
+      --bg-primary: #0b0f1a;
+      --bg-secondary: #111827;
+      --bg-card: rgba(23, 28, 46, 0.85);
+      --bg-elevated: #1a1f2e;
+      --text-primary: #e8edf5;
+      --text-secondary: #c8d0db;
+      --text-muted: #94a3b8;
+      --accent: #ff2448;
+      --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --glow: rgba(255,36,72,0.12);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--bg-primary); background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent); color: var(--text-primary); margin: 0; padding: 0; font-size: 16px; -webkit-font-smoothing: antialiased; }
+    header { background: rgba(11,15,26,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
     .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-size: 24px; font-weight: bold; color: #18181b; text-decoration: none; }
-    .logo span { color: #ff0000; }
+    .logo { display: inline-flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+    .logo span { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .logo-icon { height: 28px; width: auto; flex-shrink: 0; }
     .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    h1 { font-size: 2.5rem; color: #18181b; margin-bottom: 10px; }
-    h2 { font-size: 1.8rem; color: #18181b; margin-top: 40px; margin-bottom: 15px; }
-    h3 { font-size: 1.3rem; color: #18181b; margin-top: 30px; margin-bottom: 10px; }
-    p { margin-bottom: 16px; color: #3f3f46; line-height: 1.8; }
-    .meta { color: #71717a; font-size: 0.9rem; margin-bottom: 30px; }
-    .cta { background: linear-gradient(135deg, #ff0000, #cc0000); color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0; }
+    h1 { font-size: 2.8rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; }
+    h2 { font-size: 2.1rem; color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; font-weight: 700; }
+    h3 { font-size: 1.5rem; color: var(--text-primary); margin-top: 30px; margin-bottom: 10px; font-weight: 600; }
+    p { font-size: 1.125rem; margin-bottom: 20px; color: var(--text-secondary); line-height: 1.85; }
+    li { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.85; margin-bottom: 8px; }
+    .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+    .highlight { background: rgba(251,191,36,0.1); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .highlight * { color: var(--text-primary); }
+    .example-box { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .example-box * { color: var(--text-primary); }
+    .strategy-box { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin: 24px 0; }
+    .strategy-box h3 { margin-top: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .pro-tip { background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .pro-tip h4 { margin-top: 0; color: #60a5fa; }
+    .pro-tip * { color: var(--text-primary); }
+    .warning { background: rgba(239,68,68,0.08); border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .warning * { color: var(--text-primary); }
+    .success { background: rgba(34,197,94,0.08); border-left: 4px solid #22c55e; padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .success * { color: var(--text-primary); }
+    .steps { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin: 20px 0; }
+    .steps ol { margin: 0; padding-left: 20px; }
+    .steps li { margin-bottom: 10px; color: var(--text-secondary); }
+    .cta { background: var(--accent-gradient); color: white; padding: 24px; border-radius: var(--radius); text-align: center; margin: 30px 0; box-shadow: 0 4px 15px var(--glow); }
     .cta * { color: white; }
-    .breadcrumb { font-size: 0.9rem; color: #71717a; margin-bottom: 20px; }
-    .breadcrumb a { color: #ff0000; text-decoration: none; }
-    .related-posts { background: #f4f4f5; padding: 20px; border-radius: 8px; margin-top: 40px; }
+    .cta a { color: white; text-decoration: underline; }
+    .breadcrumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .related-posts { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin-top: 40px; }
+    .related-posts h3 { margin-top: 0; color: var(--text-primary); }
     .related-posts ul { list-style: none; padding: 0; }
-    .related-posts li { margin-bottom: 10px; color: #3f3f46; }
-    .related-posts a { color: #ff0000; text-decoration: none; }
-    .pullquote { font-size: 1.4rem; font-style: italic; color: #18181b; border-left: 4px solid #f97316; padding: 20px 24px; margin: 30px 0; background: #fafafa; border-radius: 0 8px 8px 0; }
-    .pullquote cite { display: block; font-size: 0.9rem; color: #71717a; margin-top: 8px; font-style: normal; }
-    .fact-box { background: #18181b; color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
-    .fact-box * { color: white; }
-    .fact-box h3 { color: #f97316; margin-top: 0; }
-    .refugee-card { padding: 16px; background: #f4f4f5; border-radius: 8px; margin: 12px 0; border-left: 4px solid #f97316; }
-    .refugee-card h3 { margin: 0 0 4px 0; font-size: 1.1rem; }
-    .refugee-card .subtitle { color: #71717a; font-size: 0.9rem; margin-bottom: 8px; }
-    .refugee-card p { margin: 4px 0; font-size: 0.95rem; }
-    footer { background: white; border-top: 1px solid #e5e5e5; padding: 40px 0; text-align: center; margin-top: 60px; }
-    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
-    .footer-links a { color: #52525b; text-decoration: none; font-weight: 500; }
-    .footer-links a:hover { color: #ff0000; }
-    .footer-copyright { color: #71717a; font-size: 14px; }
-    nav a { margin-left: 20px; color: #52525b; text-decoration: none; font-weight: 500; }
-    nav a:hover { color: #ff0000; }
+    .related-posts li { margin-bottom: 10px; color: var(--text-secondary); }
+    .related-posts a { color: var(--accent); text-decoration: none; }
+    .related-posts a:hover { text-decoration: underline; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    th { background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 600; }
+    .odds-table { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; overflow: hidden; }
+    .odds-table th { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+    .odds-table td { border-bottom: 1px solid var(--border); color: var(--text-primary); }
+    code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); }
+    footer { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 40px 16px 32px; text-align: center; margin-top: 60px; }
+    .footer-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap; }
+    .footer-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copyright { color: var(--text-muted); font-size: 13px; }
+    nav { display: flex; gap: 24px; }
+    nav a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s; }
+    nav a:hover { color: var(--text-primary); }
+    img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+    @media (max-width: 640px) {
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.7rem; }
+      .container { padding: 0 16px; }
+      nav { gap: 12px; }
+      nav a { font-size: 13px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="header-content">
-      <a href="/" class="logo">Win<span>Fulltime</span></a>
+      <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28"> Win<span>Fulltime</span></a>
       <nav>
         <a href="/">Home</a>
         <a href="/ticket-builder.html">Ticket Builder</a>
@@ -75,66 +122,66 @@
 
     <div style="background:#dbeafe;padding:16px 20px;border-radius:8px;margin:20px 0"><strong>Tip:</strong> Looking for match predictions? <a href="/">Click for free picks</a>.</div>
 
-    <p>The most extraordinary journeys to the 2026 World Cup did not begin in academies or trials. They began in camps. In war zones. On boats crossing the Mediterranean. In the back of trucks crossing borders. Ten players at this year's tournament have refugee backgrounds — their families fled violence, persecution, or genocide before they were born, or when they were too young to understand. Their presence on football's biggest stage is a testament not just to individual talent, but to the resilience of the human spirit. For <a href="/blog/1x2-betting-guide">1X2 betting predictions</a> on these players' World Cup matches, check our free daily picks. These are their stories.</p>
+    <p>The most extraordinary journeys to the 2026 World Cup did not begin in academies or trials. They began in camps. In war zones. On boats crossing the Mediterranean. In the back of trucks crossing borders. Ten players at this year's tournament have refugee backgrounds â€” their families fled violence, persecution, or genocide before they were born, or when they were too young to understand. Their presence on football's biggest stage is a testament not just to individual talent, but to the resilience of the human spirit. For <a href="/blog/1x2-betting-guide">1X2 betting predictions</a> on these players' World Cup matches, check our free daily picks. These are their stories.</p>
 
     <div class="refugee-card">
-      <h3>1. Alphonso Davies — Canada 🇨🇦</h3>
-      <p class="subtitle">Born in Buduburam refugee camp, Ghana • Now at Bayern Munich</p>
+      <h3>1. Alphonso Davies â€” Canada ðŸ‡¨ðŸ‡¦</h3>
+      <p class="subtitle">Born in Buduburam refugee camp, Ghana â€¢ Now at Bayern Munich</p>
       <p>No story in world football is more powerful than Alphonso Davies'. His parents fled the Liberian civil war, escaping to Ghana where they lived in the Buduburam refugee camp. Davies was born there in 2000. The family was resettled in Canada when he was five, moving to Edmonton, Alberta. Davies started playing football at a local club, was scouted by the Vancouver Whitecaps, and by 16 had made his professional debut. At 21, he won the Champions League with Bayern Munich. At 26, he is one of the best left-backs in the world and the face of Canada's first World Cup campaign since 1986. "I carry my parents' story with me every time I step on the pitch," he has said. "Their sacrifice made everything possible."</p>
     </div>
 
     <div class="refugee-card">
-      <h3>2. Luka Modric — Croatia 🇭🇷</h3>
-      <p class="subtitle">Displaced during the Croatian War of Independence • Now at Real Madrid</p>
-      <p>In 1991, when Luka Modric was six years old, his grandfather was executed by Serbian forces. His family fled their home in Zadar and lived as refugees in a hotel in the coastal town of Zaton for seven years. Modric spent hours kicking a ball against the hotel walls, dreaming of a life beyond the conflict. His talent was spotted by local coach Tomislav Bašić, who insisted that the small, skinny boy could make it as a professional. Modric went on to become the best midfielder of his generation — winning the Ballon d'Or, four Champions Leagues with Real Madrid, and leading Croatia to the World Cup final in 2018, where he won the Golden Ball as the tournament's best player. At 40, his fourth World Cup in 2026 will be his last. The refugee boy from Zadar has become a national hero.</p>
+      <h3>2. Luka Modric â€” Croatia ðŸ‡­ðŸ‡·</h3>
+      <p class="subtitle">Displaced during the Croatian War of Independence â€¢ Now at Real Madrid</p>
+      <p>In 1991, when Luka Modric was six years old, his grandfather was executed by Serbian forces. His family fled their home in Zadar and lived as refugees in a hotel in the coastal town of Zaton for seven years. Modric spent hours kicking a ball against the hotel walls, dreaming of a life beyond the conflict. His talent was spotted by local coach Tomislav BaÅ¡iÄ‡, who insisted that the small, skinny boy could make it as a professional. Modric went on to become the best midfielder of his generation â€” winning the Ballon d'Or, four Champions Leagues with Real Madrid, and leading Croatia to the World Cup final in 2018, where he won the Golden Ball as the tournament's best player. At 40, his fourth World Cup in 2026 will be his last. The refugee boy from Zadar has become a national hero.</p>
     </div>
 
     <div class="refugee-card">
-      <h3>3. Granit Xhaka — Switzerland 🇨🇭</h3>
-      <p class="subtitle">Parents fled Kosovo during the Yugoslav Wars • Now at Bayer Leverkusen</p>
-      <p>Granit Xhaka's parents, Ragip and Eli, fled persecution in Kosovo in the 1990s and settled in Basel, Switzerland, where Granit was born in 1992. His older brother Taulant played for Albania's national team — a choice that reflected the family's dual identity. Granit chose Switzerland, the country that gave his family safety. He made his debut at 19, captained the team at Euro 2020, and has been the midfield heartbeat of Swiss football for over a decade. At 33, he will play in his third World Cup for Switzerland in 2026, having already appeared in 2014, 2018, and 2022. "My parents gave up everything so we could have a better life," Xhaka said. "Playing for Switzerland is how I say thank you."</p>
+      <h3>3. Granit Xhaka â€” Switzerland ðŸ‡¨ðŸ‡­</h3>
+      <p class="subtitle">Parents fled Kosovo during the Yugoslav Wars â€¢ Now at Bayer Leverkusen</p>
+      <p>Granit Xhaka's parents, Ragip and Eli, fled persecution in Kosovo in the 1990s and settled in Basel, Switzerland, where Granit was born in 1992. His older brother Taulant played for Albania's national team â€” a choice that reflected the family's dual identity. Granit chose Switzerland, the country that gave his family safety. He made his debut at 19, captained the team at Euro 2020, and has been the midfield heartbeat of Swiss football for over a decade. At 33, he will play in his third World Cup for Switzerland in 2026, having already appeared in 2014, 2018, and 2022. "My parents gave up everything so we could have a better life," Xhaka said. "Playing for Switzerland is how I say thank you."</p>
     </div>
 
     <div class="refugee-card">
-      <h3>4. Miralem Pjanic — Bosnia 🇧🇦</h3>
-      <p class="subtitle">Family fled the Bosnian War • Now at CSKA Moscow</p>
-      <p>Pjanic was born in 1990 in Zvornik, Bosnia, the year the Yugoslav Wars began. His family fled to Luxembourg as refugees when he was a baby. He grew up playing in Luxembourg's youth system, was scouted by Metz in France, and eventually became one of Europe's most technically gifted midfielders — playing for Roma, Juventus, Barcelona, and now CSKA Moscow. Pjanic represents Bosnia, the country his family was forced to leave, and has been the creative soul of the national team for 15 years. "I could have played for Luxembourg or France," he said. "But my heart belongs to Bosnia. My parents raised me to never forget where we came from."</p>
+      <h3>4. Miralem Pjanic â€” Bosnia ðŸ‡§ðŸ‡¦</h3>
+      <p class="subtitle">Family fled the Bosnian War â€¢ Now at CSKA Moscow</p>
+      <p>Pjanic was born in 1990 in Zvornik, Bosnia, the year the Yugoslav Wars began. His family fled to Luxembourg as refugees when he was a baby. He grew up playing in Luxembourg's youth system, was scouted by Metz in France, and eventually became one of Europe's most technically gifted midfielders â€” playing for Roma, Juventus, Barcelona, and now CSKA Moscow. Pjanic represents Bosnia, the country his family was forced to leave, and has been the creative soul of the national team for 15 years. "I could have played for Luxembourg or France," he said. "But my heart belongs to Bosnia. My parents raised me to never forget where we came from."</p>
     </div>
 
     <div class="refugee-card">
-      <h3>5. Sead Kolasinac — Bosnia 🇧🇦</h3>
-      <p class="subtitle">Born in Germany to Bosnian refugee parents • Now at Atalanta</p>
-      <p>Kolasinac was born in Karlsruhe, Germany, in 1993. His parents had fled the war in Bosnia just two years earlier, arriving in Germany with nothing. They raised Sead and his siblings in a small apartment, working multiple jobs to make ends meet. Kolasinac joined Schalke's youth academy at 12 and made his Bundesliga debut at 18. He became known for his physical style and warrior mentality — traits his father said came from the struggle of building a new life from nothing. Kolasinac played at the 2014 World Cup for Bosnia and will represent the nation again in 2026. "My parents gave up their whole lives so I could have the chance to play football," he said. "Everything I do is for them."</p>
+      <h3>5. Sead Kolasinac â€” Bosnia ðŸ‡§ðŸ‡¦</h3>
+      <p class="subtitle">Born in Germany to Bosnian refugee parents â€¢ Now at Atalanta</p>
+      <p>Kolasinac was born in Karlsruhe, Germany, in 1993. His parents had fled the war in Bosnia just two years earlier, arriving in Germany with nothing. They raised Sead and his siblings in a small apartment, working multiple jobs to make ends meet. Kolasinac joined Schalke's youth academy at 12 and made his Bundesliga debut at 18. He became known for his physical style and warrior mentality â€” traits his father said came from the struggle of building a new life from nothing. Kolasinac played at the 2014 World Cup for Bosnia and will represent the nation again in 2026. "My parents gave up their whole lives so I could have the chance to play football," he said. "Everything I do is for them."</p>
     </div>
 
     <div class="refugee-card">
-      <h3>6. Victor Moses — Nigeria 🇳🇬</h3>
-      <p class="subtitle">Orphaned in Nigeria, sought asylum in England • Now at Luton Town</p>
-      <p>When Victor Moses was 11, his parents were killed in the religious violence in Kaduna, Nigeria. He fled the country and eventually arrived in the United Kingdom as an asylum seeker. He was placed with a foster family in South London. There, a youth coach named Tony Finn noticed him playing on a local pitch and connected him with the Crystal Palace academy. Moses rose through the ranks, signed for Chelsea, won the Premier League and FA Cup, and became a key figure in Nigeria's 2018 World Cup campaign, scoring against Iceland. At 35, he is expected to be part of Nigeria's squad for the 2026 World Cup — his third. "Football saved my life," Moses has said. "Without it, I do not know where I would be."</p>
+      <h3>6. Victor Moses â€” Nigeria ðŸ‡³ðŸ‡¬</h3>
+      <p class="subtitle">Orphaned in Nigeria, sought asylum in England â€¢ Now at Luton Town</p>
+      <p>When Victor Moses was 11, his parents were killed in the religious violence in Kaduna, Nigeria. He fled the country and eventually arrived in the United Kingdom as an asylum seeker. He was placed with a foster family in South London. There, a youth coach named Tony Finn noticed him playing on a local pitch and connected him with the Crystal Palace academy. Moses rose through the ranks, signed for Chelsea, won the Premier League and FA Cup, and became a key figure in Nigeria's 2018 World Cup campaign, scoring against Iceland. At 35, he is expected to be part of Nigeria's squad for the 2026 World Cup â€” his third. "Football saved my life," Moses has said. "Without it, I do not know where I would be."</p>
     </div>
 
     <div class="refugee-card">
-      <h3>7. Nadiem Amiri — Germany 🇩🇪</h3>
-      <p class="subtitle">Parents fled Afghanistan • Now at Mainz</p>
-      <p>Amiri was born in 1996 in Ludwigshafen, Germany, to Afghan parents who had fled the Soviet-Afghan War and later the Taliban. They settled in a working-class neighbourhood where football was the primary form of escape. Amiri joined the Hoffenheim academy, made his Bundesliga debut at 19, and eventually played for Bayer Leverkusen before joining Mainz. He represented Germany at youth levels and made his senior debut in 2019. After missing the 2022 World Cup due to injury, he is expected to be part of the 2026 squad — Germany's first World Cup under Julian Nagelsmann. "My parents gave up everything so I could have this life," Amiri said. "I will never forget that."</p>
+      <h3>7. Nadiem Amiri â€” Germany ðŸ‡©ðŸ‡ª</h3>
+      <p class="subtitle">Parents fled Afghanistan â€¢ Now at Mainz</p>
+      <p>Amiri was born in 1996 in Ludwigshafen, Germany, to Afghan parents who had fled the Soviet-Afghan War and later the Taliban. They settled in a working-class neighbourhood where football was the primary form of escape. Amiri joined the Hoffenheim academy, made his Bundesliga debut at 19, and eventually played for Bayer Leverkusen before joining Mainz. He represented Germany at youth levels and made his senior debut in 2019. After missing the 2022 World Cup due to injury, he is expected to be part of the 2026 squad â€” Germany's first World Cup under Julian Nagelsmann. "My parents gave up everything so I could have this life," Amiri said. "I will never forget that."</p>
     </div>
 
     <div class="refugee-card">
-      <h3>8. Mohammed Daramy — Denmark 🇩🇰</h3>
-      <p class="subtitle">Parents fled Sierra Leone's civil war • Now at Stade Reims</p>
+      <h3>8. Mohammed Daramy â€” Denmark ðŸ‡©ðŸ‡°</h3>
+      <p class="subtitle">Parents fled Sierra Leone's civil war â€¢ Now at Stade Reims</p>
       <p>Daramy was born in 2002 in Copenhagen, Denmark, to parents who had fled the brutal civil war in Sierra Leone. His father worked multiple jobs to support Mohammed's football dream. Daramy joined the FC Copenhagen academy, made his senior debut at 17, and at 19 moved to Ajax for a fee that set a Danish record for a teenager. After loan spells in the Netherlands and France, he is now a regular with Stade Reims and a key player for the Danish national team. He made his World Cup debut in 2022 at age 20. By 2026, at 24, he will be one of Denmark's most important attacking threats. "My parents never told me about what they went through," Daramy said. "But I know they sacrificed everything. I play for them."</p>
     </div>
 
     <div class="refugee-card">
-      <h3>9. Armel Bella-Kotchap — Germany 🇩🇪</h3>
-      <p class="subtitle">Parents fled Cameroon • Now at Southampton</p>
+      <h3>9. Armel Bella-Kotchap â€” Germany ðŸ‡©ðŸ‡ª</h3>
+      <p class="subtitle">Parents fled Cameroon â€¢ Now at Southampton</p>
       <p>Bella-Kotchap was born in Paris in 2001 to parents who had fled Cameroon. The family moved to Germany when he was a child, settling in Bochum. His father worked in a factory to support the family. Bella-Kotchap joined the VfL Bochum academy and rose rapidly through the ranks, making his Bundesliga debut at 18. By 21, he had moved to Southampton in the Premier League and made his Germany senior debut. His powerful, aggressive defending earned him a spot in Germany's 2022 World Cup squad at age 20, and he is now a fixture in the team. "My father is my hero," Bella-Kotchap said. "He worked 12-hour days in a factory so I could train. Now when I play, I think of him."</p>
     </div>
 
     <div class="refugee-card">
-      <h3>10. Mergim Berisha — Kosovo 🇽🇰</h3>
-      <p class="subtitle">Parents fled Kosovo for Germany • Now at TSG Hoffenheim</p>
-      <p>Berisha was born in 1998 in Berchtesgaden, Germany, to Kosovan parents who had fled the Yugoslav Wars. His childhood was defined by displacement — the family moved several times within Germany, never quite settling. His father worked construction while his mother cleaned houses. Berisha joined the Red Bull Salzburg academy at 16, made his professional debut in Austria, and eventually broke into the German youth national teams. He chose to represent Kosovo at senior level — the country of his parents' birth — and scored Kosovo's first-ever World Cup qualification goal in 2024. Now 28, Berisha is the focal point of Kosovo's attack at their debut World Cup. "I chose Kosovo because that is where my family comes from," he said. "Playing for Kosovo at a World Cup is the greatest honour of my life."</p>
+      <h3>10. Mergim Berisha â€” Kosovo ðŸ‡½ðŸ‡°</h3>
+      <p class="subtitle">Parents fled Kosovo for Germany â€¢ Now at TSG Hoffenheim</p>
+      <p>Berisha was born in 1998 in Berchtesgaden, Germany, to Kosovan parents who had fled the Yugoslav Wars. His childhood was defined by displacement â€” the family moved several times within Germany, never quite settling. His father worked construction while his mother cleaned houses. Berisha joined the Red Bull Salzburg academy at 16, made his professional debut in Austria, and eventually broke into the German youth national teams. He chose to represent Kosovo at senior level â€” the country of his parents' birth â€” and scored Kosovo's first-ever World Cup qualification goal in 2024. Now 28, Berisha is the focal point of Kosovo's attack at their debut World Cup. "I chose Kosovo because that is where my family comes from," he said. "Playing for Kosovo at a World Cup is the greatest honour of my life."</p>
     </div>
 
     <div class="fact-box">
@@ -147,10 +194,10 @@
 
     <div class="pullquote">
       "Football is more than a game. For people who have lost everything, it is a way to dream again. Every time I step on the pitch, I am living the dream my parents could not live for themselves."
-      <cite>— Alphonso Davies, reflecting on his journey from a refugee camp to Bayern Munich</cite>
+      <cite>â€” Alphonso Davies, reflecting on his journey from a refugee camp to Bayern Munich</cite>
     </div>
 
-    <p>The 2026 World Cup will feature 736 players. Ten of them come from refugee backgrounds — a small fraction of the tournament, but a disproportionately powerful one. Their stories remind us that football is not just a sport played by the privileged. It is a sport that can lift the most vulnerable, that can turn displacement into destination, that can transform a childhood spent in a refugee camp into a career spent on the biggest stage in the world. When Alphonso Davies sprints down the left wing, when Luka Modric dictates the tempo, when Granit Xhaka launches a pass — they carry not just their own hopes, but the hopes of millions of displaced people worldwide. Get <a href="/blog/btts-betting-guide">BTTS predictions</a> for matches featuring these inspiring players. That is the power of the refugee story.</p>
+    <p>The 2026 World Cup will feature 736 players. Ten of them come from refugee backgrounds â€” a small fraction of the tournament, but a disproportionately powerful one. Their stories remind us that football is not just a sport played by the privileged. It is a sport that can lift the most vulnerable, that can turn displacement into destination, that can transform a childhood spent in a refugee camp into a career spent on the biggest stage in the world. When Alphonso Davies sprints down the left wing, when Luka Modric dictates the tempo, when Granit Xhaka launches a pass â€” they carry not just their own hopes, but the hopes of millions of displaced people worldwide. Get <a href="/blog/btts-betting-guide">BTTS predictions</a> for matches featuring these inspiring players. That is the power of the refugee story.</p>
 
     <div class="cta">
       <h3>Follow the 2026 World Cup</h3>

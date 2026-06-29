@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -13,45 +13,96 @@
   <meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/kobbie-mainoo-england-midfield-maestro.webp">
   <link rel="canonical" href="https://winfulltime.com/blog/kobbie-mainoo-england-midfield-maestro">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #18181b; margin: 0; padding: 0; }
-    header { background: white; border-bottom: 1px solid #e5e5e5; padding: 16px 0; }
+    :root {
+      --bg-primary: #0b0f1a;
+      --bg-secondary: #111827;
+      --bg-card: rgba(23, 28, 46, 0.85);
+      --bg-elevated: #1a1f2e;
+      --text-primary: #e8edf5;
+      --text-secondary: #c8d0db;
+      --text-muted: #94a3b8;
+      --accent: #ff2448;
+      --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --glow: rgba(255,36,72,0.12);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--bg-primary); background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent); color: var(--text-primary); margin: 0; padding: 0; font-size: 16px; -webkit-font-smoothing: antialiased; }
+    header { background: rgba(11,15,26,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
     .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-size: 24px; font-weight: bold; color: #18181b; text-decoration: none; }
-    .logo span { color: #ff0000; }
+    .logo { display: inline-flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+    .logo span { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .logo-icon { height: 28px; width: auto; flex-shrink: 0; }
     .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    h1 { font-size: 2.5rem; color: #18181b; margin-bottom: 10px; }
-    h2 { font-size: 1.8rem; color: #18181b; margin-top: 40px; margin-bottom: 15px; }
-    h3 { font-size: 1.3rem; color: #18181b; margin-top: 30px; margin-bottom: 10px; }
-    p { margin-bottom: 16px; color: #3f3f46; line-height: 1.8; }
-    .meta { color: #71717a; font-size: 0.9rem; margin-bottom: 30px; }
-    .cta { background: linear-gradient(135deg, #ff0000, #cc0000); color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0; }
+    h1 { font-size: 2.8rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; }
+    h2 { font-size: 2.1rem; color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; font-weight: 700; }
+    h3 { font-size: 1.5rem; color: var(--text-primary); margin-top: 30px; margin-bottom: 10px; font-weight: 600; }
+    p { font-size: 1.125rem; margin-bottom: 20px; color: var(--text-secondary); line-height: 1.85; }
+    li { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.85; margin-bottom: 8px; }
+    .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+    .highlight { background: rgba(251,191,36,0.1); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .highlight * { color: var(--text-primary); }
+    .example-box { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .example-box * { color: var(--text-primary); }
+    .strategy-box { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin: 24px 0; }
+    .strategy-box h3 { margin-top: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .pro-tip { background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .pro-tip h4 { margin-top: 0; color: #60a5fa; }
+    .pro-tip * { color: var(--text-primary); }
+    .warning { background: rgba(239,68,68,0.08); border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .warning * { color: var(--text-primary); }
+    .success { background: rgba(34,197,94,0.08); border-left: 4px solid #22c55e; padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .success * { color: var(--text-primary); }
+    .steps { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin: 20px 0; }
+    .steps ol { margin: 0; padding-left: 20px; }
+    .steps li { margin-bottom: 10px; color: var(--text-secondary); }
+    .cta { background: var(--accent-gradient); color: white; padding: 24px; border-radius: var(--radius); text-align: center; margin: 30px 0; box-shadow: 0 4px 15px var(--glow); }
     .cta * { color: white; }
-    .breadcrumb { font-size: 0.9rem; color: #71717a; margin-bottom: 20px; }
-    .breadcrumb a { color: #ff0000; text-decoration: none; }
-    .related-posts { background: #f4f4f5; padding: 20px; border-radius: 8px; margin-top: 40px; }
+    .cta a { color: white; text-decoration: underline; }
+    .breadcrumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .related-posts { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin-top: 40px; }
+    .related-posts h3 { margin-top: 0; color: var(--text-primary); }
     .related-posts ul { list-style: none; padding: 0; }
-    .related-posts li { margin-bottom: 10px; color: #3f3f46; }
-    .related-posts a { color: #ff0000; text-decoration: none; }
-    .pullquote { font-size: 1.4rem; font-style: italic; color: #18181b; border-left: 4px solid #cf0810; padding: 20px 24px; margin: 30px 0; background: #fafafa; border-radius: 0 8px 8px 0; }
-    .pullquote cite { display: block; font-size: 0.9rem; color: #71717a; margin-top: 8px; font-style: normal; }
-    .fact-box { background: #18181b; color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
-    .fact-box * { color: white; }
-    .fact-box h3 { color: #cf0810; margin-top: 0; }
-    footer { background: white; border-top: 1px solid #e5e5e5; padding: 40px 0; text-align: center; margin-top: 60px; }
-    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
-    .footer-links a { color: #52525b; text-decoration: none; font-weight: 500; }
-    .footer-links a:hover { color: #ff0000; }
-    .footer-copyright { color: #71717a; font-size: 14px; }
-    nav a { margin-left: 20px; color: #52525b; text-decoration: none; font-weight: 500; }
-    nav a:hover { color: #ff0000; }
+    .related-posts li { margin-bottom: 10px; color: var(--text-secondary); }
+    .related-posts a { color: var(--accent); text-decoration: none; }
+    .related-posts a:hover { text-decoration: underline; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    th { background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 600; }
+    .odds-table { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; overflow: hidden; }
+    .odds-table th { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+    .odds-table td { border-bottom: 1px solid var(--border); color: var(--text-primary); }
+    code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); }
+    footer { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 40px 16px 32px; text-align: center; margin-top: 60px; }
+    .footer-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap; }
+    .footer-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copyright { color: var(--text-muted); font-size: 13px; }
+    nav { display: flex; gap: 24px; }
+    nav a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s; }
+    nav a:hover { color: var(--text-primary); }
+    img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+    @media (max-width: 640px) {
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.7rem; }
+      .container { padding: 0 16px; }
+      nav { gap: 12px; }
+      nav a { font-size: 13px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="header-content">
-      <a href="/" class="logo">Win<span>Fulltime</span></a>
+      <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28"> Win<span>Fulltime</span></a>
       <nav>
         <a href="/">Home</a>
         <a href="/ticket-builder.html">Ticket Builder</a>
@@ -71,20 +122,20 @@
 
     <div style="background:#dbeafe;padding:16px 20px;border-radius:8px;margin:20px 0"><strong>Tip:</strong> Looking for England's match predictions? <a href="/">Click for free picks</a>.</div>
 
-    <p>On November 26, 2023, Kobbie Mainoo made his first Premier League start for Manchester United. He was 18 years old. He had played exactly 67 minutes of senior football before that day, all of them coming in a substitute appearance against Everton two weeks prior. The match was against Everton at Goodison Park — a hostile, intimidating environment, especially for a teenager making his first start in midfield. Mainoo played 73 minutes. He completed 91% of his passes, won all three of his tackles, and did not make a single error leading to a shot. Manchester United won 3-0. And anyone who watched knew they had just seen the birth of a star. Get <a href="/blog/1x2-betting-guide">1X2 predictions for England's World Cup matches</a> on our daily tips page.</p>
+    <p>On November 26, 2023, Kobbie Mainoo made his first Premier League start for Manchester United. He was 18 years old. He had played exactly 67 minutes of senior football before that day, all of them coming in a substitute appearance against Everton two weeks prior. The match was against Everton at Goodison Park â€” a hostile, intimidating environment, especially for a teenager making his first start in midfield. Mainoo played 73 minutes. He completed 91% of his passes, won all three of his tackles, and did not make a single error leading to a shot. Manchester United won 3-0. And anyone who watched knew they had just seen the birth of a star. Get <a href="/blog/1x2-betting-guide">1X2 predictions for England's World Cup matches</a> on our daily tips page.</p>
 
     <p>Eighteen months later, Mainoo boarded a flight to the United States as England's starting central midfielder for the 2026 World Cup. He was 20 years old, with 24 senior caps, an FA Cup winner's medal, and a reputation as the most composed young midfielder English football had produced since Paul Scholes. The rise was not just fast. It was historically unprecedented.</p>
 
     <div class="pullquote">
       "He has everything to be world-class. The temperament, the technique, the intelligence. He receives the ball in tight spaces and never looks panicked. That is not something you can teach."
-      <cite>— Gareth Southgate, England manager, 2024</cite>
+      <cite>â€” Gareth Southgate, England manager, 2024</cite>
     </div>
 
     <h2>The Stockport Prodigy</h2>
 
-    <p>Mainoo was born in Stockport in 2005 and joined Manchester United's academy at age nine. He was always the standout player in his age group — not because he scored spectacular goals or did flashy tricks, but because he saw the game differently. While other children chased the ball, Mainoo positioned himself to receive it. While others tried to dribble through the entire opposition, Mainoo played one-touch passes that opened up the pitch. His coaches at Carrington noticed immediately. "He was the quiet leader," said Travis Binnion, United's academy director. "He never shouted. He never needed to. He just did everything right, and the other players naturally followed him."</p>
+    <p>Mainoo was born in Stockport in 2005 and joined Manchester United's academy at age nine. He was always the standout player in his age group â€” not because he scored spectacular goals or did flashy tricks, but because he saw the game differently. While other children chased the ball, Mainoo positioned himself to receive it. While others tried to dribble through the entire opposition, Mainoo played one-touch passes that opened up the pitch. His coaches at Carrington noticed immediately. "He was the quiet leader," said Travis Binnion, United's academy director. "He never shouted. He never needed to. He just did everything right, and the other players naturally followed him."</p>
 
-    <p>Mainoo progressed through the age groups without any fanfare. He did not have a YouTube highlight reel that went viral. He did not score 40 goals in a season. He was not signed from another club's academy with a big transfer fee. He simply got better every year, in the quiet, relentless way that separates genuine talent from hype. He made his first-team debut in a Carabao Cup match against Charlton Athletic in January 2023, coming on as a substitute in the 89th minute. It was unremarkable — five touches, all safe passes — but it was the start.</p>
+    <p>Mainoo progressed through the age groups without any fanfare. He did not have a YouTube highlight reel that went viral. He did not score 40 goals in a season. He was not signed from another club's academy with a big transfer fee. He simply got better every year, in the quiet, relentless way that separates genuine talent from hype. He made his first-team debut in a Carabao Cup match against Charlton Athletic in January 2023, coming on as a substitute in the 89th minute. It was unremarkable â€” five touches, all safe passes â€” but it was the start.</p>
 
     <h2>The Breakthrough Season</h2>
 
@@ -96,22 +147,22 @@
 
     <p>What makes Mainoo special is not any single attribute. It is the combination of qualities that typically takes a decade to develop. He receives the ball on the half-turn, meaning he already knows where he is going to pass before the ball arrives. He plays first-time passes that break opposition lines. He drives forward with the ball when space opens up, but he does not force it. He tracks runners defensively. He reads danger before it develops. He is 20 years old and plays like a 28-year-old veteran with 500 games of experience.</p>
 
-    <p>England's midfield at the 2026 World Cup is built around him. Declan Rice operates as the defensive screen, Jude Bellingham plays further forward as the attacking threat, and Mainoo is the connector — the player who links defence to attack, who controls the tempo, who makes the simple passes that allow others to make the spectacular ones. His role is not glamorous, but it is indispensable. When Mainoo plays well, England plays well. When he is subdued, the entire team struggles to build momentum.</p>
+    <p>England's midfield at the 2026 World Cup is built around him. Declan Rice operates as the defensive screen, Jude Bellingham plays further forward as the attacking threat, and Mainoo is the connector â€” the player who links defence to attack, who controls the tempo, who makes the simple passes that allow others to make the spectacular ones. His role is not glamorous, but it is indispensable. When Mainoo plays well, England plays well. When he is subdued, the entire team struggles to build momentum.</p>
 
     <div class="fact-box">
       <h3>Mainoo by the Numbers (2026 Season)</h3>
       <p>Premier League & England combined:</p>
-      <p>• 38 appearances across all competitions</p>
-      <p>• 3 goals, 5 assists</p>
-      <p>• 91.3% pass completion rate</p>
-      <p>• 87.4% pass completion in the final third</p>
-      <p>• 62 ball recoveries per 90 minutes</p>
-      <p>• 1.2 key passes per 90</p>
+      <p>â€¢ 38 appearances across all competitions</p>
+      <p>â€¢ 3 goals, 5 assists</p>
+      <p>â€¢ 91.3% pass completion rate</p>
+      <p>â€¢ 87.4% pass completion in the final third</p>
+      <p>â€¢ 62 ball recoveries per 90 minutes</p>
+      <p>â€¢ 1.2 key passes per 90</p>
     </div>
 
     <h2>The World Cup Stage</h2>
 
-    <p>England enter the 2026 World Cup as one of the favourites. They have won the European Under-19 Championship, the European Under-21 Championship, and reached the final of Euro 2024. The squad is young, talented, and battle-tested. Mainoo, Bellingham, Rice, Saka, Foden, Kane — this is a group of players entering their collective prime. For Mainoo, the tournament is a chance to confirm what everyone already suspects: that he is not just a promising young player, but one of the best midfielders in the world. For <a href="/blog/what-is-over-under-betting">Over/Under betting predictions</a> on England's matches, check our analysis page.</p>
+    <p>England enter the 2026 World Cup as one of the favourites. They have won the European Under-19 Championship, the European Under-21 Championship, and reached the final of Euro 2024. The squad is young, talented, and battle-tested. Mainoo, Bellingham, Rice, Saka, Foden, Kane â€” this is a group of players entering their collective prime. For Mainoo, the tournament is a chance to confirm what everyone already suspects: that he is not just a promising young player, but one of the best midfielders in the world. For <a href="/blog/what-is-over-under-betting">Over/Under betting predictions</a> on England's matches, check our analysis page.</p>
 
     <p>"I do not feel pressure," Mainoo said in an interview before the tournament. "Pressure is a privilege. It means people expect things from you. I grew up dreaming of moments like this. Now I get to live them." At 20, with everything ahead of him, Mainoo is the calmest player in England's squad. And that, more than any pass or tackle, is what makes him special.</p>
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -13,49 +13,96 @@
   <meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/how-to-read-football-betting-odds.webp">
   <link rel="canonical" href="https://winfulltime.com/blog/how-to-read-football-betting-odds">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.8; color: #18181b; max-width: 800px; margin: 0 auto; padding: 20px; background: #f8fafc; }
-    h1 { font-size: 2.5rem; color: #18181b; margin-bottom: 10px; }
-    h2 { font-size: 1.8rem; color: #18181b; margin-top: 40px; margin-bottom: 15px; }
-    h3 { font-size: 1.3rem; color: #18181b; margin-top: 30px; margin-bottom: 10px; }
-    p { margin-bottom: 16px; color: #3f3f46; }
-    .meta { color: #71717a; font-size: 0.9rem; margin-bottom: 30px; }
-    .highlight { background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b; }
-    .odds-box { background: #18181b; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }
-    .odds-box * { color: white; }
-    .odds-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    .odds-table th, .odds-table td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e5e5; }
-    .odds-table th { background: #f4f4f5; }
-    .pro Tip { background: #dbeafe; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .pro Tip h4 { margin-top: 0; color: #1d4ed8; }
-    .cta { background: linear-gradient(135deg, #ff0000, #cc0000); color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0; }
-    .cta a { color: white; font-weight: bold; }
-    .breadcrumb { font-size: 0.9rem; color: #71717a; margin-bottom: 20px; }
-    .breadcrumb a { color: #ff0000; text-decoration: none; }
-    .related-posts { background: #f4f4f5; padding: 20px; border-radius: 8px; margin-top: 40px; }
-    .related-posts h3 { margin-top: 0; }
-    .related-posts ul { list-style: none; padding: 0; }
-    .related-posts li { margin-bottom: 10px; }
-    .related-posts a { color: #ff0000; text-decoration: none; }
-    code { background: #e5e5e5; padding: 2px 6px; border-radius: 4px; }
-    header { background: white; border-bottom: 1px solid #e5e5e5; padding: 16px 0; }
+    :root {
+      --bg-primary: #0b0f1a;
+      --bg-secondary: #111827;
+      --bg-card: rgba(23, 28, 46, 0.85);
+      --bg-elevated: #1a1f2e;
+      --text-primary: #e8edf5;
+      --text-secondary: #c8d0db;
+      --text-muted: #94a3b8;
+      --accent: #ff2448;
+      --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --glow: rgba(255,36,72,0.12);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--bg-primary); background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent); color: var(--text-primary); margin: 0; padding: 0; font-size: 16px; -webkit-font-smoothing: antialiased; }
+    header { background: rgba(11,15,26,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
     .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-size: 24px; font-weight: bold; color: #18181b; text-decoration: none; }
-    .logo span { color: #ff0000; }
-    nav a { margin-left: 20px; color: #52525b; text-decoration: none; font-weight: 500; }
-    nav a:hover { color: #ff0000; }
-    footer { background: white; border-top: 1px solid #e5e5e5; padding: 40px 0; text-align: center; margin-top: 60px; }
-    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
-    .footer-links a { color: #52525b; text-decoration: none; font-weight: 500; }
-    .footer-links a:hover { color: #ff0000; }
-    .footer-copyright { color: #71717a; font-size: 14px; }
+    .logo { display: inline-flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+    .logo span { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .logo-icon { height: 28px; width: auto; flex-shrink: 0; }
+    .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+    h1 { font-size: 2.8rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; }
+    h2 { font-size: 2.1rem; color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; font-weight: 700; }
+    h3 { font-size: 1.5rem; color: var(--text-primary); margin-top: 30px; margin-bottom: 10px; font-weight: 600; }
+    p { font-size: 1.125rem; margin-bottom: 20px; color: var(--text-secondary); line-height: 1.85; }
+    li { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.85; margin-bottom: 8px; }
+    .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+    .highlight { background: rgba(251,191,36,0.1); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .highlight * { color: var(--text-primary); }
+    .example-box { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .example-box * { color: var(--text-primary); }
+    .strategy-box { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin: 24px 0; }
+    .strategy-box h3 { margin-top: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .pro-tip { background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .pro-tip h4 { margin-top: 0; color: #60a5fa; }
+    .pro-tip * { color: var(--text-primary); }
+    .warning { background: rgba(239,68,68,0.08); border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .warning * { color: var(--text-primary); }
+    .success { background: rgba(34,197,94,0.08); border-left: 4px solid #22c55e; padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .success * { color: var(--text-primary); }
+    .steps { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin: 20px 0; }
+    .steps ol { margin: 0; padding-left: 20px; }
+    .steps li { margin-bottom: 10px; color: var(--text-secondary); }
+    .cta { background: var(--accent-gradient); color: white; padding: 24px; border-radius: var(--radius); text-align: center; margin: 30px 0; box-shadow: 0 4px 15px var(--glow); }
+    .cta * { color: white; }
+    .cta a { color: white; text-decoration: underline; }
+    .breadcrumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .related-posts { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin-top: 40px; }
+    .related-posts h3 { margin-top: 0; color: var(--text-primary); }
+    .related-posts ul { list-style: none; padding: 0; }
+    .related-posts li { margin-bottom: 10px; color: var(--text-secondary); }
+    .related-posts a { color: var(--accent); text-decoration: none; }
+    .related-posts a:hover { text-decoration: underline; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    th { background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 600; }
+    .odds-table { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; overflow: hidden; }
+    .odds-table th { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+    .odds-table td { border-bottom: 1px solid var(--border); color: var(--text-primary); }
+    code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); }
+    footer { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 40px 16px 32px; text-align: center; margin-top: 60px; }
+    .footer-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap; }
+    .footer-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copyright { color: var(--text-muted); font-size: 13px; }
+    nav { display: flex; gap: 24px; }
+    nav a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s; }
+    nav a:hover { color: var(--text-primary); }
+    img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+    @media (max-width: 640px) {
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.7rem; }
+      .container { padding: 0 16px; }
+      nav { gap: 12px; }
+      nav a { font-size: 13px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="header-content">
-      <a href="/" class="logo">Win<span>Fulltime</span></a>
+      <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28"> Win<span>Fulltime</span></a>
       <nav>
         <a href="/">Home</a>
         <a href="/ticket-builder.html">Ticket Builder</a>
@@ -78,12 +125,12 @@
   <p>Reading betting odds is one of those skills that seems complicated at first but becomes second nature once you get the hang of it. And honestly? It's not that hard. This guide will take you through everything you need to know, using real examples from actual football matches.</p>
 
   <div class="highlight">
-    <strong>📌 In This Guide:</strong><br>
-    • What betting odds actually represent<br>
-    • Decimal odds (the most common in UK/Europe)<br>
-    • Fractional odds (traditional UK style)<br>
-    • American odds (for our US friends)<br>
-    • How to calculate your potential winnings
+    <strong>ðŸ“Œ In This Guide:</strong><br>
+    â€¢ What betting odds actually represent<br>
+    â€¢ Decimal odds (the most common in UK/Europe)<br>
+    â€¢ Fractional odds (traditional UK style)<br>
+    â€¢ American odds (for our US friends)<br>
+    â€¢ How to calculate your potential winnings
   </div>
 
   <h2>What Do Betting Odds Actually Mean?</h2>
@@ -109,20 +156,20 @@
 
   <h3>How to Calculate Winnings with Decimal Odds</h3>
   <p>This is the beauty of decimal odds - the math is incredibly simple.</p>
-  <p><strong>Your Potential Winnings = Your Stake × Decimal Odds</strong></p>
-  <p>So if you bet £10 on Arsenal at 1.75:</p>
-  <p>£10 × 1.75 = £17.50 (including your original stake)</p>
-  <p>Your profit would be £7.50 (£17.50 - £10 stake)</p>
+  <p><strong>Your Potential Winnings = Your Stake Ã— Decimal Odds</strong></p>
+  <p>So if you bet Â£10 on Arsenal at 1.75:</p>
+  <p>Â£10 Ã— 1.75 = Â£17.50 (including your original stake)</p>
+  <p>Your profit would be Â£7.50 (Â£17.50 - Â£10 stake)</p>
   <p>Pretty straightforward, right?</p>
 
   <h3>Quick Reference: Decimal Odds</h3>
   <table class="odds-table">
-    <tr><th>Decimal Odds</th><th>Implied Probability</th><th>£10 Bet Returns</th></tr>
-    <tr><td>1.10</td><td>91%</td><td>£11.00</td></tr>
-    <tr><td>1.50</td><td>67%</td><td>£15.00</td></tr>
-    <tr><td>2.00</td><td>50%</td><td>£20.00</td></tr>
-    <tr><td>3.00</td><td>33%</td><td>£30.00</td></tr>
-    <tr><td>5.00</td><td>20%</td><td>£50.00</td></tr>
+    <tr><th>Decimal Odds</th><th>Implied Probability</th><th>Â£10 Bet Returns</th></tr>
+    <tr><td>1.10</td><td>91%</td><td>Â£11.00</td></tr>
+    <tr><td>1.50</td><td>67%</td><td>Â£15.00</td></tr>
+    <tr><td>2.00</td><td>50%</td><td>Â£20.00</td></tr>
+    <tr><td>3.00</td><td>33%</td><td>Â£30.00</td></tr>
+    <tr><td>5.00</td><td>20%</td><td>Â£50.00</td></tr>
   </table>
 
   <h2>Fractional Odds: The Traditional British Way</h2>
@@ -136,25 +183,25 @@
   </div>
 
   <h3>How to Calculate with Fractional Odds</h3>
-  <p><strong>Your Profit = Your Stake × (Numerator ÷ Denominator)</strong></p>
-  <p>Let's say you bet £10 at 5/1:</p>
-  <p>£10 × 5 = £50 profit (plus your stake back)</p>
-  <p>Total return: £60</p>
+  <p><strong>Your Profit = Your Stake Ã— (Numerator Ã· Denominator)</strong></p>
+  <p>Let's say you bet Â£10 at 5/1:</p>
+  <p>Â£10 Ã— 5 = Â£50 profit (plus your stake back)</p>
+  <p>Total return: Â£60</p>
   <p>If you're betting on a favourite at 1/2:</p>
-  <p>£10 × (1 ÷ 2) = £5 profit</p>
-  <p>Total return: £15</p>
+  <p>Â£10 Ã— (1 Ã· 2) = Â£5 profit</p>
+  <p>Total return: Â£15</p>
 
   <h2>American Odds: Across the Pond</h2>
   <p>American odds (also called moneyline odds) use positive and negative numbers. They're popular in the US and can seem confusing at first, but they're actually pretty logical once you get used to them.</p>
 
   <div class="odds-box">
     <h3>American Odds Explained</h3>
-    <p><strong>Positive odds (+150)</strong> - How much you'd win with a £100 bet</p>
-    <p><strong>Negative odds (-150)</strong> - How much you need to bet to win £100</p>
+    <p><strong>Positive odds (+150)</strong> - How much you'd win with a Â£100 bet</p>
+    <p><strong>Negative odds (-150)</strong> - How much you need to bet to win Â£100</p>
   </div>
 
-  <p>With positive odds (+200), a £100 bet would return £200 profit. So +200 is the same as 3.00 in decimal format.</p>
-  <p>With negative odds (-150), you'd need to bet £150 to win £100 profit. This is the same as 1.67 in decimal format.</p>
+  <p>With positive odds (+200), a Â£100 bet would return Â£200 profit. So +200 is the same as 3.00 in decimal format.</p>
+  <p>With negative odds (-150), you'd need to bet Â£150 to win Â£100 profit. This is the same as 1.67 in decimal format.</p>
   <p>The key thing to remember: negative odds mean the team is favoured, positive odds mean they're the underdog.</p>
 
   <h2>Converting Between Odds Formats</h2>
@@ -169,7 +216,7 @@
   </table>
 
   <div class="pro Tip">
-    <h4>💡 Pro Tip</h4>
+    <h4>ðŸ’¡ Pro Tip</h4>
     <p>Most online bookmakers let you toggle between decimal, fractional, and American odds in your account settings. Find what feels most natural to you and stick with it. Being able to quickly read odds is crucial for making smart betting decisions.</p>
   </div>
 
@@ -198,7 +245,7 @@
   <div class="cta">
     <h3>Ready to Put Your Knowledge to the Test?</h3>
     <p>Get free daily football predictions with probability percentages to help you find value.</p>
-    <p><a href="/">View Today's Football Predictions →</a></p>
+    <p><a href="/">View Today's Football Predictions â†’</a></p>
   </div>
 
   <div class="related-posts">
@@ -235,7 +282,7 @@
       <a href="/privacy.html">Privacy</a>
       <a href="/terms.html">Terms</a>
     </div>
-    <p class="footer-copyright">© 2026 WinFulltime. Predictions are for informational purposes only. | <a href="https://mesigo.site" target="_blank" rel="noopener">Website Built by Mesigo</a></p>
+    <p class="footer-copyright">Â© 2026 WinFulltime. Predictions are for informational purposes only. | <a href="https://mesigo.site" target="_blank" rel="noopener">Website Built by Mesigo</a></p>
   </footer>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>

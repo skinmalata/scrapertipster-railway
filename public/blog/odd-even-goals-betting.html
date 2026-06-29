@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -13,64 +13,96 @@
   <meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/odd-even-goals-betting.webp">
   <link rel="canonical" href="https://winfulltime.com/blog/odd-even-goals-betting">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #18181b; margin: 0; padding: 0; }
-    header { background: white; border-bottom: 1px solid #e5e5e5; padding: 16px 0; }
+    :root {
+      --bg-primary: #0b0f1a;
+      --bg-secondary: #111827;
+      --bg-card: rgba(23, 28, 46, 0.85);
+      --bg-elevated: #1a1f2e;
+      --text-primary: #e8edf5;
+      --text-secondary: #c8d0db;
+      --text-muted: #94a3b8;
+      --accent: #ff2448;
+      --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --glow: rgba(255,36,72,0.12);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--bg-primary); background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent); color: var(--text-primary); margin: 0; padding: 0; font-size: 16px; -webkit-font-smoothing: antialiased; }
+    header { background: rgba(11,15,26,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
     .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-size: 24px; font-weight: bold; color: #18181b; text-decoration: none; }
-    .logo span { color: #ff0000; }
+    .logo { display: inline-flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+    .logo span { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .logo-icon { height: 28px; width: auto; flex-shrink: 0; }
     .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    h1 { font-size: 2.5rem; color: #18181b; margin-bottom: 10px; }
-    h2 { font-size: 1.8rem; color: #18181b; margin-top: 40px; margin-bottom: 15px; }
-    h3 { font-size: 1.3rem; color: #18181b; margin-top: 30px; margin-bottom: 10px; }
-    p { margin-bottom: 16px; color: #3f3f46; line-height: 1.7; }
-    .meta { color: #71717a; font-size: 0.9rem; margin-bottom: 30px; }
-    .highlight { background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b; }
-    .example-box { background: #18181b; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .example-box * { color: white; }
-    .strategy-box { background: white; border: 1px solid #e5e5e5; padding: 24px; border-radius: 12px; margin: 24px 0; }
-    .strategy-box h3 { margin-top: 0; color: #ff0000; }
-    .pro-tip { background: #dbeafe; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .pro-tip h4 { margin-top: 0; color: #1d4ed8; }
-    .warning { background: #fef2f2; border-left: 4px solid #ff0000; padding: 16px; border-radius: 4px; margin: 20px 0; }
-    .success { background: #f0fdf4; border-left: 4px solid #22c55e; padding: 16px; border-radius: 4px; margin: 20px 0; }
-    .steps { background: #f4f4f5; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    h1 { font-size: 2.8rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; }
+    h2 { font-size: 2.1rem; color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; font-weight: 700; }
+    h3 { font-size: 1.5rem; color: var(--text-primary); margin-top: 30px; margin-bottom: 10px; font-weight: 600; }
+    p { font-size: 1.125rem; margin-bottom: 20px; color: var(--text-secondary); line-height: 1.85; }
+    li { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.85; margin-bottom: 8px; }
+    .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+    .highlight { background: rgba(251,191,36,0.1); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .highlight * { color: var(--text-primary); }
+    .example-box { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .example-box * { color: var(--text-primary); }
+    .strategy-box { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin: 24px 0; }
+    .strategy-box h3 { margin-top: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .pro-tip { background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .pro-tip h4 { margin-top: 0; color: #60a5fa; }
+    .pro-tip * { color: var(--text-primary); }
+    .warning { background: rgba(239,68,68,0.08); border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .warning * { color: var(--text-primary); }
+    .success { background: rgba(34,197,94,0.08); border-left: 4px solid #22c55e; padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .success * { color: var(--text-primary); }
+    .steps { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin: 20px 0; }
     .steps ol { margin: 0; padding-left: 20px; }
-    .steps li { margin-bottom: 10px; }
-    .cta { background: linear-gradient(135deg, #ff0000, #cc0000); color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0; }
+    .steps li { margin-bottom: 10px; color: var(--text-secondary); }
+    .cta { background: var(--accent-gradient); color: white; padding: 24px; border-radius: var(--radius); text-align: center; margin: 30px 0; box-shadow: 0 4px 15px var(--glow); }
     .cta * { color: white; }
-    .breadcrumb { font-size: 0.9rem; color: #71717a; margin-bottom: 20px; }
-    .breadcrumb a { color: #ff0000; text-decoration: none; }
-    .related-posts { background: #f4f4f5; padding: 20px; border-radius: 8px; margin-top: 40px; }
-    .related-posts h3 { margin-top: 0; color: #18181b; }
+    .cta a { color: white; text-decoration: underline; }
+    .breadcrumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .related-posts { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin-top: 40px; }
+    .related-posts h3 { margin-top: 0; color: var(--text-primary); }
     .related-posts ul { list-style: none; padding: 0; }
-    .related-posts li { margin-bottom: 10px; color: #3f3f46; }
-    .related-posts a { color: #ff0000; text-decoration: none; }
+    .related-posts li { margin-bottom: 10px; color: var(--text-secondary); }
+    .related-posts a { color: var(--accent); text-decoration: none; }
+    .related-posts a:hover { text-decoration: underline; }
     table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e5e5; }
-    th { background: #f4f4f5; }
-    footer { background: white; border-top: 1px solid #e5e5e5; padding: 40px 0; text-align: center; margin-top: 60px; }
-    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
-    .footer-links a { color: #52525b; text-decoration: none; font-weight: 500; }
-    .footer-links a:hover { color: #ff0000; }
-    .footer-copyright { color: #71717a; font-size: 14px; }
-    footer a { color: #52525b; text-decoration: none; font-weight: 500; }
-    nav a { margin-left: 20px; color: #52525b; text-decoration: none; font-weight: 500; }
-    nav a:hover { color: #ff0000; }
-    table tr:nth-child(even) { background: #fafafa; }
-    .two-col { display: flex; gap: 20px; flex-wrap: wrap; }
-    .two-col > div { flex: 1; min-width: 250px; background: #f9f9f9; padding: 16px; border-radius: 8px; }
-    .toc { background: #f4f4f5; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .toc ol { margin: 0; padding-left: 20px; }
-    .toc li { margin-bottom: 6px; color: #3f3f46; }
-    .formula-box { background: #f0f4ff; padding: 16px; border-radius: 8px; margin: 16px 0; font-family: monospace; text-align: center; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    th { background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 600; }
+    .odds-table { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; overflow: hidden; }
+    .odds-table th { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+    .odds-table td { border-bottom: 1px solid var(--border); color: var(--text-primary); }
+    code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); }
+    footer { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 40px 16px 32px; text-align: center; margin-top: 60px; }
+    .footer-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap; }
+    .footer-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copyright { color: var(--text-muted); font-size: 13px; }
+    nav { display: flex; gap: 24px; }
+    nav a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s; }
+    nav a:hover { color: var(--text-primary); }
+    img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+    @media (max-width: 640px) {
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.7rem; }
+      .container { padding: 0 16px; }
+      nav { gap: 12px; }
+      nav a { font-size: 13px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="header-content">
-      <a href="/" class="logo">Win<span>Fulltime</span></a>
+      <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28"> Win<span>Fulltime</span></a>
       <nav>
         <a href="/">Home</a>
         <a href="/ticket-builder.html">Ticket Builder</a>
@@ -86,14 +118,14 @@
     <h1>Total Goals Odd/Even: Niche Market Strategy</h1>
     <p class="meta">Last updated: June 2026 | By WinFulltime Team | 20 min read</p>
     <div style="background:#dbeafe;padding:16px 20px;border-radius:8px;margin:20px 0"><strong>Tip:</strong> Looking for today's football predictions? <a href="/">Click here</a>.</div>
-    <p>The odd/even goals market is one of football betting's most misunderstood opportunities. On the surface, it appears to be a pure 50/50 coin flip — total goals must be either odd or even. But the statistical distribution is not perfectly balanced, bookmaker pricing creates consistent biases, and league-specific factors shift the probability in predictable ways.</p>
+    <p>The odd/even goals market is one of football betting's most misunderstood opportunities. On the surface, it appears to be a pure 50/50 coin flip â€” total goals must be either odd or even. But the statistical distribution is not perfectly balanced, bookmaker pricing creates consistent biases, and league-specific factors shift the probability in predictable ways.</p>
     <p>This guide goes deep into the odd/even market: the mathematics behind the distribution, how 0-0 is treated by different bookmakers, the correlation with total goals lines, league-specific rates, in-play opportunities, and a bankroll strategy designed for near-50/50 markets.</p>
     <div class="toc">
       <strong>In This Guide:</strong>
       <ol>
         <li>Understanding the Odd/Even Goals Market</li>
-        <li>Statistical Distribution — Odd vs Even Frequency</li>
-        <li>The 0-0 Push Rule — Critical Differences Across Bookmakers</li>
+        <li>Statistical Distribution â€” Odd vs Even Frequency</li>
+        <li>The 0-0 Push Rule â€” Critical Differences Across Bookmakers</li>
         <li>Correlation with Total Goals Lines</li>
         <li>When Odd or Even Is More Likely</li>
         <li>League-Specific Odd/Even Rates</li>
@@ -121,8 +153,8 @@
       <h4>Market Comparison</h4>
       <p>The odd/even market typically offers better value at Asian-facing bookmakers like <a href="https://www.pinnacle.com/" target="_blank" rel="noopener">Pinnacle</a> and 22Bet than at traditional European bookmakers. Pinnacle's lower margins mean closer-to-fair odds on both sides. Use <a href="https://www.oddsportal.com/football/" target="_blank" rel="noopener">OddsPortal</a> to compare odd/even prices across bookmakers before placing any bet.</p>
     </div>
-    <h2>2. Statistical Distribution — Odd vs Even Frequency</h2>
-    <p>If matches were completely random, odd and even would occur exactly 50% of the time. But football is not random — goal distributions follow patterns that create a measurable bias.</p>
+    <h2>2. Statistical Distribution â€” Odd vs Even Frequency</h2>
+    <p>If matches were completely random, odd and even would occur exactly 50% of the time. But football is not random â€” goal distributions follow patterns that create a measurable bias.</p>
     <p><strong>The empirical finding:</strong> Across Europe's top leagues, even total goals occur slightly more frequently than odd totals. The split is approximately 51-52% even vs 48-49% odd over large samples.</p>
     <div class="highlight">
       <strong>Why even is more common:</strong> The most common scorelines in football are 1-1 (even), 0-0 (even), 2-0 (even), and 1-0 (odd). Among these four most frequent results, three out of four produce even totals. While higher-scoring matches redistribute this slightly, the baseline bias toward even persists across virtually every league and competition.</div>
@@ -140,16 +172,16 @@
       <h3>Understanding the Distribution</h3>
       <p>The key insight is that 2-goal matches (even) are the single most common outcome at 20-23% of all matches. Combined with 0-0 (8-10% even) and 4-goal matches (10-13% even), the even side has a natural advantage. Odd totals rely primarily on 1-goal (15-18%) and 3-goal matches (16-19%), which together are less frequent than the sum of the most common even results.</p>
     </div>
-    <h2>3. The 0-0 Push Rule — Critical Differences Across Bookmakers</h2>
+    <h2>3. The 0-0 Push Rule â€” Critical Differences Across Bookmakers</h2>
     <p>The treatment of 0-0 draws varies critically between bookmakers. This is the single most important rule to understand before betting odd/even.</p>
     <table>
       <tr><th>Bookmaker</th><th>0-0 Treatment</th><th>Impact on Betting Strategy</th></tr>
-      <tr><td>Pinnacle</td><td>0-0 = Even (settled as loss for Odd)</td><td>Standard — 0 counts as even</td></tr>
-      <tr><td>Bet365</td><td>0-0 = Even (settled as loss for Odd)</td><td>Standard — 0 counts as even</td></tr>
-      <tr><td>22Bet</td><td>0-0 = Even (settled as loss for Odd)</td><td>Standard — 0 counts as even</td></tr>
-      <tr><td>Betfair</td><td>0-0 = Even (settled as loss for Odd)</td><td>Standard — 0 counts as even</td></tr>
-      <tr><td>William Hill</td><td>0-0 = Push — stake returned on both Odd and Even</td><td>Non-standard — reduces Even advantage</td></tr>
-      <tr><td>Unibet</td><td>0-0 = Even (settled as loss for Odd)</td><td>Standard — 0 counts as even</td></tr>
+      <tr><td>Pinnacle</td><td>0-0 = Even (settled as loss for Odd)</td><td>Standard â€” 0 counts as even</td></tr>
+      <tr><td>Bet365</td><td>0-0 = Even (settled as loss for Odd)</td><td>Standard â€” 0 counts as even</td></tr>
+      <tr><td>22Bet</td><td>0-0 = Even (settled as loss for Odd)</td><td>Standard â€” 0 counts as even</td></tr>
+      <tr><td>Betfair</td><td>0-0 = Even (settled as loss for Odd)</td><td>Standard â€” 0 counts as even</td></tr>
+      <tr><td>William Hill</td><td>0-0 = Push â€” stake returned on both Odd and Even</td><td>Non-standard â€” reduces Even advantage</td></tr>
+      <tr><td>Unibet</td><td>0-0 = Even (settled as loss for Odd)</td><td>Standard â€” 0 counts as even</td></tr>
     </table>
     <div class="warning">
       <strong>Critical Rule Check:</strong> Always check the specific bookmaker's rules for 0-0 before betting. If a bookmaker voids/pushes on 0-0, the even advantage is significantly reduced because 8-10% of matches (the 0-0 rate) no longer count as even wins. At bookmakers that push on 0-0, the odds should theoretically be closer to true 50/50. At bookmakers that count 0-0 as even, there is a structural edge to betting even over the long run.</div>
@@ -157,59 +189,59 @@
     <p>The odd/even market is intimately connected to the total goals market. Understanding this correlation is essential for identifying mispriced odds.</p>
     <p><strong>Key correlation principles:</strong></p>
     <ul>
-      <li><strong>Low total goals matches (Under 2.5)</strong> — Even is more likely. Scorelines of 0-0 (even), 1-1 (even), and 2-0 (even) are the most common under 2.5 outcomes.</li>
-      <li><strong>Medium total goals matches (2.5-3.5)</strong> — Closer to 50/50. Both 2-1 (odd) and 1-1 (even) are common in this range.</li>
-      <li><strong>High total goals matches (Over 3.5)</strong> — Odd becomes slightly more likely. High-scoring games tend toward odd totals because 2-1 (3 goals, odd) and 3-2 (5 goals, odd) are common high-scoring results.</li>
+      <li><strong>Low total goals matches (Under 2.5)</strong> â€” Even is more likely. Scorelines of 0-0 (even), 1-1 (even), and 2-0 (even) are the most common under 2.5 outcomes.</li>
+      <li><strong>Medium total goals matches (2.5-3.5)</strong> â€” Closer to 50/50. Both 2-1 (odd) and 1-1 (even) are common in this range.</li>
+      <li><strong>High total goals matches (Over 3.5)</strong> â€” Odd becomes slightly more likely. High-scoring games tend toward odd totals because 2-1 (3 goals, odd) and 3-2 (5 goals, odd) are common high-scoring results.</li>
     </ul>
     <table>
       <tr><th>Match Total Goals (Line)</th><th>Expected Goals Range</th><th>Odd %</th><th>Even %</th><th>Best Bet</th></tr>
-      <tr><td>Under 2.5 (low-scoring)</td><td>0-2 goals</td><td>38-42%</td><td>58-62%</td><td>Even — strong bias</td></tr>
-      <tr><td>Around 2.5 (average)</td><td>2-3 goals</td><td>48-52%</td><td>48-52%</td><td>Neutral — shop for best odds</td></tr>
-      <tr><td>Over 2.5 (high-scoring)</td><td>3+ goals</td><td>54-58%</td><td>42-46%</td><td>Odd — moderate bias</td></tr>
-      <tr><td>Over 3.5 (very high-scoring)</td><td>4+ goals</td><td>56-60%</td><td>40-44%</td><td>Odd — stronger bias</td></tr>
+      <tr><td>Under 2.5 (low-scoring)</td><td>0-2 goals</td><td>38-42%</td><td>58-62%</td><td>Even â€” strong bias</td></tr>
+      <tr><td>Around 2.5 (average)</td><td>2-3 goals</td><td>48-52%</td><td>48-52%</td><td>Neutral â€” shop for best odds</td></tr>
+      <tr><td>Over 2.5 (high-scoring)</td><td>3+ goals</td><td>54-58%</td><td>42-46%</td><td>Odd â€” moderate bias</td></tr>
+      <tr><td>Over 3.5 (very high-scoring)</td><td>4+ goals</td><td>56-60%</td><td>40-44%</td><td>Odd â€” stronger bias</td></tr>
     </table>
     <div class="strategy-box">
       <h3>Using Total Goals Lines to Inform Odd/Even Bets</h3>
       <p>If the total goals line is set at 2.5 and you believe the match is likely to go under, then even is the correct side as a correlated bet. If you believe the match will go over 2.5, odd becomes the favoured side.</p>
-      <p>This correlation means you should never bet odd/even in isolation — always consider the implied total goals first. If the market has Under 2.5 priced at 1.60 (strong favourite) but Odd/Even is priced evenly at 1.95 each, there is a clear mispricing: even should be shorter than odd when Under 2.5 is strongly favoured.</p>
+      <p>This correlation means you should never bet odd/even in isolation â€” always consider the implied total goals first. If the market has Under 2.5 priced at 1.60 (strong favourite) but Odd/Even is priced evenly at 1.95 each, there is a clear mispricing: even should be shorter than odd when Under 2.5 is strongly favoured.</p>
     </div>
     <h2>5. When Odd or Even Is More Likely</h2>
     <p>Beyond statistical averages, specific match contexts shift the odd/even probability in predictable ways.</p>
     <div class="success">
       <h3>Scenarios Favour Even</h3>
       <ul>
-        <li><strong>Low-scoring league match</strong> — Serie A, Primeira Liga, Ligue 1 matches are more likely to produce 0-0, 1-1, or 2-0</li>
-        <li><strong>Two defensive teams</strong> — Low block vs low block produces fewer goals, favouring even</li>
-        <li><strong>Cup final or high-stakes match</strong> — Caution dominates, 1-1 and 0-0 are common</li>
-        <li><strong>Heavy rain or strong wind</strong> — Weather suppresses goal-scoring, favouring low-scoring even results</li>
-        <li><strong>0-0 at half-time</strong> — Even is more likely in low-scoring second halves</li>
-        <li><strong>Key attackers missing</strong> — Absence of star strikers reduces goal expectancy</li>
+        <li><strong>Low-scoring league match</strong> â€” Serie A, Primeira Liga, Ligue 1 matches are more likely to produce 0-0, 1-1, or 2-0</li>
+        <li><strong>Two defensive teams</strong> â€” Low block vs low block produces fewer goals, favouring even</li>
+        <li><strong>Cup final or high-stakes match</strong> â€” Caution dominates, 1-1 and 0-0 are common</li>
+        <li><strong>Heavy rain or strong wind</strong> â€” Weather suppresses goal-scoring, favouring low-scoring even results</li>
+        <li><strong>0-0 at half-time</strong> â€” Even is more likely in low-scoring second halves</li>
+        <li><strong>Key attackers missing</strong> â€” Absence of star strikers reduces goal expectancy</li>
       </ul>
     </div>
     <div class="warning">
       <h3>Scenarios Favour Odd</h3>
       <ul>
-        <li><strong>High-scoring league match</strong> — Bundesliga, Eredivisie, Championship</li>
-        <li><strong>Two attacking teams</strong> — Both teams press high and attack transitions</li>
-        <li><strong>Dead rubber with nothing to play for</strong> — Open, relaxed football produces more goals</li>
-        <li><strong>1-0 at half-time</strong> — Odd leads at half-time favours odd final total (1-0 is 1 goal)</li>
-        <li><strong>Key defenders missing</strong> — Absence of centre-backs or defensive midfielders</li>
-        <li><strong>Derby match</strong> — High emotion can produce chaotic, high-scoring games</li>
+        <li><strong>High-scoring league match</strong> â€” Bundesliga, Eredivisie, Championship</li>
+        <li><strong>Two attacking teams</strong> â€” Both teams press high and attack transitions</li>
+        <li><strong>Dead rubber with nothing to play for</strong> â€” Open, relaxed football produces more goals</li>
+        <li><strong>1-0 at half-time</strong> â€” Odd leads at half-time favours odd final total (1-0 is 1 goal)</li>
+        <li><strong>Key defenders missing</strong> â€” Absence of centre-backs or defensive midfielders</li>
+        <li><strong>Derby match</strong> â€” High emotion can produce chaotic, high-scoring games</li>
       </ul>
     </div>
     <h2>6. League-Specific Odd/Even Rates</h2>
     <p>Odd/even distribution varies by league based on average goals per game and the frequency of specific scorelines.</p>
     <table>
       <tr><th>League</th><th>Avg Goals/Game</th><th>Even %</th><th>Odd %</th><th>Odd/Even Bias</th></tr>
-      <tr><td>Serie A</td><td>2.6</td><td>53%</td><td>47%</td><td>Even favoured — defensive league</td></tr>
-      <tr><td>Primeira Liga</td><td>2.4</td><td>54%</td><td>46%</td><td>Even favoured — low scoring</td></tr>
-      <tr><td>La Liga</td><td>2.5</td><td>53%</td><td>47%</td><td>Even favoured — tactical</td></tr>
+      <tr><td>Serie A</td><td>2.6</td><td>53%</td><td>47%</td><td>Even favoured â€” defensive league</td></tr>
+      <tr><td>Primeira Liga</td><td>2.4</td><td>54%</td><td>46%</td><td>Even favoured â€” low scoring</td></tr>
+      <tr><td>La Liga</td><td>2.5</td><td>53%</td><td>47%</td><td>Even favoured â€” tactical</td></tr>
       <tr><td>Ligue 1</td><td>2.6</td><td>52%</td><td>48%</td><td>Slightly even favoured</td></tr>
       <tr><td>Premier League</td><td>2.8</td><td>51%</td><td>49%</td><td>Near 50/50</td></tr>
       <tr><td>MLS</td><td>2.9</td><td>50%</td><td>50%</td><td>True 50/50</td></tr>
       <tr><td>Championship</td><td>2.7</td><td>52%</td><td>48%</td><td>Slightly even favoured</td></tr>
       <tr><td>Bundesliga</td><td>3.1</td><td>49%</td><td>51%</td><td>Slightly odd favoured</td></tr>
-      <tr><td>Eredivisie</td><td>3.2</td><td>48%</td><td>52%</td><td>Odd favoured — high scoring</td></tr>
+      <tr><td>Eredivisie</td><td>3.2</td><td>48%</td><td>52%</td><td>Odd favoured â€” high scoring</td></tr>
       <tr><td>Austrian Bundesliga</td><td>2.8</td><td>51%</td><td>49%</td><td>Near 50/50</td></tr>
       <tr><td>Swiss Super League</td><td>2.9</td><td>50%</td><td>50%</td><td>Near 50/50</td></tr>
       <tr><td>Scottish Premiership</td><td>2.8</td><td>51%</td><td>49%</td><td>Slightly even favoured</td></tr>
@@ -222,10 +254,10 @@
     <p>Just as with total goals, individual teams have distinctive odd/even profiles based on their playing style and goal distribution.</p>
     <p><strong>Team profiles and odd/even tendencies:</strong></p>
     <ul>
-      <li><strong>High-scoring attacking teams</strong> (e.g. Man City, Bayern, PSG) — More likely to produce odd totals because they frequently win 2-1, 3-1, 4-1</li>
-      <li><strong>Defensive solid teams</strong> (e.g. Atletico, Juventus, Sevilla) — More likely to produce even totals through 0-0, 1-1, 1-0 (odd), 2-0</li>
-      <li><strong>Inconsistent mid-table teams</strong> — Close to league-average distribution, less predictable</li>
-      <li><strong>Relegation-threatened teams</strong> — Lower-scoring matches, favouring even totals</li>
+      <li><strong>High-scoring attacking teams</strong> (e.g. Man City, Bayern, PSG) â€” More likely to produce odd totals because they frequently win 2-1, 3-1, 4-1</li>
+      <li><strong>Defensive solid teams</strong> (e.g. Atletico, Juventus, Sevilla) â€” More likely to produce even totals through 0-0, 1-1, 1-0 (odd), 2-0</li>
+      <li><strong>Inconsistent mid-table teams</strong> â€” Close to league-average distribution, less predictable</li>
+      <li><strong>Relegation-threatened teams</strong> â€” Lower-scoring matches, favouring even totals</li>
     </ul>
     <table>
       <tr><th>Team Profile</th><th>Example</th><th>Avg Goals in Matches</th><th>Even %</th><th>Odd %</th></tr>
@@ -254,7 +286,7 @@
     </table>
     <div class="success">
       <h3>Key In-Play Strategy: Betting Against the Current Parity</h3>
-      <p>When the current scoreline is odd (1-0, 2-1, 3-2), most bettors instinctively back even because they expect one more goal to make it even. But the reverse strategy — backing odd when the score is odd — often provides better value because the odds on odd are inflated (2.20-2.60) while the true probability of one more goal arriving is only 50-55% in most matches.</p>
+      <p>When the current scoreline is odd (1-0, 2-1, 3-2), most bettors instinctively back even because they expect one more goal to make it even. But the reverse strategy â€” backing odd when the score is odd â€” often provides better value because the odds on odd are inflated (2.20-2.60) while the true probability of one more goal arriving is only 50-55% in most matches.</p>
       <p><strong>Example:</strong> Match is 1-0 at half-time. Even odds are 1.55, odd odds are 2.50. The true probability of the match ending odd (no more goals or 2+ more goals in an odd combination) is approximately 40-45% in an average match. At 2.50 (40% implied), odd offers fair to positive value.</p>
     </div>
     <div class="success">
@@ -267,25 +299,25 @@
     <p>Odd/even can be combined with other markets for enhanced odds, but correlation must be carefully considered.</p>
     <table>
       <tr><th>Combination</th><th>Description</th><th>Typical Odds</th><th>Strategy Notes</th></tr>
-      <tr><td>Even + Under 2.5</td><td>Even total goals AND under 2.5</td><td>2.00-3.00</td><td>Strong correlation — very common combo</td></tr>
-      <tr><td>Odd + Over 2.5</td><td>Odd total goals AND over 2.5</td><td>2.00-3.00</td><td>Strong correlation — very common combo</td></tr>
-      <tr><td>Even + BTTS Yes</td><td>Even total AND both teams score</td><td>3.00-5.00</td><td>Weak correlation — 1-1 is the link</td></tr>
-      <tr><td>Odd + Correct Score 1-0</td><td>Odd total AND 1-0 exact score</td><td>6.00-10.00</td><td>Low correlation — odd covers many scores</td></tr>
+      <tr><td>Even + Under 2.5</td><td>Even total goals AND under 2.5</td><td>2.00-3.00</td><td>Strong correlation â€” very common combo</td></tr>
+      <tr><td>Odd + Over 2.5</td><td>Odd total goals AND over 2.5</td><td>2.00-3.00</td><td>Strong correlation â€” very common combo</td></tr>
+      <tr><td>Even + BTTS Yes</td><td>Even total AND both teams score</td><td>3.00-5.00</td><td>Weak correlation â€” 1-1 is the link</td></tr>
+      <tr><td>Odd + Correct Score 1-0</td><td>Odd total AND 1-0 exact score</td><td>6.00-10.00</td><td>Low correlation â€” odd covers many scores</td></tr>
       <tr><td>Even + 0-0</td><td>Even total AND goalless draw</td><td>10.00-15.00</td><td>Perfect correlation but low probability</td></tr>
     </table>
     <div class="strategy-box">
       <h3>Building Same-Game Parlays with Odd/Even</h3>
-      <p>Odd/even is a useful component in same-game parlays because it has low correlation with most other markets. Combining odd/even with match result, for example, covers both dimensions of the match — who wins and what the goal tally looks like. The true combined probability is close to the product of the individual probabilities, meaning the parlay price is fair.</p>
+      <p>Odd/even is a useful component in same-game parlays because it has low correlation with most other markets. Combining odd/even with match result, for example, covers both dimensions of the match â€” who wins and what the goal tally looks like. The true combined probability is close to the product of the individual probabilities, meaning the parlay price is fair.</p>
       <p>However, avoid combining odd/even with total goals markets in the same match. Odd + Over 2.5 and Even + Under 2.5 are both highly correlated, and bookmakers typically price these combos with a significant margin baked in.</p>
     </div>
     <h2>10. Bankroll Strategy for 50/50 Markets</h2>
     <p>Odd/even betting is a near-50/50 market, which requires a different bankroll approach than value betting in inefficient markets.</p>
     <p><strong>Key principles for 50/50 market bankroll management:</strong></p>
     <ul>
-      <li><strong>Smaller stakes, larger bankroll</strong> — Near-50/50 markets have high variance. A 100-bet losing streak is possible even with a genuine edge. Stake 0.5-1% per bet maximum.</li>
-      <li><strong>Level staking is preferred</strong> — Kelly Criterion can suggest aggressive stakes in 50/50 markets when edges are small. Level staking (fixed stake) is safer and more sustainable for most bettors.</li>
-      <li><strong>Minimum 200-bet bankroll</strong> — For odd/even betting at 1% stakes, you need a bankroll that covers 200 bets. At 0.5% stakes, 400 bets.</li>
-      <li><strong>League-specific bankrolls</strong> — If you specialise in Serie A (even bias) and the Eredivisie (odd bias), consider separate bankrolls for each strategy.</li>
+      <li><strong>Smaller stakes, larger bankroll</strong> â€” Near-50/50 markets have high variance. A 100-bet losing streak is possible even with a genuine edge. Stake 0.5-1% per bet maximum.</li>
+      <li><strong>Level staking is preferred</strong> â€” Kelly Criterion can suggest aggressive stakes in 50/50 markets when edges are small. Level staking (fixed stake) is safer and more sustainable for most bettors.</li>
+      <li><strong>Minimum 200-bet bankroll</strong> â€” For odd/even betting at 1% stakes, you need a bankroll that covers 200 bets. At 0.5% stakes, 400 bets.</li>
+      <li><strong>League-specific bankrolls</strong> â€” If you specialise in Serie A (even bias) and the Eredivisie (odd bias), consider separate bankrolls for each strategy.</li>
     </ul>
     <div class="formula-box">
       <strong>Bankroll Sizing Formula for 50/50 Markets:</strong><br>
@@ -324,7 +356,7 @@
     <h2>12. Frequently Asked Questions</h2>
     <div class="strategy-box">
       <h3>Is odd or even more common in football?</h3>
-      <p>Even totals occur slightly more frequently — approximately 51-52% of matches across Europe's top leagues. High-scoring leagues like the Bundesliga and Eredivisie can be 50-50 or slightly odd-favoured.</p>
+      <p>Even totals occur slightly more frequently â€” approximately 51-52% of matches across Europe's top leagues. High-scoring leagues like the Bundesliga and Eredivisie can be 50-50 or slightly odd-favoured.</p>
     </div>
     <div class="strategy-box">
       <h3>How does 0-0 affect odd/even betting?</h3>
@@ -348,7 +380,7 @@
     </div>
     <div class="strategy-box">
       <h3>Should I combine odd/even with other bets?</h3>
-      <p>Odd/even works well in same-game parlays with match result or BTTS because correlation is low. Avoid combining with total goals markets (Over/Under 2.5) — the correlation is too high.</p>
+      <p>Odd/even works well in same-game parlays with match result or BTTS because correlation is low. Avoid combining with total goals markets (Over/Under 2.5) â€” the correlation is too high.</p>
     </div>
     <div class="strategy-box">
       <h3>How do I calculate the true probability of odd vs even?</h3>

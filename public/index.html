@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -9,16 +9,19 @@
    <meta property="og:title" content="WinFulltime - Free AI Football Predictions Today">
   <meta property="og:url" content="https://winfulltime.com/">
    <meta property="og:description" content="Get free AI-powered football predictions daily. Expert tips for 1X2, Over/Under, BTTS, and Team to Score.">
-   <meta property="og:image" content="/logo.png">
+   <meta property="og:image" content="/winfulltimelogo.png">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
    <meta name="twitter:title" content="WinFulltime - Free AI Football Predictions Today">
     <meta name="twitter:description" content="Get free AI-powered football predictions daily. Expert tips for 1X2, Over/Under, BTTS, and Team to Score.">
-   <meta name="twitter:image" content="/logo.png">
+   <meta name="twitter:image" content="/winfulltimelogo.png">
   <link rel="canonical" href="https://winfulltime.com/">
   <meta name="p:domain_verify" content="ea6fdcfb1731666c03500a5d385f306f"/>
-  <link rel="icon" href="/logo.png" type="image/png">
-<link rel="stylesheet" href="/styles.css">
+  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -31,7 +34,7 @@
         "name": "WinFulltime",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://winfulltime.com/logo.png"
+          "url": "https://winfulltime.com/winfulltimelogo.png"
         }
       },
       "potentialAction": {
@@ -41,134 +44,185 @@
       }
     }
     </script>
- <style>
-     * {
-       margin: 0;
-       padding: 0;
-       box-sizing: border-box;
-     }
+  <style>
+    :root {
+      --bg-primary: #0b0f1a;
+      --bg-secondary: #111827;
+      --bg-card: rgba(23, 28, 46, 0.85);
+      --bg-card-hover: rgba(30, 36, 56, 0.95);
+      --bg-elevated: #1a1f2e;
+      --text-primary: #e8edf5;
+      --text-secondary: #c8d0db;
+      --text-muted: #94a3b8;
+      --accent: #ff2448;
+      --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --glow: rgba(255,36,72,0.12);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: #f8fafc;
-      color: #18181b;
+      font-family: var(--font);
+      background: var(--bg-primary);
+      background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent);
+      color: var(--text-primary);
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
 
     .container {
-      max-width: 900px;
+      max-width: 960px;
       margin: 0 auto;
-      padding: 0 12px;
+      padding: 0 16px;
     }
 
-header {
-      background: #f8fafc;
-      border-bottom: 1px solid #e2e8f0;
-      padding: 12px 0;
+    header {
+      background: rgba(11, 15, 26, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
     .header-content {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 12px;
-      max-width: 900px;
+      padding: 14px 16px;
+      max-width: 960px;
       margin: 0 auto;
     }
 
     .logo {
       display: flex;
       align-items: center;
-      font-size: 24px;
-      font-weight: bold;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
     }
 
-    .logo a { 
-      color: #18181b; 
-      text-decoration: none; 
-    }
-
-    .logo span { 
-      color: #ff0000; 
-    }
-
+    .logo a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-primary);
+        text-decoration: none;
+      }
+    .logo-icon { height: 28px; width: auto; flex-shrink: 0; }
+  
     .logo .win {
-      color: #18181b;
+      color: var(--text-primary);
     }
 
     .logo .fulltime {
-      color: #ff0000;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-
-      @media (max-width: 640px) {
-        .logo { font-size: 18px; }
-      }
-
-      .logo-text {
-       font-size: 28px;
-       font-weight: bold;
-       color: #18181b;
-     }
-
-     .logo-text span {
-       color: #ff0000;
-     }
 
     nav {
       display: flex;
-      gap: 20px;
+      gap: 24px;
     }
 
     nav a {
-      color: #71717a;
+      color: var(--text-muted);
       text-decoration: none;
       font-weight: 500;
-      font-size: 16px;
+      font-size: 14px;
+      transition: color 0.2s;
+      position: relative;
+      padding: 4px 0;
     }
 
     nav a:hover {
-      color: #ff0000;
+      color: var(--text-primary);
     }
 
-    .date-display {
-      font-size: 12px;
-      color: #71717a;
+    nav a.active {
+      color: var(--text-primary);
+    }
+
+    nav a.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent-gradient);
+      border-radius: 1px;
     }
 
     main {
-      padding: 24px 12px;
+      padding: 32px 16px;
     }
 
     .hero {
       text-align: center;
-      margin-bottom: 28px;
+      margin-bottom: 36px;
+      padding: 0 8px;
     }
 
-    .hero h2 {
-      font-size: 28px;
-      font-weight: bold;
-      color: #18181b;
-      margin-bottom: 6px;
+    .hero h1 {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #e8edf5 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
     }
 
     .hero-subtext {
-      font-size: 15px;
-      color: #71717a;
+      font-size: 16px;
+      color: var(--text-secondary);
       margin-top: 4px;
-      font-style: italic;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
     }
 
     .hero p {
-      font-size: 15px;
-      color: #71717a;
+      font-size: 16px;
+      color: var(--text-secondary);
+    }
+
+    .hero-date {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 16px;
+      font-weight: 500;
     }
 
     .stats-bar {
       display: flex;
       justify-content: center;
-      gap: 40px;
-      padding: 16px 0;
-      margin-bottom: 24px;
+      gap: 48px;
+      padding: 20px 24px;
+      margin-bottom: 28px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .stat-item {
@@ -176,67 +230,80 @@ header {
     }
 
     .stat-value {
-      font-size: 28px;
-      font-weight: bold;
-      color: #ff0000;
+      font-size: 30px;
+      font-weight: 800;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
     }
 
     .stat-label {
-      font-size: 13px;
-      color: #71717a;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+      letter-spacing: 0.3px;
     }
 
     .tabs-container {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 10px;
-      margin-bottom: 20px;
+      gap: 8px;
+      margin-bottom: 24px;
     }
 
     .tab-btn {
-      padding: 12px 24px;
-      border-radius: 10px;
-      font-size: 15px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
-      border: 1px solid #e5e5e5;
-      background: transparent;
-      color: #71717a;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      font-family: var(--font);
     }
 
     .tab-btn:hover {
-      border-color: #a1a1aa;
+      border-color: var(--border-hover);
+      background: var(--bg-card-hover);
+      color: var(--text-primary);
     }
 
     .tab-btn.active {
-      background: #ff0000;
+      background: var(--accent-gradient);
       color: white;
-      border-color: #ff0000;
+      border-color: transparent;
+      box-shadow: 0 4px 15px var(--glow);
     }
 
     .matches-grid {
       display: grid;
       grid-template-columns: 1fr;
       gap: 12px;
-      max-width: 500px;
+      max-width: 520px;
       margin: 0 auto;
     }
 
     .match-card {
-      background: #4a5568;
-      border: 1px solid #2d3748;
-      border-radius: 14px;
-      padding: 24px;
-      color: #fafafa;
-      transition: all 0.2s;
-      cursor: pointer;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 22px 24px;
+      color: var(--text-primary);
+      transition: all 0.25s ease;
+      cursor: default;
+      backdrop-filter: blur(4px);
     }
 
     .match-card:hover {
       transform: translateY(-2px);
-      border-color: #4a5568;
+      border-color: rgba(255,255,255,0.1);
+      background: var(--bg-card-hover);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
     }
 
     .match-header {
@@ -244,8 +311,10 @@ header {
       justify-content: space-between;
       align-items: center;
       margin-bottom: 14px;
-      font-size: 13px;
-      color: #cbd5e1;
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 500;
+      letter-spacing: 0.3px;
     }
 
     .match-teams {
@@ -256,9 +325,10 @@ header {
     }
 
     .team {
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 600;
       flex: 1;
+      line-height: 1.3;
     }
 
     .team-home {
@@ -272,15 +342,17 @@ header {
     }
 
     .vs-score {
-      font-size: 14px;
-      color: #94a3b8;
-      padding: 0 16px;
+      font-size: 15px;
+      color: var(--text-muted);
+      padding: 0 14px;
+      font-weight: 500;
     }
 
     .score-display {
-      font-weight: bold;
+      font-weight: 700;
       color: #fbbf24;
-      font-size: 20px;
+      font-size: 22px;
+      letter-spacing: 0.5px;
     }
 
     .match-footer {
@@ -288,7 +360,7 @@ header {
       justify-content: center;
       align-items: center;
       padding-top: 16px;
-      border-top: 1px solid #3d4a5c;
+      border-top: 1px solid var(--border);
     }
 
     .streak-row {
@@ -296,27 +368,31 @@ header {
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      background: #1e2a3a;
+      background: rgba(255,255,255,0.03);
       padding: 8px 12px;
-      border-radius: 6px;
+      border-radius: 8px;
       width: 100%;
+      border: 1px solid var(--border);
     }
+
     .streak-team {
       flex: 1;
       font-weight: 600;
-      color: #e0e0e0;
-      font-size: 13px;
+      color: var(--text-primary);
+      font-size: 15px;
       text-align: left;
     }
+
     .streak-badge {
-      background: #ff0000;
+      background: var(--accent-gradient);
       color: #fff;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 700;
-      padding: 5px 14px;
-      border-radius: 12px;
+      padding: 4px 14px;
+      border-radius: 20px;
       white-space: nowrap;
     }
+
     .streak-odds {
       font-weight: 700;
       color: #4caf50;
@@ -332,27 +408,20 @@ header {
     }
 
     .tip-badge {
-      background: linear-gradient(135deg, #ff0000, #cc0000);
+      background: var(--accent-gradient);
       color: white;
-      font-size: 18px;
-      font-weight: bold;
-      padding: 10px 20px;
-      border-radius: 6px;
+      font-size: 19px;
+      font-weight: 700;
+      padding: 9px 22px;
+      border-radius: 8px;
       display: inline-block;
+      letter-spacing: 0.3px;
     }
 
     .probability {
-      font-size: 14px;
-      font-weight: bold;
-      color: #ff0000;
-      margin-top: 4px;
-      text-align: right;
-    }
-
-    .probability {
-      font-size: 18px;
-      font-weight: bold;
-      color: #ffffff;
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text-primary);
       text-align: right;
     }
 
@@ -360,58 +429,77 @@ header {
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 48px;
+      padding: 64px 48px;
       flex-direction: column;
-      gap: 16px;
+      gap: 20px;
     }
 
     .progress-bar-container {
-      width: 200px;
-      height: 8px;
-      background: #e5e5e5;
-      border-radius: 4px;
+      width: 220px;
+      height: 6px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 3px;
       overflow: hidden;
     }
 
     .progress-bar {
       height: 100%;
-      background: linear-gradient(90deg, #ff0000, #cc0000);
-      border-radius: 4px;
+      background: var(--accent-gradient);
+      border-radius: 3px;
       width: 0%;
-      animation: progress 2s ease-in-out infinite;
+      animation: progress 1.5s ease-in-out infinite;
     }
 
     @keyframes progress {
       0% { width: 0%; margin-left: 0%; }
-      50% { width: 60%; margin-left: 20%; }
+      50% { width: 70%; margin-left: 15%; }
       100% { width: 0%; margin-left: 100%; }
     }
 
     .loading-text {
       font-size: 14px;
-      color: #71717a;
+      color: var(--text-muted);
+      font-weight: 500;
     }
 
     .spinner {
       width: 40px;
       height: 40px;
-      border: 3px solid #e5e5e5;
-      border-top: 3px solid #ff0000;
+      border: 3px solid rgba(255,255,255,0.06);
+      border-top: 3px solid var(--accent);
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
 
     .no-matches {
       text-align: center;
-      padding: 48px;
-      color: #71717a;
+      padding: 48px 24px;
+      color: var(--text-muted);
+    }
+
+    .no-matches a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .no-matches a:hover {
+      text-decoration: underline;
     }
 
     .disclaimer {
       text-align: center;
-      padding: 24px 12px;
-      font-size: 18px;
-      color: #000;
+      padding: 28px 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: 640px;
+      margin: 0 auto;
+      line-height: 1.7;
+      border-top: 1px solid var(--border);
+    }
+
+    .disclaimer strong {
+      color: var(--text-secondary);
     }
 
     .streak-buttons {
@@ -426,52 +514,53 @@ header {
 
     .streak-btn {
       flex: 1;
-      min-width: 200px;
-      padding: 20px 16px;
+      min-width: 180px;
+      padding: 18px 16px;
       border: none;
-      border-radius: 12px;
+      border-radius: var(--radius);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: all 0.25s ease;
       text-decoration: none;
+      font-family: var(--font);
     }
 
     .streak-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
     }
 
     .streak-btn.winstreak {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
+      background: linear-gradient(135deg, #059669, #10b981);
       color: white;
     }
 
     .streak-btn.losestreak {
-      background: linear-gradient(135deg, #ef4444, #dc2626);
+      background: linear-gradient(135deg, #dc2626, #ef4444);
       color: white;
     }
 
     .streak-btn.drawstreak {
-      background: linear-gradient(135deg, #6b7280, #4b5563);
+      background: linear-gradient(135deg, #52525b, #71717a);
       color: white;
     }
 
     .streak-icon {
-      font-size: 24px;
+      font-size: 20px;
     }
 
     .streak-text {
-      font-size: 15px;
+      font-size: 14px;
     }
 
     .news-section {
       max-width: 900px;
-      margin: 32px auto;
+      margin: 40px auto;
       padding: 0 12px;
     }
 
@@ -479,12 +568,12 @@ header {
       font-size: 22px;
       text-align: center;
       margin-bottom: 20px;
-      color: #18181b;
+      color: var(--text-primary);
     }
 
     .blog-section {
       max-width: 1000px;
-      margin: 48px auto;
+      margin: 56px auto;
       padding: 0 12px;
     }
 
@@ -492,26 +581,31 @@ header {
       font-size: 28px;
       text-align: center;
       margin-bottom: 8px;
-      color: #18181b;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #e8edf5 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .blog-subtitle {
       text-align: center;
-      color: #71717a;
-      font-size: 16px;
+      color: var(--text-muted);
+      font-size: 15px;
       margin-bottom: 32px;
     }
 
     .blog-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
+      gap: 16px;
     }
 
     .blog-card {
-      background: white;
-      border: 1px solid #e5e5e5;
-      border-radius: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
       padding: 24px;
       text-decoration: none;
       display: block;
@@ -520,48 +614,55 @@ header {
     }
 
     .blog-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-      border-color: #ff0000;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+      border-color: rgba(255,36,72,0.3);
+      background: var(--bg-card-hover);
     }
 
     .blog-card .news-category {
       font-size: 11px;
       font-weight: 700;
-      color: #ff0000;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
     }
 
     .blog-card h4 {
-      font-size: 18px;
-      color: #18181b;
-      margin: 12px 0 8px;
-      line-height: 1.3;
+      font-size: 17px;
+      color: var(--text-primary);
+      margin: 14px 0 8px;
+      line-height: 1.35;
       font-weight: 600;
     }
 
     .blog-card p {
-      font-size: 14px;
-      color: #71717a;
+      font-size: 13px;
+      color: var(--text-muted);
       margin: 0;
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
     .btn-primary {
       display: inline-block;
-      background: #ff0000;
+      background: var(--accent-gradient);
       color: white;
       padding: 12px 32px;
-      border-radius: 8px;
+      border-radius: 10px;
       text-decoration: none;
-      font-weight: 600;
-      font-size: 15px;
-      transition: background 0.2s;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.3px;
+      transition: all 0.2s;
+      font-family: var(--font);
     }
 
     .btn-primary:hover {
-      background: #cc0000;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px var(--glow);
     }
 
     @media (max-width: 768px) {
@@ -580,38 +681,42 @@ header {
     }
 
     .news-card {
-      background: #f4f4f5;
-      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
       padding: 16px;
       text-decoration: none;
       display: block;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: all 0.2s;
       cursor: pointer;
     }
 
     .news-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-color: var(--border-hover);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
     }
 
     .news-source {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
-      color: #ff0000;
+      color: var(--accent);
       text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .news-title {
       font-size: 14px;
-      color: #18181b;
+      color: var(--text-primary);
       margin: 8px 0 0;
       line-height: 1.4;
     }
 
     .view-all-link {
-      color: #2563eb;
+      color: var(--accent);
       text-decoration: none;
       font-weight: 500;
+      font-size: 14px;
     }
 
     .view-all-link:hover {
@@ -630,12 +735,43 @@ header {
       }
     }
 
-    footer { background: #f8fafc; padding: 32px 12px; border-top: 1px solid #e2e8f0; margin-top: auto; }
-    .footer-content { max-width: 900px; margin: 0 auto; text-align: center; }
-    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
-    .footer-links a { color: #52525b; text-decoration: none; font-weight: 500; }
-    .footer-links a:hover { color: #ff0000; }
-    .footer-copyright { color: #71717a; font-size: 14px; }
+    footer {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      padding: 40px 16px 32px;
+      margin-top: auto;
+    }
+
+    .footer-content {
+      max-width: 960px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent);
+    }
+
+    .footer-copyright {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
 
     @keyframes spin {
       0% { transform: rotate(0deg); }
@@ -651,42 +787,55 @@ header {
       animation: fadeIn 0.3s ease-in;
     }
 
-/* Responsive */
     @media (min-width: 640px) {
       .matches-grid {
         grid-template-columns: repeat(2, 1fr);
         max-width: 900px;
       }
-      .hero h2 {
-        font-size: 32px;
+      .hero h1 {
+        font-size: 46px;
       }
       .hero-subtext {
-        font-size: 14px;
+        font-size: 17px;
       }
+    }
+
+    @media (max-width: 640px) {
+      .logo { font-size: 19px; }
+      nav { gap: 16px; }
+      nav a { font-size: 13px; }
     }
 
     @media (max-width: 480px) {
       .header-content {
         flex-direction: column;
-        gap: 8px;
+        gap: 10px;
         text-align: center;
+      }
+      .hero h1 {
+        font-size: 28px;
       }
       .tabs-container {
         gap: 6px;
       }
       .tab-btn {
-        padding: 10px 16px;
-        font-size: 14px;
+        padding: 8px 14px;
+        font-size: 13px;
       }
       .stats-bar {
-        gap: 24px;
+        gap: 32px;
+        padding: 16px;
       }
       .stat-value {
-        font-size: 22px;
+        font-size: 24px;
+      }
+      .streak-btn {
+        min-width: 140px;
+        padding: 14px 12px;
+        font-size: 13px;
       }
     }
 
-    /* Modal */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -699,6 +848,7 @@ header {
       justify-content: center;
       align-items: center;
       padding: 20px;
+      backdrop-filter: blur(8px);
     }
 
     .modal-overlay.active {
@@ -706,8 +856,9 @@ header {
     }
 
     .modal-content {
-      background: #4a5568;
-      border-radius: 16px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
       max-width: 600px;
       width: 100%;
       max-height: 90vh;
@@ -715,45 +866,54 @@ header {
     }
 
     .modal-header {
-      background: #2d3748;
-      color: white;
-      padding: 20px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      padding: 20px 24px;
       border-radius: 16px 16px 0 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border-bottom: 1px solid var(--border);
     }
 
     .modal-header h2 {
       font-size: 18px;
-      font-weight: bold;
+      font-weight: 700;
     }
 
     .modal-close {
       background: none;
       border: none;
-      color: white;
+      color: var(--text-secondary);
       font-size: 28px;
       cursor: pointer;
       padding: 0;
       line-height: 1;
+      transition: color 0.2s;
+    }
+
+    .modal-close:hover {
+      color: var(--text-primary);
     }
 
     .modal-body {
-      padding: 20px;
-      color: white;
+      padding: 24px;
+      color: var(--text-primary);
     }
 
     .analysis-section {
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     .analysis-section h3 {
       font-size: 14px;
-      font-weight: bold;
+      font-weight: 700;
       margin-bottom: 12px;
       padding-bottom: 8px;
-      border-bottom: 2px solid #ff0000;
+      border-bottom: 2px solid var(--accent);
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .analysis-grid {
@@ -763,33 +923,38 @@ header {
     }
 
     .analysis-card {
-      background: #2d3748;
-      padding: 14px;
-      border-radius: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: var(--radius);
     }
 
     .stats-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 16px;
+      font-size: 14px;
     }
 
     .stats-table th,
     .stats-table td {
-      padding: 8px 12px;
+      padding: 10px 14px;
       text-align: center;
-      border-bottom: 1px solid #4a5568;
+      border-bottom: 1px solid var(--border);
     }
 
     .stats-table th {
-      background: #1a202c;
-      color: #cbd5e1;
+      background: rgba(255,255,255,0.03);
+      color: var(--text-muted);
       font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
     }
 
     .stats-table td:first-child {
       text-align: left;
-      color: #ffffff;
+      color: var(--text-primary);
+      font-weight: 500;
     }
 
     .stats-table tr:last-child td {
@@ -797,13 +962,15 @@ header {
     }
 
     .stats-table tbody tr:hover {
-      background: #374151;
+      background: rgba(255,255,255,0.02);
     }
 
     .analysis-card h4 {
-      font-size: 12px;
+      font-size: 11px;
       margin-bottom: 8px;
-      color: #cbd5e1;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .team-analysis {
@@ -816,6 +983,7 @@ header {
     .team-name {
       font-weight: 600;
       font-size: 14px;
+      color: var(--text-primary);
     }
 
     .form-bar {
@@ -835,9 +1003,9 @@ header {
       color: white;
     }
 
-    .form-win { background: #00d9a0; }
-    .form-draw { background: #ffc107; }
-    .form-loss { background: #e94560; }
+    .form-win { background: #10b981; }
+    .form-draw { background: #f59e0b; }
+    .form-loss { background: #ef4444; }
 
     .squad-strength {
       display: flex;
@@ -852,32 +1020,34 @@ header {
 
     .strength-value {
       font-size: 16px;
-      font-weight: bold;
-      color: #ff0000;
+      font-weight: 700;
+      color: var(--accent);
     }
 
     .strength-label {
       font-size: 10px;
-      color: #94a3b8;
+      color: var(--text-muted);
     }
 
     .prediction-reason {
-      background: #2d3748;
-      padding: 14px;
-      border-radius: 10px;
-      border-left: 4px solid #ff0000;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: var(--radius);
+      border-left: 4px solid var(--accent);
     }
 
     .prediction-reason h4 {
-      color: #ff0000;
+      color: var(--accent);
       font-size: 14px;
+      font-weight: 700;
       margin-bottom: 8px;
     }
 
     .prediction-reason p {
       font-size: 13px;
-      line-height: 1.5;
-      color: #e2e8f0;
+      line-height: 1.6;
+      color: var(--text-secondary);
     }
 
     @media (max-width: 500px) {
@@ -885,7 +1055,61 @@ header {
         grid-template-columns: 1fr;
       }
     }
-    </style>
+
+    .featured-cta {
+      margin: 0 auto 40px;
+      max-width: 560px;
+      background: linear-gradient(135deg, rgba(20, 28, 42, 0.95), rgba(11, 15, 26, 0.95));
+      border: 1px solid rgba(255,36,72,0.15);
+      border-radius: var(--radius-lg);
+      padding: 32px 36px;
+      text-align: center;
+    }
+
+    .featured-cta .label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+
+    .featured-cta h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .featured-cta p {
+      margin: 0 auto 18px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 440px;
+    }
+
+    .featured-cta a {
+      display: inline-block;
+      background: var(--accent-gradient);
+      color: #fff;
+      padding: 12px 32px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 15px;
+      transition: all 0.2s;
+    }
+
+    .featured-cta a:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px var(--glow);
+    }
+  </style>
   </head>
 <body>
 
@@ -893,10 +1117,10 @@ header {
     <header>
       <div class="header-content">
           <div class="logo">
-            <a href="/" class="logo"><span class="win">Win</span><span class="fulltime">Fulltime</span></a>
+            <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28"> <span class="win">Win</span><span class="fulltime">Fulltime</span></a>
           </div>
         <nav>
-          <a href="/">Home</a>
+          <a href="/" class="active">Home</a>
           <a href="/ticket-builder.html">Ticket Builder</a>
           <a href="/blog/">Blog</a>
           <a href="/about.html">About</a>
@@ -909,8 +1133,9 @@ header {
 
     <main class="container">
       <div class="hero">
-        <h1 style="font-size: 40px; font-weight: 800; margin-bottom: 16px;">Football Predictions Today</h1>
-        <p id="currentDate" style="font-size: 20px; color: black; margin-bottom: 24px;"></p>
+        <h1>Football Predictions<br>For Today</h1>
+        <p class="hero-subtext">Data-driven predictions across 1X2, Over/Under, BTTS &amp; unbeaten markets â€” updated daily</p>
+        <p class="hero-date" id="currentDate"></p>
       </div>
 
       <div class="tabs-container" id="dayTabs"></div>
@@ -919,7 +1144,7 @@ header {
         <button onclick="setCategory('1x2')" id="tab-1x2" class="tab-btn active">1X2</button>
         <button onclick="setCategory('over15')" id="tab-over15" class="tab-btn">Over 1.5</button>
         <button onclick="setCategory('over25')" id="tab-over25" class="tab-btn">Over 2.5</button>
-        <button onclick="setCategory('unbeaten')" id="tab-unbeaten" class="tab-btn">🔥 Unbeaten</button>
+        <button onclick="setCategory('unbeaten')" id="tab-unbeaten" class="tab-btn">ðŸ”¥ Unbeaten</button>
         <button onclick="setCategory('btts')" id="tab-btts" class="tab-btn">BTTS YES</button>
         <button onclick="setCategory('bttsno')" id="tab-bttsno" class="tab-btn">BTTS NO</button>
 
@@ -944,15 +1169,15 @@ header {
       <!-- Streak Buttons -->
       <div class="streak-buttons">
         <a href="#" onclick="event.preventDefault(); setCategory('winstreak')" class="streak-btn winstreak">
-          <span class="streak-icon">🔥</span>
+          <span class="streak-icon">ðŸ”¥</span>
           <span class="streak-text">Winning Streak</span>
         </a>
         <a href="#" onclick="event.preventDefault(); setCategory('losestreak')" class="streak-btn losestreak">
-          <span class="streak-icon">📉</span>
+          <span class="streak-icon">ðŸ“‰</span>
           <span class="streak-text">Losing Streak</span>
         </a>
         <a href="#" onclick="event.preventDefault(); setCategory('drawstreak')" class="streak-btn drawstreak">
-          <span class="streak-icon">➖</span>
+          <span class="streak-icon">âž–</span>
           <span class="streak-text">Draws Streak</span>
         </a>
       </div>
@@ -969,23 +1194,18 @@ header {
 
 
 
-      <p style="text-align:center; margin: 20px auto; max-width:700px; font-size:16px; color:#333333;">
-        Get free football predictions for today's matches. We analyze team form, head-to-head records, and stats to provide betting tips across major leagues worldwide.
-      </p>
+      <div class="featured-cta">
+        <div class="label">Featured Tool</div>
+        <h3>Build Winning Accumulator Tickets</h3>
+        <p>Generate optimized accumulator combinations from today's AI-powered predictions. Set your target odds and get instant ticket suggestions.</p>
+        <a href="/ticket-builder.html">Try Ticket Builder &rarr;</a>
+      </div>
 
       <div class="disclaimer">
-        <p><strong>18+ Only</strong></p>
-        <p>Predictions are for informational purposes only. Please gamble responsibly.</p>
-        <p> gambling involves financial risk and may lead to addiction. If you or someone you know has a gambling problem, please seek help from a professional organization.</p>
+        <p><strong>18+ Only</strong> â€” Predictions are for informational purposes only. Please gamble responsibly.</p>
+        <p>Gambling involves financial risk and may lead to addiction. If you or someone you know has a gambling problem, please seek help from a professional organization.</p>
       </div>
     </main>
-  </div>
-
-  <div style="margin: 0 auto 32px; max-width: 560px; background: linear-gradient(135deg, #0a0e17, #141c2a); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 28px 32px; text-align: center;">
-    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,36,72,0.6); margin-bottom: 8px;">Featured Tool</div>
-    <h3 style="margin: 0 0 10px; font-size: 20px; font-weight: 700; color: #e8edf5;">Build Winning Accumulator Tickets</h3>
-    <p style="margin: 0 auto 16px; font-size: 14px; color: rgba(232,237,245,0.55); line-height: 1.6; max-width: 440px;">Generate optimized accumulator combinations from today's AI-powered predictions. Set your target odds and get instant ticket suggestions.</p>
-    <a href="/ticket-builder.html" style="display: inline-block; background: linear-gradient(135deg, #ff2448, #d41a38); color: #fff; padding: 12px 32px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 15px;">Try Ticket Builder &rarr;</a>
   </div>
 
   <script>
@@ -1021,16 +1241,6 @@ header {
     const urlCategory = urlParams.get('category');
     if (urlCategory && ['winstreak', 'losestreak', 'drawstreak', 'unbeaten'].includes(urlCategory)) {
       currentCategory = urlCategory;
-    }
-
-    const headerDateEl = document.getElementById('headerDate');
-    if (headerDateEl) {
-      headerDateEl.textContent = today.toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
     }
 
     function getDateStr(offset) {
@@ -1445,27 +1655,27 @@ renderDayTabs();
     }
   </script>
   <footer>
-        <div style="text-align:center;padding:16px 12px;background:#fff5f5;border-top:2px solid #ff0000;margin-bottom:12px;">
-      <p style="margin:0 0 10px;font-size:15px;color:#52525b;">
-        Support WinFulltime &mdash; your donations keep this website running and all predictions free.
-      </p>
-      <a href="https://ko-fi.com/winfulltime" target="_blank" rel="noopener" style="display:inline-block;background:#ff0000;color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;">
-        Donate on Ko-fi
-      </a>
-    </div>
     <div class="footer-content">
+      <div style="text-align:center;margin-bottom:24px;">
+        <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">
+          Support WinFulltime &mdash; your donations keep all predictions free.
+        </p>
+        <a href="https://ko-fi.com/winfulltime" target="_blank" rel="noopener" style="display:inline-block;background:var(--accent-gradient);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;transition:all 0.2s;">
+          â˜• Donate on Ko-fi
+        </a>
+      </div>
       <div class="footer-links">
         <a href="/">Home</a>
+        <a href="/ticket-builder.html">Ticket Builder</a>
         <a href="/blog/">Blog</a>
         <a href="/about.html">About</a>
         <a href="/advertise.html">Advertise</a>
-        <a href="/options.html">Betting Guide</a>
         <a href="/contact.html">Contact</a>
         <a href="/terms.html">Terms</a>
         <a href="/privacy.html">Privacy</a>
         <a href="/sitemap.xml">Sitemap</a>
       </div>
-      <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved. | <a href="https://mesigo.site" target="_blank" rel="noopener">Website Built by Mesigo</a></p>
+      <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
     </div>
   </footer>
   <script src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP" async></script>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -13,62 +13,96 @@
   <meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/over-under-35-goals.webp">
   <link rel="canonical" href="https://winfulltime.com/blog/over-under-35-goals">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #18181b; margin: 0; padding: 0; }
-    header { background: white; border-bottom: 1px solid #e5e5e5; padding: 16px 0; }
+    :root {
+      --bg-primary: #0b0f1a;
+      --bg-secondary: #111827;
+      --bg-card: rgba(23, 28, 46, 0.85);
+      --bg-elevated: #1a1f2e;
+      --text-primary: #e8edf5;
+      --text-secondary: #c8d0db;
+      --text-muted: #94a3b8;
+      --accent: #ff2448;
+      --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --glow: rgba(255,36,72,0.12);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--bg-primary); background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent); color: var(--text-primary); margin: 0; padding: 0; font-size: 16px; -webkit-font-smoothing: antialiased; }
+    header { background: rgba(11,15,26,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
     .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-size: 24px; font-weight: bold; color: #18181b; text-decoration: none; }
-    .logo span { color: #ff0000; }
+    .logo { display: inline-flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+    .logo span { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .logo-icon { height: 28px; width: auto; flex-shrink: 0; }
     .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    h1 { font-size: 2.5rem; color: #18181b; margin-bottom: 10px; }
-    h2 { font-size: 1.8rem; color: #18181b; margin-top: 40px; margin-bottom: 15px; }
-    h3 { font-size: 1.3rem; color: #18181b; margin-top: 30px; margin-bottom: 10px; }
-    p { margin-bottom: 16px; color: #3f3f46; line-height: 1.7; }
-    .meta { color: #71717a; font-size: 0.9rem; margin-bottom: 30px; }
-    .highlight { background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b; }
-    .example-box { background: #18181b; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .example-box * { color: white; }
-    .strategy-box { background: white; border: 1px solid #e5e5e5; padding: 24px; border-radius: 12px; margin: 24px 0; }
-    .strategy-box h3 { margin-top: 0; color: #ff0000; }
-    .pro-tip { background: #dbeafe; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .pro-tip h4 { margin-top: 0; color: #1d4ed8; }
-    .warning { background: #fef2f2; border-left: 4px solid #ff0000; padding: 16px; border-radius: 4px; margin: 20px 0; }
-    .success { background: #f0fdf4; border-left: 4px solid #22c55e; padding: 16px; border-radius: 4px; margin: 20px 0; }
-    .steps { background: #f4f4f5; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    h1 { font-size: 2.8rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; }
+    h2 { font-size: 2.1rem; color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; font-weight: 700; }
+    h3 { font-size: 1.5rem; color: var(--text-primary); margin-top: 30px; margin-bottom: 10px; font-weight: 600; }
+    p { font-size: 1.125rem; margin-bottom: 20px; color: var(--text-secondary); line-height: 1.85; }
+    li { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.85; margin-bottom: 8px; }
+    .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+    .highlight { background: rgba(251,191,36,0.1); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .highlight * { color: var(--text-primary); }
+    .example-box { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .example-box * { color: var(--text-primary); }
+    .strategy-box { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin: 24px 0; }
+    .strategy-box h3 { margin-top: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .pro-tip { background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .pro-tip h4 { margin-top: 0; color: #60a5fa; }
+    .pro-tip * { color: var(--text-primary); }
+    .warning { background: rgba(239,68,68,0.08); border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .warning * { color: var(--text-primary); }
+    .success { background: rgba(34,197,94,0.08); border-left: 4px solid #22c55e; padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .success * { color: var(--text-primary); }
+    .steps { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin: 20px 0; }
     .steps ol { margin: 0; padding-left: 20px; }
-    .steps li { margin-bottom: 10px; }
-    .cta { background: linear-gradient(135deg, #ff0000, #cc0000); color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0; }
+    .steps li { margin-bottom: 10px; color: var(--text-secondary); }
+    .cta { background: var(--accent-gradient); color: white; padding: 24px; border-radius: var(--radius); text-align: center; margin: 30px 0; box-shadow: 0 4px 15px var(--glow); }
     .cta * { color: white; }
-    .breadcrumb { font-size: 0.9rem; color: #71717a; margin-bottom: 20px; }
-    .breadcrumb a { color: #ff0000; text-decoration: none; }
-    .related-posts { background: #f4f4f5; padding: 20px; border-radius: 8px; margin-top: 40px; }
-    .related-posts h3 { margin-top: 0; color: #18181b; }
+    .cta a { color: white; text-decoration: underline; }
+    .breadcrumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .related-posts { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin-top: 40px; }
+    .related-posts h3 { margin-top: 0; color: var(--text-primary); }
     .related-posts ul { list-style: none; padding: 0; }
-    .related-posts li { margin-bottom: 10px; color: #3f3f46; }
-    .related-posts a { color: #ff0000; text-decoration: none; }
+    .related-posts li { margin-bottom: 10px; color: var(--text-secondary); }
+    .related-posts a { color: var(--accent); text-decoration: none; }
+    .related-posts a:hover { text-decoration: underline; }
     table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e5e5; }
-    th { background: #f4f4f5; }
-    footer { background: white; border-top: 1px solid #e5e5e5; padding: 40px 0; text-align: center; margin-top: 60px; }
-    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
-    .footer-links a { color: #52525b; text-decoration: none; font-weight: 500; }
-    .footer-links a:hover { color: #ff0000; }
-    .footer-copyright { color: #71717a; font-size: 14px; }
-    footer a { color: #52525b; text-decoration: none; font-weight: 500; }
-    nav a { margin-left: 20px; color: #52525b; text-decoration: none; font-weight: 500; }
-    nav a:hover { color: #ff0000; }
-    table tr:nth-child(even) { background: #fafafa; }
-    .formula-box { background: #f0f4ff; padding: 16px; border-radius: 8px; margin: 16px 0; font-family: monospace; text-align: center; }
-    .toc { background: #f4f4f5; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .toc ol { margin: 0; padding-left: 20px; }
-    .toc li { margin-bottom: 6px; color: #3f3f46; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    th { background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 600; }
+    .odds-table { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; overflow: hidden; }
+    .odds-table th { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+    .odds-table td { border-bottom: 1px solid var(--border); color: var(--text-primary); }
+    code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); }
+    footer { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 40px 16px 32px; text-align: center; margin-top: 60px; }
+    .footer-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap; }
+    .footer-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copyright { color: var(--text-muted); font-size: 13px; }
+    nav { display: flex; gap: 24px; }
+    nav a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s; }
+    nav a:hover { color: var(--text-primary); }
+    img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+    @media (max-width: 640px) {
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.7rem; }
+      .container { padding: 0 16px; }
+      nav { gap: 12px; }
+      nav a { font-size: 13px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="header-content">
-      <a href="/" class="logo">Win<span>Fulltime</span></a>
+      <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28"> Win<span>Fulltime</span></a>
       <nav>
         <a href="/">Home</a>
         <a href="/ticket-builder.html">Ticket Builder</a>
@@ -88,47 +122,47 @@
 
     <div style="background:#dbeafe;padding:16px 20px;border-radius:8px;margin:20px 0"><strong>Tip:</strong> Looking for today's football predictions? <a href="/">Click here</a>.</div>
 
-    <p>Over 3.5 goals is a different beast from the standard Over 2.5 market. Requiring four or more goals, it eliminates roughly half of the matches that would win an Over 2.5 bet. A 2-1 scoreline wins Over 2.5 but loses Over 3.5. This makes Over 3.5 a specialist market — one where you need extreme goal-scoring conditions, not just above-average ones.</p>
-    <p>The reward is significantly better odds. While Over 2.5 typically sits around 1.80-2.00, Over 3.5 usually ranges from 2.50 to 4.00 depending on the match. The break-even rate is lower (25-40%), which means fewer bets need to land for profitability — but each individual bet carries higher variance.</p>
+    <p>Over 3.5 goals is a different beast from the standard Over 2.5 market. Requiring four or more goals, it eliminates roughly half of the matches that would win an Over 2.5 bet. A 2-1 scoreline wins Over 2.5 but loses Over 3.5. This makes Over 3.5 a specialist market â€” one where you need extreme goal-scoring conditions, not just above-average ones.</p>
+    <p>The reward is significantly better odds. While Over 2.5 typically sits around 1.80-2.00, Over 3.5 usually ranges from 2.50 to 4.00 depending on the match. The break-even rate is lower (25-40%), which means fewer bets need to land for profitability â€” but each individual bet carries higher variance.</p>
     <p>This guide covers everything you need to profit from Over 3.5 betting: league characteristics, team-level patterns, the Big Gap theory, match context, in-play tactics, statistical modelling, and a complete pre-match workflow.</p>
 
     <div class="toc">
       <strong>In This Guide:</strong>
       <ol>
         <li>What is Over 3.5 Goals Betting?</li>
-        <li>How Over 3.5 Differs from Over 2.5 — Critical Distinctions</li>
+        <li>How Over 3.5 Differs from Over 2.5 â€” Critical Distinctions</li>
         <li>League-by-League Over 3.5 Analysis</li>
         <li>Team-Level Analysis for High-Scoring Matches</li>
-        <li>The Big Gap Theory — Mismatches That Produce 4+ Goals</li>
+        <li>The Big Gap Theory â€” Mismatches That Produce 4+ Goals</li>
         <li>Match Context Factors for Over 3.5</li>
         <li>In-Play Over 3.5 Strategy</li>
-        <li>Combination Bets — Over 3.5 with BTTS and Other Markets</li>
+        <li>Combination Bets â€” Over 3.5 with BTTS and Other Markets</li>
         <li>Asian Quarter Lines for Over 3.5</li>
         <li>Building an Over 3.5 Statistical Model</li>
-        <li>Worked Example — Full Match Analysis</li>
+        <li>Worked Example â€” Full Match Analysis</li>
         <li>Five Critical Mistakes</li>
         <li>Frequently Asked Questions</li>
       </ol>
     </div>
 
     <h2>1. What is Over 3.5 Goals Betting?</h2>
-    <p>Over 3.5 goals is a total goals market where you bet on whether the combined score of both teams will exceed 3.5 goals. Because half-goals are used, the outcome is binary — there is no tie:</p>
+    <p>Over 3.5 goals is a total goals market where you bet on whether the combined score of both teams will exceed 3.5 goals. Because half-goals are used, the outcome is binary â€” there is no tie:</p>
     <ul>
-      <li><strong>Over 3.5</strong> — 4 or more goals scored in total (4-0, 3-1, 2-2, 3-2, 4-1, etc.)</li>
-      <li><strong>Under 3.5</strong> — 3 or fewer goals scored (0-0, 1-0, 1-1, 2-0, 2-1, 3-0, etc.)</li>
+      <li><strong>Over 3.5</strong> â€” 4 or more goals scored in total (4-0, 3-1, 2-2, 3-2, 4-1, etc.)</li>
+      <li><strong>Under 3.5</strong> â€” 3 or fewer goals scored (0-0, 1-0, 1-1, 2-0, 2-1, 3-0, etc.)</li>
     </ul>
 
     <div class="example-box">
       <h3>Real Example</h3>
       <p><strong>Match:</strong> Bayern Munich vs Bayer Leverkusen</p>
       <p><strong>Over 3.5:</strong> 2.80 | <strong>Under 3.5:</strong> 1.45</p>
-      <p>You stake £20 on Over 3.5. The match ends 3-2. Your return is £20 × 2.80 = £56.00 (£36.00 profit).</p>
+      <p>You stake Â£20 on Over 3.5. The match ends 3-2. Your return is Â£20 Ã— 2.80 = Â£56.00 (Â£36.00 profit).</p>
       <p>If it ends 2-1, you lose the full stake.</p>
     </div>
 
-    <p>Over 3.5 is available on most major bookmakers for top-league matches. Liquidity is thinner than Over 2.5, which means prices can vary significantly between bookmakers — making odds comparison essential.</p>
+    <p>Over 3.5 is available on most major bookmakers for top-league matches. Liquidity is thinner than Over 2.5, which means prices can vary significantly between bookmakers â€” making odds comparison essential.</p>
 
-    <h2>2. How Over 3.5 Differs from Over 2.5 — Critical Distinctions</h2>
+    <h2>2. How Over 3.5 Differs from Over 2.5 â€” Critical Distinctions</h2>
     <p>Understanding the gap between Over 2.5 and Over 3.5 is the foundation of profitable high-goal betting.</p>
 
     <table>
@@ -142,7 +176,7 @@
       <tr><td>Key requirement</td><td>Above-average attacking</td><td>Extreme attacking + defensive weakness</td></tr>
     </table>
 
-    <p>The critical insight: Over 3.5 requires a different analytical framework. You can't just look for "good attacking teams." You need specific conditions — a major quality gap between the teams, extreme defensive vulnerabilities, or match contexts that produce chaos. Over 2.5 is a volume play. Over 3.5 is a spot play.</p>
+    <p>The critical insight: Over 3.5 requires a different analytical framework. You can't just look for "good attacking teams." You need specific conditions â€” a major quality gap between the teams, extreme defensive vulnerabilities, or match contexts that produce chaos. Over 2.5 is a volume play. Over 3.5 is a spot play.</p>
 
     <p><strong>Why a 2-1 scoreline is the dividing line:</strong> In most leagues, 2-1 is the most common scoreline. It wins Over 2.5 but loses Over 3.5. Roughly 30-40% of all football matches end with exactly 3 goals. The Over 3.5 bettor must identify matches that beat the most common outcome.</p>
 
@@ -166,49 +200,49 @@
     </table>
 
     <div class="pro-tip">
-      <h4>Bundesliga — The Over 3.5 Bettor's Best Friend</h4>
-      <p>The Bundesliga produces Over 3.5 at roughly 30% — meaning nearly 1 in 3 matches hits 4+ goals. Combine this with average odds of 2.80-3.50, and you get a market where a 30% win rate at 3.00 odds delivers a 10% ROI. No other major league offers this combination of high hit rate and favourable odds. Focus your Over 3.5 bankroll primarily on German football. Use <a href="https://fbref.com/en/comps/20/Bundesliga-Stats" target="_blank" rel="noopener">FBref's Bundesliga page</a> for comprehensive team data.</p>
+      <h4>Bundesliga â€” The Over 3.5 Bettor's Best Friend</h4>
+      <p>The Bundesliga produces Over 3.5 at roughly 30% â€” meaning nearly 1 in 3 matches hits 4+ goals. Combine this with average odds of 2.80-3.50, and you get a market where a 30% win rate at 3.00 odds delivers a 10% ROI. No other major league offers this combination of high hit rate and favourable odds. Focus your Over 3.5 bankroll primarily on German football. Use <a href="https://fbref.com/en/comps/20/Bundesliga-Stats" target="_blank" rel="noopener">FBref's Bundesliga page</a> for comprehensive team data.</p>
     </div>
 
-    <p><strong>Finding value in lower-rate leagues:</strong> Even in Serie A (18% Over 3.5), value exists when the right conditions align — a top team hosting a relegation candidate with defensive injuries. The key is identifying when the 18% average jumps to 35-40% for a specific matchup. League averages are starting points, not limits.</p>
+    <p><strong>Finding value in lower-rate leagues:</strong> Even in Serie A (18% Over 3.5), value exists when the right conditions align â€” a top team hosting a relegation candidate with defensive injuries. The key is identifying when the 18% average jumps to 35-40% for a specific matchup. League averages are starting points, not limits.</p>
 
     <h2>4. Team-Level Analysis for High-Scoring Matches</h2>
     <p>Team analysis for Over 3.5 requires looking at extreme goal distributions, not just averages.</p>
 
     <p><strong>Key metrics for Over 3.5 team analysis:</strong></p>
     <ul>
-      <li><strong>% of matches with 4+ goals</strong> — How often does this team produce blowout games?</li>
-      <li><strong>% of matches with 0-2 goals</strong> — How often do their games stay low?</li>
-      <li><strong>Average goals per game</strong> (home/away split) — Baseline expectation</li>
-      <li><strong>BTTS %</strong> — If both teams don't score, 4+ goals is unlikely</li>
-      <li><strong>Goals conceded per game</strong> — Defensive fragility drives high scores</li>
+      <li><strong>% of matches with 4+ goals</strong> â€” How often does this team produce blowout games?</li>
+      <li><strong>% of matches with 0-2 goals</strong> â€” How often do their games stay low?</li>
+      <li><strong>Average goals per game</strong> (home/away split) â€” Baseline expectation</li>
+      <li><strong>BTTS %</strong> â€” If both teams don't score, 4+ goals is unlikely</li>
+      <li><strong>Goals conceded per game</strong> â€” Defensive fragility drives high scores</li>
     </ul>
 
     <table>
       <tr><th>Team Profile</th><th>Avg Goals/Game</th><th>Over 3.5 %</th><th>Over 3.5 Analysis</th></tr>
-      <tr><td>Elite attack, weak defence</td><td>3.2-3.8</td><td>35-45%</td><td>Best Over 3.5 profile — scores and concedes freely</td></tr>
-      <tr><td>Elite attack, strong defence</td><td>2.8-3.2</td><td>25-30%</td><td>Often wins 3-0 or 2-0 — Under 3.5 more likely than profile suggests</td></tr>
+      <tr><td>Elite attack, weak defence</td><td>3.2-3.8</td><td>35-45%</td><td>Best Over 3.5 profile â€” scores and concedes freely</td></tr>
+      <tr><td>Elite attack, strong defence</td><td>2.8-3.2</td><td>25-30%</td><td>Often wins 3-0 or 2-0 â€” Under 3.5 more likely than profile suggests</td></tr>
       <tr><td>Mid-table, open playing style</td><td>2.6-3.0</td><td>20-28%</td><td>Good candidate when facing other open teams</td></tr>
       <tr><td>Defensive, counter-attacking</td><td>2.0-2.4</td><td>10-15%</td><td>Avoid for Over 3.5 unless facing extreme mismatch</td></tr>
-      <tr><td>Relegation candidate</td><td>2.8-3.2</td><td>25-35%</td><td>High goals because they concede heavily — useful as opponent</td></tr>
+      <tr><td>Relegation candidate</td><td>2.8-3.2</td><td>25-35%</td><td>High goals because they concede heavily â€” useful as opponent</td></tr>
     </table>
 
     <div class="success">
       <h3>The Ideal Over 3.5 Team</h3>
-      <p>The perfect Over 3.5 team averages 1.8+ goals scored per game AND 1.5+ goals conceded per game. This ensures both sides contribute to the total. Examples from recent seasons include Bayer Leverkusen (2023-24), Feyenoord, and Eintracht Frankfurt — teams that attack relentlessly regardless of the scoreline and have defensive vulnerabilities that keep opponents in the game.</p>
+      <p>The perfect Over 3.5 team averages 1.8+ goals scored per game AND 1.5+ goals conceded per game. This ensures both sides contribute to the total. Examples from recent seasons include Bayer Leverkusen (2023-24), Feyenoord, and Eintracht Frankfurt â€” teams that attack relentlessly regardless of the scoreline and have defensive vulnerabilities that keep opponents in the game.</p>
     </div>
 
-    <h2>5. The Big Gap Theory — Mismatches That Produce 4+ Goals</h2>
-    <p>Statistical analysis reveals that the strongest predictor of Over 3.5 is not two good attacking teams, but a large gap in quality between the two sides — combined with the weaker team having no defensive capability to park the bus.</p>
+    <h2>5. The Big Gap Theory â€” Mismatches That Produce 4+ Goals</h2>
+    <p>Statistical analysis reveals that the strongest predictor of Over 3.5 is not two good attacking teams, but a large gap in quality between the two sides â€” combined with the weaker team having no defensive capability to park the bus.</p>
 
     <div class="strategy-box">
       <h3>The Big Gap Formula</h3>
       <p>Over 3.5 probability increases dramatically when:</p>
       <ul>
-        <li>The favourite is a top-3 attacking team in its league (≥1.8 goals per game)</li>
-        <li>The underdog is in the bottom-5 defensively (≥1.7 goals conceded per game)</li>
-        <li>The underdog has no clean sheet record (≤20% clean sheet rate)</li>
-        <li>The underdog needs points (relegation fight) — forces them to attack</li>
+        <li>The favourite is a top-3 attacking team in its league (â‰¥1.8 goals per game)</li>
+        <li>The underdog is in the bottom-5 defensively (â‰¥1.7 goals conceded per game)</li>
+        <li>The underdog has no clean sheet record (â‰¤20% clean sheet rate)</li>
+        <li>The underdog needs points (relegation fight) â€” forces them to attack</li>
       </ul>
       <p>In this scenario, the favourite scores 3+ while the underdog grabs 1. The 3-1, 4-1, or 4-2 scoreline wins Over 3.5 easily. This is the bread and butter of profitable Over 3.5 betting.</p>
     </div>
@@ -230,13 +264,13 @@
 
     <p><strong>Motivation dynamics:</strong></p>
     <ul>
-      <li><strong>Title contenders vs relegation fodder</strong> — The Big Gap scenario. Highest Over 3.5 probability.</li>
-      <li><strong>Two mid-table teams with nothing to play for</strong> — Can go either way. Some produce open, relaxed football. Others go through the motions. Research the specific managers' tendencies.</li>
-      <li><strong>Cup finals and high-stakes matches</strong> — Almost never hit Over 3.5. Teams are too cautious.</li>
-      <li><strong>Second legs where one team trails by 2+</strong> — The trailing team attacks recklessly, creating space. High Over 3.5 probability, especially in European competitions where away goals no longer apply.</li>
+      <li><strong>Title contenders vs relegation fodder</strong> â€” The Big Gap scenario. Highest Over 3.5 probability.</li>
+      <li><strong>Two mid-table teams with nothing to play for</strong> â€” Can go either way. Some produce open, relaxed football. Others go through the motions. Research the specific managers' tendencies.</li>
+      <li><strong>Cup finals and high-stakes matches</strong> â€” Almost never hit Over 3.5. Teams are too cautious.</li>
+      <li><strong>Second legs where one team trails by 2+</strong> â€” The trailing team attacks recklessly, creating space. High Over 3.5 probability, especially in European competitions where away goals no longer apply.</li>
     </ul>
 
-    <p><strong>Weather impact on 4+ goal matches:</strong> Weather suppresses goal-scoring linearly, which means it disproportionately affects high-goal markets. A 20% reduction in expected goals turns a potential 4-goal match into a 3-goal match — costing you the Over 3.5 bet. Heavy rain or strong wind should be an immediate Over 3.5 filter-out.</p>
+    <p><strong>Weather impact on 4+ goal matches:</strong> Weather suppresses goal-scoring linearly, which means it disproportionately affects high-goal markets. A 20% reduction in expected goals turns a potential 4-goal match into a 3-goal match â€” costing you the Over 3.5 bet. Heavy rain or strong wind should be an immediate Over 3.5 filter-out.</p>
 
     <p><strong>Referee tendencies for high-scoring matches:</strong> Referees with low foul-per-game rates and high tolerance for physical play allow the game to flow, which favours attacking teams and increases goal probability. Research referee data on <a href="https://www.transfermarkt.com/" target="_blank" rel="noopener">Transfermarkt</a> or <a href="https://www.worldfootball.net/" target="_blank" rel="noopener">worldfootball.net</a> before betting Over 3.5.</p>
 
@@ -245,7 +279,7 @@
 
     <div class="success">
       <h3>Scenario 1: 0-0 After 30 Minutes in a Big Gap Match</h3>
-      <p>You identified a strong Over 3.5 candidate pre-match (favourite vs weak defence). It's 0-0 after 30 minutes despite the favourite creating 4+ chances. Pre-match Over 3.5 was 2.80. The in-play price has now drifted to 4.50-5.00. The favourite is still creating chances and the underdog is still defensively vulnerable — the 0-0 is variance, not a structural change. This is a strong Over 3.5 value bet in-play.</p>
+      <p>You identified a strong Over 3.5 candidate pre-match (favourite vs weak defence). It's 0-0 after 30 minutes despite the favourite creating 4+ chances. Pre-match Over 3.5 was 2.80. The in-play price has now drifted to 4.50-5.00. The favourite is still creating chances and the underdog is still defensively vulnerable â€” the 0-0 is variance, not a structural change. This is a strong Over 3.5 value bet in-play.</p>
     </div>
 
     <div class="success">
@@ -261,50 +295,50 @@
     <div class="warning">
       <strong>Never bet Over 3.5 in-play at 0-0 when neither team is creating chances.</strong> If the half-time stats show few shots and low xG from both sides, the 0-0 may be an accurate reflection of the match. A cagey game is unlikely to produce 4 goals regardless of how much time remains.</div>
 
-    <h2>8. Combination Bets — Over 3.5 with BTTS and Other Markets</h2>
+    <h2>8. Combination Bets â€” Over 3.5 with BTTS and Other Markets</h2>
     <p>Over 3.5 combines naturally with other markets to produce higher odds. Some combinations offer genuine value; others are correlated traps.</p>
 
     <table>
       <tr><th>Combination</th><th>Typical Odds</th><th>Correlation</th><th>Value Assessment</th></tr>
-      <tr><td>Over 3.5 + BTTS Yes</td><td>3.50-5.00</td><td>High</td><td>Overpriced by bookmakers — avoid</td></tr>
+      <tr><td>Over 3.5 + BTTS Yes</td><td>3.50-5.00</td><td>High</td><td>Overpriced by bookmakers â€” avoid</td></tr>
       <tr><td>Over 3.5 + BTTS No</td><td>5.00-8.00</td><td>Low</td><td>Can offer value when one team dominates</td></tr>
       <tr><td>Over 3.5 + Home Win</td><td>3.50-6.00</td><td>Medium</td><td>Good for Big Gap matches (favourite wins 4-0, 4-1)</td></tr>
       <tr><td>Over 3.5 + Away Win</td><td>5.00-10.00</td><td>Low</td><td>High odds, requires strong away favourite</td></tr>
-      <tr><td>Over 3.5 + Draw</td><td>6.00-12.00</td><td>Low</td><td>2-2 is the only common 4+ goal draw — rare</td></tr>
+      <tr><td>Over 3.5 + Draw</td><td>6.00-12.00</td><td>Low</td><td>2-2 is the only common 4+ goal draw â€” rare</td></tr>
     </table>
 
     <div class="warning">
-      <strong>Correlation trap — Over 3.5 + BTTS Yes:</strong> These two markets are highly correlated. If both teams score and the total exceeds 3.5, the minimum scoreline is 2-2 or 3-1. Bookmakers price this combo as if the components are independent, but they're not. You're almost always better off betting Over 3.5 and BTTS Yes as separate single bets.</div>
+      <strong>Correlation trap â€” Over 3.5 + BTTS Yes:</strong> These two markets are highly correlated. If both teams score and the total exceeds 3.5, the minimum scoreline is 2-2 or 3-1. Bookmakers price this combo as if the components are independent, but they're not. You're almost always better off betting Over 3.5 and BTTS Yes as separate single bets.</div>
 
-    <p><strong>Over 3.5 + Home Win in Big Gap matches:</strong> This combination has genuine value. When a top-3 attacking team hosts a bottom-3 defensive team, the most common outcomes are 3-0, 4-0, 3-1, 4-1 — all of which win both Over 3.5 and Home Win. The combo odds (typically 3.50-5.00) often exceed the fair price when the probability is 25-30%.</p>
+    <p><strong>Over 3.5 + Home Win in Big Gap matches:</strong> This combination has genuine value. When a top-3 attacking team hosts a bottom-3 defensive team, the most common outcomes are 3-0, 4-0, 3-1, 4-1 â€” all of which win both Over 3.5 and Home Win. The combo odds (typically 3.50-5.00) often exceed the fair price when the probability is 25-30%.</p>
 
     <h2>9. Asian Quarter Lines for Over 3.5</h2>
     <p>Asian bookmakers offer quarter-goal lines on over/under markets, providing partial protection and more granular betting options.</p>
 
     <p><strong>Over 3.0 (Asian total 3):</strong></p>
     <ul>
-      <li>4+ goals → win</li>
-      <li>Exactly 3 goals → push (stake refunded)</li>
-      <li>0-2 goals → lose</li>
+      <li>4+ goals â†’ win</li>
+      <li>Exactly 3 goals â†’ push (stake refunded)</li>
+      <li>0-2 goals â†’ lose</li>
     </ul>
 
     <p><strong>Over 3.25 (Asian total 3.0, 3.5):</strong></p>
     <ul>
-      <li>4+ goals → full win</li>
-      <li>Exactly 3 goals → half win (half stake at Over 3.0 wins, half at Over 3.5 loses)</li>
-      <li>0-2 goals → full loss</li>
+      <li>4+ goals â†’ full win</li>
+      <li>Exactly 3 goals â†’ half win (half stake at Over 3.0 wins, half at Over 3.5 loses)</li>
+      <li>0-2 goals â†’ full loss</li>
     </ul>
 
     <p><strong>Over 3.75 (Asian total 3.5, 4.0):</strong></p>
     <ul>
-      <li>5+ goals → full win</li>
-      <li>Exactly 4 goals → half win (Over 3.5 wins, Over 4.0 pushes)</li>
-      <li>0-3 goals → full loss</li>
+      <li>5+ goals â†’ full win</li>
+      <li>Exactly 4 goals â†’ half win (Over 3.5 wins, Over 4.0 pushes)</li>
+      <li>0-3 goals â†’ full loss</li>
     </ul>
 
     <div class="strategy-box">
       <h3>When to Use Asian Quarter Lines for Over 3.5</h3>
-      <p>Use Over 3.25 when you strongly expect 4+ goals but want insurance against a 3-goal result. The odds will be lower than standard Over 3.5, but the push protection on 3 goals reduces variance significantly. This is ideal for Big Gap matches where 3-0 is a real possibility — you still get half your stake returned if the match ends 3-0.</p>
+      <p>Use Over 3.25 when you strongly expect 4+ goals but want insurance against a 3-goal result. The odds will be lower than standard Over 3.5, but the push protection on 3 goals reduces variance significantly. This is ideal for Big Gap matches where 3-0 is a real possibility â€” you still get half your stake returned if the match ends 3-0.</p>
       <p>Use Over 3.75 when you expect an absolute blowout (5+ goals) and want enhanced odds. The market is available primarily on <a href="https://www.pinnacle.com/en/betting-sports" target="_blank" rel="noopener">Pinnacle</a> and Asian-facing bookmakers.</p>
     </div>
 
@@ -313,7 +347,7 @@
 
     <h3>Tier 1: Simple Goals-Based Model</h3>
     <div class="formula-box">Expected Total Goals = Team A Goals Scored/Game + Team B Goals Scored/Game</div>
-    <p>Divide by the league average to get a multiplier. If the league average is 2.8 goals per game and your match has an expected total of 3.6, the multiplier is 1.29. Apply this to the league Over 3.5 hit rate. If the league hits Over 3.5 at 25%, your match probability is 25% × 1.29 = 32.25%. Compare to the bookmaker's implied probability (1 / odds).</p>
+    <p>Divide by the league average to get a multiplier. If the league average is 2.8 goals per game and your match has an expected total of 3.6, the multiplier is 1.29. Apply this to the league Over 3.5 hit rate. If the league hits Over 3.5 at 25%, your match probability is 25% Ã— 1.29 = 32.25%. Compare to the bookmaker's implied probability (1 / odds).</p>
 
     <h3>Tier 2: Adjusted xG Model</h3>
     <ol>
@@ -328,12 +362,12 @@
     <h3>Tier 3: The Big Gap Weighting</h3>
     <p>Apply a quality-gap multiplier to the xG model. When the favourite is in the top 25% of attacking teams and the underdog is in the bottom 25% of defensive teams, multiply the Over 3.5 probability by 1.3-1.5x. This captures the structural advantage that pure xG models miss.</p>
 
-    <div class="formula-box">Adjusted Over 3.5 Probability = Base Poisson Estimate × Big Gap Multiplier</div>
+    <div class="formula-box">Adjusted Over 3.5 Probability = Base Poisson Estimate Ã— Big Gap Multiplier</div>
 
-    <h2>11. Worked Example — Full Match Analysis</h2>
+    <h2>11. Worked Example â€” Full Match Analysis</h2>
     <p>Let's apply the full framework to a real scenario: Bayern Munich vs VfL Bochum in the Bundesliga.</p>
 
-    <p><strong>Step 1: League Context</strong> — Bundesliga averages 3.1 goals per game. Over 3.5 hit rate: ~30%.</p>
+    <p><strong>Step 1: League Context</strong> â€” Bundesliga averages 3.1 goals per game. Over 3.5 hit rate: ~30%.</p>
 
     <p><strong>Step 2: Team-Level Data</strong></p>
     <table>
@@ -345,13 +379,13 @@
       <tr><td>Clean sheet %</td><td>35%</td><td>8%</td></tr>
     </table>
 
-    <p><strong>Step 3: Big Gap Assessment</strong> — Maximum Big Gap score. Bayern is top-3 attack. Bochum is bottom-3 defence. Bochum's 8% clean sheet rate means they almost never keep teams out. Apply the 1.4x Big Gap multiplier.</p>
+    <p><strong>Step 3: Big Gap Assessment</strong> â€” Maximum Big Gap score. Bayern is top-3 attack. Bochum is bottom-3 defence. Bochum's 8% clean sheet rate means they almost never keep teams out. Apply the 1.4x Big Gap multiplier.</p>
 
     <p><strong>Step 4: Expected Goals Calculation</strong></p>
     <p>Using the xG model: Bayern's recent home xG is 2.4. Bochum's recent away xGA is 2.1. Bayern's xG estimate: 2.4 + 2.1 = 2.25 (adjusted). Bochum's recent away xG is 0.8. Bayern's xGA at home is 0.7. Bochum's xG estimate: 0.8 + 0.7 = 0.75. Total expected goals: approximately 3.0.</p>
 
     <p><strong>Step 5: Poisson Probability</strong></p>
-    <p>With 3.0 expected goals, the Poisson distribution gives approximately 35% probability of 4+ goals. Apply Big Gap multiplier: 35% × 1.4 = 49%.</p>
+    <p>With 3.0 expected goals, the Poisson distribution gives approximately 35% probability of 4+ goals. Apply Big Gap multiplier: 35% Ã— 1.4 = 49%.</p>
 
     <p><strong>Step 6: Odds Check</strong></p>
     <p>Bookmaker offers Over 3.5 at 2.90 (implied probability 34.5%). Our estimate is 49%. Significant positive edge of 14.5 percentage points. This is a strong value bet.</p>
@@ -365,12 +399,12 @@
 
     <div class="warning">
       <h3>Mistake 1: Treating Over 3.5 Like Over 2.5 With Higher Odds</h3>
-      <p>Over 3.5 is not simply a more optimistic version of Over 2.5. It requires fundamentally different match conditions. A match that has 55% Over 2.5 probability may have only 20% Over 3.5 probability. Two good attacking teams produce 3 goals — you need extreme conditions for 4+. Adjust your analytical framework accordingly.</p>
+      <p>Over 3.5 is not simply a more optimistic version of Over 2.5. It requires fundamentally different match conditions. A match that has 55% Over 2.5 probability may have only 20% Over 3.5 probability. Two good attacking teams produce 3 goals â€” you need extreme conditions for 4+. Adjust your analytical framework accordingly.</p>
     </div>
 
     <div class="warning">
       <h3>Mistake 2: Ignoring Clean Sheet Rates</h3>
-      <p>For Over 3.5, the underdog's ability to score matters enormously. A 3-0 scoreline loses the bet. If the underdog has a clean sheet rate above 30%, the probability of Over 3.5 drops significantly — even if the favourite is strong. The underdog must be able to score. Check both teams' scoring and conceding profiles.</p>
+      <p>For Over 3.5, the underdog's ability to score matters enormously. A 3-0 scoreline loses the bet. If the underdog has a clean sheet rate above 30%, the probability of Over 3.5 drops significantly â€” even if the favourite is strong. The underdog must be able to score. Check both teams' scoring and conceding profiles.</p>
     </div>
 
     <div class="warning">
@@ -380,7 +414,7 @@
 
     <div class="warning">
       <h3>Mistake 4: Not Accounting for the 3-Goal Bias</h3>
-      <p>The most dangerous scoreline for Over 3.5 bettors is 3-0. A completely dominant performance by the favourite produces exactly 3 goals — and you lose. Always check whether the favourite has a history of winning by exactly 3 goals to nil. Teams that dominate possession but control the tempo are Over 3.5 traps.</p>
+      <p>The most dangerous scoreline for Over 3.5 bettors is 3-0. A completely dominant performance by the favourite produces exactly 3 goals â€” and you lose. Always check whether the favourite has a history of winning by exactly 3 goals to nil. Teams that dominate possession but control the tempo are Over 3.5 traps.</p>
     </div>
 
     <div class="warning">
@@ -402,7 +436,7 @@
 
     <div class="strategy-box">
       <h3>What's the difference between Over 3.5 and Over 2.5?</h3>
-      <p>Over 2.5 needs 3+ goals. Over 3.5 needs 4+. The most common scoreline (2-1) wins Over 2.5 but loses Over 3.5. This means Over 3.5 requires extreme conditions — not just above-average ones.</p>
+      <p>Over 2.5 needs 3+ goals. Over 3.5 needs 4+. The most common scoreline (2-1) wins Over 2.5 but loses Over 3.5. This means Over 3.5 requires extreme conditions â€” not just above-average ones.</p>
     </div>
 
     <div class="strategy-box">
@@ -437,22 +471,22 @@
 
     <div class="strategy-box">
       <h3>Which teams are best for Over 3.5 betting?</h3>
-      <p>Teams that combine elite attacking output with defensive vulnerability. Examples include Bayer Leverkusen, Feyenoord, Eintracht Frankfurt, and mid-table Bundesliga/Eredivisie teams. Avoid possession-dominant teams that control games at low tempo — they produce more 2-0 and 3-0 wins than 4+ goal thrillers.</p>
+      <p>Teams that combine elite attacking output with defensive vulnerability. Examples include Bayer Leverkusen, Feyenoord, Eintracht Frankfurt, and mid-table Bundesliga/Eredivisie teams. Avoid possession-dominant teams that control games at low tempo â€” they produce more 2-0 and 3-0 wins than 4+ goal thrillers.</p>
     </div>
 
     <h2>Next Steps</h2>
     <p>Over 3.5 betting rewards patience and selectivity. Focus on the Bundesliga and Eredivisie, apply the Big Gap theory rigorously, and be willing to pass on 90% of available matches. The market is beatable precisely because most bettors approach it casually.</p>
     <ul>
-      <li><a href="/blog/btts-betting-guide">BTTS Betting Guide</a> — Related market for high-scoring matches</li>
-      <li><a href="/blog/correct-score-betting">Correct Score Betting</a> — High-odds value strategy</li>
-      <li><a href="/blog/poisson-distribution-football-predictions">Poisson Distribution for Football</a> — Mathematical modelling for goal markets</li>
-      <li><a href="/blog/first-half-goals-betting">First Half Goals Betting</a> — Early goal strategy</li>
+      <li><a href="/blog/btts-betting-guide">BTTS Betting Guide</a> â€” Related market for high-scoring matches</li>
+      <li><a href="/blog/correct-score-betting">Correct Score Betting</a> â€” High-odds value strategy</li>
+      <li><a href="/blog/poisson-distribution-football-predictions">Poisson Distribution for Football</a> â€” Mathematical modelling for goal markets</li>
+      <li><a href="/blog/first-half-goals-betting">First Half Goals Betting</a> â€” Early goal strategy</li>
     </ul>
 
     <div class="cta">
       <h3>Find High-Scoring Value Today</h3>
       <p>Get daily predictions with Over 3.5 probability data:</p>
-      <p><a href="/">View Today's Predictions →</a></p>
+      <p><a href="/">View Today's Predictions â†’</a></p>
     </div>
 
     <div class="related-posts">
@@ -492,7 +526,7 @@
       <a href="/privacy.html">Privacy</a>
       <a href="/terms.html">Terms</a>
     </div>
-    <p class="footer-copyright">© 2026 WinFulltime. Predictions are for informational purposes only. | <a href="https://mesigo.site" target="_blank" rel="noopener">Website Built by Mesigo</a></p>
+    <p class="footer-copyright">Â© 2026 WinFulltime. Predictions are for informational purposes only. | <a href="https://mesigo.site" target="_blank" rel="noopener">Website Built by Mesigo</a></p>
   </footer>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>

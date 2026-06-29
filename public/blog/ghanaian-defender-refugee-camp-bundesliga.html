@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -13,51 +13,96 @@
   <meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/ghanaian-defender-refugee-camp-bundesliga.webp">
   <link rel="canonical" href="https://winfulltime.com/blog/ghanaian-defender-refugee-camp-bundesliga">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #18181b; margin: 0; padding: 0; }
-    header { background: white; border-bottom: 1px solid #e5e5e5; padding: 16px 0; }
+    :root {
+      --bg-primary: #0b0f1a;
+      --bg-secondary: #111827;
+      --bg-card: rgba(23, 28, 46, 0.85);
+      --bg-elevated: #1a1f2e;
+      --text-primary: #e8edf5;
+      --text-secondary: #c8d0db;
+      --text-muted: #94a3b8;
+      --accent: #ff2448;
+      --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --glow: rgba(255,36,72,0.12);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--bg-primary); background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent); color: var(--text-primary); margin: 0; padding: 0; font-size: 16px; -webkit-font-smoothing: antialiased; }
+    header { background: rgba(11,15,26,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
     .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-size: 24px; font-weight: bold; color: #18181b; text-decoration: none; }
-    .logo span { color: #ff0000; }
+    .logo { display: inline-flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+    .logo span { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .logo-icon { height: 28px; width: auto; flex-shrink: 0; }
     .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    h1 { font-size: 2.5rem; color: #18181b; margin-bottom: 10px; }
-    h2 { font-size: 1.8rem; color: #18181b; margin-top: 40px; margin-bottom: 15px; }
-    h3 { font-size: 1.3rem; color: #18181b; margin-top: 30px; margin-bottom: 10px; }
-    p { margin-bottom: 16px; color: #3f3f46; line-height: 1.8; }
-    .meta { color: #71717a; font-size: 0.9rem; margin-bottom: 30px; }
-    .highlight { background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b; }
-    .cta { background: linear-gradient(135deg, #ff0000, #cc0000); color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0; }
+    h1 { font-size: 2.8rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; }
+    h2 { font-size: 2.1rem; color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; font-weight: 700; }
+    h3 { font-size: 1.5rem; color: var(--text-primary); margin-top: 30px; margin-bottom: 10px; font-weight: 600; }
+    p { font-size: 1.125rem; margin-bottom: 20px; color: var(--text-secondary); line-height: 1.85; }
+    li { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.85; margin-bottom: 8px; }
+    .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+    .highlight { background: rgba(251,191,36,0.1); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .highlight * { color: var(--text-primary); }
+    .example-box { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .example-box * { color: var(--text-primary); }
+    .strategy-box { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin: 24px 0; }
+    .strategy-box h3 { margin-top: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .pro-tip { background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .pro-tip h4 { margin-top: 0; color: #60a5fa; }
+    .pro-tip * { color: var(--text-primary); }
+    .warning { background: rgba(239,68,68,0.08); border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .warning * { color: var(--text-primary); }
+    .success { background: rgba(34,197,94,0.08); border-left: 4px solid #22c55e; padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .success * { color: var(--text-primary); }
+    .steps { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin: 20px 0; }
+    .steps ol { margin: 0; padding-left: 20px; }
+    .steps li { margin-bottom: 10px; color: var(--text-secondary); }
+    .cta { background: var(--accent-gradient); color: white; padding: 24px; border-radius: var(--radius); text-align: center; margin: 30px 0; box-shadow: 0 4px 15px var(--glow); }
     .cta * { color: white; }
-    .breadcrumb { font-size: 0.9rem; color: #71717a; margin-bottom: 20px; }
-    .breadcrumb a { color: #ff0000; text-decoration: none; }
-    .related-posts { background: #f4f4f5; padding: 20px; border-radius: 8px; margin-top: 40px; }
-    .related-posts h3 { margin-top: 0; }
+    .cta a { color: white; text-decoration: underline; }
+    .breadcrumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .related-posts { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin-top: 40px; }
+    .related-posts h3 { margin-top: 0; color: var(--text-primary); }
     .related-posts ul { list-style: none; padding: 0; }
-    .related-posts li { margin-bottom: 10px; color: #3f3f46; }
-    .related-posts a { color: #ff0000; text-decoration: none; }
-    .pullquote { font-size: 1.4rem; font-style: italic; color: #18181b; border-left: 4px solid #ff0000; padding: 20px 24px; margin: 30px 0; background: #fafafa; border-radius: 0 8px 8px 0; }
-    .pullquote cite { display: block; font-size: 0.9rem; color: #71717a; margin-top: 8px; font-style: normal; }
-    .fact-box { background: #18181b; color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
-    .fact-box * { color: white; }
-    .fact-box h3 { color: #ff0000; margin-top: 0; }
-    footer { background: white; border-top: 1px solid #e5e5e5; padding: 40px 0; text-align: center; margin-top: 60px; }
-    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
-    .footer-links a { color: #52525b; text-decoration: none; font-weight: 500; }
-    .footer-links a:hover { color: #ff0000; }
-    .footer-copyright { color: #71717a; font-size: 14px; }
-    nav a { margin-left: 20px; color: #52525b; text-decoration: none; font-weight: 500; }
-    nav a:hover { color: #ff0000; }
-    .route-map { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin: 30px 0; }
-    .route-stop { flex: 1; min-width: 120px; background: #f4f4f5; padding: 16px; border-radius: 8px; text-align: center; border-top: 3px solid #ff0000; }
-    .route-stop .label { font-size: 0.75rem; text-transform: uppercase; color: #71717a; letter-spacing: 0.5px; }
-    .route-stop .value { font-weight: bold; color: #18181b; margin-top: 4px; }
+    .related-posts li { margin-bottom: 10px; color: var(--text-secondary); }
+    .related-posts a { color: var(--accent); text-decoration: none; }
+    .related-posts a:hover { text-decoration: underline; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    th { background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 600; }
+    .odds-table { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; overflow: hidden; }
+    .odds-table th { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+    .odds-table td { border-bottom: 1px solid var(--border); color: var(--text-primary); }
+    code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); }
+    footer { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 40px 16px 32px; text-align: center; margin-top: 60px; }
+    .footer-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap; }
+    .footer-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copyright { color: var(--text-muted); font-size: 13px; }
+    nav { display: flex; gap: 24px; }
+    nav a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s; }
+    nav a:hover { color: var(--text-primary); }
+    img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+    @media (max-width: 640px) {
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.7rem; }
+      .container { padding: 0 16px; }
+      nav { gap: 12px; }
+      nav a { font-size: 13px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="header-content">
-      <a href="/" class="logo">Win<span>Fulltime</span></a>
+      <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28"> Win<span>Fulltime</span></a>
       <nav>
         <a href="/">Home</a>
         <a href="/ticket-builder.html">Ticket Builder</a>
@@ -91,7 +136,7 @@
 
     <div class="pullquote">
       "A kid born in a refugee camp wasn't supposed to make it. Don't let no one tell you that your dreams are unrealistic. Keep dreaming, keep achieving."
-      <cite>— Alphonso Davies</cite>
+      <cite>â€” Alphonso Davies</cite>
     </div>
 
     <h2>The Camp</h2>
@@ -106,18 +151,18 @@
 
     <p>Football in Canada in the early 2010s was a niche sport, overshadowed by hockey and basketball. But Davies' talent was undeniable. He joined the Edmonton Strikers youth club and quickly outgrew every age group. By 14, he was training with the Vancouver Whitecaps residency programme. By 15, he had signed a contract with the Whitecaps USL side. By 16, he had made his MLS debut.</p>
 
-    <p>On the international stage, he chose Canada over Liberia and Ghana — the countries of his parents' origin and his own birth. He made his senior debut for Canada at 16, becoming the youngest player ever to appear for the Canadian men's national team. By 17, he was a regular starter. By 18, he had agreed to join Bayern Munich for an MLS-record transfer fee.</p>
+    <p>On the international stage, he chose Canada over Liberia and Ghana â€” the countries of his parents' origin and his own birth. He made his senior debut for Canada at 16, becoming the youngest player ever to appear for the Canadian men's national team. By 17, he was a regular starter. By 18, he had agreed to join Bayern Munich for an MLS-record transfer fee.</p>
 
     <p>"I don't know what you were able to see back home, whether they showed the photos or not, but they showed photos of him when he was five years old, him coming to Canada and Canada adopting him as his home country," said Peter Montopoli, General Secretary of Soccer Canada, after FIFA awarded the 2026 World Cup to the North American bid. The impact of Davies' story on that decision was undeniable.</p>
 
     <div class="fact-box">
-      <h3>Alphonso Davies — Career Milestones</h3>
+      <h3>Alphonso Davies â€” Career Milestones</h3>
       <table>
         <tr><th>Year</th><th>Milestone</th></tr>
         <tr><td>2000</td><td>Born in Buduburam refugee camp, Ghana</td></tr>
         <tr><td>2005</td><td>Family resettled in Edmonton, Canada</td></tr>
         <tr><td>2016</td><td>MLS debut for Vancouver Whitecaps at age 15</td></tr>
-        <tr><td>2017</td><td>Senior Canada debut — youngest ever at 16</td></tr>
+        <tr><td>2017</td><td>Senior Canada debut â€” youngest ever at 16</td></tr>
         <tr><td>2018</td><td>Signs with Bayern Munich for MLS-record fee</td></tr>
         <tr><td>2020</td><td>Wins treble: Bundesliga, DFB-Pokal, Champions League</td></tr>
         <tr><td>2022</td><td>Scores Canada's first men's World Cup goal vs Croatia</td></tr>
@@ -130,27 +175,27 @@
 
     <p>Joining Bayern Munich at 18 would have been overwhelming for any player. For a boy who had been born in a refugee camp, it was another universe entirely. Davies handled it with a composure that would define his career. He made his first-team debut in 2019, became a starter under Hansi Flick during the 2019-20 season, and by the time Bayern won the Champions League in Lisbon in August 2020, he was one of the most feared left-backs in world football.</p>
 
-    <p>His speed is his signature — he has been clocked at 36.5 km/h, one of the fastest recorded speeds in Bundesliga history. But he is more than pace. His dribbling, his composure in possession, and his ability to read the game at both ends of the pitch have made him indispensable at Bayern. He signed a contract extension through 2030 in 2025, committing the peak years of his career to the club.</p>
+    <p>His speed is his signature â€” he has been clocked at 36.5 km/h, one of the fastest recorded speeds in Bundesliga history. But he is more than pace. His dribbling, his composure in possession, and his ability to read the game at both ends of the pitch have made him indispensable at Bayern. He signed a contract extension through 2030 in 2025, committing the peak years of his career to the club.</p>
 
-    <p>At the 2022 World Cup in Qatar, Davies wrote his name in Canadian football history by scoring his country's first ever men's World Cup goal — a towering header against Croatia. Canada finished bottom of their group, but the moment was symbolic: the boy from Buduburam had put Canadian football on the world map.</p>
+    <p>At the 2022 World Cup in Qatar, Davies wrote his name in Canadian football history by scoring his country's first ever men's World Cup goal â€” a towering header against Croatia. Canada finished bottom of their group, but the moment was symbolic: the boy from Buduburam had put Canadian football on the world map.</p>
 
     <h2>The 2026 World Cup</h2>
 
-    <p>The 2026 tournament is different. Canada are co-hosts. They will play group matches in Toronto and Vancouver, in front of crowds that will include families who arrived in Canada the same way the Davies family did — with nothing but hope and a suitcase. Alphonso Davies is now the face of Canadian football, the most recognisable athlete in the country's sporting landscape outside of hockey.</p>
+    <p>The 2026 tournament is different. Canada are co-hosts. They will play group matches in Toronto and Vancouver, in front of crowds that will include families who arrived in Canada the same way the Davies family did â€” with nothing but hope and a suitcase. Alphonso Davies is now the face of Canadian football, the most recognisable athlete in the country's sporting landscape outside of hockey.</p>
 
-    <p>Canada have been drawn in a group with Mexico, Poland, and Saudi Arabia. They are not favourites to advance, but they are not the pushovers they were in 2022. Davies is supported by a generation of players — Jonathan David, Tajon Buchanan, Stephen Eustáquio, Cyle Larin — who have all developed in Europe and represent the deepest talent pool Canada has ever produced.</p>
+    <p>Canada have been drawn in a group with Mexico, Poland, and Saudi Arabia. They are not favourites to advance, but they are not the pushovers they were in 2022. Davies is supported by a generation of players â€” Jonathan David, Tajon Buchanan, Stephen EustÃ¡quio, Cyle Larin â€” who have all developed in Europe and represent the deepest talent pool Canada has ever produced.</p>
 
     <p>Davies himself has spoken about what it means to play a World Cup on home soil, in the country that gave his family a second chance. "Canada took us in," he has said. "Canada gave us a home. Playing for Canada is my way of saying thank you."</p>
 
     <h2>The Bigger Picture</h2>
 
-    <p>Davies' story is not unique in its broad strokes — many refugee families have produced professional footballers — but it is unmatched in its scale. He is the most successful player ever to emerge from a refugee camp. He is a Champions League winner, a multiple Bundesliga champion, and a World Cup goalscorer. And he is still only 25 years old.</p>
+    <p>Davies' story is not unique in its broad strokes â€” many refugee families have produced professional footballers â€” but it is unmatched in its scale. He is the most successful player ever to emerge from a refugee camp. He is a Champions League winner, a multiple Bundesliga champion, and a World Cup goalscorer. And he is still only 25 years old.</p>
 
-    <p>His mother Victoria still lives in Edmonton. She still remembers the walk for water in Buduburam. She still has photos of Alphonso as a toddler, barefoot in the dust, chasing a ball. "A kid born in a refugee camp wasn't supposed to make it," Davies once tweeted. He was right. But he did make it. And on June 15, 2026, when Alphonso Davies steps onto the pitch at BC Place in Vancouver to face Mexico in Canada's World Cup opener, he will carry the hopes of a nation that took him in — and the memory of a camp in Ghana where it all began.</p>
+    <p>His mother Victoria still lives in Edmonton. She still remembers the walk for water in Buduburam. She still has photos of Alphonso as a toddler, barefoot in the dust, chasing a ball. "A kid born in a refugee camp wasn't supposed to make it," Davies once tweeted. He was right. But he did make it. And on June 15, 2026, when Alphonso Davies steps onto the pitch at BC Place in Vancouver to face Mexico in Canada's World Cup opener, he will carry the hopes of a nation that took him in â€” and the memory of a camp in Ghana where it all began.</p>
 
     <div class="pullquote">
       "I don't remember much about the camp. But I remember the football."
-      <cite>— Alphonso Davies</cite>
+      <cite>â€” Alphonso Davies</cite>
     </div>
 
     <div class="cta">

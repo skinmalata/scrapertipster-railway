@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -13,50 +13,96 @@
   <meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/40-dual-nationality-players-2026-world-cup.webp">
   <link rel="canonical" href="https://winfulltime.com/blog/40-dual-nationality-players-2026-world-cup">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #18181b; margin: 0; padding: 0; }
-    header { background: white; border-bottom: 1px solid #e5e5e5; padding: 16px 0; }
+    :root {
+      --bg-primary: #0b0f1a;
+      --bg-secondary: #111827;
+      --bg-card: rgba(23, 28, 46, 0.85);
+      --bg-elevated: #1a1f2e;
+      --text-primary: #e8edf5;
+      --text-secondary: #c8d0db;
+      --text-muted: #94a3b8;
+      --accent: #ff2448;
+      --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --glow: rgba(255,36,72,0.12);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--bg-primary); background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent); color: var(--text-primary); margin: 0; padding: 0; font-size: 16px; -webkit-font-smoothing: antialiased; }
+    header { background: rgba(11,15,26,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
     .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-size: 24px; font-weight: bold; color: #18181b; text-decoration: none; }
-    .logo span { color: #ff0000; }
+    .logo { display: inline-flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+    .logo span { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .logo-icon { height: 28px; width: auto; flex-shrink: 0; }
     .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    h1 { font-size: 2.5rem; color: #18181b; margin-bottom: 10px; }
-    h2 { font-size: 1.8rem; color: #18181b; margin-top: 40px; margin-bottom: 15px; }
-    h3 { font-size: 1.3rem; color: #18181b; margin-top: 30px; margin-bottom: 10px; }
-    p { margin-bottom: 16px; color: #3f3f46; line-height: 1.8; }
-    .meta { color: #71717a; font-size: 0.9rem; margin-bottom: 30px; }
-    .cta { background: linear-gradient(135deg, #ff0000, #cc0000); color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0; }
+    h1 { font-size: 2.8rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; }
+    h2 { font-size: 2.1rem; color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; font-weight: 700; }
+    h3 { font-size: 1.5rem; color: var(--text-primary); margin-top: 30px; margin-bottom: 10px; font-weight: 600; }
+    p { font-size: 1.125rem; margin-bottom: 20px; color: var(--text-secondary); line-height: 1.85; }
+    li { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.85; margin-bottom: 8px; }
+    .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+    .highlight { background: rgba(251,191,36,0.1); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .highlight * { color: var(--text-primary); }
+    .example-box { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .example-box * { color: var(--text-primary); }
+    .strategy-box { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin: 24px 0; }
+    .strategy-box h3 { margin-top: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .pro-tip { background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .pro-tip h4 { margin-top: 0; color: #60a5fa; }
+    .pro-tip * { color: var(--text-primary); }
+    .warning { background: rgba(239,68,68,0.08); border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .warning * { color: var(--text-primary); }
+    .success { background: rgba(34,197,94,0.08); border-left: 4px solid #22c55e; padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .success * { color: var(--text-primary); }
+    .steps { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin: 20px 0; }
+    .steps ol { margin: 0; padding-left: 20px; }
+    .steps li { margin-bottom: 10px; color: var(--text-secondary); }
+    .cta { background: var(--accent-gradient); color: white; padding: 24px; border-radius: var(--radius); text-align: center; margin: 30px 0; box-shadow: 0 4px 15px var(--glow); }
     .cta * { color: white; }
-    .breadcrumb { font-size: 0.9rem; color: #71717a; margin-bottom: 20px; }
-    .breadcrumb a { color: #ff0000; text-decoration: none; }
-    .related-posts { background: #f4f4f5; padding: 20px; border-radius: 8px; margin-top: 40px; }
+    .cta a { color: white; text-decoration: underline; }
+    .breadcrumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .related-posts { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin-top: 40px; }
+    .related-posts h3 { margin-top: 0; color: var(--text-primary); }
     .related-posts ul { list-style: none; padding: 0; }
-    .related-posts li { margin-bottom: 10px; color: #3f3f46; }
-    .related-posts a { color: #ff0000; text-decoration: none; }
-    .pullquote { font-size: 1.4rem; font-style: italic; color: #18181b; border-left: 4px solid #ff0000; padding: 20px 24px; margin: 30px 0; background: #fafafa; border-radius: 0 8px 8px 0; }
-    .pullquote cite { display: block; font-size: 0.9rem; color: #71717a; margin-top: 8px; font-style: normal; }
-    .fact-box { background: #18181b; color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
-    .fact-box * { color: white; }
-    .fact-box h3 { color: #ff0000; margin-top: 0; }
-    .player-card { display: flex; gap: 12px; align-items: flex-start; margin: 12px 0; padding: 12px; background: #f4f4f5; border-radius: 8px; }
-    .player-card .flags { font-size: 1.5rem; min-width: 60px; }
-    .player-card .info { flex: 1; }
-    .player-card .info .name { font-weight: bold; }
-    .player-card .info .detail { font-size: 0.9rem; color: #71717a; }
-    footer { background: white; border-top: 1px solid #e5e5e5; padding: 40px 0; text-align: center; margin-top: 60px; }
-    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
-    .footer-links a { color: #52525b; text-decoration: none; font-weight: 500; }
-    .footer-links a:hover { color: #ff0000; }
-    .footer-copyright { color: #71717a; font-size: 14px; }
-    nav a { margin-left: 20px; color: #52525b; text-decoration: none; font-weight: 500; }
-    nav a:hover { color: #ff0000; }
+    .related-posts li { margin-bottom: 10px; color: var(--text-secondary); }
+    .related-posts a { color: var(--accent); text-decoration: none; }
+    .related-posts a:hover { text-decoration: underline; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    th { background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 600; }
+    .odds-table { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; overflow: hidden; }
+    .odds-table th { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+    .odds-table td { border-bottom: 1px solid var(--border); color: var(--text-primary); }
+    code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); }
+    footer { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 40px 16px 32px; text-align: center; margin-top: 60px; }
+    .footer-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap; }
+    .footer-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copyright { color: var(--text-muted); font-size: 13px; }
+    nav { display: flex; gap: 24px; }
+    nav a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s; }
+    nav a:hover { color: var(--text-primary); }
+    img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+    @media (max-width: 640px) {
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.7rem; }
+      .container { padding: 0 16px; }
+      nav { gap: 12px; }
+      nav a { font-size: 13px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="header-content">
-      <a href="/" class="logo">Win<span>Fulltime</span></a>
+      <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28"> Win<span>Fulltime</span></a>
       <nav>
         <a href="/">Home</a>
         <a href="/ticket-builder.html">Ticket Builder</a>
@@ -76,31 +122,31 @@
 
     <div style="background:#dbeafe;padding:16px 20px;border-radius:8px;margin:20px 0"><strong>Tip:</strong> Looking for World Cup predictions? <a href="/">Click for free picks</a>.</div>
 
-    <p>On June 15, 2022, France's Minister of Sport held an emergency meeting with the French Football Federation. The topic: an alarming number of dual-nationality players were choosing to represent other countries instead of France. The meeting was prompted by a study showing that 37 players who had represented France at youth level had pledged their senior international futures elsewhere — the majority of them to African nations. The meeting produced no policy change. There was nothing France could do. The players were within their rights to switch, and FIFA's rules encouraged them to do so. For <a href="/blog/1x2-betting-guide">1X2 betting predictions</a> on these nations' World Cup matches, check our free daily picks.</p>
+    <p>On June 15, 2022, France's Minister of Sport held an emergency meeting with the French Football Federation. The topic: an alarming number of dual-nationality players were choosing to represent other countries instead of France. The meeting was prompted by a study showing that 37 players who had represented France at youth level had pledged their senior international futures elsewhere â€” the majority of them to African nations. The meeting produced no policy change. There was nothing France could do. The players were within their rights to switch, and FIFA's rules encouraged them to do so. For <a href="/blog/1x2-betting-guide">1X2 betting predictions</a> on these nations' World Cup matches, check our free daily picks.</p>
 
     <p>Four years later, that number has more than doubled. At least 40 players on the 2026 World Cup rosters were born in one country but will represent another on the world's biggest stage. The dual-nationality football revolution is not coming. It is here.</p>
 
     <div class="pullquote">
       "National teams have become like transfer markets. You scout players with a connection, you build relationships, you persuade them to commit. It is not just about developing talent anymore. It is about recruiting it."
-      <cite>— Former FIFA executive, speaking on eligibility reform</cite>
+      <cite>â€” Former FIFA executive, speaking on eligibility reform</cite>
     </div>
 
     <h2>The Rule Change That Changed Everything</h2>
 
-    <p>The spike in nationality switches is directly traceable to FIFA's 2020 eligibility reform. Under the old rules, once a player made a single competitive senior appearance for a country, they were locked in for life — even if the appearance came in a meaningless friendly. The new rules allow players to switch national teams if (a) they have played fewer than three senior competitive matches, (b) at least three years have passed since their last appearance, and (c) they held the second nationality at the time of their first appearance. The window created by these rules opened a floodgate.</p>
+    <p>The spike in nationality switches is directly traceable to FIFA's 2020 eligibility reform. Under the old rules, once a player made a single competitive senior appearance for a country, they were locked in for life â€” even if the appearance came in a meaningless friendly. The new rules allow players to switch national teams if (a) they have played fewer than three senior competitive matches, (b) at least three years have passed since their last appearance, and (c) they held the second nationality at the time of their first appearance. The window created by these rules opened a floodgate.</p>
 
-    <p>Dozens of players who had made early-career appearances for European youth teams — often in friendlies or minor tournaments — suddenly had a second chance. They could switch to the country of their parents or grandparents without needing special permission from FIFA. The result has been a dramatic redistribution of talent from Europe's traditional powers to nations in Africa, Asia, and the Caribbean.</p>
+    <p>Dozens of players who had made early-career appearances for European youth teams â€” often in friendlies or minor tournaments â€” suddenly had a second chance. They could switch to the country of their parents or grandparents without needing special permission from FIFA. The result has been a dramatic redistribution of talent from Europe's traditional powers to nations in Africa, Asia, and the Caribbean.</p>
 
     <div class="fact-box">
       <h3>The Numbers Behind the Trend</h3>
       <p>At the 2026 World Cup:</p>
-      <p>• At least 40 dual-nationality players in the tournament</p>
-      <p>• 22 are playing for an African nation after being eligible for a European one</p>
-      <p>• 14 switched from France to another country (most to Algeria, Morocco, Senegal)</p>
-      <p>• 6 switched from the Netherlands (most to Morocco, Suriname, Indonesia)</p>
-      <p>• 4 switched from England (most to Ghana, Nigeria, Jamaica)</p>
-      <p>• 3 switched from Portugal (to Cape Verde, Angola, Mozambique)</p>
-      <p>• The average age at switch: 23 years old</p>
+      <p>â€¢ At least 40 dual-nationality players in the tournament</p>
+      <p>â€¢ 22 are playing for an African nation after being eligible for a European one</p>
+      <p>â€¢ 14 switched from France to another country (most to Algeria, Morocco, Senegal)</p>
+      <p>â€¢ 6 switched from the Netherlands (most to Morocco, Suriname, Indonesia)</p>
+      <p>â€¢ 4 switched from England (most to Ghana, Nigeria, Jamaica)</p>
+      <p>â€¢ 3 switched from Portugal (to Cape Verde, Angola, Mozambique)</p>
+      <p>â€¢ The average age at switch: 23 years old</p>
     </div>
 
     <h2>The Big Switches</h2>
@@ -108,15 +154,15 @@
     <p>Some of the biggest names at the 2026 World Cup are dual-nationality players who made high-profile switches. Here are the most significant cases:</p>
 
     <div class="player-card">
-      <div class="flags">🇫🇷→🇩🇿</div>
+      <div class="flags">ðŸ‡«ðŸ‡·â†’ðŸ‡©ðŸ‡¿</div>
       <div class="info">
-        <p class="name">Sébastien Haller</p>
+        <p class="name">SÃ©bastien Haller</p>
         <p class="detail">Born in France, played for France U21s. Switched to Ivory Coast in 2020. Scored the winning goal in the 2024 AFCON final. Now one of the most recognisable faces of the diaspora movement.</p>
       </div>
     </div>
 
     <div class="player-card">
-      <div class="flags">🇫🇷→🇲🇦</div>
+      <div class="flags">ðŸ‡«ðŸ‡·â†’ðŸ‡²ðŸ‡¦</div>
       <div class="info">
         <p class="name">Sofyan Amrabat</p>
         <p class="detail">Born in the Netherlands, played for Netherlands U17-U19. Switched to Morocco in 2017. Starred in Morocco's 2022 World Cup semi-final run. One of the best defensive midfielders in the tournament.</p>
@@ -124,7 +170,7 @@
     </div>
 
     <div class="player-card">
-      <div class="flags">🇬🇧→🇬🇭</div>
+      <div class="flags">ðŸ‡¬ðŸ‡§â†’ðŸ‡¬ðŸ‡­</div>
       <div class="info">
         <p class="name">Tariq Lamptey</p>
         <p class="detail">Born in England, played for England U20-U21. Switched to Ghana in 2022. Brighton's explosive right-back brings Premier League quality to Ghana's backline.</p>
@@ -132,7 +178,7 @@
     </div>
 
     <div class="player-card">
-      <div class="flags">🇫🇷→🇸🇳</div>
+      <div class="flags">ðŸ‡«ðŸ‡·â†’ðŸ‡¸ðŸ‡³</div>
       <div class="info">
         <p class="name">Iliman Ndiaye</p>
         <p class="detail">Born in France. Played for France U20. Switched to Senegal in 2022. A dynamic forward who can play across the front line, now a key figure in Senegal's attack.</p>
@@ -140,7 +186,7 @@
     </div>
 
     <div class="player-card">
-      <div class="flags">🇳🇱→🇨🇻</div>
+      <div class="flags">ðŸ‡³ðŸ‡±â†’ðŸ‡¨ðŸ‡»</div>
       <div class="info">
         <p class="name">Jamiro Monteiro</p>
         <p class="detail">Born in the Netherlands. Switched to Cape Verde. The creative heartbeat of Cape Verde's midfield, playing in the Dutch Eredivisie for FC Twente.</p>
@@ -148,7 +194,7 @@
     </div>
 
     <div class="player-card">
-      <div class="flags">🇵🇹→🇨🇻</div>
+      <div class="flags">ðŸ‡µðŸ‡¹â†’ðŸ‡¨ðŸ‡»</div>
       <div class="info">
         <p class="name">Ryan Mendes</p>
         <p class="detail">Born in France to Cape Verdean parents. Switched to Cape Verde. Lille winger with Champions League experience, the talisman of Cape Verde's first World Cup campaign.</p>
@@ -156,7 +202,7 @@
     </div>
 
     <div class="player-card">
-      <div class="flags">🇪🇸→🇲🇦</div>
+      <div class="flags">ðŸ‡ªðŸ‡¸â†’ðŸ‡²ðŸ‡¦</div>
       <div class="info">
         <p class="name">Achraf Hakimi</p>
         <p class="detail">Born in Spain to Moroccan parents. Always chose Morocco. One of the best right-backs in the world. The poster boy for diaspora success at the highest level.</p>
@@ -164,7 +210,7 @@
     </div>
 
     <div class="player-card">
-      <div class="flags">🇫🇷→🇩🇿</div>
+      <div class="flags">ðŸ‡«ðŸ‡·â†’ðŸ‡©ðŸ‡¿</div>
       <div class="info">
         <p class="name">Riyad Mahrez</p>
         <p class="detail">Born in France to Algerian parents. Always chose Algeria. The most decorated African player in history won the Premier League with Leicester and Manchester City, and the AFCON with Algeria.</p>
@@ -173,13 +219,13 @@
 
     <h2>The Nations That Benefit Most</h2>
 
-    <p>No nation has benefited more from the dual-nationality pipeline than Morocco. Of their expected 26-man squad, 14 players were born outside Morocco — 12 in France, one in Spain, one in the Netherlands. Algeria and Senegal are close behind, each with 10-12 diaspora players. But the pattern extends beyond Africa. Jamaica's squad at the 2026 World Cup will likely feature 10 players born in England, including Aston Villa's Leon Bailey and Fulham's Adama Traoré (who both switched from England youth teams). Suriname will field multiple Netherlands-born players. New Zealand will have a handful of England-born players.</p>
+    <p>No nation has benefited more from the dual-nationality pipeline than Morocco. Of their expected 26-man squad, 14 players were born outside Morocco â€” 12 in France, one in Spain, one in the Netherlands. Algeria and Senegal are close behind, each with 10-12 diaspora players. But the pattern extends beyond Africa. Jamaica's squad at the 2026 World Cup will likely feature 10 players born in England, including Aston Villa's Leon Bailey and Fulham's Adama TraorÃ© (who both switched from England youth teams). Suriname will field multiple Netherlands-born players. New Zealand will have a handful of England-born players.</p>
 
     <p>"The dual-nationality trend is not a bug in the system," said a FIFA spokesperson. "It is a feature. The eligibility rules were designed to give players more freedom and to make international football more competitive. The results speak for themselves." Our <a href="/analysis.html">match analysis tool</a> provides head-to-head stats for all 48 teams competing in 2026.</p>
 
     <h2>The Controversy</h2>
 
-    <p>Not everyone is comfortable with the trend. Critics argue that the mass recruitment of diaspora players undermines the traditional link between a national team and its domestic football culture. When a team like Cape Verde fields 26 players who all play abroad — 14 of them born in Portugal — what does "Cape Verdean football" actually mean?</p>
+    <p>Not everyone is comfortable with the trend. Critics argue that the mass recruitment of diaspora players undermines the traditional link between a national team and its domestic football culture. When a team like Cape Verde fields 26 players who all play abroad â€” 14 of them born in Portugal â€” what does "Cape Verdean football" actually mean?</p>
 
     <p>"There is a risk that national teams become disconnected from the countries they represent," said Dr. Christina Anderson, a sports sociologist at the University of Leicester. "Fans want to see players who have grown up in their culture, who understand the local context, who are part of the community. When the entire team is assembled from abroad, something is lost."</p>
 

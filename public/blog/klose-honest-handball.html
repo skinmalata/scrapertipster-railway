@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Football's Most Honest Player Once Told the Ref He Handled the Ball</title>
-  <meta name="description" content="Miroslav Klose, the World Cup's all-time top scorer with 16 goals, once scored a handball goal for Lazio against Napoli — then immediately told the referee to disallow it.">
+  <meta name="description" content="Miroslav Klose, the World Cup's all-time top scorer with 16 goals, once scored a handball goal for Lazio against Napoli â€” then immediately told the referee to disallow it.">
   <meta name="keywords" content="Miroslav Klose, honest football player, handball goal, Lazio Napoli, fair play Paolo Di Canio, World Cup top scorer, Klose handball 2012, Werder Bremen penalty">
   <meta property="og:title" content="Football's Most Honest Player Once Told the Ref He Handled the Ball">
   <meta property="og:description" content="Miroslav Klose scored a handball goal for Lazio against Napoli in 2012, then immediately told the referee to disallow it. Napoli players patted him on the back.">
@@ -13,50 +13,96 @@
   <meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/klose-honest-handball.webp">
   <link rel="canonical" href="https://winfulltime.com/blog/klose-honest-handball">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #18181b; margin: 0; padding: 0; }
-    header { background: white; border-bottom: 1px solid #e5e5e5; padding: 16px 0; }
+    :root {
+      --bg-primary: #0b0f1a;
+      --bg-secondary: #111827;
+      --bg-card: rgba(23, 28, 46, 0.85);
+      --bg-elevated: #1a1f2e;
+      --text-primary: #e8edf5;
+      --text-secondary: #c8d0db;
+      --text-muted: #94a3b8;
+      --accent: #ff2448;
+      --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --glow: rgba(255,36,72,0.12);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--bg-primary); background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent); color: var(--text-primary); margin: 0; padding: 0; font-size: 16px; -webkit-font-smoothing: antialiased; }
+    header { background: rgba(11,15,26,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
     .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-size: 24px; font-weight: bold; color: #18181b; text-decoration: none; }
-    .logo span { color: #ff0000; }
+    .logo { display: inline-flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+    .logo span { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .logo-icon { height: 28px; width: auto; flex-shrink: 0; }
     .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    h1 { font-size: 2.5rem; color: #18181b; margin-bottom: 10px; }
-    h2 { font-size: 1.8rem; color: #18181b; margin-top: 40px; margin-bottom: 15px; }
-    h3 { font-size: 1.3rem; color: #18181b; margin-top: 30px; margin-bottom: 10px; }
-    p { margin-bottom: 16px; color: #3f3f46; line-height: 1.8; }
-    .meta { color: #71717a; font-size: 0.9rem; margin-bottom: 30px; }
-    .highlight { background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b; }
-    .cta { background: linear-gradient(135deg, #ff0000, #cc0000); color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0; }
+    h1 { font-size: 2.8rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; }
+    h2 { font-size: 2.1rem; color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; font-weight: 700; }
+    h3 { font-size: 1.5rem; color: var(--text-primary); margin-top: 30px; margin-bottom: 10px; font-weight: 600; }
+    p { font-size: 1.125rem; margin-bottom: 20px; color: var(--text-secondary); line-height: 1.85; }
+    li { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.85; margin-bottom: 8px; }
+    .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+    .highlight { background: rgba(251,191,36,0.1); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .highlight * { color: var(--text-primary); }
+    .example-box { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .example-box * { color: var(--text-primary); }
+    .strategy-box { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin: 24px 0; }
+    .strategy-box h3 { margin-top: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .pro-tip { background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .pro-tip h4 { margin-top: 0; color: #60a5fa; }
+    .pro-tip * { color: var(--text-primary); }
+    .warning { background: rgba(239,68,68,0.08); border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .warning * { color: var(--text-primary); }
+    .success { background: rgba(34,197,94,0.08); border-left: 4px solid #22c55e; padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .success * { color: var(--text-primary); }
+    .steps { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin: 20px 0; }
+    .steps ol { margin: 0; padding-left: 20px; }
+    .steps li { margin-bottom: 10px; color: var(--text-secondary); }
+    .cta { background: var(--accent-gradient); color: white; padding: 24px; border-radius: var(--radius); text-align: center; margin: 30px 0; box-shadow: 0 4px 15px var(--glow); }
     .cta * { color: white; }
-    .breadcrumb { font-size: 0.9rem; color: #71717a; margin-bottom: 20px; }
-    .breadcrumb a { color: #ff0000; text-decoration: none; }
-    .related-posts { background: #f4f4f5; padding: 20px; border-radius: 8px; margin-top: 40px; }
-    .related-posts h3 { margin-top: 0; }
+    .cta a { color: white; text-decoration: underline; }
+    .breadcrumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .related-posts { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin-top: 40px; }
+    .related-posts h3 { margin-top: 0; color: var(--text-primary); }
     .related-posts ul { list-style: none; padding: 0; }
-    .related-posts li { margin-bottom: 10px; color: #3f3f46; }
-    .related-posts a { color: #ff0000; text-decoration: none; }
-    .pullquote { font-size: 1.4rem; font-style: italic; color: #18181b; border-left: 4px solid #ff0000; padding: 20px 24px; margin: 30px 0; background: #fafafa; border-radius: 0 8px 8px 0; }
-    .pullquote cite { display: block; font-size: 0.9rem; color: #71717a; margin-top: 8px; font-style: normal; }
-    .fact-box { background: #18181b; color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
-    .fact-box * { color: white; }
-    .fact-box h3 { color: #ff0000; margin-top: 0; }
+    .related-posts li { margin-bottom: 10px; color: var(--text-secondary); }
+    .related-posts a { color: var(--accent); text-decoration: none; }
+    .related-posts a:hover { text-decoration: underline; }
     table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e5e5; }
-    th { background: #f4f4f5; }
-    footer { background: white; border-top: 1px solid #e5e5e5; padding: 40px 0; text-align: center; margin-top: 60px; }
-    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
-    .footer-links a { color: #52525b; text-decoration: none; font-weight: 500; }
-    .footer-links a:hover { color: #ff0000; }
-    .footer-copyright { color: #71717a; font-size: 14px; }
-    nav a { margin-left: 20px; color: #52525b; text-decoration: none; font-weight: 500; }
-    nav a:hover { color: #ff0000; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    th { background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 600; }
+    .odds-table { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; overflow: hidden; }
+    .odds-table th { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+    .odds-table td { border-bottom: 1px solid var(--border); color: var(--text-primary); }
+    code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); }
+    footer { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 40px 16px 32px; text-align: center; margin-top: 60px; }
+    .footer-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap; }
+    .footer-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copyright { color: var(--text-muted); font-size: 13px; }
+    nav { display: flex; gap: 24px; }
+    nav a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s; }
+    nav a:hover { color: var(--text-primary); }
+    img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+    @media (max-width: 640px) {
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.7rem; }
+      .container { padding: 0 16px; }
+      nav { gap: 12px; }
+      nav a { font-size: 13px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="header-content">
-      <a href="/" class="logo">Win<span>Fulltime</span></a>
+      <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28"> Win<span>Fulltime</span></a>
       <nav>
         <a href="/">Home</a>
         <a href="/ticket-builder.html">Ticket Builder</a>
@@ -74,13 +120,13 @@
 
     <div style="background:#dbeafe;padding:16px 20px;border-radius:8px;margin:20px 0"><strong>Tip:</strong> Betting on Serie A or Bundesliga this weekend? <a href="/">Get today's free predictions here</a>.</div>
 
-    <p>There is a specific kind of silence that falls over a stadium when something happens that nobody knows how to process. It happened at the Stadio Olimpico on December 15, 2012, when Miroslav Klose — a German striker playing for Lazio against Napoli — scored a goal, wheeled away for half a second, then stopped, turned, and walked straight to the referee to tell him he had handled the ball.</p>
+    <p>There is a specific kind of silence that falls over a stadium when something happens that nobody knows how to process. It happened at the Stadio Olimpico on December 15, 2012, when Miroslav Klose â€” a German striker playing for Lazio against Napoli â€” scored a goal, wheeled away for half a second, then stopped, turned, and walked straight to the referee to tell him he had handled the ball.</p>
 
     <p>The referee, Paolo Tagliavento, had not seen it. The linesman had not flagged. Klose could have taken the goal. It would have been his sixth of the season. Instead, he walked through a cluster of protesting Napoli players, stood in front of Tagliavento, and said plainly: "It was a handball. The goal should not count."</p>
 
     <div class="pullquote">
       "I scored with my hand. I could not enjoy that goal. It would have stayed with me."
-      <cite>— Miroslav Klose, after the match</cite>
+      <cite>â€” Miroslav Klose, after the match</cite>
     </div>
 
     <p>Tagliavento shook his hand and disallowed the goal. Napoli went on to win 3-0 thanks to a second-half Edinson Cavani hat-trick. But nobody remembers the hat-trick. They remember the German who refused to cheat.</p>
@@ -98,7 +144,7 @@
     <p>What made this remarkable was that it was not an isolated moment. In 2005, playing for Werder Bremen against Arminia Bielefeld, Klose was fouled in the box and awarded a penalty. He told the referee the goalkeeper got the ball first. The referee reversed his decision. The match ended 1-1. Klose dropped two points because he refused to take a penalty he had not earned. "The goalkeeper touched the ball," he said. "I could not take a penalty that was not a penalty."</p>
 
     <div class="fact-box">
-      <h3>Miroslav Klose — Career at a Glance</h3>
+      <h3>Miroslav Klose â€” Career at a Glance</h3>
       <table>
         <tr><th>Stat</th><th>Value</th></tr>
         <tr><td>World Cup Goals</td><td>16 (all-time record)</td></tr>
@@ -112,13 +158,13 @@
 
     <h2>Paolo Di Canio and the Tradition of Fair Play</h2>
 
-    <p>Klose is not the only footballer to have done something like this. In 2000, Paolo Di Canio — not a man known for restraint — caught the ball instead of scoring into an open goal when Everton's goalkeeper went down injured. He won the FIFA Fair Play Award.</p>
+    <p>Klose is not the only footballer to have done something like this. In 2000, Paolo Di Canio â€” not a man known for restraint â€” caught the ball instead of scoring into an open goal when Everton's goalkeeper went down injured. He won the FIFA Fair Play Award.</p>
 
     <p>But Klose did it twice. First as a 27-year-old in his prime, then as a 34-year-old veteran in a new league chasing Champions League football. Both times he chose honesty over advantage, unprompted, in real time.</p>
 
     <h2>The Man Who Owned the World Cup</h2>
 
-    <p>It is easy to forget, amidst the fair-play stories, that Miroslav Klose is the most prolific goalscorer in World Cup history. Sixteen goals across four tournaments. More than Ronaldo. More than Gerd Müller. More than Pelé. He scored in every World Cup he played and won the whole thing in 2014 when Germany beat Argentina in the final at the Maracanã. He assisted the winning goal too — a perfectly weighted pass to André Schürrle, whose cross found Mario Götze. Klose was 36 years old. He came on as a substitute and changed the game with a pass, because that is who he was.</p>
+    <p>It is easy to forget, amidst the fair-play stories, that Miroslav Klose is the most prolific goalscorer in World Cup history. Sixteen goals across four tournaments. More than Ronaldo. More than Gerd MÃ¼ller. More than PelÃ©. He scored in every World Cup he played and won the whole thing in 2014 when Germany beat Argentina in the final at the MaracanÃ£. He assisted the winning goal too â€” a perfectly weighted pass to AndrÃ© SchÃ¼rrle, whose cross found Mario GÃ¶tze. Klose was 36 years old. He came on as a substitute and changed the game with a pass, because that is who he was.</p>
 
     <p>Klose retired with 71 goals for Germany (also a record) and a reputation as the cleanest player in top-level football. He never received a single red card in 837 professional appearances. Not one. Twenty-four years without ever being sent off.</p>
 
@@ -129,7 +175,7 @@
 
     <h2>What the Handball Moment Means</h2>
 
-    <p>The reason this story still gets shared, more than a decade later, is that it highlights how far the game has drifted from its own ideals. In an era of simulation and gamesmanship, a professional footballer telling the referee he handled the ball feels almost subversive. Klose was not honest because he could afford to be — Lazio were chasing a top-four finish. He was honest because that was how he played. The World Cup record, the trophies, the standing ovations in opposition stadiums — those were the consequences, not the cause.</p>
+    <p>The reason this story still gets shared, more than a decade later, is that it highlights how far the game has drifted from its own ideals. In an era of simulation and gamesmanship, a professional footballer telling the referee he handled the ball feels almost subversive. Klose was not honest because he could afford to be â€” Lazio were chasing a top-four finish. He was honest because that was how he played. The World Cup record, the trophies, the standing ovations in opposition stadiums â€” those were the consequences, not the cause.</p>
 
     <p>Cavani himself acknowledged it in his post-match interview: "What Klose did today was bigger than any goal I have ever scored."</p>
 

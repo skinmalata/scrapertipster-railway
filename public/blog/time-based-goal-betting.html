@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -13,54 +13,96 @@
   <meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/time-based-goal-betting.webp">
   <link rel="canonical" href="https://winfulltime.com/blog/time-based-betting">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #18181b; margin: 0; padding: 0; }
-    header { background: white; border-bottom: 1px solid #e5e5e5; padding: 16px 0; }
+    :root {
+      --bg-primary: #0b0f1a;
+      --bg-secondary: #111827;
+      --bg-card: rgba(23, 28, 46, 0.85);
+      --bg-elevated: #1a1f2e;
+      --text-primary: #e8edf5;
+      --text-secondary: #c8d0db;
+      --text-muted: #94a3b8;
+      --accent: #ff2448;
+      --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --glow: rgba(255,36,72,0.12);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--bg-primary); background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent); color: var(--text-primary); margin: 0; padding: 0; font-size: 16px; -webkit-font-smoothing: antialiased; }
+    header { background: rgba(11,15,26,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
     .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-size: 24px; font-weight: bold; color: #18181b; text-decoration: none; }
-    .logo span { color: #ff0000; }
+    .logo { display: inline-flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+    .logo span { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .logo-icon { height: 28px; width: auto; flex-shrink: 0; }
     .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    h1 { font-size: 2.5rem; color: #18181b; margin-bottom: 10px; }
-    h2 { font-size: 1.8rem; color: #18181b; margin-top: 40px; margin-bottom: 15px; }
-    h3 { font-size: 1.3rem; color: #18181b; margin-top: 30px; margin-bottom: 10px; }
-    p { margin-bottom: 16px; color: #3f3f46; line-height: 1.7; }
-    .meta { color: #71717a; font-size: 0.9rem; margin-bottom: 30px; }
-    .highlight { background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b; }
-    .strategy-box { background: white; border: 1px solid #e5e5e5; padding: 24px; border-radius: 12px; margin: 24px 0; }
-    .strategy-box h3 { margin-top: 0; color: #ff0000; }
-    .pro-tip { background: #dbeafe; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .pro-tip h4 { margin-top: 0; color: #1d4ed8; }
-    .warning { background: #fef2f2; border-left: 4px solid #ff0000; padding: 16px; border-radius: 4px; margin: 20px 0; }
-    .success { background: #f0fdf4; border-left: 4px solid #22c55e; padding: 16px; border-radius: 4px; margin: 20px 0; }
-    .example-box { background: #18181b; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .example-box * { color: white; }
-    .cta { background: linear-gradient(135deg, #ff0000, #cc0000); color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0; }
+    h1 { font-size: 2.8rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; }
+    h2 { font-size: 2.1rem; color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; font-weight: 700; }
+    h3 { font-size: 1.5rem; color: var(--text-primary); margin-top: 30px; margin-bottom: 10px; font-weight: 600; }
+    p { font-size: 1.125rem; margin-bottom: 20px; color: var(--text-secondary); line-height: 1.85; }
+    li { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.85; margin-bottom: 8px; }
+    .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+    .highlight { background: rgba(251,191,36,0.1); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .highlight * { color: var(--text-primary); }
+    .example-box { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .example-box * { color: var(--text-primary); }
+    .strategy-box { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin: 24px 0; }
+    .strategy-box h3 { margin-top: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .pro-tip { background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .pro-tip h4 { margin-top: 0; color: #60a5fa; }
+    .pro-tip * { color: var(--text-primary); }
+    .warning { background: rgba(239,68,68,0.08); border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .warning * { color: var(--text-primary); }
+    .success { background: rgba(34,197,94,0.08); border-left: 4px solid #22c55e; padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .success * { color: var(--text-primary); }
+    .steps { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin: 20px 0; }
+    .steps ol { margin: 0; padding-left: 20px; }
+    .steps li { margin-bottom: 10px; color: var(--text-secondary); }
+    .cta { background: var(--accent-gradient); color: white; padding: 24px; border-radius: var(--radius); text-align: center; margin: 30px 0; box-shadow: 0 4px 15px var(--glow); }
     .cta * { color: white; }
-    .breadcrumb { font-size: 0.9rem; color: #71717a; margin-bottom: 20px; }
-    .breadcrumb a { color: #ff0000; text-decoration: none; }
-    .related-posts { background: #f4f4f5; padding: 20px; border-radius: 8px; margin-top: 40px; }
-    .related-posts h3 { margin-top: 0; }
+    .cta a { color: white; text-decoration: underline; }
+    .breadcrumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .related-posts { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin-top: 40px; }
+    .related-posts h3 { margin-top: 0; color: var(--text-primary); }
     .related-posts ul { list-style: none; padding: 0; }
-    .related-posts li { margin-bottom: 10px; color: #3f3f46; }
-    .related-posts a { color: #ff0000; text-decoration: none; }
+    .related-posts li { margin-bottom: 10px; color: var(--text-secondary); }
+    .related-posts a { color: var(--accent); text-decoration: none; }
+    .related-posts a:hover { text-decoration: underline; }
     table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e5e5; }
-    th { background: #f4f4f5; }
-    footer { background: white; border-top: 1px solid #e5e5e5; padding: 40px 0; text-align: center; margin-top: 60px; }
-    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
-    .footer-links a { color: #52525b; text-decoration: none; font-weight: 500; }
-    .footer-links a:hover { color: #ff0000; }
-    .footer-copyright { color: #71717a; font-size: 14px; }
-    nav a { margin-left: 20px; color: #52525b; text-decoration: none; font-weight: 500; }
-    nav a:hover { color: #ff0000; }
-    .external-link { color: #2563eb; text-decoration: underline; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    th { background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 600; }
+    .odds-table { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; overflow: hidden; }
+    .odds-table th { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+    .odds-table td { border-bottom: 1px solid var(--border); color: var(--text-primary); }
+    code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); }
+    footer { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 40px 16px 32px; text-align: center; margin-top: 60px; }
+    .footer-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap; }
+    .footer-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copyright { color: var(--text-muted); font-size: 13px; }
+    nav { display: flex; gap: 24px; }
+    nav a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s; }
+    nav a:hover { color: var(--text-primary); }
+    img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+    @media (max-width: 640px) {
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.7rem; }
+      .container { padding: 0 16px; }
+      nav { gap: 12px; }
+      nav a { font-size: 13px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="header-content">
-      <a href="/" class="logo">Win<span>Fulltime</span></a>
+      <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28"> Win<span>Fulltime</span></a>
       <nav>
         <a href="/">Home</a>
         <a href="/ticket-builder.html">Ticket Builder</a>
@@ -81,23 +123,23 @@
 
     <div style="background:#dbeafe;padding:16px 20px;border-radius:8px;margin:20px 0"><strong>Tip:</strong> Looking for today's football predictions? <a href="/">Click here</a>.</div>
 
-    <p>Among the most nuanced betting markets in football are time-based bets — wagers tied to <em>when</em> something happens rather than <em>if</em> it happens. These markets are offered by <a href="https://www.bet365.com" class="external-link" target="_blank" rel="noopener">Bet365</a>, <a href="https://www.betway.com" class="external-link" target="_blank" rel="noopener">Betway</a>, and <a href="https://www.1xbet.com" class="external-link" target="_blank" rel="noopener">1xBet</a>, and they reward bettors who understand the temporal patterns of football matches.</p>
+    <p>Among the most nuanced betting markets in football are time-based bets â€” wagers tied to <em>when</em> something happens rather than <em>if</em> it happens. These markets are offered by <a href="https://www.bet365.com" class="external-link" target="_blank" rel="noopener">Bet365</a>, <a href="https://www.betway.com" class="external-link" target="_blank" rel="noopener">Betway</a>, and <a href="https://www.1xbet.com" class="external-link" target="_blank" rel="noopener">1xBet</a>, and they reward bettors who understand the temporal patterns of football matches.</p>
 
     <h2>What Are Time-Based Betting Markets?</h2>
     <p>Time-based betting covers any market where timing is the primary condition. Examples include:</p>
     <ul>
       <li>First goal scored before/after a specific minute</li>
-      <li>Goal in a specific 15-minute interval (e.g., 15:00–30:00)</li>
+      <li>Goal in a specific 15-minute interval (e.g., 15:00â€“30:00)</li>
       <li>Last goal before half-time</li>
       <li>Goal in the last 10 minutes of a match</li>
-      <li>Goal in the 76–90 minute window (often called the "insurance goal" market)</li>
+      <li>Goal in the 76â€“90 minute window (often called the "insurance goal" market)</li>
     </ul>
 
     <div class="example-box">
-      <strong>Example — "Goal in 15:01–30:00":</strong><br><br>
+      <strong>Example â€” "Goal in 15:01â€“30:00":</strong><br><br>
       You bet that a goal will be scored between 15 minutes and 30 minutes (the exact second doesn't matter).<br>
       The odds might be 2.50.<br><br>
-      If the first goal comes at 22' — you win. If it's 8' or 33' — you lose.<br>
+      If the first goal comes at 22' â€” you win. If it's 8' or 33' â€” you lose.<br>
       Goals after 30' don't affect this bet; only the FIRST goal matters.
     </div>
 
@@ -106,9 +148,9 @@
     <ul>
       <li>Goals are most likely in the first 15 minutes (teams are fresh, pressing high)</li>
       <li>Goals spike again in the last 15 minutes (fatigue, desperation, open games)</li>
-      <li>The 15–30 and 30–45 minute windows are typically lower-scoring</li>
+      <li>The 15â€“30 and 30â€“45 minute windows are typically lower-scoring</li>
     </ul>
-    <p><a href="https://www.planetm澳洲betting.com" class="external-link" target="_blank" rel="noopener">Research published in sports science journals</a> confirms that goal distribution follows a U-shaped curve — more goals early and late, fewer in the middle.</p>
+    <p><a href="https://www.planetmæ¾³æ´²betting.com" class="external-link" target="_blank" rel="noopener">Research published in sports science journals</a> confirms that goal distribution follows a U-shaped curve â€” more goals early and late, fewer in the middle.</p>
 
     <h2>Goal Timing Distribution by League</h2>
     <table>
@@ -122,37 +164,37 @@
       </thead>
       <tbody>
         <tr>
-          <td>0–15 min</td>
+          <td>0â€“15 min</td>
           <td>22%</td>
           <td>20%</td>
           <td>18%</td>
         </tr>
         <tr>
-          <td>16–30 min</td>
+          <td>16â€“30 min</td>
           <td>18%</td>
           <td>19%</td>
           <td>17%</td>
         </tr>
         <tr>
-          <td>31–45 min</td>
+          <td>31â€“45 min</td>
           <td>20%</td>
           <td>21%</td>
           <td>19%</td>
         </tr>
         <tr>
-          <td>46–60 min</td>
+          <td>46â€“60 min</td>
           <td>18%</td>
           <td>18%</td>
           <td>19%</td>
         </tr>
         <tr>
-          <td>61–75 min</td>
+          <td>61â€“75 min</td>
           <td>14%</td>
           <td>13%</td>
           <td>15%</td>
         </tr>
         <tr>
-          <td>76–90+ min</td>
+          <td>76â€“90+ min</td>
           <td>8%</td>
           <td>9%</td>
           <td>12%</td>
@@ -166,10 +208,10 @@
     <p>High-pressing teams score earlier on average. Teams that take their time building up play (like many Italian teams) see more goals in the second half. Check a team's average first goal time on <a href="https://www.sofascore.com" class="external-link" target="_blank" rel="noopener">SofaScore</a>.</p>
 
     <h3>2. Defensive Quality vs Attacking Intent</h3>
-    <p>A match between two defensive teams is likely to stay goalless early. The longer a 0-0 draw continues, the more both teams may open up — shifting goal probability toward the final 30 minutes.</p>
+    <p>A match between two defensive teams is likely to stay goalless early. The longer a 0-0 draw continues, the more both teams may open up â€” shifting goal probability toward the final 30 minutes.</p>
 
     <h3>3. Match Context</h3>
-    <p>Must-win matches see earlier goals — teams come out flying. Relegation six-pointers and cup finals historically see earlier goals than mid-table dead rubbers.</p>
+    <p>Must-win matches see earlier goals â€” teams come out flying. Relegation six-pointers and cup finals historically see earlier goals than mid-table dead rubbers.</p>
 
     <h3>4. Weather</h3>
     <p>Heavy rain and wind slow the game, reduce early goal attempts, and push goals later. Check the forecast on <a href="https://www.bbc.com/weather" class="external-link" target="_blank" rel="noopener">BBC Weather</a> before betting on early time markets.</p>
@@ -187,17 +229,17 @@
     <h2>Popular Time Betting Strategies</h2>
 
     <h3>1. Late Goal Backing (76+ Minutes)</h3>
-    <p>Matches with low xG in the first half but high second-half energy — back the "Goal in 76–90" market. The value comes from the market underestimating the push for a late equaliser or winner.</p>
+    <p>Matches with low xG in the first half but high second-half energy â€” back the "Goal in 76â€“90" market. The value comes from the market underestimating the push for a late equaliser or winner.</p>
 
     <h3>2. Interval Split Betting</h3>
-    <p>Instead of one time bet, split your stake across two intervals. E.g., if you think a goal is likely between 15–30, cover 0–15 as well with a smaller stake. This increases your coverage while keeping some upside.</p>
+    <p>Instead of one time bet, split your stake across two intervals. E.g., if you think a goal is likely between 15â€“30, cover 0â€“15 as well with a smaller stake. This increases your coverage while keeping some upside.</p>
 
     <h3>3. In-Play Time Correction</h3>
-    <p>In-play time markets adjust live. If it goes 60' and the line is set at "Goal by 75", the odds are often generous because the market overshoots. A goal is most likely to come in the final stretch of a match — this is where in-play time betting has consistent value.</p>
+    <p>In-play time markets adjust live. If it goes 60' and the line is set at "Goal by 75", the odds are often generous because the market overshoots. A goal is most likely to come in the final stretch of a match â€” this is where in-play time betting has consistent value.</p>
 
     <h2>Common Mistakes</h2>
     <p><strong>Betting on first-half intervals without checking team form:</strong> A slow-starting team facing an aggressive press means the early interval may not have the expected goal frequency.</p>
-    <p><strong>Ignoring added time:</strong> The 90th minute is actually closer to the 93rd in modern football. Time markets can end at 90:00 or 90:05 depending on the bookmaker — check the rules.</p>
+    <p><strong>Ignoring added time:</strong> The 90th minute is actually closer to the 93rd in modern football. Time markets can end at 90:00 or 90:05 depending on the bookmaker â€” check the rules.</p>
 
     <h2>The Bottom Line</h2>
     <p>Time-based betting rewards bettors who understand goal distribution patterns, team tempo tendencies, and match context. Use first-goal average data from <a href="https://www.fbref.com" class="external-link" target="_blank" rel="noopener">FBref</a> and <a href="https://www.sofascore.com" class="external-link" target="_blank" rel="noopener">SofaScore</a>, and look for in-play opportunities where the market hasn't caught up to the actual play on the pitch.</p>

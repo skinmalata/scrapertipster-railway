@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -13,60 +13,96 @@
   <meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/bayern-psg-champions-league-preview-may-2026.webp">
   <link rel="canonical" href="https://winfulltime.com/blog/bayern-psg-champions-league-preview-may-2026">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #18181b; margin: 0; padding: 0; }
-    header { background: white; border-bottom: 1px solid #e5e5e5; padding: 16px 0; }
+    :root {
+      --bg-primary: #0b0f1a;
+      --bg-secondary: #111827;
+      --bg-card: rgba(23, 28, 46, 0.85);
+      --bg-elevated: #1a1f2e;
+      --text-primary: #e8edf5;
+      --text-secondary: #c8d0db;
+      --text-muted: #94a3b8;
+      --accent: #ff2448;
+      --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --glow: rgba(255,36,72,0.12);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--bg-primary); background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent); color: var(--text-primary); margin: 0; padding: 0; font-size: 16px; -webkit-font-smoothing: antialiased; }
+    header { background: rgba(11,15,26,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
     .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-size: 24px; font-weight: bold; color: #18181b; text-decoration: none; }
-    .logo span { color: #ff0000; }
+    .logo { display: inline-flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+    .logo span { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .logo-icon { height: 28px; width: auto; flex-shrink: 0; }
     .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    h1 { font-size: 2.5rem; color: #18181b; margin-bottom: 10px; }
-    h2 { font-size: 1.8rem; color: #18181b; margin-top: 40px; margin-bottom: 15px; }
-    h3 { font-size: 1.3rem; color: #18181b; margin-top: 30px; margin-bottom: 10px; }
-    p { margin-bottom: 16px; color: #3f3f46; line-height: 1.7; }
-    .meta { color: #71717a; font-size: 0.9rem; margin-bottom: 30px; }
-    .highlight { background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b; }
-    .example-box { background: #18181b; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .example-box * { color: white; }
-    .strategy-box { background: white; border: 1px solid #e5e5e5; padding: 24px; border-radius: 12px; margin: 24px 0; }
-    .strategy-box h3 { margin-top: 0; color: #ff0000; }
-    .pro-tip { background: #dbeafe; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .pro-tip h4 { margin-top: 0; color: #1d4ed8; }
-    .warning { background: #fef2f2; border-left: 4px solid #ff0000; padding: 16px; border-radius: 4px; margin: 20px 0; }
-    .success { background: #f0fdf4; border-left: 4px solid #22c55e; padding: 16px; border-radius: 4px; margin: 20px 0; }
-    .steps { background: #f4f4f5; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    h1 { font-size: 2.8rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; }
+    h2 { font-size: 2.1rem; color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; font-weight: 700; }
+    h3 { font-size: 1.5rem; color: var(--text-primary); margin-top: 30px; margin-bottom: 10px; font-weight: 600; }
+    p { font-size: 1.125rem; margin-bottom: 20px; color: var(--text-secondary); line-height: 1.85; }
+    li { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.85; margin-bottom: 8px; }
+    .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+    .highlight { background: rgba(251,191,36,0.1); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .highlight * { color: var(--text-primary); }
+    .example-box { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .example-box * { color: var(--text-primary); }
+    .strategy-box { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin: 24px 0; }
+    .strategy-box h3 { margin-top: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .pro-tip { background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .pro-tip h4 { margin-top: 0; color: #60a5fa; }
+    .pro-tip * { color: var(--text-primary); }
+    .warning { background: rgba(239,68,68,0.08); border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .warning * { color: var(--text-primary); }
+    .success { background: rgba(34,197,94,0.08); border-left: 4px solid #22c55e; padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .success * { color: var(--text-primary); }
+    .steps { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin: 20px 0; }
     .steps ol { margin: 0; padding-left: 20px; }
-    .steps li { margin-bottom: 10px; }
-    .cta { background: linear-gradient(135deg, #ff0000, #cc0000); color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0; }
+    .steps li { margin-bottom: 10px; color: var(--text-secondary); }
+    .cta { background: var(--accent-gradient); color: white; padding: 24px; border-radius: var(--radius); text-align: center; margin: 30px 0; box-shadow: 0 4px 15px var(--glow); }
     .cta * { color: white; }
-    .breadcrumb { font-size: 0.9rem; color: #71717a; margin-bottom: 20px; }
-    .breadcrumb a { color: #ff0000; text-decoration: none; }
-    .related-posts { background: #f4f4f5; padding: 20px; border-radius: 8px; margin-top: 40px; }
-    .related-posts h3 { margin-top: 0; color: #18181b; }
+    .cta a { color: white; text-decoration: underline; }
+    .breadcrumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .related-posts { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin-top: 40px; }
+    .related-posts h3 { margin-top: 0; color: var(--text-primary); }
     .related-posts ul { list-style: none; padding: 0; }
-    .related-posts li { margin-bottom: 10px; color: #3f3f46; }
-    .related-posts a { color: #ff0000; text-decoration: none; }
+    .related-posts li { margin-bottom: 10px; color: var(--text-secondary); }
+    .related-posts a { color: var(--accent); text-decoration: none; }
+    .related-posts a:hover { text-decoration: underline; }
     table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e5e5; }
-    th { background: #f4f4f5; }
-    footer { background: white; border-top: 1px solid #e5e5e5; padding: 40px 0; text-align: center; margin-top: 60px; }
-    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
-    .footer-links a { color: #52525b; text-decoration: none; font-weight: 500; }
-    .footer-links a:hover { color: #ff0000; }
-    .footer-copyright { color: #71717a; font-size: 14px; }
-    nav a { margin-left: 20px; color: #52525b; text-decoration: none; font-weight: 500; }
-    nav a:hover { color: #ff0000; }
-    .odds-table { background: #18181b; color: white; border-radius: 8px; overflow: hidden; }
-    .odds-table th { background: #2d2d2d; color: white; }
-    .odds-table td { border-bottom: 1px solid #404040; color: white; }
-    .external-link { color: #2563eb; text-decoration: underline; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    th { background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 600; }
+    .odds-table { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; overflow: hidden; }
+    .odds-table th { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+    .odds-table td { border-bottom: 1px solid var(--border); color: var(--text-primary); }
+    code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); }
+    footer { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 40px 16px 32px; text-align: center; margin-top: 60px; }
+    .footer-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap; }
+    .footer-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copyright { color: var(--text-muted); font-size: 13px; }
+    nav { display: flex; gap: 24px; }
+    nav a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s; }
+    nav a:hover { color: var(--text-primary); }
+    img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+    @media (max-width: 640px) {
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.7rem; }
+      .container { padding: 0 16px; }
+      nav { gap: 12px; }
+      nav a { font-size: 13px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="header-content">
-      <a href="/" class="logo">Win<span>Fulltime</span></a>
+      <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28"> Win<span>Fulltime</span></a>
       <nav>
         <a href="/">Home</a>
         <a href="/ticket-builder.html">Ticket Builder</a>
@@ -99,27 +135,27 @@
     </div>
 
     <h2>The Stakes: PSG Hold Slender Advantage After Goal Fest in Paris</h2>
-    <p>The first leg at the Parc des Princes was a Champions League classic — a 5-4 thriller already being hailed as one of the greatest semi-finals in the competition's modern history. Khvicha Kvaratskhelia struck twice, Ousmane Dembélé scored twice including a penalty, and João Neves also found the net for PSG. Harry Kane, Michael Olise, Dayot Upamecano, and Luis Díaz replied for Bayern in a match that saw nine goals and relentless end-to-end action.</p>
+    <p>The first leg at the Parc des Princes was a Champions League classic â€” a 5-4 thriller already being hailed as one of the greatest semi-finals in the competition's modern history. Khvicha Kvaratskhelia struck twice, Ousmane DembÃ©lÃ© scored twice including a penalty, and JoÃ£o Neves also found the net for PSG. Harry Kane, Michael Olise, Dayot Upamecano, and Luis DÃ­az replied for Bayern in a match that saw nine goals and relentless end-to-end action.</p>
     <p>With no away goals rule in effect since 2022, Bayern simply need to win by any margin to force extra time and potentially penalties. A draw or defeat eliminates the Bavarians; PSG require only a draw to defend their European crown and reach the final in Budapest.</p>
 
     <h2>Bayern Munich: Fortress Allianz Arena Awaits</h2>
 
     <h3>Team News & Predicted Lineup</h3>
-    <p><strong>Out:</strong> Serge Gnabry (thigh), Sven Ulreich (adductor), Raphaël Guerreiro (hamstring), Tom Bischof (calf)<br>
+    <p><strong>Out:</strong> Serge Gnabry (thigh), Sven Ulreich (adductor), RaphaÃ«l Guerreiro (hamstring), Tom Bischof (calf)<br>
     <strong>Doubtful:</strong> Lennart Karl (thigh)</p>
 
     <p>Bayern welcome back head coach Vincent Kompany to the touchline after he served a one-match suspension incurred from his third yellow card against Real Madrid in the quarter-final. His assistant Aaron Danks steered the ship in Paris, but Kompany's tactical presence returns at a critical juncture.</p>
 
-    <p>The Bavarians have already clinched the Bundesliga title with a 16-point margin, affording Kompany the luxury of rotating heavily against Heidenheim last weekend — a match that ended 3-3, underlining both their attacking firepower and defensive vulnerability.</p>
+    <p>The Bavarians have already clinched the Bundesliga title with a 16-point margin, affording Kompany the luxury of rotating heavily against Heidenheim last weekend â€” a match that ended 3-3, underlining both their attacking firepower and defensive vulnerability.</p>
 
     <p><strong>Predicted XI (4-2-3-1):</strong><br>
-    Neuer; Stanisic, Upamecano, Tah, Davies; Kimmich, Pavlovic; Olise, Musiala, Díaz; Kane</p>
+    Neuer; Stanisic, Upamecano, Tah, Davies; Kimmich, Pavlovic; Olise, Musiala, DÃ­az; Kane</p>
 
     <h3>Key Player: Harry Kane</h3>
     <p>The English striker has been nothing short of phenomenal this season, notching 54 goals across all competitions. Kane scored from the penalty spot in the first leg and remains Bayern's talisman. His ability to drop deep, hold up play, and convert chances will be central to Bayern's comeback hopes at the Allianz Arena.</p>
 
     <h3>Tactical Outlook</h3>
-    <p>Bayern's 4-2-3-1 system relies on width from Michael Olise and Luis Díaz, with Jamal Musiala operating as the creative hub behind Kane. The return of Kompany means a disciplined defensive shape, but the first leg exposed frailties — Bayern conceded five goals and looked susceptible to PSG's rapid transitions. At the Allianz Arena, expect Bayern to dominate possession early and commit numbers forward, knowing a single goal deficit leaves no room for caution.</p>
+    <p>Bayern's 4-2-3-1 system relies on width from Michael Olise and Luis DÃ­az, with Jamal Musiala operating as the creative hub behind Kane. The return of Kompany means a disciplined defensive shape, but the first leg exposed frailties â€” Bayern conceded five goals and looked susceptible to PSG's rapid transitions. At the Allianz Arena, expect Bayern to dominate possession early and commit numbers forward, knowing a single goal deficit leaves no room for caution.</p>
 
     <h2>Paris Saint-Germain: Defending Champions One Step from History</h2>
 
@@ -127,18 +163,18 @@
     <p><strong>Out:</strong> Achraf Hakimi (hamstring), Lucas Chevalier (hand)<br>
     <strong>Doubtful:</strong> None</p>
 
-    <p>Luis Enrique's PSG are bidding to become only the second team in the modern era to successfully defend the Champions League. They rested key attackers — Dembélé, Kvaratskhelia, and Doué — in a 2-2 draw against Lorient last weekend, ensuring fresh legs for Munich.</p>
+    <p>Luis Enrique's PSG are bidding to become only the second team in the modern era to successfully defend the Champions League. They rested key attackers â€” DembÃ©lÃ©, Kvaratskhelia, and DouÃ© â€” in a 2-2 draw against Lorient last weekend, ensuring fresh legs for Munich.</p>
 
-    <p>Hakimi's absence is significant. The Moroccan right-back is one of the world's elite in his position, contributing both defensively and in attack. Warren Zaïre-Emery is expected to shift to right-back, with Fabián Ruiz slotting into midfield alongside Vitinha and João Neves.</p>
+    <p>Hakimi's absence is significant. The Moroccan right-back is one of the world's elite in his position, contributing both defensively and in attack. Warren ZaÃ¯re-Emery is expected to shift to right-back, with FabiÃ¡n Ruiz slotting into midfield alongside Vitinha and JoÃ£o Neves.</p>
 
     <p><strong>Predicted XI (4-3-3):</strong><br>
-    Safonov; Zaïre-Emery, Marquinhos, Pacho, Mendes; Ruiz, Vitinha, Neves; Doué, Dembélé, Kvaratskhelia</p>
+    Safonov; ZaÃ¯re-Emery, Marquinhos, Pacho, Mendes; Ruiz, Vitinha, Neves; DouÃ©, DembÃ©lÃ©, Kvaratskhelia</p>
 
     <h3>Key Player: Khvicha Kvaratskhelia</h3>
-    <p>The Georgian winger was instrumental in the first leg with two goals and will be PSG's primary threat on the counter-attack. With 11 goals in his last 10 games, Kvaratskhelia's direct dribbling and link-up play with Dembélé could exploit Bayern's high defensive line.</p>
+    <p>The Georgian winger was instrumental in the first leg with two goals and will be PSG's primary threat on the counter-attack. With 11 goals in his last 10 games, Kvaratskhelia's direct dribbling and link-up play with DembÃ©lÃ© could exploit Bayern's high defensive line.</p>
 
     <h3>Tactical Outlook</h3>
-    <p>PSG's 4-3-3 thrives on high pressing and lightning-quick transitions. Without Hakimi, their right flank lacks its usual dynamism, but Zaïre-Emery's athleticism offers a solid alternative. Enrique will likely set his side up to absorb Bayern's early pressure and strike on the break, knowing a draw suffices. PSG have won six consecutive away games and remain unbeaten on the road in their last nine European outings.</p>
+    <p>PSG's 4-3-3 thrives on high pressing and lightning-quick transitions. Without Hakimi, their right flank lacks its usual dynamism, but ZaÃ¯re-Emery's athleticism offers a solid alternative. Enrique will likely set his side up to absorb Bayern's early pressure and strike on the break, knowing a draw suffices. PSG have won six consecutive away games and remain unbeaten on the road in their last nine European outings.</p>
 
     <h2>Head-to-Head & Recent Form</h2>
     <table>
@@ -146,14 +182,14 @@
         <tr><th>Date</th><th>Result</th><th>Competition</th></tr>
       </thead>
       <tbody>
-        <tr><td>Apr 28, 2026</td><td>PSG 5–4 Bayern</td><td>UCL Semi (1st Leg)</td></tr>
-        <tr><td>Nov 4, 2025</td><td>PSG 1–2 Bayern</td><td>UCL League Phase</td></tr>
-        <tr><td>Jul 5, 2025</td><td>PSG 2–0 Bayern</td><td>FIFA Club World Cup</td></tr>
-        <tr><td>Nov 26, 2024</td><td>Bayern 1–0 PSG</td><td>UCL League Phase</td></tr>
+        <tr><td>Apr 28, 2026</td><td>PSG 5â€“4 Bayern</td><td>UCL Semi (1st Leg)</td></tr>
+        <tr><td>Nov 4, 2025</td><td>PSG 1â€“2 Bayern</td><td>UCL League Phase</td></tr>
+        <tr><td>Jul 5, 2025</td><td>PSG 2â€“0 Bayern</td><td>FIFA Club World Cup</td></tr>
+        <tr><td>Nov 26, 2024</td><td>Bayern 1â€“0 PSG</td><td>UCL League Phase</td></tr>
       </tbody>
     </table>
 
-    <p>Bayern have won seven of the last ten meetings, but PSG's 5-4 triumph last week reversed recent momentum. The first leg produced nine goals — a Champions League semi-final record — and both teams have been averaging well over 3.5 goals per game in recent fixtures.</p>
+    <p>Bayern have won seven of the last ten meetings, but PSG's 5-4 triumph last week reversed recent momentum. The first leg produced nine goals â€” a Champions League semi-final record â€” and both teams have been averaging well over 3.5 goals per game in recent fixtures.</p>
 
     <h2>Betting Odds & Market Analysis</h2>
     <table class="odds-table">
@@ -167,7 +203,7 @@
         <tr><td>Over 4.5 Goals</td><td>+115</td></tr>
         <tr><td>Under 4.5 Goals</td><td>-145</td></tr>
         <tr><td>Over 3.5 Goals</td><td>-200</td></tr>
-        <tr><td>Both Teams to Score – Yes</td><td>~1.25 (-400)</td></tr>
+        <tr><td>Both Teams to Score â€“ Yes</td><td>~1.25 (-400)</td></tr>
       </tbody>
     </table>
 
@@ -176,7 +212,7 @@
     <h2>Expert Betting Picks</h2>
 
     <div class="strategy-box">
-      <h3>1. Both Teams to Score – YES @ 1.25</h3>
+      <h3>1. Both Teams to Score â€“ YES @ 1.25</h3>
       <p>Both sides possess elite attacking depth and have conceded regularly in recent weeks. The first leg delivered goals at both ends; expect the same in Munich. This is a high-confidence play backed by both teams' recent form.</p>
     </div>
 
@@ -192,12 +228,12 @@
 
     <div class="strategy-box">
       <h3>4. Khvicha Kvaratskhelia to Score or Assist @ +100</h3>
-      <p>The Georgian wizard has been in scintillating form with 11 goals in his last 10 games. He enjoys operating in the half-spaces against Bayern's high line and links superbly with Dembélé and Doué.</p>
+      <p>The Georgian wizard has been in scintillating form with 11 goals in his last 10 games. He enjoys operating in the half-spaces against Bayern's high line and links superbly with DembÃ©lÃ© and DouÃ©.</p>
     </div>
 
     <div class="strategy-box">
-      <h3>5. Correct Score: Bayern 3–2 PSG @ 12.00</h3>
-      <p>A high-scoring Bayern win mirrors the pattern of recent fixtures. Bayern's home dominance (averaging 3.94 goals per game at Allianz Arena) combined with PSG's attacking threat makes a 3-2 outcome plausible — sending the tie to extra time at 7-7 on aggregate.</p>
+      <h3>5. Correct Score: Bayern 3â€“2 PSG @ 12.00</h3>
+      <p>A high-scoring Bayern win mirrors the pattern of recent fixtures. Bayern's home dominance (averaging 3.94 goals per game at Allianz Arena) combined with PSG's attacking threat makes a 3-2 outcome plausible â€” sending the tie to extra time at 7-7 on aggregate.</p>
     </div>
 
     <h2>Final Verdict</h2>
@@ -205,7 +241,7 @@
 
     <div class="pro-tip">
       <h4>Our Final Prediction</h4>
-      <p><strong>Bayern Munich 3–2 PSG</strong> (7–7 aggregate, extra time/penalties likely)<br>
+      <p><strong>Bayern Munich 3â€“2 PSG</strong> (7â€“7 aggregate, extra time/penalties likely)<br>
       <strong>Best Value Bet:</strong> PSG +0.75 Asian Handicap @ +102<br>
       <strong>Goals Bet:</strong> Over 3.5 Goals @ 1.53</p>
     </div>

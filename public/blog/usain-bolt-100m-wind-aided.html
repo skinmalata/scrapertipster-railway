@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -13,49 +13,96 @@
   <meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/usain-bolt-100m-wind-aided.webp">
   <link rel="canonical" href="https://winfulltime.com/blog/usain-bolt-100m-wind-aided">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="icon" href="/winfulltimelogo.png" type="image/png">
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #18181b; margin: 0; padding: 0; }
-    header { background: white; border-bottom: 1px solid #e5e5e5; padding: 16px 0; }
+    :root {
+      --bg-primary: #0b0f1a;
+      --bg-secondary: #111827;
+      --bg-card: rgba(23, 28, 46, 0.85);
+      --bg-elevated: #1a1f2e;
+      --text-primary: #e8edf5;
+      --text-secondary: #c8d0db;
+      --text-muted: #94a3b8;
+      --accent: #ff2448;
+      --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --glow: rgba(255,36,72,0.12);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--bg-primary); background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent); color: var(--text-primary); margin: 0; padding: 0; font-size: 16px; -webkit-font-smoothing: antialiased; }
+    header { background: rgba(11,15,26,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
     .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-size: 24px; font-weight: bold; color: #18181b; text-decoration: none; }
-    .logo span { color: #ff0000; }
+    .logo { display: inline-flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+    .logo span { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .logo-icon { height: 28px; width: auto; flex-shrink: 0; }
     .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    h1 { font-size: 2.5rem; color: #18181b; margin-bottom: 10px; }
-    h2 { font-size: 1.8rem; color: #18181b; margin-top: 40px; margin-bottom: 15px; }
-    h3 { font-size: 1.3rem; color: #18181b; margin-top: 30px; margin-bottom: 10px; }
-    p { margin-bottom: 16px; color: #3f3f46; line-height: 1.8; }
-    .meta { color: #71717a; font-size: 0.9rem; margin-bottom: 30px; }
-    .cta { background: linear-gradient(135deg, #ff0000, #cc0000); color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0; }
+    h1 { font-size: 2.8rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; }
+    h2 { font-size: 2.1rem; color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; font-weight: 700; }
+    h3 { font-size: 1.5rem; color: var(--text-primary); margin-top: 30px; margin-bottom: 10px; font-weight: 600; }
+    p { font-size: 1.125rem; margin-bottom: 20px; color: var(--text-secondary); line-height: 1.85; }
+    li { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.85; margin-bottom: 8px; }
+    .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+    .highlight { background: rgba(251,191,36,0.1); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .highlight * { color: var(--text-primary); }
+    .example-box { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .example-box * { color: var(--text-primary); }
+    .strategy-box { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin: 24px 0; }
+    .strategy-box h3 { margin-top: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .pro-tip { background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .pro-tip h4 { margin-top: 0; color: #60a5fa; }
+    .pro-tip * { color: var(--text-primary); }
+    .warning { background: rgba(239,68,68,0.08); border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .warning * { color: var(--text-primary); }
+    .success { background: rgba(34,197,94,0.08); border-left: 4px solid #22c55e; padding: 16px; border-radius: 8px; margin: 20px 0; }
+    .success * { color: var(--text-primary); }
+    .steps { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin: 20px 0; }
+    .steps ol { margin: 0; padding-left: 20px; }
+    .steps li { margin-bottom: 10px; color: var(--text-secondary); }
+    .cta { background: var(--accent-gradient); color: white; padding: 24px; border-radius: var(--radius); text-align: center; margin: 30px 0; box-shadow: 0 4px 15px var(--glow); }
     .cta * { color: white; }
-    .breadcrumb { font-size: 0.9rem; color: #71717a; margin-bottom: 20px; }
-    .breadcrumb a { color: #ff0000; text-decoration: none; }
-    .related-posts { background: #f4f4f5; padding: 20px; border-radius: 8px; margin-top: 40px; }
+    .cta a { color: white; text-decoration: underline; }
+    .breadcrumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .related-posts { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin-top: 40px; }
+    .related-posts h3 { margin-top: 0; color: var(--text-primary); }
     .related-posts ul { list-style: none; padding: 0; }
-    .related-posts li { margin-bottom: 10px; color: #3f3f46; }
-    .related-posts a { color: #ff0000; text-decoration: none; }
-    .pullquote { font-size: 1.4rem; font-style: italic; color: #18181b; border-left: 4px solid #ff0000; padding: 20px 24px; margin: 30px 0; background: #fafafa; border-radius: 0 8px 8px 0; }
-    .pullquote cite { display: block; font-size: 0.9rem; color: #71717a; margin-top: 8px; font-style: normal; }
-    .fact-box { background: #18181b; color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
-    .fact-box * { color: white; }
-    .fact-box h3 { color: #ff0000; margin-top: 0; }
-    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
-    .stat-item { background: #f4f4f5; padding: 16px; border-radius: 8px; text-align: center; }
-    .stat-item .big { font-size: 2rem; font-weight: bold; color: #ff0000; }
-    .stat-item .desc { font-size: 0.85rem; color: #71717a; }
-    footer { background: white; border-top: 1px solid #e5e5e5; padding: 40px 0; text-align: center; margin-top: 60px; }
-    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
-    .footer-links a { color: #52525b; text-decoration: none; font-weight: 500; }
-    .footer-links a:hover { color: #ff0000; }
-    .footer-copyright { color: #71717a; font-size: 14px; }
-    nav a { margin-left: 20px; color: #52525b; text-decoration: none; font-weight: 500; }
-    nav a:hover { color: #ff0000; }
+    .related-posts li { margin-bottom: 10px; color: var(--text-secondary); }
+    .related-posts a { color: var(--accent); text-decoration: none; }
+    .related-posts a:hover { text-decoration: underline; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    th { background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 600; }
+    .odds-table { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; overflow: hidden; }
+    .odds-table th { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+    .odds-table td { border-bottom: 1px solid var(--border); color: var(--text-primary); }
+    code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); }
+    footer { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 40px 16px 32px; text-align: center; margin-top: 60px; }
+    .footer-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap; }
+    .footer-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copyright { color: var(--text-muted); font-size: 13px; }
+    nav { display: flex; gap: 24px; }
+    nav a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s; }
+    nav a:hover { color: var(--text-primary); }
+    img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+    @media (max-width: 640px) {
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.7rem; }
+      .container { padding: 0 16px; }
+      nav { gap: 12px; }
+      nav a { font-size: 13px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="header-content">
-      <a href="/" class="logo">Win<span>Fulltime</span></a>
+      <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28"> Win<span>Fulltime</span></a>
       <nav>
         <a href="/">Home</a>
         <a href="/ticket-builder.html">Ticket Builder</a>
@@ -75,45 +122,45 @@
 
     <div style="background:#dbeafe;padding:16px 20px;border-radius:8px;margin:20px 0"><strong>Tip:</strong> Looking for athletics betting insights? <a href="/">Click for free daily football predictions</a>.</div>
 
-    <p>Usain Bolt's 9.58-second 100m at the 2009 World Championships in Berlin is widely regarded as the greatest sprint ever run. It shattered his own world record of 9.69 from the Beijing Olympics. It produced the fastest non-winning time in history — Tyson Gay ran 9.71, still the American record, and finished second. It was the largest improvement to the 100m world record since fully automatic electronic timing began in 1968. And yet, for nearly two decades, a persistent myth has followed it: that the record was wind-aided. It was not. Here is exactly what happened, how wind measurement works, and why the 9.58 deserves its place in history without an asterisk.</p>
+    <p>Usain Bolt's 9.58-second 100m at the 2009 World Championships in Berlin is widely regarded as the greatest sprint ever run. It shattered his own world record of 9.69 from the Beijing Olympics. It produced the fastest non-winning time in history â€” Tyson Gay ran 9.71, still the American record, and finished second. It was the largest improvement to the 100m world record since fully automatic electronic timing began in 1968. And yet, for nearly two decades, a persistent myth has followed it: that the record was wind-aided. It was not. Here is exactly what happened, how wind measurement works, and why the 9.58 deserves its place in history without an asterisk.</p>
 
     <div class="pullquote">
       "I came to these championships to win. The time is a bonus. I knew I could run 9.58. People said I couldn't, and I proved them wrong. That is what I do."
-      <cite>— Usain Bolt, August 16, 2009</cite>
+      <cite>â€” Usain Bolt, August 16, 2009</cite>
     </div>
 
     <h2>The Race That Shook the World</h2>
 
-    <p>August 16, 2009. The Olympiastadion in Berlin — the same stadium where Jesse Owens won four gold medals in 1936, shattering Hitler's myth of Aryan supremacy. The atmosphere was electric. Bolt had already won his heat and semi-final with ridiculous ease, jogging the final 20 metres in the semi and still running 9.68 — which would have been a world record if not for the +2.0 m/s wind reading, exactly at the legal limit. The final was different. He ran through the line, leaned at the chest, and stopped the clock at 9.58. The scoreboard flashed the numbers, and the stadium erupted. He had beaten his own world record by 0.11 seconds — an eternity in sprinting. To put that in perspective, the difference between Bolt in first and Gay in second (9.71) was 0.13 seconds. Bolt beat the entire field by more than Gay beat the third-place finisher, Asafa Powell, who ran 9.84 in bronze.</p>
+    <p>August 16, 2009. The Olympiastadion in Berlin â€” the same stadium where Jesse Owens won four gold medals in 1936, shattering Hitler's myth of Aryan supremacy. The atmosphere was electric. Bolt had already won his heat and semi-final with ridiculous ease, jogging the final 20 metres in the semi and still running 9.68 â€” which would have been a world record if not for the +2.0 m/s wind reading, exactly at the legal limit. The final was different. He ran through the line, leaned at the chest, and stopped the clock at 9.58. The scoreboard flashed the numbers, and the stadium erupted. He had beaten his own world record by 0.11 seconds â€” an eternity in sprinting. To put that in perspective, the difference between Bolt in first and Gay in second (9.71) was 0.13 seconds. Bolt beat the entire field by more than Gay beat the third-place finisher, Asafa Powell, who ran 9.84 in bronze.</p>
 
-    <p>The margins were absurd. Bolt's 9.58 was, and remains, a statistical outlier in the history of human performance — so far ahead of anything that came before that people instinctively looked for an explanation. And that is where the wind-aided myth was born.</p>
+    <p>The margins were absurd. Bolt's 9.58 was, and remains, a statistical outlier in the history of human performance â€” so far ahead of anything that came before that people instinctively looked for an explanation. And that is where the wind-aided myth was born.</p>
 
     <h2>How Wind Measurement Actually Works</h2>
 
-    <p>Wind measurement in track and field is governed by strict World Athletics rules. A wind gauge is placed beside the track, 50 metres from the start line, at a height of 1.22 metres (approximately half the height of a sprinter). It measures the wind speed in the direction of the race for 10 seconds — the first 5 seconds after the gun, and the first 5 seconds after the first runner crosses the finish line. The average of those 10 seconds is the official wind reading. The legal limit for record purposes is +2.0 metres per second. Anything above that is considered wind-aided, and the time cannot be ratified as a world record.</p>
+    <p>Wind measurement in track and field is governed by strict World Athletics rules. A wind gauge is placed beside the track, 50 metres from the start line, at a height of 1.22 metres (approximately half the height of a sprinter). It measures the wind speed in the direction of the race for 10 seconds â€” the first 5 seconds after the gun, and the first 5 seconds after the first runner crosses the finish line. The average of those 10 seconds is the official wind reading. The legal limit for record purposes is +2.0 metres per second. Anything above that is considered wind-aided, and the time cannot be ratified as a world record.</p>
 
-    <p>In the 2009 100m final, the wind reading was +0.9 m/s. That is well within the legal limit — less than half the permitted maximum. For context, Bolt's 9.69 in Beijing had a wind reading of 0.0 m/s (still air). His 9.63 Olympic gold in London 2012 had a wind reading of +1.5 m/s. The 9.58 was not even the windiest legal race of his career. The +0.9 m/s reading means the wind provided approximately 0.01 seconds of assistance — a trivial amount that does not meaningfully impact the time.</p>
+    <p>In the 2009 100m final, the wind reading was +0.9 m/s. That is well within the legal limit â€” less than half the permitted maximum. For context, Bolt's 9.69 in Beijing had a wind reading of 0.0 m/s (still air). His 9.63 Olympic gold in London 2012 had a wind reading of +1.5 m/s. The 9.58 was not even the windiest legal race of his career. The +0.9 m/s reading means the wind provided approximately 0.01 seconds of assistance â€” a trivial amount that does not meaningfully impact the time.</p>
 
     <div class="fact-box">
-      <h3>Bolt's 100m World Records — Wind Readings</h3>
-      <p>• 9.72 — New York, May 2008: +1.7 m/s (legal)</p>
-      <p>• 9.69 — Beijing Olympics, August 2008: 0.0 m/s (legal)</p>
-      <p>• 9.58 — Berlin Worlds, August 2009: +0.9 m/s (legal)</p>
-      <p>• 9.63 — London Olympics, August 2012: +1.5 m/s (legal)</p>
-      <p>• Legal threshold: +2.0 m/s</p>
-      <p>• Bolt's 9.58 wind reading: +0.9 m/s — well inside the limit</p>
+      <h3>Bolt's 100m World Records â€” Wind Readings</h3>
+      <p>â€¢ 9.72 â€” New York, May 2008: +1.7 m/s (legal)</p>
+      <p>â€¢ 9.69 â€” Beijing Olympics, August 2008: 0.0 m/s (legal)</p>
+      <p>â€¢ 9.58 â€” Berlin Worlds, August 2009: +0.9 m/s (legal)</p>
+      <p>â€¢ 9.63 â€” London Olympics, August 2012: +1.5 m/s (legal)</p>
+      <p>â€¢ Legal threshold: +2.0 m/s</p>
+      <p>â€¢ Bolt's 9.58 wind reading: +0.9 m/s â€” well inside the limit</p>
     </div>
 
     <h2>Why the Myth Persists</h2>
 
-    <p>The idea that Bolt's 9.58 was wind-aided persists for three reasons. First, the sheer magnitude of the improvement. Shaving 0.11 seconds off a world record in the 100m is almost unheard of. When Bolt ran 9.69 in Beijing, many experts said the limit of human potential was somewhere around 9.65. He ran 9.58 less than a year later. People could not believe it was legitimate, so they searched for external explanations. Second, the semi-final wind reading of +2.0 m/s (exactly at the limit) created confusion. Casual fans saw "wind-aided" associated with Bolt's semi and assumed the final was also wind-aided. Third, the race itself felt illegal — a man running so far ahead of everyone else, celebrating before the line, and still running 9.58. It defied belief. But defying belief is not the same as cheating.</p>
+    <p>The idea that Bolt's 9.58 was wind-aided persists for three reasons. First, the sheer magnitude of the improvement. Shaving 0.11 seconds off a world record in the 100m is almost unheard of. When Bolt ran 9.69 in Beijing, many experts said the limit of human potential was somewhere around 9.65. He ran 9.58 less than a year later. People could not believe it was legitimate, so they searched for external explanations. Second, the semi-final wind reading of +2.0 m/s (exactly at the limit) created confusion. Casual fans saw "wind-aided" associated with Bolt's semi and assumed the final was also wind-aided. Third, the race itself felt illegal â€” a man running so far ahead of everyone else, celebrating before the line, and still running 9.58. It defied belief. But defying belief is not the same as cheating.</p>
 
-    <p>Bolt was simply that good. His 200m world record of 19.19, set in the same championships five days later, had a wind reading of -0.3 m/s (a headwind). He ran the fastest 200m ever into a slight breeze. If the 9.58 was wind-aided, the 19.19 would have to be even more extraordinary — and yet nobody questions the 200m record in the same way.</p>
+    <p>Bolt was simply that good. His 200m world record of 19.19, set in the same championships five days later, had a wind reading of -0.3 m/s (a headwind). He ran the fastest 200m ever into a slight breeze. If the 9.58 was wind-aided, the 19.19 would have to be even more extraordinary â€” and yet nobody questions the 200m record in the same way.</p>
 
     <div class="stat-grid">
       <div class="stat-item">
         <p class="big">9.58</p>
-        <p class="desc">Bolt's 100m WR — Berlin 2009</p>
+        <p class="desc">Bolt's 100m WR â€” Berlin 2009</p>
       </div>
       <div class="stat-item">
         <p class="big">+0.9</p>
@@ -125,34 +172,34 @@
       </div>
       <div class="stat-item">
         <p class="big">19.19</p>
-        <p class="desc">Bolt's 200m WR — same championships</p>
+        <p class="desc">Bolt's 200m WR â€” same championships</p>
       </div>
     </div>
 
     <h2>The Deepest Field in History</h2>
 
-    <p>The 2009 100m final was not just the fastest race ever run — it was the deepest. Five men ran under 9.90 seconds. Tyson Gay's 9.71 would have won a gold medal in every single Olympics except Beijing 2008 (where Bolt ran 9.69) and London 2012 (where Bolt ran 9.63 and Gay ran 9.80 for fourth). Asafa Powell, the former world record holder, ran 9.84 and got bronze. Daniel Bailey ran 9.93 and finished fourth — a time that would have won the 2004 Olympic gold. The quality of the field makes Bolt's dominance even more staggering. He did not beat a weak field. He beat the strongest collection of sprinters ever assembled, in the best shape of their lives, and he destroyed them all.</p>
+    <p>The 2009 100m final was not just the fastest race ever run â€” it was the deepest. Five men ran under 9.90 seconds. Tyson Gay's 9.71 would have won a gold medal in every single Olympics except Beijing 2008 (where Bolt ran 9.69) and London 2012 (where Bolt ran 9.63 and Gay ran 9.80 for fourth). Asafa Powell, the former world record holder, ran 9.84 and got bronze. Daniel Bailey ran 9.93 and finished fourth â€” a time that would have won the 2004 Olympic gold. The quality of the field makes Bolt's dominance even more staggering. He did not beat a weak field. He beat the strongest collection of sprinters ever assembled, in the best shape of their lives, and he destroyed them all.</p>
 
     <h2>The Berlin Double</h2>
 
-    <p>Five days after the 100m, Bolt lined up for the 200m final. The world record was his own 19.30 from Beijing, and the speculation was whether he could break 19.20. He ran 19.19 — into a headwind of -0.3 m/s. The 200m record is, in many respects, even more impressive than the 100m record. The 100m record has been genuinely threatened several times since 2009 — Yohan Blake ran 9.69, Tyson Gay ran 9.69, Justin Gatlin ran 9.74, and multiple men have broken 9.80. The 200m record has not been seriously challenged. No one has come within 0.1 seconds of 19.19. The world list since 2009 reads 19.26 (Yohan Blake, 2011), 19.31 (Noah Lyles, 2022), 19.32 (Michael Johnson, 1996). Bolt's 200m record remains virtually untouched. And it was run into a headwind.</p>
+    <p>Five days after the 100m, Bolt lined up for the 200m final. The world record was his own 19.30 from Beijing, and the speculation was whether he could break 19.20. He ran 19.19 â€” into a headwind of -0.3 m/s. The 200m record is, in many respects, even more impressive than the 100m record. The 100m record has been genuinely threatened several times since 2009 â€” Yohan Blake ran 9.69, Tyson Gay ran 9.69, Justin Gatlin ran 9.74, and multiple men have broken 9.80. The 200m record has not been seriously challenged. No one has come within 0.1 seconds of 19.19. The world list since 2009 reads 19.26 (Yohan Blake, 2011), 19.31 (Noah Lyles, 2022), 19.32 (Michael Johnson, 1996). Bolt's 200m record remains virtually untouched. And it was run into a headwind.</p>
 
     <div class="pullquote">
       "The 200m is my favourite event. The 100m is about power. The 200m is about pain. I just love pain."
-      <cite>— Usain Bolt, Berlin 2009</cite>
+      <cite>â€” Usain Bolt, Berlin 2009</cite>
     </div>
 
     <h2>What This Means for Betting Markets</h2>
 
-    <p>Pervasive myths in sport — like the belief that Bolt's 9.58 was wind-aided — affect betting markets in subtle but meaningful ways. When bettors misunderstand the fundamentals of a sport or event, they misprice probability. The belief that Bolt's record was illegitimate leads to undervaluation of sprinting markets in athletics betting, or to misplaced confidence that the record will fall easily because it was somehow artificially achieved. The same dynamic plays out in football betting all the time. Bettors routinely overvalue recent form while ignoring underlying statistics, or assume that a team's winning streak is unsustainable when the data says otherwise. Understanding how records are set — and how they are legitimately achieved — is the same skill as understanding expected goals, xG against, or home advantage adjustments. It is the difference between betting on narratives and betting on facts.</p>
+    <p>Pervasive myths in sport â€” like the belief that Bolt's 9.58 was wind-aided â€” affect betting markets in subtle but meaningful ways. When bettors misunderstand the fundamentals of a sport or event, they misprice probability. The belief that Bolt's record was illegitimate leads to undervaluation of sprinting markets in athletics betting, or to misplaced confidence that the record will fall easily because it was somehow artificially achieved. The same dynamic plays out in football betting all the time. Bettors routinely overvalue recent form while ignoring underlying statistics, or assume that a team's winning streak is unsustainable when the data says otherwise. Understanding how records are set â€” and how they are legitimately achieved â€” is the same skill as understanding expected goals, xG against, or home advantage adjustments. It is the difference between betting on narratives and betting on facts.</p>
 
-    <p>On WinFulltime, we apply the same principle to football: no myths, no narratives, no assumptions. Every prediction is based on data — current form, head-to-head records, injury reports, squad depth, and match context. If you want to bet on the 100m at the next Olympics or the Champions League final this season, the approach should be the same: look at the numbers, not the noise. Our <a href="/">free football predictions</a> cover every major league and tournament, built on the same commitment to factual analysis rather than popular belief.</p>
+    <p>On WinFulltime, we apply the same principle to football: no myths, no narratives, no assumptions. Every prediction is based on data â€” current form, head-to-head records, injury reports, squad depth, and match context. If you want to bet on the 100m at the next Olympics or the Champions League final this season, the approach should be the same: look at the numbers, not the noise. Our <a href="/">free football predictions</a> cover every major league and tournament, built on the same commitment to factual analysis rather than popular belief.</p>
 
     <h2>The Legacy</h2>
 
-    <p>Seventeen years later, Bolt's 9.58 remains the world record. It has survived the doping scandals that engulfed sprinters like Gatlin and Justin Gatlin's teammate training groups. It has survived the technological advances in starting blocks, super spikes, and track surfaces. It has survived the emergence of a new generation of sprinters — Lyles, Kerley, Bromell, Jacobs, Bednarek — none of whom have come within 0.1 seconds of the mark. The closest anyone has come is Tyson Gay's wind-aided 9.69 with a +4.0 m/s tailwind in 2012, a time that would have been 9.80 in still air. In still air conditions, no man has run faster than 9.69 (Gay, Blake, Gatlin) — still 0.11 seconds slower than Bolt.</p>
+    <p>Seventeen years later, Bolt's 9.58 remains the world record. It has survived the doping scandals that engulfed sprinters like Gatlin and Justin Gatlin's teammate training groups. It has survived the technological advances in starting blocks, super spikes, and track surfaces. It has survived the emergence of a new generation of sprinters â€” Lyles, Kerley, Bromell, Jacobs, Bednarek â€” none of whom have come within 0.1 seconds of the mark. The closest anyone has come is Tyson Gay's wind-aided 9.69 with a +4.0 m/s tailwind in 2012, a time that would have been 9.80 in still air. In still air conditions, no man has run faster than 9.69 (Gay, Blake, Gatlin) â€” still 0.11 seconds slower than Bolt.</p>
 
-    <p>The wind-aided myth persists because the human brain struggles to accept statistical outliers. Bolt's 9.58 is an outlier — a performance so far outside the normal distribution of elite sprinting that it looks like an error. But it was not an error. It was not wind-assisted. It was not doping (he never failed a test). It was a 6-foot-5 Jamaican man with a 2.4-metre stride length, a reaction time of 0.146 seconds, a top speed of 44.72 km/h (27.8 mph), and a level of talent that may never be seen again. The +0.9 m/s wind did not give him 9.58. He gave himself 9.58. And the world has been trying to catch up ever since.</p>
+    <p>The wind-aided myth persists because the human brain struggles to accept statistical outliers. Bolt's 9.58 is an outlier â€” a performance so far outside the normal distribution of elite sprinting that it looks like an error. But it was not an error. It was not wind-assisted. It was not doping (he never failed a test). It was a 6-foot-5 Jamaican man with a 2.4-metre stride length, a reaction time of 0.146 seconds, a top speed of 44.72 km/h (27.8 mph), and a level of talent that may never be seen again. The +0.9 m/s wind did not give him 9.58. He gave himself 9.58. And the world has been trying to catch up ever since.</p>
 
     <div class="cta">
       <h3>Bet With Knowledge, Not Myths</h3>
