@@ -730,12 +730,19 @@
           perCategory[p.category].push(p);
         }
         const cats = Object.keys(perCategory);
+        const matchUsed = new Set();
         let catIdx = 0;
-        for (let i = 0; i < 40; i++) {
+        for (let i = 0; i < 80; i++) {
           const cat = cats[catIdx % cats.length];
           const catPicks = perCategory[cat];
           const idx = Math.floor(catIdx / cats.length);
-          if (idx < catPicks.length) pool.push(catPicks[idx]);
+          if (idx < catPicks.length) {
+            const pick = catPicks[idx];
+            if (!matchUsed.has(pick.match)) {
+              matchUsed.add(pick.match);
+              pool.push(pick);
+            }
+          }
           catIdx++;
         }
 
@@ -784,12 +791,12 @@
 
         tickets.sort((a, b) => a.diff - b.diff);
 
-        // Select diverse top tickets - each match can appear in at most 2 tickets
+        // Select diverse top tickets - each match appears in at most 1 ticket
         const top = [];
         const matchCount = new Map();
         for (const t of tickets) {
           const matchSet = new Set(t.selections.map(s => s.match));
-          const exceedsLimit = [...matchSet].some(m => (matchCount.get(m) || 0) >= 2);
+          const exceedsLimit = [...matchSet].some(m => (matchCount.get(m) || 0) >= 1);
           if (!exceedsLimit) {
             top.push(t);
             for (const m of matchSet) matchCount.set(m, (matchCount.get(m) || 0) + 1);
