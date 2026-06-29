@@ -431,15 +431,6 @@
       letter-spacing: 0.3px;
     }
 
-    .ticket-leg .leg-odds {
-      font-weight: 700;
-      color: #4ade80;
-      font-size: 19px;
-      min-width: 54px;
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-    }
-
     .ticket-actions {
       display: flex;
       gap: 10px;
@@ -818,12 +809,11 @@
           const legsHtml = ticket.selections.map(s => `
             <div class="ticket-leg">
               <span class="leg-match">${s.match} <span class="leg-tip">${s.tip}</span></span>
-              <span class="leg-odds">${Number(s.odds).toFixed(2)}</span>
             </div>
           `).join('');
 
           const legLines = ticket.selections.map((s, i) =>
-            `${i + 1}. ${s.match} - ${s.tip} @ ${Number(s.odds).toFixed(2)}`
+            `${i + 1}. ${s.match} - ${s.tip}`
           );
           const copyData = JSON.stringify({
             legs: legLines,
