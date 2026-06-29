@@ -694,6 +694,16 @@
         const today = data.date || new Date().toISOString().split('T')[0];
         const maxTickets = 8;
 
+        // Load unbeaten data
+        let unbeatenMatches = [];
+        try {
+          const ubRes = await fetch('/data/h2h-unbeaten.json');
+          if (ubRes.ok) {
+            const ubData = await ubRes.json();
+            unbeatenMatches = (ubData.dates && ubData.dates[today]) || [];
+          }
+        } catch (e) { /* unbeaten data unavailable */ }
+
         const picks = [];
         const seen = new Set();
 
@@ -726,14 +736,39 @@
           }
         }
 
+        function addUnbeatenPicks(matches) {
+          if (!matches) return;
+          for (const m of matches) {
+            if (!m.match || !m.streaks) continue;
+            const matchDate = today;
+            for (const s of m.streaks) {
+              const tipText = `${s.team} - ${s.count} unbeaten${s.location ? ' ' + s.location : ''}`;
+              const key = `${m.match}|${tipText}|${matchDate}`;
+              if (seen.has(key)) continue;
+              const prob = Math.min(85, Math.max(50, 50 + s.count * 2));
+              const odds = parseFloat((100 / prob).toFixed(2));
+              if (odds < minOdds || odds > maxOdds) continue;
+              seen.add(key);
+              picks.push({
+                match: m.match,
+                tip: tipText,
+                odds,
+                probability: prob,
+                date: matchDate,
+                time: m.time || '',
+                league: m.league || '',
+                category: 'Unbeaten'
+              });
+            }
+          }
+        }
+
         addPicks(data.matches, '1X2');
         addPicks(data.over15Matches, 'Over 1.5');
         addPicks(data.over25Matches, 'Over 2.5');
         addPicks(data.bttsMatches, 'BTTS YES');
         addPicks(data.bttsNoMatches, 'BTTS NO');
-        addPicks(data.winstreakMatches, 'Win Streak');
-        addPicks(data.losestreakMatches, 'Loss Streak');
-        addPicks(data.drawstreakMatches, 'Draw Streak');
+        addUnbeatenPicks(unbeatenMatches);
 
         if (picks.length === 0) {
           results.innerHTML = `<div class="no-matches"><p>No picks match the criteria. Try adjusting your odds range or disable "Only Today's Matches".</p></div>`;
