@@ -431,6 +431,16 @@
       letter-spacing: 0.3px;
     }
 
+    .ticket-leg .leg-cat {
+      font-weight: 700;
+      color: rgba(232, 237, 245, 0.35);
+      font-size: 13px;
+      min-width: 72px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.3px;
+    }
+
     .ticket-actions {
       display: flex;
       gap: 10px;
@@ -816,11 +826,12 @@
           const legsHtml = ticket.selections.map(s => `
             <div class="ticket-leg">
               <span class="leg-match">${s.match} <span class="leg-tip">${s.tip}</span></span>
+              <span class="leg-cat">${s.category}</span>
             </div>
           `).join('');
 
           const legLines = ticket.selections.map((s, i) =>
-            `${i + 1}. ${s.match} - ${s.tip}`
+            `${i + 1}. ${s.match} - ${s.tip} (${s.category})`
           );
           const copyData = JSON.stringify({
             legs: legLines,
