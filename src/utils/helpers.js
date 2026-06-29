@@ -5,9 +5,9 @@ function getDateRange() {
   const now = new Date();
   const todayStr = getLocalDateStr();
   const todayDate = new Date(todayStr + 'T12:00:00');
-  for (let i = -1; i <= 1; i++) {
+  for (const offset of [0, -1, 1]) {
     const d = new Date(todayDate);
-    d.setDate(todayDate.getDate() + i);
+    d.setDate(todayDate.getDate() + offset);
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
