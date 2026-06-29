@@ -11,3 +11,65 @@ YouTube API Key loaded: Yes (AIzaSyCGjk...)
 YouTube Channel ID: UCyDIjH4CQiITAGnjZ_ZTTYg
 Server running on port 3000
 Access at http://0.0.0.0:3000
+Running initial prediction fetch in background...
+Fetching H2H overview for 2026-06-29...
+Fetching predictions for dates: [ '2026-06-28', '2026-06-29', '2026-06-30' ]
+Scraping yesterday results...
+Scraping results for 2026-06-28...
+Parsing unbeaten streaks...
+Found 1 matches with unbeaten streaks
+Filtered to 1 matches with streak >= 7
+Fetching H2H overview for 2026-06-30...
+Parsing unbeaten streaks...
+Found 7 matches with unbeaten streaks
+Filtered to 3 matches with streak >= 7
+Saved 20 matches across 3 dates to cache
+Initial H2H unbeaten scrape completed
+Axios loaded results, length: 737489
+Results cache updated
+Found 1038 results for 2026-06-28
+Scraping predictions for 2026-06-28...
+Axios loaded page for 2026-06-28, length: 251203
+Found 45 match elements for 2026-06-28
+Only 2 matches with 65%+, adding 3 matches with 60-64%
+Checking for scheduled articles to publish...
+No articles scheduled for today
+Scraping predictions for 2026-06-29...
+Axios loaded page for 2026-06-29, length: 107368
+Found 18 match elements for 2026-06-29
+Only 4 matches with 65%+, adding 4 matches with 60-64%
+Scraping predictions for 2026-06-30...
+Axios loaded page for 2026-06-30, length: 59060
+Found 8 match elements for 2026-06-30
+Only 3 matches with 65%+, adding 1 matches with 60-64%
+Scraping ProSoccer predictions...
+Scraping ProSoccer predictions for 2026-06-28...
+ProSoccer page date mismatch: URL derived 2026-06-28, actual page shows 2026-07-05. Using 2026-07-05
+ProSoccer: 10 matches with >70% confidence for 2026-07-05
+Scraping ProSoccer predictions for 2026-06-29...
+ProSoccer page date mismatch: URL derived 2026-06-29, actual page shows 2026-07-06. Using 2026-07-06
+ProSoccer: 2 matches with >70% confidence for 2026-07-06
+Scraping ProSoccer predictions for 2026-06-30...
+ProSoccer: 3 matches with >70% confidence for 2026-06-30
+Adding 2 unique ProSoccer predictions
+Scraping win streaks...
+Axios loaded streaks win, length: 166520
+Found 45 table rows for win streaks
+Parsed 44 win streak matches
+Scraping loss streaks...
+Axios loaded streaks loss, length: 197645
+Found 66 table rows for loss streaks
+Parsed 65 loss streak matches
+Scraping draw streaks...
+Axios loaded streaks draw, length: 162493
+Found 42 table rows for draw streaks
+Parsed 41 draw streak matches
+Calculating Team to Score from BTTS data...
+Calculated 26 Team to Score matches
+Calculated 2 Team to Score 2+ matches
+Initial fetch completed. Matches found: 19
+Enriched predictions with results
+Saved predictions.json
+Saved results.json
+Saved h2h-unbeaten.json
+Copied predictions.json for ticket builder
