@@ -72,7 +72,7 @@
         <label for="ticketTodayOnly">Only Today's Matches</label>
       </div>
       <button class="gen-btn" onclick="generateTickets()">Generate Tickets</button>
-      <div style="font-size: 12px; color: rgba(232,237,245,0.3); text-align: center; margin-top: 14px; letter-spacing: 0.2px;">Odds are estimated based on prediction probabilities</div>
+      <div style="font-size: 12px; color: rgba(255,255,255,0.85); text-align: center; margin-top: 14px; letter-spacing: 0.2px;">Odds are estimated based on prediction probabilities</div>
     </div>
 
     <div id="ticketResults">
@@ -668,18 +668,34 @@
 
         picks.sort((a, b) => a.odds - b.odds);
 
+        // Build a diverse pool: take top picks from each category evenly
         const scored = picks.map(p => ({
           ...p,
           score: Math.abs(Math.log(p.odds) - Math.log(target) / 4)
         }));
         scored.sort((a, b) => a.score - b.score);
-        const pool = scored.slice(0, 25);
+
+        const pool = [];
+        const perCategory = {};
+        for (const p of scored) {
+          if (!perCategory[p.category]) perCategory[p.category] = [];
+          perCategory[p.category].push(p);
+        }
+        const cats = Object.keys(perCategory);
+        let catIdx = 0;
+        for (let i = 0; i < 100; i++) {
+          const cat = cats[catIdx % cats.length];
+          const catPicks = perCategory[cat];
+          const idx = Math.floor(catIdx / cats.length);
+          if (idx < catPicks.length) pool.push(catPicks[idx]);
+          catIdx++;
+        }
 
         const tickets = [];
         const seenTickets = new Set();
         const maxLegs = 8;
 
-        function backtrack(start, current, product) {
+        function backtrack(start, current, product, usedMatches) {
           if (current.length >= 2) {
             const key = current.map(s => `${s.match}|${s.tip}`).sort().join('||');
             if (!seenTickets.has(key)) {
@@ -694,15 +710,19 @@
           if (current.length >= maxLegs) return;
 
           for (let i = start; i < pool.length; i++) {
-            const newProduct = product * pool[i].odds;
+            const p = pool[i];
+            if (usedMatches.has(p.match)) continue;
+            const newProduct = product * p.odds;
             if (newProduct > target * 1.2) break;
-            current.push(pool[i]);
-            backtrack(i + 1, current, newProduct);
+            usedMatches.add(p.match);
+            current.push(p);
+            backtrack(i + 1, current, newProduct, usedMatches);
             current.pop();
+            usedMatches.delete(p.match);
           }
         }
 
-        backtrack(0, [], 1);
+        backtrack(0, [], 1, new Set());
 
         if (tickets.length === 0) {
           results.innerHTML = `<div class="no-matches"><p>No ticket combinations found. Try adjusting your target odds or range.</p></div>`;
@@ -710,7 +730,24 @@
         }
 
         tickets.sort((a, b) => a.diff - b.diff);
-        const top = tickets.slice(0, maxTickets);
+
+        // Select diverse top tickets - avoid recycling the same matches
+        const top = [];
+        const usedMatchesAcross = new Set();
+        for (const t of tickets) {
+          const matchSet = new Set(t.selections.map(s => s.match));
+          const overlap = [...matchSet].filter(m => usedMatchesAcross.has(m)).length;
+          if (overlap <= 1 || top.length === 0) {
+            top.push(t);
+            for (const m of matchSet) usedMatchesAcross.add(m);
+          }
+          if (top.length >= maxTickets) break;
+        }
+        // Fallback if diversity filter was too aggressive
+        if (top.length < 2 && tickets.length > 0) {
+          top.length = 0;
+          top.push(...tickets.slice(0, maxTickets));
+        }
 
         const html = top.map((ticket, ti) => {
           const legsHtml = ticket.selections.map(s => `
