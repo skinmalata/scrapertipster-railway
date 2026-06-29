@@ -634,12 +634,16 @@
             if (todayOnly && m.date !== today) continue;
             const odds = parseFloat((100 / effectiveProb).toFixed(2));
             if (odds < minOdds || odds > maxOdds) continue;
-            const key = `${matchName}|${m.tip}|${m.date}`;
+            let tipText = m.tip;
+            if (m.streak && m.match && matchName !== m.match) {
+              tipText = `${m.match} - ${m.tip}`;
+            }
+            const key = `${matchName}|${tipText}|${m.date}`;
             if (seen.has(key)) continue;
             seen.add(key);
             picks.push({
               match: matchName,
-              tip: m.tip,
+              tip: tipText,
               odds,
               probability: effectiveProb,
               date: m.date,
