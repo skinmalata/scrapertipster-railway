@@ -606,24 +606,113 @@
 
   <script>
     async function generateTickets() {
-      const target = document.getElementById('ticketTarget').value;
-      const minOdds = document.getElementById('ticketMinOdds').value;
-      const maxOdds = document.getElementById('ticketMaxOdds').value;
-      const todayOnly = document.getElementById('ticketTodayOnly').checked ? '1' : '0';
+      const target = parseFloat(document.getElementById('ticketTarget').value);
+      const minOdds = parseFloat(document.getElementById('ticketMinOdds').value);
+      const maxOdds = parseFloat(document.getElementById('ticketMaxOdds').value);
+      const todayOnly = document.getElementById('ticketTodayOnly').checked;
       const results = document.getElementById('ticketResults');
 
       results.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text">Building tickets...</div></div>`;
 
       try {
-        const res = await fetch(`/api/ticket-builder?target=${target}&minOdds=${minOdds}&maxOdds=${maxOdds}&todayOnly=${todayOnly}&maxTickets=8`);
+        const res = await fetch('/data/predictions.json');
+        if (!res.ok) throw new Error('Failed to load predictions');
         const data = await res.json();
 
-        if (!data.success || !data.tickets || data.tickets.length === 0) {
-          results.innerHTML = `<div class="no-matches"><p>${data.message || 'No tickets found. Try adjusting your target odds or range.'}</p></div>`;
+        const today = data.date || new Date().toISOString().split('T')[0];
+        const maxTickets = 8;
+
+        const picks = [];
+        const seen = new Set();
+
+        function addPicks(matches, category) {
+          if (!matches) return;
+          for (const m of matches) {
+            const matchName = m.nextMatch || m.match;
+            if (!matchName || !m.tip || !m.probability) continue;
+            const effectiveProb = m.probability > 0 && m.probability <= 100 ? m.probability : 50;
+            if (todayOnly && m.date !== today) continue;
+            const odds = parseFloat((100 / effectiveProb).toFixed(2));
+            if (odds < minOdds || odds > maxOdds) continue;
+            const key = `${matchName}|${m.tip}|${m.date}`;
+            if (seen.has(key)) continue;
+            seen.add(key);
+            picks.push({
+              match: matchName,
+              tip: m.tip,
+              odds,
+              probability: effectiveProb,
+              date: m.date,
+              time: m.time || '',
+              league: m.league || '',
+              category
+            });
+          }
+        }
+
+        addPicks(data.matches, '1X2');
+        addPicks(data.over15Matches, 'Over 1.5');
+        addPicks(data.over25Matches, 'Over 2.5');
+        addPicks(data.bttsMatches, 'BTTS YES');
+        addPicks(data.bttsNoMatches, 'BTTS NO');
+        addPicks(data.winstreakMatches, 'Win Streak');
+        addPicks(data.losestreakMatches, 'Loss Streak');
+        addPicks(data.drawstreakMatches, 'Draw Streak');
+        addPicks(data.teamToScoreMatches, 'To Score');
+        addPicks(data.teamToScore2PlusMatches, 'To Score 2+');
+
+        if (picks.length === 0) {
+          results.innerHTML = `<div class="no-matches"><p>No picks match the criteria. Try adjusting your odds range or disable "Only Today's Matches".</p></div>`;
           return;
         }
 
-        const html = data.tickets.map((ticket, ti) => {
+        picks.sort((a, b) => a.odds - b.odds);
+
+        const scored = picks.map(p => ({
+          ...p,
+          score: Math.abs(Math.log(p.odds) - Math.log(target) / 4)
+        }));
+        scored.sort((a, b) => a.score - b.score);
+        const pool = scored.slice(0, 25);
+
+        const tickets = [];
+        const seenTickets = new Set();
+        const maxLegs = 8;
+
+        function backtrack(start, current, product) {
+          if (current.length >= 2) {
+            const key = current.map(s => `${s.match}|${s.tip}`).sort().join('||');
+            if (!seenTickets.has(key)) {
+              seenTickets.add(key);
+              tickets.push({
+                selections: [...current],
+                totalOdds: parseFloat(product.toFixed(2)),
+                diff: Math.abs(product - target)
+              });
+            }
+          }
+          if (current.length >= maxLegs) return;
+
+          for (let i = start; i < pool.length; i++) {
+            const newProduct = product * pool[i].odds;
+            if (newProduct > target * 1.2) break;
+            current.push(pool[i]);
+            backtrack(i + 1, current, newProduct);
+            current.pop();
+          }
+        }
+
+        backtrack(0, [], 1);
+
+        if (tickets.length === 0) {
+          results.innerHTML = `<div class="no-matches"><p>No ticket combinations found. Try adjusting your target odds or range.</p></div>`;
+          return;
+        }
+
+        tickets.sort((a, b) => a.diff - b.diff);
+        const top = tickets.slice(0, maxTickets);
+
+        const html = top.map((ticket, ti) => {
           const legsHtml = ticket.selections.map(s => `
             <div class="ticket-leg">
               <span class="leg-match">${s.match} <span class="leg-tip">${s.tip}</span></span>
@@ -638,7 +727,7 @@
               </div>
               ${legsHtml}
               <div class="ticket-diff" style="margin-top: 8px; text-align: right;">
-                Target: ${data.targetOdds} &mdash; Difference: ${ticket.diff.toFixed(2)}
+                Target: ${target} &mdash; Difference: ${ticket.diff.toFixed(2)}
               </div>
             </div>
           `;
@@ -646,7 +735,7 @@
 
         results.innerHTML = `<div class="matches-grid">${html}</div>`;
       } catch (e) {
-        results.innerHTML = `<div class="no-matches"><p>Unable to generate tickets. The prediction server may be unavailable. Try again later.</p></div>`;
+        results.innerHTML = `<div class="no-matches"><p>Unable to generate tickets. The prediction data may be unavailable. Try again later.</p></div>`;
       }
     }
   </script>
