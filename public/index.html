@@ -1728,8 +1728,7 @@ renderDayTabs();
 <script>
 (function() {
   const saved = localStorage.getItem("wf-theme");
-  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  const theme = saved || (prefersDark ? "dark" : "light");
+    const theme = saved || "dark";
   document.documentElement.setAttribute("data-theme", theme === "dark" ? "" : "light");
   const btn = document.getElementById("themeToggle");
   if (btn) btn.textContent = theme === "dark" ? "Light" : "Dark";
