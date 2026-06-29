@@ -451,10 +451,10 @@ cron.schedule('0 3 * * *', () => {
   runPinterestPipeline();
 });
 
-// H2H Unbeaten Streaks Scraper - daily at 4:00 AM
+// H2H Unbeaten Streaks Scraper - daily at 12:10 AM
 const scrapeH2h = require('./scripts/scrape-h2h-unbeaten');
 const { scrapeUnbeatenStreaks } = scrapeH2h;
-cron.schedule('0 4 * * *', async () => {
+cron.schedule('10 0 * * *', async () => {
   console.log('Running H2H unbeaten streaks scrape...');
   try {
     const today = new Date().toISOString().split('T')[0];
