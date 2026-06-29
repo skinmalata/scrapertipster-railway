@@ -853,19 +853,36 @@
 
         tickets.sort((a, b) => a.diff - b.diff);
 
-        // Select diverse top tickets - same match+tip can appear in at most 2 tickets
+        // Greedy diverse ticket selection
         const top = [];
-        const pairCount = new Map();
-        for (const t of tickets) {
-          const pairs = t.selections.map(s => `${s.match}|${s.tip}`);
-          const exceedsLimit = pairs.some(p => (pairCount.get(p) || 0) >= 2);
-          if (!exceedsLimit) {
-            top.push(t);
-            for (const p of pairs) pairCount.set(p, (pairCount.get(p) || 0) + 1);
+        const usedPairs = new Map();
+        const taken = new Set();
+
+        for (let round = 0; round < maxTickets; round++) {
+          let bestIdx = -1;
+          let bestScore = -Infinity;
+
+          for (let i = 0; i < tickets.length; i++) {
+            if (taken.has(i)) continue;
+            const pairs = tickets[i].selections.map(s => `${s.match}|${s.tip}`);
+            const exceeds = pairs.some(p => (usedPairs.get(p) || 0) >= 2);
+            if (exceeds) continue;
+            const newCount = pairs.filter(p => !usedPairs.has(p)).length;
+            const score = newCount * 100 - tickets[i].diff;
+            if (score > bestScore) {
+              bestScore = score;
+              bestIdx = i;
+            }
           }
-          if (top.length >= maxTickets) break;
+
+          if (bestIdx === -1) break;
+          const t = tickets[bestIdx];
+          taken.add(bestIdx);
+          top.push(t);
+          const pairs = t.selections.map(s => `${s.match}|${s.tip}`);
+          for (const p of pairs) usedPairs.set(p, (usedPairs.get(p) || 0) + 1);
         }
-        // Fallback if too few tickets pass
+
         if (top.length < 2 && tickets.length > 0) {
           top.length = 0;
           top.push(...tickets.slice(0, maxTickets));
