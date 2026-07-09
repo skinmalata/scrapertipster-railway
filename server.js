@@ -231,6 +231,78 @@ ${items}  </channel>
   }
 });
 
+// Predictions RSS Feed (for Flipboard / content distribution)
+app.get('/predictions-feed.xml', (req, res) => {
+  try {
+    const cache = getPredictionsCache();
+    if (!cache || !cache.matches || cache.matches.length === 0) {
+      return res.status(503).send('Predictions data not available yet');
+    }
+
+    const now = new Date().toUTCString();
+    const matches = cache.matches;
+    const dates = [...new Set(matches.map(m => m.date))].sort();
+    const catTotals = { '1X2': 0, 'Over 2.5': 0, 'Over 1.5': 0, 'BTTS YES': 0, 'BTTS NO': 0 };
+
+    let items = '';
+    for (const dateStr of dates) {
+      const dayMatches = matches.filter(m => m.date === dateStr);
+      const d = new Date(dateStr + 'T12:00:00');
+      const pubDate = d.toUTCString();
+      const matchCount = dayMatches.length;
+
+      // Reset category counts
+      for (const k in catTotals) catTotals[k] = 0;
+
+      let matchRows = '';
+      for (const m of dayMatches) {
+        const tip = m.tip || '';
+        const prob = m.probability || 0;
+        const key = tip === '1' || tip === 'X' || tip === '2' ? '1X2' :
+                    tip === 'Over 2.5' ? 'Over 2.5' :
+                    tip === 'Over 1.5' ? 'Over 1.5' :
+                    tip === 'BTTS YES' ? 'BTTS YES' : 'BTTS NO';
+        catTotals[key]++;
+        matchRows += `${m.match} → ${tip} (${prob}%)\n`;
+      }
+
+      const catSummary = Object.entries(catTotals)
+        .filter(([,v]) => v > 0)
+        .map(([k,v]) => `${v} ${k}`)
+        .join(', ');
+
+      items += `    <item>
+      <title>Football Predictions for ${d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</title>
+      <link>https://winfulltime.com/</link>
+      <guid>https://winfulltime.com/predictions/${dateStr}</guid>
+      <pubDate>${pubDate}</pubDate>
+      <description><![CDATA[${matchCount} match predictions: ${catSummary}.
+
+${matchRows}]]></description>
+    </item>
+`;
+    }
+
+    const feed = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>WinFulltime Daily Football Predictions</title>
+    <link>https://winfulltime.com/</link>
+    <description>Daily AI-powered football predictions for 1X2, Over/Under, BTTS, and Team to Score markets. Updated daily.</description>
+    <language>en</language>
+    <lastBuildDate>${now}</lastBuildDate>
+    <atom:link href="https://winfulltime.com/predictions-feed.xml" rel="self" type="application/rss+xml"/>
+${items}  </channel>
+</rss>`;
+
+    res.set('Content-Type', 'application/rss+xml; charset=utf-8');
+    res.send(feed);
+  } catch (e) {
+    console.error('Predictions RSS feed error:', e.message);
+    res.status(500).send('Failed to generate predictions RSS feed');
+  }
+});
+
 // Email subscription endpoint
 const SUBSCRIBERS_FILE = path.join(__dirname, 'subscribers.json');
 app.post('/api/subscribe', (req, res) => {
