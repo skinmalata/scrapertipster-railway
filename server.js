@@ -523,6 +523,37 @@ cron.schedule('0 3 * * *', () => {
   runPinterestPipeline();
 });
 
+// Mastodon auto-posting - daily predictions toot
+async function runMastodonPost() {
+  if (process.env.MASTODON_AUTO_POST !== 'true') {
+    console.log('Mastodon auto-posting disabled (MASTODON_AUTO_POST != true)');
+    return;
+  }
+  if (!process.env.MASTODON_ACCESS_TOKEN) {
+    console.log('Mastodon credentials missing, skipping auto-post');
+    return;
+  }
+
+  console.log('Running Mastodon post...');
+
+  try {
+    const { execSync } = require('child_process');
+    execSync('node scripts/post-to-mastodon.js', {
+      cwd: __dirname,
+      timeout: 60000,
+      stdio: 'pipe'
+    });
+    console.log('Mastodon posting complete.');
+  } catch (error) {
+    console.error('Mastodon post error:', error.message);
+  }
+}
+
+// Run Mastodon post daily at 4:00 AM
+cron.schedule('0 4 * * *', () => {
+  runMastodonPost();
+});
+
 // H2H Unbeaten Streaks Scraper - daily at 12:10 AM WAT
 const scrapeH2h = require('./scripts/scrape-h2h-unbeaten');
 const { scrapeUnbeatenStreaks } = scrapeH2h;
