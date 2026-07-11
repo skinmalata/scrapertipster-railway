@@ -208,8 +208,8 @@ async function main() {
       failed++;
     }
 
-    // 2 second delay between posts to avoid rate limits
-    await delay(2000);
+    // 10 second delay between posts to avoid rate limits
+    await delay(10000);
   }
 
   console.log(`\nDone. ${posted} posted, ${failed} failed.`);
