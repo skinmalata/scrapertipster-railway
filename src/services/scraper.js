@@ -338,12 +338,12 @@ async function scrapeDate(dateStr, retryCount = 0) {
   });
 
   const $ = cheerio.load(html);
-  const matches = [];
+  let matches = [];
   const fallbackMatches = [];
-  const over25Matches = [];
-  const over15Matches = [];
-  const bttsMatches = [];
-  const bttsNoMatches = [];
+  let over25Matches = [];
+  let over15Matches = [];
+  let bttsMatches = [];
+  let bttsNoMatches = [];
   
   const matchElements = $('.match');
   console.log(`Found ${matchElements.length} match elements for ${dateStr}`);
@@ -518,6 +518,20 @@ async function scrapeDate(dateStr, retryCount = 0) {
     console.log(`Only ${matches.length} matches with 65%+, adding ${fallbackMatches.length} matches with 60-64%`);
     matches.push(...fallbackMatches);
   }
+  
+  // Deduplicate within Statarea results (same match may appear in multiple sections)
+  const seenKeys = new Set();
+  const dedup = (arr) => arr.filter(m => {
+    const key = normalizeMatchKey(m.match, m.date);
+    if (seenKeys.has(key)) return false;
+    seenKeys.add(key);
+    return true;
+  });
+  matches = dedup(matches);
+  over25Matches = dedup(over25Matches);
+  over15Matches = dedup(over15Matches);
+  bttsMatches = dedup(bttsMatches);
+  bttsNoMatches = dedup(bttsNoMatches);
   
   return { matches, over25Matches, over15Matches, bttsMatches, bttsNoMatches };
 }
@@ -999,7 +1013,7 @@ async function fetchAndCachePredictions() {
     
     // Scrape ProSoccer for additional 1X2 predictions with >70% confidence
     console.log('Scraping ProSoccer predictions...');
-    const statareaKeys = new Set(allMatches.map(m => `${m.match.toLowerCase()}|${m.date}`));
+    const statareaKeys = new Set(allMatches.map(m => normalizeMatchKey(m.match, m.date)));
     const proSoccerAll = [];
     const dateRangeSet = new Set(dateRange);
     for (const dateStr of dateRange) {
@@ -1007,7 +1021,7 @@ async function fetchAndCachePredictions() {
       for (const pm of proMatches) {
         // Only include matches whose date is within our expected range
         if (!dateRangeSet.has(pm.date)) continue;
-        const key = `${pm.match.toLowerCase()}|${pm.date}`;
+        const key = normalizeMatchKey(pm.match, pm.date);
         if (!statareaKeys.has(key)) {
           proSoccerAll.push(pm);
           statareaKeys.add(key);
@@ -1160,6 +1174,19 @@ function normalizeTeamName(name) {
     .replace(/[^a-z0-9]/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
+}
+
+function normalizeMatchKey(matchStr, date) {
+  const parts = matchStr.split(/\s*-\s*/);
+  const normalized = parts.map(p => {
+    return p.toLowerCase()
+      .replace(/\b(ff|bk|if|fk|sc|cf|afc|fc|ac|as|ss|rv|av|ov|uk|sk|tk|ok|op|kb|mb|ab|hb|fb|db|cb|lb|ub|ib|ob|sb|vb|wb|yb|zb)\b/g, '')
+      .replace(/[^a-z0-9]/g, '')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .trim();
+  }).filter(Boolean);
+  return normalized.join('|') + '|' + date;
 }
 
 // Analysis cache file - declared earlier in the file
