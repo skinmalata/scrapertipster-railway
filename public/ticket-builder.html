@@ -680,8 +680,12 @@
  .copy-icon { font-size: 16px; }
 
 
- .share-btn {
+ .share-wrap {
   flex: 1;
+  position: relative;
+ }
+ .share-btn {
+  width: 100%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -703,11 +707,37 @@
   transform: translateY(-1px);
   box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
  }
- .share-btn.copied {
-  background: rgba(74, 222, 128, 0.25);
-  color: #4ade80;
+ .share-dropdown {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #1e2640;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 6px;
+  z-index: 20;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
  }
- .share-icon { font-size: 16px; }
+ .share-dropdown.open { display: block; }
+ .share-option {
+  display: block;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(232,237,245,0.75);
+  text-decoration: none;
+  border-radius: 7px;
+  transition: background 0.2s, color 0.2s;
+  cursor: pointer;
+  text-align: left;
+ }
+ .share-option:hover {
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+ }
+ .share-option:last-child { border-bottom: none; }
 
 
  .bet-btn {
@@ -1487,9 +1517,19 @@
 
  '<span class="copy-icon"></span> Copy Selections</button>' +
 
- '<button class="share-btn" data-share=\'' + copyData + '\'>' +
+ '<div class="share-wrap"><button class="share-btn" data-toggle="share-' + tidx + '">&#9733; Share</button><div class="share-dropdown" id="share-' + tidx + '">' +
 
- '<span class="share-icon"></span> Share</button>' +
+ '<a class="share-option" href="https://api.whatsapp.com/send?text=' + encodeURIComponent('WinFulltime Ticket ' + (tidx+1) + ' - ' + ticket.selections.length + ' Legs @ ' + ticket.totalOdds + ' odds') + '" target="_blank" rel="noopener">WhatsApp</a>' +
+
+ '<a class="share-option" href="https://twitter.com/intent/tweet?text=' + encodeURIComponent('Check out this accumulator from @winfulltime! ' + ticket.totalOdds + ' odds, ' + ticket.selections.length + ' legs') + '" target="_blank" rel="noopener">X / Twitter</a>' +
+
+ '<a class="share-option" href="https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent('https://winfulltime.com/ticket-builder.html') + '&quote=' + encodeURIComponent('Football Accumulator @ ' + ticket.totalOdds + ' odds') + '" target="_blank" rel="noopener">Facebook</a>' +
+
+ '<a class="share-option" href="https://t.me/share/url?url=' + encodeURIComponent('https://winfulltime.com/ticket-builder.html') + '&text=' + encodeURIComponent('Football Accumulator @ ' + ticket.totalOdds + ' odds - ' + ticket.selections.length + ' legs') + '" target="_blank" rel="noopener">Telegram</a>' +
+
+ '<a class="share-option share-copy" data-copy=\'' + copyData + '\'>' + 'Copy Link</a>' +
+
+ '</div></div>' +
 
  (AFFILIATE_URL ? '<a href="' + AFFILIATE_URL + '" target="_blank" rel="noopener" class="bet-btn"> Bet Now</a>' : '') +
 
@@ -1559,20 +1599,18 @@
 
 
  document.addEventListener('click', function(e) {
-  var shareBtn = e.target.closest('[data-share]');
-  if (!shareBtn) return;
-  var data = JSON.parse(shareBtn.dataset.share);
-  var aff = data.aff ? '\n\n ' + data.aff : '';
-  var text = 'WinFulltime Ticket ' + data.num + ' - ' + data.legs.length + ' Legs @ ' + data.total + ' odds\n\n' + data.legs.join('\n') + '\n\nTotal Odds: ' + data.total + '\nTarget: ' + data.target + aff;
-  if (navigator.share) {
-   navigator.share({ title: 'WinFulltime Ticket ' + data.num, text: text }).catch(function(){});
-  } else {
-   navigator.clipboard.writeText(text).then(function() {
-    shareBtn.classList.add('copied');
-    var orig = shareBtn.innerHTML;
-    shareBtn.innerHTML = '<span class=\"share-icon\"></span> Shared!';
-    setTimeout(function() { shareBtn.innerHTML = orig; shareBtn.classList.remove('copied'); }, 2000);
-   }).catch(function() { alert('Failed to share.'); });
+  var toggle = e.target.closest('[data-toggle]');
+  if (toggle) {
+   var dd = document.getElementById(toggle.dataset.toggle);
+   if (dd) {
+    var isOpen = dd.classList.contains('open');
+    document.querySelectorAll('.share-dropdown.open').forEach(function(d){ d.classList.remove('open'); });
+    if (!isOpen) dd.classList.add('open');
+   }
+   return;
+  }
+  if (!e.target.closest('.share-wrap')) {
+   document.querySelectorAll('.share-dropdown.open').forEach(function(d){ d.classList.remove('open'); });
   }
  });
 </script>
