@@ -1437,18 +1437,6 @@
 
  var html = top.map(function(ticket, tidx) {
 
- var combinedProb = 1;
-
- for (var pi = 0; pi < ticket.selections.length; pi++) {
-
- combinedProb *= (ticket.selections[pi].probability / 100);
-
- }
-
- var confidence = (combinedProb * 100).toFixed(1);
-
- var confColor = confidence >= 30 ? '#4ade80' : confidence >= 15 ? '#facc15' : '#ff2448';
-
  var legLines = ticket.selections.map(function(s, i) {
 
  return (i + 1) + '. ' + s.match + ' - ' + s.tip;
@@ -1509,7 +1497,7 @@
 
  '<div class="ticket-table-footer">' +
 
- '<div class="ticket-confidence"><span style="color:' + confColor + '">&#9679;</span> Confidence: <strong>' + confidence + '%</strong></div>' +
+
 
  '<div class="ticket-actions">' +
 
