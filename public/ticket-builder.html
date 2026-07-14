@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
  <meta charset="UTF-8">
@@ -70,8 +70,13 @@
  <input type="checkbox" id="ticketTodayOnly" checked>
  <label for="ticketTodayOnly">Only Today's Matches</label>
 </div>
- <button class="gen-btn" onclick="generateTickets()">Generate Tickets</button>
- <div style="font-size: 12px; color: rgba(255,255,255,0.85); text-align: center; margin-top: 14px; letter-spacing: 0.2px;">Odds are estimated based on prediction probabilities</div>
+
+ <div style="display:flex;gap:10px;margin-top:16px;">
+ <button class="gen-btn" onclick="generateTickets()" style="flex:1;">Generate Tickets</button>
+ <button class="gen-btn" onclick="shuffleTickets()" style="flex:1;background:linear-gradient(135deg,#4ade80,#22c55e);color:#0a0e17;">Shuffle</button>
+ </div>
+ <div style="font-size:12px;color:rgba(255,255,255,0.85);text-align:center;margin-top:14px;letter-spacing:0.2px;">Odds include estimated bookmaker margin (~5%)</div>
+
 </div>
 
  <div id="ticketResults">
@@ -164,22 +169,25 @@
  nav a { font-size: 13px !important; }
  }
 
- @media (max-width: 480px) {
- .ticket-card { padding: 20px 16px; border-radius: 12px; }
- .ticket-card .ticket-header { font-size: 15px; margin-bottom: 14px; padding-bottom: 12px; }
- .ticket-card .ticket-odds { font-size: 22px; }
- .ticket-leg { padding: 12px 0; gap: 8px; }
- .ticket-leg .leg-match { font-size: 14px; }
- .ticket-leg .leg-cat { font-size: 12px; min-width: 0; }
- .ticket-form { padding: 20px 16px; }
- .ticket-form input[type="number"] { font-size: 14px; padding: 10px 12px; }
- .ticket-actions { flex-direction: column; gap: 8px; }
- .hero h1 { font-size: 24px; }
- .hero-subtext { font-size: 14px; }
- .copy-btn, .bet-btn { font-size: 13px; padding: 12px 16px; }
- .no-matches { padding: 32px 16px; }
- .how-it-works { margin-top: 32px; }
- }
+ @media (max-width: 480px) {
+ .ticket-table-wrap { margin-bottom: 16px; }
+ .ticket-table-header { font-size: 17px; padding: 16px 16px; }
+ .ticket-odds { font-size: 24px; }
+ .ticket-table thead th { font-size: 10px; padding: 10px 8px; letter-spacing: 0.5px; }
+ .ticket-table tbody td { padding: 10px 8px; font-size: 13px; }
+ .ticket-cell-num { font-size: 14px; }
+ .ticket-cell-match { font-size: 15px; max-width: 160px; }
+ .ticket-cell-tip .tip-badge { font-size: 13px; padding: 4px 10px; }
+ 
+ .ticket-actions { flex-direction: column; gap: 8px; }
+ .copy-btn, .bet-btn { font-size: 13px; padding: 12px 16px; }
+ .hero h1 { font-size: 24px; }
+ .hero-subtext { font-size: 14px; }
+ .ticket-form { padding: 20px 16px; }
+ .ticket-form input[type="number"] { font-size: 14px; padding: 10px 12px; }
+ .no-matches { padding: 32px 16px; }
+ .how-it-works { margin-top: 32px; }
+ }
 
  nav { display: flex; gap: 24px; align-items: center; }
  nav a {
@@ -379,35 +387,34 @@
  font-weight: 500 !important;
  }
 
- .ticket-card {
+ .ticket-table-wrap {
  background: linear-gradient(135deg, rgba(30,38,56,0.85), rgba(21,26,44,0.9));
  border: 1px solid rgba(255, 255, 255, 0.06);
  border-radius: 16px;
- padding: 28px 32px;
+ overflow: hidden;
  margin-bottom: 20px;
  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
  transition: border-color 0.3s, box-shadow 0.3s;
  }
 
- .ticket-card:hover {
+.ticket-table-wrap:hover {
  border-color: rgba(255, 36, 72, 0.2);
  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 36, 72, 0.06);
  }
 
- .ticket-card .ticket-header {
+.ticket-table-header {
  display: flex;
  justify-content: space-between;
  align-items: center;
- margin-bottom: 18px;
- padding-bottom: 16px;
+ padding: 20px 24px;
  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
  color: #e8edf5;
  font-weight: 600;
- font-size: 18px;
+ font-size: 17px;
  letter-spacing: 0.2px;
  }
 
- .ticket-card .ticket-odds {
+.ticket-odds {
  font-size: 28px;
  font-weight: 800;
  background: linear-gradient(135deg, #4ade80, #22c55e);
@@ -416,30 +423,71 @@
  background-clip: text;
  }
 
- .ticket-leg {
- display: flex;
- align-items: center;
- justify-content: space-between;
- padding: 14px 0;
- border-bottom: 1px solid rgba(255, 255, 255, 0.04);
- gap: 12px;
+.ticket-table {
+ width: 100%;
+ border-collapse: collapse;
+ table-layout: auto;
  }
 
- .ticket-leg:last-child { border-bottom: none; }
-
- .ticket-leg .leg-match {
- flex: 1;
- font-size: 17px;
- color: rgba(232, 237, 245, 0.85);
- }
-
- .ticket-leg .leg-tip {
- background: linear-gradient(135deg, #ff2448, #d41a38);
- color: #fff;
+.ticket-table thead th {
+ padding: 14px 18px;
  font-size: 13px;
  font-weight: 700;
- padding: 5px 14px;
- border-radius: 8px;
+ text-transform: uppercase;
+ letter-spacing: 0.8px;
+ color: rgba(232,237,245,0.4);
+ background: rgba(21,26,44,0.5);
+ border-bottom: 1px solid rgba(255,255,255,0.06);
+ text-align: left;
+ white-space: nowrap;
+ }
+
+.th-num { width: 40px; text-align: center; }
+.th-tip { width: 110px; text-align: center; }
+
+.ticket-table tbody tr {
+ border-bottom: 1px solid rgba(255,255,255,0.03);
+ transition: background 0.2s;
+ }
+
+.ticket-table tbody tr:last-child { border-bottom: none; }
+.ticket-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+.ticket-table tbody td {
+ padding: 14px 18px;
+ font-size: 16px;
+ color: rgba(232,237,245,0.8);
+ vertical-align: middle;
+ }
+
+.ticket-cell-num {
+ text-align: center;
+ color: rgba(232,237,245,0.4);
+ font-weight: 600;
+ font-size: 15px;
+ font-variant-numeric: tabular-nums;
+ }
+
+.ticket-cell-match {
+ font-weight: 600;
+ color: rgba(232,237,245,0.9);
+ font-size: 16px;
+ white-space: nowrap;
+ overflow: hidden;
+ text-overflow: ellipsis;
+ max-width: 260px;
+ }
+
+.ticket-cell-tip { text-align: center; }
+
+.tip-badge {
+ display: inline-block;
+ background: linear-gradient(135deg, #ff2448, #d41a38);
+ color: #fff;
+ font-size: 14px;
+ font-weight: 700;
+ padding: 4px 12px;
+ border-radius: 6px;
  white-space: nowrap;
  letter-spacing: 0.3px;
  }
@@ -669,285 +717,643 @@
  }
 
  .footer-copyright a:hover { color: #ff2448; }
+
+ .ticket-confidence {
+
+ font-size: 13px;
+
+ color: rgba(232, 237, 245, 0.6);
+
+ margin-top: 8px;
+
+ padding-top: 8px;
+
+ border-top: 1px solid rgba(255, 255, 255, 0.04);
+
+ letter-spacing: 0.2px;
+
+ }
+
+ .ticket-confidence strong {
+
+ color: rgba(232, 237, 245, 0.85);
+
+ font-weight: 700;
+
+ }
 </style>
 
- <script>
- async function generateTickets() {
- const target = parseFloat(document.getElementById('ticketTarget').value);
- const minOdds = parseFloat(document.getElementById('ticketMinOdds').value);
- const maxOdds = parseFloat(document.getElementById('ticketMaxOdds').value);
- const todayOnly = document.getElementById('ticketTodayOnly').checked;
- const results = document.getElementById('ticketResults');
-
- results.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text">Building tickets...</div></div>`;
-
- try {
- const res = await fetch('/data/predictions.json');
- if (!res.ok) throw new Error('Failed to load predictions');
- const data = await res.json();
-
- const today = data.date || new Date().toISOString().split('T')[0];
- const maxTickets = 8;
-
- // Load unbeaten data
- let unbeatenMatches = [];
- try {
- const ubRes = await fetch('/data/h2h-unbeaten.json');
- if (ubRes.ok) {
- const ubData = await ubRes.json();
- unbeatenMatches = (ubData.dates && ubData.dates[today]) || [];
- }
- } catch (e) { /* unbeaten data unavailable */ }
-
- const picks = [];
- const seen = new Set();
-
- function addPicks(matches, category) {
- if (!matches) return;
- for (const m of matches) {
- const matchName = m.nextMatch || m.match;
- if (!matchName || !m.tip || !m.probability) continue;
- const effectiveProb = m.probability > 0 && m.probability <= 100 ? m.probability : 50;
+ <script>
+
+ let allPicks = [];
+
+ let allUnbeaten = [];
+
+ let lastData = null;
+
+ let lastUbData = null;
+
+ let lastTarget = 20;
+
+ async function generateTickets(shuffle) {
+
+ const target = parseFloat(document.getElementById('ticketTarget').value);
+
+ const minOdds = parseFloat(document.getElementById('ticketMinOdds').value);
+
+ const maxOdds = parseFloat(document.getElementById('ticketMaxOdds').value);
+
+ const todayOnly = document.getElementById('ticketTodayOnly').checked;
+
+ const results = document.getElementById('ticketResults');
+
+ lastTarget = target;
+
+ results.innerHTML = '<div class="loading"><div class="spinner"></div><div class="loading-text">Building tickets...</div></div>';
+
+ try {
+
+ if (!lastData) {
+
+ const res = await fetch('/data/predictions.json');
+
+ if (!res.ok) throw new Error('Failed to load predictions');
+
+ lastData = await res.json();
+
+ }
+
+ if (!lastUbData) {
+
+ try {
+
+ const ubRes = await fetch('/data/h2h-unbeaten.json');
+
+ if (ubRes.ok) lastUbData = await ubRes.json();
+
+ } catch (e) {}
+
+ }
+
+ const data = lastData;
+
+ const today = data.date || new Date().toISOString().split('T')[0];
+
+ let unbeatenMatches = [];
+
+ if (lastUbData) {
+
+ unbeatenMatches = (lastUbData.dates && lastUbData.dates[today]) || [];
+
+ }
+
+ allPicks = [];
+
+ const seen = new Set();
+
+ function addPicks(matches, category) {
+
+ if (!matches) return;
+
+ for (const m of matches) {
+
+ const matchName = m.nextMatch || m.match;
+
+ if (!matchName || !m.tip || !m.probability) continue;
+
+ const effectiveProb = m.probability > 0 && m.probability <= 100 ? m.probability : 50;
+
  if (todayOnly && m.date !== today) continue;
- const odds = parseFloat((100 / effectiveProb).toFixed(2));
- if (odds < minOdds || odds > maxOdds) continue;
- let tipText = m.tip;
- if (m.streak && m.match && matchName !== m.match) {
- tipText = `${m.match} - ${m.tip}`;
- }
- const key = `${matchName}|${tipText}|${m.date}`;
- if (seen.has(key)) continue;
- seen.add(key);
- picks.push({
- match: matchName,
- tip: tipText,
- odds,
- probability: effectiveProb,
- date: m.date,
- time: m.time || '',
- league: m.league || '',
- category
- });
- }
- }
-
- function addUnbeatenPicks(matches) {
- if (!matches) return;
- for (const m of matches) {
- if (!m.match || !m.streaks) continue;
- const matchDate = today;
- for (const s of m.streaks) {
- const tipText = `${s.team} - ${s.count} unbeaten${s.location ? ' ' + s.location : ''}`;
- const key = `${m.match}|${tipText}|${matchDate}`;
- if (seen.has(key)) continue;
- const prob = Math.min(85, Math.max(50, 50 + s.count * 2));
- const odds = parseFloat((100 / prob).toFixed(2));
- if (odds < minOdds || odds > maxOdds) continue;
- seen.add(key);
- picks.push({
- match: m.match,
- tip: tipText,
- odds,
- probability: prob,
- date: matchDate,
- time: m.time || '',
- league: m.league || '',
- category: 'Unbeaten'
- });
- }
- }
- }
-
- addPicks(data.matches, '1X2');
- addPicks(data.over15Matches, 'Over 1.5');
- addPicks(data.over25Matches, 'Over 2.5');
- addPicks(data.bttsMatches, 'BTTS YES');
- addPicks(data.bttsNoMatches, 'BTTS NO');
- addUnbeatenPicks(unbeatenMatches);
-
- if (picks.length === 0) {
- results.innerHTML = `<div class="no-matches"><p>No picks match the criteria. Try adjusting your odds range or disable "Only Today's Matches".</p></div>`;
- return;
- }
-
- picks.sort((a, b) => a.odds - b.odds);
-
- // Build a diverse pool: take top picks from each category evenly
- const scored = picks.map(p => ({
-...p,
- score: Math.abs(Math.log(p.odds) - Math.log(target) / 4)
- }));
- scored.sort((a, b) => a.score - b.score);
-
- const pool = [];
- const perCategory = {};
- for (const p of scored) {
- if (!perCategory[p.category]) perCategory[p.category] = [];
- perCategory[p.category].push(p);
- }
- const cats = Object.keys(perCategory);
- const poolMatchCount = new Map();
- let catIdx = 0;
- for (let i = 0; i < 80; i++) {
- const cat = cats[catIdx % cats.length];
- const catPicks = perCategory[cat];
- const idx = Math.floor(catIdx / cats.length);
- if (idx < catPicks.length) {
- const pick = catPicks[idx];
- const mcnt = poolMatchCount.get(pick.match) || 0;
- if (mcnt < 2) {
- poolMatchCount.set(pick.match, mcnt + 1);
- pool.push(pick);
- }
- }
- catIdx++;
- }
-
- const tickets = [];
- const seenKeys = new Set();
- let iterations = 0;
- const MAX_ITER = 50000;
- const maxLegs = 8;
-
- function backtrack(start, current, product, usedMatches) {
- if (iterations >= MAX_ITER) return;
- if (current.length >= 2) {
- iterations++;
- const key = current.map(s => `${s.match}|${s.tip}`).sort().join('||');
- if (!seenKeys.has(key)) {
- seenKeys.add(key);
- tickets.push({
- selections: [...current],
- totalOdds: parseFloat(product.toFixed(2)),
- diff: Math.abs(product - target)
- });
- }
- }
- if (current.length >= maxLegs) return;
-
- for (let i = start; i < pool.length; i++) {
- if (iterations >= MAX_ITER) return;
- const p = pool[i];
- if (usedMatches.has(p.match)) continue;
- const newProduct = product * p.odds;
- if (newProduct > target * 1.2) break;
- usedMatches.add(p.match);
- current.push(p);
- backtrack(i + 1, current, newProduct, usedMatches);
- current.pop();
- usedMatches.delete(p.match);
- }
- }
-
- backtrack(0, [], 1, new Set());
-
- if (tickets.length === 0) {
- results.innerHTML = `<div class="no-matches"><p>No ticket combinations found. Try adjusting your target odds or range.</p></div>`;
- return;
- }
-
- tickets.sort((a, b) => a.diff - b.diff);
-
- // Greedy diverse ticket selection
- const top = [];
- const usedPairs = new Map();
- const taken = new Set();
-
- for (let round = 0; round < maxTickets; round++) {
- let bestIdx = -1;
- let bestScore = -Infinity;
-
- for (let i = 0; i < tickets.length; i++) {
- if (taken.has(i)) continue;
- const pairs = tickets[i].selections.map(s => `${s.match}|${s.tip}`);
- const exceeds = pairs.some(p => (usedPairs.get(p) || 0) >= 2);
- if (exceeds) continue;
- const newCount = pairs.filter(p => !usedPairs.has(p)).length;
- const score = newCount * 100 - tickets[i].diff;
- if (score > bestScore) {
- bestScore = score;
- bestIdx = i;
- }
- }
-
- if (bestIdx === -1) break;
- const t = tickets[bestIdx];
- taken.add(bestIdx);
- top.push(t);
- const pairs = t.selections.map(s => `${s.match}|${s.tip}`);
- for (const p of pairs) usedPairs.set(p, (usedPairs.get(p) || 0) + 1);
- }
-
- if (top.length < 2 && tickets.length > 0) {
- top.length = 0;
- top.push(...tickets.slice(0, maxTickets));
- }
-
- // Set your affiliate link here (or pass via server)
- const AFFILIATE_URL = '';
-
- const html = top.map((ticket, ti) => {
- const legsHtml = ticket.selections.map(s => `
- <div class="ticket-leg">
- <span class="leg-match">${s.match}</span>
- <span class="leg-cat">${s.tip}</span>
-</div>
- `).join('');
-
- const legLines = ticket.selections.map((s, i) =>
- `${i + 1}. ${s.match} - ${s.tip}`
- );
- const copyData = JSON.stringify({
- legs: legLines,
- total: ticket.totalOdds,
- num: ti + 1,
- target: target,
- aff: AFFILIATE_URL
- });
-
- return `
- <div class="ticket-card fade-in" style="animation-delay: ${ti * 80}ms">
- <div class="ticket-header">
- <span>Ticket ${ti + 1} &mdash; ${ticket.selections.length} Legs</span>
- <span class="ticket-odds">${ticket.totalOdds} odds</span>
-</div>
- ${legsHtml}
- <div class="ticket-actions" style="margin-top: 12px;">
- <button class="copy-btn" data-copy='${copyData}'>
- <span class="copy-icon"></span> Copy Selections
-</button>
- ${AFFILIATE_URL ? `<a href="${AFFILIATE_URL}" target="_blank" rel="noopener" class="bet-btn"> Bet Now</a>` : ''}
-</div>
-</div>
- `;
- }).join('');
-
- results.innerHTML = `<div class="matches-grid">${html}</div>`;
- } catch (e) {
- results.innerHTML = `<div class="no-matches"><p>Unable to generate tickets. The prediction data may be unavailable. Try again later.</p></div>`;
- }
- }
-
- document.addEventListener('click', function(e) {
- const btn = e.target.closest('[data-copy]');
- if (!btn) return;
- const data = JSON.parse(btn.dataset.copy);
- const aff = data.aff ? '\n\n ' + data.aff : '';
- const text = 'WinFulltime Ticket ' + data.num + ' - ' + data.legs.length + ' Legs @ ' + data.total + ' odds\n\n' +
- data.legs.join('\n') + '\n\nTotal Odds: ' + data.total + '\nTarget: ' + data.target + aff;
-
- navigator.clipboard.writeText(text).then(function() {
- btn.classList.add('copied');
- var orig = btn.innerHTML;
- btn.innerHTML = '<span class="copy-icon"></span> Copied!';
- setTimeout(function() {
- btn.innerHTML = orig;
- btn.classList.remove('copied');
- }, 2000);
- }).catch(function() {
- alert('Failed to copy. Select and copy manually.');
- });
- });
+ if (effectiveProb < 40) continue;
+
+ const odds = parseFloat(((100 / effectiveProb) / 1.05).toFixed(2));
+
+ if (odds < minOdds || odds > maxOdds) continue;
+
+ let tipText = m.tip;
+
+ if (m.streak && m.match && matchName !== m.match) {
+
+ tipText = m.match + ' - ' + m.tip;
+
+ }
+
+ const key = matchName + '|' + tipText + '|' + m.date;
+
+ if (seen.has(key)) continue;
+
+ seen.add(key);
+
+ allPicks.push({
+
+ match: matchName,
+
+ tip: tipText,
+
+ odds: odds,
+
+ probability: effectiveProb,
+
+ date: m.date,
+
+ time: m.time || '',
+
+ league: m.league || '',
+
+ category: category
+
+ });
+
+ }
+
+ }
+
+ function addUnbeatenPicks(matches) {
+
+ if (!matches) return;
+
+ for (const m of matches) {
+
+ if (!m.match || !m.streaks) continue;
+
+ const matchDate = today;
+
+ for (const s of m.streaks) {
+
+ const tipText = s.team + ' or Draw';
+
+ const key = m.match + '|' + tipText + '|' + matchDate;
+
+ if (seen.has(key)) continue;
+
+ const prob = Math.min(85, Math.max(42, 50 + s.count * 2));
+
+ const odds = parseFloat(((100 / prob) / 1.05).toFixed(2));
+
+ if (odds < minOdds || odds > maxOdds) continue;
+
+ seen.add(key);
+
+ allPicks.push({
+
+ match: m.match,
+
+ tip: tipText,
+
+ odds: odds,
+
+ probability: prob,
+
+ date: matchDate,
+
+ time: m.time || '',
+
+ league: m.league || '',
+
+ category: 'Unbeaten'
+
+ });
+
+ }
+
+ }
+
+ }
+
+ addPicks(data.matches, '1X2');
+
+ addPicks(data.over15Matches, 'Over 1.5');
+
+ addPicks(data.over25Matches, 'Over 2.5');
+
+ addPicks(data.bttsMatches, 'BTTS YES');
+
+ addPicks(data.bttsNoMatches, 'BTTS NO');
+
+ addUnbeatenPicks(unbeatenMatches);
+
+ if (allPicks.length === 0) {
+
+ results.innerHTML = '<div class="no-matches"><p>No picks match the criteria. Try adjusting your odds range or disable "Only Today\'s Matches".</p></div>';
+
+ return;
+
+ }
+
+ buildTickets(target, shuffle);
+
+ } catch (e) {
+
+ results.innerHTML = '<div class="no-matches"><p>Unable to generate tickets. The prediction data may be unavailable. Try again later.</p></div>';
+
+ }
+
+ }
+
+ function shuffleTickets() {
+
+ if (allPicks.length === 0) {
+
+ generateTickets(true);
+
+ return;
+
+ }
+
+ buildTickets(lastTarget, true);
+
+ }
+
+ function buildTickets(target, shuffle) {
+
+ const results = document.getElementById('ticketResults');
+
+ const picks = shuffle ? shuffleArray([...allPicks]) : [...allPicks];
+
+ picks.sort(function(a, b) { return a.odds - b.odds; });
+
+ const scored = picks.map(function(p) {
+
+ return Object.assign({}, p, {
+
+ score: Math.abs(Math.log(p.odds) - Math.log(target) / 4)
+
+ });
+
+ });
+
+ scored.sort(function(a, b) { return a.score - b.score; });
+
+ var pool = [];
+
+ var perCategory = {};
+
+ for (var ci = 0; ci < scored.length; ci++) {
+
+ var cat = scored[ci].category;
+
+ if (!perCategory[cat]) perCategory[cat] = [];
+
+ perCategory[cat].push(scored[ci]);
+
+ }
+
+ var cats = Object.keys(perCategory);
+
+ var poolMatchCount = new Map();
+
+ var poolLeagueCount = new Map();
+
+ var catIdx = 0;
+
+ for (var i = 0; i < 120; i++) {
+
+ var catKey = cats[catIdx % cats.length];
+
+ var catPicks = perCategory[catKey];
+
+ var idx = Math.floor(catIdx / cats.length);
+
+ if (idx < catPicks.length) {
+
+ var pick = catPicks[idx];
+
+ var mcnt = poolMatchCount.get(pick.match) || 0;
+
+ var lcnt = poolLeagueCount.get(pick.league) || 0;
+
+ if (mcnt < 2 && lcnt < 6) {
+
+ poolMatchCount.set(pick.match, mcnt + 1);
+
+ poolLeagueCount.set(pick.league, lcnt + 1);
+
+ pool.push(pick);
+
+ }
+
+ }
+
+ catIdx++;
+
+ }
+
+ var extraPicks = scored.filter(function(p) {
+
+ return p.probability >= 40 && p.probability <= 55;
+
+ });
+
+ for (var ei = 0; ei < extraPicks.length && pool.length < 150; ei++) {
+
+ var ep = extraPicks[ei];
+
+ var emcnt = poolMatchCount.get(ep.match) || 0;
+
+ if (emcnt < 2) {
+
+ poolMatchCount.set(ep.match, emcnt + 1);
+
+ pool.push(ep);
+
+ }
+
+ }
+
+ pool.sort(function(a, b) { return a.odds - b.odds; });
+
+ var tickets = [];
+
+ var seenKeys = new Set();
+
+ var iterations = 0;
+
+ var MAX_ITER = 50000;
+
+ var maxLegs = 8;
+
+ function backtrack(start, current, product, usedMatches) {
+
+ if (iterations >= MAX_ITER) return;
+
+ if (current.length >= 2) {
+
+ iterations++;
+
+ var key = current.map(function(s) { return s.match + '|' + s.tip; }).sort().join('||');
+
+ if (!seenKeys.has(key)) {
+
+ seenKeys.add(key);
+
+ tickets.push({
+
+ selections: current.slice(),
+
+ totalOdds: parseFloat(product.toFixed(2)),
+
+ diff: Math.abs(product - target)
+
+ });
+
+ }
+
+ }
+
+ if (current.length >= maxLegs) return;
+
+ for (var j = start; j < pool.length; j++) {
+
+ if (iterations >= MAX_ITER) return;
+
+ var p = pool[j];
+
+ if (usedMatches.has(p.match)) continue;
+
+ var newProduct = product * p.odds;
+
+ if (newProduct > target * 1.2) break;
+
+ usedMatches.add(p.match);
+
+ current.push(p);
+
+ backtrack(j + 1, current, newProduct, usedMatches);
+
+ current.pop();
+
+ usedMatches.delete(p.match);
+
+ }
+
+ }
+
+ backtrack(0, [], 1, new Set());
+
+ if (tickets.length === 0) {
+
+ results.innerHTML = '<div class="no-matches"><p>No ticket combinations found. Try adjusting your target odds or range.</p></div>';
+
+ return;
+
+ }
+
+ tickets.sort(function(a, b) { return a.diff - b.diff; });
+
+ var top = [];
+
+ var usedPairs = new Map();
+
+ var taken = new Set();
+
+ var maxTickets = 8;
+
+ for (var round = 0; round < maxTickets; round++) {
+
+ var bestIdx = -1;
+
+ var bestScore = -Infinity;
+
+ for (var ti = 0; ti < tickets.length; ti++) {
+
+ if (taken.has(ti)) continue;
+
+ var pairs = tickets[ti].selections.map(function(s) { return s.match + '|' + s.tip; });
+
+ var exceeds = pairs.some(function(p) { return (usedPairs.get(p) || 0) >= 2; });
+
+ if (exceeds) continue;
+
+ var newCount = pairs.filter(function(p) { return !usedPairs.has(p); }).length;
+
+ var sc = newCount * 100 - tickets[ti].diff;
+
+ if (sc > bestScore) {
+
+ bestScore = sc;
+
+ bestIdx = ti;
+
+ }
+
+ }
+
+ if (bestIdx === -1) break;
+
+ var t = tickets[bestIdx];
+
+ taken.add(bestIdx);
+
+ top.push(t);
+
+ var tpairs = t.selections.map(function(s) { return s.match + '|' + s.tip; });
+
+ for (var pi = 0; pi < tpairs.length; pi++) {
+
+ usedPairs.set(tpairs[pi], (usedPairs.get(tpairs[pi]) || 0) + 1);
+
+ }
+
+ }
+
+ if (top.length < 2 && tickets.length > 0) {
+
+ top.length = 0;
+
+ top.push.apply(top, tickets.slice(0, maxTickets));
+
+ }
+
+ var AFFILIATE_URL = '';
+
+ var html = top.map(function(ticket, tidx) {
+
+ var combinedProb = 1;
+
+ for (var pi = 0; pi < ticket.selections.length; pi++) {
+
+ combinedProb *= (ticket.selections[pi].probability / 100);
+
+ }
+
+ var confidence = (combinedProb * 100).toFixed(1);
+
+ var confColor = confidence >= 30 ? '#4ade80' : confidence >= 15 ? '#facc15' : '#ff2448';
+
+ var legLines = ticket.selections.map(function(s, i) {
+
+ return (i + 1) + '. ' + s.match + ' - ' + s.tip;
+
+ });
+
+ var copyData = JSON.stringify({
+
+ legs: legLines,
+
+ total: ticket.totalOdds,
+
+ num: tidx + 1,
+
+ target: target,
+
+ aff: AFFILIATE_URL
+
+ });
+
+ var tableRows = ticket.selections.map(function(s, si) {
+
+ return '<tr class="ticket-row fade-in" style="animation-delay: ' + (tidx * 80 + si * 30) + 'ms">' +
+
+ '<td class="ticket-cell-num">' + (si + 1) + '</td>' +
+
+ '<td class="ticket-cell-match">' + s.match + '</td>' +
+
+ '<td class="ticket-cell-tip"><span class="tip-badge">' + s.tip + '</span></td>' +
+
+ '</tr>'; }).join('');
+
+ return '<div class="ticket-table-wrap fade-in" style="animation-delay: ' + (tidx * 80) + 'ms">' +
+
+ '<div class="ticket-table-header">' +
+
+ '<span class="ticket-table-title">Ticket ' + (tidx + 1) + ' &mdash; ' + ticket.selections.length + ' Legs</span>' +
+
+ '<span class="ticket-odds">' + ticket.totalOdds + ' odds</span>' +
+
+ '</div>' +
+
+ '<table class="ticket-table">' +
+
+ '<thead><tr>' +
+
+ '<th class="th-num">#</th>' +
+
+ '<th class="th-match">Match</th>' +
+
+ '<th class="th-tip">Selection</th>' +
+
+ '</tr></thead>' +
+
+ '<tbody>' + tableRows + '</tbody>' +
+
+ '</table>' +
+
+ '<div class="ticket-table-footer">' +
+
+ '<div class="ticket-confidence"><span style="color:' + confColor + '">&#9679;</span> Confidence: <strong>' + confidence + '%</strong></div>' +
+
+ '<div class="ticket-actions">' +
+
+ '<button class="copy-btn" data-copy=\'' + copyData + '\'>' +
+
+ '<span class="copy-icon"></span> Copy Selections</button>' +
+
+ (AFFILIATE_URL ? '<a href="' + AFFILIATE_URL + '" target="_blank" rel="noopener" class="bet-btn"> Bet Now</a>' : '') +
+
+ '</div></div></div>';
+
+ }).join('');
+
+ results.innerHTML = '<div class="matches-grid">' + html + '</div>';
+
+ }
+
+ function shuffleArray(arr) {
+
+ for (var i = arr.length - 1; i > 0; i--) {
+
+ var j = Math.floor(Math.random() * (i + 1));
+
+ var tmp = arr[i];
+
+ arr[i] = arr[j];
+
+ arr[j] = tmp;
+
+ }
+
+ return arr;
+
+ }
+
+ document.addEventListener('click', function(e) {
+
+ var btn = e.target.closest('[data-copy]');
+
+ if (!btn) return;
+
+ var data = JSON.parse(btn.dataset.copy);
+
+ var aff = data.aff ? '\n\n ' + data.aff : '';
+
+ var text = 'WinFulltime Ticket ' + data.num + ' - ' + data.legs.length + ' Legs @ ' + data.total + ' odds\n\n' +
+
+ data.legs.join('\n') + '\n\nTotal Odds: ' + data.total + '\nTarget: ' + data.target + aff;
+
+ navigator.clipboard.writeText(text).then(function() {
+
+ btn.classList.add('copied');
+
+ var orig = btn.innerHTML;
+
+ btn.innerHTML = '<span class="copy-icon"></span> Copied!';
+
+ setTimeout(function() {
+
+ btn.innerHTML = orig;
+
+ btn.classList.remove('copied');
+
+ }, 2000);
+
+ }).catch(function() {
+
+ alert('Failed to copy. Select and copy manually.');
+
+ });
+
+ });
+
 </script>
  <script src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP" async></script>
  <script>
