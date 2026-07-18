@@ -14,8 +14,8 @@ function getDateStr(offset) {
   return d.toISOString().split('T')[0];
 }
 
-async function fetchOverview(date) {
-  const params = { show_finished: 0, date, category: 'overview', filter: '', gmt: '0', sport: '1' };
+async function fetchNoLosses(date) {
+  const params = { show_finished: 1, date, category: 'h2hstreaks', filter: 'nolosses', gmt: '0', sport: '1' };
   const { data } = await axios.get(API_URL, { params, timeout: 30000 });
   return data;
 }
@@ -24,43 +24,72 @@ function parseUnbeatenStreaks(html) {
   const $ = cheerio.load(html);
   const results = [];
 
-  $('.match-card').each((_, card) => {
+  $('.match-card-second').each((_, card) => {
     const $card = $(card);
-    const time = $card.find('.match-time').clone().children().remove().end().text().trim();
-    const league = $card.find('.match-league-overview').text().replace('|', '').trim();
-    const teams = [];
-    $card.find('.match-teams .team').each((_, t) => {
-      teams.push($(t).text().trim());
-    });
+    const time = $card.find('.match-time').text().trim();
+    const teamsText = $card.find('.match-teams').text().trim();
+    const teams = teamsText.split(' - ').map(t => t.trim());
     if (teams.length < 2) return;
     const matchKey = `${teams[0]} - ${teams[1]}`;
 
+    const subheader = $card.find('.match-subheader').text().trim();
+    const leagueMatch = subheader.match(/-\s*(.+?)\s*$/);
+    const league = leagueMatch ? leagueMatch[1].replace(/&raquo;/g, '|').trim() : '';
+
     const streaks = [];
-    $card.find('.streak-item').each((_, item) => {
-      const $item = $(item);
-      const countText = $item.find('.streak-count').text().trim();
-      const rawText = $item.find('.streak-text').text().trim();
-      const count = parseInt(countText, 10);
+    const lines = $card.find('.match-history .match-line');
+    if (lines.length === 0) return;
 
-      if (isNaN(count)) return;
+    const homeTeam = teams[0];
+    const awayTeam = teams[1];
 
-      const isUnbeaten = rawText.toLowerCase().includes('unbeaten');
-      if (!isUnbeaten) return;
+    let homeStreak = 0;
+    let awayStreak = 0;
 
-      let team = '';
-      let location = '';
+    lines.each((_, line) => {
+      const lineText = $(line).text().trim();
+      const scoreMatch = lineText.match(/(\d+)\s*:\s*(\d+)/);
+      if (!scoreMatch) return;
 
-      let m = rawText.match(/matches in a row where\s+(.+?)\s+was\s+unbeaten(?:\s+(at home|away))?$/i);
-      if (!m) {
-        m = rawText.match(/matches in a row with the\s+(.+?)\s+unbeaten(?:\s+(at home|away))?$/i);
+      const homeScore = parseInt(scoreMatch[1], 10);
+      const awayScore = parseInt(scoreMatch[2], 10);
+
+      const boldTeam = $(line).find('strong').text().trim();
+      const isHomeBold = boldTeam === homeTeam;
+
+      const resultTeam = isHomeBold ? 'home' : 'away';
+      const teamScore = isHomeBold ? homeScore : awayScore;
+      const opponentScore = isHomeBold ? awayScore : homeScore;
+
+      const won = teamScore > opponentScore;
+      const drew = teamScore === opponentScore;
+      const unbeaten = won || drew;
+
+      if (unbeaten) {
+        if (resultTeam === 'home') homeStreak++;
+        else awayStreak++;
+      } else {
+        if (resultTeam === 'home') homeStreak = 0;
+        else awayStreak = 0;
       }
-      if (m) {
-        team = m[1].trim();
-        location = (m[2] || '').toLowerCase();
-      }
-
-      streaks.push({ count, text: rawText, team, location });
     });
+
+    if (homeStreak >= MIN_STREAK) {
+      streaks.push({
+        count: homeStreak,
+        text: `${homeStreak} consecutive unbeaten H2H matches`,
+        team: homeTeam,
+        location: ''
+      });
+    }
+    if (awayStreak >= MIN_STREAK) {
+      streaks.push({
+        count: awayStreak,
+        text: `${awayStreak} consecutive unbeaten H2H matches`,
+        team: awayTeam,
+        location: ''
+      });
+    }
 
     if (streaks.length === 0) return;
 
@@ -102,8 +131,8 @@ function saveCache(cache) {
 }
 
 async function scrapeDate(date) {
-  console.log(`Fetching H2H overview for ${date}...`);
-  const html = await fetchOverview(date);
+  console.log(`Fetching H2H no-losses for ${date}...`);
+  const html = await fetchNoLosses(date);
   console.log('Parsing unbeaten streaks...');
   const allMatches = parseUnbeatenStreaks(html);
   console.log(`Found ${allMatches.length} matches with unbeaten streaks`);
