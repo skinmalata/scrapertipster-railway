@@ -1,5 +1,6 @@
 const scraper = require('../src/services/scraper');
 const { scrapeUnbeatenStreaks } = require('./scrape-h2h-unbeaten');
+const { scrapeBttsNo } = require('./scrape-btts-no');
 const { generateAllPages } = require('./generate-category-pages');
 const fs = require('fs');
 const path = require('path');
@@ -175,6 +176,36 @@ async function main() {
     }
   }
 
+  // BTTS No from h2hstats
+  console.log('Fetching BTTS No from h2hstats...');
+  try {
+    const today = getDateStr(0);
+    const tomorrow = getDateStr(1);
+    const bttsNoData = await scrapeBttsNo([today, tomorrow]);
+    if (bttsNoData && bttsNoData.matches && bttsNoData.matches.length > 0) {
+      const predFile = path.join(dataDir, 'predictions.json');
+      const predictions = JSON.parse(fs.readFileSync(predFile, 'utf8'));
+      predictions.bttsNoMatches = bttsNoData.matches;
+      fs.writeFileSync(predFile, JSON.stringify(predictions));
+      console.log(`Merged bttsNoMatches: ${bttsNoData.matches.length} matches`);
+    }
+  } catch (err) {
+    console.error('BTTS No fetch failed:', err.message);
+    const bttsNoFile = path.join(process.cwd(), 'btts-no-cache.json');
+    if (fs.existsSync(bttsNoFile)) {
+      try {
+        const bttsNoCache = JSON.parse(fs.readFileSync(bttsNoFile, 'utf8'));
+        if (bttsNoCache.matches && bttsNoCache.matches.length > 0) {
+          const predFile = path.join(dataDir, 'predictions.json');
+          const predictions = JSON.parse(fs.readFileSync(predFile, 'utf8'));
+          predictions.bttsNoMatches = bttsNoCache.matches;
+          fs.writeFileSync(predFile, JSON.stringify(predictions));
+          console.log(`Used cached bttsNoMatches: ${bttsNoCache.matches.length} matches`);
+        }
+      } catch (e) {}
+    }
+  }
+
   // Merge corners, cards, both-halves data from their separate caches/scrapers
   const mergeCacheFile = (cacheFile, key) => {
     if (fs.existsSync(cacheFile)) {
@@ -300,6 +331,19 @@ function rebuildStatic() {
       console.log('Merged both-halves matches:', predictions.teamToScore2PlusMatches.length);
     } catch (e) {
       console.error('Failed to load both-halves cache:', e.message);
+    }
+  }
+
+  const bttsNoCacheFile = path.join(process.cwd(), 'btts-no-cache.json');
+  if (fs.existsSync(bttsNoCacheFile)) {
+    try {
+      const bttsNoData = JSON.parse(fs.readFileSync(bttsNoCacheFile, 'utf8'));
+      if (bttsNoData.matches && bttsNoData.matches.length > 0) {
+        predictions.bttsNoMatches = bttsNoData.matches;
+        console.log('Merged btts-no matches:', predictions.bttsNoMatches.length);
+      }
+    } catch (e) {
+      console.error('Failed to load btts-no cache:', e.message);
     }
   }
 
