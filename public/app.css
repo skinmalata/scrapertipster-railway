@@ -130,7 +130,7 @@
  background: none;
  border: 1px solid var(--border);
  border-radius: 8px;
- padding: 4px 8px;
+ padding: 8px 12px;
  cursor: pointer;
  font-size: 16px;
  line-height: 1;
@@ -138,9 +138,11 @@
  transition: all 0.2s;
  display: inline-flex;
  align-items: center;
- justify-content: center;
- }
-
+ justify-content: center;
+
+ min-height: 44px;
+
+ }
 .theme-toggle:hover {
  border-color: var(--border-hover);
  color: var(--text-primary);
@@ -809,7 +811,7 @@ nav a.active::after {
  gap: 6px;
  }
  .tab-btn {
- padding: 8px 14px;
+ padding: 12px 14px;
  font-size: 13px;
  }
  .stats-bar {
@@ -1207,6 +1209,6 @@ body { overflow-x: hidden; }
   .hamburger { display: block; }
   nav { display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-primary); border-bottom: 1px solid var(--border); flex-direction: column; padding: 16px; gap: 12px; z-index: 1000; }
   nav.open { display: flex; }
-  nav a { font-size: 15px; padding: 8px 0; }
+  nav a { font-size: 15px; padding: 12px 0; min-height: 44px; display: flex; align-items: center; }
   .header-content { position: relative; }
 }
