@@ -6,7 +6,7 @@ const FAQ_SCHEMA = {
     { q: 'What does 1X2 mean in football betting?', a: '1X2 is the standard match result market. 1 means the home team wins, X means the match ends in a draw, and 2 means the away team wins. It covers the three possible outcomes after 90 minutes of regulation time including stoppage time.' },
     { q: 'How accurate are WinFulltime 1X2 predictions?', a: 'Our AI model analyzes team form, head-to-head records, home/away performance, and league context to assign a probability percentage to each outcome. No system guarantees wins, but probability scores help you assess risk. Higher percentages indicate stronger confidence picks.' },
     { q: 'Do 1X2 predictions include extra time?', a: 'No. All 1X2 predictions cover only the 90-minute regulation result plus stoppage time. Extra time and penalty shootouts are excluded from this market.' },
-    { q: 'How often are 1X2 predictions updated?', a: 'Predictions are refreshed daily. The primary update runs at 1:00 AM WAT and a secondary scrape at 6:00 AM WAT captures late-appearing fixtures across 50+ leagues worldwide.' },
+    { q: 'How often are 1X2 predictions updated?', a: 'Predictions are refreshed daily. The primary update runs at 1:00 AM WAT and a secondary update at 6:00 AM WAT captures late-appearing fixtures across 50+ leagues worldwide.' },
     { q: 'Can I use 1X2 picks in accumulators?', a: 'Yes. 1X2 picks are the most common accumulator legs. Use our Ticket Builder to automatically combine 1X2 picks with Over 2.5, BTTS, and other markets for optimized tickets.' },
     { q: 'Which leagues do 1X2 predictions cover?', a: 'WinFulltime covers 50+ leagues including the Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, and second divisions across South America, Africa, and Asia.' }
   ],
@@ -48,15 +48,15 @@ const FAQ_SCHEMA = {
     { q: 'Why do unbeaten streaks matter for betting?', a: 'Teams on long unbeaten runs signal tactical consistency and psychological confidence. Mid-table teams with quiet 8-12 game unbeaten runs often offer value odds. Unbeaten streaks help identify form that bookmakers may undervalue.' },
     { q: 'Can I combine unbeaten streaks with other markets?', a: 'Yes. Unbeaten streak data works well alongside 1X2 tips and Over 1.5 goals in accumulators. Teams on long unbeaten runs are statistically more likely to avoid defeat, making them strong double-chance or draw-no-bet picks.' },
     { q: 'How do I read the unbeaten streak badges?', a: 'Each match card shows the fixture, kick-off time, league, and streak badges. A badge reading "8 unbeaten" means the team has not lost in their last 8 matches. Some entries show "home" or "away" to indicate the streak applies to specific venues only.' },
-    { q: 'When is unbeaten streak data updated?', a: 'Data updates daily. The primary scrape runs at 1:00 AM WAT and a secondary update at 6:00 AM WAT ensures late results and newly scheduled fixtures are captured across dozens of leagues worldwide.' }
+    { q: 'When is unbeaten streak data updated?', a: 'Data updates daily. The primary update runs at 1:00 AM WAT and a secondary update at 6:00 AM WAT ensures late results and newly scheduled fixtures are captured across dozens of leagues worldwide.' }
   ],
   'corners': [
     { q: 'What do corner predictions cover?', a: 'Our corner predictions identify matches likely to have a high number of corners. We track Over 8.5 and Over 9.5 corner markets, using historical corner data to find matches with the strongest corner trends.' },
-    { q: 'How are corner predictions calculated?', a: 'Each prediction is based on historical corner statistics. We only show matches where the source hit rate exceeds 80%, meaning the Over 8.5 or Over 9.5 corners market has landed in 4 out of the last 5 similar fixtures. Hit rate, odds, and league are shown for each pick.' },
+    { q: 'How are corner predictions calculated?', a: 'Each prediction is based on historical corner statistics. We only show matches where the hit rate exceeds 80%, meaning the Over 8.5 or Over 9.5 corners market has landed in 4 out of the last 5 similar fixtures. Hit rate, odds, and league are shown for each pick.' },
     { q: 'What does "hit rate" mean for corners?', a: 'Hit rate is the percentage of recent matches in which the corners market landed. A 100% hit rate means the Over 8.5 or Over 9.5 corners line has been exceeded in every recent match for that fixture or league. We only display picks above 80%.' },
     { q: 'Which leagues have the most corners?', a: 'Leagues like the Eredivisie, Allsvenskan, Eliteserien, and Serie B tend to produce higher corner counts due to their attacking styles. Our predictions span 50+ leagues and highlight the highest corner-producing fixtures daily.' },
     { q: 'Can I use corner picks in accumulators?', a: 'Yes. Corner picks with high hit rates make solid accumulator legs. Combine corners with 1X2, Over 2.5, or BTTS picks using our Ticket Builder for diversified accumulator tickets.' },
-    { q: 'When are corner predictions updated?', a: 'Corner predictions update daily alongside all other markets. The primary refresh runs at 1:00 AM WAT with a secondary scrape at 6:00 AM WAT to capture fixtures that appear closer to matchday.' }
+    { q: 'When are corner predictions updated?', a: 'Corner predictions update daily alongside all other markets. The primary refresh runs at 1:00 AM WAT with a secondary update at 6:00 AM WAT to capture fixtures that appear closer to matchday.' }
   ]
 };
 
