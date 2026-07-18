@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>
@@ -129,7 +129,8 @@ gtag('config', 'G-HMGZMW9EDP');
  <div class="logo">
  <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a>
 </div>
- <nav>
+ <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+ <nav id="nav">
  <a href="/" class="active">Home</a>
  <a href="/ticket-builder.html">Ticket Builder</a>
  <a href="/blog/">Blog</a>
@@ -755,6 +756,10 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 
 
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() { this.classList.toggle('active'); document.getElementById('nav')?.classList.toggle('open'); });
+</script>
+
 <script src="/responsible-gambling.js"></script>
 </body>
 

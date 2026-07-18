@@ -1164,3 +1164,49 @@ nav a.active::after {
   .faq-item summary { padding: 14px 16px; font-size: 14px; }
   .faq-item p { padding: 0 16px 14px; font-size: 13px; }
 }
+
+/* === RESPONSIVE FIXES === */
+body { overflow-x: hidden; }
+
+/* Team name truncation */
+.team { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.match-teams { min-width: 0; }
+
+/* Streak row overflow */
+.streak-team { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+
+/* Stats table scroll */
+.analysis-card { overflow-x: auto; }
+
+/* Featured CTA mobile */
+@media (max-width: 480px) {
+  .featured-cta { padding: 24px 20px; }
+  .featured-cta h3 { font-size: 18px; }
+  .featured-cta a { padding: 10px 24px; font-size: 14px; }
+}
+
+/* News grid breakpoints */
+@media (max-width: 900px) {
+  .news-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+  .news-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .news-grid { grid-template-columns: 1fr; }
+}
+
+/* Hamburger menu */
+.hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 1001; }
+.hamburger span { display: block; width: 22px; height: 2px; background: var(--text-primary); margin: 5px 0; transition: all 0.3s; border-radius: 2px; }
+.hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+.hamburger.active span:nth-child(2) { opacity: 0; }
+.hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+@media (max-width: 640px) {
+  .hamburger { display: block; }
+  nav { display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-primary); border-bottom: 1px solid var(--border); flex-direction: column; padding: 16px; gap: 12px; z-index: 1000; }
+  nav.open { display: flex; }
+  nav a { font-size: 15px; padding: 8px 0; }
+  .header-content { position: relative; }
+}

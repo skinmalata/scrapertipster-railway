@@ -232,7 +232,8 @@ ${generateFaqSchema(slug)}
 <header>
 <div class="header-content">
 <div class="logo"><a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a></div>
-<nav>
+<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+<nav id="nav">
 <a href="/">Home</a>
 <a href="/ticket-builder.html">Ticket Builder</a>
 <a href="/blog/">Blog</a>
@@ -308,6 +309,9 @@ ${generateFaqHtml(slug)}
 <script>
 (function(){const s=localStorage.getItem("wf-theme");const t=s||"dark";document.documentElement.setAttribute("data-theme",t==="dark"?"":"light");const b=document.getElementById("themeToggle");if(b)b.textContent=t==="dark"?"Light":"Dark";})();
 document.addEventListener("DOMContentLoaded",function(){const b=document.getElementById("themeToggle");if(!b)return;b.addEventListener("click",function(){const h=document.documentElement;const l=h.getAttribute("data-theme")==="light";if(l){h.removeAttribute("data-theme");b.textContent="Light";localStorage.setItem("wf-theme","dark")}else{h.setAttribute("data-theme","light");b.textContent="Dark";localStorage.setItem("wf-theme","light")}});});
+</script>
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() { this.classList.toggle('active'); document.getElementById('nav')?.classList.toggle('open'); });
 </script>
 <script src="/responsible-gambling.js"></script>
 <script>
