@@ -354,7 +354,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
           '<span class="team team-away">' + away + '</span></div>' +
           '<div class="match-footer"><div style="text-align:center;display:flex;flex-direction:column;align-items:center;">' +
           '<span class="tip-badge">' + match.tip + '</span>' +
-          '<div class="probability">' + match.probability + '%</div></div></div>';
+          (CATEGORY_SLUG === 'btts-no' ? '' : '<div class="probability">' + match.probability + '%</div>') + '</div></div>';
       }
 
       return '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms">' +
