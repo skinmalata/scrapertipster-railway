@@ -147,6 +147,7 @@
             <a href="/predictions/btts" id="tab-btts" class="tab-btn">BTTS Yes</a>
             <a href="/predictions/btts-no" id="tab-btts-no" class="tab-btn active">BTTS No</a>
             <a href="/predictions/unbeaten" id="tab-unbeaten" class="tab-btn">Unbeaten</a>
+            <a href="/predictions/corners" id="tab-corners" class="tab-btn">Corners</a>
 </div>
 
 <div class="stats-bar">
@@ -206,7 +207,7 @@
 </div>
 <div style="text-align:center;padding:12px 0;"><button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">Light</button></div>
 </footer>
-<script src="/chat-widget.js" async></script>
+<script src="/chat-widget.js"></script>
 <script>
 (function(){const s=localStorage.getItem("wf-theme");const t=s||"dark";document.documentElement.setAttribute("data-theme",t==="dark"?"":"light");const b=document.getElementById("themeToggle");if(b)b.textContent=t==="dark"?"Light":"Dark";})();
 document.addEventListener("DOMContentLoaded",function(){const b=document.getElementById("themeToggle");if(!b)return;b.addEventListener("click",function(){const h=document.documentElement;const l=h.getAttribute("data-theme")==="light";if(l){h.removeAttribute("data-theme");b.textContent="Light";localStorage.setItem("wf-theme","dark")}else{h.setAttribute("data-theme","light");b.textContent="Dark";localStorage.setItem("wf-theme","light")}});});

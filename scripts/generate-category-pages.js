@@ -49,6 +49,14 @@ const FAQ_SCHEMA = {
     { q: 'Can I combine unbeaten streaks with other markets?', a: 'Yes. Unbeaten streak data works well alongside 1X2 tips and Over 1.5 goals in accumulators. Teams on long unbeaten runs are statistically more likely to avoid defeat, making them strong double-chance or draw-no-bet picks.' },
     { q: 'How do I read the unbeaten streak badges?', a: 'Each match card shows the fixture, kick-off time, league, and streak badges. A badge reading "8 unbeaten" means the team has not lost in their last 8 matches. Some entries show "home" or "away" to indicate the streak applies to specific venues only.' },
     { q: 'When is unbeaten streak data updated?', a: 'Data updates daily. The primary scrape runs at 1:00 AM WAT and a secondary update at 6:00 AM WAT ensures late results and newly scheduled fixtures are captured across dozens of leagues worldwide.' }
+  ],
+  'corners': [
+    { q: 'What do corner predictions cover?', a: 'Our corner predictions identify matches likely to have a high number of corners. We track Over 8.5 and Over 9.5 corner markets, using historical corner data from statsbet.org to find matches with the strongest corner trends.' },
+    { q: 'How are corner predictions calculated?', a: 'Each prediction is based on historical corner statistics. We only show matches where the source hit rate exceeds 80%, meaning the Over 8.5 or Over 9.5 corners market has landed in 4 out of the last 5 similar fixtures. Hit rate, odds, and league are shown for each pick.' },
+    { q: 'What does "hit rate" mean for corners?', a: 'Hit rate is the percentage of recent matches in which the corners market landed. A 100% hit rate means the Over 8.5 or Over 9.5 corners line has been exceeded in every recent match for that fixture or league. We only display picks above 80%.' },
+    { q: 'Which leagues have the most corners?', a: 'Leagues like the Eredivisie, Allsvenskan, Eliteserien, and Serie B tend to produce higher corner counts due to their attacking styles. Our predictions span 50+ leagues and highlight the highest corner-producing fixtures daily.' },
+    { q: 'Can I use corner picks in accumulators?', a: 'Yes. Corner picks with high hit rates make solid accumulator legs. Combine corners with 1X2, Over 2.5, or BTTS picks using our Ticket Builder for diversified accumulator tickets.' },
+    { q: 'When are corner predictions updated?', a: 'Corner predictions update daily alongside all other markets. The primary refresh runs at 1:00 AM WAT with a secondary scrape at 6:00 AM WAT to capture fixtures that appear closer to matchday.' }
   ]
 };
 
@@ -129,6 +137,14 @@ const CATEGORIES = {
     keywords: 'unbeaten streak predictions, football unbeaten runs, teams on winning streak, unbeaten football tips',
     heading: 'Unbeaten Streaks',
     label: 'Unbeaten'
+  },
+  'corners': {
+    dataKey: 'cornersMatches',
+    title: 'Corner Kick Predictions Today',
+    description: 'Free corner kick predictions for today. Over 8.5 and Over 9.5 corners tips with 80%+ hit rates from statsbet.org.',
+    keywords: 'corner predictions, corner kick betting, over 8.5 corners tips, over 9.5 corners, football corner tips',
+    heading: 'Corner Predictions',
+    label: 'Corners'
   }
 };
 
