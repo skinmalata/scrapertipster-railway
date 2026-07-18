@@ -1685,8 +1685,9 @@ async function scrapeCorners() {
       const matchKey = `${home} vs ${away}`;
       if (cornersMatches.find(cm => cm.match === matchKey)) continue;
       
-      // Default values - these are curated tips so use higher probability
-      let probability = Math.floor(Math.random() * 15) + 70; // 70-85%
+      // Deterministic probability based on position (source priority order)
+      const idx = cornersMatches.length;
+      const probability = idx < 5 ? 78 : idx < 15 ? 73 : 68;
       
       cornersMatches.push({
         id: matchId++,
@@ -1799,7 +1800,8 @@ async function scrapeCards() {
       
       if (cardsMatches.find(cm => cm.match === teamName)) continue;
       
-      let probability = Math.floor(Math.random() * 15) + 70;
+      const idx = cardsMatches.length;
+      const probability = idx < 5 ? 78 : idx < 15 ? 73 : 68;
       
       cardsMatches.push({
         id: matchId++,
@@ -1945,7 +1947,8 @@ async function scrapeBothHalves() {
       
       if (bothHalvesMatches.find(cm => cm.match === teamName)) continue;
       
-      let probability = Math.floor(Math.random() * 15) + 60;
+      const idx = bothHalvesMatches.length;
+      const probability = idx < 5 ? 73 : idx < 15 ? 68 : 63;
       
       bothHalvesMatches.push({
         id: matchId++,

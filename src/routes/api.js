@@ -329,11 +329,6 @@ router.get('/refresh', async (req, res) => {
   }
 });
 
-router.get('/refresh-results', async (req, res) => {
-    // Stubbed for now as results fetching is complex
-    res.json({ success: true, message: 'Results refresh functionality is currently limited in this version.' });
-});
-
 function sanitizeTeamName(name) {
   if (!name || typeof name !== 'string') return '';
   return name.replace(/[<>\"'&;$`|\x00-\x1F\x7F]/g, '').slice(0, 100);
@@ -514,8 +509,6 @@ router.get('/cards', async (req, res) => {
   }
 });
 
-module.exports = router;
-
 // Articles API
 const articlesFile = path.join(__dirname, '../../articles-manifest.json');
 
@@ -535,7 +528,15 @@ router.get('/articles', (req, res) => {
   }
 });
 
-router.post('/articles/publish', (req, res) => {
+function requireAdmin(req, res, next) {
+  const token = req.headers['x-admin-token'];
+  if (!token || token !== process.env.ADMIN_TOKEN) {
+    return res.status(403).json({ success: false, error: 'Forbidden' });
+  }
+  next();
+}
+
+router.post('/articles/publish', requireAdmin, (req, res) => {
   const { slug } = req.body;
   if (!slug) {
     return res.json({ success: false, error: 'Missing slug' });
@@ -698,3 +699,5 @@ router.get('/ticket-builder', (req, res) => {
     res.json({ success: false, error: e.message, tickets: [] });
   }
 });
+
+module.exports = router;

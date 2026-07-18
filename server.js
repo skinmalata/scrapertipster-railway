@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const fs = require('fs');
 const path = require('path');
 const cron = require('node-cron');
 const axios = require('axios');
@@ -204,8 +205,7 @@ const RSS_FEED_ARTICLES_FILE = path.join(__dirname, 'articles-manifest.json');
 
 app.get('/feed.xml', (req, res) => {
   try {
-    const rssFs = require('fs');
-    const data = rssFs.readFileSync(RSS_FEED_ARTICLES_FILE, 'utf8');
+    const data = fs.readFileSync(RSS_FEED_ARTICLES_FILE, 'utf8');
     const articles = JSON.parse(data);
     const published = articles.filter(a => a.published).sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
     const now = new Date().toUTCString();
@@ -325,10 +325,9 @@ app.post('/api/subscribe', (req, res) => {
     return res.json({ success: false });
   }
   try {
-    const subscriberFs = require('fs');
     let subscribers = [];
-    if (subscriberFs.existsSync(SUBSCRIBERS_FILE)) {
-      subscribers = JSON.parse(subscriberFs.readFileSync(SUBSCRIBERS_FILE, 'utf8'));
+    if (fs.existsSync(SUBSCRIBERS_FILE)) {
+      subscribers = JSON.parse(fs.readFileSync(SUBSCRIBERS_FILE, 'utf8'));
     }
     if (!subscribers.some(s => s.email === email)) {
       subscribers.push({ email, subscribedAt: new Date().toISOString() });
@@ -342,12 +341,20 @@ app.post('/api/subscribe', (req, res) => {
   }
 });
 
+// Admin auth middleware
+function requireAdmin(req, res, next) {
+  const token = req.headers['x-admin-token'];
+  if (!token || token !== process.env.ADMIN_TOKEN) {
+    return res.status(403).json({ success: false, error: 'Forbidden' });
+  }
+  next();
+}
+
 // View subscribers (GET for admin)
-app.get('/api/subscribers', (req, res) => {
+app.get('/api/subscribers', requireAdmin, (req, res) => {
   try {
-    const subscriberFs = require('fs');
-    if (subscriberFs.existsSync(SUBSCRIBERS_FILE)) {
-      const data = JSON.parse(subscriberFs.readFileSync(SUBSCRIBERS_FILE, 'utf8'));
+    if (fs.existsSync(SUBSCRIBERS_FILE)) {
+      const data = JSON.parse(fs.readFileSync(SUBSCRIBERS_FILE, 'utf8'));
       return res.json({ success: true, count: data.length, subscribers: data });
     }
     res.json({ success: true, count: 0, subscribers: [] });
@@ -421,7 +428,6 @@ app.get('/', (req, res) => {
 // Handle blog posts - try both with and without .html extension
 app.get('/blog/:slug', (req, res) => {
   const slug = req.params.slug;
-  const fs = require('fs');
   
   // First try without .html (if already exists as static file)
   let filePath = path.join(__dirname, 'public', 'blog', slug + '.html');
@@ -584,7 +590,6 @@ cron.schedule('10 23 * * *', async () => {
 });
 
 // Auto-publish scheduled articles daily at 6:00 AM
-const fs = require('fs');
 const ARTICLES_FILE = path.join(__dirname, 'articles-manifest.json');
 
 function loadArticlesManifest() {
@@ -626,7 +631,6 @@ function publishScheduledArticles() {
 }
 
 function updateSitemap() {
-  const fs = require('fs');
   const articles = loadArticlesManifest();
   const today = new Date().toISOString().split('T')[0];
   
