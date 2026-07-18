@@ -27,7 +27,7 @@
       'streaks': 'We track team streaks including: Winning Streak (teams on consecutive wins), Losing Streak (teams on consecutive losses), and Draw Streak (teams on consecutive draws) based on recent match results.',
       'team to score': 'Team to Score predictions identify teams likely to find the net based on their scoring form and upcoming opposition.',
       'corners': 'Corner predictions focus on Over 9.5 corners markets, predicting matches likely to have 10+ total corners.',
-      'cards': 'Card predictions focus on Over 4.5 cards markets.'
+      'cards': 'Card predictions identify matches with high booking rates. We analyze team discipline records and historical card data to highlight fixtures likely to produce Over 8.5 or Over 9.5 cards.'
     },
     howToUse: 'Using WinFulltime is easy:\n1. Visit the homepage at winfulltime.com\n2. Select a day using the day tabs (Today, Tomorrow, etc.)\n3. Choose your market category: 1X2, Over 1.5, Over 2.5, BTTS YES, BTTS NO\n4. Browse the predictions - each shows the match, prediction, and confidence probability\n5. Click on any match for detailed analysis including head-to-head stats and form guides',
     blog: 'Our blog features 180+ articles on betting strategies, league guides, market explanations, and analysis. Topics include: value betting, bankroll management, Asian handicap, accumulator strategies, Kelly criterion, Poisson distribution, and much more. Visit https://winfulltime.com/blog/',

@@ -1771,11 +1771,11 @@ function loadCardsCache() {
 }
 
 async function scrapeCards() {
-  const CARDS_URL = 'https://www.apwin.com/decreasing-stats/over-45-cards/';
+  const CARDS_URL = 'https://footballzz.co.uk/bookings-yellow-cards-football-predictions-and-statistics';
   const cardsCacheFile = path.join(process.cwd(), 'cards-cache.json');
   
   try {
-    console.log('[Cards] Starting cards scrape from apwin...');
+    console.log('[Cards] Starting cards scrape from footballzz.co.uk...');
     
     const response = await axios.get(CARDS_URL, {
       headers: {
@@ -1788,39 +1788,60 @@ async function scrapeCards() {
     
     const $ = cheerio.load(response.data);
     const cardsMatches = [];
-    let matchId = 0;
+    const seen = new Set();
     
-    // Get team names from team links
-    const teamNames = [];
-    $('a[href*="/team/"]').each((i, el) => {
-      const text = $(el).text().trim();
-      if (text && !teamNames.includes(text)) {
-        teamNames.push(text);
+    $('table.table tr').each((_, row) => {
+      const $row = $(row);
+      if ($row.find('th').length > 0) return;
+      
+      const startDate = $row.find('span[itemprop="startDate"]').attr('content') || '';
+      const homeTeam = $row.find('div[itemprop="homeTeam"] meta[itemprop="name"]').attr('content') || '';
+      const awayTeam = $row.find('div[itemprop="awayTeam"] meta[itemprop="name"]').attr('content') || '';
+      if (!homeTeam || !awayTeam) return;
+      
+      const flagTitle = $row.find('span.flag').attr('title') || '';
+      const league = flagTitle.replace(/^[^-]+\s*-\s*/, '').trim() || 'Unknown';
+      
+      const threshold = $row.find('.stat-tip').text().trim();
+      const description = $row.find('td[itemprop="description"]').text().trim();
+      
+      const matchKey = `${homeTeam} - ${awayTeam}`;
+      const uniqueKey = `${matchKey}|${threshold}`;
+      if (seen.has(uniqueKey)) return;
+      seen.add(uniqueKey);
+      
+      let gamesSample = 0;
+      const gamesMatch = description.match(/last\s+(\d+)\s+games?/i);
+      if (gamesMatch) gamesSample = parseInt(gamesMatch[1], 10);
+      
+      const teamRef = description.match(/^([A-Za-z0-9\s.'-]+?)\s+have/i);
+      const refTeam = teamRef ? teamRef[1].trim() : homeTeam;
+      
+      let kickoffDate = '';
+      if (startDate) {
+        kickoffDate = startDate.split('T')[0];
       }
-    });
-    
-    console.log('[Cards] Found', teamNames.length, 'teams');
-    
-    for (const teamName of teamNames.slice(0, 50)) {
-      if (teamName.length < 2) continue;
       
-      if (cardsMatches.find(cm => cm.match === teamName)) continue;
+      const kickoffTime = startDate ? new Date(startDate).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) : '';
       
-      const idx = cardsMatches.length;
-      const probability = idx < 5 ? 78 : idx < 15 ? 73 : 68;
+      const insights = [`Over ${threshold} Cards`, league];
+      if (gamesSample > 0) insights.push(`${refTeam} pattern: ${gamesSample} games`);
       
       cardsMatches.push({
-        id: matchId++,
-        match: teamName,
-        tip: 'Over 4.5 Cards',
-        insights: ['High card count matches expected'],
-        probability: probability,
-        league: 'Various',
-        date: new Date().toISOString().split('T')[0]
+        match: matchKey,
+        tip: `Over ${threshold} Cards`,
+        insights,
+        probability: gamesSample > 0 ? Math.min(85, 60 + gamesSample) : 65,
+        league,
+        date: kickoffDate || new Date().toISOString().split('T')[0],
+        time: kickoffTime,
+        threshold,
+        description,
+        teamPattern: refTeam
       });
-    }
+    });
     
-    console.log('[Cards] Found matches:', cardsMatches.length);
+    console.log('[Cards] Found', cardsMatches.length, 'card predictions');
     
     const result = {
       success: true,

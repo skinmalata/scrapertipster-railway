@@ -57,6 +57,14 @@ const FAQ_SCHEMA = {
     { q: 'Which leagues have the most corners?', a: 'Leagues like the Eredivisie, Allsvenskan, Eliteserien, and Serie B tend to produce higher corner counts due to their attacking styles. Our predictions span 50+ leagues and highlight the highest corner-producing fixtures daily.' },
     { q: 'Can I use corner picks in accumulators?', a: 'Yes. Corner picks with high hit rates make solid accumulator legs. Combine corners with 1X2, Over 2.5, or BTTS picks using our Ticket Builder for diversified accumulator tickets.' },
     { q: 'When are corner predictions updated?', a: 'Corner predictions update daily alongside all other markets. The primary refresh runs at 1:00 AM WAT with a secondary update at 6:00 AM WAT to capture fixtures that appear closer to matchday.' }
+  ],
+  'cards': [
+    { q: 'What do cards predictions cover?', a: 'Our cards predictions identify matches likely to produce a high number of yellow cards. We analyze team discipline records, historical booking trends, and referee tendencies to highlight fixtures with the strongest card-count patterns.' },
+    { q: 'How are cards predictions calculated?', a: 'Each prediction is based on recent booking data. We track how often a team or match has gone over specific card thresholds (Over 8.5, Over 9.5 cards) and only show fixtures where the historical pattern is consistent.' },
+    { q: 'What does "Over 9.5 cards" mean?', a: 'Over 9.5 cards means the total yellow and red cards shown by the referee in a match should be 10 or more. If the match finishes with 10, 11, or 12 cards, the Over 9.5 prediction wins.' },
+    { q: 'Which factors influence card predictions?', a: 'Key factors include a team average cards per game, derby or rivalry intensity, referee strictness, league discipline norms, and tactical style. Teams that press aggressively or play physically tend to accumulate more bookings.' },
+    { q: 'Can I combine cards picks with other markets?', a: 'Yes. Cards picks pair well with 1X2 and Under 2.5 goals in accumulators. Physical, low-scoring matches often produce both fewer goals and more cards, making them natural combination candidates.' },
+    { q: 'When are cards predictions updated?', a: 'Cards predictions update daily alongside all other markets. The primary refresh runs at 1:00 AM WAT with a secondary update at 6:00 AM WAT to capture late-appearing fixtures with strong booking trends.' }
   ]
 };
 
@@ -145,6 +153,14 @@ const CATEGORIES = {
     keywords: 'corner predictions, corner kick betting, over 8.5 corners tips, over 9.5 corners, football corner tips',
     heading: 'Corner Predictions',
     label: 'Corners'
+  },
+  'cards': {
+    dataKey: 'cardsMatches',
+    title: 'Cards & Bookings Predictions Today',
+    description: 'Free yellow cards and bookings predictions for today. Tips for matches likely to produce high card counts based on team discipline trends.',
+    keywords: 'cards predictions, yellow cards tips, bookings predictions, football card betting, over cards tips',
+    heading: 'Cards Predictions',
+    label: 'Cards'
   }
 };
 
@@ -224,6 +240,7 @@ ${generateFaqSchema(slug)}
 .faq-item[open] summary::after{content:'\\2212'}
 .faq-item p{padding:0 20px 16px;font-size:14px;line-height:1.7;color:var(--text-secondary);margin:0}
 @media(max-width:640px){.seo-content h2{font-size:18px}.faq-item summary{padding:14px 16px;font-size:14px}.faq-item p{padding:0 16px 14px;font-size:13px}.date-tab{padding:8px 14px;font-size:13px;min-width:80px}}
+.match-reason{font-size:12px;color:var(--text-muted);margin-top:6px;line-height:1.4;text-align:center;max-width:280px}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6975707128100932" crossorigin="anonymous"></script>
 </head>
@@ -446,12 +463,14 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
           '<span class="tip-badge">' + streakLabel + '</span>' +
           '<div class="probability">' + match.probability + '%</div></div></div>';
       } else {
+        var reasonHtml = match.description ? '<div class="match-reason">' + match.description + '</div>' : '';
         cardContent = '<div class="match-teams"><span class="team team-home">' + home + '</span>' +
           (hasScore ? '<span class="vs-score score-display">' + displayScore.home + ' - ' + displayScore.away + '</span>' : '<span class="vs-score">vs</span>') +
           '<span class="team team-away">' + away + '</span></div>' +
           '<div class="match-footer"><div style="text-align:center;display:flex;flex-direction:column;align-items:center;">' +
           '<span class="tip-badge">' + match.tip + '</span>' +
-          (CATEGORY_SLUG === 'btts-no' ? '' : '<div class="probability">' + match.probability + '%</div>') + '</div></div>';
+          (CATEGORY_SLUG === 'btts-no' ? '' : '<div class="probability">' + match.probability + '%</div>') +
+          reasonHtml + '</div></div>';
       }
 
       return '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms">' +

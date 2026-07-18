@@ -111,6 +111,7 @@
 .faq-item[open] summary::after{content:'\2212'}
 .faq-item p{padding:0 20px 16px;font-size:14px;line-height:1.7;color:var(--text-secondary);margin:0}
 @media(max-width:640px){.seo-content h2{font-size:18px}.faq-item summary{padding:14px 16px;font-size:14px}.faq-item p{padding:0 16px 14px;font-size:13px}.date-tab{padding:8px 14px;font-size:13px;min-width:80px}}
+.match-reason{font-size:12px;color:var(--text-muted);margin-top:6px;line-height:1.4;text-align:center;max-width:280px}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6975707128100932" crossorigin="anonymous"></script>
 </head>
@@ -149,6 +150,7 @@
             <a href="/predictions/btts-no" id="tab-btts-no" class="tab-btn active">BTTS No</a>
             <a href="/predictions/unbeaten" id="tab-unbeaten" class="tab-btn">Unbeaten</a>
             <a href="/predictions/corners" id="tab-corners" class="tab-btn">Corners</a>
+            <a href="/predictions/cards" id="tab-cards" class="tab-btn">Cards</a>
 </div>
 
 <div class="stats-bar">
@@ -349,12 +351,14 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
           '<span class="tip-badge">' + streakLabel + '</span>' +
           '<div class="probability">' + match.probability + '%</div></div></div>';
       } else {
+        var reasonHtml = match.description ? '<div class="match-reason">' + match.description + '</div>' : '';
         cardContent = '<div class="match-teams"><span class="team team-home">' + home + '</span>' +
           (hasScore ? '<span class="vs-score score-display">' + displayScore.home + ' - ' + displayScore.away + '</span>' : '<span class="vs-score">vs</span>') +
           '<span class="team team-away">' + away + '</span></div>' +
           '<div class="match-footer"><div style="text-align:center;display:flex;flex-direction:column;align-items:center;">' +
           '<span class="tip-badge">' + match.tip + '</span>' +
-          (CATEGORY_SLUG === 'btts-no' ? '' : '<div class="probability">' + match.probability + '%</div>') + '</div></div>';
+          (CATEGORY_SLUG === 'btts-no' ? '' : '<div class="probability">' + match.probability + '%</div>') +
+          reasonHtml + '</div></div>';
       }
 
       return '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms">' +

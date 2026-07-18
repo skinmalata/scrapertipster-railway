@@ -100,6 +100,9 @@ function enrichWithResults(predictions, resultsCache) {
   predictions.over15Matches = enrich(predictions.over15Matches);
   predictions.bttsMatches = enrich(predictions.bttsMatches);
   predictions.bttsNoMatches = enrich(predictions.bttsNoMatches);
+  predictions.cornersMatches = enrich(predictions.cornersMatches);
+  predictions.cardsMatches = enrich(predictions.cardsMatches);
+  predictions.teamToScore2PlusMatches = enrich(predictions.teamToScore2PlusMatches);
 
   return predictions;
 }
