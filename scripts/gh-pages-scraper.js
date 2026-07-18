@@ -175,6 +175,69 @@ async function main() {
     }
   }
 
+  // Merge corners, cards, both-halves data from their separate caches/scrapers
+  const mergeCacheFile = (cacheFile, key) => {
+    if (fs.existsSync(cacheFile)) {
+      try {
+        const data = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
+        if (data.matches && data.matches.length > 0) {
+          const predFile = path.join(dataDir, 'predictions.json');
+          const predictions = JSON.parse(fs.readFileSync(predFile, 'utf8'));
+          predictions[key] = data.matches;
+          fs.writeFileSync(predFile, JSON.stringify(predictions));
+          console.log(`Merged ${key}: ${data.matches.length} matches`);
+        }
+      } catch (e) {
+        console.error(`Failed to merge ${key}:`, e.message);
+      }
+    }
+  };
+
+  try {
+    console.log('Scraping corners...');
+    const cornersData = await scraper.scrapeCorners();
+    if (cornersData && cornersData.matches && cornersData.matches.length > 0) {
+      const predFile = path.join(dataDir, 'predictions.json');
+      const predictions = JSON.parse(fs.readFileSync(predFile, 'utf8'));
+      predictions.cornersMatches = cornersData.matches;
+      fs.writeFileSync(predFile, JSON.stringify(predictions));
+      console.log(`Merged cornersMatches: ${cornersData.matches.length} matches`);
+    }
+  } catch (err) {
+    console.error('Corners scrape failed:', err.message);
+    mergeCacheFile(path.join(process.cwd(), 'corners-cache.json'), 'cornersMatches');
+  }
+
+  try {
+    console.log('Scraping cards...');
+    const cardsData = await scraper.scrapeCards();
+    if (cardsData && cardsData.matches && cardsData.matches.length > 0) {
+      const predFile = path.join(dataDir, 'predictions.json');
+      const predictions = JSON.parse(fs.readFileSync(predFile, 'utf8'));
+      predictions.cardsMatches = cardsData.matches;
+      fs.writeFileSync(predFile, JSON.stringify(predictions));
+      console.log(`Merged cardsMatches: ${cardsData.matches.length} matches`);
+    }
+  } catch (err) {
+    console.error('Cards scrape failed:', err.message);
+    mergeCacheFile(path.join(process.cwd(), 'cards-cache.json'), 'cardsMatches');
+  }
+
+  try {
+    console.log('Scraping both halves...');
+    const bothHalvesData = await scraper.scrapeBothHalves();
+    if (bothHalvesData && bothHalvesData.matches && bothHalvesData.matches.length > 0) {
+      const predFile = path.join(dataDir, 'predictions.json');
+      const predictions = JSON.parse(fs.readFileSync(predFile, 'utf8'));
+      predictions.teamToScore2PlusMatches = bothHalvesData.matches;
+      fs.writeFileSync(predFile, JSON.stringify(predictions));
+      console.log(`Merged teamToScore2PlusMatches: ${bothHalvesData.matches.length} matches`);
+    }
+  } catch (err) {
+    console.error('Both halves scrape failed:', err.message);
+    mergeCacheFile(path.join(process.cwd(), 'both-halves-cache.json'), 'teamToScore2PlusMatches');
+  }
+
   console.log('All data written to public/data/');
 
   // Generate static category pages
