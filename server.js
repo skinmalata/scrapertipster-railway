@@ -164,10 +164,23 @@ app.use(rateLimiter);
 app.use(trackVisit);
 
 
-// Noindex category query params on homepage (must be before static middleware)
-app.use('/', (req, res, next) => {
-  if (req.path === '/' && req.query.category) {
-    res.set('X-Robots-Tag', 'noindex, follow');
+// Redirect old ?category= query params to clean URLs
+const CATEGORY_REDIRECTS = {
+  'unbeaten': 'unbeaten',
+  'over15': 'over-1-5',
+  'over25': 'over-2-5',
+  'bttsno': 'btts-no',
+  '1x2': '1x2',
+  'btts': 'btts',
+  'cards': 'cards'
+};
+
+app.get('/', (req, res, next) => {
+  if (req.query.category) {
+    const newSlug = CATEGORY_REDIRECTS[req.query.category];
+    if (newSlug) {
+      return res.redirect(301, '/predictions/' + newSlug);
+    }
   }
   next();
 });
@@ -176,7 +189,8 @@ app.use('/', (req, res, next) => {
 app.use(express.static('public', {
   maxAge: 0,
   etag: false,
-  lastModified: false
+  lastModified: false,
+  extensions: ['html']
 }));
 
 // Railway handles HTTPS redirect at proxy level, skip in app
@@ -682,6 +696,43 @@ function updateSitemap() {
     <priority>0.9</priority>
   </url>
 ${blogUrls}
+  <!-- Prediction Category Pages -->
+  <url>
+    <loc>https://winfulltime.com/predictions/1x2</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://winfulltime.com/predictions/over-1-5</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://winfulltime.com/predictions/over-2-5</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://winfulltime.com/predictions/btts</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://winfulltime.com/predictions/btts-no</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://winfulltime.com/predictions/unbeaten</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>`;
   
   fs.writeFileSync(path.join(__dirname, 'public', 'sitemap.xml'), sitemap);

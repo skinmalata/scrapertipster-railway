@@ -43,7 +43,7 @@ function build1x2() {
   const sorted = [...matches].sort((a, b) => (b.probability || 0) - (a.probability || 0));
   const top = sorted.slice(0, 5);
 
-  const tipText = t => t === '1' ? 'Home Win' : t === '2' ? 'Away Win' : t === 'X' ? 'Draw' : t;
+  const tipText = t => t === '1' ? 'Home Win' : t === '2' ? 'Away Win' : t === 'X' ? 'Draw' : t === '1X' ? 'Double Chance 1X' : t === 'X2' ? 'Double Chance X2' : t;
 
   let status = `📊 WinFulltime — 1X2 Picks\n${formatDate(today)}\n${matches.length} matches analyzed.\n\nTop picks:\n`;
   for (const m of top) {

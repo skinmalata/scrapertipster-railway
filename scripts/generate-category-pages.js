@@ -1,0 +1,414 @@
+const fs = require('fs');
+const path = require('path');
+
+const CATEGORIES = {
+  '1x2': {
+    dataKey: 'matches',
+    title: '1X2 Football Predictions Today',
+    description: 'Free AI-powered 1X2 football predictions for today. Expert home, draw, and away win tips across 50+ leagues worldwide.',
+    keywords: '1X2 predictions, football predictions today, home win tips, draw predictions, away win tips, soccer betting tips',
+    heading: '1X2 Predictions',
+    label: '1X2'
+  },
+  'over-1-5': {
+    dataKey: 'over15Matches',
+    title: 'Over 1.5 Goals Predictions Today',
+    description: 'Free Over 1.5 goals football predictions for today. Data-driven tips for matches likely to produce 2 or more goals.',
+    keywords: 'over 1.5 predictions, over 1.5 goals tips, football goals betting, soccer over under tips',
+    heading: 'Over 1.5 Goals',
+    label: 'Over 1.5'
+  },
+  'over-2-5': {
+    dataKey: 'over25Matches',
+    title: 'Over 2.5 Goals Predictions Today',
+    description: 'Free Over 2.5 goals football predictions for today. Expert tips for high-scoring matches across major leagues.',
+    keywords: 'over 2.5 predictions, over 2.5 goals tips, high scoring football tips, soccer goals betting',
+    heading: 'Over 2.5 Goals',
+    label: 'Over 2.5'
+  },
+  'btts': {
+    dataKey: 'bttsMatches',
+    title: 'BTTS Yes Predictions Today',
+    description: 'Free Both Teams to Score (BTTS) predictions for today. Tips for matches where both teams are expected to score.',
+    keywords: 'BTTS predictions, both teams to score tips, BTTS yes predictions, soccer both teams to score',
+    heading: 'BTTS Yes',
+    label: 'BTTS Yes'
+  },
+  'btts-no': {
+    dataKey: 'bttsNoMatches',
+    title: 'BTTS No Predictions Today',
+    description: 'Free Both Teams to Score No predictions for today. Tips for matches where at least one team will fail to score.',
+    keywords: 'BTTS no predictions, both teams to score no, clean sheet tips, soccer shutout predictions',
+    heading: 'BTTS No',
+    label: 'BTTS No'
+  },
+  'unbeaten': {
+    dataKey: null,
+    title: 'Unbeaten Streak Predictions Today',
+    description: 'Free unbeaten streak football predictions for today. Teams on long unbeaten runs and their upcoming fixtures.',
+    keywords: 'unbeaten streak predictions, football unbeaten runs, teams on winning streak, unbeaten football tips',
+    heading: 'Unbeaten Streaks',
+    label: 'Unbeaten'
+  }
+};
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function generateCategoryPage(slug, catConfig) {
+  const allSlugs = Object.keys(CATEGORIES);
+  const categoryTabs = allSlugs.map(s => {
+    const c = CATEGORIES[s];
+    const active = s === slug ? ' active' : '';
+    return `<a href="/predictions/${s}" id="tab-${s}" class="tab-btn${active}">${escapeHtml(c.label)}</a>`;
+  }).join('\n            ');
+
+  const isStreak = slug === 'draws-streak';
+  const isUnbeaten = slug === 'unbeaten';
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HMGZMW9EDP');</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escapeHtml(catConfig.title)} | WinFulltime</title>
+<meta name="description" content="${escapeHtml(catConfig.description)}">
+<meta name="keywords" content="${escapeHtml(catConfig.keywords)}">
+<meta property="og:title" content="${escapeHtml(catConfig.title)} | WinFulltime">
+<meta property="og:url" content="https://winfulltime.com/predictions/${slug}">
+<meta property="og:description" content="${escapeHtml(catConfig.description)}">
+<meta property="og:image" content="https://winfulltime.com/winfulltimelogo.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${escapeHtml(catConfig.title)} | WinFulltime">
+<meta name="twitter:description" content="${escapeHtml(catConfig.description)}">
+<meta name="twitter:image" content="https://winfulltime.com/winfulltimelogo.png">
+<link rel="canonical" href="https://winfulltime.com/predictions/${slug}">
+<link rel="icon" href="/winfulltimelogo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/app.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "${escapeHtml(catConfig.title)}",
+  "description": "${escapeHtml(catConfig.description)}",
+  "url": "https://winfulltime.com/predictions/${slug}",
+  "publisher": {
+    "@type": "Organization",
+    "name": "WinFulltime",
+    "logo": { "@type": "ImageObject", "url": "https://winfulltime.com/winfulltimelogo.png" }
+  }
+}
+</script>
+<style>
+.date-tabs{display:flex;justify-content:center;gap:0;margin-bottom:24px;background:var(--bg-card);border-radius:12px;padding:4px;width:fit-content;margin-left:auto;margin-right:auto;border:1px solid var(--border)}
+.date-tab{flex:1;padding:10px 24px;border:none;border-radius:8px;background:transparent;color:var(--text-secondary);font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;min-width:100px;text-align:center}
+.date-tab:hover{color:var(--text-primary);background:var(--bg-card-hover)}
+.date-tab.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+</style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6975707128100932" crossorigin="anonymous"></script>
+</head>
+<body>
+<div>
+<header>
+<div class="header-content">
+<div class="logo"><a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a></div>
+<nav>
+<a href="/">Home</a>
+<a href="/ticket-builder.html">Ticket Builder</a>
+<a href="/blog/">Blog</a>
+<a href="/contact.html">Contact</a>
+</nav>
+</div>
+</header>
+<main class="container">
+<div class="hero">
+<h1 id="pageHeading">${escapeHtml(catConfig.heading)}<br>Predictions For Today</h1>
+<p class="hero-subtext" id="pageDescription">${escapeHtml(catConfig.description)}</p>
+<p class="hero-date" id="currentDate"></p>
+</div>
+
+<div class="date-tabs" id="dateTabs">
+  <button class="date-tab" data-date="yesterday" onclick="switchDate('yesterday')">Yesterday</button>
+  <button class="date-tab active" data-date="today" onclick="switchDate('today')">Today</button>
+  <button class="date-tab" data-date="tomorrow" onclick="switchDate('tomorrow')">Tomorrow</button>
+</div>
+
+<div class="tabs-container" id="categoryLinks">
+  ${categoryTabs}
+</div>
+
+<div class="stats-bar">
+<div class="stat-item">
+<div class="stat-value" id="totalMatches">0</div>
+<div class="stat-label">Matches</div>
+</div>
+</div>
+
+<div id="content">
+<div class="loading">
+<div class="progress-bar-container">
+<div class="progress-bar"></div>
+</div>
+<span class="loading-text">Loading predictions...</span>
+</div>
+</div>
+
+</main>
+</div>
+<footer>
+<div class="footer-content">
+<div style="text-align:center;margin-bottom:24px;">
+<p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Support WinFulltime &mdash; your donations keep all predictions free.</p>
+<a href="https://ko-fi.com/winfulltime" target="_blank" rel="noopener nofollow" style="display:inline-block;background:var(--accent-gradient);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Donate on Ko-fi</a>
+</div>
+<div class="footer-links">
+<a href="/">Home</a>
+<a href="/ticket-builder.html">Ticket Builder</a>
+<a href="/blog/">Blog</a>
+<a href="/advertise.html">Advertise</a>
+<a href="/contact.html">Contact</a>
+<a href="/terms.html">Terms</a>
+<a href="/privacy.html">Privacy</a>
+<a href="/sitemap.xml">Sitemap</a>
+</div>
+<p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
+</div>
+<div style="text-align:center;padding:12px 0;"><button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">Light</button></div>
+</footer>
+<script src="/chat-widget.js"></script>
+<script>
+(function(){const s=localStorage.getItem("wf-theme");const t=s||"dark";document.documentElement.setAttribute("data-theme",t==="dark"?"":"light");const b=document.getElementById("themeToggle");if(b)b.textContent=t==="dark"?"Light":"Dark";})();
+document.addEventListener("DOMContentLoaded",function(){const b=document.getElementById("themeToggle");if(!b)return;b.addEventListener("click",function(){const h=document.documentElement;const l=h.getAttribute("data-theme")==="light";if(l){h.removeAttribute("data-theme");b.textContent="Light";localStorage.setItem("wf-theme","dark")}else{h.setAttribute("data-theme","light");b.textContent="Dark";localStorage.setItem("wf-theme","light")}});});
+</script>
+<script src="/responsible-gambling.js"></script>
+<script>
+(function() {
+  var CATEGORY_SLUG = '${slug}';
+  var CATEGORY_LABEL = '${escapeHtml(catConfig.heading)}';
+  var DATA_KEY = ${catConfig.dataKey ? "'" + catConfig.dataKey + "'" : 'null'};
+  var IS_STREAK = ${isStreak ? 'true' : 'false'};
+  var IS_UNBEATEN = ${isUnbeaten ? 'true' : 'false'};
+  var CATEGORY_HEADING = '${escapeHtml(catConfig.heading)}';
+
+  var allData = null;
+  var h2hData = null;
+  var currentDate = 'today';
+
+  function getServerDate() {
+    var now = new Date();
+    var parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Africa/Lagos',
+      year: 'numeric', month: '2-digit', day: '2-digit'
+    }).formatToParts(now);
+    return new Date(
+      parseInt(parts.find(function(p){return p.type==='year'}).value),
+      parseInt(parts.find(function(p){return p.type==='month'}).value) - 1,
+      parseInt(parts.find(function(p){return p.type==='day'}).value)
+    );
+  }
+
+  function dateToString(d) {
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function formatDateLong(dateStr) {
+    return new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+  }
+
+  function getSelectedDateStr() {
+    var today = getServerDate();
+    if (currentDate === 'yesterday') {
+      var d = new Date(today); d.setDate(d.getDate() - 1);
+      return dateToString(d);
+    } else if (currentDate === 'tomorrow') {
+      var d = new Date(today); d.setDate(d.getDate() + 1);
+      return dateToString(d);
+    }
+    return dateToString(today);
+  }
+
+  function updateDateDisplay() {
+    var dateStr = getSelectedDateStr();
+    var dateDisplay = document.getElementById('currentDate');
+    if (dateDisplay) dateDisplay.textContent = formatDateLong(dateStr);
+
+    var dayLabel = currentDate === 'today' ? 'Today' : currentDate === 'yesterday' ? 'Yesterday' : 'Tomorrow';
+    document.getElementById('pageHeading').innerHTML = CATEGORY_HEADING + '<br>Predictions For ' + dayLabel;
+
+    var tabs = document.querySelectorAll('.date-tab');
+    tabs.forEach(function(tab) {
+      tab.classList.toggle('active', tab.getAttribute('data-date') === currentDate);
+    });
+
+    var newUrl = '/predictions/' + CATEGORY_SLUG;
+    if (currentDate !== 'today') newUrl += '?date=' + currentDate;
+    history.replaceState(null, '', newUrl);
+
+    var canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.href = 'https://winfulltime.com' + newUrl;
+    var ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) ogUrl.content = 'https://winfulltime.com' + newUrl;
+  }
+
+  function renderUnbeaten(matches) {
+    var content = document.getElementById('content');
+    if (matches.length === 0) {
+      content.innerHTML = '<div class="no-matches"><p>No unbeaten streak data for this date.</p></div>';
+      document.getElementById('totalMatches').textContent = '0';
+      return;
+    }
+    document.getElementById('totalMatches').textContent = matches.length;
+    var html = matches.map(function(match, i) {
+      var streaksHtml = (match.streaks || []).map(function(s) {
+        var loc = s.location ? ' ' + s.location : '';
+        return '<div class="streak-row"><span class="streak-team">' + s.team + '</span><span class="streak-badge">' + s.count + ' unbeaten' + loc + '</span></div>';
+      }).join('');
+      return '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms">' +
+        '<div class="match-header"><span>' + (match.league || '') + '</span><span>' + (match.time || '') + '</span></div>' +
+        '<div class="match-teams" style="justify-content:center;"><span class="team team-home" style="text-align:center;width:100%;">' + (match.match || '') + '</span></div>' +
+        '<div class="match-footer" style="flex-direction:column;gap:6px;">' + streaksHtml + '</div></div>';
+    }).join('');
+    content.innerHTML = '<div class="matches-grid">' + html + '</div>';
+  }
+
+  function renderMatches(matches) {
+    var content = document.getElementById('content');
+    var selectedDateStr = getSelectedDateStr();
+    var filtered;
+
+    if (IS_STREAK) {
+      filtered = matches.filter(function(m) { return m.date === selectedDateStr || m.nextMatchDate === selectedDateStr; });
+    } else {
+      filtered = matches.filter(function(m) { return m.date === selectedDateStr; });
+    }
+
+    if (filtered.length === 0) {
+      var dayLabel = currentDate === 'today' ? 'today' : currentDate;
+      content.innerHTML = '<div class="no-matches"><p>No predictions for ' + dayLabel + ' in this market.</p><p style="margin-top:12px;font-size:14px;color:var(--text-muted);">Predictions update daily. Check back soon or explore other markets below.</p></div>';
+      document.getElementById('totalMatches').textContent = '0';
+      return;
+    }
+
+    document.getElementById('totalMatches').textContent = filtered.length;
+    var html = filtered.map(function(match, i) {
+      var matchStr = match.match || match.nextMatch || '';
+      var teams = matchStr.indexOf(' - ') !== -1 ? matchStr.split(' - ') : matchStr.split(' vs ');
+      var home = (teams[0] || '').trim();
+      var away = (teams[1] || '').trim();
+      var hasScore = (match.score && match.score.home != null && match.score.away != null) ||
+                     (match.result && match.result.home != null && match.result.away != null);
+      var displayScore = match.result || match.score;
+
+      var streakLabel = match.tip;
+      if (IS_STREAK) {
+        if (CATEGORY_SLUG === 'draws-streak') streakLabel = 'Draws Streak: ' + (match.streak || '');
+      }
+
+      var cardContent;
+      if (IS_STREAK) {
+        cardContent = '<div class="match-teams" style="justify-content:center;"><span class="team team-home" style="text-align:center;width:100%;">' + home + '</span></div>' +
+          '<div class="match-footer"><div style="text-align:center;display:flex;flex-direction:column;align-items:center;">' +
+          '<span class="tip-badge">' + streakLabel + '</span>' +
+          '<div class="probability">' + match.probability + '%</div></div></div>';
+      } else {
+        cardContent = '<div class="match-teams"><span class="team team-home">' + home + '</span>' +
+          (hasScore ? '<span class="vs-score score-display">' + displayScore.home + ' - ' + displayScore.away + '</span>' : '<span class="vs-score">vs</span>') +
+          '<span class="team team-away">' + away + '</span></div>' +
+          '<div class="match-footer"><div style="text-align:center;display:flex;flex-direction:column;align-items:center;">' +
+          '<span class="tip-badge">' + match.tip + '</span>' +
+          '<div class="probability">' + match.probability + '%</div></div></div>';
+      }
+
+      return '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms">' +
+        '<div class="match-header"><span></span><span>' + (match.time || '') + '</span></div>' +
+        cardContent + '</div>';
+    }).join('');
+
+    content.innerHTML = '<div class="matches-grid">' + html + '</div>';
+  }
+
+  function renderCurrentView() {
+    updateDateDisplay();
+    if (IS_UNBEATEN) {
+      var dates = h2hData ? (h2hData.dates || {}) : {};
+      var dateStr = getSelectedDateStr();
+      renderUnbeaten(dates[dateStr] || []);
+    } else if (DATA_KEY && allData && allData[DATA_KEY]) {
+      renderMatches(allData[DATA_KEY]);
+    } else {
+      document.getElementById('content').innerHTML = '<div class="no-matches"><p>No data available for this market.</p></div>';
+    }
+  }
+
+  window.switchDate = function(date) {
+    currentDate = date;
+    renderCurrentView();
+  };
+
+  function initFromUrl() {
+    var params = new URLSearchParams(window.location.search);
+    var dateParam = params.get('date');
+    if (dateParam === 'yesterday' || dateParam === 'tomorrow') {
+      currentDate = dateParam;
+    }
+  }
+
+  async function loadData() {
+    try {
+      var res = await fetch('/data/predictions.json');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      allData = await res.json();
+
+      if (IS_UNBEATEN) {
+        var h2hRes = await fetch('/data/h2h-unbeaten.json');
+        if (h2hRes.ok) {
+          h2hData = await h2hRes.json();
+        }
+      }
+
+      initFromUrl();
+      renderCurrentView();
+    } catch (e) {
+      console.error('Load error:', e);
+      document.getElementById('content').innerHTML = '<div class="no-matches"><p>Predictions currently unavailable. Check back soon.</p></div>';
+    }
+  }
+
+  loadData();
+})();
+</script>
+</body>
+</html>`;
+}
+
+function generateAllPages(outputDir) {
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
+  for (const [slug, config] of Object.entries(CATEGORIES)) {
+    const html = generateCategoryPage(slug, config);
+    fs.writeFileSync(path.join(outputDir, slug + '.html'), html);
+    console.log('Generated: predictions/' + slug + '.html');
+  }
+
+  console.log('All category pages generated in ' + outputDir);
+}
+
+module.exports = { CATEGORIES, generateCategoryPage, generateAllPages };
+
+if (require.main === module) {
+  const outDir = path.join(__dirname, '..', 'public', 'predictions');
+  generateAllPages(outDir);
+}

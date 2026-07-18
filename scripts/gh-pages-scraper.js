@@ -1,5 +1,6 @@
 const scraper = require('../src/services/scraper');
 const { scrapeUnbeatenStreaks } = require('./scrape-h2h-unbeaten');
+const { generateAllPages } = require('./generate-category-pages');
 const fs = require('fs');
 const path = require('path');
 
@@ -175,6 +176,11 @@ async function main() {
   }
 
   console.log('All data written to public/data/');
+
+  // Generate static category pages
+  console.log('Generating category pages...');
+  const categoryPagesDir = path.join(process.cwd(), 'public', 'predictions');
+  generateAllPages(categoryPagesDir);
 }
 
 function rebuildStatic() {
@@ -221,6 +227,11 @@ function rebuildStatic() {
     fs.copyFileSync(predCache, path.join(dataDir, 'predictions.json'));
     console.log('Copied predictions.json for ticket builder');
   }
+
+  // Generate static category pages
+  console.log('Generating category pages...');
+  const categoryPagesDir = path.join(process.cwd(), 'public', 'predictions');
+  generateAllPages(categoryPagesDir);
 }
 
 if (require.main === module) {

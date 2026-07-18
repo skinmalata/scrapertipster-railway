@@ -416,13 +416,20 @@ async function scrapeDate(dateStr, retryCount = 0) {
 
     const bestProb = Math.max(prob1, probX, prob2);
     let bestPick = '';
+    let finalProb = bestProb;
     if (prob1 >= probX && prob1 >= prob2) bestPick = '1';
     else if (probX >= prob1 && probX >= prob2) bestPick = 'X';
     else bestPick = '2';
 
+    if (bestPick === '1' && bestProb < 70) {
+      bestPick = '1X';
+    } else if (bestPick === '2' && bestProb < 70) {
+      bestPick = 'X2';
+    }
+
     const leagueInfo = detectLeague(homeTeam);
 
-     if (homeTeam && awayTeam && bestProb >= 65) {
+     if (homeTeam && awayTeam && finalProb >= 65) {
       matches.push({
         id: matchId++,
         league: leagueInfo.league,
@@ -431,11 +438,11 @@ async function scrapeDate(dateStr, retryCount = 0) {
         match: `${homeTeam} - ${awayTeam}`,
         probabilities: { homeWin: prob1, draw: probX, awayWin: prob2 },
         tip: bestPick,
-        probability: bestProb,
+        probability: finalProb,
         date: dateStr,
         score: score
       });
-    } else if (homeTeam && awayTeam && bestProb >= 60) {
+    } else if (homeTeam && awayTeam && finalProb >= 60) {
       fallbackMatches.push({
         id: matchId++,
         league: leagueInfo.league,
@@ -444,7 +451,7 @@ async function scrapeDate(dateStr, retryCount = 0) {
         match: `${homeTeam} - ${awayTeam}`,
         probabilities: { homeWin: prob1, draw: probX, awayWin: prob2 },
         tip: bestPick,
-        probability: bestProb,
+        probability: finalProb,
         date: dateStr,
         score: score
       });

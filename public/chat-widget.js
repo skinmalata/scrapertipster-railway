@@ -77,6 +77,8 @@
     if (m.tip === '1') return 'Home Win';
     if (m.tip === 'X') return 'Draw';
     if (m.tip === '2') return 'Away Win';
+    if (m.tip === '1X') return 'Double Chance 1X';
+    if (m.tip === 'X2') return 'Double Chance X2';
     return m.tip;
   }
 

@@ -33,6 +33,8 @@ function tipDisplay(tip) {
   if (tip === '1') return 'Home';
   if (tip === '2') return 'Away';
   if (tip === 'X') return 'Draw';
+  if (tip === '1X') return 'Double Chance 1X';
+  if (tip === 'X2') return 'Double Chance X2';
   return tip;
 }
 
