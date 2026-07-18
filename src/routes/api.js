@@ -310,7 +310,7 @@ router.get('/predictions', async (req, res) => {
   }
 });
 
-router.get('/refresh', async (req, res) => {
+router.get('/refresh', requireAdmin, async (req, res) => {
   if (isRefreshing) {
     return res.json({ success: false, message: 'Refresh already in progress' });
   }

@@ -3,7 +3,6 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
-const cron = require('node-cron');
 const axios = require('axios');
 const apiRoutes = require('./src/routes/api');
 const chatRoutes = require('./src/routes/chat');
@@ -41,6 +40,7 @@ function getPredictionsCache() {
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+app.set('trust proxy', 1);
 
 // Visitor Analytics (in-memory storage)
 const visitorData = {
@@ -154,7 +154,7 @@ app.use((req, res, next) => {
 });
 
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : true
+  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['https://winfulltime.com', 'https://www.winfulltime.com']
 }));
 app.use((req, res, next) => {
   res.setHeader('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https: https://i.ytimg.com https://yt3.ggpht.com; connect-src 'self' https: http://localhost http://127.0.0.1 ws://localhost ws://127.0.0.1 https://www.google-analytics.com https://www.googletagmanager.com; frame-src https://www.youtube.com https://youtube.com;");
@@ -194,9 +194,7 @@ app.use(express.static('public', {
   extensions: ['html']
 }));
 
-// Railway handles HTTPS redirect at proxy level, skip in app
-
-// API Routes
+// API Routes (optional local/dev API — production site is GitHub Pages)
 app.use('/api', apiRoutes);
 app.use('/api', chatRoutes);
 
@@ -331,7 +329,7 @@ app.post('/api/subscribe', (req, res) => {
     }
     if (!subscribers.some(s => s.email === email)) {
       subscribers.push({ email, subscribedAt: new Date().toISOString() });
-      subscriberFs.writeFileSync(SUBSCRIBERS_FILE, JSON.stringify(subscribers, null, 2));
+      fs.writeFileSync(SUBSCRIBERS_FILE, JSON.stringify(subscribers, null, 2));
       console.log('New subscriber:', email);
     }
     res.json({ success: true });
@@ -440,351 +438,9 @@ app.get('/blog/:slug', (req, res) => {
   res.redirect('/blog/');
 });
 
-// Rebuild static public/data/predictions.json from cache files
-function rebuildStaticPredictions() {
-  try {
-    const ghPagesScraper = require('./scripts/gh-pages-scraper');
-    if (typeof ghPagesScraper.rebuildStatic === 'function') {
-      ghPagesScraper.rebuildStatic();
-    } else {
-      // Fallback: run the script as a child process
-      const { execSync } = require('child_process');
-      execSync('node scripts/gh-pages-scraper.js', { timeout: 120000, cwd: __dirname });
-    }
-  } catch (e) {
-    console.error('Failed to rebuild static predictions:', e.message);
-  }
-}
-
-// Scheduled Tasks
-// Run daily at 1:00 AM
-cron.schedule('0 1 * * *', async () => {
-  console.log('Running scheduled daily prediction fetch...');
-  try {
-    const data = await getScraperService().fetchAndCachePredictions();
-    console.log('Scheduled fetch completed. Matches found:', data.totalMatches);
-    rebuildStaticPredictions();
-  } catch (error) {
-    console.error('Scheduled fetch error:', error.message);
-  }
-});
-
-// Run secondary scrape at 6:00 AM to catch late-appearing matches
-cron.schedule('0 6 * * *', async () => {
-  console.log('Running secondary scrape to capture missed matches...');
-  try {
-    const data = await getScraperService().fetchPredictions();
-    console.log('Secondary scrape completed. Total matches:', data.totalMatches);
-    if (data.recoveredMatches) {
-      console.log(`Recovered ${data.recoveredMatches} missed matches from previous scrape`);
-    }
-    rebuildStaticPredictions();
-  } catch (error) {
-    console.error('Secondary scrape error:', error.message);
-  }
-});
-
-// Run background analysis scraping daily at 2:00 AM (only if enabled)
-if (process.env.ENABLE_BACKGROUND_SCRAPING === 'true') {
-  cron.schedule('0 2 * * *', async () => {
-    console.log('Running scheduled background analysis scraping...');
-    try {
-      getScraperService().triggerBackgroundScraping();
-    } catch (error) {
-      console.error('Background scraping error:', error.message);
-    }
-  });
-}
-
-// Pinterest auto-posting - daily pin generation + posting
-async function runPinterestPipeline() {
-  if (process.env.PINTEREST_AUTO_POST !== 'true') {
-    console.log('Pinterest auto-posting disabled (PINTEREST_AUTO_POST != true)');
-    return;
-  }
-  if (!process.env.PINTEREST_ACCESS_TOKEN || !process.env.PINTEREST_BOARD_ID) {
-    console.log('Pinterest credentials missing, skipping auto-post');
-    return;
-  }
-
-  console.log('Running Pinterest pipeline...');
-
-  try {
-    const { execSync } = require('child_process');
-    const scriptDir = __dirname;
-
-    // Generate fresh pins from predictions cache
-    console.log('Generating daily pins...');
-    execSync('node scripts/generate-daily-pins.js', {
-      cwd: scriptDir,
-      timeout: 180000,
-      stdio: 'pipe'
-    });
-    console.log('Pin generation complete.');
-
-    // Check if we should also post (not just generate)
-    const shouldPost = process.env.PINTEREST_POST === 'true';
-    if (shouldPost) {
-      console.log('Posting pins to Pinterest...');
-      execSync('node scripts/post-to-pinterest.js', {
-        cwd: scriptDir,
-        timeout: 300000,
-        stdio: 'pipe'
-      });
-      console.log('Pinterest posting complete.');
-    }
-  } catch (error) {
-    console.error('Pinterest pipeline error:', error.message);
-  }
-}
-
-// Run Pinterest pipeline daily at 3:00 AM (after prediction fetches)
-cron.schedule('0 3 * * *', () => {
-  runPinterestPipeline();
-});
-
-// Mastodon auto-posting - daily predictions toot
-async function runMastodonPost() {
-  if (process.env.MASTODON_AUTO_POST !== 'true') {
-    console.log('Mastodon auto-posting disabled (MASTODON_AUTO_POST != true)');
-    return;
-  }
-  if (!process.env.MASTODON_ACCESS_TOKEN) {
-    console.log('Mastodon credentials missing, skipping auto-post');
-    return;
-  }
-
-  console.log('Running Mastodon post...');
-
-  try {
-    const { execSync } = require('child_process');
-    execSync('node scripts/post-to-mastodon.js', {
-      cwd: __dirname,
-      timeout: 60000,
-      stdio: 'pipe'
-    });
-    console.log('Mastodon posting complete.');
-  } catch (error) {
-    console.error('Mastodon post error:', error.message);
-  }
-}
-
-// Run Mastodon post daily at 4:00 AM
-cron.schedule('0 4 * * *', () => {
-  runMastodonPost();
-});
-
-// H2H Unbeaten Streaks Scraper - daily at 12:10 AM WAT
-const scrapeH2h = require('./scripts/scrape-h2h-unbeaten');
-const { scrapeUnbeatenStreaks } = scrapeH2h;
-cron.schedule('10 23 * * *', async () => {
-  console.log('Running H2H unbeaten streaks scrape...');
-  try {
-    const today = new Date().toISOString().split('T')[0];
-    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-    await scrapeUnbeatenStreaks([today, tomorrow]);
-    console.log('H2H unbeaten streaks scrape completed');
-  } catch (error) {
-    console.error('H2H unbeaten streaks error:', error.message);
-  }
-});
-
-// Auto-publish scheduled articles daily at 6:00 AM
-const ARTICLES_FILE = path.join(__dirname, 'articles-manifest.json');
-
-function loadArticlesManifest() {
-  try {
-    const data = fs.readFileSync(ARTICLES_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (e) {
-    console.log('No articles manifest found:', e.message);
-    return [];
-  }
-}
-
-function saveArticlesManifest(articles) {
-  fs.writeFileSync(ARTICLES_FILE, JSON.stringify(articles, null, 2));
-}
-
-function publishScheduledArticles() {
-  console.log('Checking for scheduled articles to publish...');
-  const articles = loadArticlesManifest();
-  const today = new Date().toISOString().split('T')[0];
-  
-  let published = 0;
-  const updatedArticles = articles.map(article => {
-    if (!article.published && article.publishDate === today) {
-      console.log(`Publishing article: ${article.title}`);
-      published++;
-      return { ...article, published: true };
-    }
-    return article;
-  });
-  
-  if (published > 0) {
-    saveArticlesManifest(updatedArticles);
-    updateSitemap();
-    console.log(`Published ${published} article(s) today`);
-  } else {
-    console.log('No articles scheduled for today');
-  }
-}
-
-function updateSitemap() {
-  const articles = loadArticlesManifest();
-  const today = new Date().toISOString().split('T')[0];
-  
-  let blogUrls = '';
-  
-  articles.forEach(article => {
-    if (article.published) {
-      blogUrls += `  <url>
-    <loc>https://winfulltime.com/blog/${article.slug}</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-`;
-    }
-  });
-  
-  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://winfulltime.com/</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://winfulltime.com/options.html</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://winfulltime.com/analysis.html</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://winfulltime.com/about.html</loc>
-    <lastmod>2026-04-06</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://winfulltime.com/contact.html</loc>
-    <lastmod>2026-04-06</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://winfulltime.com/privacy.html</loc>
-    <lastmod>2026-04-06</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://winfulltime.com/terms.html</loc>
-    <lastmod>2026-04-06</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <!-- Blog Index -->
-  <url>
-    <loc>https://winfulltime.com/blog/</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-${blogUrls}
-  <!-- Prediction Category Pages -->
-  <url>
-    <loc>https://winfulltime.com/predictions/1x2</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://winfulltime.com/predictions/over-1-5</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://winfulltime.com/predictions/over-2-5</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://winfulltime.com/predictions/btts</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://winfulltime.com/predictions/btts-no</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://winfulltime.com/predictions/unbeaten</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-</urlset>`;
-  
-  fs.writeFileSync(path.join(__dirname, 'public', 'sitemap.xml'), sitemap);
-  console.log('Sitemap updated with published articles');
-}
-
-// Run at 6:00 AM daily to check for articles to publish
-cron.schedule('0 6 * * *', () => {
-  publishScheduledArticles();
-});
-
-// Also check on server startup
-setTimeout(() => {
-  publishScheduledArticles();
-}, 10000);
-
-// Use a flag to track if initial fetch is running
-let initialFetchRunning = false;
-
-// Initial Fetch - run in background, don't block
-setTimeout(async () => {
-  if (initialFetchRunning) {
-    console.log('Initial fetch already in progress, skipping');
-    return;
-  }
-  
-  initialFetchRunning = true;
-  console.log('Running initial prediction fetch in background...');
-  
-  getScraperService().fetchAndCachePredictions()
-    .then(data => {
-      console.log('Initial fetch completed. Matches found:', data.totalMatches);
-      predictionsCache = data;
-      rebuildStaticPredictions();
-    })
-    .catch(err => console.error('Initial fetch error:', err.message));
-  
-  // Initial H2H unbeaten scrape
-  try {
-    const today = new Date().toISOString().split('T')[0];
-    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-    scrapeUnbeatenStreaks([today, tomorrow])
-      .then(() => console.log('Initial H2H unbeaten scrape completed'))
-      .catch(err => console.error('Initial H2H unbeaten error:', err.message));
-  } catch (err) {
-    console.error('Initial H2H unbeaten error:', err.message);
-  }
-}, 5000);
+// Production site is static on GitHub Pages.
+// Scraping, social posting, and deploys run via GitHub Actions only.
+// This Express app is optional for local API/dev use — no scheduled jobs.
 
 const HOST = process.env.HOST || '0.0.0.0';
 
@@ -795,6 +451,7 @@ const server = app.listen(PORT, HOST, (err) => {
   }
   console.log(`Server running on port ${PORT}`);
   console.log(`Access at http://${HOST}:${PORT}`);
+  console.log('Scheduled scrapes disabled — use GitHub Actions (scrape-and-deploy.yml)');
 });
 
 module.exports = app;

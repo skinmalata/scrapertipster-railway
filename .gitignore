@@ -4,6 +4,7 @@ debug_*.html
 .env
 .DS_Store
 *.log
+*.err
 server_run.err
 .scraper-lock
 
@@ -14,3 +15,21 @@ public/data/
 
 medium/
 500_football_blog_titles.txt
+
+# Repo clutter: screenshots, topic lists, scratch files
+screenshot-*.png
+*.ps1
+100_blog_topics.txt
+100_promotion_methods.txt
+50-1xbet-evergreen-blog-topics.txt
+50-affiliate-strategy-posts.md
+new-blog-posts.txt
+ad-mockup.html
+affiliate-programs-analysis.md
+google analytics tag.txt
+messi.webp
+pinterest-demo-script.md
+pinterest-ea6fd.html
+take-screenshots.js
+SETUP_GUIDE.txt
+supabase-schema.sql

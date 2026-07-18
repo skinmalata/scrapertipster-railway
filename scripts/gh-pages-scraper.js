@@ -138,8 +138,19 @@ async function main() {
 
     const resultsFile = path.join(process.cwd(), 'results-cache.json');
     if (fs.existsSync(resultsFile)) {
-      fs.copyFileSync(resultsFile, path.join(dataDir, 'results.json'));
-      console.log('Saved results.json');
+      // Cap results cache to last 30 days before writing static copy
+      try {
+        const raw = JSON.parse(fs.readFileSync(resultsFile, 'utf8'));
+        const pruned = scraper.pruneResultsCache
+          ? scraper.pruneResultsCache(raw, 30)
+          : raw;
+        fs.writeFileSync(resultsFile, JSON.stringify(pruned, null, 2));
+        fs.writeFileSync(path.join(dataDir, 'results.json'), JSON.stringify(pruned));
+        console.log(`Saved results.json (${Object.keys(pruned).length} day(s), max 30)`);
+      } catch (e) {
+        fs.copyFileSync(resultsFile, path.join(dataDir, 'results.json'));
+        console.log('Saved results.json (unpruned fallback)');
+      }
     }
   } catch (err) {
     console.error('Predictions fetch failed:', err.message);
@@ -278,6 +289,94 @@ async function main() {
   console.log('Generating category pages...');
   const categoryPagesDir = path.join(process.cwd(), 'public', 'predictions');
   generateAllPages(categoryPagesDir);
+
+  // Refresh sitemap core URLs (blog entries preserved from existing file when present)
+  try {
+    updateSitemapCore();
+  } catch (e) {
+    console.error('Sitemap update failed:', e.message);
+  }
+}
+
+/** Keep prediction category pages and key static pages in sitemap (D8) */
+function updateSitemapCore() {
+  const sitemapPath = path.join(process.cwd(), 'public', 'sitemap.xml');
+  const today = new Date().toISOString().split('T')[0];
+
+  const coreUrls = [
+    { loc: 'https://winfulltime.com/', changefreq: 'daily', priority: '1.0' },
+    { loc: 'https://winfulltime.com/options.html', changefreq: 'weekly', priority: '0.8' },
+    { loc: 'https://winfulltime.com/analysis.html', changefreq: 'daily', priority: '0.8' },
+    { loc: 'https://winfulltime.com/about.html', changefreq: 'monthly', priority: '0.7' },
+    { loc: 'https://winfulltime.com/contact.html', changefreq: 'monthly', priority: '0.5' },
+    { loc: 'https://winfulltime.com/privacy.html', changefreq: 'monthly', priority: '0.4' },
+    { loc: 'https://winfulltime.com/terms.html', changefreq: 'monthly', priority: '0.4' },
+    { loc: 'https://winfulltime.com/advertise.html', changefreq: 'monthly', priority: '0.6' },
+    { loc: 'https://winfulltime.com/ticket-builder.html', changefreq: 'weekly', priority: '0.8' },
+    { loc: 'https://winfulltime.com/blog/', changefreq: 'weekly', priority: '0.9' },
+    { loc: 'https://winfulltime.com/predictions/1x2', changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://winfulltime.com/predictions/over-1-5', changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://winfulltime.com/predictions/over-2-5', changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://winfulltime.com/predictions/btts', changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://winfulltime.com/predictions/btts-no', changefreq: 'daily', priority: '0.8' },
+    { loc: 'https://winfulltime.com/predictions/unbeaten', changefreq: 'daily', priority: '0.8' },
+    { loc: 'https://winfulltime.com/predictions/corners', changefreq: 'daily', priority: '0.8' },
+    { loc: 'https://winfulltime.com/predictions/cards', changefreq: 'daily', priority: '0.8' }
+  ];
+
+  // Preserve existing blog URLs from current sitemap
+  let blogEntries = '';
+  if (fs.existsSync(sitemapPath)) {
+    const existing = fs.readFileSync(sitemapPath, 'utf8');
+    const blogMatches = existing.match(/<url>\s*<loc>https:\/\/winfulltime\.com\/blog\/[^<]+<\/loc>[\s\S]*?<\/url>/g) || [];
+    blogEntries = blogMatches
+      .filter(u => !u.includes('https://winfulltime.com/blog/</loc>'))
+      .join('\n');
+  }
+
+  // Also pull published articles from manifest if available
+  const manifestPath = path.join(process.cwd(), 'articles-manifest.json');
+  if (fs.existsSync(manifestPath)) {
+    try {
+      const articles = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+      const seen = new Set();
+      const fromManifest = articles
+        .filter(a => a.published && a.slug)
+        .map(a => {
+          const loc = `https://winfulltime.com/blog/${a.slug}`;
+          if (seen.has(loc)) return '';
+          seen.add(loc);
+          return `  <url>
+    <loc>${loc}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>`;
+        })
+        .filter(Boolean)
+        .join('\n');
+      if (fromManifest) blogEntries = fromManifest;
+    } catch (e) {
+      console.error('Could not read articles-manifest for sitemap:', e.message);
+    }
+  }
+
+  const coreXml = coreUrls.map(u => `  <url>
+    <loc>${u.loc}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority}</priority>
+  </url>`).join('\n');
+
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${coreXml}
+${blogEntries}
+</urlset>
+`;
+
+  fs.writeFileSync(sitemapPath, sitemap);
+  console.log('Sitemap updated with all live prediction categories');
 }
 
 function rebuildStatic() {

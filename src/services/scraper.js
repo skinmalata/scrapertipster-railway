@@ -163,10 +163,28 @@ function getAnalysisCache() {
   return {};
 }
 
+const RESULTS_CACHE_MAX_DAYS = 30;
+
+function pruneResultsCache(results, maxDays = RESULTS_CACHE_MAX_DAYS) {
+  if (!results || typeof results !== 'object') return {};
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - maxDays);
+  const cutoffStr = cutoff.toISOString().split('T')[0];
+  const pruned = {};
+  for (const dateKey of Object.keys(results)) {
+    // Keep only YYYY-MM-DD keys within the retention window
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateKey) && dateKey >= cutoffStr) {
+      pruned[dateKey] = results[dateKey];
+    }
+  }
+  return pruned;
+}
+
 function getResultsCache() {
   try {
     if (fs.existsSync(RESULTS_CACHE_FILE)) {
-      return JSON.parse(fs.readFileSync(RESULTS_CACHE_FILE, 'utf8'));
+      const data = JSON.parse(fs.readFileSync(RESULTS_CACHE_FILE, 'utf8'));
+      return pruneResultsCache(data);
     }
   } catch (e) {}
   return {};
@@ -175,9 +193,10 @@ function getResultsCache() {
 function saveResultsCache(results) {
   try {
     const existing = getResultsCache();
-    const merged = { ...existing, ...results };
+    const merged = pruneResultsCache({ ...existing, ...results });
     fs.writeFileSync(RESULTS_CACHE_FILE, JSON.stringify(merged, null, 2));
-    console.log('Results cache updated');
+    const days = Object.keys(merged).length;
+    console.log(`Results cache updated (${days} day(s), max ${RESULTS_CACHE_MAX_DAYS})`);
   } catch (err) {
     console.error('Results cache save error:', err);
   }
@@ -1701,12 +1720,14 @@ async function scrapeCorners() {
       const matchKey = `${home} vs ${away}`;
       if (cornersMatches.find(cm => cm.match === matchKey)) continue;
       
+      const parsedOdds = odds ? parseFloat(odds) : null;
       cornersMatches.push({
         id: matchId++,
         match: matchKey,
         tip: market,
         insights: [`Hit rate: ${hitRate}%`, `Odds: ${odds}`, league],
         probability: hitRate,
+        odds: parsedOdds && parsedOdds > 1 ? parsedOdds : null,
         league: league,
         date: new Date().toISOString().split('T')[0]
       });
@@ -2041,6 +2062,7 @@ module.exports = {
   loadCachedPredictions,
   loadAnalysisCache,
   saveAnalysisCache,
+  pruneResultsCache,
   scrapeMissingAnalysis,
   scrapeSingleAnalysis,
   triggerBackgroundScraping,
