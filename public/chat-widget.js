@@ -17,14 +17,14 @@
     features: {
       predictions: 'We provide daily football predictions including: 1X2 (match result), Over 1.5 Goals, Over 2.5 Goals, BTTS YES (Both Teams To Score), BTTS NO, Winning Streaks, Losing Streaks, Draw Streaks, Team to Score, Team to Score 2+, Corners, and Cards predictions.',
       leagues: 'We cover 50+ leagues worldwide including: Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, Eredivisie, Primeira Liga, Belgian Pro League, Brazilian Serie A, Argentine League, MLS, Liga MX, Saudi Pro League, and many more - covering over 750 teams.',
-      sources: 'Our predictions are powered by data from trusted sources including Statarea, BetExplorer, and Apwin, combined with our own statistical analysis.',
+      sources: 'Our predictions are powered by advanced statistical analysis, combining team form data, head-to-head records, and league-wide performance metrics to deliver accurate predictions.',
       accuracy: 'Our predictions use probability thresholds to identify the strongest picks. Each prediction shows its confidence percentage so you can make informed decisions.'
     },
     bettingMarkets: {
       '1x2': '1X2 betting means predicting the match outcome: 1 = Home Win, X = Draw, 2 = Away Win. Our predictions show picks with 65%+ probability.',
       'over/under': 'Over/Under betting is predicting whether total goals will be over or under a certain number. We cover Over 1.5 (80%+ threshold) and Over 2.5 (60%+ threshold).',
       'btts': 'BTTS means Both Teams To Score. BTTS YES predicts both teams will score at least one goal. BTTS NO predicts one or both teams will not score (also called OTS - One Team to Score).',
-      'streaks': 'We track team streaks including: Winning Streak (teams on consecutive wins), Losing Streak (teams on consecutive losses), and Draw Streak (teams on consecutive draws) from BetExplorer data.',
+      'streaks': 'We track team streaks including: Winning Streak (teams on consecutive wins), Losing Streak (teams on consecutive losses), and Draw Streak (teams on consecutive draws) based on recent match results.',
       'team to score': 'Team to Score predictions identify teams likely to find the net based on their scoring form and upcoming opposition.',
       'corners': 'Corner predictions focus on Over 9.5 corners markets, predicting matches likely to have 10+ total corners.',
       'cards': 'Card predictions focus on Over 4.5 cards markets.'
@@ -43,7 +43,7 @@
     { keywords: ['how', 'use', 'works', 'work', 'guide', 'start'], response: knowledge.howToUse },
     { keywords: ['responsible', 'gamble', 'gambling', 'addict', 'problem', '18+'], response: knowledge.responsible },
     { keywords: ['accuracy', 'accurate', 'reliable', 'confidence', 'probability', 'percentage'], response: knowledge.features.accuracy },
-    { keywords: ['source', 'data', 'where', 'api', 'statarea', 'betexplorer', 'apwin'], response: knowledge.features.sources },
+    { keywords: ['source', 'data', 'where', 'api', 'method', 'how'], response: knowledge.features.sources },
     { keywords: ['youtube', 'video', 'channel'], response: 'Check out our YouTube channel @winfulltime at https://www.youtube.com/@winfulltime/videos for video predictions and analysis.' },
     { keywords: ['register', 'sign up', 'signup', 'account', 'login', 'create'], response: 'No registration needed! WinFulltime is completely free and accessible to everyone without creating an account.' }
   ];
