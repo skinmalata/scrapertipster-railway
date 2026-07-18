@@ -207,6 +207,39 @@ function rebuildStatic() {
     console.log('Enriched predictions with results');
   }
 
+  const cornersCacheFile = path.join(process.cwd(), 'corners-cache.json');
+  if (fs.existsSync(cornersCacheFile)) {
+    try {
+      const cornersData = JSON.parse(fs.readFileSync(cornersCacheFile, 'utf8'));
+      predictions.cornersMatches = cornersData.matches || [];
+      console.log('Merged corners matches:', predictions.cornersMatches.length);
+    } catch (e) {
+      console.error('Failed to load corners cache:', e.message);
+    }
+  }
+
+  const cardsCacheFile = path.join(process.cwd(), 'cards-cache.json');
+  if (fs.existsSync(cardsCacheFile)) {
+    try {
+      const cardsData = JSON.parse(fs.readFileSync(cardsCacheFile, 'utf8'));
+      predictions.cardsMatches = cardsData.matches || [];
+      console.log('Merged cards matches:', predictions.cardsMatches.length);
+    } catch (e) {
+      console.error('Failed to load cards cache:', e.message);
+    }
+  }
+
+  const bothHalvesCacheFile = path.join(process.cwd(), 'both-halves-cache.json');
+  if (fs.existsSync(bothHalvesCacheFile)) {
+    try {
+      const bothHalvesData = JSON.parse(fs.readFileSync(bothHalvesCacheFile, 'utf8'));
+      predictions.teamToScore2PlusMatches = bothHalvesData.matches || [];
+      console.log('Merged both-halves matches:', predictions.teamToScore2PlusMatches.length);
+    } catch (e) {
+      console.error('Failed to load both-halves cache:', e.message);
+    }
+  }
+
   fs.writeFileSync(path.join(dataDir, 'predictions.json'), JSON.stringify(predictions));
   console.log('Saved predictions.json');
 
@@ -219,13 +252,6 @@ function rebuildStatic() {
   if (fs.existsSync(h2hFile)) {
     fs.copyFileSync(h2hFile, path.join(dataDir, 'h2h-unbeaten.json'));
     console.log('Saved h2h-unbeaten.json');
-  }
-
-  // Copy predictions cache for ticket builder
-  const predCache = path.join(process.cwd(), 'predictions-cache.json');
-  if (fs.existsSync(predCache)) {
-    fs.copyFileSync(predCache, path.join(dataDir, 'predictions.json'));
-    console.log('Copied predictions.json for ticket builder');
   }
 
   // Generate static category pages
