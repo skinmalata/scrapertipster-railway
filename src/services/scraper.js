@@ -623,10 +623,17 @@ async function scrapeProSoccerDate(dateStr) {
     if (!tip) return;
 
     const tipProb = tip === '1' ? prob1 : tip === 'X' ? probX : prob2;
-    if (tipProb <= 70) return;
+    if (tipProb <= 60) return;
 
     const leagueInfo = detectLeague(homeTeam);
     const matchLabel = `${homeTeam} - ${awayTeam}`;
+
+    let finalTip = tip;
+    let finalProb = tipProb;
+    if (tipProb < 70) {
+      if (tip === '1') { finalTip = '1X'; }
+      else if (tip === '2') { finalTip = 'X2'; }
+    }
 
     matches.push({
       id: matchId++,
@@ -636,14 +643,14 @@ async function scrapeProSoccerDate(dateStr) {
       time: time,
       match: matchLabel,
       probabilities: { homeWin: prob1, draw: probX, awayWin: prob2 },
-      tip: tip,
-      probability: tipProb,
+      tip: finalTip,
+      probability: finalProb,
       date: effectiveDate,
       score: null
     });
   });
 
-  console.log(`ProSoccer: ${matches.length} matches with >70% confidence for ${effectiveDate}`);
+  console.log(`ProSoccer: ${matches.length} matches with >60% confidence for ${effectiveDate}`);
   return matches;
 }
 
