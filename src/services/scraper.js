@@ -1636,11 +1636,11 @@ async function getTeamAnalysis(homeTeam, awayTeam) {
 }
 
 async function scrapeCorners() {
-  const CORNERS_URL = 'https://www.apwin.com/decreasing-stats/over-corners/';
+  const CORNERS_URL = 'https://statsbet.org/football/predictions/corners';
   const cornersCacheFile = path.join(process.cwd(), 'corners-cache.json');
   
   try {
-    console.log('[Corners] Starting corners scrape from apwin...');
+    console.log('[Corners] Starting corners scrape from statsbet.org...');
     
     const response = await axios.get(CORNERS_URL, {
       headers: {
@@ -1651,56 +1651,68 @@ async function scrapeCorners() {
       timeout: 30000
     });
     
-    const $ = cheerio.load(response.data);
+    const html = response.data;
+    // Unescape RSC payload quotes for regex parsing
+    const unescaped = html.replace(/\\"/g, '"');
+    
+    // Extract home teams
+    const homePattern = '"className":"font-medium text-sm text-white truncate","children":"([^"]+)"';
+    const homeMatches = [...unescaped.matchAll(new RegExp(homePattern, 'g'))];
+    
+    // Extract away teams
+    const awayPattern = '"vs"," ","([^"]+)"';
+    const awayMatches = [...unescaped.matchAll(new RegExp(awayPattern, 'g'))];
+    
+    // Extract leagues (one per pair of entries)
+    const leaguePattern = '"className":"truncate max-w-\\[140px\\]","children":"([^"]+)"';
+    const leagueMatches = [...unescaped.matchAll(new RegExp(leaguePattern, 'g'))];
+    
+    // Extract hit rates
+    const hitPattern = '"children":"(\\d{2,3})%"';
+    const hitMatches = [...unescaped.matchAll(new RegExp(hitPattern, 'g'))];
+    
+    // Extract odds
+    const oddsPattern = '"children":"(1\\.\\d{2})"';
+    const oddsMatches = [...unescaped.matchAll(new RegExp(oddsPattern, 'g'))];
+    
+    // Extract markets
+    const marketPattern = '"children":"(Over [89]\\.5 Corners)"';
+    const marketMatches = [...unescaped.matchAll(new RegExp(marketPattern, 'g'))];
+    
+    console.log(`[Corners] Parsed: ${homeMatches.length} homes, ${awayMatches.length} aways, ${hitMatches.length} hits`);
+    
+    const totalEntries = homeMatches.length;
     const cornersMatches = [];
     let matchId = 0;
     
-    // Extract match URLs from the page
-    const matchUrls = [];
-    $('a[href*="/match/"]').each((i, el) => {
-      const href = $(el).attr('href');
-      if (href && href.includes('/match/') && !matchUrls.includes(href)) {
-        matchUrls.push(href);
-      }
-    });
-    
-    console.log('[Corners] Found', matchUrls.length, 'match URLs');
-    
-    // Parse team names from URLs
-    for (const url of matchUrls.slice(0, 50)) {
-      const matchParts = url.match(/\/match\/([^\/]+)\//);
-      if (!matchParts) continue;
+    for (let i = 0; i < totalEntries; i++) {
+      const home = homeMatches[i]?.[1] || '';
+      const away = awayMatches[i]?.[1] || '';
+      const league = leagueMatches[Math.floor(i / 2)]?.[1] || 'Various';
+      const hitRate = parseInt(hitMatches[i]?.[1] || '0', 10);
+      const odds = oddsMatches[i]?.[1] || '';
+      const market = marketMatches[i]?.[1] || 'Over 8.5 Corners';
       
-      const matchSlug = matchParts[1];
+      if (!home || !away || home.length < 2 || away.length < 2) continue;
       
-      // URL format: /match/team1-team2/id/ - split at last hyphen before the ID
-      const lastDashIndex = matchSlug.lastIndexOf('-');
-      if (lastDashIndex < 5) continue;
-      
-      const home = matchSlug.substring(0, lastDashIndex).replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-      const away = matchSlug.substring(lastDashIndex + 1).replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-      
-      if (home.length < 3 || away.length < 3) continue;
+      // Only include matches with hit rate > 80%
+      if (hitRate <= 80) continue;
       
       const matchKey = `${home} vs ${away}`;
       if (cornersMatches.find(cm => cm.match === matchKey)) continue;
       
-      // Deterministic probability based on position (source priority order)
-      const idx = cornersMatches.length;
-      const probability = idx < 5 ? 78 : idx < 15 ? 73 : 68;
-      
       cornersMatches.push({
         id: matchId++,
         match: matchKey,
-        tip: 'Over 9.5 Corners',
-        insights: ['High corner matches today'],
-        probability: probability,
-        league: 'Various',
+        tip: market,
+        insights: [`Hit rate: ${hitRate}%`, `Odds: ${odds}`, league],
+        probability: hitRate,
+        league: league,
         date: new Date().toISOString().split('T')[0]
       });
     }
     
-    console.log('[Corners] Found matches:', cornersMatches.length);
+    console.log(`[Corners] Filtered (>80% hit rate): ${cornersMatches.length} matches`);
     
     const result = {
       success: true,
@@ -1710,20 +1722,14 @@ async function scrapeCorners() {
     };
     
     fs.writeFileSync(cornersCacheFile, JSON.stringify(result, null, 2));
-    console.log('[Corners] Scraped', cornersMatches.length, 'corners tips');
-    
     return result;
   } catch (error) {
-    console.error('[Corners] Scraping error:', error.message);
-    
+    console.error('[Corners] Scrape error:', error.message);
     try {
       if (fs.existsSync(cornersCacheFile)) {
-        const cached = JSON.parse(fs.readFileSync(cornersCacheFile, 'utf8'));
-        console.log('[Corners] Returning cached data');
-        return cached;
+        return JSON.parse(fs.readFileSync(cornersCacheFile, 'utf8'));
       }
     } catch (e) {}
-    
     return { success: true, totalMatches: 0, matches: [], message: 'Corners data unavailable' };
   }
 }
