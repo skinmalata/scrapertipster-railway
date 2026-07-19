@@ -261,7 +261,6 @@ ${generateFaqSchema(slug)}
 <main class="container">
 <div class="hero">
 <h1 id="pageHeading">${escapeHtml(catConfig.heading)}<br>Predictions For Today</h1>
-<p class="hero-subtext" id="pageDescription">${escapeHtml(catConfig.description)}</p>
 <p class="hero-date" id="currentDate"></p>
 </div>
 
@@ -297,7 +296,7 @@ ${generateFaqHtml(slug)}
 <div class="label">Featured Tool</div>
 <h3>Build Winning Accumulator Tickets</h3>
 <p>Generate optimized accumulator combinations from today's AI-powered predictions. Set your target odds and get instant ticket suggestions.</p>
-<a href="/ticket-builder.html">Try Ticket Builder &rarr;</a>
+<a href="/ticket-builder.html">Free Ticket Builder &rarr;</a>
 </div>
 
 </main>
