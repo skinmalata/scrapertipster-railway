@@ -315,10 +315,10 @@
  .ticket-table-wrap { margin-bottom: 16px; }
  .ticket-table-header { font-size: 17px; padding: 16px 16px; }
  .ticket-odds { font-size: 24px; }
- .ticket-table thead th { font-size: 10px; padding: 10px 8px; letter-spacing: 0.5px; }
+ .ticket-table thead th { font-size: 10px; padding: 8px 6px; letter-spacing: 0.5px; }
  .ticket-table tbody td { padding: 10px 8px; font-size: 13px; }
  .ticket-cell-num { font-size: 14px; }
- .ticket-cell-match { font-size: 15px; max-width: 160px; }
+ .ticket-cell-match { font-size: 15px; }
  .ticket-cell-tip .tip-badge { font-size: 13px; padding: 4px 10px; }
  
  .ticket-actions { flex-direction: column; gap: 8px; }
@@ -533,7 +533,8 @@
  background: linear-gradient(135deg, rgba(30,38,56,0.85), rgba(21,26,44,0.9));
  border: 1px solid rgba(255, 255, 255, 0.06);
  border-radius: 16px;
- overflow: hidden;
+ overflow-x: auto;
+ -webkit-overflow-scrolling: touch;
  margin-bottom: 20px;
  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
  transition: border-color 0.3s, box-shadow 0.3s;
@@ -568,7 +569,8 @@
 .ticket-table {
  width: 100%;
  border-collapse: collapse;
- table-layout: auto;
+ table-layout: auto;
+ min-width: 480px;
  }
 
 .ticket-table thead th {
@@ -581,7 +583,7 @@
  background: rgba(21,26,44,0.5);
  border-bottom: 1px solid rgba(255,255,255,0.06);
  text-align: left;
- white-space: nowrap;
+ 
  }
 
 .th-num { width: 40px; text-align: center; }
@@ -614,10 +616,7 @@
  font-weight: 600;
  color: rgba(232,237,245,0.9);
  font-size: 16px;
- white-space: nowrap;
- overflow: hidden;
- text-overflow: ellipsis;
- max-width: 260px;
+ word-break: break-word;
  }
 
 .ticket-cell-tip { text-align: center; }
