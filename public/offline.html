@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Offline - WinFulltime</title>
+ <meta name="theme-color" content="#ff2448">
+ <link rel="icon" href="/icons/icon-192.png" type="image/png">
+ <style>
+ * { margin: 0; padding: 0; box-sizing: border-box; }
+ body {
+   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+   background: #0f1219;
+   color: #e8edf5;
+   min-height: 100vh;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   padding: 20px;
+   text-align: center;
+ }
+ .offline-icon {
+   width: 120px;
+   height: 120px;
+   margin-bottom: 24px;
+   background: rgba(255,36,72,0.1);
+   border-radius: 50%;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   font-size: 56px;
+ }
+ h1 {
+   font-size: 2rem;
+   font-weight: 800;
+   margin-bottom: 12px;
+   letter-spacing: -0.5px;
+ }
+ p {
+   color: #94a3b8;
+   font-size: 1.1rem;
+   line-height: 1.6;
+   max-width: 400px;
+   margin-bottom: 32px;
+ }
+ .cached-section {
+   background: rgba(255,255,255,0.04);
+   border: 1px solid rgba(255,255,255,0.06);
+   border-radius: 16px;
+   padding: 24px;
+   width: 100%;
+   max-width: 400px;
+   margin-bottom: 24px;
+ }
+ .cached-section h3 {
+   font-size: 14px;
+   text-transform: uppercase;
+   letter-spacing: 1px;
+   color: #ff2448;
+   margin-bottom: 16px;
+   font-weight: 700;
+ }
+ .cached-links {
+   display: flex;
+   flex-direction: column;
+   gap: 8px;
+ }
+ .cached-links a {
+   display: block;
+   padding: 12px 16px;
+   background: rgba(255,255,255,0.03);
+   border: 1px solid rgba(255,255,255,0.06);
+   border-radius: 10px;
+   color: #e8edf5;
+   text-decoration: none;
+   font-weight: 500;
+   transition: all 0.2s;
+ }
+ .cached-links a:hover {
+   background: rgba(255,36,72,0.1);
+   border-color: rgba(255,36,72,0.3);
+ }
+ .cached-links a span {
+   display: block;
+   font-size: 12px;
+   color: #94a3b8;
+   margin-top: 4px;
+ }
+ .retry-btn {
+   display: inline-block;
+   padding: 14px 32px;
+   background: linear-gradient(135deg, #ff2448, #d41a38);
+   color: white;
+   border: none;
+   border-radius: 12px;
+   font-size: 16px;
+   font-weight: 700;
+   cursor: pointer;
+   text-decoration: none;
+   transition: transform 0.2s;
+ }
+ .retry-btn:hover { transform: scale(1.05); }
+ </style>
+</head>
+<body>
+ <div class="offline-icon">&#128268;</div>
+ <h1>You're Offline</h1>
+ <p>No internet connection detected. Your saved predictions are still available below.</p>
+
+ <div class="cached-section">
+   <h3>Saved Predictions</h3>
+   <div class="cached-links">
+     <a href="/predictions/1x2.html">1X2 Predictions<span>Match winner tips</span></a>
+     <a href="/predictions/over-2-5.html">Over/Under 2.5<span>Total goals market</span></a>
+     <a href="/predictions/btts.html">BTTS Predictions<span>Both teams to score</span></a>
+     <a href="/predictions/corners.html">Corners<span>Corner kick tips</span></a>
+     <a href="/predictions/cards.html">Cards<span>Booking predictions</span></a>
+   </div>
+ </div>
+
+ <button class="retry-btn" onclick="location.reload()">Try Again</button>
+</body>
+</html>

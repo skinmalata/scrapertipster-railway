@@ -1,0 +1,69 @@
+{
+  "name": "WinFulltime - Free AI Football Predictions",
+  "short_name": "WinFulltime",
+  "description": "Free AI-powered football predictions. 1X2, Over/Under, BTTS, Corners, Cards tips updated daily.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1219",
+  "theme_color": "#ff2448",
+  "orientation": "any",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["sports", "entertainment", "utilities"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/winfulltimelogo.png",
+      "sizes": "2000x2000",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "WinFulltime Predictions Dashboard"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "1X2 Predictions",
+      "short_name": "1X2",
+      "url": "/predictions/1x2.html",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Over/Under 2.5",
+      "short_name": "O/U 2.5",
+      "url": "/predictions/over-2-5.html",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "BTTS Predictions",
+      "short_name": "BTTS",
+      "url": "/predictions/btts.html",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Ticket Builder",
+      "short_name": "Tickets",
+      "url": "/ticket-builder.html",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "prefer_related_applications": false
+}
