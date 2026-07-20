@@ -88,11 +88,12 @@
          color: #e8edf5;
          margin-bottom: 2px;
        }
-       #pwa-install-banner .pwa-desc {
-         font-size: 13px;
-         color: #64748b;
-         line-height: 1.4;
-       }
+        #pwa-install-banner .pwa-desc {
+          font-size: 13px;
+          color: #ffffff;
+          line-height: 1.4;
+          opacity: 0.9;
+        }
        #pwa-install-banner .pwa-actions {
          display: flex;
          gap: 8px;
