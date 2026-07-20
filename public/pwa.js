@@ -13,8 +13,8 @@
  let deferredPrompt = null;
  const DISMISSED_KEY = 'wf_pwa_dismissed';
  const DISMISSED_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
+ const isBeforeInstallPromptSupported = 'onbeforeinstallprompt' in window;
 
- // Don't show if already dismissed recently
  function wasDismissed() {
    const val = localStorage.getItem(DISMISSED_KEY);
    if (!val) return false;
@@ -25,26 +25,38 @@
    localStorage.setItem(DISMISSED_KEY, String(Date.now()));
  }
 
- // Don't show if already running as installed PWA
  function isStandalone() {
    return window.matchMedia('(display-mode: standalone)').matches ||
           window.navigator.standalone === true;
  }
 
-  function hideChatBubble() {
-    const bubble = document.querySelector('.wf-chat-bubble');
-    if (bubble) bubble.style.display = 'none';
-  }
-  function showChatBubble() {
-    const bubble = document.querySelector('.wf-chat-bubble');
-    if (bubble) bubble.style.display = '';
-  }
+ function hideChatBubble() {
+   const bubble = document.querySelector('.wf-chat-bubble');
+   if (bubble) bubble.style.display = 'none';
+ }
+ function showChatBubble() {
+   const bubble = document.querySelector('.wf-chat-bubble');
+   if (bubble) bubble.style.display = '';
+ }
 
-  // Create and inject the install banner
-  function createBanner() {
-    if (isStandalone() || wasDismissed()) return;
+ function showBannerOnFirefox() {
+   const banner = document.getElementById('pwa-install-banner');
+   if (!banner) return;
+   banner.querySelector('.pwa-desc').textContent = 'Open browser menu and tap "Add to Home Screen".';
+   const btn = document.getElementById('pwa-install-btn');
+   btn.textContent = 'How to Install';
+   btn.onclick = () => {
+     banner.remove();
+     showChatBubble();
+     markDismissed();
+     window.open('/app.html', '_blank');
+   };
+ }
 
-    hideChatBubble();
+ function createBanner() {
+   if (isStandalone() || wasDismissed()) return;
+
+   hideChatBubble();
 
    const banner = document.createElement('div');
    banner.id = 'pwa-install-banner';
@@ -88,12 +100,12 @@
          color: #e8edf5;
          margin-bottom: 2px;
        }
-        #pwa-install-banner .pwa-desc {
-          font-size: 13px;
-          color: #ffffff;
-          line-height: 1.4;
-          opacity: 0.9;
-        }
+       #pwa-install-banner .pwa-desc {
+         font-size: 13px;
+         color: #ffffff;
+         line-height: 1.4;
+         opacity: 0.9;
+       }
        #pwa-install-banner .pwa-actions {
          display: flex;
          gap: 8px;
@@ -147,37 +159,46 @@
    document.body.appendChild(banner);
 
    document.getElementById('pwa-install-btn').addEventListener('click', async () => {
-     if (!deferredPrompt) return;
-     deferredPrompt.prompt();
-     const { outcome } = await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      banner.remove();
-      showChatBubble();
-     if (outcome === 'accepted') {
-       // Installed successfully
+     if (deferredPrompt) {
+       deferredPrompt.prompt();
+       const { outcome } = await deferredPrompt.userChoice;
+       deferredPrompt = null;
+       banner.remove();
+       showChatBubble();
      }
    });
 
-    document.getElementById('pwa-dismiss-btn').addEventListener('click', () => {
-      banner.remove();
-      showChatBubble();
-      markDismissed();
+   document.getElementById('pwa-dismiss-btn').addEventListener('click', () => {
+     banner.remove();
+     showChatBubble();
+     markDismissed();
    });
+
+   // If Firefox (no beforeinstallprompt), adapt banner
+   if (!isBeforeInstallPromptSupported) {
+     showBannerOnFirefox();
+   }
  }
 
- // Listen for the browser prompt
+ // Chrome/Edge/Samsung: wait for browser install prompt
  window.addEventListener('beforeinstallprompt', (e) => {
    e.preventDefault();
    deferredPrompt = e;
    setTimeout(createBanner, 1500);
  });
 
- // Handle successful install
+ // Firefox etc: show banner directly after page load
+ if (!isBeforeInstallPromptSupported && 'serviceWorker' in navigator) {
+   window.addEventListener('load', () => {
+     setTimeout(createBanner, 2000);
+   });
+ }
+
  window.addEventListener('appinstalled', () => {
-    deferredPrompt = null;
-    const banner = document.getElementById('pwa-install-banner');
-    if (banner) banner.remove();
-    showChatBubble();
+   deferredPrompt = null;
+   const banner = document.getElementById('pwa-install-banner');
+   if (banner) banner.remove();
+   showChatBubble();
  });
 
 })();
