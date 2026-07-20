@@ -329,27 +329,18 @@
    font-size: 14px;
    border: none;
  }
- .ticket-cell-num {
-   display: inline-block;
-   font-size: 12px;
-   color: rgba(232,237,245,0.35);
-   font-weight: 600;
-   min-width: 24px;
-   vertical-align: middle;
- }
- .ticket-cell-match {
-   display: inline-block;
-   font-size: 15px;
-   font-weight: 600;
-   color: rgba(232,237,245,0.9);
-   word-break: break-word;
-   vertical-align: middle;
-   width: calc(100% - 28px);
- }
- .ticket-cell-tip {
-   padding-left: 24px !important;
-   margin-top: 4px;
- }
+  .ticket-cell-num { display: none; }
+  .ticket-cell-match {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(232,237,245,0.9);
+    word-break: break-word;
+  }
+  .ticket-cell-tip {
+    padding-left: 0 !important;
+    margin-top: 6px;
+  }
  .ticket-cell-tip .tip-badge { font-size: 12px; padding: 3px 10px; }
  
  .ticket-actions { flex-direction: column; gap: 8px; }
