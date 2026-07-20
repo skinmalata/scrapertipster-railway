@@ -311,15 +311,46 @@
  nav a { font-size: 13px !important; }
  }
 
- @media (max-width: 480px) {
- .ticket-table-wrap { margin-bottom: 16px; }
+ @media (max-width: 700px) {
+ .ticket-table-wrap { margin-bottom: 16px; overflow-x: hidden; }
  .ticket-table-header { font-size: 17px; padding: 16px 16px; }
  .ticket-odds { font-size: 24px; }
- .ticket-table thead th { font-size: 10px; padding: 8px 6px; letter-spacing: 0.5px; }
- .ticket-table tbody td { padding: 10px 8px; font-size: 13px; }
- .ticket-cell-num { font-size: 14px; }
- .ticket-cell-match { font-size: 15px; }
- .ticket-cell-tip .tip-badge { font-size: 13px; padding: 4px 10px; }
+ .ticket-table { min-width: 0; }
+ .ticket-table thead { display: none; }
+ .ticket-table tbody tr {
+   display: block;
+   padding: 12px 16px;
+   border-bottom: 1px solid rgba(255,255,255,0.06);
+ }
+ .ticket-table tbody tr:last-child { border-bottom: none; }
+ .ticket-table tbody td {
+   display: block;
+   padding: 2px 0;
+   font-size: 14px;
+   border: none;
+ }
+ .ticket-cell-num {
+   display: inline-block;
+   font-size: 12px;
+   color: rgba(232,237,245,0.35);
+   font-weight: 600;
+   min-width: 24px;
+   vertical-align: middle;
+ }
+ .ticket-cell-match {
+   display: inline-block;
+   font-size: 15px;
+   font-weight: 600;
+   color: rgba(232,237,245,0.9);
+   word-break: break-word;
+   vertical-align: middle;
+   width: calc(100% - 28px);
+ }
+ .ticket-cell-tip {
+   padding-left: 24px !important;
+   margin-top: 4px;
+ }
+ .ticket-cell-tip .tip-badge { font-size: 12px; padding: 3px 10px; }
  
  .ticket-actions { flex-direction: column; gap: 8px; }
  .copy-btn, .bet-btn { font-size: 13px; padding: 12px 16px; }
