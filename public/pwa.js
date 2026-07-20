@@ -31,9 +31,20 @@
           window.navigator.standalone === true;
  }
 
- // Create and inject the install banner
- function createBanner() {
-   if (isStandalone() || wasDismissed()) return;
+  function hideChatBubble() {
+    const bubble = document.querySelector('.wf-chat-bubble');
+    if (bubble) bubble.style.display = 'none';
+  }
+  function showChatBubble() {
+    const bubble = document.querySelector('.wf-chat-bubble');
+    if (bubble) bubble.style.display = '';
+  }
+
+  // Create and inject the install banner
+  function createBanner() {
+    if (isStandalone() || wasDismissed()) return;
+
+    hideChatBubble();
 
    const banner = document.createElement('div');
    banner.id = 'pwa-install-banner';
@@ -44,7 +55,7 @@
          bottom: 0;
          left: 0;
          right: 0;
-         z-index: 9999;
+         z-index: 9999999;
          padding: 16px 20px;
          padding-bottom: calc(16px + env(safe-area-inset-bottom, 0));
          background: linear-gradient(135deg, #141820 0%, #1a1f30 100%);
@@ -138,16 +149,18 @@
      if (!deferredPrompt) return;
      deferredPrompt.prompt();
      const { outcome } = await deferredPrompt.userChoice;
-     deferredPrompt = null;
-     banner.remove();
+      deferredPrompt = null;
+      banner.remove();
+      showChatBubble();
      if (outcome === 'accepted') {
        // Installed successfully
      }
    });
 
-   document.getElementById('pwa-dismiss-btn').addEventListener('click', () => {
-     banner.remove();
-     markDismissed();
+    document.getElementById('pwa-dismiss-btn').addEventListener('click', () => {
+      banner.remove();
+      showChatBubble();
+      markDismissed();
    });
  }
 
@@ -160,9 +173,10 @@
 
  // Handle successful install
  window.addEventListener('appinstalled', () => {
-   deferredPrompt = null;
-   const banner = document.getElementById('pwa-install-banner');
-   if (banner) banner.remove();
+    deferredPrompt = null;
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner) banner.remove();
+    showChatBubble();
  });
 
 })();
