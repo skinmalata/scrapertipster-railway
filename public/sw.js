@@ -1,7 +1,7 @@
-const CACHE_NAME = 'winfulltime-v1';
-const STATIC_CACHE = 'winfulltime-static-v1';
-const DYNAMIC_CACHE = 'winfulltime-dynamic-v1';
-const IMAGE_CACHE = 'winfulltime-images-v1';
+const CACHE_NAME = 'winfulltime-v2';
+const STATIC_CACHE = 'winfulltime-static-v2';
+const DYNAMIC_CACHE = 'winfulltime-dynamic-v2';
+const IMAGE_CACHE = 'winfulltime-images-v2';
 
 const STATIC_ASSETS = [
   '/',
@@ -53,6 +53,7 @@ self.addEventListener('fetch', event => {
   const url = new URL(request.url);
 
   if (request.method !== 'GET') return;
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
 
   if (url.pathname.startsWith('/blog/thumbnails/') || url.pathname.endsWith('.webp') || url.pathname.endsWith('.png') || url.pathname.endsWith('.jpg')) {
     event.respondWith(cacheFirst(request, IMAGE_CACHE));
@@ -84,7 +85,7 @@ async function cacheFirst(request, cacheName) {
     const response = await fetch(request);
     if (response.ok) {
       const cache = await caches.open(cacheName);
-      cache.put(request, response.clone());
+      await cache.put(request, response.clone()).catch(() => {});
     }
     return response;
   } catch {
@@ -97,7 +98,7 @@ async function networkFirst(request, cacheName) {
     const response = await fetch(request);
     if (response.ok) {
       const cache = await caches.open(cacheName);
-      cache.put(request, response.clone());
+      await cache.put(request, response.clone()).catch(() => {});
     }
     return response;
   } catch {
@@ -114,7 +115,7 @@ async function staleWhileRevalidate(request, cacheName) {
   const cache = await caches.open(cacheName);
   const cached = await cache.match(request);
   const fetchPromise = fetch(request).then(response => {
-    if (response.ok) cache.put(request, response.clone());
+    if (response.ok) cache.put(request, response.clone()).catch(() => {});
     return response;
   }).catch(() => cached);
   return cached || fetchPromise;
