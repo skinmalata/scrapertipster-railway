@@ -312,7 +312,7 @@
  }
 
  @media (max-width: 700px) {
- .ticket-table-wrap { margin-bottom: 16px; overflow-x: hidden; }
+ .ticket-table-wrap { margin-bottom: 16px; }
  .ticket-table-header { font-size: 17px; padding: 16px 16px; }
  .ticket-odds { font-size: 24px; }
  .ticket-table { min-width: 0; }
@@ -557,8 +557,6 @@
  background: linear-gradient(135deg, rgba(30,38,56,0.85), rgba(21,26,44,0.9));
  border: 1px solid rgba(255, 255, 255, 0.06);
  border-radius: 16px;
- overflow-x: auto;
- -webkit-overflow-scrolling: touch;
  margin-bottom: 20px;
  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
  transition: border-color 0.3s, box-shadow 0.3s;
@@ -593,8 +591,7 @@
 .ticket-table {
  width: 100%;
  border-collapse: collapse;
- table-layout: auto;
- min-width: 480px;
+ table-layout: auto;
  }
 
 .ticket-table thead th {
