@@ -77,21 +77,45 @@ function upsertMeta(html, name, content) {
   return pattern.test(html) ? html.replace(pattern, tag) : html.replace(/<\/head>/i, `  ${tag}\n</head>`);
 }
 
+function addFeaturedImage(html, slug, title) {
+  const thumbnail = `thumbnails/${slug}.webp`;
+  if (html.includes(`src="${thumbnail}"`)) return html;
+  const featured = `\n\n <figure class="post-featured-image" style="margin:24px 0 28px;">\n  <img src="${thumbnail}" alt="${esc(title)}" width="1200" height="630" loading="eager" decoding="async" style="display:block;width:100%;height:auto;margin:0;border-radius:12px;">\n </figure>`;
+  return /<h1\b[^>]*>[\s\S]*?<\/h1>/i.test(html)
+    ? html.replace(/(<h1\b[^>]*>[\s\S]*?<\/h1>)/i, `$1${featured}`)
+    : html;
+}
+
+function prepareThumbnailTask(slug) {
+  if (keep.has(slug) || slug === 'blog-template') return null;
+  const articlePath = path.join(blogDir, `${slug}.html`);
+  if (!fs.existsSync(articlePath)) throw new Error(`Article not found: ${slug}`);
+  let html = fs.readFileSync(articlePath, 'utf8');
+  const title = decode((html.match(/<title>([\s\S]*?)<\/title>/i) || [])[1] || slug).replace(/\s*\|\s*WinFulltime\s*$/i, '').trim();
+  const category = decode((html.match(/<meta name=["']keywords["'] content=["']([^"']*)/i) || [])[1] || '').split(',')[0].replace(/\bbetting\b/i, 'Betting Guide').trim() || 'Football Guide';
+  const imageUrl = `https://winfulltime.com/blog/thumbnails/${slug}.webp`;
+  html = upsertMeta(html, 'og:image', imageUrl);
+  html = upsertMeta(html, 'twitter:card', 'summary_large_image');
+  html = upsertMeta(html, 'twitter:image', imageUrl);
+  fs.writeFileSync(articlePath, addFeaturedImage(html, slug, title));
+  return { slug, title, category, svg: svgFor({ title, category, slug }) };
+}
+
+async function generatePostThumbnail(slug) {
+  const task = prepareThumbnailTask(slug);
+  if (!task) return null;
+  await sharp(Buffer.from(task.svg)).webp({ quality: 88 }).toFile(path.join(thumbDir, `${task.slug}.webp`));
+  return task;
+}
+
 async function main() {
-  const files = fs.readdirSync(blogDir).filter(file => file.endsWith('.html') && file !== 'index.html');
+  const requestedSlug = process.argv[2];
+  const files = requestedSlug ? [`${requestedSlug}.html`] : fs.readdirSync(blogDir).filter(file => file.endsWith('.html') && file !== 'index.html');
   const tasks = [];
   for (const file of files) {
     const slug = file.slice(0, -5);
-    if (keep.has(slug) || slug === 'blog-template') continue;
-    const articlePath = path.join(blogDir, file); let html = fs.readFileSync(articlePath, 'utf8');
-    const title = decode((html.match(/<title>([\s\S]*?)<\/title>/i) || [])[1] || slug).replace(/\s*\|\s*WinFulltime\s*$/i, '').trim();
-    const category = decode((html.match(/<meta name=["']keywords["'] content=["']([^"']*)/i) || [])[1] || '').split(',')[0].replace(/\bbetting\b/i, 'Betting Guide').trim() || 'Football Guide';
-    const imageUrl = `https://winfulltime.com/blog/thumbnails/${slug}.webp`;
-    html = upsertMeta(html, 'og:image', imageUrl);
-    html = upsertMeta(html, 'twitter:card', 'summary_large_image');
-    html = upsertMeta(html, 'twitter:image', imageUrl);
-    fs.writeFileSync(articlePath, html);
-    tasks.push({ slug, title, category, svg: svgFor({ title, category, slug }) });
+    const task = prepareThumbnailTask(slug);
+    if (task) tasks.push(task);
   }
   for (let start = 0; start < tasks.length; start += 6) {
     await Promise.all(tasks.slice(start, start + 6).map(task => sharp(Buffer.from(task.svg)).webp({ quality: 88 }).toFile(path.join(thumbDir, `${task.slug}.webp`))));
@@ -99,4 +123,8 @@ async function main() {
   }
   console.log(`Done: ${tasks.length} legacy thumbnails regenerated.`);
 }
-main().catch(error => { console.error(error); process.exit(1); });
+if (require.main === module) {
+  main().catch(error => { console.error(error); process.exit(1); });
+}
+
+module.exports = { generatePostThumbnail };

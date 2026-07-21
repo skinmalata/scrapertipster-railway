@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
+const { generatePostThumbnail } = require('../../scripts/regenerate-legacy-thumbnails');
 
 // API-Football responses are cached so one busy page does not consume the
 // provider quota for every visitor. The API key is deliberately kept here,
@@ -569,7 +570,7 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-router.post('/articles/publish', requireAdmin, (req, res) => {
+router.post('/articles/publish', requireAdmin, async (req, res) => {
   const { slug } = req.body;
   if (!slug) {
     return res.json({ success: false, error: 'Missing slug' });
@@ -586,8 +587,9 @@ router.post('/articles/publish', requireAdmin, (req, res) => {
       return a;
     });
     
+    const thumbnail = await generatePostThumbnail(slug);
     fs.writeFileSync(articlesFile, JSON.stringify(updated, null, 2));
-    res.json({ success: true, message: `Published ${slug}` });
+    res.json({ success: true, message: `Published ${slug}`, thumbnailGenerated: Boolean(thumbnail) });
   } catch (e) {
     res.json({ success: false, error: e.message });
   }
