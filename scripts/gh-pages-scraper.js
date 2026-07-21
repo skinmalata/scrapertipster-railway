@@ -371,42 +371,26 @@ function updateSitemapCore() {
     { loc: 'https://winfulltime.com/predictions/cards', changefreq: 'daily', priority: '0.8' }
   ];
 
-  // Preserve existing blog URLs from current sitemap
-  let blogEntries = '';
-  if (fs.existsSync(sitemapPath)) {
-    const existing = fs.readFileSync(sitemapPath, 'utf8');
-    const blogMatches = existing.match(/<url>\s*<loc>https:\/\/winfulltime\.com\/blog\/[^<]+<\/loc>[\s\S]*?<\/url>/g) || [];
-    blogEntries = blogMatches
-      .filter(u => !u.includes('https://winfulltime.com/blog/</loc>'))
-      .join('\n');
-  }
-
-  // Also pull published articles from manifest if available
-  const manifestPath = path.join(process.cwd(), 'articles-manifest.json');
-  if (fs.existsSync(manifestPath)) {
-    try {
-      const articles = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-      const seen = new Set();
-      const fromManifest = articles
-        .filter(a => a.published && a.slug)
-        .map(a => {
-          const loc = `https://winfulltime.com/blog/${a.slug}`;
-          if (seen.has(loc)) return '';
-          seen.add(loc);
-          return `  <url>
-    <loc>${loc}</loc>
-    <lastmod>${today}</lastmod>
+  // The HTML files are the source of truth. A post can be live before it is
+  // added to articles-manifest.json, so relying on the manifest leaves new
+  // content out of the sitemap.
+  const blogDir = path.join(process.cwd(), 'public', 'blog');
+  const blogEntries = fs.readdirSync(blogDir)
+    .filter(file => file.endsWith('.html') && file !== 'index.html' && file !== 'blog-template.html')
+    .sort()
+    .map(file => {
+      const html = fs.readFileSync(path.join(blogDir, file), 'utf8');
+      const canonical = (html.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i) || [])[1]
+        || `https://winfulltime.com/blog/${file}`;
+      const modified = (html.match(/["']dateModified["']\s*:\s*["'](\d{4}-\d{2}-\d{2})/i) || [])[1] || today;
+      return `  <url>
+    <loc>${canonical}</loc>
+    <lastmod>${modified}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>`;
-        })
-        .filter(Boolean)
-        .join('\n');
-      if (fromManifest) blogEntries = fromManifest;
-    } catch (e) {
-      console.error('Could not read articles-manifest for sitemap:', e.message);
-    }
-  }
+    })
+    .join('\n');
 
   const coreXml = coreUrls.map(u => `  <url>
     <loc>${u.loc}</loc>
@@ -523,5 +507,5 @@ if (require.main === module) {
     process.exit(1);
   });
 } else {
-  module.exports = { enrichWithResults, enrichPublishedPredictions, rebuildStatic, main };
+  module.exports = { enrichWithResults, enrichPublishedPredictions, rebuildStatic, updateSitemapCore, main };
 }
