@@ -362,7 +362,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
           '<span class="team team-away">' + away + '</span></div>' +
           '<div class="match-footer"><div style="text-align:center;display:flex;flex-direction:column;align-items:center;">' +
           '<span class="tip-badge">' + match.tip + '</span>' +
-          (CATEGORY_SLUG === 'btts-no' ? '' : '<div class="probability">' + match.probability + '%</div>') +
+          ((CATEGORY_SLUG === 'btts-no' || CATEGORY_SLUG === 'corners') ? '' : '<div class="probability">' + match.probability + '%</div>') +
           reasonHtml + '</div></div>';
       }
 

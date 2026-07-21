@@ -1037,6 +1037,11 @@
   return String(value || '').toLowerCase().replace(/\b(fc|afc|cf|the)\b/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
  }
 
+ function matchIdentity(value) {
+  const teams = String(value || '').split(/\s+(?:-|vs)\s+/i).map(normaliseTeam).filter(Boolean);
+  return teams.length === 2 ? teams.sort().join('|') : normaliseTeam(value);
+ }
+
  function findLiveOdd(matchName, category, tip) {
   if (!lastOddsData || !lastOddsData.available || !Array.isArray(lastOddsData.response)) return null;
   const teams = String(matchName || '').split(/\s+-\s+/);
@@ -1170,18 +1175,26 @@
 
  const matchName = m.nextMatch || m.match;
 
- if (!matchName || !m.tip || !m.probability) continue;
+ const listedOdds = category === 'Corners' ? (function() {
+  const directOdds = Number.parseFloat(m.odds);
+  if (Number.isFinite(directOdds) && directOdds > 1) return directOdds;
+  const oddsInsight = Array.isArray(m.insights) ? m.insights.find(function(insight) { return /^Odds:\s*/i.test(String(insight)); }) : '';
+  const insightOdds = Number.parseFloat(String(oddsInsight).replace(/^Odds:\s*/i, ''));
+  return Number.isFinite(insightOdds) && insightOdds > 1 ? insightOdds : null;
+ })() : null;
+ const hasProbability = Number.isFinite(Number(m.probability)) && Number(m.probability) > 0 && Number(m.probability) <= 100;
+ if (!matchName || !m.tip || (!hasProbability && !listedOdds)) continue;
 
- const effectiveProb = m.probability > 0 && m.probability <= 100 ? m.probability : 50;
+ const effectiveProb = hasProbability ? Number(m.probability) : null;
 
  if (todayOnly && m.date !== today) continue;
- if (effectiveProb < 40) continue;
+ if (effectiveProb !== null && effectiveProb < 40) continue;
 
  const isDoubleChance = category === '1X2' && /^(1X|X2|12)$/.test(String(m.tip).trim());
  const displayCategory = isDoubleChance ? 'Double Chance' : category;
  const liveOdd = findLiveOdd(matchName, displayCategory, m.tip);
- // Use a model estimate only when API-Football does not return this fixture/market.
- const odds = liveOdd ? liveOdd.odds : parseFloat(((100 / effectiveProb) / 1.05).toFixed(2));
+ // Corner picks supply their listed market price; other picks use live or model odds.
+ const odds = liveOdd ? liveOdd.odds : (listedOdds || parseFloat(((100 / effectiveProb) / 1.05).toFixed(2)));
 
  if (odds < minOdds || odds > maxOdds) continue;
 
@@ -1217,7 +1230,7 @@
 
  category: displayCategory,
 
- oddsSource: liveOdd ? 'API-Football' : 'Estimated',
+ oddsSource: liveOdd ? 'API-Football' : (listedOdds ? 'Listed corner price' : 'Estimated'),
 
  bookmaker: liveOdd ? liveOdd.bookmaker : ''
 
@@ -1470,7 +1483,7 @@
 
  iterations++;
 
- var key = current.map(function(s) { return s.match + '|' + s.tip; }).sort().join('||');
+ var key = current.map(function(s) { return matchIdentity(s.match) + '|' + normaliseTeam(s.tip); }).sort().join('||');
 
  if (!seenKeys.has(key)) {
 
@@ -1498,13 +1511,14 @@
 
  var p = pool[j];
 
- if (usedMatches.has(p.match)) continue;
+ var matchId = matchIdentity(p.match);
+ if (usedMatches.has(matchId)) continue;
 
  var newProduct = product * p.odds;
 
  if (newProduct > maxTicketOdds) break;
 
- usedMatches.add(p.match);
+ usedMatches.add(matchId);
 
  current.push(p);
 
@@ -1512,7 +1526,7 @@
 
  current.pop();
 
- usedMatches.delete(p.match);
+ usedMatches.delete(matchId);
 
  }
 
@@ -1532,7 +1546,9 @@
 
  var top = [];
 
- var usedPairs = new Map();
+ var usedPairs = new Set();
+
+ var usedMatchIds = new Set();
 
  var taken = new Set();
 
@@ -1542,30 +1558,33 @@
 
  var bestIdx = -1;
 
- var bestScore = -Infinity;
+ // Prefer an entirely fresh fixture list. Only reuse a fixture when that is
+ // impossible, and never repeat the same fixture/selection combination.
+ for (var pass = 0; pass < 2 && bestIdx === -1; pass++) {
+  var bestScore = -Infinity;
 
- for (var ti = 0; ti < tickets.length; ti++) {
+  for (var ti = 0; ti < tickets.length; ti++) {
 
- if (taken.has(ti)) continue;
+  if (taken.has(ti)) continue;
 
- var pairs = tickets[ti].selections.map(function(s) { return s.match + '|' + s.tip; });
+  var pairs = tickets[ti].selections.map(function(s) { return matchIdentity(s.match) + '|' + normaliseTeam(s.tip); });
+  var matchIds = tickets[ti].selections.map(function(s) { return matchIdentity(s.match); });
 
- var exceeds = pairs.some(function(p) { return (usedPairs.get(p) || 0) >= 2; });
+  if (pairs.some(function(pair) { return usedPairs.has(pair); })) continue;
+  if (pass === 0 && matchIds.some(function(matchId) { return usedMatchIds.has(matchId); })) continue;
 
- if (exceeds) continue;
+  var freshMatchCount = matchIds.filter(function(matchId) { return !usedMatchIds.has(matchId); }).length;
+  var sc = freshMatchCount * 100 - tickets[ti].diff;
 
- var newCount = pairs.filter(function(p) { return !usedPairs.has(p); }).length;
+  if (sc > bestScore) {
 
- var sc = newCount * 100 - tickets[ti].diff;
+  bestScore = sc;
 
- if (sc > bestScore) {
+  bestIdx = ti;
 
- bestScore = sc;
+  }
 
- bestIdx = ti;
-
- }
-
+  }
  }
 
  if (bestIdx === -1) break;
@@ -1576,21 +1595,15 @@
 
  top.push(t);
 
- var tpairs = t.selections.map(function(s) { return s.match + '|' + s.tip; });
+ var tpairs = t.selections.map(function(s) { return matchIdentity(s.match) + '|' + normaliseTeam(s.tip); });
 
  for (var pi = 0; pi < tpairs.length; pi++) {
 
- usedPairs.set(tpairs[pi], (usedPairs.get(tpairs[pi]) || 0) + 1);
+ usedPairs.add(tpairs[pi]);
+
+ usedMatchIds.add(matchIdentity(t.selections[pi].match));
 
  }
-
- }
-
- if (top.length < 2 && tickets.length > 0) {
-
- top.length = 0;
-
- top.push.apply(top, tickets.slice(0, maxTickets));
 
  }
 
@@ -1618,8 +1631,9 @@
 
  })).replace(/'/g, '%27');
 
- var liveOddsCount = ticket.selections.filter(function(s) { return s.oddsSource === 'API-Football'; }).length;
- var sourceNote = liveOddsCount === ticket.selections.length ? 'Live API-Football market odds' : (liveOddsCount ? 'Mixed live and estimated odds' : 'Estimated odds — not bookmaker prices');
+  var liveOddsCount = ticket.selections.filter(function(s) { return s.oddsSource === 'API-Football'; }).length;
+  var listedCornerCount = ticket.selections.filter(function(s) { return s.oddsSource === 'Listed corner price'; }).length;
+  var sourceNote = liveOddsCount === ticket.selections.length ? 'Live API-Football market odds' : (listedCornerCount === ticket.selections.length ? 'Listed corner-market odds' : (liveOddsCount || listedCornerCount ? 'Mixed live, listed, and estimated odds' : 'Estimated odds — not bookmaker prices'));
  var tableRows = ticket.selections.map(function(s, si) {
 
  return '<tr class="ticket-row fade-in" style="animation-delay: ' + (tidx * 80 + si * 30) + 'ms">' +
@@ -1628,7 +1642,7 @@
 
  '<td class="ticket-cell-match">' + escapeHtml(s.match) + '<span class="ticket-detail">' + escapeHtml([s.league, s.date, s.time].filter(Boolean).join(' · ') || 'Match details unavailable') + '</span></td>' +
 
- '<td class="ticket-cell-tip"><span class="tip-badge">' + escapeHtml(s.tip) + '</span><div class="ticket-confidence"><strong>' + escapeHtml(s.category) + '</strong> · ' + escapeHtml(s.oddsSource === 'API-Football' ? 'Live API-Football market price' : 'Estimated probability ' + Number(s.probability).toFixed(0) + '%') + '</div></td>' +
+  '<td class="ticket-cell-tip"><span class="tip-badge">' + escapeHtml(s.tip) + '</span><div class="ticket-confidence"><strong>' + escapeHtml(s.category) + '</strong> · ' + escapeHtml(s.oddsSource === 'API-Football' ? 'Live API-Football market price' : (s.oddsSource === 'Listed corner price' ? 'Listed corner-market price' : 'Estimated probability ' + Number(s.probability).toFixed(0) + '%')) + '</div></td>' +
 
  '</tr>'; }).join('');
 
