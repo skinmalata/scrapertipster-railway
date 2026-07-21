@@ -296,14 +296,14 @@ ${generateFaqSchema(slug)}
 </div>
 </div>
 
-${generateFaqHtml(slug)}
-
 <div class="featured-cta">
 <div class="label">Featured Tool</div>
 <h3>Build Winning Accumulator Tickets</h3>
 <p>Generate optimized accumulator combinations from today's AI-powered predictions. Set your target odds and get instant ticket suggestions.</p>
 <a href="/ticket-builder.html">Free Ticket Builder &rarr;</a>
 </div>
+
+${generateFaqHtml(slug)}
 
 </main>
 </div>

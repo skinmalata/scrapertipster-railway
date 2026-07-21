@@ -12,7 +12,7 @@ function getDateStr(offset) {
 }
 
 function normalizeTeam(name) {
-  return name.toLowerCase()
+  const normalized = name.toLowerCase()
     .replace(/\(w\)/g, '')
     .replace(/\(u23\)/g, '')
     .replace(/\(u21\)/g, '')
@@ -20,8 +20,19 @@ function normalizeTeam(name) {
     .replace(/\(u19\)/g, '')
     .replace(/\(u17\)/g, '')
     .replace(/\b(u\.?td|united|fc|afc|cf|sc|ac)\b/g, '')
+    .replace(/[.'’]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
+  const aliases = { 'milton keynes dons': 'mk dons', ucd: 'uc dublin', 'uanl tigres': 'tigres uanl' };
+  return aliases[normalized] || normalized;
+}
+
+function splitMatch(match) {
+  const separator = String(match || '').search(/\s+-\s+|\s+vs\s+/i);
+  if (separator < 0) return [];
+  const token = String(match).slice(separator).match(/^\s+(?:-|vs)\s+/i);
+  if (!token) return [];
+  return [String(match).slice(0, separator), String(match).slice(separator + token[0].length)];
 }
 
 function getSignificantTokens(name) {
@@ -76,7 +87,7 @@ function enrichWithResults(predictions, resultsCache) {
   const today = predictions.date || new Date().toISOString().split('T')[0];
 
   function findResult(predMatch, predDate) {
-    const predTeams = predMatch.split(/ - | vs /);
+    const predTeams = splitMatch(predMatch);
     if (predTeams.length !== 2) return null;
     const [predHome, predAway] = predTeams;
     let bestMatch = null;
@@ -84,15 +95,21 @@ function enrichWithResults(predictions, resultsCache) {
 
     const candidates = resultsByDate[predDate] || [];
     for (const result of candidates) {
-      const resultTeams = result.key.split(/ - | vs /);
+      const resultTeams = splitMatch(result.key);
       if (resultTeams.length !== 2) continue;
       const [resHome, resAway] = resultTeams;
-      const homeSim = teamSimilarity(predHome, resHome);
-      const awaySim = teamSimilarity(predAway, resAway);
-      const combined = homeSim * awaySim;
-      if (combined > bestScore && combined > 0.6) {
-        bestScore = combined;
-        bestMatch = result.score;
+      const comparisons = [
+        { home: teamSimilarity(predHome, resHome), away: teamSimilarity(predAway, resAway), score: result.score },
+        { home: teamSimilarity(predHome, resAway), away: teamSimilarity(predAway, resHome), score: { ...result.score, home: result.score.away, away: result.score.home } }
+      ];
+      for (const comparison of comparisons) {
+        const combined = (comparison.home + comparison.away) / 2;
+        // Both teams must match; averaging accepts harmless name variants when
+        // the other team is an exact match, unlike the previous multiplication.
+        if (comparison.home >= 0.5 && comparison.away >= 0.5 && combined > bestScore && combined >= 0.7) {
+          bestScore = combined;
+          bestMatch = comparison.score;
+        }
       }
     }
     return bestMatch;
@@ -119,6 +136,21 @@ function enrichWithResults(predictions, resultsCache) {
   predictions.teamToScore2PlusMatches = enrich(predictions.teamToScore2PlusMatches);
 
   return predictions;
+}
+
+// Some markets are fetched after the core predictions. Run this once at the
+// end of a build so their completed fixtures receive results as well.
+function enrichPublishedPredictions(dataDir) {
+  const predictionFile = path.join(dataDir, 'predictions.json');
+  const resultsFile = path.join(process.cwd(), 'results-cache.json');
+  if (!fs.existsSync(predictionFile) || !fs.existsSync(resultsFile)) return false;
+
+  const predictions = JSON.parse(fs.readFileSync(predictionFile, 'utf8'));
+  const resultsCache = JSON.parse(fs.readFileSync(resultsFile, 'utf8'));
+  enrichWithResults(predictions, resultsCache);
+  fs.writeFileSync(predictionFile, JSON.stringify(predictions));
+  console.log('Enriched all published markets with results');
+  return true;
 }
 
 async function main() {
@@ -297,6 +329,7 @@ async function main() {
     mergeCacheFile(path.join(process.cwd(), 'both-halves-cache.json'), 'teamToScore2PlusMatches');
   }
 
+  enrichPublishedPredictions(dataDir);
   console.log('All data written to public/data/');
 
   // Generate static category pages
@@ -465,6 +498,7 @@ function rebuildStatic() {
 
   fs.writeFileSync(path.join(dataDir, 'predictions.json'), JSON.stringify(predictions));
   console.log('Saved predictions.json');
+  enrichPublishedPredictions(dataDir);
 
   if (fs.existsSync(resultsFile)) {
     fs.copyFileSync(resultsFile, path.join(dataDir, 'results.json'));
@@ -489,5 +523,5 @@ if (require.main === module) {
     process.exit(1);
   });
 } else {
-  module.exports = { enrichWithResults, rebuildStatic, main };
+  module.exports = { enrichWithResults, enrichPublishedPredictions, rebuildStatic, main };
 }

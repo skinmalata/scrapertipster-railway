@@ -152,7 +152,7 @@ router.get('/predictions', async (req, res) => {
     
     // Normalize team name for matching
     function normalizeTeam(name) {
-      return name.toLowerCase()
+      const normalized = name.toLowerCase()
         .replace(/\(w\)/g, '')
         .replace(/\(u23\)/g, '')
         .replace(/\(u21\)/g, '')
@@ -160,8 +160,19 @@ router.get('/predictions', async (req, res) => {
         .replace(/\(u19\)/g, '')
         .replace(/\(u17\)/g, '')
         .replace(/\b(u\.?td|united|fc|afc|cf|sc|ac)\b/g, '')
+        .replace(/[.'’]/g, '')
         .replace(/\s+/g, ' ')
         .trim();
+      const aliases = { 'milton keynes dons': 'mk dons', ucd: 'uc dublin', 'uanl tigres': 'tigres uanl' };
+      return aliases[normalized] || normalized;
+    }
+
+    function splitMatch(match) {
+      const separator = String(match || '').search(/\s+-\s+|\s+vs\s+/i);
+      if (separator < 0) return [];
+      const token = String(match).slice(separator).match(/^\s+(?:-|vs)\s+/i);
+      if (!token) return [];
+      return [String(match).slice(0, separator), String(match).slice(separator + token[0].length)];
     }
     
     // Get significant tokens from team name (filter out common words)
@@ -215,7 +226,7 @@ router.get('/predictions', async (req, res) => {
     
     // Find best matching result for a prediction
     function findResult(predMatch, predDate) {
-      const predTeams = predMatch.split(/ - | vs /);
+      const predTeams = splitMatch(predMatch);
       if (predTeams.length !== 2) return null;
       
       const [predHome, predAway] = predTeams;
@@ -224,19 +235,21 @@ router.get('/predictions', async (req, res) => {
       
       const candidates = resultsByDate[predDate] || [];
       for (const result of candidates) {
-        const resultTeams = result.key.split(/ - | vs /);
+        const resultTeams = splitMatch(result.key);
         if (resultTeams.length !== 2) continue;
         
         const [resHome, resAway] = resultTeams;
         
-        const homeSim = teamSimilarity(predHome, resHome);
-        const awaySim = teamSimilarity(predAway, resAway);
-        
-        const combined = homeSim * awaySim;
-        
-        if (combined > bestScore && combined > 0.6) {
-          bestScore = combined;
-          bestMatch = result.score;
+        const comparisons = [
+          { home: teamSimilarity(predHome, resHome), away: teamSimilarity(predAway, resAway), score: result.score },
+          { home: teamSimilarity(predHome, resAway), away: teamSimilarity(predAway, resHome), score: { ...result.score, home: result.score.away, away: result.score.home } }
+        ];
+        for (const comparison of comparisons) {
+          const combined = (comparison.home + comparison.away) / 2;
+          if (comparison.home >= 0.5 && comparison.away >= 0.5 && combined > bestScore && combined >= 0.7) {
+            bestScore = combined;
+            bestMatch = comparison.score;
+          }
         }
       }
       
