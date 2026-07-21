@@ -205,39 +205,24 @@
  <p>Each generated ticket shows the match, predicted outcome, individual odds, and total accumulator price. The algorithm prioritizes combinations closest to your target odds.</p>
 </div>
 
- <div class="faq-section">
- <h2>Frequently Asked Questions</h2>
+  <section class="seo-content faq-section">
+  <h2>Frequently Asked Questions</h2>
+  <div class="faq-list">
 
- <div class="faq-item">
- <h3>How does the football accumulator ticket builder work?</h3>
- <p>The accumulator ticket builder scans all available AI-powered predictions across 1X2, Over/Under, BTTS, and double chance markets. It combines selections whose multiplied odds match your target, prioritising combinations closest to your desired accumulator price.</p>
- </div>
+  <details class="faq-item"><summary>How does the football accumulator ticket builder work?</summary><p>The accumulator ticket builder scans all available AI-powered predictions across 1X2, Over/Under, BTTS, and double chance markets. It combines selections whose multiplied odds match your target, prioritising combinations closest to your desired accumulator price.</p></details>
 
- <div class="faq-item">
- <h3>What markets are included in the accumulator builder?</h3>
- <p>The builder covers 1X2 (match result), Over 1.5 goals, Over 2.5 goals, BTTS Yes, BTTS No, and Double Chance selections derived from unbeaten streak analysis. All predictions are powered by AI analysis of team form, head-to-head records, and statistical models.</p>
- </div>
+  <details class="faq-item"><summary>What markets are included in the accumulator builder?</summary><p>The builder covers 1X2 (match result), Over 1.5 goals, Over 2.5 goals, BTTS Yes, BTTS No, and Double Chance selections derived from unbeaten streak analysis. All predictions are powered by AI analysis of team form, head-to-head records, and statistical models.</p></details>
 
- <div class="faq-item">
- <h3>Can I filter accumulator tickets by odds range?</h3>
- <p>Yes. Set a target total odds, a minimum odds per leg, and a maximum odds per leg. The builder then finds the optimal combination of selections within your specified range.</p>
- </div>
+  <details class="faq-item"><summary>Can I filter accumulator tickets by odds range?</summary><p>Yes. Set a target total odds, a minimum odds per leg, and a maximum odds per leg. The builder then finds the optimal combination of selections within your specified range.</p></details>
 
- <div class="faq-item">
- <h3>Is the accumulator ticket builder free to use?</h3>
- <p>Yes, the WinFulltime accumulator ticket builder is completely free. No sign-ups, no subscriptions, no hidden fees. Generate unlimited accumulator tickets every day.</p>
- </div>
+  <details class="faq-item"><summary>Is the accumulator ticket builder free to use?</summary><p>Yes, the WinFulltime accumulator ticket builder is completely free. No sign-ups, no subscriptions, no hidden fees. Generate unlimited accumulator tickets every day.</p></details>
 
- <div class="faq-item">
- <h3>What does double chance mean in an accumulator?</h3>
- <p>Double chance covers two of three possible match outcomes in a single selection. For example, "Home or Draw" wins if the home team wins or the match ends in a draw. This increases your probability of winning each leg, making it popular for accumulators.</p>
- </div>
+  <details class="faq-item"><summary>What does double chance mean in an accumulator?</summary><p>Double chance covers two of three possible match outcomes in a single selection. For example, "Home or Draw" wins if the home team wins or the match ends in a draw. This increases your probability of winning each leg, making it popular for accumulators.</p></details>
 
- <div class="faq-item">
- <h3>How are the prediction odds calculated?</h3>
- <p>Odds are derived from AI-predicted win probabilities. The formula divides 100 by the probability and adjusts for a ~5% bookmaker margin. For example, a 70% probability translates to approximately 1.36 odds, giving realistic prices close to major bookmakers.</p>
- </div>
- </div>
+  <details class="faq-item"><summary>How are the prediction odds calculated?</summary><p>Odds are derived from AI-predicted win probabilities. The formula divides 100 by the probability and adjusts for a ~5% bookmaker margin. For example, a 70% probability translates to approximately 1.36 odds, giving realistic prices close to major bookmakers.</p></details>
+
+  </div>
+  </section>
  <div class="disclaimer">
  <p>18+ Only</p>
  <p>Predictions are for informational purposes only. Please gamble responsibly.</p>
@@ -983,12 +968,17 @@
  .breadcrumbs a:hover { color: #ff2448; }
  .breadcrumbs [aria-current] { color: rgba(232,237,245,0.7); font-weight: 500; }
 
- /* FAQ */
- .faq-section { max-width: 700px; margin: 48px auto 0; padding: 0 16px; }
- .faq-section h2 { font-size: 22px; font-weight: 700; color: #e8edf5; margin-bottom: 24px; letter-spacing: -0.3px; text-align: center; }
- .faq-item { margin-bottom: 24px; }
- .faq-item h3 { font-size: 16px; font-weight: 700; color: rgba(232,237,245,0.9); margin-bottom: 8px; line-height: 1.5; }
- .faq-item p { font-size: 14px; color: rgba(232,237,245,0.55); line-height: 1.8; }
+ /* FAQ Accordion */
+ .faq-section h2 { text-align: center; font-size: 22px; margin-bottom: 24px; }
+ .faq-list { display: flex; flex-direction: column; gap: 8px; }
+ .faq-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(232,237,245,0.1); border-radius: 8px; overflow: hidden; transition: border-color 0.2s; }
+ .faq-item:hover { border-color: rgba(232,237,245,0.2); }
+ .faq-item[open] { border-color: rgba(255,36,72,0.3); }
+ .faq-item summary { padding: 16px 20px; font-weight: 600; font-size: 15px; color: rgba(232,237,245,0.9); cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+ .faq-item summary::-webkit-details-marker { display: none; }
+ .faq-item summary::after { content: '+'; font-size: 20px; font-weight: 700; color: #ff2448; transition: transform 0.2s; flex-shrink: 0; }
+ .faq-item[open] summary::after { content: '\2212'; }
+ .faq-item p { padding: 0 20px 16px; font-size: 14px; line-height: 1.7; color: rgba(232,237,245,0.55); margin: 0; }
 
  /* SEO content section */
  .seo-content { max-width: 700px; margin: 48px auto 0; padding: 0 16px; }
@@ -1003,7 +993,8 @@
 
  @media (max-width: 480px) {
   .faq-section h2 { font-size: 19px; }
-  .faq-item h3 { font-size: 15px; }
+  .faq-item summary { padding: 14px 16px; font-size: 14px; }
+  .faq-item p { padding: 0 16px 14px; font-size: 13px; }
   .seo-content h2 { font-size: 18px; }
  }
 
