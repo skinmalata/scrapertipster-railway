@@ -4,7 +4,7 @@
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
  <title>Free Football Accumulator Ticket Builder | Daily Acca Tips &amp; Predictions - WinFulltime</title>
- <meta name="description" content="Build winning accumulator tickets using AI-powered football predictions. Set your target odds, choose selections from 1X2, Over/Under, BTTS markets, and get optimized betting tickets instantly.">
+ <meta name="description" content="Build Accumulator Tickets using AI-powered football predictions. Set your target odds, choose selections from 1X2, Over/Under, BTTS, corners, cards, and streak markets.">
  <meta name="keywords" content="accumulator builder, football acca generator, betting ticket builder, multi bet builder, football accumulator tips, bet builder, parlay builder, free acca tips, daily football predictions, acca insurance tips, double chance accumulator, over 2.5 accumulator, BTTS accumulator">
  <meta property="og:title" content="Free Football Accumulator Ticket Builder - WinFulltime">
  <meta property="og:url" content="https://winfulltime.com/ticket-builder.html">
@@ -156,8 +156,8 @@
  </nav>
  <main class="container">
  <div class="hero">
- <h1>Football Accumulator Ticket Builder</h1>
- <p class="hero-subtext">Build winning accumulator tickets using free AI-powered football predictions. Our accumulator builder scans 1X2, Over/Under, BTTS, and double chance markets to find the best multi-leg combinations at your target odds. Updated daily with fresh match data from leagues worldwide.</p>
+ <h1>Build Accumulator Tickets</h1>
+<p class="hero-subtext">Build Accumulator Tickets using free AI-powered football predictions. The builder scans 1X2, Over/Under, BTTS, corners, cards, and streak markets to find multi-leg combinations at your target odds. It shows the date of the available prediction data before generating a ticket.</p>
 </div>
 
  <div class="ticket-form">
@@ -633,12 +633,21 @@
  font-variant-numeric: tabular-nums;
  }
 
-.ticket-cell-match {
+.ticket-cell-match {
  font-weight: 600;
  color: rgba(232,237,245,0.9);
  font-size: 16px;
  word-break: break-word;
- }
+}
+
+.ticket-detail {
+ display: block;
+ margin-top: 5px;
+ color: rgba(232, 237, 245, 0.52);
+ font-size: 12px;
+ font-weight: 500;
+ line-height: 1.4;
+}
 
 .ticket-cell-tip { text-align: center; }
 
@@ -1012,6 +1021,14 @@
 
  let lastTarget = 20;
 
+ let lastMinOdds = 1.20;
+
+ function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>'"]/g, function(char) {
+   return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char];
+  });
+ }
+
  async function generateTickets(shuffle) {
 
  const target = parseFloat(document.getElementById('ticketTarget').value);
@@ -1026,13 +1043,20 @@
 
  lastTarget = target;
 
+ lastMinOdds = minOdds;
+
+ if (!Number.isFinite(target) || !Number.isFinite(minOdds) || !Number.isFinite(maxOdds) || target <= 1 || minOdds <= 1 || maxOdds < minOdds) {
+  results.innerHTML = '<div class="no-matches"><p>Enter a target above 1.00 and a valid minimum/maximum odds range.</p></div>';
+  return;
+ }
+
  results.innerHTML = '<div class="loading"><div class="spinner"></div><div class="loading-text">Building tickets...</div></div>';
 
  try {
 
- if (!lastData) {
+ {
 
- const res = await fetch('/data/predictions.json');
+ const res = await fetch('/data/predictions.json', { cache: 'no-store' });
 
  if (!res.ok) throw new Error('Failed to load predictions');
 
@@ -1040,11 +1064,11 @@
 
  }
 
- if (!lastUbData) {
+ {
 
  try {
 
- const ubRes = await fetch('/data/h2h-unbeaten.json');
+ const ubRes = await fetch('/data/h2h-unbeaten.json', { cache: 'no-store' });
 
  if (ubRes.ok) lastUbData = await ubRes.json();
 
@@ -1054,7 +1078,13 @@
 
  const data = lastData;
 
- const today = data.date || new Date().toISOString().split('T')[0];
+ const today = new Date().toISOString().split('T')[0];
+ const dataDate = data.date || '';
+
+ if (todayOnly && dataDate !== today) {
+  results.innerHTML = '<div class="no-matches"><p>Today\'s prediction data is not available yet. The latest data is dated ' + escapeHtml(dataDate || 'unknown date') + '. Disable “Only Today\'s Matches” to review the latest available fixtures.</p></div>';
+  return;
+ }
 
  let unbeatenMatches = [];
 
@@ -1187,6 +1217,18 @@
 
  addPicks(data.bttsNoMatches, 'BTTS NO');
 
+ addPicks(data.cornersMatches, 'Corners');
+
+ addPicks(data.cardsMatches, 'Cards');
+
+ addPicks(data.teamToScore2PlusMatches, 'To Score 2+');
+
+ addPicks(data.winstreakMatches, 'Win Streak');
+
+ addPicks(data.losestreakMatches, 'Loss Streak');
+
+ addPicks(data.drawstreakMatches, 'Draw Streak');
+
  addUnbeatenPicks(unbeatenMatches);
 
  if (allPicks.length === 0) {
@@ -1197,7 +1239,7 @@
 
  }
 
- buildTickets(target, shuffle);
+ buildTickets(target, shuffle, minOdds);
 
  } catch (e) {
 
@@ -1217,11 +1259,11 @@
 
  }
 
- buildTickets(lastTarget, true);
+ buildTickets(lastTarget, true, lastMinOdds);
 
  }
 
- function buildTickets(target, shuffle) {
+ function buildTickets(target, shuffle, selectedMinOdds) {
 
  const results = document.getElementById('ticketResults');
 
@@ -1229,17 +1271,33 @@
 
  picks.sort(function(a, b) { return a.odds - b.odds; });
 
+ var maxLegs = 8;
+
+ var minTicketOdds = target * 0.8;
+
+ var maxTicketOdds = target * 1.2;
+
  const scored = picks.map(function(p) {
+
+ var score = Infinity;
+
+ for (var legCount = 2; legCount <= maxLegs; legCount++) {
+
+ score = Math.min(score, Math.abs(Math.log(p.odds) - Math.log(target) / legCount));
+
+ }
 
  return Object.assign({}, p, {
 
- score: Math.abs(Math.log(p.odds) - Math.log(target) / 4)
+ score: score,
+
+ rank: score + (shuffle ? Math.random() * 0.08 : 0)
 
  });
 
  });
 
- scored.sort(function(a, b) { return a.score - b.score; });
+ scored.sort(function(a, b) { return a.rank - b.rank; });
 
  var pool = [];
 
@@ -1327,13 +1385,11 @@
 
  var MAX_ITER = 50000;
 
- var maxLegs = 8;
-
  function backtrack(start, current, product, usedMatches) {
 
  if (iterations >= MAX_ITER) return;
 
- if (current.length >= 2) {
+ if (current.length >= 2 && product >= minTicketOdds) {
 
  iterations++;
 
@@ -1369,7 +1425,7 @@
 
  var newProduct = product * p.odds;
 
- if (newProduct > target * 1.2) break;
+ if (newProduct > maxTicketOdds) break;
 
  usedMatches.add(p.match);
 
@@ -1389,7 +1445,7 @@
 
  if (tickets.length === 0) {
 
- results.innerHTML = '<div class="no-matches"><p>No ticket combinations found. Try adjusting your target odds or range.</p></div>';
+ results.innerHTML = '<div class="no-matches"><p>No tickets are within 20% of your ' + target.toFixed(2) + ' target using a minimum leg odds of ' + Number(selectedMinOdds).toFixed(2) + '. Try lowering the minimum, increasing the target, or widening the maximum odds.</p></div>';
 
  return;
 
@@ -1471,7 +1527,7 @@
 
  });
 
- var copyData = JSON.stringify({
+ var copyData = encodeURIComponent(JSON.stringify({
 
  legs: legLines,
 
@@ -1483,7 +1539,7 @@
 
  aff: AFFILIATE_URL
 
- });
+ })).replace(/'/g, '%27');
 
  var tableRows = ticket.selections.map(function(s, si) {
 
@@ -1491,9 +1547,9 @@
 
  '<td class="ticket-cell-num">' + (si + 1) + '</td>' +
 
- '<td class="ticket-cell-match">' + s.match + '</td>' +
+ '<td class="ticket-cell-match">' + escapeHtml(s.match) + '<span class="ticket-detail">' + escapeHtml([s.league, s.date, s.time].filter(Boolean).join(' · ') || 'Match details unavailable') + '</span></td>' +
 
- '<td class="ticket-cell-tip"><span class="tip-badge">' + s.tip + '</span></td>' +
+ '<td class="ticket-cell-tip"><span class="tip-badge">' + escapeHtml(s.tip) + '</span><div class="ticket-confidence"><strong>' + escapeHtml(s.category) + '</strong> · Estimated probability ' + Number(s.probability).toFixed(0) + '%</div></td>' +
 
  '</tr>'; }).join('');
 
@@ -1581,7 +1637,7 @@
 
  if (!btn) return;
 
- var data = JSON.parse(btn.dataset.copy);
+ var data = JSON.parse(decodeURIComponent(btn.dataset.copy));
 
  var aff = data.aff ? '\n\n ' + data.aff : '';
 
