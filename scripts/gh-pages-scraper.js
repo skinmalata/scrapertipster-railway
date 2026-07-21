@@ -19,12 +19,13 @@ function normalizeTeam(name) {
     .replace(/\(u20\)/g, '')
     .replace(/\(u19\)/g, '')
     .replace(/\(u17\)/g, '')
+    .replace(/\b(u\.?td|united|fc|afc|cf|sc|ac)\b/g, '')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
 function getSignificantTokens(name) {
-  const commonWords = new Set(['fc', 'sc', 'ac', 'rc', 'us', 'ud', 'as', 'ss', 'cf', 'cd', 'de', 'da', 'do', 'el', 'la', 'le', 'il', 'al', 'united', 'city', 'club', 'team', 'sporting', 'athletic', 'association', 'real', 'inter', 'san', 'saint', 'st']);
+  const commonWords = new Set(['fc', 'sc', 'ac', 'rc', 'us', 'ud', 'utd', 'as', 'ss', 'cf', 'cd', 'de', 'da', 'do', 'el', 'la', 'le', 'il', 'al', 'united', 'city', 'club', 'team', 'sporting', 'athletic', 'association', 'real', 'inter', 'san', 'saint', 'st']);
   return normalizeTeam(name).split(/\s+/).filter(t => t.length > 2 && !commonWords.has(t));
 }
 
@@ -33,6 +34,7 @@ function teamSimilarity(name1, name2) {
   const norm2 = normalizeTeam(name2);
   if (norm1 === norm2) return 1.0;
   if (norm1.includes(norm2) || norm2.includes(norm1)) return 0.9;
+  if (norm1.length >= 7 && norm2.length >= 7 && editSimilarity(norm1, norm2) >= 0.85) return 0.85;
   const tokens1 = getSignificantTokens(name1);
   const tokens2 = getSignificantTokens(name2);
   if (tokens1.length === 0 || tokens2.length === 0) return 0;
@@ -46,6 +48,18 @@ function teamSimilarity(name1, name2) {
     }
   }
   return matches / Math.max(tokens1.length, tokens2.length);
+}
+
+function editSimilarity(first, second) {
+  const previous = Array.from({ length: second.length + 1 }, (_, index) => index);
+  for (let row = 1; row <= first.length; row++) {
+    const current = [row];
+    for (let column = 1; column <= second.length; column++) {
+      current[column] = Math.min(current[column - 1] + 1, previous[column] + 1, previous[column - 1] + (first[row - 1] === second[column - 1] ? 0 : 1));
+    }
+    previous.splice(0, previous.length, ...current);
+  }
+  return 1 - previous[second.length] / Math.max(first.length, second.length);
 }
 
 function enrichWithResults(predictions, resultsCache) {

@@ -3,6 +3,12 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 
+// API-Football responses are cached so one busy page does not consume the
+// provider quota for every visitor. The API key is deliberately kept here,
+// never sent to the browser.
+const footballOddsCache = new Map();
+const FOOTBALL_ODDS_CACHE_MS = 10 * 60 * 1000;
+
 let scraperService = null;
 let cornersLastScrape = null;
 const SCRAPE_INTERVAL_MS = 2 * 60 * 60 * 1000;
@@ -153,13 +159,14 @@ router.get('/predictions', async (req, res) => {
         .replace(/\(u20\)/g, '')
         .replace(/\(u19\)/g, '')
         .replace(/\(u17\)/g, '')
+        .replace(/\b(u\.?td|united|fc|afc|cf|sc|ac)\b/g, '')
         .replace(/\s+/g, ' ')
         .trim();
     }
     
     // Get significant tokens from team name (filter out common words)
     function getSignificantTokens(name) {
-      const commonWords = new Set(['fc', 'sc', 'ac', 'rc', 'us', 'ud', 'as', 'ss', 'cf', 'cd', 'de', 'da', 'do', 'el', 'la', 'le', 'il', 'al', 'united', 'city', 'club', 'team', 'sporting', 'athletic', 'association', 'real', 'inter', 'san', 'saint', 'st']);
+      const commonWords = new Set(['fc', 'sc', 'ac', 'rc', 'us', 'ud', 'utd', 'as', 'ss', 'cf', 'cd', 'de', 'da', 'do', 'el', 'la', 'le', 'il', 'al', 'united', 'city', 'club', 'team', 'sporting', 'athletic', 'association', 'real', 'inter', 'san', 'saint', 'st']);
       return normalizeTeam(name).split(/\s+/).filter(t => t.length > 2 && !commonWords.has(t));
     }
     
@@ -173,6 +180,7 @@ router.get('/predictions', async (req, res) => {
       
       // One contains the other
       if (norm1.includes(norm2) || norm2.includes(norm1)) return 0.9;
+      if (norm1.length >= 7 && norm2.length >= 7 && editSimilarity(norm1, norm2) >= 0.85) return 0.85;
       
       // Token-based similarity
       const tokens1 = getSignificantTokens(name1);
@@ -191,6 +199,18 @@ router.get('/predictions', async (req, res) => {
       }
       
       return matches / Math.max(tokens1.length, tokens2.length);
+    }
+
+    function editSimilarity(first, second) {
+      const previous = Array.from({ length: second.length + 1 }, (_, index) => index);
+      for (let row = 1; row <= first.length; row++) {
+        const current = [row];
+        for (let column = 1; column <= second.length; column++) {
+          current[column] = Math.min(current[column - 1] + 1, previous[column] + 1, previous[column - 1] + (first[row - 1] === second[column - 1] ? 0 : 1));
+        }
+        previous.splice(0, previous.length, ...current);
+      }
+      return 1 - previous[second.length] / Math.max(first.length, second.length);
     }
     
     // Find best matching result for a prediction
@@ -581,6 +601,53 @@ router.get('/h2h-unbeaten', (req, res) => {
     res.json({ success: true, dates: {}, allDates: [], matches: [], message: 'No data yet - first scrape runs at 4 AM' });
   } catch (e) {
     res.json({ success: false, error: e.message, matches: [] });
+  }
+});
+
+router.get('/football-odds', async (req, res) => {
+  const requestedDate = typeof req.query.date === 'string' ? req.query.date : new Date().toISOString().slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(requestedDate)) {
+    return res.status(400).json({ available: false, message: 'date must use YYYY-MM-DD', response: [] });
+  }
+
+  const apiKey = process.env.API_FOOTBALL_KEY;
+  if (!apiKey) {
+    return res.json({
+      available: false,
+      source: 'API-Football',
+      message: 'API_FOOTBALL_KEY is not configured',
+      response: []
+    });
+  }
+
+  const cached = footballOddsCache.get(requestedDate);
+  if (cached && Date.now() - cached.createdAt < FOOTBALL_ODDS_CACHE_MS) {
+    return res.json({ ...cached.payload, cached: true });
+  }
+
+  try {
+    const upstream = await fetch('https://v3.football.api-sports.io/odds?date=' + encodeURIComponent(requestedDate) + '&timezone=Africa%2FLagos', {
+      headers: { 'x-apisports-key': apiKey, accept: 'application/json' },
+      signal: AbortSignal.timeout(12000)
+    });
+    const data = await upstream.json();
+    if (!upstream.ok || (data.errors && Object.keys(data.errors).length)) {
+      console.warn('API-Football odds request failed:', upstream.status, data.errors || data.message || 'Unknown error');
+      return res.status(502).json({ available: false, source: 'API-Football', message: 'Live odds are temporarily unavailable', response: [] });
+    }
+
+    const payload = {
+      available: true,
+      source: 'API-Football',
+      date: requestedDate,
+      fetchedAt: new Date().toISOString(),
+      response: Array.isArray(data.response) ? data.response : []
+    };
+    footballOddsCache.set(requestedDate, { createdAt: Date.now(), payload });
+    res.json(payload);
+  } catch (error) {
+    console.warn('API-Football odds request error:', error.message);
+    res.status(502).json({ available: false, source: 'API-Football', message: 'Live odds are temporarily unavailable', response: [] });
   }
 });
 
