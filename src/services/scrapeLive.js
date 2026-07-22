@@ -1,18 +1,13 @@
 const https = require('https');
 
 const SCRAPE_INTERVAL_MS = 5 * 60 * 1000;
-const STATS_FETCH_DELAY_MS = 350;
 const FOTMOB_STATS_DELAY_MS = 200;
-const FOTMOB_MATCH_DETAILS_DELAY_MS = 150;
 const MAX_FOTMOB_DETAIL_MATCHES = 20;
 const HTTP_TIMEOUT_MS = 8000;
 
 let liveCache = null;
 let isScraping = false;
 let scrapeTimer = null;
-
-let apiFootballDailyCount = 0;
-let apiFootballDailyResetMs = 0;
 
 function todayStr() {
   const d = new Date();
@@ -71,40 +66,6 @@ function httpGet(url, timeoutMs) {
   });
 }
 
-function httpGetAuth(url, headers, timeoutMs) {
-  var timeout = timeoutMs || HTTP_TIMEOUT_MS;
-  return new Promise(function (resolve, reject) {
-    var req = https.get(url, { headers: headers, timeout: timeout }, function (res) {
-      var body = '';
-      res.on('data', function (c) { body += c; });
-      res.on('end', function () { try { resolve(JSON.parse(body)); } catch (e) { resolve(null); } });
-    });
-    req.on('timeout', function () { req.destroy(); reject(new Error('Request timeout')); });
-    req.on('error', function () { resolve(null); });
-  });
-}
-
-function resetApiFootballDailyIfNeeded() {
-  var now = Date.now();
-  var startOfToday = new Date();
-  startOfToday.setUTCHours(0, 0, 0, 0);
-  var resetMs = startOfToday.getTime() + 86400000;
-  if (now >= apiFootballDailyResetMs) {
-    apiFootballDailyCount = 0;
-    apiFootballDailyResetMs = resetMs;
-  }
-}
-
-function canCallApiFootball() {
-  resetApiFootballDailyIfNeeded();
-  return apiFootballDailyCount < 95;
-}
-
-function trackApiFootballCall() {
-  resetApiFootballDailyIfNeeded();
-  apiFootballDailyCount++;
-}
-
 async function fetchFotMobLive() {
   var date = todayStr();
   var res = await httpGet('https://www.fotmob.com/api/data/matches?date=' + date);
@@ -128,44 +89,11 @@ async function fetchFotMobLive() {
         leagueId: league.id || null,
         minute: minute,
         score: score,
-        htScore: null,
-        probabilities: { home: 0, draw: 0, away: 0 },
-        prediction: '',
-        avgGoals: 0,
-        preMatchOdds: { home: null, draw: null, away: null },
-        matchUrl: null
+        htScore: null
       });
     });
   });
   return matches;
-}
-
-function extractApiFootballStats(response) {
-  if (!response) return null;
-  var statsArr = Array.isArray(response) ? response : [];
-  function extract(entry) {
-    var stats = (entry && entry.statistics) || [];
-    function val(type) {
-      var t = String(type).toLowerCase();
-      var s = stats.find(function (x) { return String(x.type).toLowerCase() === t; });
-      return s ? (parseFloat(s.value) || 0) : 0;
-    }
-    return { shotsOnGoal: val('Shots on Goal'), shotsOffGoal: val('Shots off Goal'), corners: val('Corner Kicks') };
-  }
-  var homeEntry = statsArr[0] || null;
-  var awayEntry = statsArr[1] || null;
-  var homeStats = extract(homeEntry);
-  var awayStats = extract(awayEntry);
-  return {
-    homeTeam: homeStats,
-    awayTeam: awayStats,
-    total: {
-      shotsOnGoal: homeStats.shotsOnGoal + awayStats.shotsOnGoal,
-      shotsOffGoal: homeStats.shotsOffGoal + awayStats.shotsOffGoal,
-      corners: homeStats.corners + awayStats.corners,
-      totalShots: homeStats.shotsOnGoal + homeStats.shotsOffGoal + awayStats.shotsOnGoal + awayStats.shotsOffGoal
-    }
-  };
 }
 
 function extractFotMobStats(matchDetails) {
@@ -200,48 +128,37 @@ function extractFotMobStats(matchDetails) {
   };
 }
 
-async function fetchFotMobMatchStats(matchId) {
+function extractH2H(matchDetails) {
+  if (!matchDetails) return null;
+  var h2h = matchDetails.content && matchDetails.content.h2h;
+  if (!h2h || !h2h.summary) return null;
+  var summary = h2h.summary;
+  var pastMatches = (h2h.matches || []).filter(function (m) { return m.status && m.status.started && m.status.finished; });
+  var homeWins = summary[0] || 0;
+  var draws = summary[1] || 0;
+  var awayWins = summary[2] || 0;
+  var total = homeWins + draws + awayWins;
+  if (total === 0) return null;
+  return {
+    homeWins: homeWins,
+    draws: draws,
+    awayWins: awayWins,
+    total: total,
+    homeWinPct: Math.round((homeWins / total) * 100),
+    awayWinPct: Math.round((awayWins / total) * 100),
+    drawPct: Math.round((draws / total) * 100),
+    recentCount: pastMatches.length
+  };
+}
+
+async function fetchFotMobMatchDetails(matchId) {
   var url = 'https://www.fotmob.com/api/data/matchDetails?matchId=' + matchId;
   var res = await httpGet(url);
   if (res.status !== 200 || !res.data) return null;
-  return extractFotMobStats(res.data);
-}
-
-async function fetchApiFootballStats(apiKey, fixtureId) {
-  if (!canCallApiFootball()) return null;
-  var url = 'https://v3.football.api-sports.io/fixtures/statistics?fixture=' + encodeURIComponent(fixtureId);
-  var res = await httpGetAuth(url, { 'x-apisports-key': apiKey, 'accept': 'application/json' });
-  trackApiFootballCall();
-  if (!res || !res.response) return null;
-  return extractApiFootballStats(res.response);
-}
-
-async function matchFotMobToApiFootball(fotmobMatches, apiKey) {
-  if (!canCallApiFootball()) return new Map();
-  var fixtureRes = await httpGetAuth('https://v3.football.api-sports.io/fixtures?live=all', {
-    'x-apisports-key': apiKey,
-    'accept': 'application/json'
-  });
-  trackApiFootballCall();
-  if (!fixtureRes || !fixtureRes.response) return new Map();
-  var apiFixtures = Array.isArray(fixtureRes.response) ? fixtureRes.response : [];
-
-  var fixtureByTeam = new Map();
-  apiFixtures.forEach(function (f) {
-    var home = f.teams && f.teams.home ? normaliseTeam(f.teams.home.name) : '';
-    var away = f.teams && f.teams.away ? normaliseTeam(f.teams.away.name) : '';
-    fixtureByTeam.set(home + '|' + away, f);
-  });
-
-  var matched = new Map();
-  fotmobMatches.forEach(function (m) {
-    var key = m.homeNormal + '|' + m.awayNormal;
-    var fixture = fixtureByTeam.get(key);
-    if (fixture) {
-      matched.set(m.matchId, fixture.fixture ? fixture.fixture.id : null);
-    }
-  });
-  return matched;
+  return {
+    stats: extractFotMobStats(res.data),
+    h2h: extractH2H(res.data)
+  };
 }
 
 async function scrapeLive() {
@@ -260,29 +177,17 @@ async function scrapeLive() {
     for (var i = 0; i < detailLimit; i++) {
       var m = matches[i];
       if (i > 0 && i % 3 === 0) await new Promise(function (r) { setTimeout(r, FOTMOB_STATS_DELAY_MS); });
-      var fotmobStats = await fetchFotMobMatchStats(m.matchId).catch(function () { return null; });
-      if (fotmobStats) m.fotmobStats = fotmobStats;
-    }
-
-    var apiKey = process.env.API_FOOTBALL_KEY;
-    if (apiKey && canCallApiFootball()) {
-      var idMap = await matchFotMobToApiFootball(matches, apiKey).catch(function () { return new Map(); });
-
-      for (var i = 0; i < matches.length; i++) {
-        var m = matches[i];
-        var apiFixtureId = idMap.get(m.matchId);
-        if (apiFixtureId && canCallApiFootball()) {
-          if (i > 0 && i % 3 === 0) await new Promise(function (r) { setTimeout(r, STATS_FETCH_DELAY_MS); });
-          var stats = await fetchApiFootballStats(apiKey, apiFixtureId).catch(function () { return null; });
-          if (stats) m.apiStats = stats;
-        }
+      var details = await fetchFotMobMatchDetails(m.matchId).catch(function () { return null; });
+      if (details) {
+        if (details.stats) m.fotmobStats = details.stats;
+        if (details.h2h) m.h2h = details.h2h;
       }
     }
 
     liveCache = { fetchedAt: new Date().toISOString(), matchCount: matches.length, matches: matches };
-    var withFotmob = matches.filter(function (m) { return m.fotmobStats; }).length;
-    var withApi = matches.filter(function (m) { return m.apiStats; }).length;
-    console.log('[fotmob-live] Scraped', matches.length, 'live matches (' + withFotmob + ' FotMob stats, ' + withApi + ' API-Football stats, API-Football budget:', apiFootballDailyCount + '/95)');
+    var withStats = matches.filter(function (m) { return m.fotmobStats; }).length;
+    var withH2h = matches.filter(function (m) { return m.h2h; }).length;
+    console.log('[fotmob-live] Scraped', matches.length, 'live matches (' + withStats + ' stats, ' + withH2h + ' h2h)');
   } catch (e) {
     console.warn('[fotmob-live] Scrape failed:', e.message);
   }
