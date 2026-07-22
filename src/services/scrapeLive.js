@@ -1,0 +1,220 @@
+const https = require('https');
+
+const SCRAPE_INTERVAL_MS = 5 * 60 * 1000;
+const STATS_FETCH_DELAY_MS = 350;
+
+let liveCache = null;
+let isScraping = false;
+let scrapeTimer = null;
+
+function todayStr() {
+  const d = new Date();
+  return d.getUTCFullYear() +
+    String(d.getUTCMonth() + 1).padStart(2, '0') +
+    String(d.getUTCDate()).padStart(2, '0');
+}
+
+function normaliseTeam(name) {
+  return String(name || '').toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function parseLiveMinute(time) {
+  if (!time) return 0;
+  if (time.liveTime && time.liveTime.short) {
+    const n = parseInt(String(time.liveTime.short).replace(/[^0-9]/g, ''), 10);
+    if (Number.isFinite(n)) return n;
+  }
+  if (time.currentPeriodStartTimestamp) {
+    const elapsed = Math.floor((Date.now() / 1000 - time.currentPeriodStartTimestamp) / 60);
+    return Math.max(1, elapsed);
+  }
+  return 0;
+}
+
+function parseScore(status) {
+  if (!status || !status.scoreStr) return { home: 0, away: 0 };
+  const m = String(status.scoreStr).match(/(\d+)\s*-\s*(\d+)/);
+  if (!m) return { home: 0, away: 0 };
+  return { home: parseInt(m[1], 10), away: parseInt(m[2], 10) };
+}
+
+function httpGet(url) {
+  return new Promise(function (resolve, reject) {
+    https.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Language': 'en-US,en;q=0.9'
+      }
+    }, function (res) {
+      var body = '';
+      res.on('data', function (c) { body += c; });
+      res.on('end', function () {
+        try { resolve({ status: res.statusCode, data: JSON.parse(body) }); }
+        catch (e) { resolve({ status: res.statusCode, data: null }); }
+      });
+    }).on('error', reject);
+  });
+}
+
+async function fetchFotMobLive() {
+  var date = todayStr();
+  var res = await httpGet('https://www.fotmob.com/api/data/matches?date=' + date);
+  if (res.status !== 200 || !res.data || !res.data.leagues) return [];
+
+  var matches = [];
+  res.data.leagues.forEach(function (league) {
+    league.matches.forEach(function (m) {
+      if (!m.status || !m.status.started || m.status.finished || !m.status.ongoing) return;
+      var minute = parseLiveMinute(m.status);
+      var score = parseScore(m.status);
+      matches.push({
+        matchId: String(m.id),
+        home: m.home ? m.home.name : '',
+        away: m.away ? m.away.name : '',
+        homeId: m.home ? m.home.id : null,
+        awayId: m.away ? m.away.id : null,
+        homeNormal: normaliseTeam(m.home ? m.home.name : ''),
+        awayNormal: normaliseTeam(m.away ? m.away.name : ''),
+        league: league.name || '',
+        leagueId: league.id || null,
+        minute: minute,
+        score: score,
+        htScore: null,
+        probabilities: { home: 0, draw: 0, away: 0 },
+        prediction: '',
+        avgGoals: 0,
+        preMatchOdds: { home: null, draw: null, away: null },
+        matchUrl: null
+      });
+    });
+  });
+  return matches;
+}
+
+function extractApiFootballStats(response) {
+  if (!response) return null;
+  var statsArr = Array.isArray(response) ? response : [];
+  function extract(entry) {
+    var stats = (entry && entry.statistics) || [];
+    function val(type) {
+      var t = String(type).toLowerCase();
+      var s = stats.find(function (x) { return String(x.type).toLowerCase() === t; });
+      return s ? (parseFloat(s.value) || 0) : 0;
+    }
+    return { shotsOnGoal: val('Shots on Goal'), shotsOffGoal: val('Shots off Goal'), corners: val('Corner Kicks') };
+  }
+  var homeEntry = statsArr[0] || null;
+  var awayEntry = statsArr[1] || null;
+  var homeStats = extract(homeEntry);
+  var awayStats = extract(awayEntry);
+  return {
+    homeTeam: homeStats,
+    awayTeam: awayStats,
+    total: {
+      shotsOnGoal: homeStats.shotsOnGoal + awayStats.shotsOnGoal,
+      shotsOffGoal: homeStats.shotsOffGoal + awayStats.shotsOffGoal,
+      corners: homeStats.corners + awayStats.corners,
+      totalShots: homeStats.shotsOnGoal + homeStats.shotsOffGoal + awayStats.shotsOnGoal + awayStats.shotsOffGoal
+    }
+  };
+}
+
+async function fetchApiFootballStats(apiKey, fixtureId) {
+  var url = 'https://v3.football.api-sports.io/fixtures/statistics?fixture=' + encodeURIComponent(fixtureId);
+  var res = await new Promise(function (resolve, reject) {
+    https.get(url, {
+      headers: { 'x-apisports-key': apiKey, 'accept': 'application/json' }
+    }, function (r) {
+      var body = '';
+      r.on('data', function (c) { body += c; });
+      r.on('end', function () { try { resolve(JSON.parse(body)); } catch (e) { resolve(null); } });
+    }).on('error', function () { resolve(null); });
+  });
+  if (!res || !res.response) return null;
+  return extractApiFootballStats(res.response);
+}
+
+async function matchFotMobToApiFootball(fotmobMatches, apiKey) {
+  var fixtureRes = await new Promise(function (resolve, reject) {
+    https.get('https://v3.football.api-sports.io/fixtures?live=all', {
+      headers: { 'x-apisports-key': apiKey, 'accept': 'application/json' }
+    }, function (r) {
+      var body = '';
+      r.on('data', function (c) { body += c; });
+      r.on('end', function () { try { resolve(JSON.parse(body)); } catch (e) { resolve(null); } });
+    }).on('error', function () { resolve(null); });
+  });
+  if (!fixtureRes || !fixtureRes.response) return new Map();
+  var apiFixtures = Array.isArray(fixtureRes.response) ? fixtureRes.response : [];
+
+  var fixtureByTeam = new Map();
+  apiFixtures.forEach(function (f) {
+    var home = f.teams && f.teams.home ? normaliseTeam(f.teams.home.name) : '';
+    var away = f.teams && f.teams.away ? normaliseTeam(f.teams.away.name) : '';
+    fixtureByTeam.set(home + '|' + away, f);
+  });
+
+  var matched = new Map();
+  fotmobMatches.forEach(function (m) {
+    var key = m.homeNormal + '|' + m.awayNormal;
+    var fixture = fixtureByTeam.get(key);
+    if (fixture) {
+      matched.set(m.matchId, fixture.fixture ? fixture.fixture.id : null);
+    }
+  });
+  return matched;
+}
+
+async function scrapeLive() {
+  if (isScraping) return liveCache;
+  isScraping = true;
+
+  try {
+    var matches = await fetchFotMobLive();
+    if (!matches.length) {
+      liveCache = { fetchedAt: new Date().toISOString(), matchCount: 0, matches: [] };
+      isScraping = false;
+      return liveCache;
+    }
+
+    var apiKey = process.env.API_FOOTBALL_KEY;
+    if (apiKey) {
+      var idMap = await matchFotMobToApiFootball(matches, apiKey).catch(function () { return new Map(); });
+
+      for (var i = 0; i < matches.length; i++) {
+        var m = matches[i];
+        var apiFixtureId = idMap.get(m.matchId);
+        if (apiFixtureId) {
+          if (i > 0 && i % 3 === 0) await new Promise(function (r) { setTimeout(r, STATS_FETCH_DELAY_MS); });
+          var stats = await fetchApiFootballStats(apiKey, apiFixtureId).catch(function () { return null; });
+          if (stats) m.apiStats = stats;
+        }
+      }
+    }
+
+    liveCache = { fetchedAt: new Date().toISOString(), matchCount: matches.length, matches: matches };
+    console.log('[fotmob-live] Scraped', matches.length, 'live matches');
+  } catch (e) {
+    console.warn('[fotmob-live] Scrape failed:', e.message);
+  }
+
+  isScraping = false;
+  return liveCache;
+}
+
+function getCachedLive() {
+  return liveCache;
+}
+
+function startLiveScrapeLoop() {
+  if (scrapeTimer) return;
+  console.log('[fotmob-live] Starting scrape loop (every 5 min)');
+  scrapeLive();
+  scrapeTimer = setInterval(scrapeLive, SCRAPE_INTERVAL_MS);
+}
+
+module.exports = { scrapeLive, getCachedLive, startLiveScrapeLoop };

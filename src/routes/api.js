@@ -10,7 +10,7 @@ function getGeneratePostThumbnail() {
   return generatePostThumbnail;
 }
 const { asNumber, buildOpportunities } = require('../services/liveTips');
-const { getCachedLive } = require('../services/scrapeForebetLive');
+const { getCachedLive } = require('../services/scrapeLive');
 const { buildGoldenTips } = require('../services/goldenOpportunities');
 
 // API-Football responses are cached so one busy page does not consume the
@@ -824,7 +824,7 @@ router.get('/live-tips', async (req, res) => {
   }
 });
 
-router.get('/forebet-live', function (req, res) {
+router.get('/live-matches', function (req, res) {
   const data = getCachedLive();
   if (!data) {
     return res.json({ available: false, matches: [], message: 'Live data is being collected. Please check again shortly.' });
@@ -840,79 +840,22 @@ router.get('/golden-tips', async function (req, res) {
     return res.json({ ...goldenTipsCache.payload, cached: true });
   }
 
-  const forebetData = getCachedLive();
-  if (!forebetData || !forebetData.matches || forebetData.matches.length === 0) {
-    return res.json({ available: false, opportunities: [], message: 'Forebet live data is not available yet. Tips will appear once live matches are detected.' });
+  const liveData = getCachedLive();
+  if (!liveData || !liveData.matches || liveData.matches.length === 0) {
+    return res.json({ available: false, opportunities: [], message: 'Live data is not available yet. Tips will appear once live matches are detected.' });
   }
 
-  const apiData = new Map();
-  const apiKey = process.env.API_FOOTBALL_KEY;
-  if (apiKey) {
-    try {
-      const today = new Date().toISOString().slice(0, 10);
-      const fixturesRes = await fetch('https://v3.football.api-sports.io/fixtures?live=all', {
-        headers: { 'x-apisports-key': apiKey, accept: 'application/json' },
-        signal: AbortSignal.timeout(25000)
-      });
-      const fixturesData = await fixturesRes.json();
-      const fixtures = Array.isArray(fixturesData.response) ? fixturesData.response : [];
-
-      for (const fixture of fixtures) {
-        const fid = fixture.fixture?.id;
-        if (!fid) continue;
-        try {
-          const statsRes = await fetch('https://v3.football.api-sports.io/fixtures/statistics?fixture=' + encodeURIComponent(fid), {
-            headers: { 'x-apisports-key': apiKey, accept: 'application/json' },
-            signal: AbortSignal.timeout(25000)
-          });
-          const statsData = await statsRes.json();
-          const statsArr = Array.isArray(statsData.response) ? statsData.response : [];
-          const homeEntry = statsArr.find(function (e) { return e.team?.id === fixture.teams?.home?.id; });
-          const awayEntry = statsArr.find(function (e) { return e.team?.id === fixture.teams?.away?.id; });
-
-          function extractStats(entry) {
-            const stats = entry?.statistics || [];
-            function val(type) {
-              const t = String(type).toLowerCase();
-              const s = stats.find(function (x) { return String(x.type).toLowerCase() === t; });
-              return asNumber(s?.value);
-            }
-            return { shotsOnGoal: val('Shots on Goal'), shotsOffGoal: val('Shots off Goal'), corners: val('Corner Kicks') };
-          }
-
-          const homeStats = extractStats(homeEntry);
-          const awayStats = extractStats(awayEntry);
-
-          apiData.set(fid, {
-            homeTeam: homeStats,
-            awayTeam: awayStats,
-            total: {
-              shotsOnGoal: homeStats.shotsOnGoal + awayStats.shotsOnGoal,
-              shotsOffGoal: homeStats.shotsOffGoal + awayStats.shotsOffGoal,
-              corners: homeStats.corners + awayStats.corners
-            }
-          });
-        } catch (e) {
-          // Skip failed stats
-        }
-      }
-    } catch (e) {
-      console.warn('[golden-tips] API-Football stats fetch failed:', e.message);
-    }
-  }
-
-  const opportunities = buildGoldenTips(forebetData, apiData, null);
+  const opportunities = buildGoldenTips(liveData);
 
   const payload = {
     available: true,
     fetchedAt: new Date().toISOString(),
-    forebetMatches: forebetData.matchCount,
-    apiMatches: apiData.size,
+    matchCount: liveData.matchCount,
     refreshSeconds: GOLDEN_TIPS_CACHE_MS / 1000,
     opportunities: opportunities
   };
 
-  console.log('[golden-tips] forebet=' + forebetData.matchCount + ' api=' + apiData.size + ' opportunities=' + opportunities.length);
+  console.log('[golden-tips] matches=' + liveData.matchCount + ' opportunities=' + opportunities.length);
   goldenTipsCache = { createdAt: Date.now(), payload };
   res.json(payload);
 });

@@ -21,8 +21,6 @@
     @keyframes pulse { 70% { box-shadow:0 0 0 8px rgba(255,36,72,0); } 100% { box-shadow:0 0 0 0 rgba(255,36,72,0); } }
     .live-hero h1 { margin:16px 0 10px; font-size:clamp(28px,5vw,44px); letter-spacing:-.045em; }
     .live-hero p { max-width:680px; margin:0 auto; color:var(--text-secondary); line-height:1.7; }
-    .live-status { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin:18px auto 28px; color:var(--text-muted); font-size:13px; }
-    .live-status span { padding:7px 10px; border-radius:8px; background:var(--bg-card); border:1px solid var(--border); }
     .alert-panel { max-width:560px; margin:0 auto 28px; padding:14px; border:1px solid rgba(255,36,72,.36); border-radius:12px; background:linear-gradient(135deg,rgba(255,36,72,.16),rgba(255,36,72,.05)); text-align:center; }
     .alert-btn { width:100%; display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:11px 16px; border:1px solid #ff526b; border-radius:9px; background:linear-gradient(135deg,#ff2448,#d41a38); color:#fff; font:inherit; font-size:14px; font-weight:800; cursor:pointer; box-shadow:0 6px 18px rgba(255,36,72,.25); }
     .alert-btn.enabled { border-color:#45d98d; background:linear-gradient(135deg,#4ade80,#22c55e); color:#092316; box-shadow:0 6px 18px rgba(74,222,128,.2); }
@@ -73,11 +71,6 @@
       <h1>In-Play Betting Tips</h1>
       <p>We monitor live match data and show a tip only when a defined opportunity rule qualifies. No tip is a valid result—not a missing prediction.</p>
     </section>
-    <div class="live-status" aria-live="polite">
-      <span id="matchCount">Checking live matches…</span>
-      <span id="updatedAt">Waiting for live data</span>
-      <span>Refreshes every 15 minutes (free-plan protection)</span>
-    </div>
     <div class="alert-panel">
       <button id="alertButton" class="alert-btn" type="button">Enable In-Play Alerts</button>
       <p class="alert-note">Alerts are sent only while this In-Play Betting Tips page remains open in your browser.</p>
@@ -100,8 +93,6 @@
     (function() {
       var API_BASE = 'https://winfulltime-api.onrender.com';
       var container = document.getElementById('tips');
-      var matchCount = document.getElementById('matchCount');
-      var updatedAt = document.getElementById('updatedAt');
       var alertButton = document.getElementById('alertButton');
       var alertEnabled = localStorage.getItem('wf-live-alerts') === 'true';
       function escapeHtml(value) { return String(value || '').replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
@@ -113,8 +104,6 @@
         alertButton.textContent = !supported ? 'Alerts unavailable in this browser' : (Notification.permission === 'denied' ? 'Alerts blocked in browser settings' : (alertEnabled ? 'In-Play alerts enabled' : 'Enable In-Play Alerts'));
       }
       function renderOpportunities(data) {
-        matchCount.textContent = (data.liveMatches || 0) + ' live matches';
-        updatedAt.textContent = data.fetchedAt ? 'Updated ' + new Date(data.fetchedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}) : 'Data unavailable';
         if (!data.available || !data.opportunities || !data.opportunities.length) {
           container.innerHTML = empty('No qualified opportunities right now', 'We monitor live matches and show a tip only when a defined rule qualifies. No tip is a valid result — not a missing prediction.');
           return;

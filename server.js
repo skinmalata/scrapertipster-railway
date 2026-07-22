@@ -443,9 +443,9 @@ app.get('/blog/:slug', (req, res) => {
   res.redirect('/blog/');
 });
 
-// Production site is static on GitHub Pages.
-// Scraping, social posting, and deploys run via GitHub Actions only.
-// Forebet live scraping is disabled — Cloudflare blocks axios on Render.
+// FotMob live scraping + API-Football stats — replaces Forebet (Cloudflare blocked axios on Render).
+const { startLiveScrapeLoop } = require('./src/services/scrapeLive');
+startLiveScrapeLoop();
 
 const HOST = process.env.HOST || '0.0.0.0';
 
