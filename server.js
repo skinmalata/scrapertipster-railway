@@ -186,6 +186,11 @@ app.get('/', (req, res, next) => {
   next();
 });
 
+// Consolidate the retired in-play betting article with the current guide.
+app.get('/blog/in-play-betting-strategy.html', (req, res) => {
+  res.redirect(301, '/blog/inplay-betting-strategies.html');
+});
+
 // Static files with no cache
 app.use(express.static('public', {
   maxAge: 0,
