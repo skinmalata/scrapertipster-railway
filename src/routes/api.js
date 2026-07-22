@@ -9,7 +9,7 @@ function getGeneratePostThumbnail() {
   }
   return generatePostThumbnail;
 }
-const { buildOpportunities } = require('../services/liveTips');
+const { asNumber, buildOpportunities } = require('../services/liveTips');
 
 // API-Football responses are cached so one busy page does not consume the
 // provider quota for every visitor. The API key is deliberately kept here,
@@ -682,6 +682,8 @@ router.get('/football-odds', async (req, res) => {
   }
 });
 
+let liveTipsPending = null;
+
 router.get('/live-tips', async (req, res) => {
   const apiKey = process.env.API_FOOTBALL_KEY;
   if (!apiKey) {
@@ -692,34 +694,46 @@ router.get('/live-tips', async (req, res) => {
     return res.json({ ...liveTipsCache.payload, cached: true });
   }
 
-  const request = async function(endpoint) {
-    const today = new Date().toISOString().slice(0, 10);
-    if (liveTipsBudget.day !== today) liveTipsBudget = { day: today, used: 0, remaining: null };
-    if (liveTipsBudget.used >= LIVE_TIPS_DAILY_BUDGET || (liveTipsBudget.remaining !== null && liveTipsBudget.remaining <= API_REQUEST_RESERVE)) {
-      const quotaError = new Error('The free-plan live-data budget has been reached for now. Please check again after the daily reset.');
-      quotaError.code = 'LIVE_TIPS_BUDGET_REACHED';
-      throw quotaError;
-    }
-    liveTipsBudget.used++;
-    const response = await fetch('https://v3.football.api-sports.io/' + endpoint, {
-      headers: { 'x-apisports-key': apiKey, accept: 'application/json' },
-      signal: AbortSignal.timeout(12000)
-    });
-    const remaining = Number(response.headers.get('x-ratelimit-requests-remaining'));
-    if (Number.isFinite(remaining)) liveTipsBudget.remaining = remaining;
-    const data = await response.json();
-    if (!response.ok || (data.errors && Object.keys(data.errors).length)) throw new Error(data.message || 'Live data is temporarily unavailable');
-    return Array.isArray(data.response) ? data.response : [];
-  };
+  if (liveTipsPending) return liveTipsPending.then(function(payload) { res.json(payload); }).catch(function() { res.status(502).json({ available: false, opportunities: [], message: 'Live data is temporarily unavailable.' }); });
 
-  try {
+  liveTipsPending = (async function() {
+    const request = async function(endpoint) {
+      const today = new Date().toISOString().slice(0, 10);
+      if (liveTipsBudget.day !== today) liveTipsBudget = { day: today, used: 0, remaining: null };
+      if (liveTipsBudget.remaining !== null && liveTipsBudget.remaining <= API_REQUEST_RESERVE) {
+        const quotaError = new Error('The daily API quota is nearly exhausted. Tips will resume after the reset.');
+        quotaError.code = 'LIVE_TIPS_BUDGET_REACHED';
+        throw quotaError;
+      }
+      if (liveTipsBudget.used >= LIVE_TIPS_DAILY_BUDGET) {
+        const quotaError = new Error('The daily live-data budget has been reached. Please check again after the reset.');
+        quotaError.code = 'LIVE_TIPS_BUDGET_REACHED';
+        throw quotaError;
+      }
+      liveTipsBudget.used++;
+      const response = await fetch('https://v3.football.api-sports.io/' + endpoint, {
+        headers: { 'x-apisports-key': apiKey, accept: 'application/json' },
+        signal: AbortSignal.timeout(12000)
+      });
+      const remaining = Number(response.headers.get('x-ratelimit-requests-remaining'));
+      if (Number.isFinite(remaining)) liveTipsBudget.remaining = remaining;
+      const data = await response.json();
+      if (!response.ok || (data.errors && Object.keys(data.errors).length)) throw new Error(data.message || 'Live data is temporarily unavailable');
+      return Array.isArray(data.response) ? data.response : [];
+    };
+
     const fixtures = await request('fixtures?live=all');
     const odds = await request('odds/live');
     const oddsByFixture = new Map(odds.map(function(entry) { return [entry.fixture?.id, entry]; }));
     const candidates = fixtures.filter(function(fixture) {
       const minute = Number(fixture.fixture?.status?.elapsed || 0);
       return minute >= 51 && minute <= 85;
-    }).slice(0, 1);
+    }).sort(function(a, b) {
+      const scoreA = asNumber(a.goals?.home) + asNumber(a.goals?.away);
+      const scoreB = asNumber(b.goals?.home) + asNumber(b.goals?.away);
+      if (scoreA !== scoreB) return scoreA - scoreB;
+      return Number(b.fixture?.status?.elapsed || 0) - Number(a.fixture?.status?.elapsed || 0);
+    }).slice(0, 3);
     const statistics = await Promise.all(candidates.map(async function(fixture) {
       try {
         const data = await request('fixtures/statistics?fixture=' + encodeURIComponent(fixture.fixture.id));
@@ -737,6 +751,10 @@ router.get('/live-tips', async (req, res) => {
       if (cached && Date.now() - cached.createdAt < HEAD_TO_HEAD_CACHE_MS) return [fixture.fixture.id, cached.data];
       try {
         const data = await request('fixtures/headtohead?h2h=' + encodeURIComponent(homeId + '-' + awayId) + '&last=10');
+        if (headToHeadCache.size >= 200) {
+          const oldest = headToHeadCache.keys().next().value;
+          headToHeadCache.delete(oldest);
+        }
         headToHeadCache.set(cacheKey, { createdAt: Date.now(), data });
         return [fixture.fixture.id, data];
       } catch (error) {
@@ -751,7 +769,13 @@ router.get('/live-tips', async (req, res) => {
       liveMatches: fixtures.length,
       opportunities: buildOpportunities(fixtures, oddsByFixture, statisticsByFixture, headToHeadByFixture)
     };
+    console.log('[live-tips] budget=' + liveTipsBudget.used + '/' + LIVE_TIPS_DAILY_BUDGET + ' remaining=' + liveTipsBudget.remaining + ' live=' + fixtures.length + ' candidates=' + candidates.length + ' opportunities=' + payload.opportunities.length);
     liveTipsCache = { createdAt: Date.now(), payload };
+    return payload;
+  })();
+
+  try {
+    const payload = await liveTipsPending;
     res.json(payload);
   } catch (error) {
     if (error.code === 'LIVE_TIPS_BUDGET_REACHED') {
@@ -759,6 +783,8 @@ router.get('/live-tips', async (req, res) => {
     }
     console.warn('Live tips request error:', error.message);
     res.status(502).json({ available: false, opportunities: [], message: 'Live data is temporarily unavailable. Please try again shortly.' });
+  } finally {
+    liveTipsPending = null;
   }
 });
 

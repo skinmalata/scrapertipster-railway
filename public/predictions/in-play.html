@@ -129,7 +129,7 @@
       function render(data) {
         matchCount.textContent = (data.liveMatches || 0) + ' live matches checked';
         updatedAt.textContent = data.fetchedAt ? 'Updated ' + new Date(data.fetchedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}) : 'Live data unavailable';
-        if (!data.available) return empty('Live tips are temporarily unavailable', data.message || 'Please try again shortly.');
+        if (!data.available) return empty(data.budgetLimited ? 'Daily data limit reached' : 'Live tips are temporarily unavailable', data.message || 'Please try again shortly.');
         notifyNewOpportunities(data.opportunities);
         if (!data.opportunities || !data.opportunities.length) return empty('No qualified opportunity right now', 'We checked the live matches, but none currently meet the required score, pressure and market criteria.');
         container.innerHTML = data.opportunities.map(function(tip) {
@@ -160,6 +160,10 @@
         }
         updateAlertButton();
       });
+      if (alertEnabled && 'Notification' in window && Notification.permission !== 'granted') {
+        alertEnabled = false;
+        localStorage.removeItem('wf-live-alerts');
+      }
       updateAlertButton();
       load();
     })();

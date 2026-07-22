@@ -115,7 +115,7 @@ function buildOpportunities(fixtures, oddsByFixture, statisticsByFixture, headTo
       statistics.shotsOnGoal >= 5 && (statistics.shotsOnGoal + statistics.shotsOffGoal) >= 12 &&
       statistics.corners >= 5 && liveOdds && liveOdds.odds >= 1.25;
     if (qualifies) {
-      const pressureScore = Math.min(99, 54 + statistics.shotsOnGoal * 3 + statistics.corners * 2);
+      const pressureScore = Math.min(99, 42 + statistics.shotsOnGoal * 2.5 + statistics.shotsOffGoal * 1 + statistics.corners * 2);
       opportunities.push(buildTip(fixture, elapsed, homeGoals, awayGoals, 'Over 0.5 Match Goals', liveOdds, pressureScore,
         statistics.shotsOnGoal + ' shots on target, ' + statistics.corners + ' corners and ' +
         (statistics.shotsOnGoal + statistics.shotsOffGoal) + ' total attempts in a 0-0 match.', 'late-goal-pressure'));
@@ -159,4 +159,4 @@ function buildOpportunities(fixtures, oddsByFixture, statisticsByFixture, headTo
   });
 }
 
-module.exports = { buildOpportunities, summariseStatistics, findOverHalfGoalOdds, headToHeadSummary };
+module.exports = { asNumber, buildOpportunities, summariseStatistics, findOverHalfGoalOdds, headToHeadSummary };
