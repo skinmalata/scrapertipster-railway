@@ -6,12 +6,6 @@ function getCheerio() {
   if (!_cheerio) _cheerio = require('cheerio');
   return _cheerio;
 }
-
-let _puppeteer;
-function getPuppeteer() {
-  if (!_puppeteer) _puppeteer = require('puppeteer');
-  return _puppeteer;
-}
 const path = require('path');
 const { detectLeague } = require('../data/leagues');
 const { getDateRange, getLocalDateStr, findMatchingResult } = require('../utils/helpers');
@@ -52,7 +46,7 @@ async function processBrowserQueue() {
   const { resolve, reject, browserOptions } = browserLaunchQueue.shift();
   
   try {
-    const browser = await getPuppeteer().launch(browserOptions);
+    throw new Error('Puppeteer is not available');
     resolve(browser);
   } catch (err) {
     reject(err);

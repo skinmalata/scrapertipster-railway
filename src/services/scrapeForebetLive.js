@@ -1,4 +1,3 @@
-const { executablePath, args } = require('../config/puppeteer');
 const axios = require('axios');
 
 const FOREBET_LIVE_URL = 'https://www.forebet.com/en/live-football-tips';
@@ -50,7 +49,13 @@ function parseMatchUrl(href) {
 }
 
 function parseHTML(html) {
-  const cheerio = require('cheerio');
+  let cheerio;
+  try {
+    cheerio = require('cheerio');
+  } catch (e) {
+    console.warn('[forebet-live] Cheerio not available:', e.message);
+    return [];
+  }
   const $ = cheerio.load(html);
   const matches = [];
 
@@ -119,8 +124,6 @@ async function scrapeForebetLive() {
   if (isScraping) return liveCache;
   isScraping = true;
 
-  let html = null;
-
   try {
     const res = await axios.get(FOREBET_LIVE_URL, {
       timeout: 20000,
@@ -131,53 +134,20 @@ async function scrapeForebetLive() {
         'Accept-Encoding': 'gzip, deflate'
       }
     });
-    html = res.data;
+    const html = res.data;
     if (typeof html === 'string' && html.length > 1000) {
-      console.log('[forebet-live] Axios loaded page, length:', html.length);
+      const matches = parseHTML(html);
+      liveCache = {
+        fetchedAt: new Date().toISOString(),
+        matchCount: matches.length,
+        matches
+      };
+      console.log('[forebet-live] Scraped', matches.length, 'live matches');
     } else {
-      html = null;
+      console.warn('[forebet-live] Response too short or not HTML');
     }
   } catch (e) {
-    console.warn('[forebet-live] Axios failed:', e.message);
-  }
-
-  if (!html) {
-    let puppeteer;
-    try {
-      puppeteer = require('puppeteer');
-    } catch (e) {
-      console.warn('[forebet-live] Puppeteer not available:', e.message);
-      isScraping = false;
-      return liveCache;
-    }
-
-    let browser;
-    try {
-      browser = await puppeteer.launch({ headless: true, executablePath, args });
-      const page = await browser.newPage();
-      await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36');
-      await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' });
-
-      await page.goto(FOREBET_LIVE_URL, { waitUntil: 'domcontentloaded', timeout: 45000 });
-      await page.waitForSelector('.schema .rcnt', { timeout: 15000 }).catch(function () {});
-
-      html = await page.content();
-      console.log('[forebet-live] Puppeteer loaded page, length:', html.length);
-    } catch (error) {
-      console.warn('[forebet-live] Puppeteer scrape failed:', error.message);
-    } finally {
-      if (browser) await browser.close().catch(function () {});
-    }
-  }
-
-  if (html) {
-    const matches = parseHTML(html);
-    liveCache = {
-      fetchedAt: new Date().toISOString(),
-      matchCount: matches.length,
-      matches
-    };
-    console.log('[forebet-live] Scraped', matches.length, 'live matches');
+    console.warn('[forebet-live] Scrape failed:', e.message);
   }
 
   isScraping = false;

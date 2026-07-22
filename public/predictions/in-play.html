@@ -88,10 +88,10 @@
     <section class="faq-section" aria-label="Frequently asked questions">
       <h2>In-Play Betting Tips FAQ</h2>
       <div class="faq-list">
-        <details class="faq-item" open><summary>How does this page work?</summary><p>We monitor live football matches and display real-time data including scores, 1X2 probabilities, match predictions, and pre-match odds. Data refreshes automatically every 5 minutes.</p></details>
-        <details class="faq-item"><summary>Why are there no live matches?</summary><p>Live match data only appears when football games are in progress. During off-peak hours or between match rounds, the page may show no live matches.</p></details>
-        <details class="faq-item"><summary>How often do the tips update?</summary><p>The page refreshes every 5 minutes to get the latest live match data.</p></details>
-        <details class="faq-item"><summary>What do the probabilities mean?</summary><p>The home/draw/away percentages are model-based probabilities for each match outcome. The prediction column shows the recommended pick based on the analysis.</p></details>
+        <details class="faq-item" open><summary>How does this page work?</summary><p>We analyse live football matches using real-time statistics, head-to-head records, and odds from API-Football. A tip only appears when a defined opportunity rule qualifies — for example, sustained attacking pressure in a goalless match. No tip is a valid result.</p></details>
+        <details class="faq-item"><summary>Why are there no tips?</summary><p>Live tips only appear when a specific rule qualifies during an in-progress match. During off-peak hours or when matches don't meet the rules, the page will correctly show no opportunities.</p></details>
+        <details class="faq-item"><summary>How often do the tips update?</summary><p>The live data refreshes every 15 minutes to stay within the API free-plan limit.</p></details>
+        <details class="faq-item"><summary>What do the odds and market mean?</summary><p>The market is the specific bet type (e.g. Over 0.5 Match Goals) and the odds are the live price from a bookmaker. Odds change as the match progresses.</p></details>
       </div>
     </section>
   </main>
@@ -112,47 +112,39 @@
         alertButton.classList.toggle('enabled', alertEnabled && supported && Notification.permission === 'granted');
         alertButton.textContent = !supported ? 'Alerts unavailable in this browser' : (Notification.permission === 'denied' ? 'Alerts blocked in browser settings' : (alertEnabled ? 'In-Play alerts enabled' : 'Enable In-Play Alerts'));
       }
-      function renderMatches(data) {
-        matchCount.textContent = (data.matchCount || 0) + ' live matches';
+      function renderOpportunities(data) {
+        matchCount.textContent = (data.liveMatches || 0) + ' live matches';
         updatedAt.textContent = data.fetchedAt ? 'Updated ' + new Date(data.fetchedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}) : 'Data unavailable';
-        if (!data.available || !data.matches || !data.matches.length) {
-          container.innerHTML = empty('No live matches right now', data.message || 'Live match data will appear when games are in progress.');
+        if (!data.available || !data.opportunities || !data.opportunities.length) {
+          container.innerHTML = empty('No qualified opportunities right now', 'We monitor live matches and show a tip only when a defined rule qualifies. No tip is a valid result — not a missing prediction.');
           return;
         }
-        container.innerHTML = data.matches.map(function(m, i) {
-          var score = m.score ? (m.score.home + ' - ' + m.score.away) : '0 - 0';
-          var htScore = m.htScore ? ' (HT: ' + m.htScore.home + ' - ' + m.htScore.away + ')' : '';
-          var minute = m.minute ? m.minute + '\'' : 'Live';
-          var probBar = '<div style="display:flex;gap:4px;margin:10px 0;">' +
-            '<div style="flex:' + (m.probabilities.home || 1) + ';background:rgba(255,36,72,.35);border-radius:4px;text-align:center;padding:4px 0;color:#fff;font-size:11px;font-weight:700;">' + escapeHtml(m.probabilities.home) + '%</div>' +
-            '<div style="flex:' + (m.probabilities.draw || 1) + ';background:rgba(255,255,255,.1);border-radius:4px;text-align:center;padding:4px 0;color:var(--text-muted);font-size:11px;font-weight:700;">' + escapeHtml(m.probabilities.draw) + '%</div>' +
-            '<div style="flex:' + (m.probabilities.away || 1) + ';background:rgba(74,222,128,.35);border-radius:4px;text-align:center;padding:4px 0;color:#fff;font-size:11px;font-weight:700;">' + escapeHtml(m.probabilities.away) + '%</div></div>';
-          var predText = m.prediction ? '<div class="market-row"><div><small>Prediction</small><div class="market">' + escapeHtml(m.prediction) + '</div></div></div>' : '';
-          var oddsText = (m.preMatchOdds && (m.preMatchOdds.home || m.preMatchOdds.draw || m.preMatchOdds.away)) ?
-            '<div style="display:flex;gap:10px;margin-top:10px;color:var(--text-muted);font-size:12px;">' +
-            (m.preMatchOdds.home ? '<span>1: ' + escapeHtml(m.preMatchOdds.home) + '</span>' : '') +
-            (m.preMatchOdds.draw ? '<span>X: ' + escapeHtml(m.preMatchOdds.draw) + '</span>' : '') +
-            (m.preMatchOdds.away ? '<span>2: ' + escapeHtml(m.preMatchOdds.away) + '</span>' : '') +
-            '</div>' : '';
-          var avgGoals = m.avgGoals ? '<div style="color:var(--text-muted);font-size:12px;margin-top:6px;">Avg goals: ' + escapeHtml(m.avgGoals) + '</div>' : '';
-          return '<article class="tip-card"><div class="tip-top"><span class="qualified">Live</span><span class="minute">' + escapeHtml(minute) + '</span></div>' +
-            '<div class="tip-body"><div class="league">' + escapeHtml(m.league || '') + '</div><div class="teams">' + escapeHtml(m.home) + ' <span aria-hidden="true">vs</span> ' + escapeHtml(m.away) + '</div>' +
-            '<div class="score">' + escapeHtml(score) + escapeHtml(htScore) + '</div>' +
-            probBar + predText + oddsText + avgGoals +
+        container.innerHTML = data.opportunities.map(function(o) {
+          var minute = o.minute ? o.minute + '\'' : 'Live';
+          var confidence = o.signalScore ? Math.round(o.signalScore) : null;
+          var confidenceColor = confidence >= 70 ? '#4ade80' : confidence >= 50 ? '#facc15' : '#ff6b7e';
+          var oddsText = o.odds ? '<span class="odds">' + escapeHtml(o.odds.toFixed(2)) + '</span>' : '';
+          var bookmakerText = o.bookmaker ? ' <span style="color:var(--text-muted);font-size:11px;">via ' + escapeHtml(o.bookmaker) + '</span>' : '';
+          return '<article class="tip-card"><div class="tip-top"><span class="qualified">' + escapeHtml(o.market) + '</span><span class="minute">' + escapeHtml(minute) + '</span></div>' +
+            '<div class="tip-body"><div class="league">' + escapeHtml(o.league || '') + '</div><div class="teams">' + escapeHtml(o.home) + ' <span aria-hidden="true">vs</span> ' + escapeHtml(o.away) + '</div>' +
+            '<div class="score">' + escapeHtml(o.score || '0 - 0') + '</div>' +
+            '<div class="market-row"><div><small>Market</small><div class="market">' + escapeHtml(o.market) + '</div></div>' +
+            '<div style="text-align:right;"><small>Odds</small>' + oddsText + bookmakerText + '</div></div>' +
+            '<div class="reason">' + escapeHtml(o.reason || '') + '</div>' +
+            (confidence ? '<div class="tip-meta"><span>Confidence: <strong style="color:' + confidenceColor + ';">' + confidence + '%</strong></span><span>' + escapeHtml(o.rule || '') + '</span></div>' : '') +
             '</div></article>';
         }).join('');
       }
       async function loadLive() {
         try {
-          var res = await fetch(API_BASE + '/api/forebet-live', {mode:'cors', cache:'no-store'});
+          var res = await fetch(API_BASE + '/api/live-tips', {mode:'cors', cache:'no-store'});
           var data = await res.json();
-          renderMatches(data);
-          window.setTimeout(loadLive, 5 * 60 * 1000);
+          renderOpportunities(data);
+          window.setTimeout(loadLive, 15 * 60 * 1000);
         } catch (e) {
           container.innerHTML = empty('Live data unavailable', 'The live data feed is warming up. Please check again shortly.');
           window.setTimeout(loadLive, 2 * 60 * 1000);
         }
-      }
       }
       alertButton.addEventListener('click', async function() {
         if (!('Notification' in window)) return updateAlertButton();
