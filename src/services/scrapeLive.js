@@ -2,6 +2,7 @@ const https = require('https');
 
 const SCRAPE_INTERVAL_MS = 5 * 60 * 1000;
 const STATS_FETCH_DELAY_MS = 350;
+const FOTMOB_STATS_DELAY_MS = 200;
 
 let liveCache = null;
 let isScraping = false;
@@ -123,6 +124,45 @@ function extractApiFootballStats(response) {
   };
 }
 
+function extractFotMobStats(matchDetails) {
+  if (!matchDetails) return null;
+  var allStats = matchDetails.content && matchDetails.content.stats && matchDetails.content.stats.Periods && matchDetails.content.stats.Periods.All && matchDetails.content.stats.Periods.All.stats;
+  if (!allStats || !allStats.length) return null;
+
+  var homeShotsOn = 0, awayShotsOn = 0, homeShotsTotal = 0, awayShotsTotal = 0, homeCorners = 0, awayCorners = 0, homePossession = 0, awayPossession = 0;
+
+  allStats.forEach(function (group) {
+    (group.stats || []).forEach(function (s) {
+      var h = Array.isArray(s.stats) ? (parseFloat(s.stats[0]) || 0) : 0;
+      var a = Array.isArray(s.stats) ? (parseFloat(s.stats[1]) || 0) : 0;
+      if (s.key === 'ShotsOnTarget') { homeShotsOn = h; awayShotsOn = a; }
+      if (s.key === 'total_shots') { homeShotsTotal = h; awayShotsTotal = a; }
+      if (s.key === 'corners') { homeCorners = h; awayCorners = a; }
+      if (s.key === 'BallPossesion') { homePossession = h; awayPossession = a; }
+    });
+  });
+
+  if (homeShotsOn === 0 && awayShotsOn === 0 && homeShotsTotal === 0 && awayShotsTotal === 0) return null;
+
+  return {
+    homeTeam: { shotsOnGoal: homeShotsOn, shotsOffGoal: homeShotsTotal - homeShotsOn, corners: homeCorners, possession: homePossession },
+    awayTeam: { shotsOnGoal: awayShotsOn, shotsOffGoal: awayShotsTotal - awayShotsOn, corners: awayCorners, possession: awayPossession },
+    total: {
+      shotsOnGoal: homeShotsOn + awayShotsOn,
+      shotsOffGoal: (homeShotsTotal - homeShotsOn) + (awayShotsTotal - awayShotsOn),
+      corners: homeCorners + awayCorners,
+      totalShots: homeShotsTotal + awayShotsTotal
+    }
+  };
+}
+
+async function fetchFotMobMatchStats(matchId) {
+  var url = 'https://www.fotmob.com/api/data/matchDetails?matchId=' + matchId;
+  var res = await httpGet(url);
+  if (res.status !== 200 || !res.data) return null;
+  return extractFotMobStats(res.data);
+}
+
 async function fetchApiFootballStats(apiKey, fixtureId) {
   var url = 'https://v3.football.api-sports.io/fixtures/statistics?fixture=' + encodeURIComponent(fixtureId);
   var res = await new Promise(function (resolve, reject) {
@@ -181,6 +221,13 @@ async function scrapeLive() {
       return liveCache;
     }
 
+    for (var i = 0; i < matches.length; i++) {
+      var m = matches[i];
+      if (i > 0 && i % 3 === 0) await new Promise(function (r) { setTimeout(r, FOTMOB_STATS_DELAY_MS); });
+      var fotmobStats = await fetchFotMobMatchStats(m.matchId).catch(function () { return null; });
+      if (fotmobStats) m.fotmobStats = fotmobStats;
+    }
+
     var apiKey = process.env.API_FOOTBALL_KEY;
     if (apiKey) {
       var idMap = await matchFotMobToApiFootball(matches, apiKey).catch(function () { return new Map(); });
@@ -197,7 +244,9 @@ async function scrapeLive() {
     }
 
     liveCache = { fetchedAt: new Date().toISOString(), matchCount: matches.length, matches: matches };
-    console.log('[fotmob-live] Scraped', matches.length, 'live matches');
+    var withFotmob = matches.filter(function (m) { return m.fotmobStats; }).length;
+    var withApi = matches.filter(function (m) { return m.apiStats; }).length;
+    console.log('[fotmob-live] Scraped', matches.length, 'live matches (' + withFotmob + ' FotMob stats, ' + withApi + ' API-Football stats)');
   } catch (e) {
     console.warn('[fotmob-live] Scrape failed:', e.message);
   }
