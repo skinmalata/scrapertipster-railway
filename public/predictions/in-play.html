@@ -169,7 +169,14 @@
     .seo-links ul { list-style:none; padding:0; margin:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:8px; }
     .seo-links a { color:#ff6b7e; font-size:14px; text-decoration:none; }
     .seo-links a:hover { text-decoration:underline; }
-    @media(max-width:600px){ .live-hero{padding-top:28px}.tip-meta{flex-direction:column}.market-row{align-items:flex-end} }
+    .related-section { max-width:780px; margin:42px auto; padding:24px 0 0; border-top:1px solid var(--border); }
+    .related-section h2 { font-size:18px; color:var(--text-primary); margin:0 0 16px; }
+    .related-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+    .related-col h3 { font-size:13px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; margin:0 0 10px; }
+    .related-col ul { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:6px; }
+    .related-col a { color:#ff6b7e; font-size:14px; text-decoration:none; }
+    .related-col a:hover { text-decoration:underline; }
+    @media(max-width:600px){ .live-hero{padding-top:28px}.tip-meta{flex-direction:column}.market-row{align-items:flex-end}.related-grid{grid-template-columns:1fr} }
   </style>
 </head>
 <body>
@@ -209,19 +216,55 @@
       </div>
     </section>
 
-    <nav class="seo-links" aria-label="Related pages">
-      <h2>More Football Tips &amp; Tools</h2>
-      <ul>
-        <li><a href="/predictions">Pre-Match Predictions</a></li>
-        <li><a href="/ticket-builder.html">Ticket Builder</a></li>
-        <li><a href="/blog/">Football Betting Blog</a></li>
-        <li><a href="/contact.html">Contact Us</a></li>
-        <li><a href="/terms.html">Terms &amp; Conditions</a></li>
-        <li><a href="/privacy.html">Privacy Policy</a></li>
-      </ul>
-    </nav>
+    <section class="related-section" aria-label="Related predictions and guides">
+      <h2>Related Predictions &amp; Guides</h2>
+      <div class="related-grid">
+        <div class="related-col">
+          <h3>Prediction Markets</h3>
+          <ul>
+            <li><a href="/predictions/1x2">1X2 Predictions</a></li>
+            <li><a href="/predictions/over-2-5">Over 2.5 Predictions</a></li>
+            <li><a href="/predictions/btts">BTTS Yes Predictions</a></li>
+            <li><a href="/predictions/corners">Corners Predictions</a></li>
+            <li><a href="/predictions/cards">Cards Predictions</a></li>
+            <li><a href="/predictions/over-1-5">Over 1.5 Predictions</a></li>
+          </ul>
+        </div>
+        <div class="related-col">
+          <h3>Guides</h3>
+          <ul>
+            <li><a href="/blog/in-play-betting-strategy">In-Play Betting Strategy</a></li>
+            <li><a href="/blog/shots-on-target-betting">Shots on Target Betting</a></li>
+            <li><a href="/blog/head-to-head-statistics">Head-to-Head Statistics</a></li>
+            <li><a href="/blog/corner-betting-strategy">Corner Betting Strategy</a></li>
+            <li><a href="/blog/expected-goals-xg-betting-strategy">Expected Goals (xG) Guide</a></li>
+            <li><a href="/ticket-builder.html">Ticket Builder Tool</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
   </main>
-  <footer><div class="footer-content"><div class="footer-links"><a href="/">Home</a><a href="/ticket-builder.html">Ticket Builder</a><a href="/terms.html">Terms</a><a href="/privacy.html">Privacy</a></div><p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p></div></footer>
+  <footer>
+    <div class="footer-content">
+      <div style="text-align:center;margin-bottom:24px;">
+        <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Support WinFulltime &mdash; your donations keep all predictions free.</p>
+        <a href="https://ko-fi.com/winfulltime" target="_blank" rel="noopener nofollow" style="display:inline-block;background:linear-gradient(135deg,#ff6b7e,#ff2448);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Donate on Ko-fi</a>
+      </div>
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/ticket-builder.html">Ticket Builder</a>
+        <a href="/blog/">Blog</a>
+        <a href="/advertise.html">Advertise</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/terms.html">Terms</a>
+        <a href="/privacy.html">Privacy</a>
+        <a href="/sitemap.xml">Sitemap</a>
+      </div>
+      <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
+    </div>
+    <div style="text-align:center;padding:12px 0;"><button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">Light</button></div>
+  </footer>
   <script>
     (function() {
       var API_BASE = 'https://winfulltime-api.onrender.com';
