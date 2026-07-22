@@ -105,7 +105,7 @@
       }
       function renderOpportunities(data) {
         if (!data.available || !data.opportunities || !data.opportunities.length) {
-          container.innerHTML = empty('No qualified opportunities right now', 'We monitor live matches and show a tip only when a defined rule qualifies. Bet Responsibly.');
+          container.innerHTML = empty('No in-play betting tips currently', 'We monitor live matches and show a tip only when a defined rule qualifies. Bet Responsibly.');
           return;
         }
         container.innerHTML = data.opportunities.map(function(o) {
