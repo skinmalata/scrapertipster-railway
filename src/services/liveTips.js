@@ -80,7 +80,7 @@ function headToHeadSummary(fixture, history) {
   return summary;
 }
 
-function buildTip(fixture, elapsed, homeGoals, awayGoals, market, liveOdds, confidence, reason, rule) {
+function buildTip(fixture, elapsed, homeGoals, awayGoals, market, liveOdds, signalScore, reason, rule) {
   return {
     fixtureId: fixture.fixture?.id,
     league: fixture.league?.name || 'Football',
@@ -91,7 +91,8 @@ function buildTip(fixture, elapsed, homeGoals, awayGoals, market, liveOdds, conf
     market,
     odds: liveOdds.odds,
     bookmaker: liveOdds.bookmaker,
-    confidence,
+    // This is a rule-strength score, not a probability of winning.
+    signalScore,
     reason,
     rule
   };
@@ -155,7 +156,7 @@ function buildOpportunities(fixtures, oddsByFixture, statisticsByFixture, headTo
     });
   });
   return opportunities.sort(function(a, b) {
-    return b.confidence - a.confidence || b.odds - a.odds;
+    return b.signalScore - a.signalScore || b.odds - a.odds;
   });
 }
 

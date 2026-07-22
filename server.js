@@ -445,7 +445,16 @@ app.get('/blog/:slug', (req, res) => {
 
 // Production site is static on GitHub Pages.
 // Scraping, social posting, and deploys run via GitHub Actions only.
-// This Express app is optional for local API/dev use — no scheduled jobs.
+// Forebet live scraping runs on this server (every 5 minutes).
+
+let forebetScraper;
+try {
+  forebetScraper = require('./src/services/scrapeForebetLive');
+  console.log('[forebet-live] Starting live scrape loop...');
+  forebetScraper.startLiveScrapeLoop();
+} catch (e) {
+  console.warn('[forebet-live] Scraper not available:', e.message);
+}
 
 const HOST = process.env.HOST || '0.0.0.0';
 
@@ -456,7 +465,7 @@ const server = app.listen(PORT, HOST, (err) => {
   }
   console.log(`Server running on port ${PORT}`);
   console.log(`Access at http://${HOST}:${PORT}`);
-  console.log('Scheduled scrapes disabled — use GitHub Actions (scrape-and-deploy.yml)');
+  console.log('Forebet live scraper runs every 5 minutes via in-process cron');
 });
 
 module.exports = app;

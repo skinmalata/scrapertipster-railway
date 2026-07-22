@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>In-Play Betting Tips | Live Football Betting - WinFulltime</title>
-  <meta name="description" content="Live football betting opportunities based on current match statistics and available in-play odds. Tips are shown only when a rule qualifies.">
+  <meta name="description" content="Live football betting opportunities powered by mathematical models, match statistics and in-play odds. Golden tips combine Forebet predictions with real-time data.">
   <link rel="canonical" href="https://winfulltime.com/predictions/in-play">
   <link rel="icon" href="/icons/icon-192.png" type="image/png">
   <link rel="manifest" href="/manifest.json">
@@ -29,6 +29,17 @@
     .alert-note { margin:10px 0 0; color:#fff; font-size:13px; font-weight:600; line-height:1.55; }
     .tip-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:18px; margin:0 auto; max-width:1050px; }
     .tip-card { background:linear-gradient(155deg,rgba(255,255,255,.055),rgba(255,255,255,.015)); border:1px solid rgba(74,222,128,.26); border-radius:16px; overflow:hidden; box-shadow:0 12px 36px rgba(0,0,0,.16); }
+    .golden-card { border-color:rgba(255,193,7,.35); box-shadow:0 12px 36px rgba(255,193,7,.12); }
+    .golden-card .tip-top { background:rgba(255,193,7,.08); border-bottom-color:rgba(255,193,7,.18); }
+    .golden-card .qualified { color:#ffc107; }
+    .golden-card .odds { color:#ffc107; }
+    .golden-card .market-row { border:1px solid rgba(255,193,7,.15); }
+    .golden-section { margin:32px auto; max-width:1050px; }
+    .golden-header { display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+    .golden-header h2 { margin:0; font-size:22px; color:var(--text-primary); }
+    .golden-pill { display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border:1px solid rgba(255,193,7,.4); border-radius:999px; color:#ffc107; font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; background:rgba(255,193,7,.06); }
+    .golden-dot { width:6px; height:6px; border-radius:50%; background:#ffc107; animation:pulse 1.7s infinite; }
+    .rule-tag { display:inline-block; padding:3px 7px; border-radius:5px; background:rgba(255,193,7,.1); color:#ffc107; font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; margin-top:8px; }
     .tip-top { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; background:rgba(74,222,128,.07); border-bottom:1px solid rgba(74,222,128,.14); }
     .qualified { color:#56e69c; font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
     .minute { font-weight:800; color:var(--text-primary); }
@@ -82,6 +93,15 @@
       <button id="alertButton" class="alert-btn" type="button">Enable In-Play Alerts</button>
       <p class="alert-note">Alerts are sent only while this In-Play Betting Tips page remains open in your browser.</p>
     </div>
+    <section id="goldenTips" class="golden-section" aria-live="polite">
+      <div class="golden-header">
+        <div class="golden-pill"><span class="golden-dot"></span>Golden Tips</div>
+        <h2>Model + Stats Analysis</h2>
+      </div>
+      <div id="goldenContainer" class="tip-grid">
+        <div class="empty"><div class="empty-icon">◈</div><h2>Analysing live opportunities</h2><p>Cross-referencing Forebet mathematical models with live match statistics.</p></div>
+      </div>
+    </section>
     <section id="tips" class="tip-grid" aria-live="polite">
       <div class="empty"><div class="empty-icon">◌</div><h2>Loading live opportunities</h2><p>Checking current scorelines, match pressure and available markets.</p></div>
     </section>
@@ -101,13 +121,15 @@
     (function() {
       var API_BASE = 'https://winfulltime-api.onrender.com';
       var container = document.getElementById('tips');
+      var goldenContainer = document.getElementById('goldenContainer');
       var matchCount = document.getElementById('matchCount');
       var updatedAt = document.getElementById('updatedAt');
       var alertButton = document.getElementById('alertButton');
       var alertEnabled = localStorage.getItem('wf-live-alerts') === 'true';
       var activeOpportunityKeys = new Set();
       function escapeHtml(value) { return String(value || '').replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-      function empty(title, body) { container.innerHTML = '<div class="empty"><div class="empty-icon">◌</div><h2>' + escapeHtml(title) + '</h2><p>' + escapeHtml(body) + '</p></div>'; }
+      function empty(title, body) { return '<div class="empty"><div class="empty-icon">◌</div><h2>' + escapeHtml(title) + '</h2><p>' + escapeHtml(body) + '</p></div>'; }
+      function goldenEmpty(title, body) { return '<div class="empty"><div class="empty-icon">◈</div><h2>' + escapeHtml(title) + '</h2><p>' + escapeHtml(body) + '</p></div>'; }
       function updateAlertButton() {
         var supported = 'Notification' in window;
         alertButton.disabled = !supported || Notification.permission === 'denied';
@@ -120,35 +142,61 @@
           (opportunities || []).forEach(function(tip) {
             var key = tip.fixtureId + '|' + tip.market;
             if (!activeOpportunityKeys.has(key)) {
-              new Notification('Live opportunity detected', { body: tip.home + ' vs ' + tip.away + ' — ' + tip.market + ' @ ' + tip.odds, icon: '/icons/icon-192.png', tag: key, renotify: false });
+              new Notification('Live opportunity detected', { body: tip.home + ' vs ' + tip.away + ' — ' + tip.market, icon: '/icons/icon-192.png', tag: 'gf-' + key, renotify: false });
             }
           });
         }
         activeOpportunityKeys = currentKeys;
       }
-      function render(data) {
+      function renderGolden(data) {
+        if (!data.available || !data.opportunities || !data.opportunities.length) {
+          goldenContainer.innerHTML = goldenEmpty('No golden opportunity right now', 'The model and stats analysis did not find qualifying matches. Tips appear when multiple signals converge.');
+          return;
+        }
+        goldenContainer.innerHTML = data.opportunities.map(function(tip) {
+          var edgeText = tip.edge ? '<span>Edge: +' + escapeHtml(tip.edge) + '%</span>' : '';
+          return '<article class="tip-card golden-card"><div class="tip-top"><span class="qualified">Golden tip</span><span class="minute">' + escapeHtml(tip.minute) + '\'</span></div>' +
+            '<div class="tip-body"><div class="league">' + escapeHtml(tip.league) + '</div><div class="teams">' + escapeHtml(tip.home) + ' <span aria-hidden="true">vs</span> ' + escapeHtml(tip.away) + '</div><div class="score">' + escapeHtml(tip.score) + (tip.htScore ? ' ' + escapeHtml(tip.htScore) : '') + '</div>' +
+            '<div class="market-row"><div><small>Suggested market</small><div class="market">' + escapeHtml(tip.market) + '</div></div><div></div></div>' +
+            '<p class="reason">' + escapeHtml(tip.reason) + '</p>' +
+            '<div class="tip-meta"><span>Confidence: ' + escapeHtml(tip.confidence) + '/99</span>' + edgeText + '</div>' +
+            '<div class="rule-tag">' + escapeHtml(tip.rule) + '</div></div></article>';
+        }).join('');
+      }
+      function renderLiveTips(data) {
         matchCount.textContent = (data.liveMatches || 0) + ' live matches checked';
         updatedAt.textContent = data.fetchedAt ? 'Updated ' + new Date(data.fetchedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}) : 'Live data unavailable';
-        if (!data.available) return empty(data.budgetLimited ? 'Daily data limit reached' : 'Live tips are temporarily unavailable', data.message || 'Please try again shortly.');
+        if (!data.available) { container.innerHTML = empty(data.budgetLimited ? 'Daily data limit reached' : 'Live tips are temporarily unavailable', data.message || 'Please try again shortly.'); return; }
         notifyNewOpportunities(data.opportunities);
-        if (!data.opportunities || !data.opportunities.length) return empty('No qualified opportunity right now', 'We checked the live matches, but none currently meet the required score, pressure and market criteria.');
+        if (!data.opportunities || !data.opportunities.length) { container.innerHTML = empty('No qualified opportunity right now', 'We checked the live matches, but none currently meet the required score, pressure and market criteria.'); return; }
         container.innerHTML = data.opportunities.map(function(tip) {
           return '<article class="tip-card"><div class="tip-top"><span class="qualified">Opportunity detected</span><span class="minute">' + escapeHtml(tip.minute) + '\'</span></div>' +
             '<div class="tip-body"><div class="league">' + escapeHtml(tip.league) + '</div><div class="teams">' + escapeHtml(tip.home) + ' <span aria-hidden="true">vs</span> ' + escapeHtml(tip.away) + '</div><div class="score">' + escapeHtml(tip.score) + '</div>' +
             '<div class="market-row"><div><small>Suggested market</small><div class="market">' + escapeHtml(tip.market) + '</div></div><div class="odds">' + escapeHtml(tip.odds) + '</div></div>' +
-            '<p class="reason">' + escapeHtml(tip.reason) + '</p><div class="tip-meta"><span>Confidence: ' + escapeHtml(tip.confidence) + '/99</span><span>' + escapeHtml(tip.bookmaker) + '</span></div></div></article>';
+            '<p class="reason">' + escapeHtml(tip.reason) + '</p><div class="tip-meta"><span>Signal score: ' + escapeHtml(tip.signalScore) + '/99</span><span>' + escapeHtml(tip.bookmaker) + '</span></div></div></article>';
         }).join('');
       }
-      async function load() {
+      async function loadGolden() {
+        try {
+          var res = await fetch(API_BASE + '/api/golden-tips', {mode:'cors', cache:'no-store'});
+          var data = await res.json();
+          renderGolden(data);
+          window.setTimeout(loadGolden, Math.max(60, Number(data.refreshSeconds || 300)) * 1000);
+        } catch (e) {
+          goldenContainer.innerHTML = goldenEmpty('Golden tips unavailable', 'The analysis engine is warming up. Please check again shortly.');
+          window.setTimeout(loadGolden, 10 * 60 * 1000);
+        }
+      }
+      async function loadLiveTips() {
         try {
           var response = await fetch(API_BASE + '/api/live-tips', {mode:'cors', cache:'no-store'});
           var data = await response.json();
-          render(data);
-          window.setTimeout(load, Math.max(60, Number(data.refreshSeconds || 900)) * 1000);
+          renderLiveTips(data);
+          window.setTimeout(loadLiveTips, Math.max(60, Number(data.refreshSeconds || 900)) * 1000);
         } catch (error) {
           matchCount.textContent = 'Live check failed';
-          empty('Unable to load live tips', 'Please refresh the page in a moment.');
-          window.setTimeout(load, 15 * 60 * 1000);
+          container.innerHTML = empty('Unable to load live tips', 'Please refresh the page in a moment.');
+          window.setTimeout(loadLiveTips, 15 * 60 * 1000);
         }
       }
       alertButton.addEventListener('click', async function() {
@@ -165,7 +213,8 @@
         localStorage.removeItem('wf-live-alerts');
       }
       updateAlertButton();
-      load();
+      loadGolden();
+      loadLiveTips();
     })();
     document.getElementById('hamburger')?.addEventListener('click', function() { this.classList.toggle('active'); document.getElementById('nav')?.classList.toggle('open'); });
   </script>
