@@ -2,13 +2,29 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
-const { generatePostThumbnail } = require('../../scripts/regenerate-legacy-thumbnails');
+let generatePostThumbnail;
+function getGeneratePostThumbnail() {
+  if (!generatePostThumbnail) {
+    generatePostThumbnail = require('../../scripts/regenerate-legacy-thumbnails').generatePostThumbnail;
+  }
+  return generatePostThumbnail;
+}
+const { buildOpportunities } = require('../services/liveTips');
 
 // API-Football responses are cached so one busy page does not consume the
 // provider quota for every visitor. The API key is deliberately kept here,
 // never sent to the browser.
 const footballOddsCache = new Map();
 const FOOTBALL_ODDS_CACHE_MS = 10 * 60 * 1000;
+let liveTipsCache = null;
+// API-Football's free plan allows 100 requests/day. Live analysis is capped
+// well below that, leaving a reserve for the rest of the site.
+const LIVE_TIPS_CACHE_MS = 15 * 60 * 1000;
+const LIVE_TIPS_DAILY_BUDGET = 60;
+const API_REQUEST_RESERVE = 20;
+let liveTipsBudget = { day: '', used: 0, remaining: null };
+const headToHeadCache = new Map();
+const HEAD_TO_HEAD_CACHE_MS = 12 * 60 * 60 * 1000;
 
 let scraperService = null;
 let cornersLastScrape = null;
@@ -587,7 +603,7 @@ router.post('/articles/publish', requireAdmin, async (req, res) => {
       return a;
     });
     
-    const thumbnail = await generatePostThumbnail(slug);
+    const thumbnail = await getGeneratePostThumbnail()(slug);
     fs.writeFileSync(articlesFile, JSON.stringify(updated, null, 2));
     res.json({ success: true, message: `Published ${slug}`, thumbnailGenerated: Boolean(thumbnail) });
   } catch (e) {
@@ -663,6 +679,86 @@ router.get('/football-odds', async (req, res) => {
   } catch (error) {
     console.warn('API-Football odds request error:', error.message);
     res.status(502).json({ available: false, source: 'API-Football', message: 'Live odds are temporarily unavailable', response: [] });
+  }
+});
+
+router.get('/live-tips', async (req, res) => {
+  const apiKey = process.env.API_FOOTBALL_KEY;
+  if (!apiKey) {
+    return res.json({ available: false, opportunities: [], message: 'Live data is not configured yet.' });
+  }
+
+  if (liveTipsCache && Date.now() - liveTipsCache.createdAt < LIVE_TIPS_CACHE_MS) {
+    return res.json({ ...liveTipsCache.payload, cached: true });
+  }
+
+  const request = async function(endpoint) {
+    const today = new Date().toISOString().slice(0, 10);
+    if (liveTipsBudget.day !== today) liveTipsBudget = { day: today, used: 0, remaining: null };
+    if (liveTipsBudget.used >= LIVE_TIPS_DAILY_BUDGET || (liveTipsBudget.remaining !== null && liveTipsBudget.remaining <= API_REQUEST_RESERVE)) {
+      const quotaError = new Error('The free-plan live-data budget has been reached for now. Please check again after the daily reset.');
+      quotaError.code = 'LIVE_TIPS_BUDGET_REACHED';
+      throw quotaError;
+    }
+    liveTipsBudget.used++;
+    const response = await fetch('https://v3.football.api-sports.io/' + endpoint, {
+      headers: { 'x-apisports-key': apiKey, accept: 'application/json' },
+      signal: AbortSignal.timeout(12000)
+    });
+    const remaining = Number(response.headers.get('x-ratelimit-requests-remaining'));
+    if (Number.isFinite(remaining)) liveTipsBudget.remaining = remaining;
+    const data = await response.json();
+    if (!response.ok || (data.errors && Object.keys(data.errors).length)) throw new Error(data.message || 'Live data is temporarily unavailable');
+    return Array.isArray(data.response) ? data.response : [];
+  };
+
+  try {
+    const fixtures = await request('fixtures?live=all');
+    const odds = await request('odds/live');
+    const oddsByFixture = new Map(odds.map(function(entry) { return [entry.fixture?.id, entry]; }));
+    const candidates = fixtures.filter(function(fixture) {
+      const minute = Number(fixture.fixture?.status?.elapsed || 0);
+      return minute >= 51 && minute <= 85;
+    }).slice(0, 1);
+    const statistics = await Promise.all(candidates.map(async function(fixture) {
+      try {
+        const data = await request('fixtures/statistics?fixture=' + encodeURIComponent(fixture.fixture.id));
+        return [fixture.fixture.id, data];
+      } catch (error) {
+        return [fixture.fixture.id, []];
+      }
+    }));
+    const statisticsByFixture = new Map(statistics);
+    const headToHead = await Promise.all(candidates.map(async function(fixture) {
+      const homeId = fixture.teams?.home?.id;
+      const awayId = fixture.teams?.away?.id;
+      const cacheKey = [homeId, awayId].sort().join('-');
+      const cached = headToHeadCache.get(cacheKey);
+      if (cached && Date.now() - cached.createdAt < HEAD_TO_HEAD_CACHE_MS) return [fixture.fixture.id, cached.data];
+      try {
+        const data = await request('fixtures/headtohead?h2h=' + encodeURIComponent(homeId + '-' + awayId) + '&last=10');
+        headToHeadCache.set(cacheKey, { createdAt: Date.now(), data });
+        return [fixture.fixture.id, data];
+      } catch (error) {
+        return [fixture.fixture.id, []];
+      }
+    }));
+    const headToHeadByFixture = new Map(headToHead);
+    const payload = {
+      available: true,
+      fetchedAt: new Date().toISOString(),
+      refreshSeconds: LIVE_TIPS_CACHE_MS / 1000,
+      liveMatches: fixtures.length,
+      opportunities: buildOpportunities(fixtures, oddsByFixture, statisticsByFixture, headToHeadByFixture)
+    };
+    liveTipsCache = { createdAt: Date.now(), payload };
+    res.json(payload);
+  } catch (error) {
+    if (error.code === 'LIVE_TIPS_BUDGET_REACHED') {
+      return res.json({ available: false, opportunities: [], budgetLimited: true, refreshSeconds: LIVE_TIPS_CACHE_MS / 1000, message: error.message });
+    }
+    console.warn('Live tips request error:', error.message);
+    res.status(502).json({ available: false, opportunities: [], message: 'Live data is temporarily unavailable. Please try again shortly.' });
   }
 });
 

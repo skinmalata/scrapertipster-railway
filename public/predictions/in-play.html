@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>In-Play Betting Tips | Live Football Betting - WinFulltime</title>
+  <meta name="description" content="Live football betting opportunities based on current match statistics and available in-play odds. Tips are shown only when a rule qualifies.">
+  <link rel="canonical" href="https://winfulltime.com/predictions/in-play">
+  <link rel="icon" href="/icons/icon-192.png" type="image/png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#ff2448">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/app.css">
+  <style>
+    .live-hero { text-align:center; padding:42px 16px 26px; }
+    .live-pill { display:inline-flex; align-items:center; gap:8px; padding:7px 12px; border:1px solid rgba(255,71,96,.35); border-radius:999px; color:#ff6b7e; font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; }
+    .live-dot { width:8px; height:8px; border-radius:50%; background:#ff2448; box-shadow:0 0 0 0 rgba(255,36,72,.7); animation:pulse 1.7s infinite; }
+    @keyframes pulse { 70% { box-shadow:0 0 0 8px rgba(255,36,72,0); } 100% { box-shadow:0 0 0 0 rgba(255,36,72,0); } }
+    .live-hero h1 { margin:16px 0 10px; font-size:clamp(28px,5vw,44px); letter-spacing:-.045em; }
+    .live-hero p { max-width:680px; margin:0 auto; color:var(--text-secondary); line-height:1.7; }
+    .live-status { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin:18px auto 28px; color:var(--text-muted); font-size:13px; }
+    .live-status span { padding:7px 10px; border-radius:8px; background:var(--bg-card); border:1px solid var(--border); }
+    .alert-panel { max-width:560px; margin:0 auto 28px; padding:14px; border:1px solid rgba(255,36,72,.36); border-radius:12px; background:linear-gradient(135deg,rgba(255,36,72,.16),rgba(255,36,72,.05)); text-align:center; }
+    .alert-btn { width:100%; display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:11px 16px; border:1px solid #ff526b; border-radius:9px; background:linear-gradient(135deg,#ff2448,#d41a38); color:#fff; font:inherit; font-size:14px; font-weight:800; cursor:pointer; box-shadow:0 6px 18px rgba(255,36,72,.25); }
+    .alert-btn.enabled { border-color:#45d98d; background:linear-gradient(135deg,#4ade80,#22c55e); color:#092316; box-shadow:0 6px 18px rgba(74,222,128,.2); }
+    .alert-note { margin:10px 0 0; color:#fff; font-size:13px; font-weight:600; line-height:1.55; }
+    .tip-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:18px; margin:0 auto; max-width:1050px; }
+    .tip-card { background:linear-gradient(155deg,rgba(255,255,255,.055),rgba(255,255,255,.015)); border:1px solid rgba(74,222,128,.26); border-radius:16px; overflow:hidden; box-shadow:0 12px 36px rgba(0,0,0,.16); }
+    .tip-top { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; background:rgba(74,222,128,.07); border-bottom:1px solid rgba(74,222,128,.14); }
+    .qualified { color:#56e69c; font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+    .minute { font-weight:800; color:var(--text-primary); }
+    .tip-body { padding:18px 16px 16px; }
+    .league { color:var(--text-muted); font-size:12px; margin-bottom:8px; }
+    .teams { color:var(--text-primary); font-weight:800; font-size:18px; line-height:1.35; }
+    .score { margin:8px 0 16px; color:#ff6b7e; font-size:15px; font-weight:800; }
+    .market-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px; border-radius:10px; background:rgba(255,255,255,.04); }
+    .market-row small { display:block; color:var(--text-muted); margin-bottom:3px; font-size:11px; text-transform:uppercase; letter-spacing:.06em; }
+    .market { font-weight:800; color:var(--text-primary); }
+    .odds { color:#56e69c; font-size:22px; font-weight:800; }
+    .reason { color:var(--text-secondary); font-size:13px; line-height:1.6; margin:15px 0 12px; }
+    .tip-meta { display:flex; justify-content:space-between; gap:10px; color:var(--text-muted); font-size:12px; }
+    .empty { max-width:680px; margin:0 auto; text-align:center; padding:44px 24px; border:1px dashed var(--border-hover); border-radius:16px; background:var(--bg-card); }
+    .empty h2 { margin:12px 0 8px; font-size:21px; }
+    .empty p { color:var(--text-secondary); margin:0; line-height:1.65; }
+    .empty-icon { font-size:32px; }
+    .faq-section { max-width:830px; margin:42px auto; padding:24px; border-top:1px solid var(--border); }
+    .faq-section h2 { color:var(--text-primary); font-size:20px; margin:0 0 14px; }
+    .faq-list { display:flex; flex-direction:column; gap:8px; }
+    .faq-item { background:var(--bg-card); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    .faq-item[open] { border-color:rgba(255,36,72,.35); }
+    .faq-item summary { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:15px 16px; color:var(--text-primary); cursor:pointer; font-weight:700; font-size:14px; list-style:none; }
+    .faq-item summary::-webkit-details-marker { display:none; }
+    .faq-item summary::after { content:'+'; color:#ff2448; font-size:20px; line-height:1; }
+    .faq-item[open] summary::after { content:'−'; }
+    .faq-item p { margin:0; padding:0 16px 16px; color:var(--text-secondary); font-size:14px; line-height:1.65; }
+    @media(max-width:600px){ .live-hero{padding-top:28px}.tip-meta{flex-direction:column}.market-row{align-items:flex-end} }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="logo"><a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a></div>
+      <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+      <nav id="nav"><a href="/">Home</a><a href="/ticket-builder.html">Ticket Builder</a><a href="/blog/">Blog</a><a href="/contact.html">Contact</a></nav>
+    </div>
+  </header>
+  <main class="container">
+    <section class="live-hero">
+      <div class="live-pill"><span class="live-dot"></span>Live analysis</div>
+      <h1>In-Play Betting Tips</h1>
+      <p>We monitor live match data and show a tip only when a defined opportunity rule qualifies. No tip is a valid result—not a missing prediction.</p>
+    </section>
+    <div class="live-status" aria-live="polite">
+      <span id="matchCount">Checking live matches…</span>
+      <span id="updatedAt">Waiting for live data</span>
+      <span>Refreshes every 15 minutes (free-plan protection)</span>
+    </div>
+    <div class="alert-panel">
+      <button id="alertButton" class="alert-btn" type="button">Enable In-Play Alerts</button>
+      <p class="alert-note">Alerts are sent only while this In-Play Betting Tips page remains open in your browser.</p>
+    </div>
+    <section id="tips" class="tip-grid" aria-live="polite">
+      <div class="empty"><div class="empty-icon">◌</div><h2>Loading live opportunities</h2><p>Checking current scorelines, match pressure and available markets.</p></div>
+    </section>
+    <section class="faq-section" aria-label="Frequently asked questions">
+      <h2>In-Play Betting Tips FAQ</h2>
+      <div class="faq-list">
+        <details class="faq-item" open><summary>How are live opportunities qualified?</summary><p><strong>Live data only:</strong> current score, minute, match statistics and an available market are required.</p><p><strong>Pressure rule:</strong> a 0-0 match from 65–82 minutes with sustained attacking pressure may qualify for Over 0.5 Match Goals.</p><p><strong>Head-to-head rules:</strong> a historically dominant winner in a second-half draw, or a team that consistently scores in this matchup while currently pressing, may qualify when the matching live market is available.</p><p><strong>Safety checks:</strong> suspended, blocked, finished or stale markets are not shown.</p><p><strong>Important:</strong> odds can change quickly. Tips are informational, not a guarantee or financial advice.</p></details>
+        <details class="faq-item"><summary>Why are there no tips right now?</summary><p>No tip is shown when current matches do not meet the required criteria. This is intentional: the page does not create a recommendation merely because a match is live.</p></details>
+        <details class="faq-item"><summary>How often do the tips update?</summary><p>On the free data plan, the page refreshes every 15 minutes while the page is open. Match events and odds can change between updates, so always confirm the price and market availability with your bookmaker before placing a bet.</p></details>
+        <details class="faq-item"><summary>What does the confidence score mean?</summary><p>The score is a rule-based indicator of the current pressure conditions, not a guarantee that a bet will win. It is based on the live indicators used by that opportunity rule.</p></details>
+        <details class="faq-item"><summary>What happens when a market is suspended?</summary><p>Suspended, blocked or finished markets are excluded automatically. A tip will not be displayed unless its matching in-play market is currently available.</p></details>
+      </div>
+    </section>
+  </main>
+  <footer><div class="footer-content"><div class="footer-links"><a href="/">Home</a><a href="/ticket-builder.html">Ticket Builder</a><a href="/terms.html">Terms</a><a href="/privacy.html">Privacy</a></div><p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p></div></footer>
+  <script>
+    (function() {
+      var API_BASE = 'https://winfulltime-api.onrender.com';
+      var container = document.getElementById('tips');
+      var matchCount = document.getElementById('matchCount');
+      var updatedAt = document.getElementById('updatedAt');
+      var alertButton = document.getElementById('alertButton');
+      var alertEnabled = localStorage.getItem('wf-live-alerts') === 'true';
+      var activeOpportunityKeys = new Set();
+      function escapeHtml(value) { return String(value || '').replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+      function empty(title, body) { container.innerHTML = '<div class="empty"><div class="empty-icon">◌</div><h2>' + escapeHtml(title) + '</h2><p>' + escapeHtml(body) + '</p></div>'; }
+      function updateAlertButton() {
+        var supported = 'Notification' in window;
+        alertButton.disabled = !supported || Notification.permission === 'denied';
+        alertButton.classList.toggle('enabled', alertEnabled && supported && Notification.permission === 'granted');
+        alertButton.textContent = !supported ? 'Alerts unavailable in this browser' : (Notification.permission === 'denied' ? 'Alerts blocked in browser settings' : (alertEnabled ? 'In-Play alerts enabled' : 'Enable In-Play Alerts'));
+      }
+      function notifyNewOpportunities(opportunities) {
+        var currentKeys = new Set((opportunities || []).map(function(tip) { return tip.fixtureId + '|' + tip.market; }));
+        if (alertEnabled && Notification.permission === 'granted') {
+          (opportunities || []).forEach(function(tip) {
+            var key = tip.fixtureId + '|' + tip.market;
+            if (!activeOpportunityKeys.has(key)) {
+              new Notification('Live opportunity detected', { body: tip.home + ' vs ' + tip.away + ' — ' + tip.market + ' @ ' + tip.odds, icon: '/icons/icon-192.png', tag: key, renotify: false });
+            }
+          });
+        }
+        activeOpportunityKeys = currentKeys;
+      }
+      function render(data) {
+        matchCount.textContent = (data.liveMatches || 0) + ' live matches checked';
+        updatedAt.textContent = data.fetchedAt ? 'Updated ' + new Date(data.fetchedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}) : 'Live data unavailable';
+        if (!data.available) return empty('Live tips are temporarily unavailable', data.message || 'Please try again shortly.');
+        notifyNewOpportunities(data.opportunities);
+        if (!data.opportunities || !data.opportunities.length) return empty('No qualified opportunity right now', 'We checked the live matches, but none currently meet the required score, pressure and market criteria.');
+        container.innerHTML = data.opportunities.map(function(tip) {
+          return '<article class="tip-card"><div class="tip-top"><span class="qualified">Opportunity detected</span><span class="minute">' + escapeHtml(tip.minute) + '\'</span></div>' +
+            '<div class="tip-body"><div class="league">' + escapeHtml(tip.league) + '</div><div class="teams">' + escapeHtml(tip.home) + ' <span aria-hidden="true">vs</span> ' + escapeHtml(tip.away) + '</div><div class="score">' + escapeHtml(tip.score) + '</div>' +
+            '<div class="market-row"><div><small>Suggested market</small><div class="market">' + escapeHtml(tip.market) + '</div></div><div class="odds">' + escapeHtml(tip.odds) + '</div></div>' +
+            '<p class="reason">' + escapeHtml(tip.reason) + '</p><div class="tip-meta"><span>Confidence: ' + escapeHtml(tip.confidence) + '/99</span><span>' + escapeHtml(tip.bookmaker) + '</span></div></div></article>';
+        }).join('');
+      }
+      async function load() {
+        try {
+          var response = await fetch(API_BASE + '/api/live-tips', {mode:'cors', cache:'no-store'});
+          var data = await response.json();
+          render(data);
+          window.setTimeout(load, Math.max(60, Number(data.refreshSeconds || 900)) * 1000);
+        } catch (error) {
+          matchCount.textContent = 'Live check failed';
+          empty('Unable to load live tips', 'Please refresh the page in a moment.');
+          window.setTimeout(load, 15 * 60 * 1000);
+        }
+      }
+      alertButton.addEventListener('click', async function() {
+        if (!('Notification' in window)) return updateAlertButton();
+        if (Notification.permission === 'default') await Notification.requestPermission();
+        if (Notification.permission === 'granted') {
+          alertEnabled = !alertEnabled;
+          localStorage.setItem('wf-live-alerts', String(alertEnabled));
+        }
+        updateAlertButton();
+      });
+      updateAlertButton();
+      load();
+    })();
+    document.getElementById('hamburger')?.addEventListener('click', function() { this.classList.toggle('active'); document.getElementById('nav')?.classList.toggle('open'); });
+  </script>
+  <script src="/responsible-gambling.js"></script>
+  <script src="/pwa.js"></script>
+</body>
+</html>
