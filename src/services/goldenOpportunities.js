@@ -322,9 +322,16 @@ function buildGoldenTips(liveData) {
     });
   });
 
-  return opportunities.sort(function (a, b) {
-    return b.confidence - a.confidence;
+  var byFixture = {};
+  opportunities.forEach(function (tip) {
+    var key = tip.fixtureId;
+    if (!byFixture[key] || tip.confidence > byFixture[key].confidence) {
+      byFixture[key] = tip;
+    }
   });
+
+  return Object.keys(byFixture).map(function (k) { return byFixture[k]; })
+    .sort(function (a, b) { return b.confidence - a.confidence; });
 }
 
 module.exports = {

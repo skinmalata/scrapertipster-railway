@@ -3,10 +3,16 @@ const https = require('https');
 const SCRAPE_INTERVAL_MS = 5 * 60 * 1000;
 const STATS_FETCH_DELAY_MS = 350;
 const FOTMOB_STATS_DELAY_MS = 200;
+const FOTMOB_MATCH_DETAILS_DELAY_MS = 150;
+const MAX_FOTMOB_DETAIL_MATCHES = 20;
+const HTTP_TIMEOUT_MS = 8000;
 
 let liveCache = null;
 let isScraping = false;
 let scrapeTimer = null;
+
+let apiFootballDailyCount = 0;
+let apiFootballDailyResetMs = 0;
 
 function todayStr() {
   const d = new Date();
@@ -29,8 +35,8 @@ function parseLiveMinute(time) {
     if (Number.isFinite(n)) return n;
   }
   if (time.currentPeriodStartTimestamp) {
-    const elapsed = Math.floor((Date.now() / 1000 - time.currentPeriodStartTimestamp) / 60);
-    return Math.max(1, elapsed);
+    const periodElapsed = Math.floor((Date.now() / 1000 - time.currentPeriodStartTimestamp) / 60);
+    return 45 + Math.max(1, periodElapsed);
   }
   return 0;
 }
@@ -42,14 +48,16 @@ function parseScore(status) {
   return { home: parseInt(m[1], 10), away: parseInt(m[2], 10) };
 }
 
-function httpGet(url) {
+function httpGet(url, timeoutMs) {
+  var timeout = timeoutMs || HTTP_TIMEOUT_MS;
   return new Promise(function (resolve, reject) {
-    https.get(url, {
+    var req = https.get(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
         'Accept': 'application/json, text/plain, */*',
         'Accept-Language': 'en-US,en;q=0.9'
-      }
+      },
+      timeout: timeout
     }, function (res) {
       var body = '';
       res.on('data', function (c) { body += c; });
@@ -57,8 +65,44 @@ function httpGet(url) {
         try { resolve({ status: res.statusCode, data: JSON.parse(body) }); }
         catch (e) { resolve({ status: res.statusCode, data: null }); }
       });
-    }).on('error', reject);
+    });
+    req.on('timeout', function () { req.destroy(); reject(new Error('Request timeout')); });
+    req.on('error', reject);
   });
+}
+
+function httpGetAuth(url, headers, timeoutMs) {
+  var timeout = timeoutMs || HTTP_TIMEOUT_MS;
+  return new Promise(function (resolve, reject) {
+    var req = https.get(url, { headers: headers, timeout: timeout }, function (res) {
+      var body = '';
+      res.on('data', function (c) { body += c; });
+      res.on('end', function () { try { resolve(JSON.parse(body)); } catch (e) { resolve(null); } });
+    });
+    req.on('timeout', function () { req.destroy(); reject(new Error('Request timeout')); });
+    req.on('error', function () { resolve(null); });
+  });
+}
+
+function resetApiFootballDailyIfNeeded() {
+  var now = Date.now();
+  var startOfToday = new Date();
+  startOfToday.setUTCHours(0, 0, 0, 0);
+  var resetMs = startOfToday.getTime() + 86400000;
+  if (now >= apiFootballDailyResetMs) {
+    apiFootballDailyCount = 0;
+    apiFootballDailyResetMs = resetMs;
+  }
+}
+
+function canCallApiFootball() {
+  resetApiFootballDailyIfNeeded();
+  return apiFootballDailyCount < 95;
+}
+
+function trackApiFootballCall() {
+  resetApiFootballDailyIfNeeded();
+  apiFootballDailyCount++;
 }
 
 async function fetchFotMobLive() {
@@ -164,30 +208,21 @@ async function fetchFotMobMatchStats(matchId) {
 }
 
 async function fetchApiFootballStats(apiKey, fixtureId) {
+  if (!canCallApiFootball()) return null;
   var url = 'https://v3.football.api-sports.io/fixtures/statistics?fixture=' + encodeURIComponent(fixtureId);
-  var res = await new Promise(function (resolve, reject) {
-    https.get(url, {
-      headers: { 'x-apisports-key': apiKey, 'accept': 'application/json' }
-    }, function (r) {
-      var body = '';
-      r.on('data', function (c) { body += c; });
-      r.on('end', function () { try { resolve(JSON.parse(body)); } catch (e) { resolve(null); } });
-    }).on('error', function () { resolve(null); });
-  });
+  var res = await httpGetAuth(url, { 'x-apisports-key': apiKey, 'accept': 'application/json' });
+  trackApiFootballCall();
   if (!res || !res.response) return null;
   return extractApiFootballStats(res.response);
 }
 
 async function matchFotMobToApiFootball(fotmobMatches, apiKey) {
-  var fixtureRes = await new Promise(function (resolve, reject) {
-    https.get('https://v3.football.api-sports.io/fixtures?live=all', {
-      headers: { 'x-apisports-key': apiKey, 'accept': 'application/json' }
-    }, function (r) {
-      var body = '';
-      r.on('data', function (c) { body += c; });
-      r.on('end', function () { try { resolve(JSON.parse(body)); } catch (e) { resolve(null); } });
-    }).on('error', function () { resolve(null); });
+  if (!canCallApiFootball()) return new Map();
+  var fixtureRes = await httpGetAuth('https://v3.football.api-sports.io/fixtures?live=all', {
+    'x-apisports-key': apiKey,
+    'accept': 'application/json'
   });
+  trackApiFootballCall();
   if (!fixtureRes || !fixtureRes.response) return new Map();
   var apiFixtures = Array.isArray(fixtureRes.response) ? fixtureRes.response : [];
 
@@ -221,7 +256,8 @@ async function scrapeLive() {
       return liveCache;
     }
 
-    for (var i = 0; i < matches.length; i++) {
+    var detailLimit = Math.min(matches.length, MAX_FOTMOB_DETAIL_MATCHES);
+    for (var i = 0; i < detailLimit; i++) {
       var m = matches[i];
       if (i > 0 && i % 3 === 0) await new Promise(function (r) { setTimeout(r, FOTMOB_STATS_DELAY_MS); });
       var fotmobStats = await fetchFotMobMatchStats(m.matchId).catch(function () { return null; });
@@ -229,13 +265,13 @@ async function scrapeLive() {
     }
 
     var apiKey = process.env.API_FOOTBALL_KEY;
-    if (apiKey) {
+    if (apiKey && canCallApiFootball()) {
       var idMap = await matchFotMobToApiFootball(matches, apiKey).catch(function () { return new Map(); });
 
       for (var i = 0; i < matches.length; i++) {
         var m = matches[i];
         var apiFixtureId = idMap.get(m.matchId);
-        if (apiFixtureId) {
+        if (apiFixtureId && canCallApiFootball()) {
           if (i > 0 && i % 3 === 0) await new Promise(function (r) { setTimeout(r, STATS_FETCH_DELAY_MS); });
           var stats = await fetchApiFootballStats(apiKey, apiFixtureId).catch(function () { return null; });
           if (stats) m.apiStats = stats;
@@ -246,7 +282,7 @@ async function scrapeLive() {
     liveCache = { fetchedAt: new Date().toISOString(), matchCount: matches.length, matches: matches };
     var withFotmob = matches.filter(function (m) { return m.fotmobStats; }).length;
     var withApi = matches.filter(function (m) { return m.apiStats; }).length;
-    console.log('[fotmob-live] Scraped', matches.length, 'live matches (' + withFotmob + ' FotMob stats, ' + withApi + ' API-Football stats)');
+    console.log('[fotmob-live] Scraped', matches.length, 'live matches (' + withFotmob + ' FotMob stats, ' + withApi + ' API-Football stats, API-Football budget:', apiFootballDailyCount + '/95)');
   } catch (e) {
     console.warn('[fotmob-live] Scrape failed:', e.message);
   }
