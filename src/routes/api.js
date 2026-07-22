@@ -662,7 +662,7 @@ router.get('/football-odds', async (req, res) => {
   try {
     const upstream = await fetch('https://v3.football.api-sports.io/odds?date=' + encodeURIComponent(requestedDate) + '&timezone=Africa%2FLagos', {
       headers: { 'x-apisports-key': apiKey, accept: 'application/json' },
-      signal: AbortSignal.timeout(12000)
+      signal: AbortSignal.timeout(25000)
     });
     const data = await upstream.json();
     if (!upstream.ok || (data.errors && Object.keys(data.errors).length)) {
@@ -700,7 +700,9 @@ router.get('/live-tips', async (req, res) => {
   if (liveTipsPending) return liveTipsPending.then(function(payload) { res.json(payload); }).catch(function() { res.status(502).json({ available: false, opportunities: [], message: 'Live data is temporarily unavailable.' }); });
 
   liveTipsPending = (async function() {
-    const request = async function(endpoint) {
+    const API_TIMEOUT_MS = 25000;
+    const request = async function(endpoint, retries) {
+      retries = retries || 1;
       const today = new Date().toISOString().slice(0, 10);
       if (liveTipsBudget.day !== today) liveTipsBudget = { day: today, used: 0, remaining: null };
       if (liveTipsBudget.remaining !== null && liveTipsBudget.remaining <= API_REQUEST_RESERVE) {
@@ -714,15 +716,22 @@ router.get('/live-tips', async (req, res) => {
         throw quotaError;
       }
       liveTipsBudget.used++;
-      const response = await fetch('https://v3.football.api-sports.io/' + endpoint, {
-        headers: { 'x-apisports-key': apiKey, accept: 'application/json' },
-        signal: AbortSignal.timeout(12000)
-      });
-      const remaining = Number(response.headers.get('x-ratelimit-requests-remaining'));
-      if (Number.isFinite(remaining)) liveTipsBudget.remaining = remaining;
-      const data = await response.json();
-      if (!response.ok || (data.errors && Object.keys(data.errors).length)) throw new Error(data.message || 'Live data is temporarily unavailable');
-      return Array.isArray(data.response) ? data.response : [];
+      try {
+        const response = await fetch('https://v3.football.api-sports.io/' + endpoint, {
+          headers: { 'x-apisports-key': apiKey, accept: 'application/json' },
+          signal: AbortSignal.timeout(API_TIMEOUT_MS)
+        });
+        const remaining = Number(response.headers.get('x-ratelimit-requests-remaining'));
+        if (Number.isFinite(remaining)) liveTipsBudget.remaining = remaining;
+        const data = await response.json();
+        if (!response.ok || (data.errors && Object.keys(data.errors).length)) throw new Error(data.message || 'API returned status ' + response.status);
+        return Array.isArray(data.response) ? data.response : [];
+      } catch (fetchErr) {
+        if (retries > 1) throw fetchErr;
+        console.warn('[live-tips] Retrying endpoint', endpoint, 'after error:', fetchErr.message);
+        liveTipsBudget.used--;
+        return request(endpoint, retries + 1);
+      }
     };
 
     const fixtures = await request('fixtures?live=all');
@@ -843,7 +852,7 @@ router.get('/golden-tips', async function (req, res) {
       const today = new Date().toISOString().slice(0, 10);
       const fixturesRes = await fetch('https://v3.football.api-sports.io/fixtures?live=all', {
         headers: { 'x-apisports-key': apiKey, accept: 'application/json' },
-        signal: AbortSignal.timeout(12000)
+        signal: AbortSignal.timeout(25000)
       });
       const fixturesData = await fixturesRes.json();
       const fixtures = Array.isArray(fixturesData.response) ? fixturesData.response : [];
@@ -854,7 +863,7 @@ router.get('/golden-tips', async function (req, res) {
         try {
           const statsRes = await fetch('https://v3.football.api-sports.io/fixtures/statistics?fixture=' + encodeURIComponent(fid), {
             headers: { 'x-apisports-key': apiKey, accept: 'application/json' },
-            signal: AbortSignal.timeout(12000)
+            signal: AbortSignal.timeout(25000)
           });
           const statsData = await statsRes.json();
           const statsArr = Array.isArray(statsData.response) ? statsData.response : [];

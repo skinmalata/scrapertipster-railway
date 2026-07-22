@@ -1,7 +1,17 @@
 const axios = require('axios');
-const cheerio = require('cheerio');
-const puppeteer = require('puppeteer');
 const fs = require('fs');
+
+let _cheerio;
+function getCheerio() {
+  if (!_cheerio) _cheerio = require('cheerio');
+  return _cheerio;
+}
+
+let _puppeteer;
+function getPuppeteer() {
+  if (!_puppeteer) _puppeteer = require('puppeteer');
+  return _puppeteer;
+}
 const path = require('path');
 const { detectLeague } = require('../data/leagues');
 const { getDateRange, getLocalDateStr, findMatchingResult } = require('../utils/helpers');
@@ -42,7 +52,7 @@ async function processBrowserQueue() {
   const { resolve, reject, browserOptions } = browserLaunchQueue.shift();
   
   try {
-    const browser = await puppeteer.launch(browserOptions);
+    const browser = await getPuppeteer().launch(browserOptions);
     resolve(browser);
   } catch (err) {
     reject(err);
@@ -257,7 +267,7 @@ async function scrapeYesterdayResults() {
 
   if (!html) return {};
   
-  const $ = cheerio.load(html);
+  const $ = getCheerio().load(html);
   const results = {};
   const dateResults = {};
   let currentLeague = '';
@@ -356,7 +366,7 @@ async function scrapeDate(dateStr, retryCount = 0) {
     }
   });
 
-  const $ = cheerio.load(html);
+  const $ = getCheerio().load(html);
   let matches = [];
   const fallbackMatches = [];
   let over25Matches = [];
@@ -603,7 +613,7 @@ async function scrapeProSoccerDate(dateStr) {
     return [];
   }
 
-  const $ = cheerio.load(html);
+  const $ = getCheerio().load(html);
 
   // Parse the actual match date from the page title instead of using the URL-derived date.
   // ProSoccer's "today" may differ from Lagos timezone, causing a 1-day offset in URLs.
@@ -675,7 +685,7 @@ async function scrapeProSoccerDate(dateStr) {
 
 function parseBetexplorerStreaks(html, streakType = 'win') {
   const matches = [];
-  const $ = cheerio.load(html);
+  const $ = getCheerio().load(html);
   
   let streakLabel;
   if (streakType === 'loss') streakLabel = 'Back To Back Losses';
@@ -787,7 +797,7 @@ async function scrapeTeamToScore(type, retryCount = 0) {
 
 function parseTeamToScore(html, type) {
   const matches = [];
-  const $ = cheerio.load(html);
+  const $ = getCheerio().load(html);
   const tableRows = $('.table-main tbody tr');
   
   console.log(`Found ${tableRows.length} table rows for team to score ${type}`);
@@ -1592,7 +1602,7 @@ async function getTeamAnalysis(homeTeam, awayTeam) {
     await page.waitForSelector('.lastteamsmatches, .teamsstatistics', { timeout: 15000 }).catch(() => {});
     
     const html = await page.content();
-    const $ = cheerio.load(html);
+    const $ = getCheerio().load(html);
     
     $('.lastteamsmatches .halfcontainer').each((i, el) => {
       const form = $(el).find('.teamform').map((_, tel) => $(tel).text().trim()).get().join('');
@@ -1807,7 +1817,7 @@ async function scrapeCards() {
       timeout: 30000
     });
     
-    const $ = cheerio.load(response.data);
+    const $ = getCheerio().load(response.data);
     const cardsMatches = [];
     const seen = new Set();
     
@@ -1987,7 +1997,7 @@ async function scrapeBothHalves() {
       timeout: 30000
     });
     
-    const $ = cheerio.load(response.data);
+    const $ = getCheerio().load(response.data);
     const bothHalvesMatches = [];
     let matchId = 0;
     
