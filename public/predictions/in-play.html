@@ -260,6 +260,7 @@
       var alertButton = document.getElementById('alertButton');
       var alertEnabled = localStorage.getItem('wf-live-alerts') === 'true';
       var previousTipKeys = {};
+      var baselineReady = false;
       function escapeHtml(value) { return String(value || '').replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
       function empty(title, body) { return '<div class="empty"><div class="empty-icon">◌</div><h2>' + escapeHtml(title) + '</h2><p>' + escapeHtml(body) + '</p></div>'; }
       function updateAlertButton() {
@@ -276,18 +277,22 @@
       function notifyNewTips(opportunities) {
         var currentKeys = {};
         opportunities.forEach(function(o) { currentKeys[tipKey(o)] = true; });
-        opportunities.forEach(function(o) {
-          var k = tipKey(o);
-          if (!previousTipKeys[k]) {
-            sendNotification(o.home + ' vs ' + o.away, o.market + ' — ' + o.confidence + '% confidence');
-          }
-        });
+        if (baselineReady) {
+          opportunities.forEach(function(o) {
+            var k = tipKey(o);
+            if (!previousTipKeys[k]) {
+              sendNotification(o.home + ' vs ' + o.away, o.market + ' — ' + o.confidence + '% confidence');
+            }
+          });
+        }
         previousTipKeys = currentKeys;
+        baselineReady = true;
       }
       function renderOpportunities(data) {
         if (!data.available || !data.opportunities || !data.opportunities.length) {
           container.innerHTML = empty('No in-play betting tips currently', 'Tips appear when live match data meets our strategy rules. Bet Responsibly.');
           previousTipKeys = {};
+          baselineReady = false;
           return;
         }
         notifyNewTips(data.opportunities);
@@ -310,7 +315,8 @@
           var res = await fetch(API_BASE + '/api/golden-tips', {mode:'cors', cache:'no-store'});
           var data = await res.json();
           renderOpportunities(data);
-          window.setTimeout(loadLive, 15 * 60 * 1000);
+          var delay = (data.refreshSeconds || 300) * 1000;
+          window.setTimeout(loadLive, delay);
         } catch (e) {
           container.innerHTML = empty('Live data unavailable', 'The live data feed is warming up. Please check again shortly.');
           window.setTimeout(loadLive, 2 * 60 * 1000);
