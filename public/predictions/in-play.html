@@ -110,15 +110,13 @@
         }
         container.innerHTML = data.opportunities.map(function(o) {
           var minute = o.minute ? o.minute + '\'' : 'Live';
-          var confidence = o.signalScore ? Math.round(o.signalScore) : null;
+          var confidence = o.confidence ? Math.round(o.confidence) : null;
           var confidenceColor = confidence >= 70 ? '#4ade80' : confidence >= 50 ? '#facc15' : '#ff6b7e';
-          var oddsText = o.odds ? '<span class="odds">' + escapeHtml(o.odds.toFixed(2)) + '</span>' : '';
-          var bookmakerText = o.bookmaker ? ' <span style="color:var(--text-muted);font-size:11px;">via ' + escapeHtml(o.bookmaker) + '</span>' : '';
-          return '<article class="tip-card"><div class="tip-top"><span class="qualified">' + escapeHtml(o.market) + '</span><span class="minute">' + escapeHtml(minute) + '</span></div>' +
+          var categoryBadge = o.category ? '<span class="qualified">' + escapeHtml(o.category.toUpperCase()) + '</span>' : '';
+          return '<article class="tip-card"><div class="tip-top">' + categoryBadge + '<span class="minute">' + escapeHtml(minute) + '</span></div>' +
             '<div class="tip-body"><div class="league">' + escapeHtml(o.league || '') + '</div><div class="teams">' + escapeHtml(o.home) + ' <span aria-hidden="true">vs</span> ' + escapeHtml(o.away) + '</div>' +
             '<div class="score">' + escapeHtml(o.score || '0 - 0') + '</div>' +
-            '<div class="market-row"><div><small>Market</small><div class="market">' + escapeHtml(o.market) + '</div></div>' +
-            '<div style="text-align:right;"><small>Odds</small>' + oddsText + bookmakerText + '</div></div>' +
+            '<div class="market-row"><div><small>Market</small><div class="market">' + escapeHtml(o.market) + '</div></div></div>' +
             '<div class="reason">' + escapeHtml(o.reason || '') + '</div>' +
             (confidence ? '<div class="tip-meta"><span>Confidence: <strong style="color:' + confidenceColor + ';">' + confidence + '%</strong></span><span>' + escapeHtml(o.rule || '') + '</span></div>' : '') +
             '</div></article>';
@@ -126,7 +124,7 @@
       }
       async function loadLive() {
         try {
-          var res = await fetch(API_BASE + '/api/live-tips', {mode:'cors', cache:'no-store'});
+          var res = await fetch(API_BASE + '/api/golden-tips', {mode:'cors', cache:'no-store'});
           var data = await res.json();
           renderOpportunities(data);
           window.setTimeout(loadLive, 15 * 60 * 1000);
