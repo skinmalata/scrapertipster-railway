@@ -69,7 +69,7 @@
     <section class="live-hero">
       <div class="live-pill"><span class="live-dot"></span>Live analysis</div>
       <h1>In-Play Betting Tips</h1>
-      <p>We monitor live match data and show a tip only when a defined opportunity rule qualifies. Bet Responsibly.</p>
+      <p>We analyse live football matches and show tips when our strategy rules find an edge. Bet Responsibly.</p>
     </section>
     <div class="alert-panel">
       <button id="alertButton" class="alert-btn" type="button">Enable In-Play Alerts</button>
@@ -81,7 +81,7 @@
     <section class="faq-section" aria-label="Frequently asked questions">
       <h2>In-Play Betting Tips FAQ</h2>
       <div class="faq-list">
-        <details class="faq-item" open><summary>How does this page work?</summary><p>We analyse live football matches using real-time statistics, head-to-head records, and odds from API-Football. A tip only appears when a defined opportunity rule qualifies — for example, sustained attacking pressure in a goalless match. Bet Responsibly.</p></details>
+        <details class="faq-item" open><summary>How does this page work?</summary><p>We analyse live football matches using real-time statistics from FotMob. A tip only appears when a strategy rule finds an edge — for example, sustained attacking pressure in a goalless match. Bet Responsibly.</p></details>
         <details class="faq-item"><summary>Why are there no tips?</summary><p>Live tips only appear when a specific rule qualifies during an in-progress match. During off-peak hours or when matches don't meet the rules, the page will correctly show no opportunities.</p></details>
         <details class="faq-item"><summary>How often do the tips update?</summary><p>The live data refreshes every 15 minutes to stay within the API free-plan limit.</p></details>
         <details class="faq-item"><summary>What do the odds and market mean?</summary><p>The market is the specific bet type (e.g. Over 0.5 Match Goals) and the odds are the live price from a bookmaker. Odds change as the match progresses.</p></details>
@@ -105,7 +105,7 @@
       }
       function renderOpportunities(data) {
         if (!data.available || !data.opportunities || !data.opportunities.length) {
-          container.innerHTML = empty('No in-play betting tips currently', 'We monitor live matches and show a tip only when a defined rule qualifies. Bet Responsibly.');
+          container.innerHTML = empty('No in-play betting tips currently', 'Tips appear when live match data meets our strategy rules. Bet Responsibly.');
           return;
         }
         container.innerHTML = data.opportunities.map(function(o) {
