@@ -1,4 +1,3 @@
-const cheerio = require('cheerio');
 const { executablePath, args } = require('../config/puppeteer');
 
 const FOREBET_LIVE_URL = 'https://www.forebet.com/en/live-football-tips';
@@ -50,6 +49,7 @@ function parseMatchUrl(href) {
 }
 
 function parseHTML(html) {
+  const cheerio = require('cheerio');
   const $ = cheerio.load(html);
   const matches = [];
 
