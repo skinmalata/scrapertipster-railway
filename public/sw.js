@@ -22,6 +22,7 @@ const STATIC_ASSETS = [
   '/predictions/corners.html',
   '/predictions/cards.html',
   '/predictions/unbeaten.html'
+  ,'/predictions/in-play.html'
 ];
 
 self.addEventListener('install', event => {
