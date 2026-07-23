@@ -39,7 +39,7 @@ function classifyStreak(rawText) {
   if (t.includes('goal scored in first half') || t.includes('goal in first half')) {
     return { type: 'ht-over-0.5', team: '' };
   }
-  if (t.includes('draw') && !t.includes('unbeaten')) {
+  if (t.includes('draw') && !t.includes('unbeaten') && (t.includes('first half') || t.includes('ht') || t.includes('half'))) {
     return { type: 'ht-draw', team: '' };
   }
   return null;
