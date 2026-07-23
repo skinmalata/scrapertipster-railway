@@ -833,7 +833,7 @@ router.get('/live-matches', function (req, res) {
 });
 
 let goldenTipsCache = null;
-const GOLDEN_TIPS_CACHE_MS = 5 * 60 * 1000;
+const GOLDEN_TIPS_CACHE_MS = 60 * 1000;
 
 router.get('/golden-tips', async function (req, res) {
   if (goldenTipsCache && Date.now() - goldenTipsCache.createdAt < GOLDEN_TIPS_CACHE_MS) {
