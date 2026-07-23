@@ -365,67 +365,38 @@ function checkSecondHalfPush(match) {
   };
 }
 
-function checkWinningStreakDraw(match) {
+function checkH2HDrawWinner(match) {
   var s = homeAway(match.score);
   if (s.home !== s.away) return null;
 
   var elapsed = asNumber(match.minute);
   if (elapsed < 46 || elapsed > 85) return null;
 
-  var streaks = getWinningStreak(match);
-  if (!streaks) return null;
+  var h2h = getH2H(match);
+  // Require a meaningful set of recent meetings. The H2H summary is aligned
+  // to the current home/away teams by the live-data provider.
+  if (!h2h || h2h.total < 4 || h2h.recentCount < 4) return null;
 
-  var streakTeam = null;
-  var isHome = false;
-  var homeQualifies = streaks.home && !hasRedCards(match, true);
-  var awayQualifies = streaks.away && !hasRedCards(match, false);
+  var homeQualifies = h2h.homeWinPct > 75 && !hasRedCards(match, true);
+  var awayQualifies = h2h.awayWinPct > 75 && !hasRedCards(match, false);
+  if (!homeQualifies && !awayQualifies) return null;
 
-  if (homeQualifies && awayQualifies) {
-    var homeLen = streaks.home.count;
-    var awayLen = streaks.away.count;
-    if (homeLen > awayLen) {
-      streakTeam = streaks.home;
-      isHome = true;
-    } else if (awayLen > homeLen) {
-      streakTeam = streaks.away;
-      isHome = false;
-    } else {
-      var stats = getStats(match);
-      var homeShots = stats ? asNumber((stats.homeTeam || {}).shotsOnGoal) : 0;
-      var awayShots = stats ? asNumber((stats.awayTeam || {}).shotsOnGoal) : 0;
-      if (homeShots >= awayShots) {
-        streakTeam = streaks.home;
-        isHome = true;
-      } else {
-        streakTeam = streaks.away;
-        isHome = false;
-      }
-    }
-  } else if (homeQualifies) {
-    streakTeam = streaks.home;
-    isHome = true;
-  } else if (awayQualifies) {
-    streakTeam = streaks.away;
-    isHome = false;
-  }
-  if (!streakTeam) return null;
-
+  var isHome = homeQualifies && (!awayQualifies || h2h.homeWinPct >= h2h.awayWinPct);
   var teamName = isHome ? match.home : match.away;
-  var streakLen = streakTeam.count;
-
-  var signalScore = Math.min(95, 55 + (streakLen - 5) * 1.5 + nextGoalTimeFactor(elapsed) * 3);
+  var winPct = isHome ? h2h.homeWinPct : h2h.awayWinPct;
+  var signalScore = Math.min(95, 58 + (winPct - 75) * 1.5 + nextGoalTimeFactor(elapsed) * 3);
 
   return {
     category: 'team',
-    rule: 'winning-streak-draw',
+    rule: 'h2h-draw-winner',
     market: teamName + ' to Win',
     signalScore: Math.round(signalScore),
-    reason: teamName + ' on a ' + streakLen + '-match winning streak, currently drawn ' + s.home + '-' + s.away + ' at minute ' + elapsed + '. Strong motivation to maintain the run.'
+    reason: teamName + ' has won ' + winPct + '% of the last ' + h2h.recentCount + ' head-to-head meetings. The match is level ' + s.home + '-' + s.away + ' at minute ' + elapsed + ' and ' + teamName + ' has no red card.'
   };
 }
 
 var MARKET_RULES = [checkLateGoalStorm, checkBTTSPressure, checkHighVolumeNoGoal, checkGoalFest];
-var TEAM_RULES = [checkDominantPressure, checkComebackMomentum, checkSecondHalfPush, checkWinningStreakDraw];
+var TEAM_RULES = [checkDominantPressure, checkComebackMomentum, checkSecondHalfPush, checkH2HDrawWinner];
 
 function checkHTOver15Streak(match) {
   var streak = getMatchStreak(match, 'ht-over-1.5');
@@ -548,7 +519,7 @@ module.exports = {
   checkComebackMomentum,
   checkGoalFest,
   checkSecondHalfPush,
-  checkWinningStreakDraw,
+  checkH2HDrawWinner,
   checkHTOver15Streak,
   checkHTOver05Streak,
   checkHTDrawStreak

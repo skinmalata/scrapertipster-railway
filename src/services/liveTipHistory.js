@@ -1,5 +1,11 @@
+const fs = require('fs');
+const path = require('path');
 const TIME_ZONE = 'Africa/Lagos';
 const tipsByDay = new Map();
+const HISTORY_FILE = process.env.LIVE_TIP_HISTORY_FILE || path.join(
+  process.env.RAILWAY_VOLUME_MOUNT_PATH || process.env.RENDER_DISK_PATH || process.cwd(),
+  'live-tip-history.json'
+);
 
 function dayKey(value) {
   const parts = new Intl.DateTimeFormat('en-GB', { timeZone: TIME_ZONE, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(value ? new Date(value) : new Date());
@@ -10,6 +16,32 @@ function dayKey(value) {
 
 function number(value) { const result = Number(value); return Number.isFinite(result) ? result : 0; }
 function total(score) { return number(score && score.home) + number(score && score.away); }
+
+function loadHistory() {
+  try {
+    const saved = JSON.parse(fs.readFileSync(HISTORY_FILE, 'utf8'));
+    Object.keys(saved || {}).forEach(function(day) {
+      const entries = Array.isArray(saved[day]) ? saved[day] : [];
+      tipsByDay.set(day, new Map(entries.filter(function(tip) { return tip && tip.id; }).map(function(tip) { return [tip.id, tip]; })));
+    });
+  } catch (error) {
+    // A missing or malformed history file must never prevent live tips loading.
+    if (error.code !== 'ENOENT') console.warn('[live-tip-history] Could not load history:', error.message);
+  }
+}
+
+function saveHistory() {
+  try {
+    const saved = {};
+    tipsByDay.forEach(function(tips, day) { saved[day] = Array.from(tips.values()); });
+    const tempFile = HISTORY_FILE + '.tmp';
+    fs.mkdirSync(path.dirname(HISTORY_FILE), { recursive: true });
+    fs.writeFileSync(tempFile, JSON.stringify(saved, null, 2));
+    fs.renameSync(tempFile, HISTORY_FILE);
+  } catch (error) {
+    console.warn('[live-tip-history] Could not save history:', error.message);
+  }
+}
 
 function outcomeForFinal(tip, score) {
   const home = number(score && score.home), away = number(score && score.away), market = tip.market || '';
@@ -38,7 +70,14 @@ function resolveNextGoal(tip, score, final) {
 
 function prune() {
   const today = dayKey();
-  tipsByDay.forEach(function(_, key) { if (key !== today) tipsByDay.delete(key); });
+  let changed = false;
+  tipsByDay.forEach(function(_, key) {
+    if (key !== today) {
+      tipsByDay.delete(key);
+      changed = true;
+    }
+  });
+  if (changed) saveHistory();
 }
 
 function recordTips(opportunities, issuedAt) {
@@ -51,6 +90,7 @@ function recordTips(opportunities, issuedAt) {
     tips.set(id, { id: id, fixtureId: String(tip.fixtureId), home: tip.home, away: tip.away, league: tip.league, minute: tip.minute, scoreAtTip: { home: score ? Number(score[1]) : 0, away: score ? Number(score[2]) : 0 }, market: tip.market, rule: tip.rule, signalScore: tip.signalScore, issuedAt: issuedAt || new Date().toISOString(), outcome: 'pending', finalScore: null, resolvedAt: null });
   });
   tipsByDay.set(day, tips);
+  saveHistory();
 }
 
 function settleTips(liveMatches, dailyResults) {
@@ -71,6 +111,7 @@ function settleTips(liveMatches, dailyResults) {
     tip.outcome = outcome;
     tip.finalScore = score ? number(score.home) + ' - ' + number(score.away) : null;
     tip.resolvedAt = new Date().toISOString();
+    saveHistory();
   });
 }
 
@@ -79,5 +120,7 @@ function getTodayTips() {
   const tips = tipsByDay.get(dayKey());
   return tips ? Array.from(tips.values()).sort(function(a, b) { return new Date(b.issuedAt) - new Date(a.issuedAt); }) : [];
 }
+
+loadHistory();
 
 module.exports = { recordTips, settleTips, getTodayTips };
