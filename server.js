@@ -444,8 +444,22 @@ app.get('/blog/:slug', (req, res) => {
 });
 
 // FotMob live scraping + API-Football stats — replaces Forebet (Cloudflare blocked axios on Render).
-const { startLiveScrapeLoop } = require('./src/services/scrapeLive');
+const { startLiveScrapeLoop, getCachedLive } = require('./src/services/scrapeLive');
+const { buildGoldenTips } = require('./src/services/goldenOpportunities');
+const { startTelegramBot } = require('./src/services/telegramBot');
 startLiveScrapeLoop();
+
+function getLiveTipsFromCache() {
+  var liveData = getCachedLive();
+  if (!liveData || !liveData.matches || !liveData.matches.length) return [];
+  return buildGoldenTips(liveData);
+}
+
+startTelegramBot(
+  getLiveTipsFromCache,
+  process.env.TELEGRAM_BOT_TOKEN,
+  process.env.TELEGRAM_CHAT_ID
+);
 
 const HOST = process.env.HOST || '0.0.0.0';
 
