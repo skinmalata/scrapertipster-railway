@@ -31,6 +31,15 @@ function scoreTotal(score) {
   return asNumber(score.home) + asNumber(score.away);
 }
 
+function goalMarketForMinute(match, elapsed) {
+  var goals = scoreTotal(match.score);
+  if (goals === null) return null;
+  // Before (and including) minute 30, use a two-goal line. From minute 60,
+  // use a one-goal line. The 31-59 minute window emits no in-play tips.
+  var line = goals + (elapsed <= 30 ? 1.5 : 0.5);
+  return 'Over ' + line.toFixed(1) + ' Match Goals';
+}
+
 function isGoalless(score) {
   return scoreTotal(score) === 0;
 }
@@ -196,7 +205,7 @@ function checkDominantPressure(match) {
   if (!stats) return null;
 
   var elapsed = asNumber(match.minute);
-  if (elapsed < 50 || elapsed > 85) return null;
+  if (elapsed < 60 || elapsed > 85) return null;
 
   var homeStats = stats.homeTeam || {};
   var awayStats = stats.awayTeam || {};
@@ -241,9 +250,9 @@ function checkDominantPressure(match) {
   var signalScore = Math.min(95, 48 + gap * 1.5 + dominantCorners * 1.2 + nextGoalTimeFactor(elapsed) * 4 + h2hBoost * 2 + recentFormBoost * 2);
 
   return {
-    category: 'team',
+    category: 'market',
     rule: 'dominant-pressure',
-    market: dominantName + ' to Score Next',
+    market: goalMarketForMinute(match, elapsed),
     signalScore: Math.round(signalScore),
     reason: dominantName + ' dominating with ' + dominantShots + ' shots (' + dominatedShots + ' for opponent), ' + dominantCorners + ' corners' + (domPossession ? ', ' + domPossession + '% possession' : '') + ' at minute ' + elapsed + '.' + (h2hBoost > 0 ? ' H2H history favors ' + dominantName + '.' : '') + (recentFormBoost > 0 ? ' Recent form favors ' + dominantName + '.' : '')
   };
@@ -255,7 +264,7 @@ function checkComebackMomentum(match) {
 
   var s = homeAway(match.score);
   var elapsed = asNumber(match.minute);
-  if (elapsed < 50 || elapsed > 80) return null;
+  if (elapsed < 60 || elapsed > 80) return null;
 
   var homeStats = stats.homeTeam || {};
   var awayStats = stats.awayTeam || {};
@@ -296,9 +305,9 @@ function checkComebackMomentum(match) {
   var signalScore = Math.min(95, 44 + gap * 2 + nextGoalTimeFactor(elapsed) * 3 + h2hBoost * 2 + recentFormBoost * 2);
 
   return {
-    category: 'team',
+    category: 'market',
     rule: 'comeback-momentum',
-    market: trailingName + ' to Score Next',
+    market: goalMarketForMinute(match, elapsed),
     signalScore: Math.round(signalScore),
     reason: trailingName + ' trailing ' + s.home + '-' + s.away + ' but dominating with ' + trailShotsTotal + ' shots (' + leadShotsTotal + ' for ' + leaderName + ') at minute ' + elapsed + '. Comeback building.' + (h2hBoost > 0 ? ' H2H history favors ' + trailingName + '.' : '') + (recentFormBoost > 0 ? ' Recent form favors ' + trailingName + '.' : '')
   };
@@ -348,9 +357,9 @@ function checkSecondHalfPush(match) {
   var signalScore = Math.min(95, 45 + domShots * 3 + (domPossession - 50) * 0.5 + nextGoalTimeFactor(elapsed) * 3 + h2hBoost * 2 + recentFormBoost * 2);
 
   return {
-    category: 'team',
+    category: 'market',
     rule: 'second-half-push',
-    market: dominatorName + ' to Score Next',
+    market: goalMarketForMinute(match, elapsed),
     signalScore: Math.round(signalScore),
     reason: dominatorName + ' controlling the second half with ' + domPossession + '% possession and ' + domShots + ' shots on target at minute ' + elapsed + '.' + (h2hBoost > 0 ? ' H2H history favors ' + dominatorName + '.' : '') + (recentFormBoost > 0 ? ' Recent form favors ' + dominatorName + '.' : '')
   };
@@ -426,14 +435,14 @@ function checkHTOver15Streak(match) {
   if (elapsed > 30) return null;
 
   var totalGoals = scoreTotal(match.score);
-  if (totalGoals === null || totalGoals >= 2) return null;
+  if (totalGoals === null) return null;
 
   var signalScore = Math.min(95, 62 + (streak.count - 5) * 1.5);
 
   return {
     category: 'market',
     rule: 'ht-over-15-streak',
-    market: 'HT Over 1.5 Goals',
+    market: goalMarketForMinute(match, elapsed),
     signalScore: Math.round(signalScore),
     reason: match.home + ' vs ' + match.away + ' has ' + streak.count + ' consecutive first halves with 2+ goals. Strong pattern for early goals.'
   };
@@ -444,17 +453,17 @@ function checkHTOver05Streak(match) {
   if (!streak) return null;
 
   var elapsed = asNumber(match.minute);
-  if (elapsed > 35) return null;
+  if (elapsed > 30) return null;
 
   var totalGoals = scoreTotal(match.score);
-  if (totalGoals === null || totalGoals >= 1) return null;
+  if (totalGoals === null) return null;
 
   var signalScore = Math.min(95, 58 + (streak.count - 5) * 1.5);
 
   return {
     category: 'market',
     rule: 'ht-over-05-streak',
-    market: 'HT Over 0.5 Goals',
+    market: goalMarketForMinute(match, elapsed),
     signalScore: Math.round(signalScore),
     reason: match.home + ' vs ' + match.away + ' has ' + streak.count + ' consecutive first halves with a goal. Expecting an early breakthrough.'
   };
@@ -478,7 +487,7 @@ function checkHTDrawStreak(match) {
   };
 }
 
-var KICKOFF_RULES = [checkHTOver15Streak, checkHTOver05Streak, checkHTDrawStreak];
+var KICKOFF_RULES = [checkHTOver15Streak, checkHTOver05Streak];
 
 function pickBest(rules, match) {
   var best = null;
@@ -497,6 +506,8 @@ function buildGoldenTips(liveData) {
   var opportunities = [];
 
   liveData.matches.forEach(function (match) {
+    var elapsed = asNumber(match.minute);
+    if (elapsed > 30 && elapsed < 60) return;
     var marketTip = pickBest(MARKET_RULES, match);
     var teamTip = pickBest(TEAM_RULES, match);
 
