@@ -505,7 +505,16 @@ function buildGoldenTips(liveData) {
     });
   });
 
-  return opportunities.sort(function (a, b) {
+  // Different rules can arrive at the same market for one fixture. Present
+  // that recommendation once, using the strongest qualifying signal.
+  var uniqueOpportunities = new Map();
+  opportunities.forEach(function(opportunity) {
+    var key = String(opportunity.fixtureId) + '|' + String(opportunity.market || '').toLowerCase();
+    var existing = uniqueOpportunities.get(key);
+    if (!existing || opportunity.signalScore > existing.signalScore) uniqueOpportunities.set(key, opportunity);
+  });
+
+  return Array.from(uniqueOpportunities.values()).sort(function (a, b) {
     return b.signalScore - a.signalScore;
   });
 }

@@ -118,7 +118,16 @@ function settleTips(liveMatches, dailyResults) {
 function getTodayTips() {
   prune();
   const tips = tipsByDay.get(dayKey());
-  return tips ? Array.from(tips.values()).sort(function(a, b) { return new Date(b.issuedAt) - new Date(a.issuedAt); }) : [];
+  if (!tips) return [];
+  const uniqueTips = new Map();
+  tips.forEach(function(tip) {
+    const key = String(tip.fixtureId) + '|' + String(tip.market || '').toLowerCase();
+    const existing = uniqueTips.get(key);
+    // Preserve the first published tip for a market, unless a later duplicate
+    // is the one that has already been settled.
+    if (!existing || (existing.outcome === 'pending' && tip.outcome !== 'pending')) uniqueTips.set(key, tip);
+  });
+  return Array.from(uniqueTips.values()).sort(function(a, b) { return new Date(b.issuedAt) - new Date(a.issuedAt); });
 }
 
 loadHistory();
