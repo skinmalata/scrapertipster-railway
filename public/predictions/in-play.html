@@ -151,6 +151,14 @@
     .reason { color:var(--text-secondary); font-size:13px; line-height:1.6; margin:15px 0 12px; }
     .tip-meta { display:flex; justify-content:space-between; gap:10px; color:var(--text-muted); font-size:12px; }
     .history-section { max-width:1050px; margin:42px auto 0; padding-top:28px; border-top:1px solid var(--border); }
+    .telegram-cta { max-width:1050px; margin:32px auto 0; }
+    .telegram-cta-inner { display:flex; align-items:center; gap:16px; padding:16px 20px; border:1px solid rgba(0,136,204,.35); border-radius:14px; background:linear-gradient(135deg,rgba(0,136,204,.12),rgba(0,136,204,.04)); flex-wrap:wrap; }
+    .telegram-cta-icon { font-size:28px; flex-shrink:0; }
+    .telegram-cta-text { flex:1; min-width:200px; }
+    .telegram-cta-text strong { display:block; color:var(--text-primary); font-size:15px; margin-bottom:2px; }
+    .telegram-cta-text p { margin:0; color:var(--text-secondary); font-size:13px; }
+    .telegram-cta-btn { display:inline-flex; align-items:center; padding:10px 22px; border-radius:8px; background:linear-gradient(135deg,#0088cc,#006ba6); color:#fff; font-weight:700; font-size:14px; text-decoration:none; white-space:nowrap; box-shadow:0 4px 12px rgba(0,136,204,.25); transition:transform .15s,box-shadow .15s; }
+    .telegram-cta-btn:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(0,136,204,.35); }
     .history-section h2 { margin:0 0 8px; font-size:22px; }
     .history-section > p { margin:0 0 16px; color:var(--text-secondary); font-size:14px; }
     .history-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px; }
@@ -185,7 +193,7 @@
     .related-col ul { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:6px; }
     .related-col a { color:#ff6b7e; font-size:14px; text-decoration:none; }
     .related-col a:hover { text-decoration:underline; }
-    @media(max-width:600px){ .live-hero{padding-top:28px}.tip-meta{flex-direction:column}.market-row{align-items:flex-end}.related-grid{grid-template-columns:1fr} }
+    @media(max-width:600px){ .live-hero{padding-top:28px}.tip-meta{flex-direction:column}.market-row{align-items:flex-end}.related-grid{grid-template-columns:1fr}.telegram-cta-inner{flex-direction:column;text-align:center}.telegram-cta-btn{width:100%;justify-content:center} }
   </style>
 </head>
 <body>
@@ -216,6 +224,16 @@
     <section id="tips" class="tip-grid" aria-live="polite">
       <div class="empty"><div class="empty-icon">?</div><h2>Loading live matches</h2><p>Fetching current live match data.</p></div>
     </section>
+    <div class="telegram-cta">
+      <div class="telegram-cta-inner">
+        <span class="telegram-cta-icon">&#9889;</span>
+        <div class="telegram-cta-text">
+          <strong>Get instant alerts on Telegram</strong>
+          <p>Join our channel for live in-play tips the moment they drop.</p>
+        </div>
+        <a href="https://t.me/winfulltime" target="_blank" rel="noopener" class="telegram-cta-btn">Join Channel</a>
+      </div>
+    </div>
     <section class="history-section" aria-labelledby="history-title">
       <h2 id="history-title">Today’s In-Play Tip Results</h2>
       <p>Tips generated today, with results settled from the final match score where available.</p>
