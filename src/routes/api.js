@@ -12,6 +12,7 @@ function getGeneratePostThumbnail() {
 const { asNumber, buildOpportunities } = require('../services/liveTips');
 const { getCachedLive } = require('../services/scrapeLive');
 const { buildGoldenTips } = require('../services/goldenOpportunities');
+const { getTodayTips } = require('../services/liveTipHistory');
 
 // API-Football responses are cached so one busy page does not consume the
 // provider quota for every visitor. The API key is deliberately kept here,
@@ -834,6 +835,7 @@ router.get('/live-matches', function (req, res) {
 
 let goldenTipsCache = null;
 const GOLDEN_TIPS_CACHE_MS = 60 * 1000;
+const MAX_LIVE_DATA_AGE_MS = 15 * 60 * 1000;
 
 router.get('/golden-tips', async function (req, res) {
   if (goldenTipsCache && Date.now() - goldenTipsCache.createdAt < GOLDEN_TIPS_CACHE_MS) {
@@ -841,7 +843,8 @@ router.get('/golden-tips', async function (req, res) {
   }
 
   const liveData = getCachedLive();
-  if (!liveData || !liveData.matches || liveData.matches.length === 0) {
+  const liveDataAge = liveData && liveData.fetchedAt ? Date.now() - new Date(liveData.fetchedAt).getTime() : Infinity;
+  if (!liveData || liveDataAge > MAX_LIVE_DATA_AGE_MS || !liveData.matches || liveData.matches.length === 0) {
     return res.json({ available: false, opportunities: [], message: 'Live data is not available yet. Tips will appear once live matches are detected.' });
   }
 
@@ -862,6 +865,10 @@ router.get('/golden-tips', async function (req, res) {
   console.log('[golden-tips] matches=' + liveData.matchCount + ' opportunities=' + opportunities.length);
   goldenTipsCache = { createdAt: Date.now(), payload };
   res.json(payload);
+});
+
+router.get('/golden-tips/history', function(req, res) {
+  res.json({ available: true, date: new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Lagos' }).format(new Date()), tips: getTodayTips() });
 });
 
 module.exports = router;

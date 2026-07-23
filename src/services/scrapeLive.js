@@ -1,5 +1,7 @@
 const https = require('https');
 const { fetchTodayStreaks, findStreakForTeam, findMatchStreak } = require('./h2hWinningStreaks');
+const { buildGoldenTips } = require('./goldenOpportunities');
+const { recordTips, settleTips } = require('./liveTipHistory');
 
 const SCRAPE_INTERVAL_MS = 5 * 60 * 1000;
 const FOTMOB_STATS_DELAY_MS = 200;
@@ -12,12 +14,13 @@ let liveCache = null;
 let isScraping = false;
 let scrapeTimer = null;
 const teamFormCache = new Map();
+let dailyMatchResults = new Map();
 
 function todayStr() {
-  const d = new Date();
-  return d.getUTCFullYear() +
-    String(d.getUTCMonth() + 1).padStart(2, '0') +
-    String(d.getUTCDate()).padStart(2, '0');
+  const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Africa/Lagos', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
+  const values = {};
+  parts.forEach(function(part) { values[part.type] = part.value; });
+  return values.year + values.month + values.day;
 }
 
 function normaliseTeam(name) {
@@ -76,8 +79,10 @@ async function fetchFotMobLive() {
   if (res.status !== 200 || !res.data || !res.data.leagues) return [];
 
   var matches = [];
+  dailyMatchResults = new Map();
   res.data.leagues.forEach(function (league) {
     league.matches.forEach(function (m) {
+      dailyMatchResults.set(String(m.id), { finished: Boolean(m.status && m.status.finished), score: parseScore(m.status) });
       if (!m.status || !m.status.started || m.status.finished || !m.status.ongoing) return;
       var minute = parseLiveMinute(m.status);
       var score = parseScore(m.status);
@@ -258,6 +263,7 @@ async function scrapeLive() {
     var matches = await fetchFotMobLive();
     if (!matches.length) {
       liveCache = { fetchedAt: new Date().toISOString(), matchCount: 0, matches: [] };
+      settleTips([], dailyMatchResults);
       isScraping = false;
       return liveCache;
     }
@@ -313,6 +319,9 @@ async function scrapeLive() {
     });
 
     liveCache = { fetchedAt: new Date().toISOString(), matchCount: matches.length, detailedMatchCount: withStats, formMatchCount: withForm, streakMatchCount: withStreak, matchStreakCount: withMatchStreak, matches: matches };
+    // Resolve previous entries before adding any tips from the latest scrape.
+    settleTips(matches, dailyMatchResults);
+    recordTips(buildGoldenTips(liveCache), liveCache.fetchedAt);
     console.log('[fotmob-live] Scraped', matches.length, 'live matches (' + withStats + ' stats, ' + withH2h + ' h2h, ' + withForm + ' form, ' + withStreak + ' win-streaks, ' + withMatchStreak + ' match-streaks)');
   } catch (e) {
     console.warn('[fotmob-live] Scrape failed:', e.message);

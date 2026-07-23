@@ -150,6 +150,15 @@
     .odds { color:#56e69c; font-size:22px; font-weight:800; }
     .reason { color:var(--text-secondary); font-size:13px; line-height:1.6; margin:15px 0 12px; }
     .tip-meta { display:flex; justify-content:space-between; gap:10px; color:var(--text-muted); font-size:12px; }
+    .history-section { max-width:1050px; margin:42px auto 0; padding-top:28px; border-top:1px solid var(--border); }
+    .history-section h2 { margin:0 0 8px; font-size:22px; }
+    .history-section > p { margin:0 0 16px; color:var(--text-secondary); font-size:14px; }
+    .history-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px; }
+    .history-card { padding:15px; border:1px solid var(--border); border-radius:12px; background:var(--bg-card); }
+    .history-card h3 { margin:8px 0 5px; font-size:15px; color:var(--text-primary); }
+    .history-card p { margin:7px 0; color:var(--text-secondary); font-size:13px; }
+    .outcome { display:inline-block; padding:4px 8px; border-radius:999px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; }
+    .outcome.won { color:#092316; background:#4ade80; }.outcome.lost { color:#fff; background:#e5484d; }.outcome.pending,.outcome.unresolved { color:#251d00; background:#facc15; }
     .empty { max-width:680px; margin:0 auto; text-align:center; padding:44px 24px; border:1px dashed var(--border-hover); border-radius:16px; background:var(--bg-card); }
     .empty h2 { margin:12px 0 8px; font-size:21px; }
     .empty p { color:var(--text-secondary); margin:0; line-height:1.65; }
@@ -206,6 +215,11 @@
     </div>
     <section id="tips" class="tip-grid" aria-live="polite">
       <div class="empty"><div class="empty-icon">?</div><h2>Loading live matches</h2><p>Fetching current live match data.</p></div>
+    </section>
+    <section class="history-section" aria-labelledby="history-title">
+      <h2 id="history-title">Today’s In-Play Tip Results</h2>
+      <p>Tips generated today, with results settled from the final match score where available.</p>
+      <div id="history" class="history-list" aria-live="polite"><div class="empty"><h2>Loading today’s results</h2></div></div>
     </section>
 
     <section class="faq-section" aria-label="Frequently asked questions">
@@ -335,6 +349,21 @@
             '</div></article>';
         }).join('');
       }
+      function outcomeLabel(outcome) { return outcome === 'won' ? 'Won' : outcome === 'lost' ? 'Lost' : outcome === 'unresolved' ? 'Not settled' : 'Pending'; }
+      function renderHistory(data) {
+        var history = document.getElementById('history');
+        var tips = data && data.tips || [];
+        if (!tips.length) { history.innerHTML = empty('No in-play tips recorded today', 'Completed and pending tips will appear here as live matches are analysed.'); return; }
+        history.innerHTML = tips.map(function(tip) {
+          var outcome = tip.outcome || 'pending';
+          var score = tip.finalScore ? 'Final score: ' + tip.finalScore : 'Score at tip: ' + tip.scoreAtTip.home + ' - ' + tip.scoreAtTip.away;
+          return '<article class="history-card"><span class="outcome ' + escapeHtml(outcome) + '">' + outcomeLabel(outcome) + '</span><h3>' + escapeHtml(tip.home) + ' vs ' + escapeHtml(tip.away) + '</h3><p>' + escapeHtml(tip.market) + '</p><p>' + escapeHtml(score) + '</p></article>';
+        }).join('');
+      }
+      async function loadHistory() {
+        try { var res = await fetch(API_BASE + '/api/golden-tips/history', {mode:'cors', cache:'no-store'}); renderHistory(await res.json()); }
+        catch (e) { document.getElementById('history').innerHTML = empty('Today’s results unavailable', 'Please check again shortly.'); }
+      }
       var liveTimer = null;
       var POLL_INTERVAL = 60 * 1000;
       var FAILBACK_INTERVAL = 30 * 1000;
@@ -349,6 +378,7 @@
           var res = await fetch(API_BASE + '/api/golden-tips', {mode:'cors', cache:'no-store'});
           var data = await res.json();
           renderOpportunities(data);
+          loadHistory();
           schedulePoll(POLL_INTERVAL);
         } catch (e) {
           container.innerHTML = empty('Live data unavailable', 'The live data feed is warming up. Retrying shortly...');
@@ -377,6 +407,7 @@
       }
       updateAlertButton();
       loadLive();
+      loadHistory();
     })();
     document.getElementById('hamburger')?.addEventListener('click', function() { this.classList.toggle('active'); document.getElementById('nav')?.classList.toggle('open'); });
   </script>
