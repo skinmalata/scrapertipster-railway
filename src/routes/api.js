@@ -851,6 +851,10 @@ router.get('/golden-tips', async function (req, res) {
     available: true,
     fetchedAt: new Date().toISOString(),
     matchCount: liveData.matchCount,
+    analyzedMatchCount: liveData.detailedMatchCount || 0,
+    formMatchCount: liveData.formMatchCount || 0,
+    streakMatchCount: liveData.streakMatchCount || 0,
+    matchStreakCount: liveData.matchStreakCount || 0,
     refreshSeconds: GOLDEN_TIPS_CACHE_MS / 1000,
     opportunities: opportunities
   };

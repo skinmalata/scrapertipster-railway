@@ -8,6 +8,24 @@ function getH2H(match) {
   return match.h2h || null;
 }
 
+function getRecentForm(match) {
+  return match.recentForm || null;
+}
+
+function getWinningStreak(match) {
+  return match.winningStreak || null;
+}
+
+function getMatchStreak(match, streakType) {
+  if (!match.matchStreaks) return null;
+  return match.matchStreaks[streakType] || null;
+}
+
+function hasRedCards(match, isHome) {
+  if (!match.redCards) return false;
+  return isHome ? match.redCards.home > 0 : match.redCards.away > 0;
+}
+
 function scoreTotal(score) {
   if (!score) return null;
   return asNumber(score.home) + asNumber(score.away);
@@ -17,11 +35,11 @@ function isGoalless(score) {
   return scoreTotal(score) === 0;
 }
 
-function timePressureFactor(elapsed) {
+function nextGoalTimeFactor(elapsed) {
   if (elapsed < 60) return 0;
-  if (elapsed <= 70) return 1;
-  if (elapsed <= 80) return 2;
-  return 3;
+  if (elapsed <= 70) return -0.5;
+  if (elapsed <= 80) return -1;
+  return -2;
 }
 
 function goalTimeFactor(elapsed) {
@@ -35,26 +53,24 @@ function homeAway(score) {
   return { home: asNumber(score.home), away: asNumber(score.away) };
 }
 
-function h2hDrawBoost(h2h) {
-  if (!h2h || !h2h.total) return 0;
-  if (h2h.drawPct >= 35) return 2;
-  if (h2h.drawPct >= 25) return 1;
-  return 0;
-}
-
 function h2hDominanceBoost(h2h, isHomeTeam) {
-  if (!h2h || !h2h.total) return 0;
+  // Direct meetings are only a minor tie-breaker. Small or partial samples
+  // are too noisy to influence a live recommendation.
+  if (!h2h || h2h.total < 5 || h2h.recentCount < 5) return 0;
   var pct = isHomeTeam ? h2h.homeWinPct : h2h.awayWinPct;
   if (pct >= 55) return 3;
   if (pct >= 45) return 1;
   return 0;
 }
 
-function h2hTightMatchBoost(h2h) {
-  if (!h2h || !h2h.total) return 0;
-  var maxPct = Math.max(h2h.homeWinPct, h2h.awayWinPct);
-  if (maxPct <= 40) return 2;
-  if (maxPct <= 45) return 1;
+function formBoost(recentForm, isHomeTeam) {
+  if (!recentForm || !recentForm.home || !recentForm.away) return 0;
+  var team = isHomeTeam ? recentForm.home : recentForm.away;
+  var opponent = isHomeTeam ? recentForm.away : recentForm.home;
+  if (team.matches < 5 || opponent.matches < 5) return 0;
+  var pointsPerMatchGap = (team.points / team.matches) - (opponent.points / opponent.matches);
+  if (pointsPerMatchGap >= 1) return 2;
+  if (pointsPerMatchGap >= 0.5) return 1;
   return 0;
 }
 
@@ -73,17 +89,14 @@ function checkLateGoalStorm(match) {
 
   if (shotsOn < 4 || totalShots < 10 || corners < 4) return null;
 
-  var h2h = getH2H(match);
-  var h2hBoost = h2hTightMatchBoost(h2h) + h2hDrawBoost(h2h);
-
-  var signalScore = Math.min(95, 52 + shotsOn * 2 + corners * 1.5 + totalShots * 0.3 + goalTimeFactor(elapsed) * 5 + h2hBoost * 2);
+  var signalScore = Math.min(95, 52 + shotsOn * 2 + corners * 1.5 + totalShots * 0.3 + goalTimeFactor(elapsed) * 5);
 
   return {
     category: 'market',
     rule: 'late-goal-storm',
     market: 'Over 0.5 Match Goals',
     signalScore: Math.round(signalScore),
-    reason: 'High-pressure 0-0 at minute ' + elapsed + ': ' + shotsOn + ' shots on target, ' + corners + ' corners, ' + totalShots + ' total shots.' + (h2hBoost > 0 ? ' H2H history supports a tight, goal-rich fixture.' : '')
+    reason: 'High-pressure 0-0 at minute ' + elapsed + ': ' + shotsOn + ' shots on target, ' + corners + ' corners, ' + totalShots + ' total shots.'
   };
 }
 
@@ -105,17 +118,14 @@ function checkBTTSPressure(match) {
   if (homeShotsOn < 2 || awayShotsOn < 2) return null;
   if (homeShotsTotal + awayShotsTotal < 8) return null;
 
-  var h2h = getH2H(match);
-  var h2hBoost = h2hTightMatchBoost(h2h);
-
-  var signalScore = Math.min(95, 45 + (homeShotsOn + awayShotsOn) * 3.5 + goalTimeFactor(elapsed) * 3 + h2hBoost * 2);
+  var signalScore = Math.min(95, 45 + (homeShotsOn + awayShotsOn) * 3.5 + goalTimeFactor(elapsed) * 3);
 
   return {
     category: 'market',
     rule: 'btts-pressure',
     market: 'BTTS - Yes',
     signalScore: Math.round(signalScore),
-    reason: 'Both teams creating chances in a 0-0: ' + match.home + ' (' + homeShotsOn + ' on target), ' + match.away + ' (' + awayShotsOn + ' on target). Total ' + (homeShotsTotal + awayShotsTotal) + ' attempts at minute ' + elapsed + '.' + (h2hBoost > 0 ? ' H2H record suggests both teams tend to score.' : '')
+    reason: 'Both teams creating chances in a 0-0: ' + match.home + ' (' + homeShotsOn + ' on target), ' + match.away + ' (' + awayShotsOn + ' on target). Total ' + (homeShotsTotal + awayShotsTotal) + ' attempts at minute ' + elapsed + '.'
   };
 }
 
@@ -134,17 +144,14 @@ function checkHighVolumeNoGoal(match) {
 
   if (shotsOn < 6 || totalShots < 12 || corners < 5) return null;
 
-  var h2h = getH2H(match);
-  var h2hBoost = h2hTightMatchBoost(h2h) + h2hDrawBoost(h2h);
-
-  var signalScore = Math.min(95, 50 + shotsOn * 1.8 + corners * 1.2 + goalTimeFactor(elapsed) * 4 + h2hBoost * 2);
+  var signalScore = Math.min(95, 50 + shotsOn * 1.8 + corners * 1.2 + goalTimeFactor(elapsed) * 4);
 
   return {
     category: 'market',
     rule: 'high-volume-no-goal',
     market: 'Over 0.5 Match Goals',
     signalScore: Math.round(signalScore),
-    reason: 'Exceptional attacking pressure in a 0-0 at minute ' + elapsed + ': ' + shotsOn + ' shots on target, ' + corners + ' corners, ' + totalShots + ' total shots. Goal is statistically overdue.' + (h2hBoost > 0 ? ' H2H history supports goal action.' : '')
+    reason: 'Exceptional attacking pressure in a 0-0 at minute ' + elapsed + ': ' + shotsOn + ' shots on target, ' + corners + ' corners, ' + totalShots + ' total shots. Goal is statistically overdue.'
   };
 }
 
@@ -173,17 +180,14 @@ function checkGoalFest(match) {
 
   if (homeShotsOn < 2 || awayShotsOn < 2) return null;
 
-  var h2h = getH2H(match);
-  var h2hBoost = h2hTightMatchBoost(h2h);
-
-  var signalScore = Math.min(95, 50 + shotsOn * 1.5 + totalGoals * 2 + goalTimeFactor(elapsed) * 2 + h2hBoost * 2);
+  var signalScore = Math.min(95, 50 + shotsOn * 1.5 + totalGoals * 2 + goalTimeFactor(elapsed) * 2);
 
   return {
     category: 'market',
     rule: 'goal-fest',
     market: 'Over ' + totalGoals + '.5 Match Goals',
     signalScore: Math.round(signalScore),
-    reason: 'Open match at ' + s.home + '-' + s.away + ' with ' + shotsOn + ' shots on target and ' + corners + ' corners at minute ' + elapsed + '. Both teams attacking.' + (h2hBoost > 0 ? ' H2H history suggests open, competitive fixtures.' : '')
+    reason: 'Open match at ' + s.home + '-' + s.away + ' with ' + shotsOn + ' shots on target and ' + corners + ' corners at minute ' + elapsed + '. Both teams attacking.'
   };
 }
 
@@ -230,16 +234,18 @@ function checkDominantPressure(match) {
 
   var h2h = getH2H(match);
   var h2hBoost = h2hDominanceBoost(h2h, isHomeDominant);
+  var recentForm = getRecentForm(match);
+  var recentFormBoost = formBoost(recentForm, isHomeDominant);
 
   var gap = dominantShots - dominatedShots;
-  var signalScore = Math.min(95, 48 + gap * 1.5 + dominantCorners * 1.2 + timePressureFactor(elapsed) * 4 + h2hBoost * 2);
+  var signalScore = Math.min(95, 48 + gap * 1.5 + dominantCorners * 1.2 + nextGoalTimeFactor(elapsed) * 4 + h2hBoost * 2 + recentFormBoost * 2);
 
   return {
     category: 'team',
     rule: 'dominant-pressure',
     market: dominantName + ' to Score Next',
     signalScore: Math.round(signalScore),
-    reason: dominantName + ' dominating with ' + dominantShots + ' shots (' + dominatedShots + ' for opponent), ' + dominantCorners + ' corners' + (domPossession ? ', ' + domPossession + '% possession' : '') + ' at minute ' + elapsed + '.' + (h2hBoost > 0 ? ' H2H history favors ' + dominantName + '.' : '')
+    reason: dominantName + ' dominating with ' + dominantShots + ' shots (' + dominatedShots + ' for opponent), ' + dominantCorners + ' corners' + (domPossession ? ', ' + domPossession + '% possession' : '') + ' at minute ' + elapsed + '.' + (h2hBoost > 0 ? ' H2H history favors ' + dominantName + '.' : '') + (recentFormBoost > 0 ? ' Recent form favors ' + dominantName + '.' : '')
   };
 }
 
@@ -283,16 +289,18 @@ function checkComebackMomentum(match) {
 
   var h2h = getH2H(match);
   var h2hBoost = h2hDominanceBoost(h2h, isTrailingHome);
+  var recentForm = getRecentForm(match);
+  var recentFormBoost = formBoost(recentForm, isTrailingHome);
 
   var gap = trailShotsTotal - leadShotsTotal;
-  var signalScore = Math.min(95, 44 + gap * 2 + timePressureFactor(elapsed) * 3 + h2hBoost * 2);
+  var signalScore = Math.min(95, 44 + gap * 2 + nextGoalTimeFactor(elapsed) * 3 + h2hBoost * 2 + recentFormBoost * 2);
 
   return {
     category: 'team',
     rule: 'comeback-momentum',
     market: trailingName + ' to Score Next',
     signalScore: Math.round(signalScore),
-    reason: trailingName + ' trailing ' + s.home + '-' + s.away + ' but dominating with ' + trailShotsTotal + ' shots (' + leadShotsTotal + ' for ' + leaderName + ') at minute ' + elapsed + '. Comeback building.' + (h2hBoost > 0 ? ' H2H history favors ' + trailingName + '.' : '')
+    reason: trailingName + ' trailing ' + s.home + '-' + s.away + ' but dominating with ' + trailShotsTotal + ' shots (' + leadShotsTotal + ' for ' + leaderName + ') at minute ' + elapsed + '. Comeback building.' + (h2hBoost > 0 ? ' H2H history favors ' + trailingName + '.' : '') + (recentFormBoost > 0 ? ' Recent form favors ' + trailingName + '.' : '')
   };
 }
 
@@ -334,20 +342,113 @@ function checkSecondHalfPush(match) {
 
   var h2h = getH2H(match);
   var h2hBoost = h2hDominanceBoost(h2h, isHomeDominant);
+  var recentForm = getRecentForm(match);
+  var recentFormBoost = formBoost(recentForm, isHomeDominant);
 
-  var signalScore = Math.min(95, 45 + domShots * 3 + (domPossession - 50) * 0.5 + timePressureFactor(elapsed) * 3 + h2hBoost * 2);
+  var signalScore = Math.min(95, 45 + domShots * 3 + (domPossession - 50) * 0.5 + nextGoalTimeFactor(elapsed) * 3 + h2hBoost * 2 + recentFormBoost * 2);
 
   return {
     category: 'team',
     rule: 'second-half-push',
     market: dominatorName + ' to Score Next',
     signalScore: Math.round(signalScore),
-    reason: dominatorName + ' controlling the second half with ' + domPossession + '% possession and ' + domShots + ' shots on target at minute ' + elapsed + '.' + (h2hBoost > 0 ? ' H2H history favors ' + dominatorName + '.' : '')
+    reason: dominatorName + ' controlling the second half with ' + domPossession + '% possession and ' + domShots + ' shots on target at minute ' + elapsed + '.' + (h2hBoost > 0 ? ' H2H history favors ' + dominatorName + '.' : '') + (recentFormBoost > 0 ? ' Recent form favors ' + dominatorName + '.' : '')
+  };
+}
+
+function checkWinningStreakDraw(match) {
+  var s = homeAway(match.score);
+  if (s.home !== s.away) return null;
+
+  var elapsed = asNumber(match.minute);
+  if (elapsed < 46 || elapsed > 85) return null;
+
+  var streaks = getWinningStreak(match);
+  if (!streaks) return null;
+
+  var streakTeam = null;
+  var isHome = false;
+  if (streaks.home && !hasRedCards(match, true)) {
+    streakTeam = streaks.home;
+    isHome = true;
+  } else if (streaks.away && !hasRedCards(match, false)) {
+    streakTeam = streaks.away;
+    isHome = false;
+  }
+  if (!streakTeam) return null;
+
+  var teamName = isHome ? match.home : match.away;
+  var streakLen = streakTeam.count;
+
+  var signalScore = Math.min(95, 55 + (streakLen - 5) * 1.5 + nextGoalTimeFactor(elapsed) * 3);
+
+  return {
+    category: 'team',
+    rule: 'winning-streak-draw',
+    market: teamName + ' to Win',
+    signalScore: Math.round(signalScore),
+    reason: teamName + ' on a ' + streakLen + '-match winning streak, currently drawn ' + s.home + '-' + s.away + ' at minute ' + elapsed + '. Strong motivation to maintain the run.'
   };
 }
 
 var MARKET_RULES = [checkLateGoalStorm, checkBTTSPressure, checkHighVolumeNoGoal, checkGoalFest];
-var TEAM_RULES = [checkDominantPressure, checkComebackMomentum, checkSecondHalfPush];
+var TEAM_RULES = [checkDominantPressure, checkComebackMomentum, checkSecondHalfPush, checkWinningStreakDraw];
+
+function checkHTOver15Streak(match) {
+  var streak = getMatchStreak(match, 'ht-over-1.5');
+  if (!streak) return null;
+
+  var elapsed = asNumber(match.minute);
+  if (elapsed > 30) return null;
+
+  var signalScore = Math.min(95, 62 + (streak.count - 5) * 1.5);
+
+  return {
+    category: 'market',
+    rule: 'ht-over-15-streak',
+    market: 'HT Over 1.5 Goals',
+    signalScore: Math.round(signalScore),
+    reason: match.home + ' vs ' + match.away + ' has ' + streak.count + ' consecutive first halves with 2+ goals. Strong pattern for early goals.'
+  };
+}
+
+function checkHTOver05Streak(match) {
+  var streak = getMatchStreak(match, 'ht-over-0.5');
+  if (!streak) return null;
+
+  var elapsed = asNumber(match.minute);
+  if (elapsed > 35) return null;
+
+  var signalScore = Math.min(95, 58 + (streak.count - 5) * 1.5);
+
+  return {
+    category: 'market',
+    rule: 'ht-over-05-streak',
+    market: 'HT Over 0.5 Goals',
+    signalScore: Math.round(signalScore),
+    reason: match.home + ' vs ' + match.away + ' has ' + streak.count + ' consecutive first halves with a goal. Expecting an early breakthrough.'
+  };
+}
+
+function checkHTDrawStreak(match) {
+  var streak = getMatchStreak(match, 'ht-draw');
+  if (!streak) return null;
+
+  var elapsed = asNumber(match.minute);
+  if (elapsed > 40) return null;
+
+  var signalScore = Math.min(95, 56 + (streak.count - 5) * 1.5);
+
+  return {
+    category: 'market',
+    rule: 'ht-draw-streak',
+    market: 'HT Draw',
+    signalScore: Math.round(signalScore),
+    reason: match.home + ' vs ' + match.away + ' has ' + streak.count + ' consecutive first halves ending level. Tight opening expected.'
+  };
+}
+
+var KICKOFF_RULES = [checkHTOver15Streak, checkHTOver05Streak, checkHTDrawStreak];
 
 function pickBest(rules, match) {
   var best = null;
@@ -369,7 +470,13 @@ function buildGoldenTips(liveData) {
     var marketTip = pickBest(MARKET_RULES, match);
     var teamTip = pickBest(TEAM_RULES, match);
 
-    [marketTip, teamTip].forEach(function (tip) {
+    var kickoffTips = [];
+    KICKOFF_RULES.forEach(function (rule) {
+      var tip = rule(match);
+      if (tip) kickoffTips.push(tip);
+    });
+
+    [marketTip, teamTip].concat(kickoffTips).forEach(function (tip) {
       if (!tip) return;
       opportunities.push({
         fixtureId: match.matchId,
@@ -403,5 +510,9 @@ module.exports = {
   checkHighVolumeNoGoal,
   checkComebackMomentum,
   checkGoalFest,
-  checkSecondHalfPush
+  checkSecondHalfPush,
+  checkWinningStreakDraw,
+  checkHTOver15Streak,
+  checkHTOver05Streak,
+  checkHTDrawStreak
 };
