@@ -478,7 +478,9 @@ function buildGoldenTips(liveData) {
 
   liveData.matches.forEach(function (match) {
     var elapsed = asNumber(match.minute);
-    if (elapsed > 30 && elapsed < 60) return;
+    // Publish only while at least 15 minutes remain in the active half:
+    // minutes 0-30 in the first half and 60-75 in the second half.
+    if ((elapsed > 30 && elapsed < 60) || elapsed > 75) return;
     var marketTip = pickBest(MARKET_RULES, match);
     var teamTip = pickBest(TEAM_RULES, match);
 
