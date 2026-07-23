@@ -7,37 +7,31 @@ const MAX_MESSAGE_LENGTH = 4000;
 let sentKeys = new Map();
 const SENT_KEY_TTL_MS = 6 * 60 * 60 * 1000;
 
-function escapeMarkdown(text) {
-  return String(text || '').replace(/[_*[\]()~`>#+\-=|{}.!\\]/g, '\\$&');
-}
-
 function formatTip(tip) {
   var minute = tip.minute ? tip.minute + "'" : 'Live';
   var score = tip.signalScore ? Math.round(tip.signalScore) : null;
-  var signalLine = score ? '📊 Signal: ' + score + '%' : '';
   var lines = [
-    '⚽ *' + escapeMarkdown(tip.home) + ' vs ' + escapeMarkdown(tip.away) + '*',
-    '🏆 ' + escapeMarkdown(tip.league || ''),
-    '⏱ ' + minute + '  |  ' + escapeMarkdown(tip.score || '0 - 0'),
+    '\u26BD ' + tip.home + ' vs ' + tip.away,
+    '\uD83C\uDFC6 ' + (tip.league || ''),
+    '\u23F1 ' + minute + '  |  ' + (tip.score || '0 - 0'),
     '',
-    '🎯 *' + escapeMarkdown(tip.market) + '*',
-    escapeMarkdown(tip.reason || ''),
-    signalLine ? '' : '',
-    signalLine,
-    '🤖 ' + escapeMarkdown(tip.rule || '')
+    '\uD83C\uDFAF ' + tip.market,
+    tip.reason || '',
+    score ? '\uD83D\uDCCA Signal: ' + score + '%' : '',
+    '\uD83E\uDD16 ' + (tip.rule || '')
   ];
   return lines.filter(function(l) { return l !== ''; }).join('\n');
 }
 
 function formatSummary(tips) {
   var now = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Lagos' });
-  var header = '🔴 *LIVE IN-PLAY ALERT* — ' + now + ' WAT\n';
-  header += '━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+  var header = '\uD83D\uDD34 LIVE IN-PLAY ALERT \u2014 ' + now + ' WAT\n';
+  header += '\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n';
   var body = tips.map(function(tip, i) {
-    var sep = i < tips.length - 1 ? '\n━━━━━━━━━━━━━━━━━━━━━━━━\n\n' : '';
+    var sep = i < tips.length - 1 ? '\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n' : '';
     return formatTip(tip) + sep;
   }).join('');
-  var footer = '\n\n━━━━━━━━━━━━━━━━━━━━━━━━\n💡 Free tips from winfulltime\\.com | Bet Responsibly';
+  var footer = '\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\uD83D\uDCA1 Free tips from winfulltime.com | Bet Responsibly';
   return header + body + footer;
 }
 
@@ -79,7 +73,7 @@ function pruneSentKeys() {
 async function sendToChannel(botToken, chatId, text) {
   if (text.length > MAX_MESSAGE_LENGTH) {
     var mid = Math.ceil(text.length / 2);
-    var splitPoint = text.lastIndexOf('\n━━━', mid);
+    var splitPoint = text.lastIndexOf('\n\u2501', mid);
     if (splitPoint < mid - 500) splitPoint = mid;
     await sendToChannel(botToken, chatId, text.substring(0, splitPoint));
     await sendToChannel(botToken, chatId, text.substring(splitPoint));
@@ -89,7 +83,6 @@ async function sendToChannel(botToken, chatId, text) {
   var result = await httpPost(url, {
     chat_id: chatId,
     text: text,
-    parse_mode: 'MarkdownV2',
     disable_web_page_preview: true
   });
   if (!result.ok) {
@@ -107,10 +100,15 @@ async function postNewTips(opportunities, botToken, chatId) {
     sentKeys.set(k, Date.now());
     return true;
   });
-  if (!newTips.length) return;
+  if (!newTips.length) {
+    console.log('[telegram] No new tips to post (all already sent or none available)');
+    return;
+  }
   var message = formatSummary(newTips);
-  await sendToChannel(botToken, chatId, message);
-  console.log('[telegram] Posted', newTips.length, 'new tip(s) to channel');
+  var result = await sendToChannel(botToken, chatId, message);
+  if (result && result.ok) {
+    console.log('[telegram] Posted', newTips.length, 'new tip(s) to channel');
+  }
 }
 
 function startTelegramBot(getLiveTips, botToken, chatId) {
@@ -122,6 +120,7 @@ function startTelegramBot(getLiveTips, botToken, chatId) {
   setInterval(async function() {
     try {
       var tips = getLiveTips();
+      console.log('[telegram] Polling: ' + (tips ? tips.length : 0) + ' live tips available');
       if (tips && tips.length) {
         await postNewTips(tips, botToken, chatId);
       }
