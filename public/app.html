@@ -389,6 +389,110 @@
  }
  .tool-btn:hover { transform: scale(1.05); }
 
+ /* Live alerts */
+ .live-alert-bar {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   gap: 12px;
+   padding: 14px 18px;
+   border-radius: 12px;
+   background: linear-gradient(135deg, rgba(255,36,72,0.12), rgba(255,36,72,0.04));
+   border: 1px solid rgba(255,36,72,0.3);
+   margin-bottom: 20px;
+ }
+ .live-alert-bar .alert-info { flex: 1; }
+ .live-alert-bar .alert-info h3 { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+ .live-alert-bar .alert-info p { font-size: 12px; color: var(--text-muted); margin: 0; }
+ .alert-toggle {
+   flex-shrink: 0;
+   padding: 10px 20px;
+   border: 1px solid #ff526b;
+   border-radius: 9px;
+   background: linear-gradient(135deg, #ff2448, #d41a38);
+   color: #fff;
+   font: inherit;
+   font-size: 13px;
+   font-weight: 700;
+   cursor: pointer;
+   transition: all 0.2s;
+ }
+ .alert-toggle.enabled {
+   border-color: #45d98d;
+   background: linear-gradient(135deg, #4ade80, #22c55e);
+   color: #092316;
+ }
+ .alert-toggle:disabled { opacity: 0.5; cursor: default; }
+ .live-pulse {
+   display: inline-flex;
+   align-items: center;
+   gap: 6px;
+   font-size: 11px;
+   font-weight: 800;
+   color: #56e69c;
+   text-transform: uppercase;
+   letter-spacing: 0.06em;
+ }
+ .live-dot-sm {
+   width: 6px;
+   height: 6px;
+   border-radius: 50%;
+   background: #4ade80;
+   box-shadow: 0 0 0 0 rgba(74,222,128,0.7);
+   animation: pulse 1.7s infinite;
+ }
+ @keyframes pulse { 70%{box-shadow:0 0 0 6px rgba(74,222,128,0)} 100%{box-shadow:0 0 0 0 rgba(74,222,128,0)} }
+ .live-grid {
+   display: grid;
+   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+   gap: 14px;
+   margin-bottom: 32px;
+ }
+ .live-card {
+   background: var(--bg-card);
+   border: 1px solid rgba(74,222,128,0.2);
+   border-radius: 12px;
+   padding: 16px;
+   transition: all 0.2s;
+ }
+ .live-card:hover { border-color: rgba(74,222,128,0.4); transform: translateY(-1px); }
+ .live-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+ .live-card-cat {
+   font-size: 10px;
+   font-weight: 800;
+   text-transform: uppercase;
+   letter-spacing: 0.06em;
+   color: #56e69c;
+ }
+ .live-card-min { font-size: 12px; font-weight: 700; color: var(--text-muted); }
+ .live-card-league { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+ .live-card-teams { font-size: 15px; font-weight: 800; line-height: 1.3; }
+ .live-card-score { font-size: 13px; font-weight: 800; color: #ff6b7e; margin: 6px 0 10px; }
+ .live-card-market {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding: 10px 12px;
+   border-radius: 8px;
+   background: rgba(255,255,255,0.03);
+   margin-bottom: 8px;
+ }
+ .live-card-market small { display: block; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+ .live-card-market strong { font-size: 13px; }
+ .live-card-reason { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
+ .live-card-signal { font-size: 11px; color: var(--text-muted); margin-top: 8px; display: flex; justify-content: space-between; }
+ .live-card-signal strong { font-weight: 700; }
+ .live-empty {
+   grid-column: 1 / -1;
+   text-align: center;
+   padding: 40px 20px;
+   color: var(--text-muted);
+   border: 1px dashed var(--border);
+   border-radius: 12px;
+ }
+ .live-empty h3 { font-size: 16px; margin-bottom: 6px; color: var(--text-secondary); }
+ .live-empty p { font-size: 13px; margin: 0; }
+
  @media (max-width: 768px) {
    .sidebar { transform: translateX(-100%); }
    .sidebar.open { transform: translateX(0); }
@@ -397,7 +501,9 @@
    .main { margin-left: 0; padding-top: var(--header-h); }
    .content { padding: 20px 16px; }
    .page-header h1 { font-size: 1.6rem; }
-   .pred-grid { grid-template-columns: 1fr; }
+    .pred-grid { grid-template-columns: 1fr; }
+    .live-grid { grid-template-columns: 1fr; }
+    .live-alert-bar { flex-direction: column; text-align: center; }
  }
  </style>
 </head>
@@ -422,8 +528,16 @@
      </a>
    </div>
 
-   <div class="sidebar-section">
-     <div class="sidebar-section-title">Predictions</div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Live</div>
+      <a href="/predictions/in-play.html" class="nav-item" data-page="in-play">
+        <span class="nav-icon">&#128308;</span> In-Play Tips
+        <span class="nav-badge" id="liveCount"></span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Predictions</div>
      <a href="/predictions/1x2.html" class="nav-item" data-page="1x2">
        <span class="nav-icon">&#9917;</span> 1X2 Match Winner
      </a>
@@ -498,9 +612,22 @@
      <a href="/predictions/corners.html" class="quick-link">Corners</a>
      <a href="/predictions/cards.html" class="quick-link">Cards</a>
      <a href="/predictions/unbeaten.html" class="quick-link">Unbeaten</a>
-   </div>
+    </div>
 
-   <div class="pred-grid">
+    <!-- Live In-Play Alerts -->
+    <div class="live-alert-bar" id="liveAlertBar">
+      <div class="alert-info">
+        <h3><span class="live-pulse"><span class="live-dot-sm"></span>Live In-Play Tips</span></h3>
+        <p>Real-time betting tips powered by live match data. Enable alerts to get notified of new tips.</p>
+      </div>
+      <button class="alert-toggle" id="alertToggle" type="button">Enable Alerts</button>
+    </div>
+
+    <div class="live-grid" id="liveTips">
+      <div class="live-empty"><h3>Loading live matches</h3><p>Fetching current in-play data&hellip;</p></div>
+    </div>
+
+    <div class="pred-grid">
 
      <a href="/predictions/1x2.html" class="pred-card">
        <div class="pred-card-header">
@@ -634,6 +761,106 @@
      item.classList.add('active');
    }
  });
+
+ // In-Play Live Tips + Alerts
+ (function() {
+   var API_BASE = 'https://winfulltime-api.onrender.com';
+   var liveGrid = document.getElementById('liveTips');
+   var alertToggle = document.getElementById('alertToggle');
+   var liveCountBadge = document.getElementById('liveCount');
+   if (!liveGrid || !alertToggle) return;
+
+   var alertEnabled = localStorage.getItem('wf-live-alerts') === 'true';
+   var previousTipKeys = {};
+   var baselineReady = false;
+
+   function esc(v) { return String(v || '').replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+   function updateAlertBtn() {
+     var supported = 'Notification' in window;
+     alertToggle.disabled = !supported || Notification.permission === 'denied';
+     alertToggle.classList.toggle('enabled', alertEnabled && supported && Notification.permission === 'granted');
+     alertToggle.textContent = !supported ? 'Unsupported' : (Notification.permission === 'denied' ? 'Blocked' : (alertEnabled ? 'Alerts On' : 'Enable Alerts'));
+   }
+
+   function tipKey(o) { return o.fixtureId + '|' + o.rule; }
+
+   function sendNotification(title, body) {
+     if (!alertEnabled || !('Notification' in window) || Notification.permission !== 'granted') return;
+     try { new Notification(title, { body: body, icon: '/winfulltimelogo.png', tag: 'wf-tip', renotify: true }); } catch (e) {}
+   }
+
+   function notifyNewTips(opportunities) {
+     var currentKeys = {};
+     opportunities.forEach(function(o) { currentKeys[tipKey(o)] = true; });
+     if (baselineReady) {
+       opportunities.forEach(function(o) {
+         if (!previousTipKeys[tipKey(o)]) {
+           sendNotification(o.home + ' vs ' + o.away, o.market + ' \u2014 ' + o.signalScore + '% signal');
+         }
+       });
+     }
+     previousTipKeys = currentKeys;
+     baselineReady = true;
+   }
+
+   function renderLiveTips(data) {
+     if (!data.available || !data.opportunities || !data.opportunities.length) {
+       liveGrid.innerHTML = '<div class="live-empty"><h3>No live tips right now</h3><p>Tips appear when match data meets our strategy rules.</p></div>';
+       if (liveCountBadge) liveCountBadge.textContent = '';
+       previousTipKeys = {};
+       baselineReady = false;
+       return;
+     }
+     notifyNewTips(data.opportunities);
+     if (liveCountBadge) liveCountBadge.textContent = data.opportunities.length;
+     liveGrid.innerHTML = data.opportunities.map(function(o) {
+       var minute = o.minute ? o.minute + '\'' : 'Live';
+       var score = o.signalScore ? Math.round(o.signalScore) : null;
+       var scoreColor = score >= 70 ? '#4ade80' : score >= 50 ? '#facc15' : '#ff6b7e';
+       return '<div class="live-card">' +
+         '<div class="live-card-top"><span class="live-card-cat">' + esc(o.category || '') + '</span><span class="live-card-min">' + esc(minute) + '</span></div>' +
+         '<div class="live-card-league">' + esc(o.league || '') + '</div>' +
+         '<div class="live-card-teams">' + esc(o.home) + ' vs ' + esc(o.away) + '</div>' +
+         '<div class="live-card-score">' + esc(o.score || '0 - 0') + '</div>' +
+         '<div class="live-card-market"><div><small>Market</small><strong>' + esc(o.market) + '</strong></div></div>' +
+         '<div class="live-card-reason">' + esc(o.reason || '') + '</div>' +
+         (score ? '<div class="live-card-signal"><span>Signal: <strong style="color:' + scoreColor + '">' + score + '%</strong></span><span>' + esc(o.rule || '') + '</span></div>' : '') +
+         '</div>';
+     }).join('');
+   }
+
+   async function loadLive() {
+     try {
+       var res = await fetch(API_BASE + '/api/golden-tips', { mode: 'cors', cache: 'no-store' });
+       var data = await res.json();
+       renderLiveTips(data);
+       window.setTimeout(loadLive, (data.refreshSeconds || 300) * 1000);
+     } catch (e) {
+       liveGrid.innerHTML = '<div class="live-empty"><h3>Live data unavailable</h3><p>Feed is warming up. Check again shortly.</p></div>';
+       window.setTimeout(loadLive, 2 * 60 * 1000);
+     }
+   }
+
+   alertToggle.addEventListener('click', async function() {
+     if (!('Notification' in window)) return updateAlertBtn();
+     if (Notification.permission === 'default') await Notification.requestPermission();
+     if (Notification.permission === 'granted') {
+       alertEnabled = !alertEnabled;
+       localStorage.setItem('wf-live-alerts', String(alertEnabled));
+     }
+     updateAlertBtn();
+   });
+
+   if (alertEnabled && 'Notification' in window && Notification.permission !== 'granted') {
+     alertEnabled = false;
+     localStorage.removeItem('wf-live-alerts');
+   }
+   updateAlertBtn();
+   loadLive();
+ })();
 </script>
+<script src="/pwa.js"></script>
+<script src="/responsible-gambling.js"></script>
 </body>
 </html>

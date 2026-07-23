@@ -101,7 +101,23 @@
    transition: transform 0.2s;
  }
  .retry-btn:hover { transform: scale(1.05); }
- </style>
+ 
+/* Hamburger menu — mobile */
+.hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 1001; }
+.hamburger span { display: block; width: 22px; height: 2px; background: var(--text-primary, #e8edf5); margin: 5px 0; transition: all 0.3s; border-radius: 2px; }
+.hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+.hamburger.active span:nth-child(2) { opacity: 0; }
+.hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+@media (max-width: 640px) {
+
+/* Hamburger visible + nav dropdown on mobile */
+.hamburger { display: block; }
+nav { display: none !important; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-primary, #181e30); border-bottom: 1px solid var(--border, rgba(255,255,255,0.06)); flex-direction: column; padding: 16px; gap: 12px; z-index: 1000; }
+nav.open { display: flex !important; }
+
+}
+</style>
 </head>
 <body>
  <div class="offline-icon">&#128268;</div>
@@ -120,5 +136,13 @@
  </div>
 
  <button class="retry-btn" onclick="location.reload()">Try Again</button>
+
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('nav')?.classList.toggle('open');
+});
+</script>
+
 </body>
 </html>

@@ -368,10 +368,34 @@ function checkWinningStreakDraw(match) {
 
   var streakTeam = null;
   var isHome = false;
-  if (streaks.home && !hasRedCards(match, true)) {
+  var homeQualifies = streaks.home && !hasRedCards(match, true);
+  var awayQualifies = streaks.away && !hasRedCards(match, false);
+
+  if (homeQualifies && awayQualifies) {
+    var homeLen = streaks.home.count;
+    var awayLen = streaks.away.count;
+    if (homeLen > awayLen) {
+      streakTeam = streaks.home;
+      isHome = true;
+    } else if (awayLen > homeLen) {
+      streakTeam = streaks.away;
+      isHome = false;
+    } else {
+      var stats = getStats(match);
+      var homeShots = stats ? asNumber((stats.homeTeam || {}).shotsOnGoal) : 0;
+      var awayShots = stats ? asNumber((stats.awayTeam || {}).shotsOnGoal) : 0;
+      if (homeShots >= awayShots) {
+        streakTeam = streaks.home;
+        isHome = true;
+      } else {
+        streakTeam = streaks.away;
+        isHome = false;
+      }
+    }
+  } else if (homeQualifies) {
     streakTeam = streaks.home;
     isHome = true;
-  } else if (streaks.away && !hasRedCards(match, false)) {
+  } else if (awayQualifies) {
     streakTeam = streaks.away;
     isHome = false;
   }
@@ -401,6 +425,9 @@ function checkHTOver15Streak(match) {
   var elapsed = asNumber(match.minute);
   if (elapsed > 30) return null;
 
+  var totalGoals = scoreTotal(match.score);
+  if (totalGoals === null || totalGoals >= 2) return null;
+
   var signalScore = Math.min(95, 62 + (streak.count - 5) * 1.5);
 
   return {
@@ -418,6 +445,9 @@ function checkHTOver05Streak(match) {
 
   var elapsed = asNumber(match.minute);
   if (elapsed > 35) return null;
+
+  var totalGoals = scoreTotal(match.score);
+  if (totalGoals === null || totalGoals >= 1) return null;
 
   var signalScore = Math.min(95, 58 + (streak.count - 5) * 1.5);
 
@@ -470,13 +500,9 @@ function buildGoldenTips(liveData) {
     var marketTip = pickBest(MARKET_RULES, match);
     var teamTip = pickBest(TEAM_RULES, match);
 
-    var kickoffTips = [];
-    KICKOFF_RULES.forEach(function (rule) {
-      var tip = rule(match);
-      if (tip) kickoffTips.push(tip);
-    });
+    var kickoffTip = pickBest(KICKOFF_RULES, match);
 
-    [marketTip, teamTip].concat(kickoffTips).forEach(function (tip) {
+    [marketTip, teamTip, kickoffTip].forEach(function (tip) {
       if (!tip) return;
       opportunities.push({
         fixtureId: match.matchId,

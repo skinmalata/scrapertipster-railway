@@ -5,7 +5,7 @@ const API_URL = 'https://www.h2hstats.net/wp-content/themes/h2hstats/lib/call.ph
 const STREAK_CACHE_TTL = 6 * 60 * 60 * 1000;
 
 let streakCache = null;
-let streakCacheDate = null;
+let streakCacheTime = null;
 
 function todayDateStr() {
   var d = new Date();
@@ -94,13 +94,13 @@ function parseAllStreaks(html, minStreak) {
 
 async function fetchTodayStreaks() {
   var today = todayDateStr();
-  if (streakCache && streakCacheDate === today) return streakCache;
+  if (streakCache && streakCacheTime && (Date.now() - streakCacheTime) < STREAK_CACHE_TTL) return streakCache;
 
   try {
     var params = { show_finished: 0, date: today, category: 'overview', filter: '', gmt: '0', sport: '1' };
     var res = await axios.get(API_URL, { params: params, timeout: 15000 });
     streakCache = parseAllStreaks(res.data, 5);
-    streakCacheDate = today;
+    streakCacheTime = Date.now();
     var counts = { win: 0, 'ht-over-1.5': 0, 'ht-over-0.5': 0, 'ht-draw': 0 };
     streakCache.forEach(function (m) {
       Object.keys(m.streaks).forEach(function (k) { counts[k] += m.streaks[k].length; });
@@ -163,7 +163,7 @@ function findMatchStreak(homeName, awayName, streakType) {
 }
 
 function getStreakData() {
-  return { matches: streakCache || [], date: streakCacheDate };
+  return { matches: streakCache || [], cachedAt: streakCacheTime };
 }
 
 module.exports = { fetchTodayStreaks, findStreakForTeam, findMatchStreak, getStreakData, normaliseName, parseAllStreaks };

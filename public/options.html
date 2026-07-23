@@ -32,7 +32,16 @@ header { background: rgba(24,30,48,0.85); backdrop-filter: blur(20px); -webkit-b
 .logo { display: flex; align-items: center; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
 .logo a { display: inline-flex; align-items: center; color: #ffffff; text-decoration: none; }
 .logo span { color: #ff7e7e; }
-@media (max-width: 640px) { .logo { font-size: 18px; } }
+@media (max-width: 640px) {
+.header-content { position: relative; }
+
+
+/* Hamburger visible + nav dropdown on mobile */
+.hamburger { display: block; }
+nav { display: none !important; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-primary, #181e30); border-bottom: 1px solid var(--border, rgba(255,255,255,0.06)); flex-direction: column; padding: 16px; gap: 12px; z-index: 1000; }
+nav.open { display: flex !important; }
+
+ .logo { font-size: 18px; } }
 .logo-text { font-size: 22px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; }
 .logo-text span { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .logo-icon { height: 28px; width: auto; flex-shrink: 0; margin-right: 8px; }
@@ -68,6 +77,13 @@ footer { background: var(--bg-secondary); border-top: 1px solid var(--border); p
  nav { gap: 12px; }
  nav a { font-size: 13px; }
 }
+
+/* Hamburger menu — mobile */
+.hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 1001; }
+.hamburger span { display: block; width: 22px; height: 2px; background: var(--text-primary, #e8edf5); margin: 5px 0; transition: all 0.3s; border-radius: 2px; }
+.hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+.hamburger.active span:nth-child(2) { opacity: 0; }
+.hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
 </style>
 
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6975707128100932" crossorigin="anonymous"></script>
@@ -78,15 +94,15 @@ footer { background: var(--bg-secondary); border-top: 1px solid var(--border); p
  <div class="logo">
  <a href="/"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a>
 </div>
- <nav>
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
+ 
+ <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+<nav id="nav">
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
  <a href="/blog/">Blog</a>
-
-<a href="/predictions/in-play">In-Play</a>
-<a href="/predictions/in-play">In-Play</a>
-  <a href="/options.html" class="active">Betting Guide</a>
- <a href="/contact.html">Contact</a>
+ <a href="/predictions/in-play">In-Play</a>
+ <a href="/options.html">Betting Guide</a>
+ <a href="/contact.html">Contact</a>
 </nav>
 </div>
 </header>
@@ -453,5 +469,13 @@ footer { background: var(--bg-secondary); border-top: 1px solid var(--border); p
 <script src="/chat-widget.js" async></script>
 
 <script src="/responsible-gambling.js"></script>
+
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('nav')?.classList.toggle('open');
+});
+</script>
+
 </body>
 </html>

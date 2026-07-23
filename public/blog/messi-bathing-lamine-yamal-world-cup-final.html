@@ -66,6 +66,24 @@
  .timeline-item { margin-bottom: 20px; }
  .timeline-date { font-weight: bold; color: #ff0000; }
  .quote-box { background: #f4f4f5; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #18181b; font-style: italic; }
+
+/* Hamburger menu — mobile */
+.hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 1001; }
+.hamburger span { display: block; width: 22px; height: 2px; background: var(--text-primary, #e8edf5); margin: 5px 0; transition: all 0.3s; border-radius: 2px; }
+.hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+.hamburger.active span:nth-child(2) { opacity: 0; }
+.hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+@media (max-width: 640px) {
+.header-content { position: relative; }
+
+
+/* Hamburger visible + nav dropdown on mobile */
+.hamburger { display: block; }
+nav { display: none !important; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-primary, #181e30); border-bottom: 1px solid var(--border, rgba(255,255,255,0.06)); flex-direction: column; padding: 16px; gap: 12px; z-index: 1000; }
+nav.open { display: flex !important; }
+
+}
 </style>
  <meta name="twitter:card" content="summary_large_image">
  <meta name="twitter:title" content="Messi Bathed Baby Lamine Yamal in 2007 — Now They Meet in the World Cup Final">
@@ -114,14 +132,14 @@
  <header>
  <div class="header-content">
  <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a>
- <nav>
+ 
+ <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+<nav id="nav">
  <a href="/">Home</a>
  <a href="/ticket-builder.html">Ticket Builder</a>
  <a href="/blog/">Blog</a>
-
-<a href="/predictions/in-play">In-Play</a>
-<a href="/predictions/in-play">In-Play</a>
-  <a href="/contact.html">Contact</a>
+ <a href="/predictions/in-play">In-Play</a>
+ <a href="/contact.html">Contact</a>
 </nav>
 </div>
 </header>
@@ -280,5 +298,13 @@
 <script src="/chat-widget.js" async></script>
 
 <script src="/responsible-gambling.js"></script>
+
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('nav')?.classList.toggle('open');
+});
+</script>
+
 </body>
 </html>
