@@ -10,8 +10,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger daily ticket send
-        run: |
-          curl -s -X POST \
-            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
-            -H "Content-Type: application/json" \
-            "${{ secrets.RENDER_URL }}/api/newsletter/daily-send"
+        run: curl -s -X POST -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" -H "Content-Type: application/json" "${{ secrets.RENDER_URL }}/api/newsletter/daily-send"
