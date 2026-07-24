@@ -290,7 +290,10 @@ gtag('config', 'G-HMGZMW9EDP');
     <div><label for="htbMax">Max / Leg</label><input type="number" id="htbMax" value="3.00" step="any"></div>
    </div>
    <div class="htb-toggle"><input type="checkbox" id="htbToday" checked><label for="htbToday">Today only</label></div>
-   <button class="htb-btn" id="htbGenerate">Build Ticket</button>
+   <div class="htb-btn-row">
+    <button class="htb-btn" id="htbGenerate">Build Ticket</button>
+    <button class="htb-btn htb-btn-shuffle" id="htbShuffle" disabled>Shuffle</button>
+   </div>
   </div>
   <div id="htbResult"></div>
  </div>
@@ -310,9 +313,16 @@ gtag('config', 'G-HMGZMW9EDP');
   .htb-toggle{display:flex;align-items:center;gap:10px}
   .htb-toggle input[type=checkbox]{accent-color:#ff2448;width:16px;height:16px}
   .htb-toggle label{font-size:13px;color:rgba(232,237,245,.65);cursor:pointer;margin:0}
-  .htb-btn{background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;border:none;padding:12px 24px;border-radius:10px;font-size:15px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:transform .2s,box-shadow .3s;letter-spacing:.3px;width:100%}
-  .htb-btn:hover{transform:translateY(-1px);box-shadow:0 8px 30px rgba(255,36,72,.3)}
-  .htb-btn:active{transform:translateY(0)}
+  .htb-btn-row{display:flex;gap:10px}
+  .htb-btn{background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;border:none;padding:12px 24px;border-radius:10px;font-size:15px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:transform .2s,box-shadow .3s;letter-spacing:.3px;flex:1}
+  .htb-btn-shuffle{background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.04));font-size:13px;padding:12px 16px;flex:0 0 auto;min-width:100px}
+  .htb-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 30px rgba(255,36,72,.3)}
+  .htb-btn:active:not(:disabled){transform:translateY(0)}
+  .htb-btn:disabled{opacity:.4;cursor:not-allowed}
+  .htb-loading{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 0}
+  .htb-loading .htb-spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,.06);border-top-color:#ff2448;border-radius:50%;animation:htbSpin .8s linear infinite}
+  .htb-loading .htb-loading-text{font-size:13px;color:rgba(232,237,245,.45)}
+  @keyframes htbSpin{to{transform:rotate(360deg)}}
   #htbResult .htb-ticket{background:rgba(21,26,44,.7);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px;margin-top:16px}
   #htbResult .htb-ticket-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
   #htbResult .htb-ticket-odds{font-size:22px;font-weight:800;background:linear-gradient(135deg,#4ade80,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -324,7 +334,8 @@ gtag('config', 'G-HMGZMW9EDP');
   #htbResult .htb-empty{text-align:center;padding:16px;color:rgba(232,237,245,.35);font-size:13px}
   #htbResult .htb-full{display:block;text-align:center;margin-top:12px;font-size:13px;font-weight:600;color:#ff2448;text-decoration:none}
   #htbResult .htb-full:hover{text-decoration:underline}
-  @media(max-width:640px){.htb-row{flex-direction:column;gap:10px}.home-ticket-builder{padding:20px 16px;margin:24px 12px}}
+  #htbResult .htb-stale{background:rgba(255,200,0,.08);border:1px solid rgba(255,200,0,.15);border-radius:8px;padding:10px 14px;margin-top:12px;font-size:12px;color:rgba(255,200,0,.8);line-height:1.5}
+  @media(max-width:640px){.htb-row{flex-direction:column;gap:10px}.home-ticket-builder{padding:20px 16px;margin:24px 12px}.htb-btn-row{flex-direction:column}}
  </style>
 
  <!-- Streak Buttons -->
@@ -1426,24 +1437,84 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
 <script>
 (function(){
+  var lastPicks=null,lastOddsData=null,lastTarget=5,lastMinOdds=1.20;
+
   function esc(v){return String(v||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 
-  document.getElementById('htbGenerate').addEventListener('click',async function(){
+  function normaliseTeam(v){return String(v||'').toLowerCase().replace(/\b(fc|afc|cf|the)\b/g,'').replace(/[^a-z0-9]/g,' ').replace(/\s+/g,' ').trim()}
+  function matchIdentity(v){var teams=String(v||'').split(/\s+(?:-|vs)\s+/i).map(normaliseTeam).filter(Boolean);return teams.length===2?teams.sort().join('|'):normaliseTeam(v)}
+
+  function shuffleArray(arr){for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=arr[i];arr[i]=arr[j];arr[j]=t}return arr}
+
+  function findLiveOdd(matchName,category,tip){
+    if(!lastOddsData||!lastOddsData.available||!Array.isArray(lastOddsData.response))return null;
+    var teams=String(matchName||'').split(/\s+-\s+/);
+    if(teams.length!==2)return null;
+    var home=normaliseTeam(teams[0]),away=normaliseTeam(teams[1]);
+    var fixture=lastOddsData.response.find(function(item){
+      return normaliseTeam(item.teams&&item.teams.home&&item.teams.home.name)===home&&normaliseTeam(item.teams&&item.teams.away&&item.teams.away.name)===away});
+    if(!fixture)return null;
+    var tipValue=String(tip||'').trim(),marketNames=[],acceptableValues=[];
+    if(category==='1X2'){marketNames=['match winner'];if(tipValue==='1')acceptableValues=['1','home',teams[0]];if(tipValue==='X')acceptableValues=['x','draw'];if(tipValue==='2')acceptableValues=['2','away',teams[1]]}
+    else if(category==='Double Chance'){marketNames=['double chance'];if(tipValue==='1X')acceptableValues=['1x','home/draw','home or draw'];if(tipValue==='X2')acceptableValues=['x2','away/draw','away or draw'];if(tipValue==='12')acceptableValues=['12','home/away','home or away']}
+    else if(/^Over\s+[0-9.]+$/i.test(tipValue)||/^Under\s+[0-9.]+$/i.test(tipValue)){marketNames=['goals over/under','over/under'];acceptableValues=[tipValue]}
+    else if(category==='BTTS YES'||category==='BTTS NO'){marketNames=['both teams score','both teams to score'];acceptableValues=[category==='BTTS YES'?'yes':'no']}
+    else return null;
+    var bookmakers=Array.isArray(fixture.bookmakers)?fixture.bookmakers:[];
+    for(var b=0;b<bookmakers.length;b++){var bets=Array.isArray(bookmakers[b].bets)?bookmakers[b].bets:[];for(var bt=0;bt<bets.length;bt++){if(!marketNames.includes(String(bets[bt].name||'').toLowerCase()))continue;var vals=Array.isArray(bets[bt].values)?bets[bt].values:[];for(var vi=0;vi<vals.length;vi++){if(acceptableValues.some(function(a){return normaliseTeam(vals[vi].value)===normaliseTeam(a)})){var odds=Number.parseFloat(vals[vi].odd);if(Number.isFinite(odds)&&odds>1)return{odds:Number(odds.toFixed(2)),bookmaker:bookmakers[b].name||'API-Football'}}}}}
+    return null;
+  }
+
+  function renderTicket(best,totalOdds,staleNote){
+    var legs=best.map(function(s,i){
+      return '<div class="htb-leg"><strong>'+(i+1)+'. '+esc(s.match)+'</strong> <span class="htb-tip">'+esc(s.tip)+'</span><br><span style="font-size:11px;color:rgba(232,237,245,.45)">'+esc(s.league)+' | '+esc(s.category)+' | '+s.odds.toFixed(2)+'</span></div>'
+    }).join('');
+    var staleHtml=staleNote?'<div class="htb-stale">'+esc(staleNote)+'</div>':'';
+    return '<div class="htb-ticket"><div class="htb-ticket-head"><span class="htb-ticket-label">'+best.length+'-Leg Accumulator</span><span class="htb-ticket-odds">'+totalOdds.toFixed(2)+' odds</span></div>'+legs+staleHtml+'<a href="/ticket-builder.html" class="htb-full">Build more tickets &rarr;</a></div>';
+  }
+
+  function buildTicket(picks,target,shuffle){
+    if(shuffle)picks=shuffleArray(picks.slice());
+    else picks=picks.slice();
+    picks.sort(function(a,b){
+      var aFit=Infinity,bFit=Infinity;
+      for(var lc=2;lc<=8;lc++){aFit=Math.min(aFit,Math.abs(Math.log(a.odds)-Math.log(target)/lc));bFit=Math.min(bFit,Math.abs(Math.log(b.odds)-Math.log(target)/lc))}
+      return aFit-bFit||b.prob-a.prob});
+    var best=[];var used=new Set();
+    var minOdds=target*0.8,maxOdds=target*1.2;
+    for(var i=0;i<picks.length&&best.length<3;i++){
+      var p=picks[i];var mid=matchIdentity(p.match);
+      if(used.has(mid))continue;used.add(mid);
+      var tentative=best.concat([p]);var prod=tentative.reduce(function(t,s){return t*s.odds},1);
+      if(prod>maxOdds)break;
+      best.push(p);
+      if(prod>=minOdds)break;
+    }
+    if(!best.length)return null;
+    var totalOdds=best.reduce(function(t,s){return t*s.odds},1);
+    return{best:best,totalOdds:totalOdds};
+  }
+
+  async function generate(shuffle){
     var target=parseFloat(document.getElementById('htbTarget').value);
     var minO=parseFloat(document.getElementById('htbMin').value);
     var maxO=parseFloat(document.getElementById('htbMax').value);
     var todayOnly=document.getElementById('htbToday').checked;
     var res=document.getElementById('htbResult');
+    var shuffleBtn=document.getElementById('htbShuffle');
     if(!Number.isFinite(target)||target<=1||!Number.isFinite(minO)||minO<=1||!Number.isFinite(maxO)||maxO<minO){res.innerHTML='<div class="htb-empty">Enter valid odds values.</div>';return}
     if(target>5){res.innerHTML='<div class="htb-empty">For targets above 5 odds, use the <a href="/ticket-builder.html" class="htb-full">full ticket builder</a>.</div>';return}
-    res.innerHTML='<div class="htb-empty">Loading predictions...</div>';
+    res.innerHTML='<div class="htb-loading"><div class="htb-spinner"></div><div class="htb-loading-text">Building ticket...</div></div>';
     try{
       var r=await fetch('/data/predictions.json',{cache:'no-store'});
       if(!r.ok)throw new Error('Failed to load');
       var data=await r.json();
       var today=new Date().toISOString().split('T')[0];
-      var todayMatches=todayOnly&&data.date===today;
-      var cats=[['matches','1X2'],['over15Matches','Over 1.5'],['over25Matches','Over 2.5'],['bttsMatches','BTTS YES'],['bttsNoMatches','BTTS NO'],['teamToScore2PlusMatches','To Score 2+']];
+      var staleNote=null;
+      if(!todayOnly&&data.date&&data.date!==today){staleNote='Showing predictions from '+data.date+'. Today\'s data is not yet available.'}
+      var dataDate=data.date||'';
+      try{var oRes=await fetch('/api/football-odds?date='+encodeURIComponent(dataDate||today),{cache:'no-store'});lastOddsData=oRes.ok?await oRes.json():null}catch(e){lastOddsData=null}
+      var cats=[['matches','1X2'],['over15Matches','Over 1.5'],['over25Matches','Over 2.5'],['bttsMatches','BTTS YES'],['bttsNoMatches','BTTS NO'],['cornersMatches','Corners'],['cardsMatches','Cards'],['teamToScore2PlusMatches','To Score 2+'],['winstreakMatches','Win Streak'],['losestreakMatches','Loss Streak'],['drawstreakMatches','Draw Streak']];
       var seen=new Set();
       var picks=[];
       cats.forEach(function(c){
@@ -1453,29 +1524,46 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
           if(todayOnly&&m.date!==today)return;
           var prob=Number(m.probability??m.confidence);
           if(!Number.isFinite(prob)||prob<40)return;
-          var odds=Number(((100/prob)/1.05).toFixed(2));
-          if(odds<minO||odds>maxO)return;
           var isDC=c[1]==='1X2'&&/^(1X|X2|12)$/.test(String(m.tip).trim());
           var cat=isDC?'Double Chance':c[1];
-          var key=match+'|'+m.tip+'|'+m.date;
+          var liveOdd=findLiveOdd(match,cat,m.tip);
+          var odds=liveOdd?liveOdd.odds:Number(((100/prob)/1.05).toFixed(2));
+          if(odds<minO||odds>maxO)return;
+          var key=matchIdentity(match)+'|'+normaliseTeam(m.tip)+'|'+m.date;
           if(seen.has(key))return;
           seen.add(key);
-          picks.push({match:match,tip:m.tip,odds:odds,prob:prob,date:m.date,time:m.time||'',league:m.league||'',category:cat});
+          picks.push({match:match,tip:m.tip,odds:odds,prob:prob,date:m.date,time:m.time||'',league:m.league||'',category:cat,oddsSource:liveOdd?'API-Football':'Estimated'});
         });
       });
-      if(!picks.length){res.innerHTML='<div class="htb-empty">No qualifying picks. <a href="/ticket-builder.html" class="htb-full">Try the full builder</a></div>';return}
-      picks.sort(function(a,b){return b.prob-a.prob||b.odds-a.odds});
-      var best=[];
-      var used=new Set();
-      for(var i=0;i<picks.length&&best.length<3;i++){
-        var p=picks[i];
-        if(!used.has(p.match)){used.add(p.match);best.push(p)}
+      var todayMatches=(dataDate===today);
+      if(!todayOnly&&!todayMatches){
+        var ubRes=null;try{ubRes=await fetch('/data/h2h-unbeaten.json',{cache:'no-store'})}catch(e){}
+        if(ubRes&&ubRes.ok){var ubData=await ubRes.json();var unbeatenMatches=(ubData.dates&&ubData.dates[today])||[];
+          (unbeatenMatches||[]).forEach(function(m){
+            if(!m.match||!m.streaks)return;
+            m.streaks.forEach(function(s){
+              var tipText=s.team+' or Draw';
+              var ubProb=Math.min(85,Math.max(42,50+s.count*2));
+              var ubOdds=Number(((100/ubProb)/1.05).toFixed(2));
+              if(ubOdds<minO||ubOdds>maxO)return;
+              var key=matchIdentity(m.match)+'|'+normaliseTeam(tipText)+'|'+today;
+              if(seen.has(key))return;seen.add(key);
+              picks.push({match:m.match,tip:tipText,odds:ubOdds,prob:ubProb,date:today,time:m.time||'',league:m.league||'',category:'Unbeaten',oddsSource:'Estimated'});
+            });
+          });
+        }
       }
-      var totalOdds=best.reduce(function(t,s){return t*s.odds},1);
-      var legs=best.map(function(s,i){return '<div class="htb-leg"><strong>'+(i+1)+'. '+esc(s.match)+'</strong> <span class="htb-tip">'+esc(s.tip)+'</span><br><span style="font-size:11px;color:rgba(232,237,245,.45)">'+esc(s.league)+' | '+esc(s.category)+' | '+s.odds.toFixed(2)+'</span></div>'}).join('');
-      res.innerHTML='<div class="htb-ticket"><div class="htb-ticket-head"><span class="htb-ticket-label">3-Leg Accumulator</span><span class="htb-ticket-odds">'+totalOdds.toFixed(2)+' odds</span></div>'+legs+'<a href="/ticket-builder.html" class="htb-full">Build more tickets &rarr;</a></div>';
-    }catch(e){res.innerHTML='<div class="htb-empty">Unable to load predictions. <a href="/ticket-builder.html" class="htb-full">Try the full builder</a></div>'}
-  });
+      if(!picks.length){res.innerHTML='<div class="htb-empty">No qualifying picks. <a href="/ticket-builder.html" class="htb-full">Try the full builder</a></div>';shuffleBtn.disabled=true;return}
+      lastPicks=picks;lastTarget=target;lastMinOdds=minO;
+      var result=buildTicket(picks,target,shuffle);
+      if(!result){res.innerHTML='<div class="htb-empty">No valid ticket found. Try adjusting odds range. <a href="/ticket-builder.html" class="htb-full">Full builder</a></div>';shuffleBtn.disabled=true;return}
+      res.innerHTML=renderTicket(result.best,result.totalOdds,staleNote);
+      shuffleBtn.disabled=false;
+    }catch(e){res.innerHTML='<div class="htb-empty">Unable to load predictions. <a href="/ticket-builder.html" class="htb-full">Try the full builder</a></div>';shuffleBtn.disabled=true}
+  }
+
+  document.getElementById('htbGenerate').addEventListener('click',function(){generate(false)});
+  document.getElementById('htbShuffle').addEventListener('click',function(){if(lastPicks)generate(true)});
 })();
 </script>
 
