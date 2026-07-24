@@ -80,6 +80,12 @@ function prune() {
   if (changed) saveHistory();
 }
 
+// Clear the daily record even if no visitor loads the history endpoint after
+// midnight. Calls to the public methods also prune, so this is a safeguard
+// rather than the only cleanup path.
+const dailyPruneTimer = setInterval(prune, 60 * 1000);
+if (typeof dailyPruneTimer.unref === 'function') dailyPruneTimer.unref();
+
 function recordTips(opportunities, issuedAt) {
   prune();
   const day = dayKey(issuedAt), tips = tipsByDay.get(day) || new Map();
@@ -119,15 +125,9 @@ function getTodayTips() {
   prune();
   const tips = tipsByDay.get(dayKey());
   if (!tips) return [];
-  const uniqueTips = new Map();
-  tips.forEach(function(tip) {
-    const key = String(tip.fixtureId) + '|' + String(tip.market || '').toLowerCase();
-    const existing = uniqueTips.get(key);
-    // Preserve the first published tip for a market, unless a later duplicate
-    // is the one that has already been settled.
-    if (!existing || (existing.outcome === 'pending' && tip.outcome !== 'pending')) uniqueTips.set(key, tip);
-  });
-  return Array.from(uniqueTips.values()).sort(function(a, b) { return new Date(b.issuedAt) - new Date(a.issuedAt); });
+  // Each stored rule is a published tip. Do not collapse different rules that
+  // happen to recommend the same market for the same fixture.
+  return Array.from(tips.values()).sort(function(a, b) { return new Date(b.issuedAt) - new Date(a.issuedAt); });
 }
 
 loadHistory();
