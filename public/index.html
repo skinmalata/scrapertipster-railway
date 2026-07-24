@@ -285,7 +285,7 @@ gtag('config', 'G-HMGZMW9EDP');
   <p class="htb-desc">Combine predictions into an accumulator at your target odds.</p>
   <div class="htb-form">
    <div class="htb-row">
-    <div><label for="htbTarget">Target Odds</label><input type="number" id="htbTarget" value="20" step="any"></div>
+    <div><label for="htbTarget">Target Odds</label><input type="number" id="htbTarget" value="5" step="any" max="5"></div>
     <div><label for="htbMin">Min / Leg</label><input type="number" id="htbMin" value="1.20" step="any"></div>
     <div><label for="htbMax">Max / Leg</label><input type="number" id="htbMax" value="3.00" step="any"></div>
    </div>
@@ -1435,6 +1435,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     var todayOnly=document.getElementById('htbToday').checked;
     var res=document.getElementById('htbResult');
     if(!Number.isFinite(target)||target<=1||!Number.isFinite(minO)||minO<=1||!Number.isFinite(maxO)||maxO<minO){res.innerHTML='<div class="htb-empty">Enter valid odds values.</div>';return}
+    if(target>5){res.innerHTML='<div class="htb-empty">For targets above 5 odds, use the <a href="/ticket-builder.html" class="htb-full">full ticket builder</a>.</div>';return}
     res.innerHTML='<div class="htb-empty">Loading predictions...</div>';
     try{
       var r=await fetch('/data/predictions.json',{cache:'no-store'});
