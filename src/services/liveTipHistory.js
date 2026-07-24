@@ -56,6 +56,16 @@ function outcomeForFinal(tip, score) {
   return null;
 }
 
+function cornerOutcome(tip, corners) {
+  const over = String(tip.market || '').match(/^Over\s+(\d+(?:\.\d+)?)\s+Match Corners$/i);
+  if (!over || !Number.isFinite(Number(corners))) return null;
+  return Number(corners) > Number(over[1]) ? 'won' : null;
+}
+
+function isCornerMarket(tip) {
+  return /^Over\s+\d+(?:\.\d+)?\s+Match Corners$/i.test(tip.market || '');
+}
+
 function resolveNextGoal(tip, score, final) {
   if (!/\s+to Score Next$/i.test(tip.market || '')) return null;
   const homeIncrease = number(score && score.home) - number(tip.scoreAtTip && tip.scoreAtTip.home);
@@ -93,7 +103,7 @@ function recordTips(opportunities, issuedAt) {
     const id = String(tip.fixtureId) + '|' + String(tip.rule);
     if (tips.has(id)) return;
     const score = String(tip.score || '0 - 0').match(/(\d+)\s*-\s*(\d+)/);
-    tips.set(id, { id: id, fixtureId: String(tip.fixtureId), home: tip.home, away: tip.away, league: tip.league, minute: tip.minute, scoreAtTip: { home: score ? Number(score[1]) : 0, away: score ? Number(score[2]) : 0 }, market: tip.market, rule: tip.rule, signalScore: tip.signalScore, issuedAt: issuedAt || new Date().toISOString(), outcome: 'pending', finalScore: null, resolvedAt: null });
+    tips.set(id, { id: id, fixtureId: String(tip.fixtureId), home: tip.home, away: tip.away, league: tip.league, minute: tip.minute, scoreAtTip: { home: score ? Number(score[1]) : 0, away: score ? Number(score[2]) : 0 }, cornersAtTip: Number.isFinite(Number(tip.cornerCount)) ? Number(tip.cornerCount) : null, market: tip.market, rule: tip.rule, signalScore: tip.signalScore, issuedAt: issuedAt || new Date().toISOString(), outcome: 'pending', finalScore: null, resolvedAt: null });
   });
   tipsByDay.set(day, tips);
   saveHistory();
@@ -107,11 +117,15 @@ function settleTips(liveMatches, dailyResults) {
   tips.forEach(function(tip) {
     if (tip.outcome !== 'pending') return;
     const live = liveById.get(tip.fixtureId), result = dailyResults && dailyResults.get(tip.fixtureId);
-    let outcome = live ? resolveNextGoal(tip, live.score, false) : null;
+    let outcome = live ? (resolveNextGoal(tip, live.score, false) || cornerOutcome(tip, live.corners)) : null;
     let score = live && live.score;
     if (!outcome && result && result.finished) {
       score = result.score;
-      outcome = resolveNextGoal(tip, score, true) || outcomeForFinal(tip, score) || 'unresolved';
+      outcome = resolveNextGoal(tip, score, true)
+        || cornerOutcome(tip, result.corners)
+        || outcomeForFinal(tip, score);
+      if (!outcome && isCornerMarket(tip) && Number.isFinite(Number(result.corners))) outcome = 'lost';
+      if (!outcome) outcome = 'unresolved';
     }
     if (!outcome) return;
     tip.outcome = outcome;
@@ -130,6 +144,15 @@ function getTodayTips() {
   return Array.from(tips.values()).sort(function(a, b) { return new Date(b.issuedAt) - new Date(a.issuedAt); });
 }
 
+function getPendingCornerFixtureIds() {
+  prune();
+  const tips = tipsByDay.get(dayKey());
+  if (!tips) return [];
+  return Array.from(new Set(Array.from(tips.values())
+    .filter(function(tip) { return tip.outcome === 'pending' && isCornerMarket(tip) && tip.fixtureId; })
+    .map(function(tip) { return tip.fixtureId; })));
+}
+
 loadHistory();
 
-module.exports = { recordTips, settleTips, getTodayTips };
+module.exports = { recordTips, settleTips, getTodayTips, getPendingCornerFixtureIds };

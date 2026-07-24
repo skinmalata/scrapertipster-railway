@@ -21,6 +21,10 @@ function getMatchStreak(match, streakType) {
   return match.matchStreaks[streakType] || null;
 }
 
+function getCornerContext(match) {
+  return match.cornerContext || null;
+}
+
 function hasRedCards(match, isHome) {
   if (!match.redCards) return false;
   return isHome ? match.redCards.home > 0 : match.redCards.away > 0;
@@ -395,8 +399,52 @@ function checkH2HDrawWinner(match) {
   };
 }
 
+function checkCornerPressure(match) {
+  var stats = getStats(match);
+  var context = getCornerContext(match);
+  if (!stats || !context || !context.h2h || !context.recent) return null;
+
+  var elapsed = asNumber(match.minute);
+  if (elapsed < 20 || elapsed > 75) return null;
+
+  var total = stats.total || {};
+  var currentCorners = asNumber(total.corners);
+  var totalShots = asNumber(total.totalShots) || asNumber(total.shotsOnGoal) + asNumber(total.shotsOffGoal);
+  var cornerRate = elapsed ? currentCorners / elapsed : 0;
+  var h2hCorners = asNumber(context.h2h.average);
+  var homeRecent = asNumber(context.recent.home && context.recent.home.average);
+  var awayRecent = asNumber(context.recent.away && context.recent.away.average);
+
+  // Require all three evidence groups: current pressure, direct-meeting
+  // history, and each team's recent corner environment.
+  if (context.h2h.sample < 2 || context.recent.home.sample < 2 || context.recent.away.sample < 2) return null;
+  if (currentCorners < 3 || totalShots < 7 || cornerRate < 0.07) return null;
+  if (h2hCorners < 8 || homeRecent < 8 || awayRecent < 8) return null;
+
+  // Pace can spike early, so blend it with the historical corner environment
+  // instead of projecting the raw rate through to full time.
+  var historicalAverage = (h2hCorners + homeRecent + awayRecent) / 3;
+  var paceAdditional = Math.round(cornerRate * (90 - elapsed) * 0.5);
+  var historicalHeadroom = Math.max(2, Math.round(historicalAverage - currentCorners));
+  var projectedAdditional = Math.max(2, Math.min(paceAdditional, historicalHeadroom));
+  var line = currentCorners + projectedAdditional - 0.5;
+  var signalScore = Math.min(95, 48 + currentCorners * 2 + totalShots * 0.7 + Math.min(8, cornerRate * 90) * 2 +
+    (h2hCorners - 8) * 1.2 + (homeRecent + awayRecent - 16) * 0.8);
+
+  return {
+    category: 'corners',
+    rule: 'corner-pressure-history',
+    market: 'Over ' + line.toFixed(1) + ' Match Corners',
+    signalScore: Math.round(signalScore),
+    cornerCount: currentCorners,
+    reason: currentCorners + ' corners by minute ' + elapsed + ' (' + (cornerRate * 90).toFixed(1) + ' per 90) with ' + totalShots +
+      ' total shots. H2H averages ' + h2hCorners.toFixed(1) + ' corners; recent team averages are ' + homeRecent.toFixed(1) + ' and ' + awayRecent.toFixed(1) + '.'
+  };
+}
+
 var MARKET_RULES = [checkLateGoalStorm, checkBTTSPressure, checkHighVolumeNoGoal, checkGoalFest];
 var TEAM_RULES = [checkDominantPressure, checkComebackMomentum, checkSecondHalfPush, checkH2HDrawWinner];
+var CORNER_RULES = [checkCornerPressure];
 
 function checkHTOver15Streak(match) {
   var streak = getMatchStreak(match, 'ht-over-1.5');
@@ -483,10 +531,11 @@ function buildGoldenTips(liveData) {
     if ((elapsed > 30 && elapsed < 60) || elapsed > 75) return;
     var marketTip = pickBest(MARKET_RULES, match);
     var teamTip = pickBest(TEAM_RULES, match);
+    var cornerTip = pickBest(CORNER_RULES, match);
 
     var kickoffTip = pickBest(KICKOFF_RULES, match);
 
-    [marketTip, teamTip, kickoffTip].forEach(function (tip) {
+    [marketTip, teamTip, cornerTip, kickoffTip].forEach(function (tip) {
       if (!tip) return;
       opportunities.push({
         fixtureId: match.matchId,
@@ -501,6 +550,7 @@ function buildGoldenTips(liveData) {
         rule: tip.rule,
         market: tip.market,
         signalScore: tip.signalScore,
+        cornerCount: tip.cornerCount,
         reason: tip.reason,
         edge: null
       });
@@ -533,5 +583,6 @@ module.exports = {
   checkH2HDrawWinner,
   checkHTOver15Streak,
   checkHTOver05Streak,
-  checkHTDrawStreak
+  checkHTDrawStreak,
+  checkCornerPressure
 };

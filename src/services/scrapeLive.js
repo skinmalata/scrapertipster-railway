@@ -1,7 +1,7 @@
 const https = require('https');
 const { fetchTodayStreaks, findStreakForTeam, findMatchStreak } = require('./h2hWinningStreaks');
 const { buildGoldenTips } = require('./goldenOpportunities');
-const { recordTips, settleTips } = require('./liveTipHistory');
+const { recordTips, settleTips, getPendingCornerFixtureIds } = require('./liveTipHistory');
 
 const SCRAPE_INTERVAL_MS = 5 * 60 * 1000;
 const FOTMOB_STATS_DELAY_MS = 200;
@@ -9,11 +9,15 @@ const MAX_FOTMOB_DETAIL_MATCHES = 20;
 const MAX_FORM_MATCHES_PER_CYCLE = 4;
 const HTTP_TIMEOUT_MS = 8000;
 const TEAM_FORM_CACHE_MS = 6 * 60 * 60 * 1000;
+const CORNER_HISTORY_CACHE_MS = 24 * 60 * 60 * 1000;
+const MAX_CORNER_CONTEXT_MATCHES = 2;
+const MAX_CORNER_HISTORY_FIXTURES = 2;
 
 let liveCache = null;
 let isScraping = false;
 let scrapeTimer = null;
 const teamFormCache = new Map();
+const cornerHistoryCache = new Map();
 let dailyMatchResults = new Map();
 
 function todayStr() {
@@ -156,7 +160,8 @@ function extractH2H(matchDetails) {
     homeWinPct: Math.round((homeWins / total) * 100),
     awayWinPct: Math.round((awayWins / total) * 100),
     drawPct: Math.round((draws / total) * 100),
-    recentCount: pastMatches.length
+    recentCount: pastMatches.length,
+    fixtures: pastMatches.map(function(match) { return match.id || match.matchId || match.fixture && match.fixture.id; }).filter(Boolean)
   };
 }
 
@@ -179,6 +184,47 @@ async function fetchFotMobMatchDetails(matchId) {
     h2h: extractH2H(res.data),
     redCards: extractRedCards(res.data)
   };
+}
+
+async function fetchHistoricalCornerTotal(matchId) {
+  if (!matchId) return null;
+  var cached = cornerHistoryCache.get(String(matchId));
+  if (cached && Date.now() - cached.createdAt < CORNER_HISTORY_CACHE_MS) return cached.total;
+  var details = await fetchFotMobMatchDetails(matchId).catch(function() { return null; });
+  var total = details && details.stats && details.stats.total ? Number(details.stats.total.corners) : null;
+  total = Number.isFinite(total) ? total : null;
+  cornerHistoryCache.set(String(matchId), { createdAt: Date.now(), total: total });
+  return total;
+}
+
+async function enrichFinishedCornerResults() {
+  var fixtureIds = getPendingCornerFixtureIds();
+  for (var i = 0; i < fixtureIds.length; i++) {
+    var result = dailyMatchResults.get(fixtureIds[i]);
+    if (!result || !result.finished) continue;
+    var corners = await fetchHistoricalCornerTotal(fixtureIds[i]);
+    if (corners !== null) result.corners = corners;
+  }
+}
+
+async function averageHistoricalCorners(fixtureIds) {
+  var ids = (fixtureIds || []).slice(0, MAX_CORNER_HISTORY_FIXTURES);
+  if (!ids.length) return null;
+  var totals = [];
+  for (var i = 0; i < ids.length; i++) {
+    var total = await fetchHistoricalCornerTotal(ids[i]);
+    if (total !== null) totals.push(total);
+  }
+  if (!totals.length) return null;
+  return { sample: totals.length, average: totals.reduce(function(sum, total) { return sum + total; }, 0) / totals.length };
+}
+
+async function attachCornerContext(match) {
+  if (!match || !match.h2h || !match.h2h.fixtures || !match.recentForm) return;
+  var h2h = await averageHistoricalCorners(match.h2h.fixtures);
+  var home = await averageHistoricalCorners(match.recentForm.home && match.recentForm.home.fixtureIds);
+  var away = await averageHistoricalCorners(match.recentForm.away && match.recentForm.away.fixtureIds);
+  if (h2h && home && away) match.cornerContext = { h2h: h2h, recent: { home: home, away: away } };
 }
 
 function scoreFromFixture(fixture) {
@@ -205,7 +251,7 @@ function fixtureArrays(value, found) {
 function extractRecentForm(teamData, teamId) {
   var lists = fixtureArrays(teamData && teamData.fixtures, []);
   var fixtures = lists.sort(function(a, b) { return b.length - a.length; })[0] || [];
-  var results = [];
+  var results = [], fixtureIds = [];
 
   fixtures.forEach(function(fixture) {
     if (results.length >= 5 || !fixture || !fixture.status || !fixture.status.finished) return;
@@ -217,11 +263,13 @@ function extractRecentForm(teamData, teamId) {
     var goalsFor = isHome ? score.home : score.away;
     var goalsAgainst = isHome ? score.away : score.home;
     results.push(goalsFor > goalsAgainst ? 'W' : (goalsFor === goalsAgainst ? 'D' : 'L'));
+    var fixtureId = fixture.id || fixture.matchId || fixture.fixture && fixture.fixture.id;
+    if (fixtureId) fixtureIds.push(fixtureId);
   });
 
   if (results.length < 5) return null;
   var points = results.reduce(function(total, result) { return total + (result === 'W' ? 3 : (result === 'D' ? 1 : 0)); }, 0);
-  return { matches: results.length, points: points, sequence: results.join('') };
+  return { matches: results.length, points: points, sequence: results.join(''), fixtureIds: fixtureIds };
 }
 
 async function fetchTeamRecentForm(teamId) {
@@ -261,6 +309,7 @@ async function scrapeLive() {
 
   try {
     var matches = await fetchFotMobLive();
+    await enrichFinishedCornerResults();
     if (!matches.length) {
       liveCache = { fetchedAt: new Date().toISOString(), matchCount: 0, matches: [] };
       settleTips([], dailyMatchResults);
@@ -294,6 +343,14 @@ async function scrapeLive() {
       if (forms[0] || forms[1]) match.recentForm = { home: forms[0], away: forms[1] };
     }));
 
+    // Corner history is deliberately narrow and cached. It supplements live
+    // pressure only when two recent fixtures per side and direct meetings are
+    // available, avoiding speculative corner recommendations.
+    var cornerMatches = formMatches.filter(function(match) { return match.h2h && match.h2h.fixtures; }).slice(0, MAX_CORNER_CONTEXT_MATCHES);
+    for (var cornerIndex = 0; cornerIndex < cornerMatches.length; cornerIndex++) {
+      await attachCornerContext(cornerMatches[cornerIndex]).catch(function() {});
+    }
+
     var withStats = matches.filter(function (m) { return m.fotmobStats; }).length;
     var withH2h = matches.filter(function (m) { return m.h2h; }).length;
     var withForm = matches.filter(function (m) { return m.recentForm && m.recentForm.home && m.recentForm.away; }).length;
@@ -318,6 +375,7 @@ async function scrapeLive() {
       }
     });
 
+    matches.forEach(function(match) { match.corners = match.fotmobStats && match.fotmobStats.total ? match.fotmobStats.total.corners : null; });
     liveCache = { fetchedAt: new Date().toISOString(), matchCount: matches.length, detailedMatchCount: withStats, formMatchCount: withForm, streakMatchCount: withStreak, matchStreakCount: withMatchStreak, matches: matches };
     // Resolve previous entries before adding any tips from the latest scrape.
     settleTips(matches, dailyMatchResults);
