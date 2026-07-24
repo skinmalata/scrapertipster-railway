@@ -396,12 +396,11 @@
           var res = await fetch(API_BASE + '/api/golden-tips', {mode:'cors', cache:'no-store'});
           var data = await res.json();
           renderOpportunities(data);
-          loadHistory();
-          schedulePoll(POLL_INTERVAL);
         } catch (e) {
           container.innerHTML = empty('Live data unavailable', 'The live data feed is warming up. Retrying shortly...');
-          schedulePoll(FAILBACK_INTERVAL);
         }
+        loadHistory();
+        schedulePoll(POLL_INTERVAL);
       }
 
       document.addEventListener('visibilitychange', function() {
