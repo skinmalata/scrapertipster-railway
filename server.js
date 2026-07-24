@@ -6,6 +6,8 @@ const path = require('path');
 const axios = require('axios');
 const apiRoutes = require('./src/routes/api');
 const chatRoutes = require('./src/routes/chat');
+const { buildDailyTicket } = require('./src/services/daily-ticket');
+const { subscribeDailyTips, createAndSendDailyTicketCampaign } = require('./src/services/brevo');
 
 const YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@winfulltime/videos';
 
@@ -341,52 +343,6 @@ ${items}  </channel>
   }
 });
 
-// Email subscription endpoint
-const SUBSCRIBERS_FILE = path.join(__dirname, 'subscribers.json');
-app.post('/api/subscribe', (req, res) => {
-  const { email } = req.body;
-  if (!email || !email.includes('@') || email === 'skipped@guest') {
-    return res.json({ success: false });
-  }
-  try {
-    let subscribers = [];
-    if (fs.existsSync(SUBSCRIBERS_FILE)) {
-      subscribers = JSON.parse(fs.readFileSync(SUBSCRIBERS_FILE, 'utf8'));
-    }
-    if (!subscribers.some(s => s.email === email)) {
-      subscribers.push({ email, subscribedAt: new Date().toISOString() });
-      fs.writeFileSync(SUBSCRIBERS_FILE, JSON.stringify(subscribers, null, 2));
-      console.log('New subscriber:', email);
-    }
-    res.json({ success: true });
-  } catch (e) {
-    console.error('Subscribe error:', e.message);
-    res.json({ success: false });
-  }
-});
-
-// Admin auth middleware
-function requireAdmin(req, res, next) {
-  const token = req.headers['x-admin-token'];
-  if (!token || token !== process.env.ADMIN_TOKEN) {
-    return res.status(403).json({ success: false, error: 'Forbidden' });
-  }
-  next();
-}
-
-// View subscribers (GET for admin)
-app.get('/api/subscribers', requireAdmin, (req, res) => {
-  try {
-    if (fs.existsSync(SUBSCRIBERS_FILE)) {
-      const data = JSON.parse(fs.readFileSync(SUBSCRIBERS_FILE, 'utf8'));
-      return res.json({ success: true, count: data.length, subscribers: data });
-    }
-    res.json({ success: true, count: 0, subscribers: [] });
-  } catch (e) {
-    res.json({ success: false, error: e.message });
-  }
-});
-
 // YouTube Videos API - using official YouTube Data API
 const YOUTUBE_CHANNEL_ID = 'UCyDIjH4CQiITAGnjZ_ZTTYg'; // @winfulltime channel ID
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
@@ -455,6 +411,69 @@ app.get('/blog/:slug', (req, res, next) => {
     if (error) return next(error);
     res.redirect('/blog/');
   });
+});
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DAILY_TIPS_SEND_LOG_FILE = process.env.DAILY_TIPS_SEND_LOG_FILE || path.join(__dirname, 'daily-tips-send-log.json');
+let dailyTicketSendInProgress = false;
+
+function readDailyTipSendLog() {
+  try {
+    return fs.existsSync(DAILY_TIPS_SEND_LOG_FILE) ? JSON.parse(fs.readFileSync(DAILY_TIPS_SEND_LOG_FILE, 'utf8')) : {};
+  } catch (error) {
+    console.error('Daily tips send log read error:', error.message);
+    return {};
+  }
+}
+
+function recordDailyTipSend(date, campaignId) {
+  fs.mkdirSync(path.dirname(DAILY_TIPS_SEND_LOG_FILE), { recursive: true });
+  const log = readDailyTipSendLog();
+  log[date] = { campaignId, sentAt: new Date().toISOString() };
+  fs.writeFileSync(DAILY_TIPS_SEND_LOG_FILE, JSON.stringify(log, null, 2));
+}
+
+app.post('/api/newsletter/subscribe', async (req, res) => {
+  const email = String(req.body?.email || '').trim().toLowerCase();
+  if (!EMAIL_PATTERN.test(email)) return res.status(400).json({ success: false, error: 'Enter a valid email address.' });
+  if (req.body?.consent !== true) return res.status(400).json({ success: false, error: 'Newsletter consent is required.' });
+  try {
+    await subscribeDailyTips(email);
+    return res.json({ success: true });
+  } catch (error) {
+    const msg = String(error.message || '');
+    if (msg.includes('already exist')) {
+      return res.json({ success: true, message: 'You are already subscribed.' });
+    }
+    console.error('Daily tips signup error:', msg);
+    return res.status(503).json({ success: false, error: 'Newsletter signup is temporarily unavailable.' });
+  }
+});
+
+app.post('/api/newsletter/daily-send', async (req, res) => {
+  if (!process.env.CRON_SECRET || req.headers['x-cron-secret'] !== process.env.CRON_SECRET) {
+    return res.status(403).json({ success: false, error: 'Forbidden' });
+  }
+  if (dailyTicketSendInProgress) return res.status(409).json({ success: false, error: 'A daily ticket send is already in progress.' });
+
+  // Reload the on-disk cache so the scheduler never relies on data present only at server startup.
+  const latestPredictions = getScraperService().loadCachedPredictions();
+  if (latestPredictions) predictionsCache = latestPredictions;
+  const ticket = buildDailyTicket(getPredictionsCache());
+  if (!ticket.ok) return res.json({ success: true, skipped: true, reason: ticket.reason });
+  if (readDailyTipSendLog()[ticket.date]) return res.json({ success: true, skipped: true, reason: 'Already sent today.' });
+
+  dailyTicketSendInProgress = true;
+  try {
+    const { campaignId } = await createAndSendDailyTicketCampaign(ticket);
+    recordDailyTipSend(ticket.date, campaignId);
+    return res.json({ success: true, campaignId, date: ticket.date, selections: ticket.selections.length });
+  } catch (error) {
+    console.error('Daily tips send error:', error.message);
+    return res.status(503).json({ success: false, error: 'Daily ticket send failed.' });
+  } finally {
+    dailyTicketSendInProgress = false;
+  }
 });
 
 // FotMob live scraping + API-Football stats — replaces Forebet (Cloudflare blocked axios on Render).

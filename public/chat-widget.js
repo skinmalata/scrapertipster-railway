@@ -280,7 +280,7 @@ var emailError=panel.querySelector('.wf-chat-email-error');
 var emailSkip=panel.querySelector('.wf-chat-email-skip');
 var chatWrap=panel.querySelector('.wf-chat-input-wrap');
 
-function saveEmail(e){if(!e||e.indexOf('@')===-1)return;userEmail=e;try{localStorage.setItem('wf_chat_email',e)}catch(ex){}var xhr=new XMLHttpRequest;xhr.open('POST','/api/subscribe',true);xhr.setRequestHeader('Content-Type','application/json');xhr.send(JSON.stringify({email:e}))}
+function saveEmail(e){if(!e||e.indexOf('@')===-1)return;userEmail=e;try{localStorage.setItem('wf_chat_email',e)}catch(ex){}var xhr=new XMLHttpRequest;xhr.open('POST','/api/newsletter/subscribe',true);xhr.setRequestHeader('Content-Type','application/json');xhr.send(JSON.stringify({email:e,consent:true}))}
 function showChatView(){emailGate.style.display='none';chatWrap.style.display='flex';if(messagesEl.children.length===0){addMessage('Hi! I\'m the WinFulltime assistant. I know everything about WinFulltime - predictions, ticket builder, blog, betting markets, and more. Try asking:\n\n\u2022 Show me today\'s predictions\n\u2022 Build me an accumulator with target 20 odds\n\u2022 What leagues do you cover?\n\u2022 How does the ticket builder work?\n\u2022 Explain BTTS betting\n\u2022 Best betting sites in Nigeria','bot')}}
 function showEmailGate(){emailGate.style.display='flex';chatWrap.style.display='none'}
 function addMessage(text,role){
