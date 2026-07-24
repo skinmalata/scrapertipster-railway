@@ -9,13 +9,12 @@ jobs:
   send:
     runs-on: ubuntu-latest
     steps:
-      - name: Debug
-        env:
-          RENDER_URL: ${{ secrets.RENDER_URL }}
-        run: echo "URL=[$RENDER_URL]"
       - name: Trigger daily ticket send
-        env:
-          RENDER_URL: ${{ secrets.RENDER_URL }}
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          curl -v -X POST -H "x-cron-secret: $CRON_SECRET" -H "Content-Type: application/json" "$RENDER_URL/api/newsletter/daily-send"
+          status=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" -H "Content-Type: application/json" "${{ secrets.RENDER_URL }}/api/newsletter/daily-send")
+          echo "HTTP Status: $status"
+          cat /tmp/response.txt
+          if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
+            echo "Request failed with status $status"
+            exit 1
+          fi
