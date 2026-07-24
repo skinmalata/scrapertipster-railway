@@ -192,6 +192,27 @@ app.get('/blog/in-play-betting-strategy.html', (req, res) => {
 });
 
 // Static files with no cache
+function serveBlogPost(req, res, next) {
+  const slug = req.params.slug;
+  if (!slug || slug === 'index' || slug === 'blog-template') return next();
+
+  const filePath = path.join(__dirname, 'public', 'blog', `${slug}.html`);
+  if (!fs.existsSync(filePath)) return next();
+
+  try {
+    const html = fs.readFileSync(filePath, 'utf8');
+    const enhancedHtml = html.includes('/article-tools-cta.js')
+      ? html
+      : html.replace(/<\/body>/i, '<script src="/article-tools-cta.js" defer></script></body>');
+    return res.type('html').send(enhancedHtml);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+// Serve article pages through one reusable conversion panel, including direct .html URLs.
+app.get('/blog/:slug.html', serveBlogPost);
+
 app.use(express.static('public', {
   maxAge: 0,
   etag: false,
@@ -429,18 +450,11 @@ app.get('/', (req, res) => {
 });
 
 // Handle blog posts - try both with and without .html extension
-app.get('/blog/:slug', (req, res) => {
-  const slug = req.params.slug;
-  
-  // First try without .html (if already exists as static file)
-  let filePath = path.join(__dirname, 'public', 'blog', slug + '.html');
-  
-  if (fs.existsSync(filePath)) {
-    return res.sendFile(filePath, { maxAge: 0 });
-  }
-  
-  // If not found, redirect to blog index
-  res.redirect('/blog/');
+app.get('/blog/:slug', (req, res, next) => {
+  serveBlogPost(req, res, (error) => {
+    if (error) return next(error);
+    res.redirect('/blog/');
+  });
 });
 
 // FotMob live scraping + API-Football stats — replaces Forebet (Cloudflare blocked axios on Render).
