@@ -272,20 +272,22 @@ nav a.active::after {
  box-shadow: 0 4px 15px var(--glow);
  }
 
- .matches-grid {
- display: grid;
- grid-template-columns: 1fr;
- gap: 12px;
- max-width: 520px;
- margin: 0 auto;
- }
+ .matches-grid {
+ display: grid;
+ grid-template-columns: 1fr;
+ gap: 12px;
+ max-width: 520px;
+ min-width: 0;
+ margin: 0 auto;
+ }
 
- .match-card {
- background: var(--bg-card);
- border: 1px solid var(--border);
- border-radius: var(--radius-lg);
- padding: 22px 24px;
- color: var(--text-primary);
+ .match-card {
+ background: var(--bg-card);
+ border: 1px solid var(--border);
+ border-radius: var(--radius-lg);
+ padding: 22px 24px;
+ min-width: 0;
+ color: var(--text-primary);
  transition: all 0.25s ease;
  cursor: default;
  backdrop-filter: blur(4px);
@@ -298,10 +300,11 @@ nav a.active::after {
  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
  }
 
- .match-header {
- display: flex;
- justify-content: space-between;
- align-items: center;
+ .match-header {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ min-width: 0;
  margin-bottom: 14px;
  font-size: 14px;
  color: var(--text-muted);
@@ -309,18 +312,21 @@ nav a.active::after {
  letter-spacing: 0.3px;
  }
 
- .match-teams {
- display: flex;
- justify-content: space-between;
- align-items: center;
+ .match-teams {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ min-width: 0;
  margin-bottom: 18px;
  }
 
- .team {
- font-size: 18px;
- font-weight: 600;
- flex: 1;
- line-height: 1.3;
+ .team {
+ font-size: 18px;
+ font-weight: 600;
+ flex: 1;
+ min-width: 0;
+ overflow-wrap: anywhere;
+ line-height: 1.3;
  }
 
  .team-home {
@@ -1198,14 +1204,14 @@ body { overflow-x: clip; overflow-clip-margin: 0; }
 }
 
 /* Mobile card layout — compact padding, readable team names */
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .match-card { padding: 16px; }
   .match-teams { gap: 8px; flex-wrap: wrap; justify-content: center; }
-  .team { font-size: 15px; white-space: normal; overflow: visible; text-overflow: unset; }
+  .team { flex: 1 1 120px; min-width: 0; font-size: 15px; white-space: normal; overflow: visible; text-overflow: unset; }
   .team-home { padding-right: 8px; text-align: right; }
   .team-away { padding-left: 8px; text-align: left; }
-  .vs-score { padding: 0 6px; font-size: 13px; }
-  .tip-badge { font-size: 16px; padding: 6px 16px; }
+  .vs-score { flex: 0 0 auto; padding: 0 6px; font-size: 13px; }
+  .tip-badge { max-width: 100%; white-space: normal; overflow-wrap: anywhere; text-align: center; font-size: 16px; padding: 6px 16px; }
   .probability { font-size: 16px; }
   .match-reason { max-width: 100%; word-break: break-word; }
 }
