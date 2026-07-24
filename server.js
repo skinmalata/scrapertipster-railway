@@ -447,6 +447,7 @@ app.get('/blog/:slug', (req, res) => {
 const { startLiveScrapeLoop, getCachedLive } = require('./src/services/scrapeLive');
 const { buildGoldenTips } = require('./src/services/goldenOpportunities');
 const { startTelegramBot } = require('./src/services/telegramBot');
+const { startMastodonBot } = require('./src/services/mastodonBot');
 startLiveScrapeLoop();
 
 function getLiveTipsFromCache() {
@@ -459,6 +460,12 @@ startTelegramBot(
   getLiveTipsFromCache,
   process.env.TELEGRAM_BOT_TOKEN,
   process.env.TELEGRAM_CHAT_ID
+);
+
+startMastodonBot(
+  getLiveTipsFromCache,
+  process.env.MASTODON_INSTANCE_URL || 'https://flipboard.social',
+  process.env.MASTODON_ACCESS_TOKEN
 );
 
 const HOST = process.env.HOST || '0.0.0.0';
