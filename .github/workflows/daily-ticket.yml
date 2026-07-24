@@ -1,0 +1,17 @@
+name: Daily Ticket Send
+
+on:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger daily ticket send
+        run: |
+          curl -s -X POST \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            "${{ secrets.BASE_URL }}/api/newsletter/daily-send"
