@@ -1168,10 +1168,9 @@ nav a.active::after {
 }
 
 /* === RESPONSIVE FIXES === */
-body { overflow-x: hidden; }
+body { overflow-x: clip; overflow-clip-margin: 0; }
 
-/* Team name truncation */
-.team { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+/* Prevent flex items from blowing out their container */
 .match-teams { min-width: 0; }
 
 /* Streak row overflow */
@@ -1196,6 +1195,19 @@ body { overflow-x: hidden; }
 }
 @media (max-width: 480px) {
   .news-grid { grid-template-columns: 1fr; }
+}
+
+/* Mobile card layout — compact padding, readable team names */
+@media (max-width: 480px) {
+  .match-card { padding: 16px; }
+  .match-teams { gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .team { font-size: 15px; white-space: normal; overflow: visible; text-overflow: unset; }
+  .team-home { padding-right: 8px; text-align: right; }
+  .team-away { padding-left: 8px; text-align: left; }
+  .vs-score { padding: 0 6px; font-size: 13px; }
+  .tip-badge { font-size: 16px; padding: 6px 16px; }
+  .probability { font-size: 16px; }
+  .match-reason { max-width: 100%; word-break: break-word; }
 }
 
 /* Hamburger menu */

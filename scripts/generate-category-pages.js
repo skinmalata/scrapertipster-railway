@@ -245,8 +245,8 @@ ${generateFaqSchema(slug)}
 .faq-item summary::after{content:'+';font-size:20px;font-weight:700;color:var(--accent);transition:transform 0.2s;flex-shrink:0}
 .faq-item[open] summary::after{content:'\\2212'}
 .faq-item p{padding:0 20px 16px;font-size:14px;line-height:1.7;color:var(--text-secondary);margin:0}
-@media(max-width:640px){.seo-content h2{font-size:18px}.faq-item summary{padding:14px 16px;font-size:14px}.faq-item p{padding:0 16px 14px;font-size:13px}.date-tab{padding:8px 14px;font-size:13px;min-width:80px}.match-reason{font-size:12px;max-width:260px;margin-top:6px}}
-.match-reason{font-size:13px;color:#fff;margin-top:8px;line-height:1.5;text-align:center;max-width:300px;opacity:0.85}
+@media(max-width:640px){.seo-content h2{font-size:18px}.faq-item summary{padding:14px 16px;font-size:14px}.faq-item p{padding:0 16px 14px;font-size:13px}.date-tab{padding:8px 14px;font-size:13px;min-width:80px}.match-reason{font-size:12px;max-width:100%;word-break:break-word;margin-top:6px}}
+.match-reason{font-size:13px;color:#fff;margin-top:8px;line-height:1.5;text-align:center;max-width:100%;opacity:0.85}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6975707128100932" crossorigin="anonymous"></script>
 </head>
