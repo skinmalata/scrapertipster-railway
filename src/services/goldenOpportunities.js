@@ -526,9 +526,10 @@ function buildGoldenTips(liveData) {
 
   liveData.matches.forEach(function (match) {
     var elapsed = asNumber(match.minute);
-    // Publish only while at least 15 minutes remain in the active half:
-    // minutes 0-30 in the first half and 60-75 in the second half.
-    if ((elapsed > 30 && elapsed < 60) || elapsed > 75) return;
+    // Publish only while at least 12 minutes remain in the active half:
+    // minutes 0-30 in the first half and 58-88 in the second half.
+    // LateGoalStorm needs up to minute 88, so the upper bound follows that.
+    if ((elapsed > 30 && elapsed < 58) || elapsed > 88) return;
     var marketTip = pickBest(MARKET_RULES, match);
     var teamTip = pickBest(TEAM_RULES, match);
     var cornerTip = pickBest(CORNER_RULES, match);

@@ -5,7 +5,7 @@ const { recordTips, settleTips, getPendingCornerFixtureIds } = require('./liveTi
 
 const SCRAPE_INTERVAL_MS = 5 * 60 * 1000;
 const FOTMOB_STATS_DELAY_MS = 200;
-const MAX_FOTMOB_DETAIL_MATCHES = 20;
+const MAX_FOTMOB_DETAIL_MATCHES = 30;
 const MAX_FORM_MATCHES_PER_CYCLE = 4;
 const HTTP_TIMEOUT_MS = 8000;
 const TEAM_FORM_CACHE_MS = 6 * 60 * 60 * 1000;
@@ -311,7 +311,11 @@ async function scrapeLive() {
     var matches = await fetchFotMobLive();
     await enrichFinishedCornerResults();
     if (!matches.length) {
-      liveCache = { fetchedAt: new Date().toISOString(), matchCount: 0, matches: [] };
+      if (liveCache && liveCache.matches && liveCache.matches.length) {
+        console.log('[fotmob-live] Empty scrape, preserving', liveCache.matches.length, 'cached matches');
+      } else {
+        liveCache = { fetchedAt: new Date().toISOString(), matchCount: 0, matches: [] };
+      }
       settleTips([], dailyMatchResults);
       isScraping = false;
       return liveCache;
@@ -383,6 +387,31 @@ async function scrapeLive() {
     console.log('[fotmob-live] Scraped', matches.length, 'live matches (' + withStats + ' stats, ' + withH2h + ' h2h, ' + withForm + ' form, ' + withStreak + ' win-streaks, ' + withMatchStreak + ' match-streaks)');
   } catch (e) {
     console.warn('[fotmob-live] Scrape failed:', e.message);
+    if (!liveCache || !liveCache.matches || !liveCache.matches.length) {
+      console.log('[fotmob-live] Retrying after failure...');
+      try {
+        var retryMatches = await fetchFotMobLive();
+        if (retryMatches && retryMatches.length) {
+          var retryDetail = retryMatches.slice().sort(function(a, b) { return detailPriority(b) - detailPriority(a); }).slice(0, MAX_FOTMOB_DETAIL_MATCHES);
+          for (var ri = 0; ri < retryDetail.length; ri++) {
+            var rm = retryDetail[ri];
+            if (ri > 0 && ri % 3 === 0) await new Promise(function(r) { setTimeout(r, FOTMOB_STATS_DELAY_MS); });
+            var rd = await fetchFotMobMatchDetails(rm.matchId).catch(function() { return null; });
+            if (rd) {
+              if (rd.stats) rm.fotmobStats = rd.stats;
+              if (rd.h2h) rm.h2h = rd.h2h;
+              if (rd.redCards) rm.redCards = rd.redCards;
+            }
+          }
+          liveCache = { fetchedAt: new Date().toISOString(), matchCount: retryMatches.length, matches: retryMatches };
+          settleTips(retryMatches, dailyMatchResults);
+          recordTips(buildGoldenTips(liveCache), liveCache.fetchedAt);
+          console.log('[fotmob-live] Retry succeeded:', retryMatches.length, 'matches');
+        }
+      } catch (retryErr) {
+        console.warn('[fotmob-live] Retry also failed:', retryErr.message);
+      }
+    }
   }
 
   isScraping = false;
