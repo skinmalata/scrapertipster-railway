@@ -277,7 +277,55 @@ gtag('config', 'G-HMGZMW9EDP');
 
 </div>
 
-
+ <div class="home-ticket-builder">
+  <div class="htb-header">
+   <h2>Build Your Accumulator</h2>
+   <a href="/ticket-builder.html" class="htb-full-link">Full Builder &rarr;</a>
+  </div>
+  <p class="htb-desc">Combine predictions into an accumulator at your target odds.</p>
+  <div class="htb-form">
+   <div class="htb-row">
+    <div><label for="htbTarget">Target Odds</label><input type="number" id="htbTarget" value="20" step="any"></div>
+    <div><label for="htbMin">Min / Leg</label><input type="number" id="htbMin" value="1.20" step="any"></div>
+    <div><label for="htbMax">Max / Leg</label><input type="number" id="htbMax" value="3.00" step="any"></div>
+   </div>
+   <div class="htb-toggle"><input type="checkbox" id="htbToday" checked><label for="htbToday">Today only</label></div>
+   <button class="htb-btn" id="htbGenerate">Build Ticket</button>
+  </div>
+  <div id="htbResult"></div>
+ </div>
+ <style>
+  .home-ticket-builder{background:linear-gradient(135deg,rgba(37,46,64,.65),rgba(30,38,56,.9));backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:28px 24px;margin:32px auto;max-width:560px;box-shadow:0 8px 40px rgba(0,0,0,.3)}
+  .htb-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .htb-header h2{font-size:18px;font-weight:700;color:#e8edf5;margin:0;letter-spacing:-.3px}
+  .htb-full-link{font-size:13px;font-weight:600;color:#ff2448;text-decoration:none;white-space:nowrap}
+  .htb-full-link:hover{text-decoration:underline}
+  .htb-desc{font-size:13px;color:rgba(232,237,245,.5);margin:0 0 16px;line-height:1.6}
+  .htb-form{display:flex;flex-direction:column;gap:12px}
+  .htb-row{display:flex;gap:12px}
+  .htb-row>div{flex:1;display:flex;flex-direction:column}
+  .htb-row label{font-size:11px;font-weight:600;color:rgba(232,237,245,.45);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px}
+  .htb-row input{background:rgba(21,26,44,.6);border:1px solid rgba(255,255,255,.08);color:#e8edf5;padding:10px 12px;border-radius:8px;font-size:14px;font-family:'Inter',sans-serif;font-weight:500;width:100%;transition:border-color .25s,box-shadow .25s}
+  .htb-row input:focus{outline:none;border-color:rgba(255,36,72,.5);box-shadow:0 0 0 3px rgba(255,36,72,.1)}
+  .htb-toggle{display:flex;align-items:center;gap:10px}
+  .htb-toggle input[type=checkbox]{accent-color:#ff2448;width:16px;height:16px}
+  .htb-toggle label{font-size:13px;color:rgba(232,237,245,.65);cursor:pointer;margin:0}
+  .htb-btn{background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;border:none;padding:12px 24px;border-radius:10px;font-size:15px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:transform .2s,box-shadow .3s;letter-spacing:.3px;width:100%}
+  .htb-btn:hover{transform:translateY(-1px);box-shadow:0 8px 30px rgba(255,36,72,.3)}
+  .htb-btn:active{transform:translateY(0)}
+  #htbResult .htb-ticket{background:rgba(21,26,44,.7);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px;margin-top:16px}
+  #htbResult .htb-ticket-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  #htbResult .htb-ticket-odds{font-size:22px;font-weight:800;background:linear-gradient(135deg,#4ade80,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  #htbResult .htb-ticket-label{font-size:14px;font-weight:600;color:rgba(232,237,245,.8)}
+  #htbResult .htb-leg{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;color:rgba(232,237,245,.75);line-height:1.5}
+  #htbResult .htb-leg:last-child{border-bottom:none}
+  #htbResult .htb-leg strong{color:rgba(232,237,245,.9);font-weight:600}
+  #htbResult .htb-leg .htb-tip{display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;font-size:12px;font-weight:700;padding:2px 8px;border-radius:5px;margin-left:6px;vertical-align:middle}
+  #htbResult .htb-empty{text-align:center;padding:16px;color:rgba(232,237,245,.35);font-size:13px}
+  #htbResult .htb-full{display:block;text-align:center;margin-top:12px;font-size:13px;font-weight:600;color:#ff2448;text-decoration:none}
+  #htbResult .htb-full:hover{text-decoration:underline}
+  @media(max-width:640px){.htb-row{flex-direction:column;gap:10px}.home-ticket-builder{padding:20px 16px;margin:24px 12px}}
+ </style>
 
  <!-- Streak Buttons -->
 
@@ -1376,6 +1424,59 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
 </script>
 
+<script>
+(function(){
+  function esc(v){return String(v||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+
+  document.getElementById('htbGenerate').addEventListener('click',async function(){
+    var target=parseFloat(document.getElementById('htbTarget').value);
+    var minO=parseFloat(document.getElementById('htbMin').value);
+    var maxO=parseFloat(document.getElementById('htbMax').value);
+    var todayOnly=document.getElementById('htbToday').checked;
+    var res=document.getElementById('htbResult');
+    if(!Number.isFinite(target)||target<=1||!Number.isFinite(minO)||minO<=1||!Number.isFinite(maxO)||maxO<minO){res.innerHTML='<div class="htb-empty">Enter valid odds values.</div>';return}
+    res.innerHTML='<div class="htb-empty">Loading predictions...</div>';
+    try{
+      var r=await fetch('/data/predictions.json',{cache:'no-store'});
+      if(!r.ok)throw new Error('Failed to load');
+      var data=await r.json();
+      var today=new Date().toISOString().split('T')[0];
+      var todayMatches=todayOnly&&data.date===today;
+      var cats=[['matches','1X2'],['over15Matches','Over 1.5'],['over25Matches','Over 2.5'],['bttsMatches','BTTS YES'],['bttsNoMatches','BTTS NO'],['teamToScore2PlusMatches','To Score 2+']];
+      var seen=new Set();
+      var picks=[];
+      cats.forEach(function(c){
+        (data[c[0]]||[]).forEach(function(m){
+          var match=m.match||m.fixture||m.name;
+          if(!match||!m.tip)return;
+          if(todayOnly&&m.date!==today)return;
+          var prob=Number(m.probability??m.confidence);
+          if(!Number.isFinite(prob)||prob<40)return;
+          var odds=Number(((100/prob)/1.05).toFixed(2));
+          if(odds<minO||odds>maxO)return;
+          var isDC=c[1]==='1X2'&&/^(1X|X2|12)$/.test(String(m.tip).trim());
+          var cat=isDC?'Double Chance':c[1];
+          var key=match+'|'+m.tip+'|'+m.date;
+          if(seen.has(key))return;
+          seen.add(key);
+          picks.push({match:match,tip:m.tip,odds:odds,prob:prob,date:m.date,time:m.time||'',league:m.league||'',category:cat});
+        });
+      });
+      if(!picks.length){res.innerHTML='<div class="htb-empty">No qualifying picks. <a href="/ticket-builder.html" class="htb-full">Try the full builder</a></div>';return}
+      picks.sort(function(a,b){return b.prob-a.prob||b.odds-a.odds});
+      var best=[];
+      var used=new Set();
+      for(var i=0;i<picks.length&&best.length<3;i++){
+        var p=picks[i];
+        if(!used.has(p.match)){used.add(p.match);best.push(p)}
+      }
+      var totalOdds=best.reduce(function(t,s){return t*s.odds},1);
+      var legs=best.map(function(s,i){return '<div class="htb-leg"><strong>'+(i+1)+'. '+esc(s.match)+'</strong> <span class="htb-tip">'+esc(s.tip)+'</span><br><span style="font-size:11px;color:rgba(232,237,245,.45)">'+esc(s.league)+' | '+esc(s.category)+' | '+s.odds.toFixed(2)+'</span></div>'}).join('');
+      res.innerHTML='<div class="htb-ticket"><div class="htb-ticket-head"><span class="htb-ticket-label">3-Leg Accumulator</span><span class="htb-ticket-odds">'+totalOdds.toFixed(2)+' odds</span></div>'+legs+'<a href="/ticket-builder.html" class="htb-full">Build more tickets &rarr;</a></div>';
+    }catch(e){res.innerHTML='<div class="htb-empty">Unable to load predictions. <a href="/ticket-builder.html" class="htb-full">Try the full builder</a></div>'}
+  });
+})();
+</script>
 
 
 <script src="/responsible-gambling.js"></script>
