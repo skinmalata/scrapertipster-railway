@@ -19,6 +19,7 @@ let scrapeTimer = null;
 const teamFormCache = new Map();
 const cornerHistoryCache = new Map();
 let dailyMatchResults = new Map();
+let dailyMatchResultsDate = '';
 
 function todayStr() {
   const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Africa/Lagos', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
@@ -79,11 +80,14 @@ function httpGet(url, timeoutMs) {
 
 async function fetchFotMobLive() {
   var date = todayStr();
+  if (date !== dailyMatchResultsDate) {
+    dailyMatchResults = new Map();
+    dailyMatchResultsDate = date;
+  }
   var res = await httpGet('https://www.fotmob.com/api/data/matches?date=' + date);
   if (res.status !== 200 || !res.data || !res.data.leagues) return [];
 
   var matches = [];
-  dailyMatchResults = new Map();
   res.data.leagues.forEach(function (league) {
     league.matches.forEach(function (m) {
       dailyMatchResults.set(String(m.id), { finished: Boolean(m.status && m.status.finished), score: parseScore(m.status) });
