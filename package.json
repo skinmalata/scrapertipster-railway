@@ -10,8 +10,7 @@
     "watch:css": "tailwindcss -i ./src/styles.css -o ./public/styles.css --watch",
     "generate-pins": "node scripts/generate-daily-pins.js",
     "post-pins": "node scripts/post-to-pinterest.js",
-    "generate:thumbnail": "node scripts/regenerate-legacy-thumbnails.js",
-    "send:daily-ticket": "node scripts/send-daily-ticket.js"
+    "generate:thumbnail": "node scripts/regenerate-legacy-thumbnails.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",

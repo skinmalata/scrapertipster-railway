@@ -6,8 +6,6 @@ const path = require('path');
 const axios = require('axios');
 const apiRoutes = require('./src/routes/api');
 const chatRoutes = require('./src/routes/chat');
-const { buildDailyTicket } = require('./src/services/daily-ticket');
-const { subscribeDailyTips, createAndSendDailyTicketCampaign } = require('./src/services/brevo');
 
 const YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@winfulltime/videos';
 
@@ -411,69 +409,6 @@ app.get('/blog/:slug', (req, res, next) => {
     if (error) return next(error);
     res.redirect('/blog/');
   });
-});
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const DAILY_TIPS_SEND_LOG_FILE = process.env.DAILY_TIPS_SEND_LOG_FILE || path.join(__dirname, 'daily-tips-send-log.json');
-let dailyTicketSendInProgress = false;
-
-function readDailyTipSendLog() {
-  try {
-    return fs.existsSync(DAILY_TIPS_SEND_LOG_FILE) ? JSON.parse(fs.readFileSync(DAILY_TIPS_SEND_LOG_FILE, 'utf8')) : {};
-  } catch (error) {
-    console.error('Daily tips send log read error:', error.message);
-    return {};
-  }
-}
-
-function recordDailyTipSend(date, campaignId) {
-  fs.mkdirSync(path.dirname(DAILY_TIPS_SEND_LOG_FILE), { recursive: true });
-  const log = readDailyTipSendLog();
-  log[date] = { campaignId, sentAt: new Date().toISOString() };
-  fs.writeFileSync(DAILY_TIPS_SEND_LOG_FILE, JSON.stringify(log, null, 2));
-}
-
-app.post('/api/newsletter/subscribe', async (req, res) => {
-  const email = String(req.body?.email || '').trim().toLowerCase();
-  if (!EMAIL_PATTERN.test(email)) return res.status(400).json({ success: false, error: 'Enter a valid email address.' });
-  if (req.body?.consent !== true) return res.status(400).json({ success: false, error: 'Newsletter consent is required.' });
-  try {
-    await subscribeDailyTips(email);
-    return res.json({ success: true });
-  } catch (error) {
-    const msg = String(error.message || '');
-    if (msg.includes('already exist')) {
-      return res.json({ success: true, message: 'You are already subscribed.' });
-    }
-    console.error('Daily tips signup error:', msg);
-    return res.status(503).json({ success: false, error: 'Newsletter signup is temporarily unavailable.' });
-  }
-});
-
-app.post('/api/newsletter/daily-send', async (req, res) => {
-  if (!process.env.CRON_SECRET || req.headers['x-cron-secret'] !== process.env.CRON_SECRET) {
-    return res.status(403).json({ success: false, error: 'Forbidden' });
-  }
-  if (dailyTicketSendInProgress) return res.status(409).json({ success: false, error: 'A daily ticket send is already in progress.' });
-
-  // Reload the on-disk cache so the scheduler never relies on data present only at server startup.
-  const latestPredictions = getScraperService().loadCachedPredictions();
-  if (latestPredictions) predictionsCache = latestPredictions;
-  const ticket = buildDailyTicket(getPredictionsCache());
-  if (!ticket.ok) return res.json({ success: true, skipped: true, reason: ticket.reason });
-  if (readDailyTipSendLog()[ticket.date]) return res.json({ success: true, skipped: true, reason: 'Already sent today.' });
-
-  dailyTicketSendInProgress = true;
-  try {
-    const { campaignId } = await createAndSendDailyTicketCampaign(ticket);
-    recordDailyTipSend(ticket.date, campaignId);
-    return res.json({ success: true, campaignId, date: ticket.date, selections: ticket.selections.length });
-  } catch (error) {
-    console.error('Daily tips send error:', error.message);
-    return res.status(503).json({ success: false, error: 'Daily ticket send failed.' });
-  } finally {
-    dailyTicketSendInProgress = false;
-  }
 });
 
 // FotMob live scraping + API-Football stats — replaces Forebet (Cloudflare blocked axios on Render).
