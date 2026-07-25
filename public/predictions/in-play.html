@@ -161,6 +161,10 @@
     .telegram-cta-btn:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(0,136,204,.35); }
     .history-section h2 { margin:0 0 8px; font-size:22px; }
     .history-section > p { margin:0 0 16px; color:var(--text-secondary); font-size:14px; }
+    .history-controls { display:flex; align-items:center; gap:8px; margin:0 0 16px; flex-wrap:wrap; }
+    .history-control { min-height:34px; padding:7px 11px; border:1px solid var(--border); border-radius:8px; background:var(--bg-card); color:var(--text-primary); font:inherit; font-size:12px; font-weight:700; cursor:pointer; }
+    .history-control:hover,.history-control.active { border-color:#4ade80; color:#56e69c; }
+    .history-date { color:var(--text-muted); font-size:12px; font-weight:700; }
     .history-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px; }
     .history-card { padding:15px; border:1px solid var(--border); border-radius:12px; background:var(--bg-card); }
     .history-card h3 { margin:8px 0 5px; font-size:15px; color:var(--text-primary); }
@@ -237,6 +241,11 @@
     <section class="history-section" aria-labelledby="history-title">
       <h2 id="history-title">Today’s In-Play Tip Results</h2>
       <p>Tips generated today, with results settled from the final match score where available.</p>
+      <div class="history-controls" aria-label="In-play history date controls">
+        <button id="previousHistoryButton" class="history-control" type="button">Previous day</button>
+        <button id="todayHistoryButton" class="history-control active" type="button">Today</button>
+        <span id="historyDate" class="history-date" aria-live="polite"></span>
+      </div>
       <div id="history" class="history-list" aria-live="polite"><div class="empty"><h2>Loading today’s results</h2></div></div>
     </section>
 
@@ -318,6 +327,8 @@
       var alertEnabled = localStorage.getItem('wf-live-alerts') === 'true';
       var previousTipKeys = {};
       var baselineReady = false;
+      var historyDate = null;
+      var historyRetryTimer = null;
       function escapeHtml(value) { return String(value || '').replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
       function empty(title, body) { return '<div class="empty"><div class="empty-icon">?</div><h2>' + escapeHtml(title) + '</h2><p>' + escapeHtml(body) + '</p></div>'; }
       function updateAlertButton() {
@@ -368,19 +379,40 @@
         }).join('');
       }
       function outcomeLabel(outcome) { return outcome === 'won' ? 'Won' : outcome === 'lost' ? 'Lost' : outcome === 'unresolved' ? 'Not settled' : 'Pending'; }
+      function displayHistoryDate(date) {
+        if (!date) return '';
+        return new Date(date + 'T12:00:00Z').toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+      }
       function renderHistory(data) {
         var history = document.getElementById('history');
         var tips = data && data.tips || [];
-        if (!tips.length) { history.innerHTML = empty('No in-play tips recorded today', 'Completed and pending tips will appear here as live matches are analysed.'); return; }
+        if (data && data.date) historyDate = data.date;
+        document.getElementById('historyDate').textContent = displayHistoryDate(historyDate);
+        document.getElementById('todayHistoryButton').classList.toggle('active', data && data.date === data.today);
+        if (!tips.length) { history.innerHTML = empty('No in-play tips recorded for this date', 'Completed and pending tips appear here after live matches are analysed.'); return; }
         history.innerHTML = tips.map(function(tip) {
           var outcome = tip.outcome || 'pending';
           var score = tip.finalScore ? 'Final score: ' + tip.finalScore : 'Score at tip: ' + tip.scoreAtTip.home + ' - ' + tip.scoreAtTip.away;
           return '<article class="history-card"><span class="outcome ' + escapeHtml(outcome) + '">' + outcomeLabel(outcome) + '</span><h3>' + escapeHtml(tip.home) + ' vs ' + escapeHtml(tip.away) + '</h3><p>' + escapeHtml(tip.market) + '</p><p>' + escapeHtml(score) + '</p></article>';
         }).join('');
       }
-      async function loadHistory() {
-        try { var res = await fetch(API_BASE + '/api/golden-tips/history', {mode:'cors', cache:'no-store'}); renderHistory(await res.json()); }
-        catch (e) { document.getElementById('history').innerHTML = empty('Today’s results unavailable', 'Please check again shortly.'); }
+      function previousDate(date) {
+        var value = new Date(date + 'T12:00:00Z');
+        value.setUTCDate(value.getUTCDate() - 1);
+        return value.toISOString().slice(0, 10);
+      }
+      async function loadHistory(date, retryOnFailure) {
+        var requestedDate = date === 'today' ? null : (date || historyDate);
+        var url = API_BASE + '/api/golden-tips/history' + (requestedDate ? '?date=' + encodeURIComponent(requestedDate) : '');
+        try {
+          var res = await fetch(url, {mode:'cors', cache:'no-store'});
+          if (!res.ok) throw new Error('History request failed');
+          renderHistory(await res.json());
+          if (historyRetryTimer) { clearTimeout(historyRetryTimer); historyRetryTimer = null; }
+        } catch (e) {
+          document.getElementById('history').innerHTML = empty('Today’s results unavailable', 'Please check again shortly.');
+          if (retryOnFailure !== false && !historyRetryTimer) historyRetryTimer = setTimeout(function() { historyRetryTimer = null; loadHistory(requestedDate, false); }, 10000);
+        }
       }
       var liveTimer = null;
       var POLL_INTERVAL = 60 * 1000;
@@ -399,7 +431,7 @@
         } catch (e) {
           container.innerHTML = empty('Live data unavailable', 'The live data feed is warming up. Retrying shortly...');
         }
-        loadHistory();
+        loadHistory(historyDate, false);
         schedulePoll(POLL_INTERVAL);
       }
 
@@ -423,8 +455,10 @@
         localStorage.removeItem('wf-live-alerts');
       }
       updateAlertButton();
+      document.getElementById('previousHistoryButton').addEventListener('click', function() { loadHistory(previousDate(historyDate || new Date().toISOString().slice(0, 10))); });
+      document.getElementById('todayHistoryButton').addEventListener('click', function() { loadHistory('today'); });
       loadLive();
-      loadHistory();
+      loadHistory('today', true);
     })();
     document.getElementById('hamburger')?.addEventListener('click', function() { this.classList.toggle('active'); document.getElementById('nav')?.classList.toggle('open'); });
   </script>

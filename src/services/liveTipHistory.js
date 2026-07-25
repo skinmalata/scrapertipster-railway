@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const TIME_ZONE = 'Africa/Lagos';
+const HISTORY_RETENTION_DAYS = 90;
 const tipsByDay = new Map();
 const HISTORY_FILE = process.env.LIVE_TIP_HISTORY_FILE || path.join(
   process.env.RAILWAY_VOLUME_MOUNT_PATH || process.env.RENDER_DISK_PATH || process.cwd(),
@@ -12,6 +13,16 @@ function dayKey(value) {
   const values = {};
   parts.forEach(function(part) { values[part.type] = part.value; });
   return values.year + '-' + values.month + '-' + values.day;
+}
+
+function isValidDayKey(value) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(String(value || ''));
+}
+
+function dayAgeInDays(day) {
+  const then = new Date(day + 'T00:00:00Z').getTime();
+  const now = new Date(dayKey() + 'T00:00:00Z').getTime();
+  return Math.floor((now - then) / (24 * 60 * 60 * 1000));
 }
 
 function number(value) { const result = Number(value); return Number.isFinite(result) ? result : 0; }
@@ -79,10 +90,9 @@ function resolveNextGoal(tip, score, final) {
 }
 
 function prune() {
-  const today = dayKey();
   let changed = false;
   tipsByDay.forEach(function(_, key) {
-    if (key !== today) {
+    if (!isValidDayKey(key) || dayAgeInDays(key) > HISTORY_RETENTION_DAYS || dayAgeInDays(key) < 0) {
       tipsByDay.delete(key);
       changed = true;
     }
@@ -90,9 +100,8 @@ function prune() {
   if (changed) saveHistory();
 }
 
-// Clear the daily record even if no visitor loads the history endpoint after
-// midnight. Calls to the public methods also prune, so this is a safeguard
-// rather than the only cleanup path.
+// Keep a rolling record for performance review. Calls to the public methods
+// also prune, so this timer is only a safeguard.
 const dailyPruneTimer = setInterval(prune, 60 * 1000);
 if (typeof dailyPruneTimer.unref === 'function') dailyPruneTimer.unref();
 
@@ -111,37 +120,44 @@ function recordTips(opportunities, issuedAt) {
 
 function settleTips(liveMatches, dailyResults) {
   prune();
-  const tips = tipsByDay.get(dayKey());
-  if (!tips) return;
   const liveById = new Map((liveMatches || []).map(function(match) { return [String(match.matchId), match]; }));
-  tips.forEach(function(tip) {
-    if (tip.outcome !== 'pending') return;
-    const live = liveById.get(tip.fixtureId), result = dailyResults && dailyResults.get(tip.fixtureId);
-    let outcome = live ? (resolveNextGoal(tip, live.score, false) || cornerOutcome(tip, live.corners)) : null;
-    let score = live && live.score;
-    if (!outcome && result && result.finished) {
-      score = result.score;
-      outcome = resolveNextGoal(tip, score, true)
-        || cornerOutcome(tip, result.corners)
-        || outcomeForFinal(tip, score);
-      if (!outcome && isCornerMarket(tip) && Number.isFinite(Number(result.corners))) outcome = 'lost';
-      if (!outcome) outcome = 'unresolved';
-    }
-    if (!outcome) return;
-    tip.outcome = outcome;
-    tip.finalScore = score ? number(score.home) + ' - ' + number(score.away) : null;
-    tip.resolvedAt = new Date().toISOString();
-    saveHistory();
+  let changed = false;
+  tipsByDay.forEach(function(tips) {
+    tips.forEach(function(tip) {
+      if (tip.outcome !== 'pending') return;
+      const live = liveById.get(tip.fixtureId), result = dailyResults && dailyResults.get(tip.fixtureId);
+      let outcome = live ? (resolveNextGoal(tip, live.score, false) || cornerOutcome(tip, live.corners)) : null;
+      let score = live && live.score;
+      if (!outcome && result && result.finished) {
+        score = result.score;
+        outcome = resolveNextGoal(tip, score, true)
+          || cornerOutcome(tip, result.corners)
+          || outcomeForFinal(tip, score);
+        if (!outcome && isCornerMarket(tip) && Number.isFinite(Number(result.corners))) outcome = 'lost';
+        if (!outcome) outcome = 'unresolved';
+      }
+      if (!outcome) return;
+      tip.outcome = outcome;
+      tip.finalScore = score ? number(score.home) + ' - ' + number(score.away) : null;
+      tip.resolvedAt = new Date().toISOString();
+      changed = true;
+    });
   });
+  if (changed) saveHistory();
 }
 
-function getTodayTips() {
+function getTipsForDate(date) {
   prune();
-  const tips = tipsByDay.get(dayKey());
+  const selectedDate = isValidDayKey(date) ? date : dayKey();
+  const tips = tipsByDay.get(selectedDate);
   if (!tips) return [];
   // Each stored rule is a published tip. Do not collapse different rules that
   // happen to recommend the same market for the same fixture.
   return Array.from(tips.values()).sort(function(a, b) { return new Date(b.issuedAt) - new Date(a.issuedAt); });
+}
+
+function getTodayTips() {
+  return getTipsForDate(dayKey());
 }
 
 function getPendingCornerFixtureIds() {
@@ -155,4 +171,4 @@ function getPendingCornerFixtureIds() {
 
 loadHistory();
 
-module.exports = { recordTips, settleTips, getTodayTips, getPendingCornerFixtureIds };
+module.exports = { recordTips, settleTips, getTodayTips, getTipsForDate, getPendingCornerFixtureIds };

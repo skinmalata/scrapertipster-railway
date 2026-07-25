@@ -12,7 +12,7 @@ function getGeneratePostThumbnail() {
 const { asNumber, buildOpportunities } = require('../services/liveTips');
 const { getCachedLive } = require('../services/scrapeLive');
 const { buildGoldenTips } = require('../services/goldenOpportunities');
-const { getTodayTips } = require('../services/liveTipHistory');
+const { getTodayTips, getTipsForDate } = require('../services/liveTipHistory');
 
 // API-Football responses are cached so one busy page does not consume the
 // provider quota for every visitor. The API key is deliberately kept here,
@@ -868,7 +868,9 @@ router.get('/golden-tips', async function (req, res) {
 });
 
 router.get('/golden-tips/history', function(req, res) {
-  res.json({ available: true, date: new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Lagos' }).format(new Date()), tips: getTodayTips() });
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Lagos' }).format(new Date());
+  const requestedDate = /^\d{4}-\d{2}-\d{2}$/.test(String(req.query.date || '')) ? String(req.query.date) : today;
+  res.json({ available: true, date: requestedDate, today, tips: requestedDate === today ? getTodayTips() : getTipsForDate(requestedDate) });
 });
 
 module.exports = router;
