@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html lang="en">
 
@@ -145,9 +145,6 @@
    ]
  }
 </script>
-
-
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6975707128100932" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -288,7 +285,7 @@
 
   <details class="faq-item"><summary>How does the football accumulator ticket builder work?</summary><p>The accumulator ticket builder scans all available AI-powered predictions across 1X2, Over/Under, BTTS, and double chance markets. It combines selections whose multiplied odds match your target, prioritising combinations closest to your desired accumulator price.</p></details>
 
-  <details class="faq-item"><summary>How the Accumulator Builder Works</summary><p>Our ticket builder algorithm scans all available predictions across 1X2, Over/Under, BTTS, corners, cards, and streak markets to find combinations of selections whose multiplied odds match your target.</p><p><strong>Target Odds</strong> � The total accumulator odds you want to achieve (e.g., 20.00 for a 20/1 shot).<br><strong>Min/Max Odds per Leg</strong> � Filters individual selections within your preferred odds range.<br><strong>Only Today</strong> � Restrict to today's fixtures or include future matches for more combinations.</p><p>Each generated ticket shows the match, predicted outcome, individual odds, and total accumulator price. The algorithm prioritizes combinations closest to your target odds.</p></details>
+  <details class="faq-item"><summary>How the Accumulator Builder Works</summary><p>Our ticket builder algorithm scans all available predictions across 1X2, Over/Under, BTTS, corners, cards, and streak markets to find combinations of selections whose multiplied odds match your target.</p><p><strong>Target Odds</strong> ï¿½ The total accumulator odds you want to achieve (e.g., 20.00 for a 20/1 shot).<br><strong>Min/Max Odds per Leg</strong> ï¿½ Filters individual selections within your preferred odds range.<br><strong>Only Today</strong> ï¿½ Restrict to today's fixtures or include future matches for more combinations.</p><p>Each generated ticket shows the match, predicted outcome, individual odds, and total accumulator price. The algorithm prioritizes combinations closest to your target odds.</p></details>
 
   <details class="faq-item"><summary>What markets are included in the accumulator builder?</summary><p>The builder covers 1X2 (match result), Over 1.5 goals, Over 2.5 goals, BTTS Yes, BTTS No, and Double Chance selections derived from unbeaten streak analysis. All predictions are powered by AI analysis of team form, head-to-head records, and statistical models.</p></details>
 
@@ -1697,7 +1694,7 @@ nav.open { display: flex !important; }
  }
 
 
-/* Hamburger menu � mobile */
+/* Hamburger menu ï¿½ mobile */
 .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 1001; }
 .hamburger span { display: block; width: 22px; height: 2px; background: var(--text-primary, #e8edf5); margin: 5px 0; transition: all 0.3s; border-radius: 2px; }
 .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
@@ -1847,7 +1844,7 @@ nav.open { display: flex !important; }
  }
 
  if (todayOnly && dataDate !== today) {
-  results.innerHTML = '<div class="no-matches"><p>Today\'s prediction data is not available yet. The latest data is dated ' + escapeHtml(dataDate || 'unknown date') + '. Disable �Only Today\'s Matches� to review the latest available fixtures.</p></div>';
+  results.innerHTML = '<div class="no-matches"><p>Today\'s prediction data is not available yet. The latest data is dated ' + escapeHtml(dataDate || 'unknown date') + '. Disable ï¿½Only Today\'s Matchesï¿½ to review the latest available fixtures.</p></div>';
   return;
  }
 
@@ -2330,16 +2327,16 @@ nav.open { display: flex !important; }
 
   var liveOddsCount = ticket.selections.filter(function(s) { return s.oddsSource === 'API-Football'; }).length;
   var listedCornerCount = ticket.selections.filter(function(s) { return s.oddsSource === 'Listed corner price'; }).length;
-  var sourceNote = liveOddsCount === ticket.selections.length ? 'Live API-Football market odds' : (listedCornerCount === ticket.selections.length ? 'Listed corner-market odds' : (liveOddsCount || listedCornerCount ? 'Mixed live, listed, and estimated odds' : 'Estimated odds � not bookmaker prices'));
+  var sourceNote = liveOddsCount === ticket.selections.length ? 'Live API-Football market odds' : (listedCornerCount === ticket.selections.length ? 'Listed corner-market odds' : (liveOddsCount || listedCornerCount ? 'Mixed live, listed, and estimated odds' : 'Estimated odds ï¿½ not bookmaker prices'));
  var tableRows = ticket.selections.map(function(s, si) {
 
  return '<tr class="ticket-row fade-in" style="animation-delay: ' + (tidx * 80 + si * 30) + 'ms">' +
 
  '<td class="ticket-cell-num">' + (si + 1) + '</td>' +
 
- '<td class="ticket-cell-match">' + escapeHtml(s.match) + '<span class="ticket-detail">' + escapeHtml([s.league, s.date, s.time].filter(Boolean).join(' � ') || 'Match details unavailable') + '</span></td>' +
+ '<td class="ticket-cell-match">' + escapeHtml(s.match) + '<span class="ticket-detail">' + escapeHtml([s.league, s.date, s.time].filter(Boolean).join(' ï¿½ ') || 'Match details unavailable') + '</span></td>' +
 
-  '<td class="ticket-cell-tip"><span class="tip-badge">' + escapeHtml(s.tip) + '</span><div class="ticket-confidence"><strong>' + escapeHtml(s.category) + '</strong> � ' + escapeHtml(s.oddsSource === 'API-Football' ? 'Live API-Football market price' : (s.oddsSource === 'Listed corner price' ? 'Listed corner-market price' : 'Estimated probability ' + Number(s.probability).toFixed(0) + '%')) + '</div></td>' +
+  '<td class="ticket-cell-tip"><span class="tip-badge">' + escapeHtml(s.tip) + '</span><div class="ticket-confidence"><strong>' + escapeHtml(s.category) + '</strong> ï¿½ ' + escapeHtml(s.oddsSource === 'API-Football' ? 'Live API-Football market price' : (s.oddsSource === 'Listed corner price' ? 'Listed corner-market price' : 'Estimated probability ' + Number(s.probability).toFixed(0) + '%')) + '</div></td>' +
 
  '</tr>'; }).join('');
 
