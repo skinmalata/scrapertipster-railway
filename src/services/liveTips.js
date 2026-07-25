@@ -123,7 +123,7 @@ function buildOpportunities(fixtures, oddsByFixture, statisticsByFixture, headTo
     }
 
     const h2h = headToHeadSummary(fixture, headToHeadByFixture.get(fixtureId));
-    if (elapsed < 51 || elapsed > 85 || h2h.meetings < 4) return;
+    if (elapsed < 51 || elapsed > 75 || h2h.meetings < 4) return;
     const teams = [
       { side: 'home', id: fixture.teams?.home?.id, name: fixture.teams?.home?.name, code: '1', stats: teamStatistics(statisticsResponse, fixture.teams?.home?.id) },
       { side: 'away', id: fixture.teams?.away?.id, name: fixture.teams?.away?.name, code: '2', stats: teamStatistics(statisticsResponse, fixture.teams?.away?.id) }

@@ -519,17 +519,22 @@ function pickBest(rules, match) {
   return best;
 }
 
+function hasAtLeastFifteenMinutesRemaining(match) {
+  var elapsed = asNumber(match && match.minute);
+
+  // A match at minute 30 or 75 has exactly 15 minutes remaining in that half.
+  // Do not publish once it moves beyond either cutoff.
+  return elapsed <= 30 || (elapsed >= 45 && elapsed <= 75);
+}
+
 function buildGoldenTips(liveData) {
   if (!liveData || !liveData.matches) return [];
 
   var opportunities = [];
 
   liveData.matches.forEach(function (match) {
-    var elapsed = asNumber(match.minute);
-    // Publish only while at least 12 minutes remain in the active half:
-    // minutes 0-30 in the first half and 58-88 in the second half.
-    // LateGoalStorm needs up to minute 88, so the upper bound follows that.
-    if ((elapsed > 30 && elapsed < 58) || elapsed > 88) return;
+    // Never publish a tip with fewer than 15 minutes remaining in either half.
+    if (!hasAtLeastFifteenMinutesRemaining(match)) return;
     var marketTip = pickBest(MARKET_RULES, match);
     var teamTip = pickBest(TEAM_RULES, match);
     var cornerTip = pickBest(CORNER_RULES, match);
@@ -574,6 +579,7 @@ function buildGoldenTips(liveData) {
 
 module.exports = {
   buildGoldenTips,
+  hasAtLeastFifteenMinutesRemaining,
   checkLateGoalStorm,
   checkBTTSPressure,
   checkDominantPressure,

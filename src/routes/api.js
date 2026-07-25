@@ -738,7 +738,8 @@ router.get('/live-tips', async (req, res) => {
     const fixtures = await request('fixtures?live=all');
     const candidates = fixtures.filter(function(fixture) {
       const minute = Number(fixture.fixture?.status?.elapsed || 0);
-      return minute >= 51 && minute <= 85;
+      // At minute 75, exactly 15 minutes remain; after that, exclude it.
+      return minute >= 51 && minute <= 75;
     }).sort(function(a, b) {
       const scoreA = asNumber(a.goals?.home) + asNumber(a.goals?.away);
       const scoreB = asNumber(b.goals?.home) + asNumber(b.goals?.away);
