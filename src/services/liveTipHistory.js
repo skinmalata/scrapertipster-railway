@@ -8,6 +8,17 @@ const HISTORY_FILE = process.env.LIVE_TIP_HISTORY_FILE || path.join(
   'live-tip-history.json'
 );
 
+let supabase = null;
+(function initSupabase() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_KEY;
+  if (!url || !key) return;
+  try {
+    const { createClient } = require('@supabase/supabase-js');
+    supabase = createClient(url, key);
+  } catch (_) {}
+})();
+
 function dayKey(value) {
   const parts = new Intl.DateTimeFormat('en-GB', { timeZone: TIME_ZONE, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(value ? new Date(value) : new Date());
   const values = {};
@@ -36,8 +47,27 @@ function loadHistory() {
       tipsByDay.set(day, new Map(entries.filter(function(tip) { return tip && tip.id; }).map(function(tip) { return [tip.id, tip]; })));
     });
   } catch (error) {
-    // A missing or malformed history file must never prevent live tips loading.
     if (error.code !== 'ENOENT') console.warn('[live-tip-history] Could not load history:', error.message);
+  }
+  loadFromSupabase();
+}
+
+async function loadFromSupabase() {
+  if (!supabase) return;
+  try {
+    const { data, error } = await supabase.from('tip_history').select('day, tips');
+    if (error) throw error;
+    (data || []).forEach(function(row) {
+      const entries = Array.isArray(row.tips) ? row.tips : [];
+      const existing = tipsByDay.get(row.day) || new Map();
+      entries.filter(function(tip) { return tip && tip.id; }).forEach(function(tip) {
+        if (!existing.has(tip.id)) existing.set(tip.id, tip);
+      });
+      tipsByDay.set(row.day, existing);
+    });
+    console.log('[live-tip-history] Loaded history from Supabase (' + (data || []).length + ' days)');
+  } catch (err) {
+    console.warn('[live-tip-history] Supabase load failed:', err.message);
   }
 }
 
@@ -50,7 +80,24 @@ function saveHistory() {
     fs.writeFileSync(tempFile, JSON.stringify(saved, null, 2));
     fs.renameSync(tempFile, HISTORY_FILE);
   } catch (error) {
-    console.warn('[live-tip-history] Could not save history:', error.message);
+    if (error.code !== 'EACCES') console.warn('[live-tip-history] Could not save history:', error.message);
+  }
+  saveToSupabase();
+}
+
+async function saveToSupabase() {
+  if (!supabase) return;
+  try {
+    const rows = [];
+    tipsByDay.forEach(function(tips, day) {
+      rows.push({ day: day, tips: Array.from(tips.values()) });
+    });
+    if (rows.length) {
+      const { error } = await supabase.from('tip_history').upsert(rows, { onConflict: 'day' });
+      if (error) throw error;
+    }
+  } catch (err) {
+    console.warn('[live-tip-history] Supabase save failed:', err.message);
   }
 }
 
