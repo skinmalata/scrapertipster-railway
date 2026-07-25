@@ -11,7 +11,6 @@ function getGeneratePostThumbnail() {
 }
 const { asNumber, buildOpportunities } = require('../services/liveTips');
 const { getCachedLive } = require('../services/scrapeLive');
-const { buildGoldenTips } = require('../services/goldenOpportunities');
 const { getSettledTodayTips, getSettledTipsForDate } = require('../services/liveTipHistory');
 
 // API-Football responses are cached so one busy page does not consume the
@@ -849,7 +848,9 @@ router.get('/golden-tips', async function (req, res) {
     return res.json({ available: false, opportunities: [], message: 'Live data is not available yet. Tips will appear once live matches are detected.' });
   }
 
-  const opportunities = buildGoldenTips(liveData);
+  // Return only new, first-time tips published during the current live-data
+  // cycle. A fixture is never suggested twice on the same day.
+  const opportunities = Array.isArray(liveData.publishedTips) ? liveData.publishedTips : [];
 
   const payload = {
     available: true,

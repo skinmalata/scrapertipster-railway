@@ -108,14 +108,22 @@ if (typeof dailyPruneTimer.unref === 'function') dailyPruneTimer.unref();
 function recordTips(opportunities, issuedAt) {
   prune();
   const day = dayKey(issuedAt), tips = tipsByDay.get(day) || new Map();
+  const tippedFixtures = new Set(Array.from(tips.values()).map(function(tip) { return String(tip.fixtureId); }));
+  const published = [];
   (opportunities || []).forEach(function(tip) {
+    const fixtureId = String(tip.fixtureId);
     const id = String(tip.fixtureId) + '|' + String(tip.rule);
-    if (tips.has(id)) return;
+    // One in-play recommendation per fixture per day. The incoming list is
+    // already sorted by signal score, so the strongest qualifying tip wins.
+    if (tippedFixtures.has(fixtureId) || tips.has(id)) return;
     const score = String(tip.score || '0 - 0').match(/(\d+)\s*-\s*(\d+)/);
     tips.set(id, { id: id, fixtureId: String(tip.fixtureId), home: tip.home, away: tip.away, league: tip.league, minute: tip.minute, scoreAtTip: { home: score ? Number(score[1]) : 0, away: score ? Number(score[2]) : 0 }, cornersAtTip: Number.isFinite(Number(tip.cornerCount)) ? Number(tip.cornerCount) : null, market: tip.market, rule: tip.rule, signalScore: tip.signalScore, issuedAt: issuedAt || new Date().toISOString(), outcome: 'pending', finalScore: null, resolvedAt: null });
+    tippedFixtures.add(fixtureId);
+    published.push(tip);
   });
   tipsByDay.set(day, tips);
   saveHistory();
+  return published;
 }
 
 function settleTips(liveMatches, dailyResults) {

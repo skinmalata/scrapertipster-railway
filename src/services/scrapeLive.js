@@ -387,7 +387,7 @@ async function scrapeLive() {
     liveCache = { fetchedAt: new Date().toISOString(), matchCount: matches.length, detailedMatchCount: withStats, formMatchCount: withForm, streakMatchCount: withStreak, matchStreakCount: withMatchStreak, matches: matches };
     // Resolve previous entries before adding any tips from the latest scrape.
     settleTips(matches, dailyMatchResults);
-    recordTips(buildGoldenTips(liveCache), liveCache.fetchedAt);
+    liveCache.publishedTips = recordTips(buildGoldenTips(liveCache), liveCache.fetchedAt);
     console.log('[fotmob-live] Scraped', matches.length, 'live matches (' + withStats + ' stats, ' + withH2h + ' h2h, ' + withForm + ' form, ' + withStreak + ' win-streaks, ' + withMatchStreak + ' match-streaks)');
   } catch (e) {
     console.warn('[fotmob-live] Scrape failed:', e.message);
@@ -409,7 +409,7 @@ async function scrapeLive() {
           }
           liveCache = { fetchedAt: new Date().toISOString(), matchCount: retryMatches.length, matches: retryMatches };
           settleTips(retryMatches, dailyMatchResults);
-          recordTips(buildGoldenTips(liveCache), liveCache.fetchedAt);
+          liveCache.publishedTips = recordTips(buildGoldenTips(liveCache), liveCache.fetchedAt);
           console.log('[fotmob-live] Retry succeeded:', retryMatches.length, 'matches');
         }
       } catch (retryErr) {
