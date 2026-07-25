@@ -1,7 +1,7 @@
 const https = require('https');
 const { fetchTodayStreaks, findStreakForTeam, findMatchStreak } = require('./h2hWinningStreaks');
 const { buildGoldenTips } = require('./goldenOpportunities');
-const { recordTips, settleTips, getPendingCornerFixtureIds } = require('./liveTipHistory');
+const { recordTips, settleTips, getPendingTipsForDate, getPendingCornerFixtureIds } = require('./liveTipHistory');
 
 const SCRAPE_INTERVAL_MS = 5 * 60 * 1000;
 const FOTMOB_STATS_DELAY_MS = 200;
@@ -387,7 +387,34 @@ async function scrapeLive() {
     liveCache = { fetchedAt: new Date().toISOString(), matchCount: matches.length, detailedMatchCount: withStats, formMatchCount: withForm, streakMatchCount: withStreak, matchStreakCount: withMatchStreak, matches: matches };
     // Resolve previous entries before adding any tips from the latest scrape.
     settleTips(matches, dailyMatchResults);
-    liveCache.publishedTips = recordTips(buildGoldenTips(liveCache), liveCache.fetchedAt);
+    var currentTips = buildGoldenTips(liveCache);
+    recordTips(currentTips, liveCache.fetchedAt);
+    // Build the full active tips list: current qualifying tips + pending tips
+    // from history that no longer qualify but haven't been settled yet.
+    var liveById = new Map((matches || []).map(function(m) { return [String(m.matchId), m]; }));
+    var currentKeys = {};
+    currentTips.forEach(function(t) { currentKeys[String(t.fixtureId) + '|' + String(t.rule)] = true; });
+    var pendingTips = getPendingTipsForDate();
+    var activeTips = currentTips.slice();
+    pendingTips.forEach(function(pt) {
+      var key = String(pt.fixtureId) + '|' + String(pt.rule);
+      if (currentKeys[key]) return;
+      var live = liveById.get(String(pt.fixtureId));
+      activeTips.push({
+        fixtureId: pt.fixtureId,
+        home: pt.home,
+        away: pt.away,
+        league: pt.league,
+        minute: live && live.minute ? live.minute : pt.minute,
+        score: live && live.score ? (live.score.home + ' - ' + live.score.away) : (pt.score || '0 - 0'),
+        market: pt.market,
+        rule: pt.rule,
+        signalScore: pt.signalScore,
+        category: pt.category || 'MARKET',
+        reason: pt.reason || 'Tip active and pending settlement.'
+      });
+    });
+    liveCache.publishedTips = activeTips;
     console.log('[fotmob-live] Scraped', matches.length, 'live matches (' + withStats + ' stats, ' + withH2h + ' h2h, ' + withForm + ' form, ' + withStreak + ' win-streaks, ' + withMatchStreak + ' match-streaks)');
   } catch (e) {
     console.warn('[fotmob-live] Scrape failed:', e.message);

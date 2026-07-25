@@ -170,7 +170,7 @@ function recordTips(opportunities, issuedAt) {
     // already sorted by signal score, so the strongest qualifying tip wins.
     if (tippedFixtures.has(fixtureId) || tips.has(id)) return;
     const score = String(tip.score || '0 - 0').match(/(\d+)\s*-\s*(\d+)/);
-    tips.set(id, { id: id, fixtureId: String(tip.fixtureId), home: tip.home, away: tip.away, league: tip.league, minute: tip.minute, scoreAtTip: { home: score ? Number(score[1]) : 0, away: score ? Number(score[2]) : 0 }, cornersAtTip: Number.isFinite(Number(tip.cornerCount)) ? Number(tip.cornerCount) : null, market: tip.market, rule: tip.rule, signalScore: tip.signalScore, issuedAt: issuedAt || new Date().toISOString(), outcome: 'pending', finalScore: null, resolvedAt: null });
+    tips.set(id, { id: id, fixtureId: String(tip.fixtureId), home: tip.home, away: tip.away, league: tip.league, minute: tip.minute, score: tip.score || '0 - 0', scoreAtTip: { home: score ? Number(score[1]) : 0, away: score ? Number(score[2]) : 0 }, cornersAtTip: Number.isFinite(Number(tip.cornerCount)) ? Number(tip.cornerCount) : null, market: tip.market, rule: tip.rule, signalScore: tip.signalScore, category: tip.category || 'MARKET', reason: tip.reason || '', issuedAt: issuedAt || new Date().toISOString(), outcome: 'pending', finalScore: null, resolvedAt: null });
     tippedFixtures.add(fixtureId);
     published.push(tip);
   });
@@ -231,6 +231,12 @@ function getSettledTodayTips() {
   return getSettledTipsForDate(dayKey());
 }
 
+function getPendingTipsForDate(date) {
+  return getTipsForDate(date).filter(function(tip) {
+    return tip.outcome === 'pending';
+  });
+}
+
 function getPendingCornerFixtureIds() {
   prune();
   const tips = tipsByDay.get(dayKey());
@@ -242,4 +248,4 @@ function getPendingCornerFixtureIds() {
 
 loadHistory();
 
-module.exports = { recordTips, settleTips, getTodayTips, getTipsForDate, getSettledTodayTips, getSettledTipsForDate, getPendingCornerFixtureIds };
+module.exports = { recordTips, settleTips, getTodayTips, getTipsForDate, getSettledTodayTips, getSettledTipsForDate, getPendingTipsForDate, getPendingCornerFixtureIds };
