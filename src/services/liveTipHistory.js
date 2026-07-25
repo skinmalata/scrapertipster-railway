@@ -12,11 +12,17 @@ let supabase = null;
 (function initSupabase() {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_KEY;
-  if (!url || !key) return;
+  if (!url || !key) {
+    console.warn('[live-tip-history] Supabase not configured (missing SUPABASE_URL or SUPABASE_SERVICE_KEY)');
+    return;
+  }
   try {
     const { createClient } = require('@supabase/supabase-js');
     supabase = createClient(url, key);
-  } catch (_) {}
+    console.log('[live-tip-history] Supabase client initialized');
+  } catch (err) {
+    console.warn('[live-tip-history] Supabase init failed:', err.message);
+  }
 })();
 
 function dayKey(value) {
