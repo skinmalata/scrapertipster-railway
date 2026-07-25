@@ -108,7 +108,7 @@ async function generatePostThumbnail(slug) {
   return task;
 }
 
-async function main() {
+async function generateAllThumbnails() {
   const requestedSlug = process.argv[2];
   const files = requestedSlug ? [`${requestedSlug}.html`] : fs.readdirSync(blogDir).filter(file => file.endsWith('.html') && file !== 'index.html');
   const tasks = [];
@@ -124,7 +124,7 @@ async function main() {
   console.log(`Done: ${tasks.length} legacy thumbnails regenerated.`);
 }
 if (require.main === module) {
-  main().catch(error => { console.error(error); process.exit(1); });
+  generateAllThumbnails().catch(error => { console.error(error); process.exit(1); });
 }
 
-module.exports = { generatePostThumbnail };
+module.exports = { generatePostThumbnail, generateAllThumbnails };

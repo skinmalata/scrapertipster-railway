@@ -5,7 +5,7 @@ const path = require('path');
 let generatePostThumbnail;
 function getGeneratePostThumbnail() {
   if (!generatePostThumbnail) {
-    generatePostThumbnail = require('../../scripts/regenerate-legacy-thumbnails').generatePostThumbnail;
+    generatePostThumbnail = require('../../scripts/generate-thumbnail').generatePostThumbnail;
   }
   return generatePostThumbnail;
 }
