@@ -512,7 +512,7 @@ function checkHTDrawStreak(match) {
   };
 }
 
-var KICKOFF_RULES = [checkHTOver15Streak, checkHTOver05Streak];
+var KICKOFF_RULES = [checkHTOver15Streak, checkHTOver05Streak, checkHTDrawStreak];
 
 function pickBest(rules, match) {
   var best = null;
