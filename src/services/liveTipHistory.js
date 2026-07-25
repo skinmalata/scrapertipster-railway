@@ -187,7 +187,7 @@ function settleTips(liveMatches, dailyResults) {
     tips.forEach(function(tip) {
       if (tip.outcome !== 'pending') return;
       const live = liveById.get(tip.fixtureId), result = dailyResults && dailyResults.get(tip.fixtureId);
-      let outcome = live ? (resolveNextGoal(tip, live.score, false) || cornerOutcome(tip, live.corners)) : null;
+      let outcome = live ? (resolveNextGoal(tip, live.score, false) || cornerOutcome(tip, live.corners) || outcomeForFinal(tip, live.score)) : null;
       let score = live && live.score;
       if (!outcome && result && result.finished) {
         score = result.score;
