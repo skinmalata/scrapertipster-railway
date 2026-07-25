@@ -541,6 +541,9 @@ function buildGoldenTips(liveData) {
   liveData.matches.forEach(function (match) {
     // Never publish a tip with fewer than 15 minutes remaining in either half.
     if (!hasAtLeastFifteenMinutesRemaining(match)) return;
+    // Skip matches with 3+ goals already scored (over 2.5)
+    var totalGoals = scoreTotal(match.score);
+    if (totalGoals !== null && totalGoals >= 3) return;
     var marketTip = pickBest(MARKET_RULES, match);
     var teamTip = pickBest(TEAM_RULES, match);
     var cornerTip = pickBest(CORNER_RULES, match);

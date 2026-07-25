@@ -105,6 +105,8 @@ function buildOpportunities(fixtures, oddsByFixture, statisticsByFixture, headTo
     const elapsed = asNumber(fixture.fixture?.status?.elapsed);
     const homeGoals = asNumber(fixture.goals?.home);
     const awayGoals = asNumber(fixture.goals?.away);
+    // Skip matches with 3+ goals already scored (over 2.5)
+    if (homeGoals + awayGoals >= 3) return;
     const statisticsResponse = statisticsByFixture.get(fixtureId);
     const statistics = summariseStatistics(statisticsResponse);
     const oddsEntry = oddsByFixture.get(fixtureId);
