@@ -406,7 +406,7 @@ async function scrapeLive() {
         away: pt.away,
         league: pt.league,
         minute: live && live.minute ? live.minute : pt.minute,
-        score: live && live.score ? (live.score.home + ' - ' + live.score.away) : (pt.score || '0 - 0'),
+        score: pt.scoreAtTip ? (pt.scoreAtTip.home + ' - ' + pt.scoreAtTip.away) : (pt.score || '0 - 0'),
         market: pt.market,
         rule: pt.rule,
         signalScore: pt.signalScore,
