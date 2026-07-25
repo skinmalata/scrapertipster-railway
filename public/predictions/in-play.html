@@ -214,10 +214,7 @@
       <p>Free live football betting tips powered by real-time match statistics. Our strategy rules analyse live shots, corners and possession to find betting edges during the game.</p>
     </section>
 
-    <div class="alert-panel">
-      <button id="alertButton" class="alert-btn" type="button">Enable In-Play Alerts</button>
-      <p class="alert-note">Alerts are sent only while this In-Play Betting Tips page remains open in your browser.</p>
-    </div>
+
     <section id="tips" class="tip-grid" aria-live="polite">
       <div class="empty"><div class="empty-icon">?</div><h2>Loading live matches</h2><p>Fetching current live match data.</p></div>
     </section>
@@ -279,47 +276,16 @@
     (function() {
       var API_BASE = 'https://winfulltime-api.onrender.com';
       var container = document.getElementById('tips');
-      var alertButton = document.getElementById('alertButton');
-      var alertEnabled = localStorage.getItem('wf-live-alerts') === 'true';
-      var previousTipKeys = {};
-      var baselineReady = false;
       var historyDate = null;
       var historyRetryTimer = null;
       function escapeHtml(value) { return String(value || '').replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
       function empty(title, body) { return '<div class="empty"><div class="empty-icon">?</div><h2>' + escapeHtml(title) + '</h2><p>' + escapeHtml(body) + '</p></div>'; }
-      function updateAlertButton() {
-        var supported = 'Notification' in window;
-        alertButton.disabled = !supported || Notification.permission === 'denied';
-        alertButton.classList.toggle('enabled', alertEnabled && supported && Notification.permission === 'granted');
-        alertButton.textContent = !supported ? 'Alerts unavailable in this browser' : (Notification.permission === 'denied' ? 'Alerts blocked in browser settings' : (alertEnabled ? 'In-Play alerts enabled' : 'Enable In-Play Alerts'));
-      }
       function tipKey(o) { return o.fixtureId + '|' + o.rule; }
-      function sendNotification(title, body) {
-        if (!alertEnabled || !('Notification' in window) || Notification.permission !== 'granted') return;
-        try { new Notification(title, { body: body, icon: '/winfulltimelogo.png', tag: 'wf-tip', renotify: true }); } catch (e) {}
-      }
-      function notifyNewTips(opportunities) {
-        var currentKeys = {};
-        opportunities.forEach(function(o) { currentKeys[tipKey(o)] = true; });
-        if (baselineReady) {
-          opportunities.forEach(function(o) {
-            var k = tipKey(o);
-            if (!previousTipKeys[k]) {
-              sendNotification(o.home + ' vs ' + o.away, o.market + ' � ' + o.signalScore + '% signal');
-            }
-          });
-        }
-        previousTipKeys = currentKeys;
-        baselineReady = true;
-      }
       function renderOpportunities(data) {
         if (!data.available || !data.opportunities || !data.opportunities.length) {
           container.innerHTML = empty('No in-play betting tips currently', 'Tips appear when live match data meets our strategy rules. Bet Responsibly.');
-          previousTipKeys = {};
-          baselineReady = false;
           return;
         }
-        notifyNewTips(data.opportunities);
         container.innerHTML = data.opportunities.map(function(o) {
           var minute = o.minute ? o.minute + '\'' : 'Live';
           var score = o.signalScore ? Math.round(o.signalScore) : null;
@@ -397,20 +363,6 @@
           loadLive();
         }
       });
-      alertButton.addEventListener('click', async function() {
-        if (!('Notification' in window)) return updateAlertButton();
-        if (Notification.permission === 'default') await Notification.requestPermission();
-        if (Notification.permission === 'granted') {
-          alertEnabled = !alertEnabled;
-          localStorage.setItem('wf-live-alerts', String(alertEnabled));
-        }
-        updateAlertButton();
-      });
-      if (alertEnabled && 'Notification' in window && Notification.permission !== 'granted') {
-        alertEnabled = false;
-        localStorage.removeItem('wf-live-alerts');
-      }
-      updateAlertButton();
       document.getElementById('previousHistoryButton').addEventListener('click', function() { loadHistory(previousDate(historyDate || new Date().toISOString().slice(0, 10))); });
       document.getElementById('todayHistoryButton').addEventListener('click', function() { loadHistory('today'); });
       loadLive();
