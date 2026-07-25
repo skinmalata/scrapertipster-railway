@@ -48,6 +48,10 @@ function isGoalless(score) {
   return scoreTotal(score) === 0;
 }
 
+function isBttsMarket(market) {
+  return /\bbtts\b/i.test(String(market || ''));
+}
+
 function nextGoalTimeFactor(elapsed) {
   if (elapsed < 60) return 0;
   if (elapsed <= 70) return -0.5;
@@ -119,7 +123,9 @@ function checkBTTSPressure(match) {
   if (!isGoalless(match.score)) return null;
 
   var elapsed = asNumber(match.minute);
-  if (elapsed < 45 || elapsed > 80) return null;
+  // BTTS is only offered in the first half, while there is still enough time
+  // for the market to develop before the interval.
+  if (elapsed < 10 || elapsed > 30) return null;
 
   var homeStats = stats.homeTeam || {};
   var awayStats = stats.awayTeam || {};
@@ -543,6 +549,9 @@ function buildGoldenTips(liveData) {
 
     [marketTip, teamTip, cornerTip, kickoffTip].forEach(function (tip) {
       if (!tip) return;
+      // Keep this at the publishing boundary so a future BTTS rule cannot
+      // accidentally introduce second-half BTTS recommendations.
+      if (isBttsMarket(tip.market) && asNumber(match.minute) >= 45) return;
       opportunities.push({
         fixtureId: match.matchId,
         home: match.home,
@@ -580,6 +589,7 @@ function buildGoldenTips(liveData) {
 module.exports = {
   buildGoldenTips,
   hasAtLeastFifteenMinutesRemaining,
+  isBttsMarket,
   checkLateGoalStorm,
   checkBTTSPressure,
   checkDominantPressure,
