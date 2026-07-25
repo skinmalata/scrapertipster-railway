@@ -160,6 +160,16 @@ function getTodayTips() {
   return getTipsForDate(dayKey());
 }
 
+function getSettledTipsForDate(date) {
+  return getTipsForDate(date).filter(function(tip) {
+    return tip.outcome === 'won' || tip.outcome === 'lost';
+  });
+}
+
+function getSettledTodayTips() {
+  return getSettledTipsForDate(dayKey());
+}
+
 function getPendingCornerFixtureIds() {
   prune();
   const tips = tipsByDay.get(dayKey());
@@ -171,4 +181,4 @@ function getPendingCornerFixtureIds() {
 
 loadHistory();
 
-module.exports = { recordTips, settleTips, getTodayTips, getTipsForDate, getPendingCornerFixtureIds };
+module.exports = { recordTips, settleTips, getTodayTips, getTipsForDate, getSettledTodayTips, getSettledTipsForDate, getPendingCornerFixtureIds };

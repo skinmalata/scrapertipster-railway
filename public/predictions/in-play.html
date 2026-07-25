@@ -385,11 +385,11 @@
       }
       function renderHistory(data) {
         var history = document.getElementById('history');
-        var tips = data && data.tips || [];
+        var tips = (data && data.tips || []).filter(function(tip) { return tip.outcome === 'won' || tip.outcome === 'lost'; });
         if (data && data.date) historyDate = data.date;
         document.getElementById('historyDate').textContent = displayHistoryDate(historyDate);
         document.getElementById('todayHistoryButton').classList.toggle('active', data && data.date === data.today);
-        if (!tips.length) { history.innerHTML = empty('No in-play tips recorded for this date', 'Completed and pending tips appear here after live matches are analysed.'); return; }
+        if (!tips.length) { history.innerHTML = empty('No settled in-play results for this date', 'Won and lost tips appear here after the match outcome is confirmed.'); return; }
         history.innerHTML = tips.map(function(tip) {
           var outcome = tip.outcome || 'pending';
           var score = tip.finalScore ? 'Final score: ' + tip.finalScore : 'Score at tip: ' + tip.scoreAtTip.home + ' - ' + tip.scoreAtTip.away;
