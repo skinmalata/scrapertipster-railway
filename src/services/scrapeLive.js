@@ -90,7 +90,10 @@ async function fetchFotMobLive() {
   var matches = [];
   res.data.leagues.forEach(function (league) {
     league.matches.forEach(function (m) {
-      dailyMatchResults.set(String(m.id), { finished: Boolean(m.status && m.status.finished), score: parseScore(m.status) });
+      var isFinished = Boolean(m.status && m.status.finished) && !m.status.ongoing;
+      var liveShort = m.status && m.status.liveTime && m.status.liveTime.short;
+      if (isFinished && liveShort && /^HT/i.test(String(liveShort))) isFinished = false;
+      dailyMatchResults.set(String(m.id), { finished: isFinished, score: parseScore(m.status) });
       if (!m.status || !m.status.started || m.status.finished || !m.status.ongoing) return;
       var minute = parseLiveMinute(m.status);
       var score = parseScore(m.status);
