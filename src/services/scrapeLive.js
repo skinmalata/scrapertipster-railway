@@ -22,11 +22,17 @@ const cornerHistoryCache = new Map();
 let dailyMatchResults = new Map();
 let dailyMatchResultsDate = '';
 
-function todayStr() {
+function fotMobDateStr(dayOffset) {
   const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Africa/Lagos', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
   const values = {};
   parts.forEach(function(part) { values[part.type] = part.value; });
-  return values.year + values.month + values.day;
+  const date = new Date(Date.UTC(Number(values.year), Number(values.month) - 1, Number(values.day)));
+  date.setUTCDate(date.getUTCDate() + (dayOffset || 0));
+  return date.toISOString().slice(0, 10).replace(/-/g, '');
+}
+
+function todayStr() {
+  return fotMobDateStr(0);
 }
 
 function normaliseTeam(name) {
@@ -79,22 +85,42 @@ function httpGet(url, timeoutMs) {
   });
 }
 
+function addFotMobResults(data) {
+  if (!data || !data.leagues) return;
+  data.leagues.forEach(function (league) {
+    league.matches.forEach(function (m) {
+      var isFinished = Boolean(m.status && m.status.finished) && !m.status.ongoing;
+      var liveShort = m.status && m.status.liveTime && m.status.liveTime.short;
+      if (isFinished && liveShort && /^HT/i.test(String(liveShort))) isFinished = false;
+      dailyMatchResults.set(String(m.id), { finished: isFinished, score: parseScore(m.status) });
+    });
+  });
+}
+
 async function fetchFotMobLive() {
   var date = todayStr();
   if (date !== dailyMatchResultsDate) {
     dailyMatchResults = new Map();
     dailyMatchResultsDate = date;
   }
-  var res = await httpGet('https://www.fotmob.com/api/data/matches?date=' + date);
+
+  // FotMob assigns late-night fixtures to its prior date. Querying only the
+  // new WAT date after midnight leaves those completed fixtures without a
+  // final score and strands their tips as pending.
+  var responses = await Promise.all([
+    httpGet('https://www.fotmob.com/api/data/matches?date=' + date),
+    httpGet('https://www.fotmob.com/api/data/matches?date=' + fotMobDateStr(-1)).catch(function() { return null; })
+  ]);
+  var res = responses[0];
+  var previousRes = responses[1];
   if (res.status !== 200 || !res.data || !res.data.leagues) return [];
+
+  if (previousRes && previousRes.status === 200) addFotMobResults(previousRes.data);
+  addFotMobResults(res.data);
 
   var matches = [];
   res.data.leagues.forEach(function (league) {
     league.matches.forEach(function (m) {
-      var isFinished = Boolean(m.status && m.status.finished) && !m.status.ongoing;
-      var liveShort = m.status && m.status.liveTime && m.status.liveTime.short;
-      if (isFinished && liveShort && /^HT/i.test(String(liveShort))) isFinished = false;
-      dailyMatchResults.set(String(m.id), { finished: isFinished, score: parseScore(m.status) });
       if (!m.status || !m.status.started || m.status.finished || !m.status.ongoing) return;
       var minute = parseLiveMinute(m.status);
       var score = parseScore(m.status);
@@ -441,8 +467,9 @@ async function scrapeLive() {
     settleTips(matches, dailyMatchResults);
     var currentTips = buildGoldenTips(liveCache);
     recordTips(currentTips, liveCache.fetchedAt);
-    // Build the full active tips list: current qualifying tips + pending tips
-    // from history that no longer qualify but haven't been settled yet.
+    // Retain a pending tip only while its fixture is still genuinely live.
+    // A pending record without a live fixture belongs to settlement/history,
+    // never in the active in-play feed.
     var liveById = new Map((matches || []).map(function(m) { return [String(m.matchId), m]; }));
     var currentKeys = {};
     currentTips.forEach(function(t) { currentKeys[String(t.fixtureId) + '|' + String(t.rule)] = true; });
@@ -452,12 +479,13 @@ async function scrapeLive() {
       var key = String(pt.fixtureId) + '|' + String(pt.rule);
       if (currentKeys[key]) return;
       var live = liveById.get(String(pt.fixtureId));
+      if (!live) return;
       activeTips.push({
         fixtureId: pt.fixtureId,
         home: pt.home,
         away: pt.away,
         league: pt.league,
-        minute: live && live.minute ? live.minute : pt.minute,
+        minute: live.minute || pt.minute,
         score: pt.scoreAtTip ? (pt.scoreAtTip.home + ' - ' + pt.scoreAtTip.away) : (pt.score || '0 - 0'),
         market: pt.market,
         rule: pt.rule,
