@@ -1,5 +1,9 @@
 const { asNumber } = require('./liveTips');
 
+// Publish only the highest-confidence opportunities. This keeps the live
+// feed selective and gives each recommendation a stronger statistical basis.
+const MINIMUM_SIGNAL_SCORE = 70;
+
 function getStats(match) {
   return match.fotmobStats || null;
 }
@@ -23,6 +27,11 @@ function getMatchStreak(match, streakType) {
 
 function getCornerContext(match) {
   return match.cornerContext || null;
+}
+
+function isFriendlyMatch(match) {
+  var competition = String(match && (match.league || match.competition || match.tournament) || '').toLowerCase();
+  return /\bfriendly\b|\bfriendlies\b|\bexhibition\b/.test(competition);
 }
 
 function hasRedCards(match, isHome) {
@@ -228,28 +237,47 @@ function checkDominantPressure(match) {
   var awayCorners = asNumber(awayStats.corners);
   var awayPossession = asNumber(awayStats.possession);
 
-  var dominantName, dominatedName, dominantShots, dominatedShots, dominantCorners, domPossession, isHomeDominant;
-  if (homeShotsTotal > awayShotsTotal && homeShotsTotal - awayShotsTotal >= 3) {
+  var dominantName, dominatedName, dominantShots, dominatedShots, dominantShotsOn, dominatedShotsOn, dominantCorners, dominatedCorners, domPossession, isHomeDominant;
+  if (homeShotsTotal > awayShotsTotal && homeShotsTotal - awayShotsTotal >= 6) {
     dominantName = match.home;
     dominatedName = match.away;
     dominantShots = homeShotsTotal;
     dominatedShots = awayShotsTotal;
+    dominantShotsOn = homeShotsOn;
+    dominatedShotsOn = awayShotsOn;
     dominantCorners = homeCorners;
+    dominatedCorners = awayCorners;
     domPossession = homePossession;
     isHomeDominant = true;
-  } else if (awayShotsTotal > homeShotsTotal && awayShotsTotal - homeShotsTotal >= 3) {
+  } else if (awayShotsTotal > homeShotsTotal && awayShotsTotal - homeShotsTotal >= 6) {
     dominantName = match.away;
     dominatedName = match.home;
     dominantShots = awayShotsTotal;
     dominatedShots = homeShotsTotal;
+    dominantShotsOn = awayShotsOn;
+    dominatedShotsOn = homeShotsOn;
     dominantCorners = awayCorners;
+    dominatedCorners = homeCorners;
     domPossession = awayPossession;
     isHomeDominant = false;
   } else {
     return null;
   }
 
-  if (dominantShots < 8) return null;
+  // Raw shot totals alone created too many weak recommendations. Require
+  // sustained control across shot quality, set pieces and possession.
+  if (dominantShots < 12 || dominantShotsOn - dominatedShotsOn < 3 ||
+      dominantCorners - dominatedCorners < 3 || domPossession < 55) return null;
+
+  var recentPressure = match.recentPressure;
+  if (recentPressure) {
+    var dominantRecent = isHomeDominant ? recentPressure.home : recentPressure.away;
+    var dominatedRecent = isHomeDominant ? recentPressure.away : recentPressure.home;
+    // The provider's timestamped shotmap lets us reject teams whose pressure
+    // is only historical. A dominant side must still be creating chances in
+    // the most recent 15 minutes.
+    if (!dominantRecent || dominantRecent.shots < 3 || dominantRecent.shots - dominatedRecent.shots < 2) return null;
+  }
 
   var h2h = getH2H(match);
   var h2hBoost = h2hDominanceBoost(h2h, isHomeDominant);
@@ -264,7 +292,7 @@ function checkDominantPressure(match) {
     rule: 'dominant-pressure',
     market: goalMarketForMinute(match, elapsed),
     signalScore: Math.round(signalScore),
-    reason: dominantName + ' dominating with ' + dominantShots + ' shots (' + dominatedShots + ' for opponent), ' + dominantCorners + ' corners' + (domPossession ? ', ' + domPossession + '% possession' : '') + ' at minute ' + elapsed + '.' + (h2hBoost > 0 ? ' H2H history favors ' + dominantName + '.' : '') + (recentFormBoost > 0 ? ' Recent form favors ' + dominantName + '.' : '')
+    reason: dominantName + ' dominating with ' + dominantShots + ' shots (' + dominantShotsOn + ' on target vs ' + dominatedShotsOn + '), ' + dominantCorners + '-' + dominatedCorners + ' corners and ' + domPossession + '% possession at minute ' + elapsed + '.' + (recentPressure ? ' Last ' + recentPressure.windowMinutes + ' minutes: ' + (isHomeDominant ? recentPressure.home.shots : recentPressure.away.shots) + '-' + (isHomeDominant ? recentPressure.away.shots : recentPressure.home.shots) + ' shots.' : '') + (h2hBoost > 0 ? ' H2H history favors ' + dominantName + '.' : '') + (recentFormBoost > 0 ? ' Recent form favors ' + dominantName + '.' : '')
   };
 }
 
@@ -539,6 +567,9 @@ function buildGoldenTips(liveData) {
   var opportunities = [];
 
   liveData.matches.forEach(function (match) {
+    // Friendly and exhibition fixtures have volatile line-ups and incentives,
+    // so they are never eligible for an in-play recommendation.
+    if (isFriendlyMatch(match)) return;
     // Never publish a tip with fewer than 15 minutes remaining in either half.
     if (!hasAtLeastFifteenMinutesRemaining(match)) return;
     // Skip matches with 3+ goals already scored (over 2.5)
@@ -552,6 +583,7 @@ function buildGoldenTips(liveData) {
 
     [marketTip, teamTip, cornerTip, kickoffTip].forEach(function (tip) {
       if (!tip) return;
+      if (asNumber(tip.signalScore) < MINIMUM_SIGNAL_SCORE) return;
       // Keep this at the publishing boundary so a future BTTS rule cannot
       // accidentally introduce second-half BTTS recommendations.
       if (isBttsMarket(tip.market) && asNumber(match.minute) >= 45) return;
@@ -590,8 +622,10 @@ function buildGoldenTips(liveData) {
 }
 
 module.exports = {
+  MINIMUM_SIGNAL_SCORE,
   buildGoldenTips,
   hasAtLeastFifteenMinutesRemaining,
+  isFriendlyMatch,
   isBttsMarket,
   checkLateGoalStorm,
   checkBTTSPressure,

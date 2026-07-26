@@ -12,6 +12,7 @@ const TEAM_FORM_CACHE_MS = 6 * 60 * 60 * 1000;
 const CORNER_HISTORY_CACHE_MS = 24 * 60 * 60 * 1000;
 const MAX_CORNER_CONTEXT_MATCHES = 2;
 const MAX_CORNER_HISTORY_FIXTURES = 2;
+const RECENT_PRESSURE_WINDOW_MINUTES = 15;
 
 let liveCache = null;
 let isScraping = false;
@@ -182,14 +183,61 @@ function extractRedCards(matchDetails) {
   return { home: home, away: away };
 }
 
-async function fetchFotMobMatchDetails(matchId) {
+// FotMob's aggregate stats describe the whole match. For a live-pressure
+// signal, use its timestamped shots and corner events to confirm that the
+// pressure is recent rather than something that happened an hour earlier.
+function extractRecentPressure(matchDetails, currentMinute) {
+  var minute = Number(currentMinute);
+  if (!Number.isFinite(minute) || minute < RECENT_PRESSURE_WINDOW_MINUTES) return null;
+
+  var general = matchDetails && matchDetails.general;
+  var homeId = general && general.homeTeam && String(general.homeTeam.id);
+  var awayId = general && general.awayTeam && String(general.awayTeam.id);
+  if (!homeId || !awayId) return null;
+
+  var startMinute = Math.max(0, minute - RECENT_PRESSURE_WINDOW_MINUTES);
+  var pressure = {
+    windowMinutes: RECENT_PRESSURE_WINDOW_MINUTES,
+    home: { shots: 0, shotsOnTarget: 0, corners: 0 },
+    away: { shots: 0, shotsOnTarget: 0, corners: 0 }
+  };
+  var sideFor = function(teamId, isHome) {
+    if (teamId && String(teamId) === homeId) return pressure.home;
+    if (teamId && String(teamId) === awayId) return pressure.away;
+    if (typeof isHome === 'boolean') return isHome ? pressure.home : pressure.away;
+    return null;
+  };
+
+  var shots = matchDetails && matchDetails.content && matchDetails.content.shotmap && matchDetails.content.shotmap.shots;
+  (shots || []).forEach(function(shot) {
+    var shotMinute = Number(shot.min);
+    if (!Number.isFinite(shotMinute) || shotMinute <= startMinute || shotMinute > minute) return;
+    var side = sideFor(shot.teamId);
+    if (!side) return;
+    side.shots++;
+    if (shot.isOnTarget) side.shotsOnTarget++;
+  });
+
+  var events = matchDetails && matchDetails.content && matchDetails.content.matchFacts && matchDetails.content.matchFacts.events && matchDetails.content.matchFacts.events.events;
+  (events || []).forEach(function(event) {
+    var eventMinute = Number(event.time);
+    if (String(event.type || '').toLowerCase() !== 'corner' || !Number.isFinite(eventMinute) || eventMinute <= startMinute || eventMinute > minute) return;
+    var side = sideFor(event.teamId, event.isHome);
+    if (side) side.corners++;
+  });
+
+  return pressure;
+}
+
+async function fetchFotMobMatchDetails(matchId, currentMinute) {
   var url = 'https://www.fotmob.com/api/data/matchDetails?matchId=' + matchId;
   var res = await httpGet(url);
   if (res.status !== 200 || !res.data) return null;
   return {
     stats: extractFotMobStats(res.data),
     h2h: extractH2H(res.data),
-    redCards: extractRedCards(res.data)
+    redCards: extractRedCards(res.data),
+    recentPressure: extractRecentPressure(res.data, currentMinute)
   };
 }
 
@@ -335,11 +383,12 @@ async function scrapeLive() {
     for (var i = 0; i < detailLimit; i++) {
       var m = detailMatches[i];
       if (i > 0 && i % 3 === 0) await new Promise(function (r) { setTimeout(r, FOTMOB_STATS_DELAY_MS); });
-      var details = await fetchFotMobMatchDetails(m.matchId).catch(function () { return null; });
+      var details = await fetchFotMobMatchDetails(m.matchId, m.minute).catch(function () { return null; });
       if (details) {
         if (details.stats) m.fotmobStats = details.stats;
         if (details.h2h) m.h2h = details.h2h;
         if (details.redCards) m.redCards = details.redCards;
+        if (details.recentPressure) m.recentPressure = details.recentPressure;
       }
     }
 
@@ -430,11 +479,12 @@ async function scrapeLive() {
           for (var ri = 0; ri < retryDetail.length; ri++) {
             var rm = retryDetail[ri];
             if (ri > 0 && ri % 3 === 0) await new Promise(function(r) { setTimeout(r, FOTMOB_STATS_DELAY_MS); });
-            var rd = await fetchFotMobMatchDetails(rm.matchId).catch(function() { return null; });
+            var rd = await fetchFotMobMatchDetails(rm.matchId, rm.minute).catch(function() { return null; });
             if (rd) {
               if (rd.stats) rm.fotmobStats = rd.stats;
               if (rd.h2h) rm.h2h = rd.h2h;
               if (rd.redCards) rm.redCards = rd.redCards;
+              if (rd.recentPressure) rm.recentPressure = rd.recentPressure;
             }
           }
           liveCache = { fetchedAt: new Date().toISOString(), matchCount: retryMatches.length, matches: retryMatches };
