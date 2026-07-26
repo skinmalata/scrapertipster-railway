@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Analyse Shot Location Heat Maps for Football Betting | WinFulltime</title>
+<meta name="description" content="Learn how to read shot location heat maps for football betting. Understand shot zones, xG maps, and how shot location data can predict goals, over/under outcomes, and team efficiency.">
+<meta name="keywords" content="shot heat maps, shot location data, xG map, shot zones, football analytics visualisation, football betting, shot location analysis, penalty area shots">
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="/winfulltimelogo.png" type="image/png">
+<meta property="og:title" content="How to Analyse Shot Location Heat Maps for Football Betting">
+<meta property="og:description" content="Learn how to read shot location heat maps for football betting. Understand shot zones, xG maps, and how shot location data predicts goals.">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://winfulltime.com/blog/thumbnails/how-to-analyse-shot-location-heat-maps-for-football-betting.webp">
+<meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/how-to-analyse-shot-location-heat-maps-for-football-betting.webp">
+<link rel="canonical" href="https://winfulltime.com/blog/how-to-analyse-shot-location-heat-maps-for-football-betting.html">
+<script type="application/ld+json">
+{
+"@context":"https://schema.org",
+"@type":"BlogPosting",
+"headline":"How to Analyse Shot Location Heat Maps for Football Betting",
+"description":"Learn how to read shot location heat maps for football betting. Understand shot zones, xG maps, and how shot location data predicts goals.",
+"url":"https://winfulltime.com/blog/how-to-analyse-shot-location-heat-maps-for-football-betting.html",
+"datePublished":"2026-07-26",
+"author":{"@type":"Organization","name":"WinFulltime"},
+"publisher":{"@type":"Organization","name":"WinFulltime"},
+"image":"https://winfulltime.com/blog/thumbnails/how-to-analyse-shot-location-heat-maps-for-football-betting.webp"
+}
+</script>
+<style>
+:root{--bg-primary:#181e30;--bg-secondary:#1e2538;--bg-card:rgba(13,17,32,0.95);--bg-elevated:#252c40;--text-primary:#e8edf5;--text-secondary:#c8d0db;--text-muted:#94a3b8;--accent:#ff2448;--accent-gradient:linear-gradient(135deg,#ff2448,#d41a38);--border:rgba(255,255,255,0.06);--border-hover:rgba(255,255,255,0.12);--glow:rgba(255,36,72,0.12);--radius:12px;--radius-lg:16px;--font:'Inter',system-ui,-apple-system,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg-primary);color:var(--text-primary);line-height:1.7}
+header{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:1rem 2rem;position:sticky;top:0;z-index:100}
+.header-content{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;text-decoration:none;color:var(--text-primary);font-size:1.5rem;font-weight:800}
+.logo-icon{width:36px;height:36px;margin-right:10px;border-radius:8px}
+.logo span{color:var(--accent)}
+nav{display:flex;gap:1.5rem;align-items:center}
+nav a{color:var(--text-secondary);text-decoration:none;font-weight:500;font-size:.95rem;transition:color .2s}
+nav a:hover{color:var(--accent)}
+.hamburger{display:none;background:none;border:none;color:var(--text-primary);font-size:1.5rem;cursor:pointer}
+.container{max-width:820px;margin:0 auto;padding:2rem 1.5rem}
+.breadcrumb{font-size:.85rem;color:var(--text-muted);margin-bottom:1.5rem}
+.breadcrumb a{color:var(--accent);text-decoration:none}
+.breadcrumb a:hover{text-decoration:underline}
+h1{font-size:2.2rem;line-height:1.25;margin-bottom:.75rem;font-weight:800}
+h2{font-size:1.5rem;margin:2rem 0 1rem;color:var(--text-primary);font-weight:700}
+h3{font-size:1.15rem;margin:1.5rem 0 .75rem;color:var(--text-primary);font-weight:600}
+p{margin-bottom:1rem;color:var(--text-secondary)}
+li{margin-bottom:.5rem;color:var(--text-secondary)}
+.meta{font-size:.85rem;color:var(--text-muted);margin-bottom:1.5rem}
+.highlight{background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700}
+.example-box{background:var(--bg-elevated);border-left:4px solid var(--accent);padding:1.25rem;border-radius:0 var(--radius) var(--radius) 0;margin:1.5rem 0}
+.example-box h3{margin-top:0}
+.strategy-box{background:var(--bg-card);border:1px solid var(--border-hover);padding:1.25rem;border-radius:var(--radius);margin:1.5rem 0}
+.pro-tip{background:rgba(34,197,94,0.08);border-left:4px solid #22c55e;padding:1.25rem;border-radius:0 var(--radius) var(--radius) 0;margin:1.5rem 0}
+.warning{background:rgba(255,193,7,0.08);border-left:4px solid #ffc107;padding:1.25rem;border-radius:0 var(--radius) var(--radius) 0;margin:1.5rem 0}
+.success{background:rgba(34,197,94,0.08);border-left:4px solid #22c55e;padding:1.25rem;border-radius:0 var(--radius) var(--radius) 0;margin:1.5rem 0}
+.steps{list-style:none;counter-reset:step}
+.steps li{counter-increment:step;padding-left:2.5rem;position:relative;margin-bottom:1rem}
+.steps li::before{content:counter(step);position:absolute;left:0;top:0;width:1.75rem;height:1.75rem;background:var(--accent-gradient);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;color:#fff}
+.cta{background:var(--accent-gradient);padding:2rem;border-radius:var(--radius-lg);text-align:center;margin:2rem 0}
+.cta h3{color:#fff;margin-bottom:.5rem}
+.cta p{color:rgba(255,255,255,.85)}
+.cta a{display:inline-block;margin-top:1rem;padding:.75rem 2rem;background:#fff;color:var(--accent);font-weight:700;border-radius:var(--radius);text-decoration:none;transition:transform .2s}
+.cta a:hover{transform:scale(1.05)}
+.related-posts{margin:2.5rem 0}
+.related-posts h2{font-size:1.25rem}
+.related-posts ul{list-style:none;display:grid;gap:.75rem}
+.related-posts a{color:var(--accent);text-decoration:none;font-weight:500}
+.related-posts a:hover{text-decoration:underline}
+.social-share{display:flex;gap:.75rem;margin:2rem 0}
+.social-share a{padding:.5rem 1.25rem;border-radius:var(--radius);text-decoration:none;font-weight:600;font-size:.85rem;color:#fff;transition:opacity .2s}
+.social-share a:hover{opacity:.85}
+table{width:100%;border-collapse:collapse;margin:1.5rem 0}
+th,td{padding:.75rem 1rem;text-align:left;border-bottom:1px solid var(--border)}
+th{background:var(--bg-elevated);color:var(--text-primary);font-weight:600}
+td{color:var(--text-secondary)}
+footer{background:var(--bg-secondary);border-top:1px solid var(--border);margin-top:3rem;padding:2rem}
+.footer-links{max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin-bottom:1.5rem}
+.footer-links a{color:var(--text-muted);text-decoration:none;font-size:.85rem;transition:color .2s}
+.footer-links a:hover{color:var(--accent)}
+footer p{text-align:center;color:var(--text-muted);font-size:.8rem}
+@media(max-width:768px){h1{font-size:1.6rem}nav{display:none}.hamburger{display:block}}
+</style>
+  <meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+<header>
+<div class="header-content">
+<a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon">Win<span>Fulltime</span></a>
+<nav>
+<a href="/1x2">1X2</a>
+<a href="/over-2-5">Over 2.5</a>
+<a href="/btts">BTTS</a>
+<a href="/blog">Blog</a>
+</nav>
+<button class="hamburger" aria-label="Toggle navigation" onclick="document.querySelector('nav').style.display=document.querySelector('nav').style.display==='flex'?'none':'flex'">&#9776;</button>
+</div>
+</header>
+
+<div class="container">
+<div class="breadcrumb"><a href="/">Home</a> / <a href="/blog">Blog</a> / How to Analyse Shot Location Heat Maps for Football Betting</div>
+
+<h1>How to Analyse Shot Location Heat Maps for Football Betting</h1>
+
+ <figure class="post-featured-image" style="margin:24px 0 28px;">
+  <img src="thumbnails/how-to-analyse-shot-location-heat-maps-for-football-betting.webp" alt="How to Analyse Shot Location Heat Maps for Football Betting" width="1200" height="630" loading="eager" decoding="async" style="display:block;width:100%;height:auto;margin:0;border-radius:12px;">
+ </figure>
+<p class="meta">Published 26 July 2026 | 11 min read</p>
+
+<figure style="margin-bottom:1.5rem">
+<img src="/blog/thumbnails/how-to-analyse-shot-location-heat-maps-for-football-betting.webp" alt="Shot location heat map analysis for football betting" style="width:100%;border-radius:var(--radius-lg)">
+</figure>
+
+<p>Every shot in football is not created equal. A shot from 25 yards out carries a fundamentally different scoring probability than a shot from 6 yards. Understanding this distinction is at the heart of modern football analytics, and <span class="highlight">shot location heat maps</span> are one of the most powerful visual tools for grasping it. By learning to read and interpret these maps, you can identify which teams create high-quality chances, which are wasteful with their opportunities, and where the value lies in the goals markets. This guide teaches you everything you need to know about shot location heat maps and how to apply them to your football betting strategy.</p>
+
+<h2>What Shot Heat Maps Show</h2>
+
+<p>A shot heat map is a visual representation of where a team (or player) takes their shots during matches. The map overlays shot locations onto a diagram of the attacking half of the pitch, with colour coding indicating the frequency of shots from each area. Warmer colours (red, orange) indicate areas from which many shots are taken, while cooler colours (blue, green) indicate areas with fewer shots. The resulting image gives you an instant picture of a team's shooting profile and attacking tendencies.</p>
+
+<p>Shot heat maps are typically generated using data from cameras and tracking systems that record the exact coordinates of every shot attempt. This data is then aggregated across multiple matches to create a cumulative picture of where a team's shooting activity occurs. The maps are available for individual matches or for season-long totals, allowing you to identify both short-term patterns and long-term tendencies.</p>
+
+<h2>How to Read a Shot Heat Map</h2>
+
+<p>Reading a shot heat map effectively requires understanding the relationship between shot location and scoring probability. Here are the key zones to identify:</p>
+
+<h3>Central Zone Inside the Box (6-12 yards)</h3>
+
+<p>The central area directly in front of goal, between the 6-yard box and the penalty spot, is the highest-value shooting zone on the pitch. Shots from this area have the highest expected goals (xG) value because the shooter is close to goal, has a wide angle, and the goalkeeper has minimal time to react. A heat map showing a concentration of shots in this zone indicates a team that creates excellent chances. These teams tend to score frequently and reliably, making them strong candidates for the over 1.5 goals and team to score markets.</p>
+
+<h3>Wide Areas Inside the Box</h3>
+
+<p>Shots from the wide areas of the penalty box, near the byline or the edge of the 18-yard area, have lower xG values because the shooting angle is tighter. Teams that take many shots from these areas may be crossing the ball frequently or cutting inside from wide positions. While these shots are less efficient, they can still generate goals, particularly from skilled finishers who can score from tight angles. A heat map concentrated in wide box areas suggests a team that relies on crosses and wing play rather than central penetration.</p>
+
+<h3>Outside the Box</h3>
+
+<p>Shots from outside the penalty area have the lowest xG values because of the distance and the number of bodies that may be between the shooter and the goal. Long-range shots have an average xG of approximately 0.03-0.05, meaning they score roughly 3-5% of the time. A heat map showing a heavy concentration of shots from outside the box indicates a team that struggles to penetrate the penalty area and is forced to shoot from distance. These teams often underperform their shot totals because the low quality of their chances limits their goal output.</p>
+
+<div class="example-box">
+<h3>Reading xG per Shot</h3>
+<p>The most efficient way to quantify shot quality is through xG per shot. A team averaging 0.12 xG per shot is creating significantly better chances than a team averaging 0.06 xG per shot. The first team averages a shot with a 12% chance of scoring, while the second averages 6%. Over 15 shots per match, this difference translates to approximately 0.9 expected goals versus 0.45 expected goals, a massive gap in betting terms.</p>
+</div>
+
+<h2>Why Shot Location Matters More Than Shot Volume</h2>
+
+<p>One of the most common mistakes in football analysis is equating shot volume with attacking quality. A team that takes 20 shots per match is not necessarily more dangerous than a team taking 10 shots if the quality of those shots is vastly different. Shot location heat maps reveal this distinction clearly.</p>
+
+<p>Consider two hypothetical teams over a 10-match period:</p>
+
+<table>
+<tr><th>Metric</th><th>Team A</th><th>Team B</th></tr>
+<tr><td>Shots per match</td><td>18</td><td>10</td></tr>
+<tr><td>% shots inside the box</td><td>35%</td><td>75%</td></tr>
+<tr><td>xG per shot</td><td>0.07</td><td>0.14</td></tr>
+<tr><td>Total xG per match</td><td>1.26</td><td>1.40</td></tr>
+<tr><td>Goals scored per match</td><td>1.1</td><td>1.6</td></tr>
+</table>
+
+<p>Team A takes nearly twice as many shots as Team B, but Team B creates better chances and scores more goals. The heat map for Team A would show heavy activity outside the box, while Team B's heat map would be concentrated in the central areas of the penalty box. Without looking at shot location, you might assume Team A is the more dangerous attacking unit. The heat map tells a completely different story.</p>
+
+<h2>Teams With Distinct Shot Profiles</h2>
+
+<p>Different tactical approaches create distinct shot profiles that are clearly visible on heat maps:</p>
+
+<h3>The Central Dominators</h3>
+
+<p>Teams like Manchester City under Guardiola create a high proportion of shots from the central areas of the penalty box. Their patient build-up play, intricate passing combinations, and movement between the lines result in shots from high-value positions. Their heat maps show a concentrated red zone directly in front of goal. These teams are strong over 2.5 goals candidates because the quality of their chances translates into consistent goal output.</p>
+
+<h3>The Long-Range Shooters</h3>
+
+<p>Some teams, particularly those that struggle to break down low-block defences, resort to frequent long-range efforts. Their heat maps show significant activity outside the penalty area. While these shots occasionally produce spectacular goals, they are statistically inefficient. Matches involving heavy long-range shooting teams often produce fewer goals than the shot totals would suggest.</p>
+
+<h3>The Cross-Dependent Teams</h3>
+
+<p>Teams that rely heavily on width and crossing generate shots from the wide areas of the penalty box. Their heat maps show concentrated activity on the flanks and near the byline. These teams' goal output is highly dependent on the quality of their deliveries and the aerial ability of their forwards. When the crossing is accurate and the forwards are winning headers, these teams can score freely. When the crossing is poor or the opposition defence dominates aerially, they struggle to score.</p>
+
+<div class="strategy-box">
+<h3>The Shot Profile Betting Matrix</h3>
+<p><strong>Central-dominant team vs cross-dependent team:</strong> The central-dominant team has the advantage because they create higher-quality chances. Back them in the 1X2 and over 1.5 markets.</p>
+<p><strong>Long-range team vs low-block defence:</strong> The low-block defence will force more long-range shots, reducing the match's goal probability. Under 2.5 goals offers value.</p>
+<p><strong>Two central-dominant teams:</strong> Both teams create high-quality chances, making over 2.5 goals and BTTS likely.</p>
+<p><strong>Two long-range teams:</strong> Low shot quality at both ends reduces goal probability. Under 2.5 goals and no BTTS are attractive.</p>
+</div>
+
+<h2>Using Heat Maps to Predict Over/Under Goals</h2>
+
+<p>Shot location data is one of the strongest predictors of total goals in a match. Here is how to apply it:</p>
+
+<h3>Over 2.5 Goals Indicators</h3>
+
+<p>Matches where both teams have heat maps concentrated inside the penalty box are strong over 2.5 goals candidates. These teams create high-quality chances consistently, increasing the probability of multiple goals. Look for matches where both teams have an xG per shot above 0.10 and more than 50% of their shots originate from inside the box.</p>
+
+<h3>Under 2.5 Goals Indicators</h3>
+
+<p>When both teams' heat maps show significant activity outside the box or in wide areas, the under 2.5 goals market becomes attractive. Low shot quality at both ends of the pitch limits the total goal output. Additionally, matches where both teams employ deep defensive blocks, forcing opponents into long-range efforts, tend to produce fewer goals.</p>
+
+<div class="pro-tip">
+<h3>Pro Tip</h3>
+<p>Compare a team's shot heat map from their last 3-5 matches with their season-long heat map. If a team that typically creates central chances has recently been forced into wider or more distant shots, this may indicate a tactical problem or opponent adaptation. This shift in shot quality often precedes a drop in goals scored, creating value in the under goals market for their next fixture.</p>
+</div>
+
+<h2>Where to Find Free Heat Map Data</h2>
+
+<p>Several platforms offer free access to shot location data and visualisations:</p>
+
+<ul>
+<li><strong>FBref:</strong> Provides shot maps for individual matches and season-long shot location data for most major leagues. The visual shot map shows each shot's location with colour-coded xG values. Free to access with no registration required.</li>
+<li><strong>Understat:</strong> One of the best free resources for shot maps and xG data. The platform shows individual shot locations with xG values and provides team-level shot location breakdowns. Covers Europe's top five leagues.</li>
+<li><strong>FotMob:</strong> The mobile app includes shot maps in its match statistics, showing where each shot was taken and its xG value. Free with premium options for additional data.</li>
+<li><strong>Sofascore:</strong> Provides shot maps in match Centre with xG data. The platform covers a wide range of leagues and competitions.</li>
+</ul>
+
+<h2>Building a Shot Location Betting Strategy</h2>
+
+<ol class="steps">
+<li><strong>Collect shot maps:</strong> Before each fixture, review the shot maps from both teams' last 5 matches. Note where the majority of shots originate and calculate the average xG per shot.</li>
+<li><strong>Identify shot quality mismatches:</strong> When one team consistently creates shots from central positions and the other from wide or distant positions, the quality mismatch often translates into a goal difference. Back the team with better shot locations.</li>
+<li><strong>Target regression candidates:</strong> A team that is scoring more goals than their shot locations would suggest is likely overperforming. Their results will regress, creating value in under goals markets. Conversely, a team underperforming their shot quality is due for positive regression.</li>
+<li><strong>Factor in opposition defensive setup:</strong> A team's shot location profile can change dramatically depending on the opposition. Against a high-pressing team, a normally central-dominant side may be forced into longer shots. Always consider the specific matchup.</li>
+<li><strong>Track and refine:</strong> Record your bets and outcomes based on shot location analysis. Over time, you will develop a refined understanding of which shot profile matchups produce the most reliable betting outcomes in your target leagues.</li>
+</ol>
+
+<div class="warning">
+<h3>Limitations of Heat Maps</h3>
+<p>Shot heat maps have limitations you should be aware of. They do not account for the quality of the chance beyond location. A shot from 12 yards with three defenders blocking the goal has a much lower actual probability of scoring than a shot from 12 yards with a clear sight of goal. Additionally, heat maps can be influenced by game state. A team that is winning comfortably may take fewer shots or shoot from less dangerous positions as they manage the game. Always contextualise heat map data with the match situation and opposition quality.</p>
+</div>
+
+<div class="cta">
+<h3>Make Smarter Bets With Shot Data</h3>
+<p>WinFulltime analyses shot location, xG, and chance quality to deliver data-driven betting predictions.</p>
+<a href="/">View Today's Predictions</a>
+</div>
+
+<div class="related-posts">
+<h2>Related Articles</h2>
+<ul>
+<li><a href="/blog/expected-goals-xg-betting.html">Expected Goals (xG) Betting Guide</a></li>
+<li><a href="/blog/how-to-analyse-football-goals-trends.html">How to Analyse Football Goals Trends</a></li>
+<li><a href="/blog/how-to-predict-over-2-5-goals-in-football.html">How to Predict Over 2.5 Goals in Football</a></li>
+<li><a href="/blog/football-expected-assists-xa-explained.html">Football Expected Assists (xA) Explained</a></li>
+</ul>
+</div>
+
+<div class="social-share">
+<a href="https://www.facebook.com/sharer/sharer.php?u=https://winfulltime.com/blog/how-to-analyse-shot-location-heat-maps-for-football-betting.html" style="background:#1877f2" target="_blank" rel="noopener">Facebook</a>
+<a href="https://twitter.com/intent/tweet?url=https://winfulltime.com/blog/how-to-analyse-shot-location-heat-maps-for-football-betting.html&text=How%20to%20Analyse%20Shot%20Location%20Heat%20Maps%20for%20Football%20Betting" style="background:#000" target="_blank" rel="noopener">X</a>
+<a href="https://wa.me/?text=How%20to%20Analyse%20Shot%20Location%20Heat%20Maps%20for%20Football%20Betting%20https://winfulltime.com/blog/how-to-analyse-shot-location-heat-maps-for-football-betting.html" style="background:#25d366" target="_blank" rel="noopener">WhatsApp</a>
+</div>
+</div>
+
+<div class="cta" style="margin:0;border-radius:0">
+<h3>In-Play Betting Available Now</h3>
+<p>Get live predictions and in-play tips for matches happening right now.</p>
+<a href="/in-play">View In-Play Tips</a>
+</div>
+
+<footer>
+<div class="footer-links">
+<a href="/">Home</a>
+<a href="/ticket-builder">Ticket Builder</a>
+<a href="/latest-news">Latest News</a>
+<a href="/in-play">In-Play</a>
+<a href="/1x2">1X2</a>
+<a href="/over-1-5">Over 1.5</a>
+<a href="/over-2-5">Over 2.5</a>
+<a href="/btts-yes">BTTS Yes</a>
+<a href="/btts-no">BTTS No</a>
+<a href="/unbeaten">Unbeaten</a>
+<a href="/corners">Corners</a>
+<a href="/cards">Cards</a>
+<a href="/advertise">Advertise</a>
+<a href="/contact">Contact</a>
+<a href="/privacy">Privacy</a>
+<a href="/terms">Terms</a>
+</div>
+<p>© 2026 WinFulltime. Predictions are for informational purposes only. | Website Built by <a href="https://mesigo.site" target="_blank" rel="noopener" style="color:var(--accent)">Mesigo</a></p>
+</footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-HMGZMW9EDP')</script>
+<script src="/chat-widget.js"></script>
+<script src="/responsible-gambling.js"></script>
+</body>
+</html>

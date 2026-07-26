@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>How to Use Passing Network Analysis for Football Betting</title>
+ <meta name="description" content="Learn how passing network analysis reveals tactical setups and player connections. Use network data to gain an edge in football betting.">
+ <meta name="keywords" content="passing network, football network analysis, passing connections, tactical data, formation analysis">
+ <meta property="og:title" content="How to Use Passing Network Analysis for Football Betting">
+ <meta property="og:description" content="Discover how passing network diagrams reveal tactical information that can improve your football betting decisions.">
+ <meta property="og:type" content="article">
+ <meta property="og:image" content="https://winfulltime.com/blog/thumbnails/how-to-use-passing-network-analysis-for-football-betting.webp">
+ <meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/how-to-use-passing-network-analysis-for-football-betting.webp">
+ <link rel="canonical" href="https://winfulltime.com/blog/how-to-use-passing-network-analysis-for-football-betting.html">
+ <link rel="stylesheet" href="/styles.css">
+ <link rel="icon" href="/winfulltimelogo.png" type="image/png">
+ <style>
+  :root {
+  --bg-primary: #181e30;
+  --bg-secondary: #1e2538;
+  --bg-card: rgba(13,17,32,0.95);
+  --bg-elevated: #252c40;
+  --text-primary: #e8edf5;
+  --text-secondary: #c8d0db;
+  --text-muted: #94a3b8;
+  --accent: #ff2448;
+  --accent-gradient: linear-gradient(135deg, #ff2448, #d41a38);
+  --border: rgba(255,255,255,0.06);
+  --border-hover: rgba(255,255,255,0.12);
+  --glow: rgba(255,36,72,0.12);
+  --radius: 12px;
+  --radius-lg: 16px;
+  --font: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font); background: var(--bg-primary); background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,36,72,0.06), transparent); color: var(--text-primary); margin: 0; padding: 0; font-size: 16px; -webkit-font-smoothing: antialiased; }
+  header { background: rgba(24,30,48,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
+  .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
+  .logo { display: inline-flex; align-items: center; font-size: 24px; font-weight: 800; color: #ffffff; text-decoration: none; letter-spacing: -0.5px; }
+  .logo-icon { height: 28px; width: auto; flex-shrink: 0; margin-right: 8px; }
+  .logo span { color: #ff7e7e; }
+  .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+  h1 { font-size: 2.8rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; }
+  h2 { font-size: 2.1rem; color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; font-weight: 700; }
+  h3 { font-size: 1.5rem; color: var(--text-primary); margin-top: 30px; margin-bottom: 10px; font-weight: 600; }
+  p { font-size: 1.125rem; margin-bottom: 20px; color: var(--text-secondary); line-height: 1.85; }
+  li { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.85; margin-bottom: 8px; }
+  .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+  .highlight { background: rgba(251,191,36,0.1); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
+  .highlight * { color: var(--text-primary); }
+  .example-box { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); padding: 20px; border-radius: 8px; margin: 20px 0; }
+  .example-box * { color: var(--text-primary); }
+  .strategy-box { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin: 24px 0; }
+  .strategy-box h3 { margin-top: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .pro-tip { background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+  .pro-tip h4 { margin-top: 0; color: #60a5fa; }
+  .pro-tip * { color: var(--text-primary); }
+  .warning { background: rgba(239,68,68,0.08); border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
+  .warning * { color: var(--text-primary); }
+  .success { background: rgba(34,197,94,0.08); border-left: 4px solid #22c55e; padding: 16px; border-radius: 8px; margin: 20px 0; }
+  .success * { color: var(--text-primary); }
+  .steps { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin: 20px 0; }
+  .steps ol { margin: 0; padding-left: 20px; }
+  .steps li { margin-bottom: 10px; color: var(--text-secondary); }
+  .cta { background: var(--accent-gradient); color: white; padding: 24px; border-radius: var(--radius); text-align: center; margin: 30px 0; box-shadow: 0 4px 15px var(--glow); }
+  .cta * { color: white; }
+  .cta a { color: white; text-decoration: underline; }
+  .breadcrumb { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+  .breadcrumb a { color: var(--accent); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .related-posts { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin-top: 40px; }
+  .related-posts h3 { margin-top: 0; color: var(--text-primary); }
+  .related-posts ul { list-style: none; padding: 0; }
+  .related-posts li { margin-bottom: 10px; color: var(--text-secondary); }
+  .related-posts a { color: var(--accent); text-decoration: none; }
+  .related-posts a:hover { text-decoration: underline; }
+ </style>
+ <script type="application/ld+json">
+ {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "How to Use Passing Network Analysis for Football Betting",
+  "description": "Learn how passing network analysis reveals tactical setups and player connections. Use network data to gain an edge in football betting.",
+  "url": "https://winfulltime.com/blog/how-to-use-passing-network-analysis-for-football-betting.html",
+  "datePublished": "2026-07-26",
+  "author": { "@type": "Organization", "name": "WinFulltime" },
+  "publisher": { "@type": "Organization", "name": "WinFulltime", "logo": { "@type": "ImageObject", "url": "https://winfulltime.com/winfulltimelogo.png" } },
+  "image": "https://winfulltime.com/blog/thumbnails/how-to-use-passing-network-analysis-for-football-betting.webp"
+ }
+ </script>
+  <meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+ <header>
+  <div class="header-content">
+   <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon">Win<span>Fulltime</span></a>
+   <nav id="nav">
+    <a href="/predictions/1x2">1X2</a>
+    <a href="/predictions/over-2-5">Over 2.5</a>
+    <a href="/predictions/btts">BTTS</a>
+    <a href="/blog/">Blog</a>
+   </nav>
+   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+ </header>
+
+ <div class="container">
+  <div class="breadcrumb"><a href="/">Home</a> / <a href="/blog/">Blog</a> / How to Use Passing Network Analysis for Football Betting</div>
+
+  <h1>How to Use Passing Network Analysis for Football Betting</h1>
+  <p class="meta">Published July 26, 2026 · 11 min read</p>
+
+  <figure class="post-featured-image" style="margin:24px 0 28px;">
+   <img src="thumbnails/how-to-use-passing-network-analysis-for-football-betting.webp" alt="How to Use Passing Network Analysis for Football Betting" width="1200" height="630" loading="eager" decoding="async" style="display:block;width:100%;height:auto;margin:0;border-radius:12px;">
+  </figure>
+
+  <p>Football analytics has evolved far beyond basic statistics like possession percentage and total passes. One of the most powerful tools in the modern analyst's arsenal is passing network analysis. A passing network diagram visualises how a team moves the ball, which players are connected to each other through passing sequences, and where the tactical structure of the team actually exists on the pitch. For bettors, this kind of information can reveal insights that traditional statistics simply cannot capture.</p>
+
+  <p>Understanding passing networks gives you a window into a team's tactical identity that goes deeper than formations listed on a team sheet. A team may line up in a 4-3-3 on paper, but their passing network might reveal that they effectively operate as a 3-2-5 in possession, with a full-back tucked into midfield and a winger hugging the touchline. This kind of nuance matters enormously when evaluating matchups and predicting how a game will unfold.</p>
+
+  <h2>What Passing Networks Show</h2>
+
+  <p>A passing network is a visual representation of every completed pass between teammates during a match or across multiple matches. Each player is represented as a node (a dot) on the diagram, and the lines connecting them represent the number and frequency of passes between those two players.</p>
+
+  <p>The position of each node on the diagram roughly corresponds to the player's average position on the pitch during the time they were on the field. The size of each node typically reflects how involved that player was in the team's passing play. The thickness of the lines between players indicates how frequently those two players completed passes to each other.</p>
+
+  <div class="example-box">
+   <h3>Reading a Passing Network Diagram</h3>
+   <ul>
+    <li><strong>Large node at the base of the diagram:</strong> This is likely the centre-back or deep-lying playmaker who initiates build-up play. If this node is disproportionately large, the team builds slowly from the back.</li>
+    <li><strong>Thick lines between the centre-backs:</strong> Frequent lateral passing at the back suggests a patient build-up style that prioritises possession over directness.</li>
+    <li><strong>Thick lines connecting a full-back to a winger:</strong> This indicates an overlapping or underlapping combination on that flank, suggesting the team creates chances through wide areas.</li>
+    <li><strong>A central node with many connections radiating outward:</strong> This is the team's playmaker. The number and thickness of their connections show how much the team relies on this individual to distribute play.</li>
+    <li><strong>Isolated nodes with few connections:</strong> Players positioned high up the pitch with thin lines to teammates are often target strikers or wide forwards who receive the ball less frequently but are dangerous when they do.</li>
+   </ul>
+  </div>
+
+  <p>By looking at these visual patterns, you can quickly grasp the tactical DNA of a team in a way that raw statistics cannot convey. The shape of the network tells you where a team is strong, where they are vulnerable, and how they prefer to construct attacks.</p>
+
+  <h2>What a Dominant Passing Network Looks Like</h2>
+
+  <p>A dominant passing network, typical of teams like Manchester City under Pep Guardiola or Barcelona during their peak years, has several distinctive features. The nodes are tightly clustered together, reflecting short passing distances and players who stay close to each other to maintain passing options. The lines are thick and numerous, indicating high pass volumes between many different pairs of players.</p>
+
+  <p>In these networks, the goalkeeper often appears as an active participant, with visible connections to the centre-backs. The centre-backs themselves have thick connections to each other and to the full-backs, who in turn are connected to the wingers and central midfielders. The entire team operates as a connected web where the ball can move fluidly from any position to any other position.</p>
+
+  <p>The key characteristic of a dominant passing network is its balance. No single player monopolises possession, and no area of the pitch is disconnected from the rest. This balanced distribution makes it extremely difficult for opponents to press effectively, because shutting down one passing lane simply opens up another.</p>
+
+  <h2>What a Disconnected Passing Network Looks Like</h2>
+
+  <p>A disconnected passing network tells a very different story. You will see clusters of players who pass mostly to each other with few connections between the clusters. For example, the defence might have strong internal connections but weak links to the midfield, suggesting the team struggles to progress the ball from back to front.</p>
+
+  <p>Another common pattern is the isolated striker. When a team plays a direct style or lacks a creative midfielder, the striker's node will sit high up the diagram with very thin lines connecting them to the rest of the team. This player relies on individual moments of quality rather than structured build-up play.</p>
+
+  <div class="strategy-box">
+   <h3>What Disconnected Networks Signal</h3>
+   <ul>
+    <li><strong>Weak links between defence and midfield:</strong> The team may struggle to build from the back and resort to long balls, leading to lower possession and fewer controlled attacks.</li>
+    <li><strong>Over-reliance on one flank:</strong> If the passing network is heavily weighted to one side, opponents can focus their defensive resources on that area.</li>
+    <li><strong>Lack of central creativity:</strong> A thin central corridor in the passing network indicates the team bypasses midfield or lacks a player capable of threading passes through the centre.</li>
+    <li><strong>Goalkeeper isolation:</strong> If the keeper has almost no connections to outfield players, the team does not build from the back and is vulnerable to high pressing.</li>
+   </ul>
+  </div>
+
+  <p>These patterns reveal weaknesses that do not always show up in standard match statistics. A team might have 55% possession but a disconnected network that suggests their dominance is superficial, consisting mostly of safe passes in their own half with little penetration into dangerous areas.</p>
+
+  <h2>How Passing Networks Reveal Tactical Setups Before Match Day</h2>
+
+  <p>One of the most valuable applications of passing network analysis for bettors is the ability to identify a team's true tactical shape before a match. Official formations listed in team news and on the scoresheet are often misleading. A team listed as playing 4-3-3 might actually deploy a 2-3-5 in possession, with the full-backs pushed so high they effectively become wingers.</p>
+
+  <p>Passing networks from previous matches reveal the reality of how a team plays rather than how they claim to play. By analysing the last five to ten matches, you can build a picture of a team's average tactical structure that is far more reliable than any pre-match press conference or predicted lineup.</p>
+
+  <p>This information is particularly useful for betting because tactical matchups are one of the most important factors in determining match outcomes. A team that builds through the centre will struggle against an opponent that presses the midfield aggressively. A team that creates through wide overloads will find success against an opponent with narrow defensive organisation. Passing networks help you identify these matchups before the odds fully reflect them.</p>
+
+  <div class="pro-tip">
+   <h4>Pro Tip</h4>
+   <p>Compare the passing networks of both teams before a match. If one team's network shows strong central connections and the other team's network shows vulnerability through the centre, this tactical matchup favours the first team regardless of their overall quality ranking.</p>
+  </div>
+
+  <h2>How to Identify Teams That Play Through the Middle vs Wide</h2>
+
+  <p>One of the most practical insights from passing network analysis is identifying whether a team prefers to attack through central areas or wide areas. This distinction has significant implications for multiple betting markets.</p>
+
+  <p>Teams that play through the middle will have a passing network with thick connections running vertically through the centre of the pitch. The central midfielders will be heavily connected to the strikers, and the ball progression will follow a central corridor. These teams tend to create chances through intricate passing combinations in tight spaces.</p>
+
+  <p>Teams that play wide will have a passing network that is stretched horizontally. The full-backs will have thick connections to the wingers, and the ball will frequently move from one flank to the other through the centre-backs or a deep midfielder. These teams create chances through crosses, cutbacks, and wide overloads.</p>
+
+  <div class="example-box">
+   <h3>Betting Applications by Attack Style</h3>
+   <ul>
+    <li><strong>Central attacking teams:</strong> More likely to produce Over 2.5 Goals when facing opponents with weak central defensive structure. Tend to have higher shot accuracy but fewer corners.</li>
+    <li><strong>Wide attacking teams:</strong> More likely to produce high corner counts. May have more total shots but lower shot accuracy due to crosses being lower-percentage opportunities.</li>
+    <li><strong>Mixed approach teams:</strong> The most adaptable and often the hardest to predict tactically. Their passing network will show balanced connections across the pitch.</li>
+   </ul>
+  </div>
+
+  <h2>Practical Betting Applications of Passing Networks</h2>
+
+  <p>The true value of passing network analysis lies in its practical application to betting markets. Here are the most direct ways this information can improve your betting decisions.</p>
+
+  <h3>Predicting Tactical Matchups</h3>
+
+  <p>By comparing the passing networks of two teams, you can predict which team will control the tactical flow of the match. If Team A plays through the centre and Team B has shown vulnerability through the middle in their recent passing networks, Team A has a tactical advantage that may not be fully reflected in the odds.</p>
+
+  <h3>Identifying Teams That Will Dominate Possession</h3>
+
+  <p>A team with a tightly connected passing network and high pass volumes is more likely to dominate possession in their next match, particularly against opponents with disconnected networks. This has direct applications for possession-based betting markets and Over/Under goal markets.</p>
+
+  <div class="warning">
+   <strong>Warning:</strong> Passing network analysis is most useful when applied to a sequence of recent matches rather than a single game. A single match's passing network can be distorted by red cards, early goals, or extreme weather conditions. Always look at a rolling average of three to five matches for the most reliable picture.
+  </div>
+
+  <h3>Predicting Match Flow</h3>
+
+  <p>When both teams have tightly connected, balanced passing networks, the match is more likely to be a controlled, tactical affair with both teams keeping the ball. When one team has a dominant network and the other is disconnected, the match is more likely to be one-sided in terms of possession and territory, even if the score remains close.</p>
+
+  <p>This information is valuable for in-play betting. If you see early in a match that one team's passing patterns resemble their dominant network while the other looks disconnected, the momentum is likely to stay with the dominant team, and live betting markets may still offer value before the odds adjust.</p>
+
+  <h3>BTTS Implications</h3>
+
+  <p>Teams with disconnected passing networks that rely on isolated attacking moments are often more vulnerable to conceding while simultaneously dangerous on the counter-attack. This profile frequently produces BTTS (Both Teams to Score) outcomes because the team can score despite limited possession but also concedes due to defensive exposure. Conversely, two teams with dominant, connected networks playing each other may produce fewer BTTS outcomes if both teams control the game effectively.</p>
+
+  <div class="steps">
+   <h3>How to Use Passing Networks for Betting</h3>
+   <ol>
+    <li><strong>Collect recent passing networks:</strong> Use data from sites like Opta, StatsBomb, or FBref to review each team's passing network from their last five matches.</li>
+    <li><strong>Identify the team's passing identity:</strong> Determine whether each team builds centrally, wide, or through direct play. Note which players are the key connectors.</li>
+    <li><strong>Compare tactical matchups:</strong> Look for mismatches where one team's passing strength aligns with the opponent's defensive weakness as revealed by their network.</li>
+    <li><strong>Check for changes from the norm:</strong> If a team's passing network has shifted recently, perhaps due to a managerial change, new signing, or injury to a key player, this may not yet be reflected in the odds.</li>
+    <li><strong>Combine with other metrics:</strong> Use passing networks alongside xG, pressing data, and defensive line height for a comprehensive tactical picture before placing your bet.</li>
+   </ol>
+  </div>
+
+  <h2>Limitations of Passing Network Analysis</h2>
+
+  <p>While passing networks are a powerful analytical tool, they have important limitations that bettors should understand. First, passing networks only capture completed passes. They do not account for attempted passes that were intercepted, passes that led to turnovers, or the quality of the chances created. A team might have a beautiful passing network but consistently fail to create high-quality scoring opportunities.</p>
+
+  <p>Second, passing networks can be misleading when teams adjust their tactics during a match. A team that starts with a disconnected network but switches to a more connected approach after half-time will have an average that does not accurately represent either phase. This is why it is useful to look at half-by-half passing networks when available.</p>
+
+  <p>Third, the strength of the opponent affects the passing network. A team might look dominant against weaker opposition but struggle to build the same connections against a team that presses aggressively. Always consider the quality of the opponent in the matches that generated the passing network you are analysing.</p>
+
+  <div class="success">
+   <strong>Key takeaway:</strong> Passing network analysis is one of the most underused tools in football betting. It reveals the true tactical identity of a team, helps identify favorable matchups, and provides insights that go beyond traditional statistics. By incorporating passing networks into your pre-match analysis, you can gain a meaningful edge in understanding how a match is likely to unfold.
+  </div>
+
+  <div class="cta">
+   <h3>Apply Tactical Analysis to Your Bets</h3>
+   <p>Use our <a href="/ticket-builder.html">free Ticket Builder</a> to structure bets informed by deep tactical analysis. Make every selection count.</p>
+  </div>
+
+  <div class="related-posts">
+   <h3>Related Articles</h3>
+   <ul>
+    <li><a href="/blog/football-expected-assists-xa-explained.html">Football Expected Assists (xA) Explained</a></li>
+    <li><a href="/blog/how-to-bet-on-football-using-expected-threat-xt.html">How to Bet on Football Using Expected Threat (xT)</a></li>
+    <li><a href="/blog/football-betting-on-using-progressive-passes-data.html">Football Betting Using Progressive Passes Data</a></li>
+    <li><a href="/blog/how-to-analyse-press-resistance-in-football-for-betting.html">How to Analyse Press Resistance in Football for Betting</a></li>
+   </ul>
+  </div>
+
+  <div class="social-share" style="display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+   <span style="color:var(--text-muted);font-size:14px;font-weight:600;align-self:center;margin-right:8px">Share:</span>
+   <a href="https://www.facebook.com/sharer/sharer.php?u=https://winfulltime.com/blog/how-to-use-passing-network-analysis-for-football-betting.html" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#1877f2;color:#fff;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600">Facebook</a>
+   <a href="https://twitter.com/intent/tweet?text=Check%20this%20out&url=https://winfulltime.com/blog/how-to-use-passing-network-analysis-for-football-betting.html" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#000;color:#fff;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600">X (Twitter)</a>
+   <a href="https://wa.me/?text=https://winfulltime.com/blog/how-to-use-passing-network-analysis-for-football-betting.html" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#25d366;color:#fff;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600">WhatsApp</a>
+  </div>
+ </div>
+
+ <footer>
+  <div style="text-align:center;padding:16px 12px;background:#fff5f5;border-top:2px solid #ff0000;margin-bottom:12px;">
+   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p><a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">In-Play Tips</a>
+  </div>
+  <div class="footer-links">
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/blog/">Latest News</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/predictions/1x2">1X2</a>
+   <a href="/predictions/over-1-5">Over 1.5</a>
+   <a href="/predictions/over-2-5">Over 2.5</a>
+   <a href="/predictions/btts">BTTS Yes</a>
+   <a href="/predictions/btts-no">BTTS No</a>
+   <a href="/predictions/unbeaten">Unbeaten</a>
+   <a href="/predictions/corners">Corners</a>
+   <a href="/predictions/cards">Cards</a>
+   <a href="/advertise.html">Advertise</a>
+   <a href="/contact.html">Contact</a>
+   <a href="/privacy.html">Privacy</a>
+   <a href="/terms.html">Terms</a>
+  </div>
+  <p class="footer-copyright">© 2026 WinFulltime. Predictions are for informational purposes only. | <a href="https://mesigo.site" target="_blank" rel="noopener">Website Built by Mesigo</a></p>
+ </footer>
+
+ <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>
+ <script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-HMGZMW9EDP');
+ </script>
+ <script src="/chat-widget.js" async></script>
+ <script src="/responsible-gambling.js"></script>
+ <script>
+  document.getElementById('hamburger')?.addEventListener('click', function() {
+   this.classList.toggle('active');
+   document.getElementById('nav')?.classList.toggle('open');
+  });
+ </script>
+</body>
+</html>

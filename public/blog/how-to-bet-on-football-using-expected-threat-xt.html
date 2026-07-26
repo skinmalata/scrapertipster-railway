@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Bet on Football Using Expected Threat (xT) | WinFulltime</title>
+<meta name="description" content="Learn how Expected Threat (xT) works in football analytics and how to use it for smarter betting decisions. Discover pitch control metrics, passing sequences, and practical xT betting strategies.">
+<meta name="keywords" content="expected threat, xT football, pitch control, football analytics, advanced metrics, xT betting, expected threat explained, pitch control model">
+<meta property="og:title" content="How to Bet on Football Using Expected Threat (xT)">
+<meta property="og:description" content="Learn how Expected Threat (xT) works in football analytics and how to use it for smarter betting decisions on over/under markets, team dominance, and possession quality.">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://winfulltime.com/blog/thumbnails/how-to-bet-on-football-using-expected-threat-xt.webp">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://winfulltime.com/blog/thumbnails/how-to-bet-on-football-using-expected-threat-xt.webp">
+<link rel="canonical" href="https://winfulltime.com/blog/how-to-bet-on-football-using-expected-threat-xt.html">
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="/winfulltimelogo.png" type="image/png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "How to Bet on Football Using Expected Threat (xT)",
+  "description": "Learn how Expected Threat (xT) works in football analytics and how to use it for smarter betting decisions. Discover pitch control metrics, passing sequences, and practical xT betting strategies.",
+  "url": "https://winfulltime.com/blog/how-to-bet-on-football-using-expected-threat-xt.html",
+  "datePublished": "2026-07-26",
+  "author": {
+    "@type": "Organization",
+    "name": "WinFulltime"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "WinFulltime",
+    "url": "https://winfulltime.com"
+  },
+  "image": "https://winfulltime.com/blog/thumbnails/how-to-bet-on-football-using-expected-threat-xt.webp"
+}
+</script>
+<style>
+:root{--bg-primary:#181e30;--bg-secondary:#1e2538;--bg-card:rgba(13,17,32,0.95);--bg-elevated:#252c40;--text-primary:#e8edf5;--text-secondary:#c8d0db;--text-muted:#94a3b8;--accent:#ff2448;--accent-gradient:linear-gradient(135deg,#ff2448,#d41a38);--border:rgba(255,255,255,0.06);--border-hover:rgba(255,255,255,0.12);--glow:rgba(255,36,72,0.12);--radius:12px;--radius-lg:16px;--font:'Inter',system-ui,-apple-system,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg-primary);color:var(--text-primary);line-height:1.7;min-height:100vh}
+header{background:var(--bg-secondary);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:1000}
+.header-content{max-width:1200px;margin:0 auto;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:0.5rem;text-decoration:none;color:var(--text-primary);font-size:1.5rem;font-weight:700}
+.logo-icon{height:36px;width:36px;border-radius:8px}
+.logo span{color:var(--accent)}
+nav{display:flex;gap:1.5rem;align-items:center}
+nav a{color:var(--text-secondary);text-decoration:none;font-weight:500;transition:color 0.2s}
+nav a:hover{color:var(--accent)}
+.hamburger{display:none;background:none;border:none;color:var(--text-primary);font-size:1.5rem;cursor:pointer}
+.container{max-width:800px;margin:0 auto;padding:2rem}
+.breadcrumb{margin-bottom:1.5rem;font-size:0.9rem}
+.breadcrumb a{color:var(--accent);text-decoration:none}
+.breadcrumb span{color:var(--text-muted);margin:0 0.5rem}
+h1{font-size:2.2rem;line-height:1.3;margin-bottom:0.5rem;background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.meta{color:var(--text-muted);font-size:0.9rem;margin-bottom:2rem;display:flex;gap:1rem;align-items:center}
+h2{font-size:1.6rem;margin:2rem 0 1rem;color:var(--text-primary);border-left:4px solid var(--accent);padding-left:1rem}
+h3{font-size:1.25rem;margin:1.5rem 0 0.75rem;color:var(--text-primary)}
+p{margin-bottom:1rem;color:var(--text-secondary)}
+ul,ol{margin:1rem 0 1rem 1.5rem;color:var(--text-secondary)}
+li{margin-bottom:0.5rem}
+.highlight{background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin:1.5rem 0}
+.example-box{background:var(--bg-card);border:1px solid var(--accent);border-left:4px solid var(--accent);border-radius:var(--radius);padding:1.25rem;margin:1.5rem 0}
+.example-box strong{color:var(--accent);display:block;margin-bottom:0.5rem}
+.strategy-box{background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin:1.5rem 0;border-left:4px solid #22c55e}
+.strategy-box strong{color:#22c55e;display:block;margin-bottom:0.5rem}
+.pro-tip{background:rgba(255,36,72,0.08);border:1px solid rgba(255,36,72,0.2);border-radius:var(--radius);padding:1.25rem;margin:1.5rem 0}
+.pro-tip strong{color:var(--accent);display:block;margin-bottom:0.5rem}
+.warning{background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);border-radius:var(--radius);padding:1.25rem;margin:1.5rem 0}
+.warning strong{color:#eab308;display:block;margin-bottom:0.5rem}
+.success{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:var(--radius);padding:1.25rem;margin:1.5rem 0}
+.success strong{color:#22c55e;display:block;margin-bottom:0.5rem}
+.steps{counter-reset:step;list-style:none;margin:1.5rem 0;padding:0}
+.steps li{counter-increment:step;padding:1rem 1rem 1rem 3.5rem;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:0.75rem;position:relative;color:var(--text-secondary)}
+.steps li::before{content:counter(step);position:absolute;left:1rem;top:50%;transform:translateY(-50%);background:var(--accent-gradient);color:#fff;width:2rem;height:2rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem}
+.cta{background:var(--bg-card);border:2px solid var(--accent);border-radius:var(--radius-lg);padding:2rem;text-align:center;margin:2.5rem 0}
+.cta h3{color:var(--accent);margin-bottom:0.75rem}
+.cta p{color:var(--text-secondary);margin-bottom:1rem}
+.cta a{display:inline-block;background:var(--accent-gradient);color:#fff;padding:0.75rem 2rem;border-radius:var(--radius);text-decoration:none;font-weight:600;transition:transform 0.2s,box-shadow 0.2s}
+.cta a:hover{transform:translateY(-2px);box-shadow:0 4px 20px var(--glow)}
+.related-posts{margin:2.5rem 0}
+.related-posts h2{border:none;padding:0;text-align:center}
+.related-posts ul{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.related-posts li{background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;transition:border-color 0.2s}
+.related-posts li:hover{border-color:var(--border-hover)}
+.related-posts a{color:var(--text-primary);text-decoration:none;font-weight:500;font-size:0.95rem}
+.social-share{display:flex;gap:0.75rem;margin:2rem 0;justify-content:center;flex-wrap:wrap}
+.social-share a{display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:var(--radius);text-decoration:none;font-weight:600;font-size:0.85rem;color:#fff;transition:transform 0.2s,opacity 0.2s}
+.social-share a:hover{transform:translateY(-2px);opacity:0.9}
+.social-share .facebook{background:#1877f2}
+.social-share .twitter{background:#000}
+.social-share .whatsapp{background:#25d366}
+footer{background:var(--bg-secondary);border-top:1px solid var(--border);margin-top:3rem;padding:2rem}
+.footer-cta{background:var(--accent-gradient);border-radius:var(--radius-lg);padding:2rem;text-align:center;margin-bottom:2rem;max-width:1200px;margin-left:auto;margin-right:auto}
+.footer-cta h3{color:#fff;margin-bottom:0.5rem}
+.footer-cta p{color:rgba(255,255,255,0.85);margin-bottom:1rem}
+.footer-cta a{display:inline-block;background:rgba(255,255,255,0.2);color:#fff;padding:0.75rem 2rem;border-radius:var(--radius);text-decoration:none;font-weight:600;transition:background 0.2s}
+.footer-cta a:hover{background:rgba(255,255,255,0.3)}
+.footer-links{max-width:1200px;margin:0 auto;padding:1.5rem 2rem;display:flex;flex-wrap:wrap;gap:1rem;justify-content:center}
+.footer-links a{color:var(--text-muted);text-decoration:none;font-size:0.85rem;transition:color 0.2s}
+.footer-links a:hover{color:var(--accent)}
+.footer-bottom{text-align:center;padding:1.5rem;border-top:1px solid var(--border);color:var(--text-muted);font-size:0.85rem}
+.footer-bottom a{color:var(--accent);text-decoration:none}
+.featured-image{margin:1.5rem 0;border-radius:var(--radius-lg);overflow:hidden}
+.featured-image img{width:100%;height:auto;display:block}
+@media(max-width:768px){
+  .header-content{padding:0.75rem 1rem}
+  nav{display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg-secondary);flex-direction:column;padding:1rem;border-bottom:1px solid var(--border)}
+  nav.active{display:flex}
+  .hamburger{display:block}
+  .container{padding:1rem}
+  h1{font-size:1.6rem}
+  h2{font-size:1.3rem}
+}
+</style>
+</head>
+<body>
+<header>
+<div class="header-content">
+<a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon">Win<span>Fulltime</span></a>
+<button class="hamburger" aria-label="Toggle menu">&#9776;</button>
+<nav>
+<a href="/predictions/1x2.html">1X2</a>
+<a href="/predictions/over-under.html">Over 2.5</a>
+<a href="/predictions/btts.html">BTTS</a>
+<a href="/blog.html">Blog</a>
+</nav>
+</div>
+</header>
+
+<div class="container">
+<div class="breadcrumb"><a href="/">Home</a><span>/</span><a href="/blog.html">Blog</a><span>/</span>How to Bet on Football Using Expected Threat (xT)</div>
+
+<h1>How to Bet on Football Using Expected Threat (xT)</h1>
+
+ <figure class="post-featured-image" style="margin:24px 0 28px;">
+  <img src="thumbnails/how-to-bet-on-football-using-expected-threat-xt.webp" alt="How to Bet on Football Using Expected Threat (xT)" width="1200" height="630" loading="eager" decoding="async" style="display:block;width:100%;height:auto;margin:0;border-radius:12px;">
+ </figure>
+<div class="meta"><time datetime="2026-07-26">July 26, 2026</time><span>|</span>8 min read</div>
+
+<figure class="featured-image">
+<img src="https://winfulltime.com/blog/thumbnails/how-to-bet-on-football-using-expected-threat-xt.webp" alt="Expected Threat xT Football Analytics" width="800" height="400" loading="eager">
+</figure>
+
+<p>Football analytics has evolved dramatically over the past decade. While Expected Goals (xG) became the industry standard for measuring shooting quality, a newer metric called Expected Threat (xT) is gaining traction among analysts and bettors who want a deeper understanding of pitch control and possession quality. If you want to find edges in football betting that most casual punters miss, understanding xT is a powerful weapon in your analytical arsenal.</p>
+
+<p>In this guide, we will break down exactly what xT measures, how it differs from other advanced metrics, how it is calculated, and most importantly, how you can apply it to your football betting strategy for smarter, more informed wagers.</p>
+
+<h2>What Is Expected Threat (xT)?</h2>
+
+<p>Expected Threat, commonly abbreviated as xT, is an advanced football metric that measures how much a team's probability of scoring increases with each action on the ball. Unlike xG, which only evaluates the quality of a shot, xT assigns a value to every single action a team takes in possession, whether that is a pass, a dribble, a carry, or a shot.</p>
+
+<p>The core idea behind xT is straightforward: not all areas of the pitch are equal in terms of goal-scoring danger. Receiving the ball in your own penalty area poses very little immediate threat to the opposition. However, receiving the ball in the opposition's penalty area is extremely dangerous. xT quantifies this gradient of danger across the entire pitch.</p>
+
+<p>Think of it this way: every position on the pitch has an associated probability of a goal being scored from that location within the next few actions. When a player moves the ball from a low-threat area to a high-threat area, they have generated positive xT. When the ball moves backward or laterally into less dangerous areas, the team has generated negative xT or simply failed to add value.</p>
+
+<div class="highlight">
+<strong>Key Concept:</strong>
+<p>xT captures the value of ball progression, not just the final action. A midfielder who consistently carries the ball from the defensive third into the attacking third may generate more xT over a match than a striker who takes two low-quality shots.</p>
+</div>
+
+<h2>How xT Differs from xG and xA</h2>
+
+<p>Understanding the distinction between xT, xG, and xA is essential for using these metrics effectively in betting analysis. Each one measures something fundamentally different about attacking play.</p>
+
+<h3>Expected Goals (xG)</h3>
+<p>xG evaluates only the quality of a shot based on factors like distance from goal, angle, the body part used, and the type of assist. A penalty is worth roughly 0.76 xG because historically, penalties result in a goal about 76% of the time. A shot from 30 yards with no angle advantage might be worth only 0.03 xG. The limitation of xG is that it only tells you about the final action. It does not capture the journey of how the ball arrived in that dangerous position.</p>
+
+<h3>Expected Assists (xA)</h3>
+<p>xA measures the likelihood that a given pass will result in a goal. It is essentially xG applied to the pass that directly precedes the shot. If a player makes a through ball that creates a one-on-one opportunity, that pass will have a high xA value. However, like xG, xA is limited to the final pass and does not capture the broader context of build-up play and positional advancement.</p>
+
+<h3>Expected Threat (xT)</h3>
+<p>xT is fundamentally different because it evaluates every action, not just shots or final passes. A pass from the centre circle to the edge of the penalty area generates xT even though it is not a shot or an assist. A dribble that beats two defenders and moves the ball from the halfway line to the corner of the box generates xT. This makes xT a much more comprehensive measure of a team's ability to progress the ball into dangerous areas.</p>
+
+<div class="example-box">
+<strong>Practical Example:</strong>
+<p>Consider a team that dominates possession with 65% of the ball but struggles to create clear-cut chances. Their xG might be low at 0.8, suggesting they are not threatening the opposition goal. However, their xT could be high at 2.4, indicating they are consistently moving the ball into dangerous areas but perhaps lacking the final ball or finishing quality. This tells a very different story and opens up different betting angles.</p>
+</div>
+
+<h2>How Is xT Calculated?</h2>
+
+<p>The xT model works by dividing the pitch into a grid of zones, typically around 16 by 12 cells. Each cell on the grid is assigned a value representing the probability of a goal being scored from that zone within a certain number of subsequent actions. These values are derived from historical data, looking at how often goals are scored when the ball is in each specific zone.</p>
+
+<p>When an action occurs, such as a pass or a carry, the model calculates the change in threat by comparing the xT value of the starting zone to the xT value of the ending zone. If the ball moves from a zone worth 0.02 xT to a zone worth 0.08 xT, the action has generated 0.06 xT for the attacking team.</p>
+
+<p>The most commonly used xT model was developed by Karun Singh and has been refined by various analytics groups since. The model typically considers:</p>
+
+<ul>
+<li><strong>Pitch location:</strong> The horizontal and vertical position of the ball</li>
+<li><strong>Action type:</strong> Passes, carries, and dribbles each have different characteristics</li>
+<li><strong>Outcome:</strong> Successful vs unsuccessful actions</li>
+<li><strong>Historical goal probability:</strong> Based on large datasets of match events</li>
+</ul>
+
+<h3>Pitch Control and xT</h3>
+
+<p>xT is closely related to the concept of pitch control, which measures which team has greater influence over different areas of the pitch at any given moment. Pitch control models use player positions, velocities, and the ball location to determine which team is more likely to gain possession in each zone. When combined with xT, pitch control gives a richer picture of which team is genuinely dominating dangerous areas rather than simply having possession in safe zones.</p>
+
+<div class="pro-tip">
+<strong>Pro Tip:</strong>
+<p>When analyzing team xT data, look at both total xT generated and xT per action. A team with high total xT but low xT per action may simply be playing very direct football with lots of forward passes. A team with lower total xT but high xT per action may be more efficient in their ball progression.</p>
+</div>
+
+<h2>Using xT to Identify Dominant Teams</h2>
+
+<p>One of the most powerful applications of xT in betting is identifying teams that genuinely control dangerous areas of the pitch. Traditional possession statistics can be misleading. A team can have 60% possession by recycling the ball between centre-backs and the goalkeeper, which generates very little threat. Another team might have 45% possession but consistently break forward into dangerous areas, generating significantly more xT.</p>
+
+<p>When you analyze xT data for a match, you are looking for teams that:</p>
+
+<ol>
+<li><strong>Generate high total xT:</strong> This indicates they are consistently moving the ball into dangerous areas</li>
+<li><strong>Allow low opponent xT:</strong> This shows they are effective at preventing the opposition from progressing into threatening positions</li>
+<li><strong>Have a positive xT differential:</strong> The difference between their xT and their opponent's xT reveals the true balance of territorial dominance</li>
+<li><strong>Consistently generate xT across the match:</strong> Spikes in xT may indicate a single dominant period, while sustained xT generation shows genuine control</li>
+</ol>
+
+<p>Teams that rank highly in xT differential tend to be more consistent performers because their style of play gives them multiple avenues to create chances. They are not reliant on moments of individual brilliance or set pieces alone.</p>
+
+<h2>Practical Betting Applications for xT</h2>
+
+<p>Now let us get to the part that matters most for bettors: how to use xT data to find value in football betting markets.</p>
+
+<h3>Over/Under Goals Markets</h3>
+<p>xT is particularly useful for over/under goals betting. Teams with high xT generation but low actual goal output may be underperforming their underlying numbers, suggesting they are due for a regression to the mean in terms of goals scored. Conversely, teams scoring significantly more goals than their xT suggests may be overperforming and could see their goal tallies drop.</p>
+
+<div class="strategy-box">
+<strong>Betting Strategy:</strong>
+<p>Look for matches where both teams have high xT numbers but one or both have been underperforming their xT in recent matches. This could signal an upcoming high-scoring game where the market has not yet adjusted to the underlying data. Similarly, if both teams have low xT generation but have been lucky in front of goal, consider backing the under.</p>
+</div>
+
+<h3>Team Dominance and Handicap Markets</h3>
+<p>When a strong team plays a weaker side, xT data can help you assess whether the handicap line is set correctly. If the strong team has been generating xT numbers well above the league average and the weaker team has been allowing high xT to opponents, a -1.5 or -2.0 handicap may offer value. The xT data provides a more nuanced picture than simple league position or recent results.</p>
+
+<h3>Possession Quality vs Quantity</h3>
+<p>xT helps differentiate between teams that dominate possession meaningfully and those that hold the ball without purpose. This distinction is critical for betting markets that depend on a team's ability to control the game, such as:</p>
+
+<ul>
+<li><strong>Corners:</strong> Teams with high xT per action tend to generate more corners because they are consistently pushing into the final third</li>
+<li><strong>Shots on target:</strong> High xT teams create more shooting opportunities, directly impacting shots on target markets</li>
+<li><strong>Player props:</strong> Identifying which players contribute most to a team's xT can help with individual player betting markets like shots, key passes, or chance creation</li>
+</ul>
+
+<h3>Live Betting with xT</h3>
+<p>During live matches, xT trends can be incredibly revealing. If a team is trailing but their xT is significantly higher than their opponent's, they may be unlucky and could be good candidates for a live comeback bet. The xT data tells you whether the trailing team is genuinely creating pressure or simply chasing the game without substance.</p>
+
+<div class="warning">
+<strong>Limitations to Consider:</strong>
+<p>xT is a relatively new metric and is not yet available from all data providers. Additionally, xT models may not fully account for set pieces, which can be significant goal-scoring opportunities. Always use xT alongside other analytical tools rather than as a standalone metric.</p>
+</div>
+
+<h2>Limitations of xT</h2>
+
+<p>While xT is a powerful analytical tool, it is important to understand its limitations before incorporating it into your betting strategy.</p>
+
+<ul>
+<li><strong>Set piece blind spot:</strong> Most xT models focus on open play and do not fully capture the threat generated from corners, free kicks, and throw-ins. Teams that are strong at set pieces may appear less threatening in xT than they actually are.</li>
+<li><strong>Game state effects:</strong> xT does not always account for the tactical adjustments teams make when leading or trailing. A team protecting a lead may deliberately reduce their xT generation, which is a rational strategy rather than a decline in performance.</li>
+<li><strong>Individual quality:</strong> xT measures positional threat but does not account for the quality of the individual player receiving the ball. A team generating high xT but relying on poor finishers may still underperform in actual goals.</li>
+<li><strong>Data availability:</strong> Not all leagues and competitions have comprehensive event data available. xT analysis is most reliable for top European leagues where data coverage is extensive.</li>
+<li><strong>Model variance:</strong> Different xT models can produce different values depending on their methodology and the datasets used for calibration. Always be aware of which model your data source is using.</li>
+</ul>
+
+<h2>How to Access xT Data</h2>
+
+<p>For bettors looking to incorporate xT into their analysis, several data providers and platforms now offer xT statistics. FBref, powered by StatsBomb data, provides xT for major European leagues. Other providers like Opta and Wyscout also include xT in their advanced metrics packages. For casual bettors, free resources like FBref provide enough xT data to start building an analytical edge.</p>
+
+<p>When using xT data, focus on sample sizes of at least 5 to 10 matches to get meaningful trends. Single-match xT numbers can be volatile, but aggregated data over several matches reveals genuine patterns in a team's ability to progress the ball into dangerous areas.</p>
+
+<div class="success">
+<strong>Bottom Line:</strong>
+<p>Expected Threat is one of the most exciting developments in football analytics for bettors. By measuring ball progression and positional threat rather than just final actions, xT provides a deeper understanding of which teams are genuinely dominating matches. When combined with traditional metrics and careful market analysis, xT can help you identify value bets that the majority of the betting market is missing.</p>
+</div>
+
+<div class="cta">
+<h3>Find Value Bets Using Advanced Metrics</h3>
+<p>Combine xT analysis with our data-driven predictions to find the best value bets across major leagues.</p>
+<a href="/ticket-builder.html">Build Your Ticket</a>
+</div>
+
+<div class="social-share">
+<a href="https://www.facebook.com/sharer/sharer.php?u=https://winfulltime.com/blog/how-to-bet-on-football-using-expected-threat-xt.html" class="facebook" target="_blank" rel="noopener">Facebook</a>
+<a href="https://twitter.com/intent/tweet?url=https://winfulltime.com/blog/how-to-bet-on-football-using-expected-threat-xt.html&text=How%20to%20Bet%20on%20Football%20Using%20Expected%20Threat%20(xT)" class="twitter" target="_blank" rel="noopener">X</a>
+<a href="https://wa.me/?text=How%20to%20Bet%20on%20Football%20Using%20Expected%20Threat%20(xT)%20https://winfulltime.com/blog/how-to-bet-on-football-using-expected-threat-xt.html" class="whatsapp" target="_blank" rel="noopener">WhatsApp</a>
+</div>
+
+<div class="related-posts">
+<h2>Related Articles</h2>
+<ul>
+<li><a href="/blog/expected-goals-xg-betting.html">Expected Goals (xG) and Football Betting Explained</a></li>
+<li><a href="/blog/football-expected-assists-xa-explained.html">Football Expected Assists (xA) Explained</a></li>
+<li><a href="/blog/how-to-analyse-counter-attacking-teams-for-football-betting.html">How to Analyse Counter-Attacking Teams for Betting</a></li>
+<li><a href="/blog/how-to-use-expected-threat-xt-for-football-betting.html">How to Use Expected Threat (xT) for Football Betting</a></li>
+</ul>
+</div>
+</div>
+
+<footer>
+<div class="footer-cta">
+<h3>Never Miss a Winning Tip</h3>
+<p>Get the latest predictions, analytics insights, and betting strategies delivered to you.</p>
+<a href="/predictions/live.html">Check In-Play Tips</a>
+</div>
+<div class="footer-links">
+<a href="/">Home</a>
+<a href="/ticket-builder.html">Ticket Builder</a>
+<a href="/blog.html">Latest News</a>
+<a href="/predictions/live.html">In-Play</a>
+<a href="/predictions/1x2.html">1X2</a>
+<a href="/predictions/over-under.html">Over 1.5</a>
+<a href="/predictions/over-under.html">Over 2.5</a>
+<a href="/predictions/btts.html">BTTS Yes</a>
+<a href="/predictions/btts-no.html">BTTS No</a>
+<a href="/predictions/unbeaten.html">Unbeaten</a>
+<a href="/predictions/corners.html">Corners</a>
+<a href="/predictions/cards.html">Cards</a>
+<a href="/advertise.html">Advertise</a>
+<a href="/contact.html">Contact</a>
+<a href="/privacy.html">Privacy</a>
+<a href="/terms.html">Terms</a>
+</div>
+<div class="footer-bottom">
+&copy; 2026 WinFulltime. Predictions are for informational purposes only. | Website Built by <a href="https://mesigo.site" target="_blank" rel="noopener">Mesigo</a>
+</div>
+</footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HMGZMW9EDP');</script>
+<script src="/chat-widget.js" defer></script>
+<script src="/responsible-gambling.js" defer></script>
+<script>
+document.querySelector('.hamburger').addEventListener('click',function(){document.querySelector('nav').classList.toggle('active');});
+</script>
+</body>
+</html>
