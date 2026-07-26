@@ -145,12 +145,13 @@ footer{background:var(--bg-secondary);border-top:1px solid var(--border);margin-
 <header>
 <div class="header-content">
 <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon">Win<span>Fulltime</span></a>
-<button class="hamburger" aria-label="Toggle menu">&#9776;</button>
-<nav>
-<a href="/predictions/1x2.html">1X2</a>
-<a href="/predictions/over-under.html">Over 2.5</a>
-<a href="/predictions/btts.html">BTTS</a>
-<a href="/blog.html">Blog</a>
+<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+<nav id="nav">
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/predictions/in-play">In-Play</a>
+ <a href="/blog/">News</a>
+ <a href="/contact.html">Contact</a>
 </nav>
 </div>
 </header>
@@ -164,10 +165,6 @@ footer{background:var(--bg-secondary);border-top:1px solid var(--border);margin-
   <img src="thumbnails/how-var-changes-football-betting-markets.webp" alt="How VAR Changes Football Betting Markets" width="1200" height="630" loading="eager" decoding="async" style="display:block;width:100%;height:auto;margin:0;border-radius:12px;">
  </figure>
 <div class="meta"><time datetime="2026-07-26">July 26, 2026</time><span>|</span>9 min read</div>
-
-<figure class="featured-image">
-<img src="https://winfulltime.com/blog/thumbnails/how-var-changes-football-betting-markets.webp" alt="VAR Impact on Football Betting Markets" width="800" height="400" loading="eager">
-</figure>
 
 <p>The introduction of the Video Assistant Referee (VAR) has fundamentally changed how football matches are officiated and, consequently, how they are bet on. Since its widespread adoption across Europe's top leagues, VAR has introduced a new layer of uncertainty that savvy bettors can exploit. Goals are being overturned, penalties are being awarded after delays, and match outcomes are being decided by decisions that would have stood pre-VAR. Understanding the VAR factor is now essential for any serious football bettor.</p>
 
@@ -348,5 +345,12 @@ footer{background:var(--bg-secondary);border-top:1px solid var(--border);margin-
 <script>
 document.querySelector('.hamburger').addEventListener('click',function(){document.querySelector('nav').classList.toggle('active');});
 </script>
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('nav')?.classList.toggle('open');
+});
+</script>
+
 </body>
 </html>

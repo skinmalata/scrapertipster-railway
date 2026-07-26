@@ -118,13 +118,14 @@ footer p{text-align:center;color:var(--text-muted);font-size:0.8rem}
 <header>
 <div class="header-content">
 <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon">Win<span>Fulltime</span></a>
-<nav id="mainNav">
-<a href="/1x2">1X2</a>
-<a href="/over-2.5">Over 2.5</a>
-<a href="/btts">BTTS</a>
-<a href="/blog">Blog</a>
+<nav id="nav">
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/predictions/in-play">In-Play</a>
+ <a href="/blog/">News</a>
+ <a href="/contact.html">Contact</a>
 </nav>
-<button class="hamburger" id="hamburger" aria-label="Toggle navigation">&#9776;</button>
+<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </div>
 </header>
 <div class="container">
@@ -135,7 +136,6 @@ footer p{text-align:center;color:var(--text-muted);font-size:0.8rem}
   <img src="thumbnails/how-to-use-cross-conversion-rates-for-football-predictions.webp" alt="How to Use Cross Conversion Rates for Football Predictions" width="1200" height="630" loading="eager" decoding="async" style="display:block;width:100%;height:auto;margin:0;border-radius:12px;">
  </figure>
 <p class="meta">Published on July 26, 2026 | 11 min read</p>
-<figure style="margin:1.5rem 0;border-radius:var(--radius-lg);overflow:hidden"><img src="https://winfulltime.com/blog/thumbnails/how-to-use-cross-conversion-rates-for-football-predictions.webp" alt="Cross conversion rates football analysis" style="width:100%;height:auto;display:block"></figure>
 
 <p>Crossing is one of football's oldest and most fundamental attacking weapons. From the earliest days of the sport to the modern era, teams have used wide areas to deliver balls into the box and create scoring opportunities. Yet crossing remains one of the most misunderstood aspects of football when it comes to betting. Many bettors focus on the volume of crosses without considering the effectiveness of those crosses, and this distinction is where genuine predictive value lies. Cross conversion rate, the percentage of crosses that create goal-scoring opportunities, is a metric that can significantly improve the accuracy of your football predictions across multiple betting markets.</p>
 
@@ -273,6 +273,11 @@ footer p{text-align:center;color:var(--text-muted);font-size:0.8rem}
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HMGZMW9EDP');</script>
 <script src="/chat-widget.js"></script>
 <script src="/responsible-gambling.js"></script>
-<script>document.getElementById('hamburger').addEventListener('click',function(){document.getElementById('mainNav').classList.toggle('active');});</script>
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('nav')?.classList.toggle('open');
+});
+</script>
 </body>
 </html>

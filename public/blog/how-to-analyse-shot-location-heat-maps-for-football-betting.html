@@ -117,13 +117,14 @@ footer p{text-align:center;color:var(--text-muted);font-size:.8rem}
 <header>
 <div class="header-content">
 <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon">Win<span>Fulltime</span></a>
-<nav>
-<a href="/1x2">1X2</a>
-<a href="/over-2-5">Over 2.5</a>
-<a href="/btts">BTTS</a>
-<a href="/blog">Blog</a>
+<nav id="nav">
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/predictions/in-play">In-Play</a>
+ <a href="/blog/">News</a>
+ <a href="/contact.html">Contact</a>
 </nav>
-<button class="hamburger" aria-label="Toggle navigation" onclick="document.querySelector('nav').style.display=document.querySelector('nav').style.display==='flex'?'none':'flex'">&#9776;</button>
+<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </div>
 </header>
 
@@ -136,10 +137,6 @@ footer p{text-align:center;color:var(--text-muted);font-size:.8rem}
   <img src="thumbnails/how-to-analyse-shot-location-heat-maps-for-football-betting.webp" alt="How to Analyse Shot Location Heat Maps for Football Betting" width="1200" height="630" loading="eager" decoding="async" style="display:block;width:100%;height:auto;margin:0;border-radius:12px;">
  </figure>
 <p class="meta">Published 26 July 2026 | 11 min read</p>
-
-<figure style="margin-bottom:1.5rem">
-<img src="/blog/thumbnails/how-to-analyse-shot-location-heat-maps-for-football-betting.webp" alt="Shot location heat map analysis for football betting" style="width:100%;border-radius:var(--radius-lg)">
-</figure>
 
 <p>Every shot in football is not created equal. A shot from 25 yards out carries a fundamentally different scoring probability than a shot from 6 yards. Understanding this distinction is at the heart of modern football analytics, and <span class="highlight">shot location heat maps</span> are one of the most powerful visual tools for grasping it. By learning to read and interpret these maps, you can identify which teams create high-quality chances, which are wasteful with their opportunities, and where the value lies in the goals markets. This guide teaches you everything you need to know about shot location heat maps and how to apply them to your football betting strategy.</p>
 
@@ -309,5 +306,12 @@ footer p{text-align:center;color:var(--text-muted);font-size:.8rem}
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-HMGZMW9EDP')</script>
 <script src="/chat-widget.js"></script>
 <script src="/responsible-gambling.js"></script>
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('nav')?.classList.toggle('open');
+});
+</script>
+
 </body>
 </html>

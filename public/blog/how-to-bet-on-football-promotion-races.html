@@ -145,12 +145,13 @@ footer{background:var(--bg-secondary);border-top:1px solid var(--border);margin-
 <header>
 <div class="header-content">
 <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon">Win<span>Fulltime</span></a>
-<button class="hamburger" aria-label="Toggle menu">&#9776;</button>
-<nav>
-<a href="/predictions/1x2.html">1X2</a>
-<a href="/predictions/over-under.html">Over 2.5</a>
-<a href="/predictions/btts.html">BTTS</a>
-<a href="/blog.html">Blog</a>
+<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+<nav id="nav">
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/predictions/in-play">In-Play</a>
+ <a href="/blog/">News</a>
+ <a href="/contact.html">Contact</a>
 </nav>
 </div>
 </header>
@@ -164,10 +165,6 @@ footer{background:var(--bg-secondary);border-top:1px solid var(--border);margin-
   <img src="thumbnails/how-to-bet-on-football-promotion-races.webp" alt="How to Bet on Football Promotion Races" width="1200" height="630" loading="eager" decoding="async" style="display:block;width:100%;height:auto;margin:0;border-radius:12px;">
  </figure>
 <div class="meta"><time datetime="2026-07-26">July 26, 2026</time><span>|</span>9 min read</div>
-
-<figure class="featured-image">
-<img src="https://winfulltime.com/blog/thumbnails/how-to-bet-on-football-promotion-races.webp" alt="Football Promotion Race Betting Strategy" width="800" height="400" loading="eager">
-</figure>
 
 <p>Promotion races are among the most dramatic and emotionally charged periods in football. As the season enters its final weeks, teams chasing promotion are playing for their futures, their manager's reputation, and in many cases, the financial fate of their entire club. For bettors, these high-stakes matches create unique opportunities that go beyond standard form analysis. Motivation, pressure, and the sheer intensity of promotion deciders can produce results that the raw numbers alone would not predict.</p>
 
@@ -368,5 +365,12 @@ footer{background:var(--bg-secondary);border-top:1px solid var(--border);margin-
 <script>
 document.querySelector('.hamburger').addEventListener('click',function(){document.querySelector('nav').classList.toggle('active');});
 </script>
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('nav')?.classList.toggle('open');
+});
+</script>
+
 </body>
 </html>

@@ -116,13 +116,14 @@ nav{display:none}
 <header>
 <div class="header-content">
 <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon">Win<span>Fulltime</span></a>
-<nav>
-<a href="/1x2">1X2</a>
-<a href="/over-2.5">Over 2.5</a>
-<a href="/btts">BTTS</a>
-<a href="/blog">Blog</a>
+<nav id="nav">
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/predictions/in-play">In-Play</a>
+ <a href="/blog/">News</a>
+ <a href="/contact.html">Contact</a>
 </nav>
-<button class="hamburger" aria-label="Toggle menu" onclick="document.querySelector('nav').style.display=document.querySelector('nav').style.display==='flex'?'none':'flex'">&#9776;</button>
+<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </div>
 </header>
 
@@ -135,10 +136,6 @@ nav{display:none}
   <img src="thumbnails/how-to-analyse-press-resistance-in-football-for-betting.webp" alt="How to Analyse Press Resistance in Football for Betting" width="1200" height="630" loading="eager" decoding="async" style="display:block;width:100%;height:auto;margin:0;border-radius:12px;">
  </figure>
 <div class="meta">Published on July 26, 2026 by WinFulltime</div>
-
-<figure style="margin-bottom:2rem;border-radius:var(--radius-lg);overflow:hidden">
-<img src="/blog/thumbnails/how-to-analyse-press-resistance-in-football-for-betting.webp" alt="Football players playing out from the back under pressure from the opposition press" style="width:100%;height:auto;display:block" loading="lazy">
-</figure>
 
 <p>In modern football, the ability to play through an opposition press has become one of the most valuable tactical qualities a team can possess. Press resistance, the ability to maintain possession and progress the ball while under intense pressure from the opposition, separates elite teams from good teams and creates significant advantages that directly influence match outcomes. For bettors, understanding press resistance provides a powerful lens through which to evaluate matches and identify value in the betting market.</p>
 
@@ -286,5 +283,12 @@ nav{display:none}
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HMGZMW9EDP');</script>
 <script src="/chat-widget.js" defer></script>
 <script src="/responsible-gambling.js" defer></script>
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('nav')?.classList.toggle('open');
+});
+</script>
+
 </body>
 </html>

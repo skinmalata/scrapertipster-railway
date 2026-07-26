@@ -116,13 +116,14 @@ nav{display:none}
 <header>
 <div class="header-content">
 <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon">Win<span>Fulltime</span></a>
-<nav>
-<a href="/1x2">1X2</a>
-<a href="/over-2.5">Over 2.5</a>
-<a href="/btts">BTTS</a>
-<a href="/blog">Blog</a>
+<nav id="nav">
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/predictions/in-play">In-Play</a>
+ <a href="/blog/">News</a>
+ <a href="/contact.html">Contact</a>
 </nav>
-<button class="hamburger" aria-label="Toggle menu" onclick="document.querySelector('nav').style.display=document.querySelector('nav').style.display==='flex'?'none':'flex'">&#9776;</button>
+<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </div>
 </header>
 
@@ -135,10 +136,6 @@ nav{display:none}
   <img src="thumbnails/how-to-bet-on-football-using-high-turnover-sequences.webp" alt="How to Bet on Football Using High Turnover Sequences" width="1200" height="630" loading="eager" decoding="async" style="display:block;width:100%;height:auto;margin:0;border-radius:12px;">
  </figure>
 <div class="meta">Published on July 26, 2026 by WinFulltime</div>
-
-<figure style="margin-bottom:2rem;border-radius:var(--radius-lg);overflow:hidden">
-<img src="/blog/thumbnails/how-to-bet-on-football-using-high-turnover-sequences.webp" alt="Football players engaged in a high turnover transition sequence during a match" style="width:100%;height:auto;display:block" loading="lazy">
-</figure>
 
 <p>In modern football, the moments immediately following a turnover of possession are among the most dangerous and decisive phases of play. When a team wins the ball back from the opposition, the opposing team is often disorganised, stretched, and vulnerable to a rapid counter-attack. Teams that excel at creating high turnover sequences, winning the ball back in advanced positions and immediately transitioning into attack, generate a disproportionate number of their goals and scoring opportunities from these moments.</p>
 
@@ -289,5 +286,12 @@ nav{display:none}
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HMGZMW9EDP');</script>
 <script src="/chat-widget.js" defer></script>
 <script src="/responsible-gambling.js" defer></script>
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('nav')?.classList.toggle('open');
+});
+</script>
+
 </body>
 </html>

@@ -116,13 +116,14 @@ nav{display:none}
 <header>
 <div class="header-content">
 <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon">Win<span>Fulltime</span></a>
-<nav>
-<a href="/1x2">1X2</a>
-<a href="/over-2.5">Over 2.5</a>
-<a href="/btts">BTTS</a>
-<a href="/blog">Blog</a>
+<nav id="nav">
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/predictions/in-play">In-Play</a>
+ <a href="/blog/">News</a>
+ <a href="/contact.html">Contact</a>
 </nav>
-<button class="hamburger" aria-label="Toggle menu" onclick="document.querySelector('nav').style.display=document.querySelector('nav').style.display==='flex'?'none':'flex'">&#9776;</button>
+<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </div>
 </header>
 
@@ -135,10 +136,6 @@ nav{display:none}
   <img src="thumbnails/how-to-use-deep-completions-data-for-football-betting.webp" alt="How to Use Deep Completions Data for Football Betting" width="1200" height="630" loading="eager" decoding="async" style="display:block;width:100%;height:auto;margin:0;border-radius:12px;">
  </figure>
 <div class="meta">Published on July 26, 2026 by WinFulltime</div>
-
-<figure style="margin-bottom:2rem;border-radius:var(--radius-lg);overflow:hidden">
-<img src="/blog/thumbnails/how-to-use-deep-completions-data-for-football-betting.webp" alt="Football midfielder playing a deep completion pass into the final third" style="width:100%;height:auto;display:block" loading="lazy">
-</figure>
 
 <p>While expected goals (xG) has become the dominant advanced metric in football analysis, there are several other data points that provide valuable insights for bettors. Among these, deep completions, successful passes completed into the final third or the penalty area, stands out as one of the most predictive and underutilised statistics in football betting. Deep completions measure a team's ability to penetrate defensive lines and deliver the ball into dangerous areas, providing a leading indicator of attacking threat that precedes shots and goals.</p>
 
@@ -292,5 +289,12 @@ nav{display:none}
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HMGZMW9EDP');</script>
 <script src="/chat-widget.js" defer></script>
 <script src="/responsible-gambling.js" defer></script>
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('nav')?.classList.toggle('open');
+});
+</script>
+
 </body>
 </html>

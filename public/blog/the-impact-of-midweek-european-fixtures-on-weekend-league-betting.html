@@ -145,12 +145,13 @@ footer{background:var(--bg-secondary);border-top:1px solid var(--border);margin-
 <header>
 <div class="header-content">
 <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon">Win<span>Fulltime</span></a>
-<button class="hamburger" aria-label="Toggle menu">&#9776;</button>
-<nav>
-<a href="/predictions/1x2.html">1X2</a>
-<a href="/predictions/over-under.html">Over 2.5</a>
-<a href="/predictions/btts.html">BTTS</a>
-<a href="/blog.html">Blog</a>
+<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+<nav id="nav">
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/predictions/in-play">In-Play</a>
+ <a href="/blog/">News</a>
+ <a href="/contact.html">Contact</a>
 </nav>
 </div>
 </header>
@@ -164,10 +165,6 @@ footer{background:var(--bg-secondary);border-top:1px solid var(--border);margin-
   <img src="thumbnails/the-impact-of-midweek-european-fixtures-on-weekend-league-betting.webp" alt="The Impact of Midweek European Fixtures on Weekend League Betting" width="1200" height="630" loading="eager" decoding="async" style="display:block;width:100%;height:auto;margin:0;border-radius:12px;">
  </figure>
 <div class="meta"><time datetime="2026-07-26">July 26, 2026</time><span>|</span>10 min read</div>
-
-<figure class="featured-image">
-<img src="https://winfulltime.com/blog/thumbnails/the-impact-of-midweek-european-fixtures-on-weekend-league-betting.webp" alt="Midweek European Fixtures Impact on Weekend Betting" width="800" height="400" loading="eager">
-</figure>
 
 <p>Every season, the European football calendar creates a fascinating dynamic for domestic league betting. When top clubs travel across the continent for Champions League and Europa League fixtures on Tuesday and Wednesday nights, the effects ripple through the following weekend's domestic programme. Fatigue, squad rotation, travel stress, and the psychological let-down after a big European night can all impact weekend league results. For bettors who understand these patterns, the midweek European fixture cycle creates one of the most reliable sources of value in football betting.</p>
 
@@ -423,5 +420,12 @@ footer{background:var(--bg-secondary);border-top:1px solid var(--border);margin-
 <script>
 document.querySelector('.hamburger').addEventListener('click',function(){document.querySelector('nav').classList.toggle('active');});
 </script>
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('nav')?.classList.toggle('open');
+});
+</script>
+
 </body>
 </html>

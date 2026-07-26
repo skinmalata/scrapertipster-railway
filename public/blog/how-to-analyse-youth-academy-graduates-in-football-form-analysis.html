@@ -117,13 +117,14 @@ footer p{text-align:center;color:var(--text-muted);font-size:.8rem}
 <header>
 <div class="header-content">
 <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon">Win<span>Fulltime</span></a>
-<nav>
-<a href="/1x2">1X2</a>
-<a href="/over-2-5">Over 2.5</a>
-<a href="/btts">BTTS</a>
-<a href="/blog">Blog</a>
+<nav id="nav">
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/predictions/in-play">In-Play</a>
+ <a href="/blog/">News</a>
+ <a href="/contact.html">Contact</a>
 </nav>
-<button class="hamburger" aria-label="Toggle navigation" onclick="document.querySelector('nav').style.display=document.querySelector('nav').style.display==='flex'?'none':'flex'">&#9776;</button>
+<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </div>
 </header>
 
@@ -136,10 +137,6 @@ footer p{text-align:center;color:var(--text-muted);font-size:.8rem}
   <img src="thumbnails/how-to-analyse-youth-academy-graduates-in-football-form-analysis.webp" alt="The Role of Youth Academy Graduates in Football Form Analysis" width="1200" height="630" loading="eager" decoding="async" style="display:block;width:100%;height:auto;margin:0;border-radius:12px;">
  </figure>
 <p class="meta">Published 26 July 2026 | 12 min read</p>
-
-<figure style="margin-bottom:1.5rem">
-<img src="/blog/thumbnails/how-to-analyse-youth-academy-graduates-in-football-form-analysis.webp" alt="Youth academy graduates in football form analysis and betting" style="width:100%;border-radius:var(--radius-lg)">
-</figure>
 
 <p>In modern football, a club's youth academy is far more than a development programme for future stars. It is a <span class="highlight">strategic asset</span> that directly influences a team's form, consistency, and long-term competitiveness. Clubs with strong academies produce players who understand the club's system, culture, and playing philosophy from a young age, creating a depth of squad knowledge that expensive signings alone cannot replicate. For football bettors, understanding how academy output affects team performance provides a valuable edge in predicting which teams will sustain form and which will fade.</p>
 
@@ -285,5 +282,12 @@ footer p{text-align:center;color:var(--text-muted);font-size:.8rem}
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-HMGZMW9EDP')</script>
 <script src="/chat-widget.js"></script>
 <script src="/responsible-gambling.js"></script>
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('nav')?.classList.toggle('open');
+});
+</script>
+
 </body>
 </html>

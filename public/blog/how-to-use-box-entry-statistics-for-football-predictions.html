@@ -117,13 +117,14 @@ footer p{text-align:center;color:var(--text-muted);font-size:.8rem}
 <header>
 <div class="header-content">
 <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon">Win<span>Fulltime</span></a>
-<nav>
-<a href="/1x2">1X2</a>
-<a href="/over-2-5">Over 2.5</a>
-<a href="/btts">BTTS</a>
-<a href="/blog">Blog</a>
+<nav id="nav">
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/predictions/in-play">In-Play</a>
+ <a href="/blog/">News</a>
+ <a href="/contact.html">Contact</a>
 </nav>
-<button class="hamburger" aria-label="Toggle navigation" onclick="document.querySelector('nav').style.display=document.querySelector('nav').style.display==='flex'?'none':'flex'">&#9776;</button>
+<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </div>
 </header>
 
@@ -136,10 +137,6 @@ footer p{text-align:center;color:var(--text-muted);font-size:.8rem}
   <img src="thumbnails/how-to-use-box-entry-statistics-for-football-predictions.webp" alt="How to Use Box Entry Statistics for Football Predictions" width="1200" height="630" loading="eager" decoding="async" style="display:block;width:100%;height:auto;margin:0;border-radius:12px;">
  </figure>
 <p class="meta">Published 26 July 2026 | 11 min read</p>
-
-<figure style="margin-bottom:1.5rem">
-<img src="/blog/thumbnails/how-to-use-box-entry-statistics-for-football-predictions.webp" alt="Box entry statistics for football predictions and betting" style="width:100%;border-radius:var(--radius-lg)">
-</figure>
 
 <p>In the world of football analytics, few metrics are as revealing yet as overlooked as <span class="highlight">box entries</span>. While casual fans and even many bettors focus on possession percentage, shots, or corners, box entry statistics tell you something far more important: how often a team successfully penetrates the most dangerous area of the pitch. A team can dominate possession without ever threatening the opposition goal, but a team that consistently enters the penalty area is creating genuine scoring opportunities. This article explains what box entries measure, why they correlate more strongly with goals than possession, and how you can use them to make sharper football betting decisions.</p>
 
@@ -294,5 +291,12 @@ footer p{text-align:center;color:var(--text-muted);font-size:.8rem}
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-HMGZMW9EDP')</script>
 <script src="/chat-widget.js"></script>
 <script src="/responsible-gambling.js"></script>
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('nav')?.classList.toggle('open');
+});
+</script>
+
 </body>
 </html>

@@ -118,13 +118,14 @@ footer p{text-align:center;color:var(--text-muted);font-size:0.8rem}
 <header>
 <div class="header-content">
 <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon">Win<span>Fulltime</span></a>
-<nav id="mainNav">
-<a href="/1x2">1X2</a>
-<a href="/over-2.5">Over 2.5</a>
-<a href="/btts">BTTS</a>
-<a href="/blog">Blog</a>
+<nav id="nav">
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/predictions/in-play">In-Play</a>
+ <a href="/blog/">News</a>
+ <a href="/contact.html">Contact</a>
 </nav>
-<button class="hamburger" id="hamburger" aria-label="Toggle navigation">&#9776;</button>
+<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </div>
 </header>
 <div class="container">
@@ -135,7 +136,6 @@ footer p{text-align:center;color:var(--text-muted);font-size:0.8rem}
   <img src="thumbnails/football-betting-on-using-progressive-passes-data.webp" alt="How to Bet on Football Using Progressive Passes Data" width="1200" height="630" loading="eager" decoding="async" style="display:block;width:100%;height:auto;margin:0;border-radius:12px;">
  </figure>
 <p class="meta">Published on July 26, 2026 | 11 min read</p>
-<figure style="margin:1.5rem 0;border-radius:var(--radius-lg);overflow:hidden"><img src="https://winfulltime.com/blog/thumbnails/football-betting-on-using-progressive-passes-data.webp" alt="Progressive passes data football analysis" style="width:100%;height:auto;display:block"></figure>
 
 <p>Football analytics has evolved dramatically over the past decade, and one of the most powerful statistical tools available to bettors today is the progressive pass metric. While traditional statistics like possession percentage and total passes tell you how much of the ball a team has, progressive passes reveal what a team actually does with it. This distinction is crucial for betting because it separates teams that dominate possession meaningfully from those that simply pass the ball sideways and backwards without threatening the opposition goal.</p>
 
@@ -254,6 +254,11 @@ footer p{text-align:center;color:var(--text-muted);font-size:0.8rem}
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HMGZMW9EDP');</script>
 <script src="/chat-widget.js"></script>
 <script src="/responsible-gambling.js"></script>
-<script>document.getElementById('hamburger').addEventListener('click',function(){document.getElementById('mainNav').classList.toggle('active');});</script>
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('nav')?.classList.toggle('open');
+});
+</script>
 </body>
 </html>

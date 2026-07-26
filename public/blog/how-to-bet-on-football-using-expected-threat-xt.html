@@ -145,12 +145,13 @@ footer{background:var(--bg-secondary);border-top:1px solid var(--border);margin-
 <header>
 <div class="header-content">
 <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon">Win<span>Fulltime</span></a>
-<button class="hamburger" aria-label="Toggle menu">&#9776;</button>
-<nav>
-<a href="/predictions/1x2.html">1X2</a>
-<a href="/predictions/over-under.html">Over 2.5</a>
-<a href="/predictions/btts.html">BTTS</a>
-<a href="/blog.html">Blog</a>
+<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+<nav id="nav">
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/predictions/in-play">In-Play</a>
+ <a href="/blog/">News</a>
+ <a href="/contact.html">Contact</a>
 </nav>
 </div>
 </header>
@@ -164,10 +165,6 @@ footer{background:var(--bg-secondary);border-top:1px solid var(--border);margin-
   <img src="thumbnails/how-to-bet-on-football-using-expected-threat-xt.webp" alt="How to Bet on Football Using Expected Threat (xT)" width="1200" height="630" loading="eager" decoding="async" style="display:block;width:100%;height:auto;margin:0;border-radius:12px;">
  </figure>
 <div class="meta"><time datetime="2026-07-26">July 26, 2026</time><span>|</span>8 min read</div>
-
-<figure class="featured-image">
-<img src="https://winfulltime.com/blog/thumbnails/how-to-bet-on-football-using-expected-threat-xt.webp" alt="Expected Threat xT Football Analytics" width="800" height="400" loading="eager">
-</figure>
 
 <p>Football analytics has evolved dramatically over the past decade. While Expected Goals (xG) became the industry standard for measuring shooting quality, a newer metric called Expected Threat (xT) is gaining traction among analysts and bettors who want a deeper understanding of pitch control and possession quality. If you want to find edges in football betting that most casual punters miss, understanding xT is a powerful weapon in your analytical arsenal.</p>
 
@@ -357,5 +354,12 @@ footer{background:var(--bg-secondary);border-top:1px solid var(--border);margin-
 <script>
 document.querySelector('.hamburger').addEventListener('click',function(){document.querySelector('nav').classList.toggle('active');});
 </script>
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('nav')?.classList.toggle('open');
+});
+</script>
+
 </body>
 </html>

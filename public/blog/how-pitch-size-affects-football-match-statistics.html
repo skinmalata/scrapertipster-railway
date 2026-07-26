@@ -116,13 +116,14 @@ nav{display:none}
 <header>
 <div class="header-content">
 <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon">Win<span>Fulltime</span></a>
-<nav>
-<a href="/1x2">1X2</a>
-<a href="/over-2.5">Over 2.5</a>
-<a href="/btts">BTTS</a>
-<a href="/blog">Blog</a>
+<nav id="nav">
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/predictions/in-play">In-Play</a>
+ <a href="/blog/">News</a>
+ <a href="/contact.html">Contact</a>
 </nav>
-<button class="hamburger" aria-label="Toggle menu" onclick="document.querySelector('nav').style.display=document.querySelector('nav').style.display==='flex'?'none':'flex'">&#9776;</button>
+<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </div>
 </header>
 
@@ -135,10 +136,6 @@ nav{display:none}
   <img src="thumbnails/how-pitch-size-affects-football-match-statistics.webp" alt="How Pitch Size Affects Football Match Statistics" width="1200" height="630" loading="eager" decoding="async" style="display:block;width:100%;height:auto;margin:0;border-radius:12px;">
  </figure>
 <div class="meta">Published on July 26, 2026 by WinFulltime</div>
-
-<figure style="margin-bottom:2rem;border-radius:var(--radius-lg);overflow:hidden">
-<img src="/blog/thumbnails/how-pitch-size-affects-football-match-statistics.webp" alt="Football pitch with varying dimensions showing how size affects match statistics" style="width:100%;height:auto;display:block" loading="lazy">
-</figure>
 
 <p>Most football bettors focus on team form, head-to-head records, and player quality when analysing matches. However, one physical factor that is frequently overlooked but can significantly influence match statistics is the size of the pitch. Football pitches vary considerably in both length and width between stadiums, and these dimensional differences affect playing style, goal frequency, corner counts, and overall match dynamics. Understanding how pitch size influences statistics gives bettors an additional analytical edge that most of the market ignores.</p>
 
@@ -284,5 +281,12 @@ nav{display:none}
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HMGZMW9EDP');</script>
 <script src="/chat-widget.js" defer></script>
 <script src="/responsible-gambling.js" defer></script>
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('nav')?.classList.toggle('open');
+});
+</script>
+
 </body>
 </html>

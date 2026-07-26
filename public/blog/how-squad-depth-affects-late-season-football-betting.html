@@ -118,13 +118,14 @@ footer p{text-align:center;color:var(--text-muted);font-size:0.8rem}
 <header>
 <div class="header-content">
 <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon">Win<span>Fulltime</span></a>
-<nav id="mainNav">
-<a href="/1x2">1X2</a>
-<a href="/over-2.5">Over 2.5</a>
-<a href="/btts">BTTS</a>
-<a href="/blog">Blog</a>
+<nav id="nav">
+ <a href="/">Home</a>
+ <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/predictions/in-play">In-Play</a>
+ <a href="/blog/">News</a>
+ <a href="/contact.html">Contact</a>
 </nav>
-<button class="hamburger" id="hamburger" aria-label="Toggle navigation">&#9776;</button>
+<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </div>
 </header>
 <div class="container">
@@ -135,7 +136,6 @@ footer p{text-align:center;color:var(--text-muted);font-size:0.8rem}
   <img src="thumbnails/how-squad-depth-affects-late-season-football-betting.webp" alt="How Squad Depth Affects Late-Season Football Betting" width="1200" height="630" loading="eager" decoding="async" style="display:block;width:100%;height:auto;margin:0;border-radius:12px;">
  </figure>
 <p class="meta">Published on July 26, 2026 | 11 min read</p>
-<figure style="margin:1.5rem 0;border-radius:var(--radius-lg);overflow:hidden"><img src="https://winfulltime.com/blog/thumbnails/how-squad-depth-affects-late-season-football-betting.webp" alt="Squad depth and late season football betting" style="width:100%;height:auto;display:block"></figure>
 
 <p>Every football season follows a similar arc. The opening months are characterised by optimism, freshness, and relatively predictable results based on pre-season expectations. But as the season progresses into its final third, a powerful and often underappreciated factor begins to dominate outcomes: squad depth. The teams that can rotate players without losing quality, manage fixture congestion effectively, and keep key players fit are the ones that finish strongest. For bettors, understanding squad depth dynamics is one of the most reliable edges available in the final 10 matchdays of any league season.</p>
 
@@ -272,6 +272,11 @@ footer p{text-align:center;color:var(--text-muted);font-size:0.8rem}
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HMGZMW9EDP');</script>
 <script src="/chat-widget.js"></script>
 <script src="/responsible-gambling.js"></script>
-<script>document.getElementById('hamburger').addEventListener('click',function(){document.getElementById('mainNav').classList.toggle('active');});</script>
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('nav')?.classList.toggle('open');
+});
+</script>
 </body>
 </html>
