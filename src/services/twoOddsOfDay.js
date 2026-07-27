@@ -184,9 +184,23 @@ function applyH2HSupport(candidates, h2hMatches) {
     const entry = entries.find(function(item) { return fixtureKey(item.match) === candidate.fixtureKey; });
     const streaks = entry && entry.streaks && Array.isArray(entry.streaks.all) ? entry.streaks.all : [];
     if (!streaks.length) return;
-    const strongest = streaks.slice().sort(function(a, b) { return Number(b.count || 0) - Number(a.count || 0); })[0];
+    const sorted = streaks.slice().sort(function(a, b) { return Number(b.count || 0) - Number(a.count || 0); });
+    const strongest = sorted[0];
     candidate.confidenceScore = Math.min(95, candidate.confidenceScore + Math.min(4, Math.max(1, Number(strongest.count || 0) - 5)));
-    candidate.evidence.push('Reported ' + strongest.count + '-match ' + strongest.type + ' streak (independent history check pending)');
+    const relevant = sorted.filter(function(s) {
+      if (candidate.category === '1x2') return s.type === 'win' || s.type === 'unbeaten';
+      if (candidate.category === 'btts' || candidate.category === 'bttsNo') return s.family === 'goals';
+      if (candidate.category === 'corners') return s.family === 'corners';
+      if (candidate.category === 'cards') return s.family === 'cards';
+      if (candidate.category === 'over25' || candidate.category === 'over15') return s.family === 'goals';
+      if (candidate.category === 'teamScore') return s.type === 'win' || s.family === 'goals';
+      return true;
+    }).slice(0, 3);
+    if (relevant.length) {
+      relevant.forEach(function(s) { candidate.evidence.push(s.text); });
+    } else {
+      candidate.evidence.push(strongest.text);
+    }
     candidate.h2hStatus = 'unverified';
   });
 }
