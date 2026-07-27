@@ -12,6 +12,8 @@ function getGeneratePostThumbnail() {
 const { asNumber, buildOpportunities } = require('../services/liveTips');
 const { getCachedLive } = require('../services/scrapeLive');
 const { getSettledTodayTips, getSettledTipsForDate } = require('../services/liveTipHistory');
+const { buildTwoOddsOfDay, publicPreview, watDate } = require('../services/twoOddsOfDay');
+const { fetchTodayStreaks } = require('../services/h2hWinningStreaks');
 
 // API-Football responses are cached so one busy page does not consume the
 // provider quota for every visitor. The API key is deliberately kept here,
@@ -82,6 +84,62 @@ async function checkUserVipStatus(userId) {
   }
   
   return { isVip: false };
+}
+
+// Membership decisions for the new VIP product must be based on a Supabase
+// bearer token, never on a browser-supplied user ID header.
+async function getAuthenticatedUser(req) {
+  const header = String(req.headers.authorization || '');
+  const token = header.match(/^Bearer\s+(.+)$/i);
+  if (!token || !supabase) return null;
+  try {
+    const { data, error } = await supabase.auth.getUser(token[1]);
+    if (error || !data || !data.user) return null;
+    return { id: data.user.id, email: data.user.email || '' };
+  } catch (error) {
+    console.warn('[vip-auth] Token validation failed:', error.message);
+    return null;
+  }
+}
+
+async function isAuthenticatedVip(req) {
+  const user = await getAuthenticatedUser(req);
+  if (!user) return false;
+  const result = await checkUserVipStatus(user.id);
+  return result.isVip === true;
+}
+
+async function fetchPreMatchOdds(date) {
+  const apiKey = process.env.API_FOOTBALL_KEY;
+  if (!apiKey) return [];
+  const cached = footballOddsCache.get(date);
+  if (cached && Date.now() - cached.createdAt < FOOTBALL_ODDS_CACHE_MS) return cached.payload.response || [];
+  try {
+    const upstream = await fetch('https://v3.football.api-sports.io/odds?date=' + encodeURIComponent(date) + '&timezone=Africa%2FLagos', {
+      headers: { 'x-apisports-key': apiKey, accept: 'application/json' },
+      signal: AbortSignal.timeout(25000)
+    });
+    const data = await upstream.json();
+    if (!upstream.ok || (data.errors && Object.keys(data.errors).length)) {
+      console.warn('[two-odds] Pre-match odds unavailable:', upstream.status, data.errors || data.message || 'Unknown error');
+      return [];
+    }
+    const payload = { available: true, source: 'API-Football', date: date, fetchedAt: new Date().toISOString(), response: Array.isArray(data.response) ? data.response : [] };
+    footballOddsCache.set(date, { createdAt: Date.now(), payload });
+    return payload.response;
+  } catch (error) {
+    console.warn('[two-odds] Pre-match odds fetch failed:', error.message);
+    return [];
+  }
+}
+
+function vipPredictionData() {
+  const data = getScraperService().loadCachedPredictions() || {};
+  const corners = getScraperService().loadCornersCache();
+  const cards = getScraperService().loadCardsCache();
+  if (corners && Array.isArray(corners.matches)) data.cornersMatches = corners.matches;
+  if (cards && Array.isArray(cards.matches)) data.cardsMatches = cards.matches;
+  return data;
 }
 
 function applyLimits(data, isVip) {
@@ -655,33 +713,24 @@ router.get('/football-odds', async (req, res) => {
   }
 
   const cached = footballOddsCache.get(requestedDate);
-  if (cached && Date.now() - cached.createdAt < FOOTBALL_ODDS_CACHE_MS) {
-    return res.json({ ...cached.payload, cached: true });
-  }
+  const response = await fetchPreMatchOdds(requestedDate);
+  if (!response.length && !cached) return res.status(502).json({ available: false, source: 'API-Football', message: 'Pre-match odds are temporarily unavailable', response: [] });
+  const payload = footballOddsCache.get(requestedDate).payload;
+  res.json({ ...payload, cached: Boolean(cached) });
+});
 
+// Public users receive a real but non-sensitive preview. The full daily ticket
+// is returned only after server-side Supabase token and VIP-status validation.
+router.get('/two-odds/today', async function(req, res) {
   try {
-    const upstream = await fetch('https://v3.football.api-sports.io/odds?date=' + encodeURIComponent(requestedDate) + '&timezone=Africa%2FLagos', {
-      headers: { 'x-apisports-key': apiKey, accept: 'application/json' },
-      signal: AbortSignal.timeout(25000)
-    });
-    const data = await upstream.json();
-    if (!upstream.ok || (data.errors && Object.keys(data.errors).length)) {
-      console.warn('API-Football odds request failed:', upstream.status, data.errors || data.message || 'Unknown error');
-      return res.status(502).json({ available: false, source: 'API-Football', message: 'Live odds are temporarily unavailable', response: [] });
-    }
-
-    const payload = {
-      available: true,
-      source: 'API-Football',
-      date: requestedDate,
-      fetchedAt: new Date().toISOString(),
-      response: Array.isArray(data.response) ? data.response : []
-    };
-    footballOddsCache.set(requestedDate, { createdAt: Date.now(), payload });
-    res.json(payload);
+    const date = typeof req.query.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(req.query.date) ? req.query.date : watDate();
+    const [oddsResponse, vip, h2hMatches] = await Promise.all([fetchPreMatchOdds(date), isAuthenticatedVip(req), fetchTodayStreaks()]);
+    const payload = buildTwoOddsOfDay(vipPredictionData(), { date: date, oddsResponse: oddsResponse, h2hMatches: h2hMatches });
+    if (!vip) return res.json({ ...publicPreview(payload), isVip: false, feature: '2 Odds of the Day' });
+    res.json({ ...payload, isVip: true, feature: '2 Odds of the Day' });
   } catch (error) {
-    console.warn('API-Football odds request error:', error.message);
-    res.status(502).json({ available: false, source: 'API-Football', message: 'Live odds are temporarily unavailable', response: [] });
+    console.error('[two-odds] Build failed:', error.message);
+    res.status(502).json({ available: false, isVip: false, feature: '2 Odds of the Day', reason: '2 Odds of the Day is being refreshed. Please check again shortly.', ticket: null });
   }
 });
 
