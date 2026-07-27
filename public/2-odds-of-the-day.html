@@ -138,6 +138,7 @@ gtag('config', 'G-HMGZMW9EDP');
     .two-leg-match{font-weight:800;color:var(--text-primary);font-size:15px;margin-bottom:6px}
     .two-leg-details{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
     .two-leg-market{font-size:13px;color:var(--text-secondary)}
+    .two-leg-evidence{font-size:12px;color:var(--text-muted);margin-top:4px;line-height:1.4}
     .two-leg-right{text-align:right}
     .two-leg-price{font-size:20px;font-weight:900;color:#4ade80}
     .two-leg-status{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
@@ -164,6 +165,7 @@ gtag('config', 'G-HMGZMW9EDP');
     .two-history-card .hist-legs{display:flex;flex-direction:column;gap:6px}
     .two-history-card .hist-leg{font-size:13px;color:var(--text-secondary);line-height:1.5}
     .two-history-card .hist-leg strong{color:var(--text-primary);font-weight:700}
+    .two-history-card .hist-leg-evidence{font-size:12px;color:var(--text-muted);margin-top:2px;line-height:1.4}
     .two-history-card .hist-badge{display:inline-block;border-radius:999px;padding:4px 10px;font-size:10px;font-weight:800;margin-top:10px}
     .two-history-card .hist-empty{color:var(--text-muted);font-size:13px;font-style:italic}
     @media(max-width:600px){
@@ -294,7 +296,8 @@ gtag('config', 'G-HMGZMW9EDP');
         if(legs.length){
           body+='<div class="two-legs">';
           legs.forEach(function(leg){
-            body+='<div class="two-leg"><div class="two-leg-match">'+escapeHtml(leg.match)+'</div><div class="two-leg-details"><div class="two-leg-market">'+escapeHtml(leg.selection)+'</div></div></div>';
+            var evidence=(leg.evidence||[]).filter(Boolean).join('. ');
+            body+='<div class="two-leg"><div class="two-leg-match">'+escapeHtml(leg.match)+'</div><div class="two-leg-details"><div class="two-leg-market">'+escapeHtml(leg.selection)+'</div>'+(evidence?'<div class="two-leg-evidence">'+escapeHtml(evidence)+'</div>':'')+'</div></div>';
           });
           body+='</div>';
         }else{
@@ -311,6 +314,7 @@ gtag('config', 'G-HMGZMW9EDP');
   </script>
 <script>
 (async function() {
+  function escapeHtml(value){return String(value == null ? '' : value).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
   var el = document.getElementById('twoHistory');
   if (!el) return;
   try {
@@ -333,6 +337,8 @@ gtag('config', 'G-HMGZMW9EDP');
       for (var j = 0; j < (t.legs || []).length; j++) {
         var s = t.legs[j];
         html += '<div class="hist-leg"><strong>' + (s.market || '') + '</strong> &mdash; ' + (s.selection || '') + '</div>';
+        var evidence=(s.evidence||[]).filter(Boolean).join('. ');
+        if(evidence) html += '<div class="hist-leg-evidence">' + escapeHtml(evidence) + '</div>';
       }
       html += '</div></div>';
     }
