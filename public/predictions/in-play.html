@@ -285,6 +285,11 @@
         if (!date) return '';
         return new Date(date + 'T12:00:00Z').toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
       }
+      function displaySignalTime(issuedAt) {
+        var date = new Date(issuedAt);
+        if (!issuedAt || isNaN(date.getTime())) return 'Time unavailable';
+        return date.toLocaleTimeString('en-NG', { timeZone: 'Africa/Lagos', hour: '2-digit', minute: '2-digit', hour12: false }) + ' WAT';
+      }
       function renderHistory(data) {
         var history = document.getElementById('history');
         var tips = (data && data.tips || []).filter(function(tip) { return tip.outcome === 'won' || tip.outcome === 'lost'; });
@@ -294,8 +299,12 @@
         if (!tips.length) { history.innerHTML = empty('No settled in-play results for this date', 'Won and lost tips appear here after the match outcome is confirmed.'); return; }
         history.innerHTML = tips.map(function(tip) {
           var outcome = tip.outcome || 'pending';
-          var score = tip.finalScore ? 'Final score: ' + tip.finalScore : 'Score at tip: ' + tip.scoreAtTip.home + ' - ' + tip.scoreAtTip.away;
-          return '<article class="history-card"><span class="outcome ' + escapeHtml(outcome) + '">' + outcomeLabel(outcome) + '</span><h3>' + escapeHtml(tip.home) + ' vs ' + escapeHtml(tip.away) + '</h3><p>' + escapeHtml(tip.market) + '</p><p>' + escapeHtml(score) + '</p></article>';
+          var scoreAtTip = tip.scoreAtTip || {};
+          var signalHome = Number(scoreAtTip.home), signalAway = Number(scoreAtTip.away);
+          var signalScore = (Number.isFinite(signalHome) ? signalHome : '?') + ' - ' + (Number.isFinite(signalAway) ? signalAway : '?');
+          var signalMinute = Number.isFinite(Number(tip.minute)) ? ' (minute ' + Number(tip.minute) + ')' : '';
+          var finalScore = tip.finalScore ? 'Final score: ' + tip.finalScore : 'Final score unavailable';
+          return '<article class="history-card"><span class="outcome ' + escapeHtml(outcome) + '">' + outcomeLabel(outcome) + '</span><h3>' + escapeHtml(tip.home) + ' vs ' + escapeHtml(tip.away) + '</h3><p>' + escapeHtml(tip.market) + '</p><p>First signal: ' + escapeHtml(displaySignalTime(tip.issuedAt)) + escapeHtml(signalMinute) + '</p><p>Score at signal: ' + escapeHtml(signalScore) + '</p><p>' + escapeHtml(finalScore) + '</p></article>';
         }).join('');
       }
       function previousDate(date) {
