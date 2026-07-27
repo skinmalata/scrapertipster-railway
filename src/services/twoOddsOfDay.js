@@ -150,12 +150,8 @@ function applyH2HSupport(candidates, h2hMatches) {
     const streaks = entry && entry.streaks && Array.isArray(entry.streaks.all) ? entry.streaks.all : [];
     if (!streaks.length) return;
     const strongest = streaks.slice().sort(function(a, b) { return Number(b.count || 0) - Number(a.count || 0); })[0];
-    // H2HStats is retained as a clearly limited, unverified support signal.
-    // It never makes a candidate eligible by itself and is capped below the
-    // broader confidence score, until a separate history-verification job is
-    // available for the VIP data store.
     candidate.confidenceScore = Math.min(95, candidate.confidenceScore + Math.min(4, Math.max(1, Number(strongest.count || 0) - 5)));
-    candidate.evidence.push('H2HStats-reported ' + strongest.count + '-match ' + strongest.type + ' streak (independent history check pending)');
+    candidate.evidence.push('Reported ' + strongest.count + '-match ' + strongest.type + ' streak (independent history check pending)');
     candidate.h2hStatus = 'unverified';
   });
 }

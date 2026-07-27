@@ -513,7 +513,7 @@ function checkStreakBackedWinner(match) {
     rule: 'streak-backed-winner',
     market: teamName + ' to Win',
     signalScore: Math.round(score),
-    reason: teamName + ' has an H2HStats ' + candidate.count + '-match ' + candidate.type + ' streak' + (candidate.scope !== 'all' ? ' (' + candidate.scope + ')' : '') + ' and is currently controlling a level match: ' + teamShots + '-' + opponentShots + ' shots, ' + teamShotsOn + '-' + opponentShotsOn + ' on target, ' + possession + '% possession, and ' + recent.shots + '-' + asNumber(opponentRecent && opponentRecent.shots) + ' attempts in the last ' + match.recentPressure.windowMinutes + ' minutes.'
+    reason: teamName + ' has a ' + candidate.count + '-match ' + candidate.type + ' streak' + (candidate.scope !== 'all' ? ' (' + candidate.scope + ')' : '') + ' and is currently controlling a level match: ' + teamShots + '-' + opponentShots + ' shots, ' + teamShotsOn + '-' + opponentShotsOn + ' on target, ' + possession + '% possession, and ' + recent.shots + '-' + asNumber(opponentRecent && opponentRecent.shots) + ' attempts in the last ' + match.recentPressure.windowMinutes + ' minutes.'
   };
 }
 
@@ -564,7 +564,7 @@ function checkStreakBackedTeamToScore(match) {
     rule: 'streak-backed-team-to-score',
     market: teamName + ' to Score',
     signalScore: Math.round(score),
-    reason: teamName + ' has an H2HStats ' + candidate.count + '-match win streak but is still scoreless after half-time. They are creating sustained pressure: ' + teamShots + '-' + opponentShots + ' shots, ' + teamShotsOn + '-' + opponentShotsOn + ' on target, ' + possession + '% possession, and ' + recent.shots + '-' + asNumber(opponentRecent && opponentRecent.shots) + ' attempts in the last ' + match.recentPressure.windowMinutes + ' minutes.'
+    reason: teamName + ' has a ' + candidate.count + '-match win streak but is still scoreless after half-time. They are creating sustained pressure: ' + teamShots + '-' + opponentShots + ' shots, ' + teamShotsOn + '-' + opponentShotsOn + ' on target, ' + possession + '% possession, and ' + recent.shots + '-' + asNumber(opponentRecent && opponentRecent.shots) + ' attempts in the last ' + match.recentPressure.windowMinutes + ' minutes.'
   };
 }
 
@@ -610,7 +610,7 @@ function checkCornerPressure(match) {
     signalScore: Math.round(signalScore),
     cornerCount: currentCorners,
     reason: currentCorners + ' corners by minute ' + elapsed + ' (' + (cornerRate * 90).toFixed(1) + ' per 90) with ' + totalShots +
-      ' total shots. H2H averages ' + h2hCorners.toFixed(1) + ' corners; recent team averages are ' + homeRecent.toFixed(1) + ' and ' + awayRecent.toFixed(1) + '.' + (cornerStreak ? ' H2HStats also shows an ' + cornerStreak.count + '-match corner streak.' : '')
+      ' total shots. H2H averages ' + h2hCorners.toFixed(1) + ' corners; recent team averages are ' + homeRecent.toFixed(1) + ' and ' + awayRecent.toFixed(1) + '.' + (cornerStreak ? ' Also shows an ' + cornerStreak.count + '-match corner streak.' : '')
   };
 }
 
