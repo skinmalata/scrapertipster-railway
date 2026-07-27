@@ -913,11 +913,9 @@ router.get('/two-odds/history', async function(req, res) {
       return res.json({ ...twoOddsHistoryCache.payload, cached: true });
     }
     const predictions = vipPredictionData();
-    const availableDates = (predictions && predictions.dates) || [];
     const results = [];
     for (let i = 1; i <= TWO_ODDS_HISTORY_DAYS; i++) {
       const date = watDateOffset(-i);
-      if (!availableDates.includes(date)) continue;
       try {
         const [oddsResponse, h2hMatches] = await Promise.all([fetchPreMatchOdds(date), fetchTodayStreaks()]);
         const payload = buildTwoOddsOfDay(predictions, { date, oddsResponse, h2hMatches });

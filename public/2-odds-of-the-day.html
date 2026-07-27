@@ -316,7 +316,8 @@ gtag('config', 'G-HMGZMW9EDP');
   var el = document.getElementById('twoHistory');
   if (!el) return;
   try {
-    var res = await fetch('/api/two-odds/history');
+    var API = window.WFT_API || 'https://winfulltime-api.onrender.com';
+    var res = await fetch(API + '/api/two-odds/history');
     var data = await res.json();
     var days = data.days || [];
     if (!days.length) { el.innerHTML = '<div style="padding:20px;color:var(--text-muted);font-size:13px;">No recent tickets available.</div>'; return; }
@@ -329,11 +330,11 @@ gtag('config', 'G-HMGZMW9EDP');
       }
       var t = d.ticket;
       html += '<div class="two-history-card"><div class="hist-date">' + d.date + '</div>';
-      html += '<div class="hist-odds">' + (t.totalOdds || '').toFixed(2) + 'x</div>';
+      html += '<div class="hist-odds">' + (t.combinedOdds || 0).toFixed(2) + 'x</div>';
       html += '<div class="hist-legs">';
-      for (var j = 0; j < (t.selections || []).length; j++) {
-        var s = t.selections[j];
-        html += '<div class="hist-leg"><strong>' + (s.combinedMarket || s.market || '') + '</strong> &mdash; ' + (s.tip || '') + '</div>';
+      for (var j = 0; j < (t.legs || []).length; j++) {
+        var s = t.legs[j];
+        html += '<div class="hist-leg"><strong>' + (s.market || '') + '</strong> &mdash; ' + (s.selection || '') + '</div>';
       }
       html += '</div></div>';
     }
