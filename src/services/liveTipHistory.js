@@ -94,14 +94,12 @@ function saveHistory() {
 async function saveToSupabase() {
   if (!supabase) return;
   try {
-    const rows = [];
-    tipsByDay.forEach(function(tips, day) {
-      rows.push({ day: day, tips: Array.from(tips.values()) });
-    });
-    if (rows.length) {
-      const { error } = await supabase.from('tip_history').upsert(rows, { onConflict: 'day' });
-      if (error) throw error;
-    }
+    var currentDay = dayKey();
+    var currentTips = tipsByDay.get(currentDay);
+    if (!currentTips || currentTips.size === 0) return;
+    var row = { day: currentDay, tips: Array.from(currentTips.values()) };
+    const { error } = await supabase.from('tip_history').upsert([row], { onConflict: 'day' });
+    if (error) throw error;
   } catch (err) {
     console.warn('[live-tip-history] Supabase save failed:', err.message);
   }

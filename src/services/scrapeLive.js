@@ -333,12 +333,12 @@ async function fetchHistoricalCornerTotal(matchId) {
 
 async function enrichFinishedCornerResults() {
   var fixtureIds = getPendingCornerFixtureIds();
-  for (var i = 0; i < fixtureIds.length; i++) {
-    var result = dailyMatchResults.get(fixtureIds[i]);
-    if (!result || !result.finished) continue;
-    var corners = await fetchHistoricalCornerTotal(fixtureIds[i]);
+  await Promise.all(fixtureIds.map(async function(fixtureId) {
+    var result = dailyMatchResults.get(fixtureId);
+    if (!result || !result.finished) return;
+    var corners = await fetchHistoricalCornerTotal(fixtureId);
     if (corners !== null) result.corners = corners;
-  }
+  }));
 }
 
 async function averageHistoricalCorners(fixtureIds) {
@@ -355,9 +355,12 @@ async function averageHistoricalCorners(fixtureIds) {
 
 async function attachCornerContext(match) {
   if (!match || !match.h2h || !match.h2h.fixtures || !match.recentForm) return;
-  var h2h = await averageHistoricalCorners(match.h2h.fixtures);
-  var home = await averageHistoricalCorners(match.recentForm.home && match.recentForm.home.fixtureIds);
-  var away = await averageHistoricalCorners(match.recentForm.away && match.recentForm.away.fixtureIds);
+  var results = await Promise.all([
+    averageHistoricalCorners(match.h2h.fixtures),
+    averageHistoricalCorners(match.recentForm.home && match.recentForm.home.fixtureIds),
+    averageHistoricalCorners(match.recentForm.away && match.recentForm.away.fixtureIds)
+  ]);
+  var h2h = results[0], home = results[1], away = results[2];
   if (h2h && home && away) match.cornerContext = { h2h: h2h, recent: { home: home, away: away } };
 }
 

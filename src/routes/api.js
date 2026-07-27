@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 let generatePostThumbnail;
@@ -151,8 +152,7 @@ function applyLimits(data, isVip) {
 
 router.get('/predictions', async (req, res) => {
   try {
-    const userId = req.headers['x-user-id'];
-    const { isVip } = await checkUserVipStatus(userId);
+    const isVip = await isAuthenticatedVip(req);
     
     let data;
     const cached = getScraperService().loadCachedPredictions();
@@ -641,7 +641,17 @@ router.get('/articles', (req, res) => {
 
 function requireAdmin(req, res, next) {
   const token = req.headers['x-admin-token'];
-  if (!token || token !== process.env.ADMIN_TOKEN) {
+  const expected = process.env.ADMIN_TOKEN;
+  if (!token || !expected) {
+    return res.status(403).json({ success: false, error: 'Forbidden' });
+  }
+  try {
+    const a = Buffer.from(String(token));
+    const b = Buffer.from(String(expected));
+    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+      return res.status(403).json({ success: false, error: 'Forbidden' });
+    }
+  } catch (e) {
     return res.status(403).json({ success: false, error: 'Forbidden' });
   }
   next();
@@ -721,11 +731,18 @@ router.get('/football-odds', async (req, res) => {
 
 // 2 Odds of the Day is temporarily free for everyone. The ticket engine keeps
 // the same data and risk rules; only the membership presentation is disabled.
+let twoOddsCache = null;
+const TWO_ODDS_CACHE_MS = 10 * 60 * 1000;
+
 router.get('/two-odds/today', async function(req, res) {
   try {
     const date = typeof req.query.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(req.query.date) ? req.query.date : watDate();
+    if (twoOddsCache && twoOddsCache.date === date && Date.now() - twoOddsCache.createdAt < TWO_ODDS_CACHE_MS) {
+      return res.json({ ...twoOddsCache.payload, cached: true });
+    }
     const [oddsResponse, h2hMatches] = await Promise.all([fetchPreMatchOdds(date), fetchTodayStreaks()]);
     const payload = buildTwoOddsOfDay(vipPredictionData(), { date: date, oddsResponse: oddsResponse, h2hMatches: h2hMatches });
+    twoOddsCache = { date, createdAt: Date.now(), payload };
     res.json({ ...payload, isVip: false, freeAccess: true, feature: '2 Odds of the Day' });
   } catch (error) {
     console.error('[two-odds] Build failed:', error.message);

@@ -11,6 +11,7 @@ const MARKET_STREAK_MINIMUM = 6;
 
 let streakCache = null;
 let streakCacheTime = null;
+let streakCacheDate = null;
 
 function todayDateStr() {
   var parts = new Intl.DateTimeFormat('en-CA', {
@@ -123,13 +124,14 @@ function parseAllStreaks(html) {
 
 async function fetchTodayStreaks() {
   var today = todayDateStr();
-  if (streakCache && streakCacheTime && (Date.now() - streakCacheTime) < STREAK_CACHE_TTL) return streakCache;
+  if (streakCache && streakCacheTime && streakCacheDate === today && (Date.now() - streakCacheTime) < STREAK_CACHE_TTL) return streakCache;
 
   try {
     var params = { show_finished: 0, date: today, category: 'overview', filter: '', gmt: '0', sport: '1' };
     var res = await axios.get(API_URL, { params: params, timeout: 15000 });
     streakCache = parseAllStreaks(res.data);
     streakCacheTime = Date.now();
+    streakCacheDate = today;
     var counts = { all: 0, win: 0, 'ht-over-1.5': 0, 'ht-over-0.5': 0, 'ht-draw': 0 };
     streakCache.forEach(function (m) {
       Object.keys(m.streaks).forEach(function (k) { counts[k] += m.streaks[k].length; });
