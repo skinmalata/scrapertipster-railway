@@ -71,6 +71,7 @@ function candidateFrom(category, source, date) {
   if (sourceProbability < MIN_PROBABILITY) return null;
   if (/friendly|friendlies|u\d{2}|reserve|reserves|women/i.test(String(source.league || ''))) return null;
   const p = Math.min(0.9, sourceProbability);
+  const evidence = buildEvidence(category, source, p);
   return {
     fixtureKey: fixtureKey(match),
     match: match,
@@ -86,11 +87,45 @@ function candidateFrom(category, source, date) {
     priceStatus: 'estimated',
     bookmaker: null,
     confidenceScore: Math.round(p * 100),
-    evidence: [category === 'corners' || category === 'cards'
-      ? (source.insights || []).filter(Boolean).slice(0, 2).join(' · ')
-      : 'Qualified ' + category + ' model signal'].filter(Boolean),
+    evidence: evidence,
     priority: marketPriority(category)
   };
+}
+
+function buildEvidence(category, source, probabilityValue) {
+  const confidence = Math.round(probabilityValue * 100);
+  const probs = source.probabilities || {};
+  if (category === '1x2') {
+    const parts = [];
+    if (probs.homeWin != null) parts.push('Home ' + Math.round(probs.homeWin) + '%');
+    if (probs.draw != null) parts.push('Draw ' + Math.round(probs.draw) + '%');
+    if (probs.awayWin != null) parts.push('Away ' + Math.round(probs.awayWin) + '%');
+    return ['Model confidence ' + confidence + '%. ' + parts.join(', ')].filter(Boolean);
+  }
+  if (category === 'over25') {
+    return ['Over 2.5 probability ' + confidence + '%. ' + (probs.over25 != null ? 'Over ' + Math.round(probs.over25) + '% vs Under ' + Math.round(probs.under25 || 0) + '%' : 'High-scoring fixture profile')].filter(Boolean);
+  }
+  if (category === 'over15') {
+    return ['Over 1.5 probability ' + confidence + '%. ' + (probs.over15 != null ? 'Over ' + Math.round(probs.over15) + '% vs Under ' + Math.round(probs.under15 || 0) + '%' : 'Goals expected from both sides')].filter(Boolean);
+  }
+  if (category === 'btts') {
+    return ['BTTS probability ' + confidence + '%. ' + (probs.bttsYes != null ? 'Yes ' + Math.round(probs.bttsYes) + '% vs No ' + Math.round(probs.bttsNo || 0) + '%' : 'Both teams have strong scoring profiles')].filter(Boolean);
+  }
+  if (category === 'bttsNo') {
+    return ['BTTS No probability ' + confidence + '%. ' + (probs.ots != null ? 'One-team-score ' + Math.round(probs.ots) + '%' : 'One-sided attacking profile expected')].filter(Boolean);
+  }
+  if (category === 'corners') {
+    const existing = (source.insights || []).filter(Boolean).slice(0, 2);
+    return existing.length ? existing : ['Corner market qualified at ' + confidence + '% confidence'];
+  }
+  if (category === 'cards') {
+    const existing = (source.insights || []).filter(Boolean).slice(0, 2);
+    return existing.length ? existing : ['Card market qualified at ' + confidence + '% confidence'];
+  }
+  if (category === 'teamScore') {
+    return ['Team-to-score probability ' + confidence + '%. ' + (source.team ? source.team + ' has strong attacking form' : 'Consistent scoring profile')].filter(Boolean);
+  }
+  return ['Model confidence ' + confidence + '%'];
 }
 
 function allCandidates(predictions, date) {
