@@ -2,7 +2,7 @@ const { asNumber } = require('./liveTips');
 
 // Publish only the highest-confidence opportunities. This keeps the live
 // feed selective and gives each recommendation a stronger statistical basis.
-const MINIMUM_SIGNAL_SCORE = 70;
+const MINIMUM_SIGNAL_SCORE = 60;
 
 function getStats(match) {
   return match.fotmobStats || null;
@@ -703,16 +703,17 @@ function buildGoldenTips(liveData) {
   if (!liveData || !liveData.matches) return [];
 
   var opportunities = [];
+  var filterStats = { friendly: 0, noTimeLeft: 0, tooManyGoals: 0, lowSignal: 0, bttsHalf: 0, total: liveData.matches.length };
 
   liveData.matches.forEach(function (match) {
     // Friendly and exhibition fixtures have volatile line-ups and incentives,
     // so they are never eligible for an in-play recommendation.
-    if (isFriendlyMatch(match)) return;
+    if (isFriendlyMatch(match)) { filterStats.friendly++; return; }
     // Never publish a tip with fewer than 15 minutes remaining in either half.
-    if (!hasAtLeastFifteenMinutesRemaining(match)) return;
+    if (!hasAtLeastFifteenMinutesRemaining(match)) { filterStats.noTimeLeft++; return; }
     // Skip matches with 3+ goals already scored (over 2.5)
     var totalGoals = scoreTotal(match.score);
-    if (totalGoals !== null && totalGoals >= 3) return;
+    if (totalGoals !== null && totalGoals >= 3) { filterStats.tooManyGoals++; return; }
     var marketTip = pickBest(MARKET_RULES, match);
     var teamTip = pickBest(TEAM_RULES, match);
     var cornerTip = pickBest(CORNER_RULES, match);
@@ -721,10 +722,10 @@ function buildGoldenTips(liveData) {
 
     [marketTip, teamTip, cornerTip, kickoffTip].forEach(function (tip) {
       if (!tip) return;
-      if (asNumber(tip.signalScore) < MINIMUM_SIGNAL_SCORE) return;
+      if (asNumber(tip.signalScore) < MINIMUM_SIGNAL_SCORE) { filterStats.lowSignal++; return; }
       // Keep this at the publishing boundary so a future BTTS rule cannot
       // accidentally introduce second-half BTTS recommendations.
-      if (isBttsMarket(tip.market) && asNumber(match.minute) >= 45) return;
+      if (isBttsMarket(tip.market) && asNumber(match.minute) >= 45) { filterStats.bttsHalf++; return; }
       opportunities.push({
         fixtureId: match.matchId,
         home: match.home,
@@ -754,9 +755,13 @@ function buildGoldenTips(liveData) {
     if (!existing || opportunity.signalScore > existing.signalScore) uniqueOpportunities.set(key, opportunity);
   });
 
-  return Array.from(uniqueOpportunities.values()).sort(function (a, b) {
+  var result = Array.from(uniqueOpportunities.values()).sort(function (a, b) {
     return b.signalScore - a.signalScore;
   });
+
+  console.log('[golden-tips] matches=' + filterStats.total + ' friendly=' + filterStats.friendly + ' noTimeLeft=' + filterStats.noTimeLeft + ' tooManyGoals=' + filterStats.tooManyGoals + ' lowSignal=' + filterStats.lowSignal + ' bttsHalf=' + filterStats.bttsHalf + ' -> opportunities=' + result.length);
+
+  return result;
 }
 
 module.exports = {

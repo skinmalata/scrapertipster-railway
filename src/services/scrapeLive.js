@@ -80,10 +80,10 @@ function httpGet(url, timeoutMs) {
       res.on('data', function (c) { body += c; });
       res.on('end', function () {
         try { resolve({ status: res.statusCode, data: JSON.parse(body) }); }
-        catch (e) { resolve({ status: res.statusCode, data: null }); }
+        catch (e) { console.warn('[fotmob-live] JSON parse failed for', url, '— status:', res.statusCode, 'body length:', body.length, 'preview:', body.slice(0, 120)); resolve({ status: res.statusCode, data: null }); }
       });
     });
-    req.on('timeout', function () { req.destroy(); reject(new Error('Request timeout')); });
+    req.on('timeout', function () { req.destroy(); reject(new Error('Request timeout for ' + url)); });
     req.on('error', reject);
   });
 }
@@ -102,11 +102,16 @@ function addFotMobResults(data) {
 
 function appendLiveMatches(data, matches, seenMatchIds) {
   if (!data || !data.leagues) return;
+  var totalScanned = 0;
+  var filteredOut = { notStarted: 0, finished: 0, notOngoing: 0, noStatus: 0, duplicate: 0 };
   data.leagues.forEach(function (league) {
     (league.matches || []).forEach(function (m) {
-      if (!m.status || !m.status.started || m.status.finished || !m.status.ongoing) return;
+      totalScanned++;
+      if (!m.status || !m.status.started) { filteredOut.notStarted++; return; }
+      if (m.status.finished) { filteredOut.finished++; return; }
+      if (!m.status.ongoing) { filteredOut.notOngoing++; return; }
       var matchId = String(m.id);
-      if (!matchId || seenMatchIds.has(matchId)) return;
+      if (!matchId || seenMatchIds.has(matchId)) { filteredOut.duplicate++; return; }
       seenMatchIds.add(matchId);
       matches.push({
         matchId: matchId,
@@ -124,6 +129,7 @@ function appendLiveMatches(data, matches, seenMatchIds) {
       });
     });
   });
+  console.log('[fotmob-live] appendLiveMatches scanned=' + totalScanned + ' live=' + matches.length + ' (notStarted=' + filteredOut.notStarted + ' finished=' + filteredOut.finished + ' notOngoing=' + filteredOut.notOngoing + ' duplicate=' + filteredOut.duplicate + ')');
 }
 
 function indexFotMobFixtures(data, fixtureIndex) {
@@ -169,6 +175,8 @@ async function fetchFotMobLive() {
     dailyMatchResultsDate = date;
   }
 
+  console.log('[fotmob-live] Fetching FotMob for dates:', date, 'and', fotMobDateStr(-1));
+
   // FotMob assigns late-night fixtures to its prior date. Querying only the
   // new WAT date after midnight leaves those completed fixtures without a
   // final score and strands their tips as pending.
@@ -178,10 +186,14 @@ async function fetchFotMobLive() {
   ]);
   var res = responses[0];
   var previousRes = responses[1];
+  console.log('[fotmob-live] API responses — today:', res ? 'status=' + res.statusCode + ' hasLeagues=' + Boolean(res.data && res.data.leagues) : 'null', '| yesterday:', previousRes ? 'status=' + previousRes.statusCode + ' hasLeagues=' + Boolean(previousRes.data && previousRes.data.leagues) : 'null');
   var validResponses = [previousRes, res].filter(function(response) {
     return response && response.status === 200 && response.data && response.data.leagues;
   });
-  if (!validResponses.length) return [];
+  if (!validResponses.length) {
+    console.warn('[fotmob-live] No valid FotMob responses — both today and yesterday returned no data');
+    return [];
+  }
 
   validResponses.forEach(function(response) { addFotMobResults(response.data); });
   fotmobFixtureIndex = new Map();
@@ -193,6 +205,7 @@ async function fetchFotMobLive() {
   var matches = [];
   var seenMatchIds = new Set();
   validResponses.forEach(function(response) { appendLiveMatches(response.data, matches, seenMatchIds); });
+  console.log('[fotmob-live] Live matches after filtering:', matches.length);
   return matches;
 }
 
@@ -467,8 +480,10 @@ async function scrapeLive() {
     await enrichFinishedCornerResults();
     if (!matches.length) {
       if (liveCache && liveCache.matches && liveCache.matches.length) {
-        console.log('[fotmob-live] Empty scrape, preserving', liveCache.matches.length, 'cached matches');
+        var age = Date.now() - new Date(liveCache.fetchedAt).getTime();
+        console.log('[fotmob-live] Empty scrape, preserving', liveCache.matches.length, 'cached matches (age:', Math.round(age / 1000) + 's)');
       } else {
+        console.log('[fotmob-live] Empty scrape, no cached matches available');
         liveCache = { fetchedAt: new Date().toISOString(), matchCount: 0, matches: [] };
       }
       settleTips([], dailyMatchResults);

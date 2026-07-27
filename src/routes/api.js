@@ -960,6 +960,8 @@ router.get('/golden-tips', async function (req, res) {
   const liveData = getCachedLive();
   const liveDataAge = liveData && liveData.fetchedAt ? Date.now() - new Date(liveData.fetchedAt).getTime() : Infinity;
   if (!liveData || liveDataAge > MAX_LIVE_DATA_AGE_MS || !liveData.matches || liveData.matches.length === 0) {
+    var reason = !liveData ? 'noLiveCache' : liveDataAge > MAX_LIVE_DATA_AGE_MS ? 'stale (' + Math.round(liveDataAge / 1000) + 's old)' : 'noMatches';
+    console.log('[golden-tips] API returning empty — reason: ' + reason);
     return res.json({ available: false, opportunities: [], message: 'Live data is not available yet. Tips will appear once live matches are detected.' });
   }
 
