@@ -292,7 +292,10 @@ gtag('config', 'G-HMGZMW9EDP');
         var odds=Number(ticket.combinedOdds||0).toFixed(2);
         var badge=ticket.priceType||'model';
         var legs=Array.isArray(ticket.legs)?ticket.legs:[];
-        var body='<div class="two-row"><div><div class="two-label">Today\'s 2 Odds ticket</div><div class="two-odds">'+odds+'</div></div><span class="two-badge '+escapeHtml(badge)+'">'+escapeHtml(priceLabel(badge))+'</span></div>';
+        var ticketDate=data.date||'';
+        var today=new Date().toISOString().slice(0,10);
+        var label=ticketDate===today?'Today\'s 2 Odds ticket':'2 Odds ticket ('+ticketDate+')';
+        var body='<div class="two-row"><div><div class="two-label">'+escapeHtml(label)+'</div><div class="two-odds">'+odds+'</div></div><span class="two-badge '+escapeHtml(badge)+'">'+escapeHtml(priceLabel(badge))+'</span></div>';
         if(legs.length){
           body+='<div class="two-legs">';
           legs.forEach(function(leg){

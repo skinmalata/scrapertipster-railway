@@ -282,13 +282,15 @@ function evaluateTicket(legs) {
 }
 
 function buildTwoOddsOfDay(predictions, options) {
-  const date = (options && options.date) || watDate();
+  const requestedDate = (options && options.date) || watDate();
   const generatedAt = new Date().toISOString();
   if (!predictions || !Array.isArray(predictions.matches)) {
-    return { available: false, date: date, generatedAt: generatedAt, reason: 'Pre-match data is not available yet.', ticket: null };
+    return { available: false, date: requestedDate, generatedAt: generatedAt, reason: 'Pre-match data is not available yet.', ticket: null };
   }
-  if (predictions.date && predictions.date !== date && !(predictions.dates || []).includes(date)) {
-    return { available: false, date: date, generatedAt: generatedAt, reason: 'Today\'s pre-match data has not been refreshed yet.', ticket: null };
+  const availableDates = (predictions.dates || []).slice().sort().reverse();
+  let date = requestedDate;
+  if (!availableDates.includes(date) && availableDates.length) {
+    date = availableDates[0];
   }
   const candidates = allCandidates(predictions, date);
   applyH2HSupport(candidates, options && options.h2hMatches);
