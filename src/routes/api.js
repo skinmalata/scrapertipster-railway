@@ -12,7 +12,7 @@ function getGeneratePostThumbnail() {
 const { asNumber, buildOpportunities } = require('../services/liveTips');
 const { getCachedLive } = require('../services/scrapeLive');
 const { getSettledTodayTips, getSettledTipsForDate } = require('../services/liveTipHistory');
-const { buildTwoOddsOfDay, publicPreview, watDate } = require('../services/twoOddsOfDay');
+const { buildTwoOddsOfDay, watDate } = require('../services/twoOddsOfDay');
 const { fetchTodayStreaks } = require('../services/h2hWinningStreaks');
 
 // API-Football responses are cached so one busy page does not consume the
@@ -719,18 +719,17 @@ router.get('/football-odds', async (req, res) => {
   res.json({ ...payload, cached: Boolean(cached) });
 });
 
-// Public users receive a real but non-sensitive preview. The full daily ticket
-// is returned only after server-side Supabase token and VIP-status validation.
+// 2 Odds of the Day is temporarily free for everyone. The ticket engine keeps
+// the same data and risk rules; only the membership presentation is disabled.
 router.get('/two-odds/today', async function(req, res) {
   try {
     const date = typeof req.query.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(req.query.date) ? req.query.date : watDate();
-    const [oddsResponse, vip, h2hMatches] = await Promise.all([fetchPreMatchOdds(date), isAuthenticatedVip(req), fetchTodayStreaks()]);
+    const [oddsResponse, h2hMatches] = await Promise.all([fetchPreMatchOdds(date), fetchTodayStreaks()]);
     const payload = buildTwoOddsOfDay(vipPredictionData(), { date: date, oddsResponse: oddsResponse, h2hMatches: h2hMatches });
-    if (!vip) return res.json({ ...publicPreview(payload), isVip: false, feature: '2 Odds of the Day' });
-    res.json({ ...payload, isVip: true, feature: '2 Odds of the Day' });
+    res.json({ ...payload, isVip: false, freeAccess: true, feature: '2 Odds of the Day' });
   } catch (error) {
     console.error('[two-odds] Build failed:', error.message);
-    res.status(502).json({ available: false, isVip: false, feature: '2 Odds of the Day', reason: '2 Odds of the Day is being refreshed. Please check again shortly.', ticket: null });
+    res.status(502).json({ available: false, isVip: false, freeAccess: true, feature: '2 Odds of the Day', reason: '2 Odds of the Day is being refreshed. Please check again shortly.', ticket: null });
   }
 });
 

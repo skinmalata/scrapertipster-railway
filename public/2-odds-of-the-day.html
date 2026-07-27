@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2 Odds of the Day | WinFulltime VIP</title>
-  <meta name="description" content="WinFulltime's VIP 2 Odds of the Day: one disciplined pre-match football ticket targeting combined odds from 2.50 to 4.00.">
+  <title>2 Odds of the Day | WinFulltime</title>
+  <meta name="description" content="WinFulltime's 2 Odds of the Day: one disciplined pre-match football ticket targeting combined odds from 2.50 to 4.00.">
   <link rel="canonical" href="https://winfulltime.com/2-odds-of-the-day.html">
   <link rel="icon" href="/icons/icon-192.png" type="image/png">
   <link rel="stylesheet" href="/styles.css">
@@ -16,16 +16,16 @@
   </style>
 </head>
 <body>
-  <header><div class="header-content"><div class="logo"><a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a></div><nav id="nav"><a href="/">Home</a><a href="/ticket-builder.html">Ticket Builder</a><a href="/2-odds-of-the-day.html" aria-current="page">2 Odds VIP</a><a href="/predictions/in-play">In-Play</a><a href="/blog/">Blog</a></nav></div></header>
+  <header><div class="header-content"><div class="logo"><a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a></div><nav id="nav"><a href="/">Home</a><a href="/ticket-builder.html">Ticket Builder</a><a href="/2-odds-of-the-day.html" aria-current="page">2 Odds</a><a href="/predictions/in-play">In-Play</a><a href="/blog/">Blog</a></nav></div></header>
   <main class="two-main">
     <section class="two-hero">
-      <div class="two-kicker">VIP pre-match research</div>
+      <div class="two-kicker">Free pre-match research</div>
       <h1>2 Odds of the Day</h1>
       <p>One disciplined daily ticket, selected from WinFulltime's pre-match models. The system targets combined odds from 2.50 to 4.00 without lowering its confidence rules to fill a ticket.</p>
     </section>
     <section class="two-card" id="twoOddsCard" aria-live="polite"><div class="two-loading">Checking today’s qualifying ticket…</div></section>
     <section class="two-section">
-      <h2>What VIP members receive</h2>
+      <h2>What this free feature shows</h2>
       <div class="two-list"><div><strong>Full daily ticket</strong>Every qualifying leg, market and kickoff time.</div><div><strong>Price transparency</strong>Verified bookmaker prices are separated from conservative model estimates.</div><div><strong>Reasoned selection</strong>One strongest market per fixture—never several correlated picks from one match.</div><div><strong>Honest no-bet days</strong>No ticket is published when the quality rules are not met.</div></div>
     </section>
     <section class="two-section two-note">
@@ -43,18 +43,16 @@
     function formatDate(value){try{return new Date(value).toLocaleString('en-NG',{timeZone:'Africa/Lagos',dateStyle:'medium',timeStyle:'short'})+' WAT'}catch(e){return 'Time unavailable'}}
     async function load(){
       try{
-        var headers={};
-        if(window.WFT && typeof window.WFT.getAccessToken==='function'){var token=await window.WFT.getAccessToken();if(token)headers.Authorization='Bearer '+token}
-        var response=await fetch(API+'/api/two-odds/today',{headers:headers,cache:'no-store'});
+        var response=await fetch(API+'/api/two-odds/today',{cache:'no-store'});
         var data=await response.json();
         if(!data.available){card.innerHTML='<div class="two-empty"><div class="two-kicker">No forced ticket</div><h2>No 2 Odds ticket today</h2><p class="two-note">'+escapeHtml(data.reason||'Today’s pre-match data is still being refreshed.')+'</p><p class="two-meta">The system publishes only when a ticket passes its 2.50–4.00 odds and confidence rules.</p></div>';return}
         var ticket=data.ticket||{};
         var odds=Number(ticket.combinedOdds||0).toFixed(2);
         var badge=ticket.priceType||'model';
-        var full=data.isVip===true&&Array.isArray(ticket.legs);
+        var full=Array.isArray(ticket.legs);
         var body='<div class="two-row"><div><div class="two-label">Today\'s 2 Odds ticket</div><div class="two-odds">'+odds+'</div></div><span class="two-badge '+escapeHtml(badge)+'">'+escapeHtml(priceLabel(badge))+'</span></div>';
         if(full){body+='<div class="two-lock"><h2>'+ticket.legs.length+' qualifying leg'+(ticket.legs.length===1?'':'s')+'</h2>'+ticket.legs.map(function(leg){return '<p><strong>'+escapeHtml(leg.match)+'</strong><br>'+escapeHtml(leg.selection)+' · '+Number(leg.price).toFixed(2)+' · '+escapeHtml(leg.priceStatus)+'</p>'}).join('')+'</div>'}
-        else{body+='<div class="two-lock"><h2>Today\'s selections are VIP-only</h2><p>The ticket has '+escapeHtml(ticket.legCount)+' qualifying leg'+(ticket.legCount===1?'':'s')+'. Join VIP to view the fixtures, markets, evidence and price status.</p><a class="two-button" href="/contact.html">Ask about VIP access</a></div>'}
+        else{body+='<div class="two-lock"><h2>Ticket details are unavailable</h2><p>Please try again shortly while today\'s pre-match data refreshes.</p></div>'}
         body+='<div class="two-meta">Generated '+escapeHtml(formatDate(data.generatedAt))+'. '+escapeHtml(data.methodology||'')+'</div>';
         card.innerHTML=body;
       }catch(error){card.innerHTML='<div class="two-empty"><h2>Ticket unavailable</h2><p class="two-note">We could not load the current ticket. Please try again shortly.</p></div>'}
