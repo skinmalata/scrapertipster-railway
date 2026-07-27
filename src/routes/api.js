@@ -737,19 +737,26 @@ const TWO_ODDS_CACHE_MS = 10 * 60 * 1000;
 router.get('/two-odds/today', async function(req, res) {
   try {
     const date = typeof req.query.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(req.query.date) ? req.query.date : watDate();
-    if (twoOddsCache && twoOddsCache.date === date && Date.now() - twoOddsCache.createdAt < TWO_ODDS_CACHE_MS) {
+    if (twoOddsCache && twoOddsCache.date === date && Date.now() - twoOddsCache.createdAt < TWO_ODDS_CACHE_MS && twoOddsCache.payload && twoOddsCache.payload.available) {
       return res.json({ ...twoOddsCache.payload, cached: true });
     }
     const predictions = vipPredictionData();
     if (predictions && predictions.isStale) {
       console.log('[two-odds] Pre-match data is stale, triggering background refresh...');
       setImmediate(async () => {
-        try { await getScraperService().fetchPredictions(); } catch (e) { console.error('[two-odds] Background refresh failed:', e.message); }
+        try {
+          await getScraperService().fetchPredictions();
+          twoOddsCache = null;
+        } catch (e) { console.error('[two-odds] Background refresh failed:', e.message); }
       });
     }
     const [oddsResponse, h2hMatches] = await Promise.all([fetchPreMatchOdds(date), fetchTodayStreaks()]);
     const payload = buildTwoOddsOfDay(predictions, { date: date, oddsResponse: oddsResponse, h2hMatches: h2hMatches });
-    twoOddsCache = { date, createdAt: Date.now(), payload };
+    if (payload && payload.available) {
+      twoOddsCache = { date, createdAt: Date.now(), payload };
+    } else {
+      twoOddsCache = null;
+    }
     res.json({ ...payload, isVip: false, freeAccess: true, feature: '2 Odds of the Day' });
   } catch (error) {
     console.error('[two-odds] Build failed:', error.message);

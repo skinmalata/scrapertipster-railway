@@ -138,6 +138,12 @@ function loadCachedPredictions() {
           console.log('[Debug] Cache is stale (>' + MAX_CACHE_AGE_HOURS + ' hours old), marking for refresh');
           data.isStale = true;
         }
+
+        const todayStr = getLocalDateStr();
+        if (!data.isStale && data.date && data.date !== todayStr && !(data.dates || []).includes(todayStr)) {
+          console.log('[Debug] Cache date (' + data.date + ') does not match today (' + todayStr + '), marking for refresh');
+          data.isStale = true;
+        }
         
         return data;
       }

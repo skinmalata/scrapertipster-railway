@@ -299,8 +299,9 @@ gtag('config', 'G-HMGZMW9EDP');
         if(legs.length){
           body+='<div class="two-legs">';
           legs.forEach(function(leg){
-            var evidence=(leg.evidence||[]).filter(Boolean).join('. ');
-            body+='<div class="two-leg"><div class="two-leg-match">'+escapeHtml(leg.match)+'</div><div class="two-leg-details"><div class="two-leg-market">'+escapeHtml(leg.selection)+'</div>'+(evidence?'<div class="two-leg-evidence">'+escapeHtml(evidence)+'</div>':'')+'</div></div>';
+            var evidenceList = (leg.evidence||[]).filter(Boolean);
+            var evidenceHtml = evidenceList.map(function(ev){ return '&bull; ' + escapeHtml(ev); }).join('<br>');
+            body+='<div class="two-leg"><div class="two-leg-match">'+escapeHtml(leg.match)+' <span style="font-weight:400;font-size:12px;color:var(--text-muted);">'+(leg.league ? escapeHtml(leg.league) : '')+(leg.time ? ' &bull; ' + escapeHtml(leg.time) : '')+'</span></div><div class="two-leg-details"><div class="two-leg-market"><strong>Selection:</strong> '+escapeHtml(leg.selection)+' &bull; <strong>Odds:</strong> '+Number(leg.price).toFixed(2)+' ('+escapeHtml(leg.priceStatus)+')</div>'+(evidenceHtml?'<div class="two-leg-evidence" style="margin-top:6px;line-height:1.5;">'+evidenceHtml+'</div>':'')+'</div></div>';
           });
           body+='</div>';
         }else{
