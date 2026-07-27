@@ -29,6 +29,20 @@ function getCornerContext(match) {
   return match.cornerContext || null;
 }
 
+function getStreakCandidates(match) {
+  return Array.isArray(match && match.streakCandidates) ? match.streakCandidates : [];
+}
+
+function bestStreakFor(match, predicate) {
+  return getStreakCandidates(match).filter(predicate).sort(function(a, b) {
+    return asNumber(b.count) - asNumber(a.count);
+  })[0] || null;
+}
+
+function normalizedTeamName(name) {
+  return String(name || '').toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+}
+
 function recentTeamPressure(match, isHome) {
   if (!match || !match.recentPressure) return null;
   return isHome ? match.recentPressure.home : match.recentPressure.away;
@@ -458,6 +472,102 @@ function checkH2HDrawWinner(match) {
   };
 }
 
+function checkStreakBackedWinner(match) {
+  var s = homeAway(match.score);
+  var elapsed = asNumber(match.minute);
+  if (s.home !== s.away || elapsed < 50 || elapsed > 75) return null;
+
+  var stats = getStats(match);
+  if (!stats) return null;
+  var homeStats = stats.homeTeam || {};
+  var awayStats = stats.awayTeam || {};
+  var homeShots = asNumber(homeStats.shotsOnGoal) + asNumber(homeStats.shotsOffGoal);
+  var awayShots = asNumber(awayStats.shotsOnGoal) + asNumber(awayStats.shotsOffGoal);
+  var homeCandidate = bestStreakFor(match, function(streak) {
+    return streak.family === 'team-result' && streak.normal === normalizedTeamName(match.home);
+  });
+  var awayCandidate = bestStreakFor(match, function(streak) {
+    return streak.family === 'team-result' && streak.normal === normalizedTeamName(match.away);
+  });
+
+  var isHome, candidate, teamName, teamShots, opponentShots, teamShotsOn, opponentShotsOn, possession;
+  if (homeCandidate && !hasRedCards(match, true) && homeShots - awayShots >= 4 &&
+      asNumber(homeStats.shotsOnGoal) - asNumber(awayStats.shotsOnGoal) >= 2 && asNumber(homeStats.possession) >= 55) {
+    isHome = true; candidate = homeCandidate; teamName = match.home; teamShots = homeShots; opponentShots = awayShots;
+    teamShotsOn = asNumber(homeStats.shotsOnGoal); opponentShotsOn = asNumber(awayStats.shotsOnGoal); possession = asNumber(homeStats.possession);
+  } else if (awayCandidate && !hasRedCards(match, false) && awayShots - homeShots >= 4 &&
+      asNumber(awayStats.shotsOnGoal) - asNumber(homeStats.shotsOnGoal) >= 2 && asNumber(awayStats.possession) >= 55) {
+    isHome = false; candidate = awayCandidate; teamName = match.away; teamShots = awayShots; opponentShots = homeShots;
+    teamShotsOn = asNumber(awayStats.shotsOnGoal); opponentShotsOn = asNumber(homeStats.shotsOnGoal); possession = asNumber(awayStats.possession);
+  } else {
+    return null;
+  }
+
+  var recent = recentTeamPressure(match, isHome);
+  var opponentRecent = recentTeamPressure(match, !isHome);
+  if (!recent || recent.shots < 4 || recent.shotsOnTarget < 1 || recent.shots - asNumber(opponentRecent && opponentRecent.shots) < 2) return null;
+
+  var score = Math.min(95, 60 + Math.min(16, asNumber(candidate.count)) + (teamShotsOn - opponentShotsOn) * 2 + (recent.shots - asNumber(opponentRecent && opponentRecent.shots)));
+  return {
+    category: 'team',
+    rule: 'streak-backed-winner',
+    market: teamName + ' to Win',
+    signalScore: Math.round(score),
+    reason: teamName + ' has an H2HStats ' + candidate.count + '-match ' + candidate.type + ' streak' + (candidate.scope !== 'all' ? ' (' + candidate.scope + ')' : '') + ' and is currently controlling a level match: ' + teamShots + '-' + opponentShots + ' shots, ' + teamShotsOn + '-' + opponentShotsOn + ' on target, ' + possession + '% possession, and ' + recent.shots + '-' + asNumber(opponentRecent && opponentRecent.shots) + ' attempts in the last ' + match.recentPressure.windowMinutes + ' minutes.'
+  };
+}
+
+// An 8+ match winning streak is useful only as a selection signal. This rule
+// requires the streaking team to be scoreless after half-time *and* clearly
+// creating the better chances before recommending that team to score.
+function checkStreakBackedTeamToScore(match) {
+  var s = homeAway(match.score);
+  var elapsed = asNumber(match.minute);
+  // Stop at 75 so every published tip retains at least 15 minutes of normal
+  // time, in line with the global in-play timing policy.
+  if (elapsed < 46 || elapsed > 75) return null;
+
+  var stats = getStats(match);
+  if (!stats) return null;
+  var homeStats = stats.homeTeam || {};
+  var awayStats = stats.awayTeam || {};
+  var homeShots = asNumber(homeStats.shotsOnGoal) + asNumber(homeStats.shotsOffGoal);
+  var awayShots = asNumber(awayStats.shotsOnGoal) + asNumber(awayStats.shotsOffGoal);
+  var homeCandidate = bestStreakFor(match, function(streak) {
+    return streak.type === 'win' && streak.normal === normalizedTeamName(match.home);
+  });
+  var awayCandidate = bestStreakFor(match, function(streak) {
+    return streak.type === 'win' && streak.normal === normalizedTeamName(match.away);
+  });
+
+  var isHome, candidate, teamName, teamShots, opponentShots, teamShotsOn, opponentShotsOn, possession;
+  if (homeCandidate && s.home === 0 && !hasRedCards(match, true) && homeShots - awayShots >= 4 &&
+      asNumber(homeStats.shotsOnGoal) - asNumber(awayStats.shotsOnGoal) >= 2 && asNumber(homeStats.possession) >= 55) {
+    isHome = true; candidate = homeCandidate; teamName = match.home; teamShots = homeShots; opponentShots = awayShots;
+    teamShotsOn = asNumber(homeStats.shotsOnGoal); opponentShotsOn = asNumber(awayStats.shotsOnGoal); possession = asNumber(homeStats.possession);
+  } else if (awayCandidate && s.away === 0 && !hasRedCards(match, false) && awayShots - homeShots >= 4 &&
+      asNumber(awayStats.shotsOnGoal) - asNumber(homeStats.shotsOnGoal) >= 2 && asNumber(awayStats.possession) >= 55) {
+    isHome = false; candidate = awayCandidate; teamName = match.away; teamShots = awayShots; opponentShots = homeShots;
+    teamShotsOn = asNumber(awayStats.shotsOnGoal); opponentShotsOn = asNumber(homeStats.shotsOnGoal); possession = asNumber(awayStats.possession);
+  } else {
+    return null;
+  }
+
+  var recent = recentTeamPressure(match, isHome);
+  var opponentRecent = recentTeamPressure(match, !isHome);
+  var recentShotGap = recent && recent.shots - asNumber(opponentRecent && opponentRecent.shots);
+  if (!recent || recent.shots < 4 || recent.shotsOnTarget < 1 || recentShotGap < 2) return null;
+
+  var score = Math.min(95, 56 + Math.min(16, asNumber(candidate.count)) + (teamShotsOn - opponentShotsOn) * 2 + recentShotGap);
+  return {
+    category: 'team',
+    rule: 'streak-backed-team-to-score',
+    market: teamName + ' to Score',
+    signalScore: Math.round(score),
+    reason: teamName + ' has an H2HStats ' + candidate.count + '-match win streak but is still scoreless after half-time. They are creating sustained pressure: ' + teamShots + '-' + opponentShots + ' shots, ' + teamShotsOn + '-' + opponentShotsOn + ' on target, ' + possession + '% possession, and ' + recent.shots + '-' + asNumber(opponentRecent && opponentRecent.shots) + ' attempts in the last ' + match.recentPressure.windowMinutes + ' minutes.'
+  };
+}
+
 function checkCornerPressure(match) {
   var stats = getStats(match);
   var context = getCornerContext(match);
@@ -487,8 +597,11 @@ function checkCornerPressure(match) {
   var historicalHeadroom = Math.max(2, Math.round(historicalAverage - currentCorners));
   var projectedAdditional = Math.max(2, Math.min(paceAdditional, historicalHeadroom));
   var line = currentCorners + projectedAdditional - 0.5;
+  var cornerStreak = bestStreakFor(match, function(streak) { return streak.family === 'corners'; });
+  var streakBoost = cornerStreak ? Math.min(5, Math.max(0, asNumber(cornerStreak.count) - 8)) : 0;
   var signalScore = Math.min(95, 48 + currentCorners * 2 + totalShots * 0.7 + Math.min(8, cornerRate * 90) * 2 +
     (h2hCorners - 8) * 1.2 + (homeRecent + awayRecent - 16) * 0.8);
+  signalScore += streakBoost;
 
   return {
     category: 'corners',
@@ -497,12 +610,12 @@ function checkCornerPressure(match) {
     signalScore: Math.round(signalScore),
     cornerCount: currentCorners,
     reason: currentCorners + ' corners by minute ' + elapsed + ' (' + (cornerRate * 90).toFixed(1) + ' per 90) with ' + totalShots +
-      ' total shots. H2H averages ' + h2hCorners.toFixed(1) + ' corners; recent team averages are ' + homeRecent.toFixed(1) + ' and ' + awayRecent.toFixed(1) + '.'
+      ' total shots. H2H averages ' + h2hCorners.toFixed(1) + ' corners; recent team averages are ' + homeRecent.toFixed(1) + ' and ' + awayRecent.toFixed(1) + '.' + (cornerStreak ? ' H2HStats also shows an ' + cornerStreak.count + '-match corner streak.' : '')
   };
 }
 
 var MARKET_RULES = [checkLateGoalStorm, checkBTTSPressure, checkHighVolumeNoGoal, checkGoalFest];
-var TEAM_RULES = [checkDominantPressure, checkComebackMomentum, checkSecondHalfPush, checkH2HDrawWinner];
+var TEAM_RULES = [checkDominantPressure, checkComebackMomentum, checkSecondHalfPush, checkH2HDrawWinner, checkStreakBackedWinner, checkStreakBackedTeamToScore];
 var CORNER_RULES = [checkCornerPressure];
 
 function checkHTOver15Streak(match) {
@@ -660,6 +773,8 @@ module.exports = {
   checkGoalFest,
   checkSecondHalfPush,
   checkH2HDrawWinner,
+  checkStreakBackedWinner,
+  checkStreakBackedTeamToScore,
   checkHTOver15Streak,
   checkHTOver05Streak,
   checkHTDrawStreak,

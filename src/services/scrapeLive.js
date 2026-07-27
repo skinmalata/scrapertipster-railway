@@ -1,5 +1,5 @@
 const https = require('https');
-const { fetchTodayStreaks, findStreakForTeam, findMatchStreak } = require('./h2hWinningStreaks');
+const { fetchTodayStreaks, findStreakForTeam, findMatchStreak, findAllStreaksForMatch } = require('./h2hWinningStreaks');
 const { buildGoldenTips } = require('./goldenOpportunities');
 const { recordTips, settleTips, getPendingTipsForDate, getPendingCornerFixtureIds } = require('./liveTipHistory');
 
@@ -22,6 +22,8 @@ const teamFormCache = new Map();
 const cornerHistoryCache = new Map();
 let dailyMatchResults = new Map();
 let dailyMatchResultsDate = '';
+let fotmobFixtureIndex = new Map();
+let streakCandidateQueue = new Map();
 
 function fotMobDateStr(dayOffset) {
   const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Africa/Lagos', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
@@ -124,6 +126,42 @@ function appendLiveMatches(data, matches, seenMatchIds) {
   });
 }
 
+function indexFotMobFixtures(data, fixtureIndex) {
+  if (!data || !data.leagues) return;
+  data.leagues.forEach(function(league) {
+    (league.matches || []).forEach(function(match) {
+      if (!match || !match.id || !match.home || !match.away || (match.status && match.status.finished)) return;
+      var fixtureId = String(match.id);
+      if (fixtureIndex.has(fixtureId)) return;
+      fixtureIndex.set(fixtureId, {
+        fixtureId: fixtureId,
+        home: match.home.name || '',
+        away: match.away.name || '',
+        homeNormal: normaliseTeam(match.home.name),
+        awayNormal: normaliseTeam(match.away.name),
+        league: league.name || ''
+      });
+    });
+  });
+}
+
+function rebuildStreakCandidateQueue() {
+  var queue = new Map();
+  fotmobFixtureIndex.forEach(function(fixture) {
+    var streaks = findAllStreaksForMatch(fixture.home, fixture.away);
+    if (!streaks.length) return;
+    queue.set(fixture.fixtureId, {
+      fixtureId: fixture.fixtureId,
+      home: fixture.home,
+      away: fixture.away,
+      league: fixture.league,
+      streaks: streaks
+    });
+  });
+  streakCandidateQueue = queue;
+  return queue;
+}
+
 async function fetchFotMobLive() {
   var date = todayStr();
   if (date !== dailyMatchResultsDate) {
@@ -146,6 +184,8 @@ async function fetchFotMobLive() {
   if (!validResponses.length) return [];
 
   validResponses.forEach(function(response) { addFotMobResults(response.data); });
+  fotmobFixtureIndex = new Map();
+  validResponses.forEach(function(response) { indexFotMobFixtures(response.data, fotmobFixtureIndex); });
 
   // Around midnight, FotMob can keep a match on its previous-date feed until
   // it is finished. Include live fixtures from both feeds, then de-duplicate
@@ -464,8 +504,10 @@ async function scrapeLive() {
 
     // Attach h2hstats streak data to live matches.
     var streakData = await fetchTodayStreaks().catch(function () { return []; });
+    var queuedCandidates = rebuildStreakCandidateQueue();
     var withStreak = 0;
     var withMatchStreak = 0;
+    var withQueuedStreakCandidate = 0;
     matches.forEach(function (m) {
       var homeStreak = findStreakForTeam(m.home, true);
       var awayStreak = findStreakForTeam(m.away, false);
@@ -480,10 +522,17 @@ async function scrapeLive() {
         m.matchStreaks = { 'ht-over-1.5': htOver15, 'ht-over-0.5': htOver05, 'ht-draw': htDraw };
         withMatchStreak++;
       }
+      var queuedCandidate = queuedCandidates.get(String(m.matchId));
+      if (queuedCandidate) {
+        // Every 8+ source streak is retained as live context. The rule layer
+        // decides whether a particular market is compatible and safe to post.
+        m.streakCandidates = queuedCandidate.streaks;
+        withQueuedStreakCandidate++;
+      }
     });
 
     matches.forEach(function(match) { match.corners = match.fotmobStats && match.fotmobStats.total ? match.fotmobStats.total.corners : null; });
-    liveCache = { fetchedAt: new Date().toISOString(), matchCount: matches.length, detailedMatchCount: withStats, formMatchCount: withForm, streakMatchCount: withStreak, matchStreakCount: withMatchStreak, matches: matches };
+    liveCache = { fetchedAt: new Date().toISOString(), matchCount: matches.length, detailedMatchCount: withStats, formMatchCount: withForm, streakMatchCount: withStreak, matchStreakCount: withMatchStreak, queuedStreakCandidateCount: queuedCandidates.size, liveStreakCandidateCount: withQueuedStreakCandidate, matches: matches };
     // Resolve previous entries before adding any tips from the latest scrape.
     settleTips(matches, dailyMatchResults);
     var currentTips = buildGoldenTips(liveCache);
@@ -516,7 +565,7 @@ async function scrapeLive() {
       });
     });
     liveCache.publishedTips = activeTips;
-    console.log('[fotmob-live] Scraped', matches.length, 'live matches (' + withStats + ' stats, ' + withH2h + ' h2h, ' + withForm + ' form, ' + withStreak + ' win-streaks, ' + withMatchStreak + ' match-streaks)');
+    console.log('[fotmob-live] Scraped', matches.length, 'live matches (' + withStats + ' stats, ' + withH2h + ' h2h, ' + withForm + ' form, ' + withStreak + ' win-streaks, ' + withMatchStreak + ' match-streaks, ' + queuedCandidates.size + ' queued 8+ streak fixtures, ' + withQueuedStreakCandidate + ' live candidates)');
   } catch (e) {
     console.warn('[fotmob-live] Scrape failed:', e.message);
     if (!liveCache || !liveCache.matches || !liveCache.matches.length) {

@@ -142,6 +142,19 @@ function resolveNextGoal(tip, score, final) {
   return tip.market.replace(/\s+to Score Next$/i, '') === scoringTeam ? 'won' : 'lost';
 }
 
+function resolveTeamToScore(tip, score, final) {
+  if (!/\s+to Score$/i.test(tip.market || '')) return null;
+  const homeIncrease = number(score && score.home) - number(tip.scoreAtTip && tip.scoreAtTip.home);
+  const awayIncrease = number(score && score.away) - number(tip.scoreAtTip && tip.scoreAtTip.away);
+  if (homeIncrease < 0 || awayIncrease < 0) return null;
+
+  const team = tip.market.replace(/\s+to Score$/i, '');
+  const teamIncrease = team === tip.home ? homeIncrease : team === tip.away ? awayIncrease : null;
+  if (teamIncrease === null) return null;
+  if (teamIncrease > 0) return 'won';
+  return final ? 'lost' : null;
+}
+
 function prune() {
   let changed = false;
   tipsByDay.forEach(function(_, key) {
@@ -187,11 +200,12 @@ function settleTips(liveMatches, dailyResults) {
     tips.forEach(function(tip) {
       if (tip.outcome !== 'pending') return;
       const live = liveById.get(tip.fixtureId), result = dailyResults && dailyResults.get(tip.fixtureId);
-      let outcome = live ? (resolveNextGoal(tip, live.score, false) || cornerOutcome(tip, live.corners)) : null;
+      let outcome = live ? (resolveTeamToScore(tip, live.score, false) || resolveNextGoal(tip, live.score, false) || cornerOutcome(tip, live.corners)) : null;
       let score = live && live.score;
       if (!outcome && result && result.finished) {
         score = result.score;
-        outcome = resolveNextGoal(tip, score, true)
+        outcome = resolveTeamToScore(tip, score, true)
+          || resolveNextGoal(tip, score, true)
           || cornerOutcome(tip, result.corners)
           || outcomeForFinal(tip, score);
         if (!outcome && isCornerMarket(tip) && Number.isFinite(Number(result.corners))) outcome = 'lost';
@@ -248,4 +262,4 @@ function getPendingCornerFixtureIds() {
 
 loadHistory();
 
-module.exports = { recordTips, settleTips, getTodayTips, getTipsForDate, getSettledTodayTips, getSettledTipsForDate, getPendingTipsForDate, getPendingCornerFixtureIds };
+module.exports = { recordTips, settleTips, getTodayTips, getTipsForDate, getSettledTodayTips, getSettledTipsForDate, getPendingTipsForDate, getPendingCornerFixtureIds, resolveTeamToScore };
