@@ -294,9 +294,7 @@ gtag('config', 'G-HMGZMW9EDP');
         if(legs.length){
           body+='<div class="two-legs">';
           legs.forEach(function(leg){
-            var statusClass=leg.priceStatus==='verified'?'verified':'estimated';
-            var statusLabel=leg.priceStatus==='verified'?'Verified':'Model';
-            body+='<div class="two-leg"><div class="two-leg-match">'+escapeHtml(leg.match)+'</div><div class="two-leg-details"><div class="two-leg-market">'+escapeHtml(leg.selection)+' &middot; '+escapeHtml(leg.priceStatus==='verified'?leg.bookmaker||'Bookmaker':'Estimated price')+'</div><div class="two-leg-right"><div class="two-leg-price">'+Number(leg.price).toFixed(2)+'</div><div class="two-leg-status '+statusClass+'">'+statusLabel+'</div></div></div></div>';
+            body+='<div class="two-leg"><div class="two-leg-match">'+escapeHtml(leg.match)+'</div><div class="two-leg-details"><div class="two-leg-market">'+escapeHtml(leg.selection)+'</div></div></div>';
           });
           body+='</div>';
         }else{
