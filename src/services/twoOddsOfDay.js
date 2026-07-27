@@ -95,35 +95,65 @@ function candidateFrom(category, source, date) {
 function buildEvidence(category, source, probabilityValue) {
   const confidence = Math.round(probabilityValue * 100);
   const probs = source.probabilities || {};
+  const league = source.league || '';
+  const match = source.match || '';
+  const teams = splitMatch(match);
+  const home = teams[0] || '';
+  const away = teams[1] || '';
   if (category === '1x2') {
+    const homeP = Math.round(probs.homeWin || 0);
+    const drawP = Math.round(probs.draw || 0);
+    const awayP = Math.round(probs.awayWin || 0);
+    const gap = homeP - awayP;
     const parts = [];
-    if (probs.homeWin != null) parts.push('Home ' + Math.round(probs.homeWin) + '%');
-    if (probs.draw != null) parts.push('Draw ' + Math.round(probs.draw) + '%');
-    if (probs.awayWin != null) parts.push('Away ' + Math.round(probs.awayWin) + '%');
-    return ['Model confidence ' + confidence + '%. ' + parts.join(', ')].filter(Boolean);
+    if (homeP) parts.push(home + ' win probability ' + homeP + '%');
+    if (drawP) parts.push('draw ' + drawP + '%');
+    if (awayP) parts.push(away + ' win ' + awayP + '%');
+    const edge = gap > 30 ? home + ' are strong favourites with a ' + gap + '-point probability advantage'
+      : gap > 15 ? home + ' hold a clear ' + gap + '-point edge'
+      : gap > 5 ? home + ' hold a modest ' + gap + '-point edge'
+      : 'A tightly contested match with minimal probability separation';
+    return [edge + '. ' + parts.join(', ') + (league ? '. League: ' + league : '')].filter(Boolean);
   }
   if (category === 'over25') {
-    return ['Over 2.5 probability ' + confidence + '%. ' + (probs.over25 != null ? 'Over ' + Math.round(probs.over25) + '% vs Under ' + Math.round(probs.under25 || 0) + '%' : 'High-scoring fixture profile')].filter(Boolean);
+    const over = Math.round(probs.over25 || 0);
+    const under = Math.round(probs.under25 || 0);
+    return ['Over 2.5 goal probability ' + confidence + '% (' + over + '% over vs ' + under + '% under)'
+      + '. Both teams contribute to an open, high-scoring fixture profile'
+      + (league ? '. League: ' + league : '')].filter(Boolean);
   }
   if (category === 'over15') {
-    return ['Over 1.5 probability ' + confidence + '%. ' + (probs.over15 != null ? 'Over ' + Math.round(probs.over15) + '% vs Under ' + Math.round(probs.under15 || 0) + '%' : 'Goals expected from both sides')].filter(Boolean);
+    const over = Math.round(probs.over15 || 0);
+    const under = Math.round(probs.under15 || 0);
+    return ['Over 1.5 goal probability ' + confidence + '% (' + over + '% over vs ' + under + '% under)'
+      + '. Goal-scoring expected from the early stages of this fixture'
+      + (league ? '. League: ' + league : '')].filter(Boolean);
   }
   if (category === 'btts') {
-    return ['BTTS probability ' + confidence + '%. ' + (probs.bttsYes != null ? 'Yes ' + Math.round(probs.bttsYes) + '% vs No ' + Math.round(probs.bttsNo || 0) + '%' : 'Both teams have strong scoring profiles')].filter(Boolean);
+    const yes = Math.round(probs.bttsYes || 0);
+    const no = Math.round(probs.bttsNo || 0);
+    return ['BTTS probability ' + confidence + '% (Yes ' + yes + '% vs No ' + no + '%)'
+      + '. Both sides have the attacking capability and defensive vulnerabilities to score'
+      + (league ? '. League: ' + league : '')].filter(Boolean);
   }
   if (category === 'bttsNo') {
-    return ['BTTS No probability ' + confidence + '%. ' + (probs.ots != null ? 'One-team-score ' + Math.round(probs.ots) + '%' : 'One-sided attacking profile expected')].filter(Boolean);
+    const ots = Math.round(probs.ots || 0);
+    return ['BTTS No probability ' + confidence + '% (One-team-score ' + ots + '%)'
+      + '. One side dominates possession and chance creation, limiting the opponent'
+      + (league ? '. League: ' + league : '')].filter(Boolean);
   }
   if (category === 'corners') {
     const existing = (source.insights || []).filter(Boolean).slice(0, 2);
-    return existing.length ? existing : ['Corner market qualified at ' + confidence + '% confidence'];
+    return existing.length ? existing.concat(league ? [league] : []) : ['Corner market qualified at ' + confidence + '% confidence' + (league ? '. League: ' + league : '')];
   }
   if (category === 'cards') {
     const existing = (source.insights || []).filter(Boolean).slice(0, 2);
-    return existing.length ? existing : ['Card market qualified at ' + confidence + '% confidence'];
+    return existing.length ? existing.concat(league ? [league] : []) : ['Card market qualified at ' + confidence + '% confidence' + (league ? '. League: ' + league : '')];
   }
   if (category === 'teamScore') {
-    return ['Team-to-score probability ' + confidence + '%. ' + (source.team ? source.team + ' has strong attacking form' : 'Consistent scoring profile')].filter(Boolean);
+    return ['Team-to-score probability ' + confidence + '%'
+      + (source.team ? '. ' + source.team + ' have a consistent scoring record' : '')
+      + (league ? '. League: ' + league : '')].filter(Boolean);
   }
   return ['Model confidence ' + confidence + '%'];
 }
