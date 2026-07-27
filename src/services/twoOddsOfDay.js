@@ -79,42 +79,42 @@ function candidateFrom(category, source, date) {
   // 1. Concrete Team / Match Ratio & Record
   const teams = splitMatch(match);
   if (category === '1x2') {
-    const team = details.selection === 'Home Win' ? (teams[0] || 'Home team') :
-                 details.selection === 'Away Win' ? (teams[1] || 'Away team') : 'Team';
-    evidence.push(`${team} has won ${outOfTen}/10 of their last 10 competitive matches (${confidenceScore}% model probability)`);
+    const team = details.selection === 'Home Win' ? (teams[0] || 'Home') :
+                 details.selection === 'Away Win' ? (teams[1] || 'Away') : '';
+    evidence.push(team ? `${team} win rate: ${outOfTen}/10 recent competitive matches (${confidenceScore}% model)` : `Win selection: ${outOfTen}/10 recent competitive matches (${confidenceScore}% model)`);
   } else if (category === 'over15') {
-    evidence.push(`Over 1.5 Goals landed in ${outOfTen}/10 of their last 10 competitive matches (${confidenceScore}% model probability)`);
+    evidence.push(`Over 1.5 hit rate: ${outOfTen}/10 recent competitive matches (${confidenceScore}% model)`);
   } else if (category === 'over25') {
-    evidence.push(`Over 2.5 Goals landed in ${outOfTen}/10 of their last 10 competitive matches (${confidenceScore}% model probability)`);
+    evidence.push(`Over 2.5 hit rate: ${outOfTen}/10 recent competitive matches (${confidenceScore}% model)`);
   } else if (category === 'btts') {
-    evidence.push(`Both teams have scored (BTTS) in ${outOfTen}/10 of their last 10 competitive matches (${confidenceScore}% model probability)`);
+    evidence.push(`BTTS hit rate: ${outOfTen}/10 recent competitive matches (${confidenceScore}% model)`);
   } else if (category === 'bttsNo') {
-    evidence.push(`Clean sheet or single-sided scoring landed in ${outOfTen}/10 of their last 10 competitive matches (${confidenceScore}% model probability)`);
+    evidence.push(`BTTS No hit rate: ${outOfTen}/10 recent competitive matches (${confidenceScore}% model)`);
   } else if (category === 'corners' || category === 'cards') {
     if (source.insights && Array.isArray(source.insights) && source.insights.length) {
-      evidence.push(source.insights.filter(Boolean).join(' · '));
+      evidence.push(source.insights.filter(Boolean).slice(0, 2).join(' \u00b7 '));
     } else {
-      evidence.push(`${details.selection} landed in ${outOfTen}/10 of their last 10 competitive matches (${confidenceScore}% model hit rate)`);
+      evidence.push(`${details.selection}: ${outOfTen}/10 recent competitive matches (${confidenceScore}% model)`);
     }
   } else if (category === 'teamScore') {
-    evidence.push(`${source.team || details.selection} has scored in ${outOfTen}/10 of their last 10 competitive matches (${confidenceScore}% model probability)`);
+    evidence.push(`${source.team || details.selection} to score: ${outOfTen}/10 recent competitive matches (${confidenceScore}% model)`);
   } else {
-    evidence.push(`Selection hit in ${outOfTen}/10 of their last 10 competitive matches (${confidenceScore}% probability)`);
+    evidence.push(`Selection hit: ${outOfTen}/10 recent competitive matches (${confidenceScore}% model)`);
   }
 
-  // 2. Form Streak Ratio if available
+  // 2. Form Streak if available
   if (source.streak) {
     if (typeof source.streak === 'number' || /^\d+$/.test(String(source.streak))) {
-      evidence.push(`Recent form streak: Won ${source.streak}/${source.streak} consecutive matches`);
+      evidence.push(`Form: ${source.streak} consecutive wins`);
     } else {
-      evidence.push(`Recent form trend: ${source.streak}`);
+      evidence.push(`Form: ${source.streak}`);
     }
   }
 
   return {
     fixtureKey: fixtureKey(match),
     match: match,
-    league: source.league || 'Unknown competition',
+    league: source.league || '',
     time: source.time || '',
     market: details.market,
     selection: details.selection,
@@ -172,14 +172,14 @@ function applyOdds(candidates, oddsResponse) {
             candidate.price = Number(price.toFixed(2));
             candidate.priceStatus = 'verified';
             candidate.bookmaker = bookmaker.name || 'API-Football bookmaker';
-            candidate.evidence.push(`Verified line price of ${candidate.price} (${candidate.bookmaker})`);
+            candidate.evidence.push(`Verified at ${candidate.price} (${candidate.bookmaker})`);
             return;
           }
         }
       }
     }
     if (candidate.priceStatus === 'estimated') {
-      candidate.evidence.push(`Conservative valuation of ${candidate.price} based on ${candidate.confidenceScore}% probability threshold`);
+      candidate.evidence.push(`Model estimate: ${candidate.price} at ${candidate.confidenceScore}% threshold`);
     }
   });
   return candidates;
@@ -196,13 +196,13 @@ function applyH2HSupport(candidates, h2hMatches) {
     
     let h2hText = '';
     if (strongest.team && strongest.type === 'win') {
-      h2hText = `H2H record: ${strongest.team} has won ${strongest.count}/${strongest.count} of their recent meetings`;
+      h2hText = `H2H: ${strongest.team} ${strongest.count}/${strongest.count} wins in recent meetings`;
     } else if (strongest.team && strongest.type === 'unbeaten') {
-      h2hText = `H2H record: ${strongest.team} is unbeaten in ${strongest.count}/${strongest.count} of their recent meetings`;
+      h2hText = `H2H: ${strongest.team} unbeaten in ${strongest.count}/${strongest.count} recent meetings`;
     } else if (strongest.text) {
-      h2hText = `H2H record: ${strongest.count}/${strongest.count} ${strongest.text}`;
+      h2hText = `H2H: ${strongest.count}/${strongest.count} ${strongest.text}`;
     } else {
-      h2hText = `H2H record: ${strongest.count}/${strongest.count} match ${strongest.type} streak in head-to-head meetings`;
+      h2hText = `H2H: ${strongest.count}/${strongest.count} match ${strongest.type} streak`;
     }
     candidate.evidence.push(h2hText);
     candidate.h2hStatus = 'unverified';

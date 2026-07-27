@@ -125,37 +125,50 @@ gtag('config', 'G-HMGZMW9EDP');
     .breadcrumbs a { color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
     .breadcrumbs a:hover { color: #ff2448; }
     .breadcrumbs [aria-current] { color: var(--text-primary); font-weight: 500; }
-    .two-card{margin-top:28px;background:var(--bg-card);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-lg);padding:28px;box-shadow:0 12px 40px rgba(0,0,0,.12)}
-    .two-row{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}
-    .two-label{font-size:12px;letter-spacing:.8px;text-transform:uppercase;color:var(--text-muted);font-weight:800}
-    .two-odds{font-size:44px;font-weight:900;color:#fff;line-height:1.1}
-    .two-badge{display:inline-block;border-radius:999px;padding:7px 13px;font-size:11px;font-weight:800;letter-spacing:.03em}
-    .two-badge.verified{background:rgba(34,197,94,.14);color:#72e6a0}
-    .two-badge.mixed{background:rgba(250,204,21,.14);color:#fde68a}
-    .two-badge.model{background:rgba(96,165,250,.14);color:#93c5fd}
-    .two-legs{margin-top:22px;display:flex;flex-direction:column;gap:10px}
-    .two-leg{padding:16px 18px;border-radius:var(--radius);background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08)}
-    .two-leg-match{font-weight:800;color:var(--text-primary);font-size:15px;margin-bottom:6px}
-    .two-leg-details{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-    .two-leg-market{font-size:13px;color:var(--text-secondary)}
-    .two-leg-evidence{font-size:12px;color:var(--text-muted);margin-top:4px;line-height:1.4}
-    .two-leg-right{text-align:right}
-    .two-leg-price{font-size:20px;font-weight:900;color:#4ade80}
-    .two-leg-status{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+
+    .two-card{margin-top:28px;background:linear-gradient(160deg,rgba(30,38,56,.95),rgba(20,26,40,.98));border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:0;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25),0 0 0 1px rgba(255,255,255,.04) inset}
+    .two-card-header{padding:32px 32px 24px;background:linear-gradient(135deg,rgba(255,36,72,.08),rgba(255,36,72,.02));border-bottom:1px solid rgba(255,255,255,.06)}
+    .two-row{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;flex-wrap:wrap}
+    .two-label{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,.45);font-weight:700;margin-bottom:6px}
+    .two-odds{font-size:56px;font-weight:900;color:#fff;line-height:1;letter-spacing:-2px}
+    .two-odds-sub{font-size:14px;color:rgba(255,255,255,.5);font-weight:500;margin-left:4px}
+    .two-badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:8px 16px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+    .two-badge.verified{background:rgba(34,197,94,.12);color:#72e6a0;border:1px solid rgba(34,197,94,.15)}
+    .two-badge.mixed{background:rgba(250,204,21,.1);color:#fde68a;border:1px solid rgba(250,204,21,.12)}
+    .two-badge.model{background:rgba(96,165,250,.1);color:#93c5fd;border:1px solid rgba(96,165,250,.12)}
+
+    .two-legs{padding:8px 0}
+    .two-leg{display:grid;grid-template-columns:36px 1fr auto;gap:16px;align-items:start;padding:20px 32px;border-bottom:1px solid rgba(255,255,255,.04)}
+    .two-leg:last-child{border-bottom:none}
+    .two-leg-num{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#ff2448,#d41a38);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0;margin-top:2px}
+    .two-leg-body{min-width:0}
+    .two-leg-match{font-weight:700;color:#fff;font-size:16px;margin-bottom:3px;line-height:1.3}
+    .two-leg-league{font-size:12px;font-weight:500;color:#fde68a;margin-bottom:6px}
+    .two-leg-market{font-size:13px;color:rgba(255,255,255,.6);margin-bottom:8px}
+    .two-leg-market strong{color:rgba(255,255,255,.85)}
+    .two-leg-evidence{font-size:12px;color:#fde68a;line-height:1.55;background:rgba(250,204,21,.04);border:1px solid rgba(250,204,21,.08);border-radius:10px;padding:10px 14px}
+    .two-leg-right{text-align:right;flex-shrink:0;min-width:72px}
+    .two-leg-price{font-size:24px;font-weight:900;color:#fff;line-height:1.1}
+    .two-leg-status{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
     .two-leg-status.verified{color:#72e6a0}
     .two-leg-status.estimated{color:#93c5fd}
-    .two-meta{margin-top:22px;font-size:13px;color:var(--text-muted);line-height:1.6}
-    .two-empty{text-align:center;padding:48px 24px}
-    .two-empty-icon{font-size:40px;margin-bottom:12px;opacity:.6}
+
+    .two-meta{padding:18px 32px;font-size:12px;color:rgba(255,255,255,.35);line-height:1.6;border-top:1px solid rgba(255,255,255,.04)}
+
+    .two-empty{text-align:center;padding:56px 24px}
+    .two-empty-icon{font-size:40px;margin-bottom:12px;opacity:.5}
     .two-empty h2{margin:0 0 8px;font-size:22px;color:var(--text-primary)}
     .two-empty p{margin:0;color:var(--text-secondary);line-height:1.65}
+
     .two-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:14px}
     .two-feature{padding:18px;background:rgba(255,255,255,.035);border-radius:var(--radius);border:1px solid rgba(255,255,255,.08)}
     .two-feature strong{display:block;margin-bottom:5px;color:var(--text-primary);font-size:14px}
     .two-feature span{font-size:13px;color:var(--text-secondary);line-height:1.6}
+
     .two-note{padding:24px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-lg);margin-top:28px}
     .two-note p{color:var(--text-secondary);line-height:1.7;font-size:15px;margin:0 0 12px}
     .two-note p:last-child{margin-bottom:0}
+
     .two-history{margin-top:36px;border-top:1px solid var(--border);padding-top:28px}
     .two-history h2{font-size:22px;margin-bottom:14px;letter-spacing:-.02em}
     .two-history-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
@@ -168,11 +181,18 @@ gtag('config', 'G-HMGZMW9EDP');
     .two-history-card .hist-leg-evidence{font-size:12px;color:var(--text-muted);margin-top:2px;line-height:1.4}
     .two-history-card .hist-badge{display:inline-block;border-radius:999px;padding:4px 10px;font-size:10px;font-weight:800;margin-top:10px}
     .two-history-card .hist-empty{color:var(--text-muted);font-size:13px;font-style:italic}
+
     @media(max-width:600px){
-      .two-card{padding:20px}
+      .two-card-header{padding:24px 20px 18px}
+      .two-leg{grid-template-columns:28px 1fr auto;padding:16px 20px;gap:12px}
+      .two-leg-num{width:28px;height:28px;font-size:12px;border-radius:8px}
+      .two-leg-match{font-size:14px}
+      .two-leg-price{font-size:20px}
       .two-leg-details{flex-direction:column;align-items:flex-start;gap:6px}
       .two-leg-right{text-align:left}
       .two-row{flex-direction:column;align-items:flex-start}
+      .two-odds{font-size:44px}
+      .two-meta{padding:14px 20px}
     }
   </style>
 </head>
@@ -295,17 +315,20 @@ gtag('config', 'G-HMGZMW9EDP');
         var ticketDate=data.date||'';
         var today=new Date().toISOString().slice(0,10);
         var label=ticketDate===today?'Today\'s 2 Odds ticket':'2 Odds ticket ('+ticketDate+')';
-        var body='<div class="two-row"><div><div class="two-label">'+escapeHtml(label)+'</div><div class="two-odds">'+odds+'</div></div><span class="two-badge '+escapeHtml(badge)+'">'+escapeHtml(priceLabel(badge))+'</span></div>';
+        var probPct = ticket.adjustedProbability ? (ticket.adjustedProbability * 100).toFixed(1) : '';
+        var body='<div class="two-card-header"><div class="two-row"><div><div class="two-label">'+escapeHtml(label)+'</div><div class="two-odds">'+odds+'<span class="two-odds-sub">combined</span></div></div><span class="two-badge '+escapeHtml(badge)+'">'+escapeHtml(priceLabel(badge))+'</span></div>'+(probPct?'<div style="margin-top:12px;font-size:12px;color:rgba(255,255,255,.45);">Adjusted probability: <strong style="color:rgba(255,255,255,.7)">'+probPct+'%</strong> &bull; '+legs.length+' selections</div>':'')+'</div>';
         if(legs.length){
           body+='<div class="two-legs">';
-          legs.forEach(function(leg){
+          legs.forEach(function(leg,i){
             var evidenceList = (leg.evidence||[]).filter(Boolean);
-            var evidenceHtml = evidenceList.map(function(ev){ return '&bull; ' + escapeHtml(ev); }).join('<br>');
-            body+='<div class="two-leg"><div class="two-leg-match">'+escapeHtml(leg.match)+' <span style="font-weight:400;font-size:12px;color:var(--text-muted);">'+(leg.league ? escapeHtml(leg.league) : '')+(leg.time ? ' &bull; ' + escapeHtml(leg.time) : '')+'</span></div><div class="two-leg-details"><div class="two-leg-market"><strong>Selection:</strong> '+escapeHtml(leg.selection)+' &bull; <strong>Odds:</strong> '+Number(leg.price).toFixed(2)+' ('+escapeHtml(leg.priceStatus)+')</div>'+(evidenceHtml?'<div class="two-leg-evidence" style="margin-top:6px;line-height:1.5;">'+evidenceHtml+'</div>':'')+'</div></div>';
+            var evidenceHtml = evidenceList.map(function(ev){ return '<div style="display:flex;gap:8px;align-items:start"><span style="color:#fde68a;flex-shrink:0;margin-top:1px">&#10003;</span><span>'+escapeHtml(ev)+'</span></div>'; }).join('');
+            var leagueLine = (leg.league || leg.time) ? '<div class="two-leg-league">'+(leg.league ? escapeHtml(leg.league) : '')+(leg.time ? ' &bull; '+escapeHtml(leg.time) : '')+'</div>' : '';
+            var statusLabel = leg.priceStatus==='verified'?'Verified':'Estimated';
+            body+='<div class="two-leg"><div class="two-leg-num">'+(i+1)+'</div><div class="two-leg-body"><div class="two-leg-match">'+escapeHtml(leg.match)+'</div>'+leagueLine+'<div class="two-leg-market"><strong>'+escapeHtml(leg.selection)+'</strong> &bull; '+escapeHtml(leg.market)+'</div>'+(evidenceHtml?'<div class="two-leg-evidence">'+evidenceHtml+'</div>':'')+'</div><div class="two-leg-right"><div class="two-leg-price">'+Number(leg.price).toFixed(2)+'</div><div class="two-leg-status '+escapeHtml(leg.priceStatus||'estimated')+'">'+escapeHtml(statusLabel)+(leg.bookmaker?' via '+escapeHtml(leg.bookmaker):'')+'</div></div></div>';
           });
           body+='</div>';
         }else{
-          body+='<div class="two-empty" style="padding:24px 0"><h2>Ticket details are unavailable</h2><p>Please try again shortly while today\'s pre-match data refreshes.</p></div>';
+          body+='<div style="padding:32px;text-align:center"><h2 style="color:var(--text-primary);margin:0 0 8px">Ticket details unavailable</h2><p style="color:var(--text-secondary);margin:0">Please try again shortly.</p></div>';
         }
         body+='<div class="two-meta">Generated '+escapeHtml(formatDate(data.generatedAt))+'. '+escapeHtml(data.methodology||'')+'</div>';
         card.innerHTML=body;
@@ -337,12 +360,14 @@ gtag('config', 'G-HMGZMW9EDP');
       var t = d.ticket;
       html += '<div class="two-history-card"><div class="hist-date">' + d.date + '</div>';
       html += '<div class="hist-odds">' + (t.combinedOdds || 0).toFixed(2) + 'x</div>';
+      if (t.adjustedProbability) html += '<div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">'+(t.adjustedProbability*100).toFixed(1)+'% adjusted probability</div>';
       html += '<div class="hist-legs">';
       for (var j = 0; j < (t.legs || []).length; j++) {
         var s = t.legs[j];
-        html += '<div class="hist-leg"><strong>' + (s.market || '') + '</strong> &mdash; ' + (s.selection || '') + '</div>';
-        var evidence=(s.evidence||[]).filter(Boolean).join('. ');
-        if(evidence) html += '<div class="hist-leg-evidence">' + escapeHtml(evidence) + '</div>';
+        html += '<div class="hist-leg"><strong>' + (s.selection || '') + '</strong> &mdash; ' + (s.match || '') + '</div>';
+        if (s.league) html += '<div style="font-size:11px;color:#fde68a;margin-top:1px;margin-bottom:4px;">'+escapeHtml(s.league)+'</div>';
+        var evidence=(s.evidence||[]).filter(Boolean).slice(0,2);
+        if(evidence.length) html += '<div class="hist-leg-evidence">' + escapeHtml(evidence.join(' \u00b7 ')) + '</div>';
       }
       html += '</div></div>';
     }
