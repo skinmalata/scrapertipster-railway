@@ -118,6 +118,13 @@ gtag('config', 'G-HMGZMW9EDP');
   </script>
   <style>
     header { position: static !important; }
+    .breadcrumbs { max-width: 900px; margin: 0 auto; padding: 16px 16px 0; }
+    .breadcrumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 0; }
+    .breadcrumbs li { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+    .breadcrumbs li + li::before { content: '\203A'; color: var(--text-muted); font-size: 16px; }
+    .breadcrumbs a { color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
+    .breadcrumbs a:hover { color: #ff2448; }
+    .breadcrumbs [aria-current] { color: var(--text-primary); font-weight: 500; }
     .two-card{margin-top:28px;background:var(--bg-card);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-lg);padding:28px;box-shadow:0 12px 40px rgba(0,0,0,.12)}
     .two-row{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}
     .two-label{font-size:12px;letter-spacing:.8px;text-transform:uppercase;color:var(--text-muted);font-weight:800}
@@ -148,6 +155,17 @@ gtag('config', 'G-HMGZMW9EDP');
     .two-note{padding:24px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-lg);margin-top:28px}
     .two-note p{color:var(--text-secondary);line-height:1.7;font-size:15px;margin:0 0 12px}
     .two-note p:last-child{margin-bottom:0}
+    .two-history{margin-top:36px;border-top:1px solid var(--border);padding-top:28px}
+    .two-history h2{font-size:22px;margin-bottom:14px;letter-spacing:-.02em}
+    .two-history-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+    .two-history-card{padding:18px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
+    .two-history-card .hist-date{font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+    .two-history-card .hist-odds{font-size:28px;font-weight:900;color:#fff;line-height:1.1;margin-bottom:8px}
+    .two-history-card .hist-legs{display:flex;flex-direction:column;gap:6px}
+    .two-history-card .hist-leg{font-size:13px;color:var(--text-secondary);line-height:1.5}
+    .two-history-card .hist-leg strong{color:var(--text-primary);font-weight:700}
+    .two-history-card .hist-badge{display:inline-block;border-radius:999px;padding:4px 10px;font-size:10px;font-weight:800;margin-top:10px}
+    .two-history-card .hist-empty{color:var(--text-muted);font-size:13px;font-style:italic}
     @media(max-width:600px){
       .two-card{padding:20px}
       .two-leg-details{flex-direction:column;align-items:flex-start;gap:6px}
@@ -187,6 +205,13 @@ gtag('config', 'G-HMGZMW9EDP');
 
     <section class="two-card" id="twoOddsCard" aria-live="polite">
       <div class="two-empty"><div class="two-empty-icon">&#9202;</div><h2>Loading today's ticket</h2><p>Checking qualifying selections for today's matches.</p></div>
+    </section>
+
+    <section class="two-history" aria-label="Recent 2 Odds tickets">
+      <h2>Recent Tickets</h2>
+      <div class="two-history-grid" id="twoHistory" aria-live="polite">
+        <div style="padding:20px;color:var(--text-muted);font-size:13px;">Loading recent tickets...</div>
+      </div>
     </section>
 
     <section style="margin-top:36px">
@@ -286,6 +311,36 @@ gtag('config', 'G-HMGZMW9EDP');
     load();
   })();
   </script>
+<script>
+(async function() {
+  var el = document.getElementById('twoHistory');
+  if (!el) return;
+  try {
+    var res = await fetch('/api/two-odds/history');
+    var data = await res.json();
+    var days = data.days || [];
+    if (!days.length) { el.innerHTML = '<div style="padding:20px;color:var(--text-muted);font-size:13px;">No recent tickets available.</div>'; return; }
+    var html = '';
+    for (var i = 0; i < days.length; i++) {
+      var d = days[i];
+      if (!d.available || !d.ticket) {
+        html += '<div class="two-history-card"><div class="hist-date">' + d.date + '</div><div class="hist-empty">No ticket available</div></div>';
+        continue;
+      }
+      var t = d.ticket;
+      html += '<div class="two-history-card"><div class="hist-date">' + d.date + '</div>';
+      html += '<div class="hist-odds">' + (t.totalOdds || '').toFixed(2) + 'x</div>';
+      html += '<div class="hist-legs">';
+      for (var j = 0; j < (t.selections || []).length; j++) {
+        var s = t.selections[j];
+        html += '<div class="hist-leg"><strong>' + (s.combinedMarket || s.market || '') + '</strong> &mdash; ' + (s.tip || '') + '</div>';
+      }
+      html += '</div></div>';
+    }
+    el.innerHTML = html;
+  } catch(e) { el.innerHTML = '<div style="padding:20px;color:var(--text-muted);font-size:13px;">Unable to load recent tickets.</div>'; }
+})();
+</script>
 <script>
 document.getElementById('hamburger')?.addEventListener('click', function() {
   this.classList.toggle('active');

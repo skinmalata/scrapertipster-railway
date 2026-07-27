@@ -897,6 +897,44 @@ router.get('/live-tips', async (req, res) => {
   }
 });
 
+const TWO_ODDS_HISTORY_DAYS = 4;
+let twoOddsHistoryCache = null;
+const TWO_ODDS_HISTORY_CACHE_MS = 30 * 60 * 1000;
+
+function watDateOffset(dayOffset) {
+  const d = new Date();
+  d.setDate(d.getDate() + dayOffset);
+  return watDate(d);
+}
+
+router.get('/two-odds/history', async function(req, res) {
+  try {
+    if (twoOddsHistoryCache && Date.now() - twoOddsHistoryCache.createdAt < TWO_ODDS_HISTORY_CACHE_MS) {
+      return res.json({ ...twoOddsHistoryCache.payload, cached: true });
+    }
+    const predictions = vipPredictionData();
+    const availableDates = (predictions && predictions.dates) || [];
+    const results = [];
+    for (let i = 1; i <= TWO_ODDS_HISTORY_DAYS; i++) {
+      const date = watDateOffset(-i);
+      if (!availableDates.includes(date)) continue;
+      try {
+        const [oddsResponse, h2hMatches] = await Promise.all([fetchPreMatchOdds(date), fetchTodayStreaks()]);
+        const payload = buildTwoOddsOfDay(predictions, { date, oddsResponse, h2hMatches });
+        results.push({ date, available: payload.available, ticket: payload.ticket, generatedAt: payload.generatedAt });
+      } catch (e) {
+        results.push({ date, available: false, ticket: null });
+      }
+    }
+    const payload = { days: results };
+    twoOddsHistoryCache = { createdAt: Date.now(), payload };
+    res.json(payload);
+  } catch (error) {
+    console.error('[two-odds-history] Failed:', error.message);
+    res.json({ days: [] });
+  }
+});
+
 router.get('/live-matches', function (req, res) {
   const data = getCachedLive();
   if (!data) {
