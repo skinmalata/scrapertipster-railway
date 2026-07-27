@@ -71,7 +71,6 @@ function candidateFrom(category, source, date) {
   if (sourceProbability < MIN_PROBABILITY) return null;
   if (/friendly|friendlies|u\d{2}|reserve|reserves|women/i.test(String(source.league || ''))) return null;
   const p = Math.min(0.9, sourceProbability);
-  const evidence = buildEvidence(category, source, p);
   return {
     fixtureKey: fixtureKey(match),
     match: match,
@@ -87,75 +86,11 @@ function candidateFrom(category, source, date) {
     priceStatus: 'estimated',
     bookmaker: null,
     confidenceScore: Math.round(p * 100),
-    evidence: evidence,
+    evidence: [category === 'corners' || category === 'cards'
+      ? (source.insights || []).filter(Boolean).slice(0, 2).join(' · ')
+      : 'Qualified ' + category + ' model signal'].filter(Boolean),
     priority: marketPriority(category)
   };
-}
-
-function buildEvidence(category, source, probabilityValue) {
-  const confidence = Math.round(probabilityValue * 100);
-  const probs = source.probabilities || {};
-  const league = source.league || '';
-  const match = source.match || '';
-  const teams = splitMatch(match);
-  const home = teams[0] || '';
-  const away = teams[1] || '';
-  if (category === '1x2') {
-    const homeP = Math.round(probs.homeWin || 0);
-    const drawP = Math.round(probs.draw || 0);
-    const awayP = Math.round(probs.awayWin || 0);
-    const gap = homeP - awayP;
-    const parts = [];
-    if (homeP) parts.push(home + ' win probability ' + homeP + '%');
-    if (drawP) parts.push('draw ' + drawP + '%');
-    if (awayP) parts.push(away + ' win ' + awayP + '%');
-    const edge = gap > 30 ? home + ' are strong favourites with a ' + gap + '-point probability advantage'
-      : gap > 15 ? home + ' hold a clear ' + gap + '-point edge'
-      : gap > 5 ? home + ' hold a modest ' + gap + '-point edge'
-      : 'A tightly contested match with minimal probability separation';
-    return [edge + '. ' + parts.join(', ') + (league ? '. League: ' + league : '')].filter(Boolean);
-  }
-  if (category === 'over25') {
-    const over = Math.round(probs.over25 || 0);
-    const under = Math.round(probs.under25 || 0);
-    return ['Over 2.5 goal probability ' + confidence + '% (' + over + '% over vs ' + under + '% under)'
-      + '. Both teams contribute to an open, high-scoring fixture profile'
-      + (league ? '. League: ' + league : '')].filter(Boolean);
-  }
-  if (category === 'over15') {
-    const over = Math.round(probs.over15 || 0);
-    const under = Math.round(probs.under15 || 0);
-    return ['Over 1.5 goal probability ' + confidence + '% (' + over + '% over vs ' + under + '% under)'
-      + '. Goal-scoring expected from the early stages of this fixture'
-      + (league ? '. League: ' + league : '')].filter(Boolean);
-  }
-  if (category === 'btts') {
-    const yes = Math.round(probs.bttsYes || 0);
-    const no = Math.round(probs.bttsNo || 0);
-    return ['BTTS probability ' + confidence + '% (Yes ' + yes + '% vs No ' + no + '%)'
-      + '. Both sides have the attacking capability and defensive vulnerabilities to score'
-      + (league ? '. League: ' + league : '')].filter(Boolean);
-  }
-  if (category === 'bttsNo') {
-    const ots = Math.round(probs.ots || 0);
-    return ['BTTS No probability ' + confidence + '% (One-team-score ' + ots + '%)'
-      + '. One side dominates possession and chance creation, limiting the opponent'
-      + (league ? '. League: ' + league : '')].filter(Boolean);
-  }
-  if (category === 'corners') {
-    const existing = (source.insights || []).filter(Boolean).slice(0, 2);
-    return existing.length ? existing.concat(league ? [league] : []) : ['Corner market qualified at ' + confidence + '% confidence' + (league ? '. League: ' + league : '')];
-  }
-  if (category === 'cards') {
-    const existing = (source.insights || []).filter(Boolean).slice(0, 2);
-    return existing.length ? existing.concat(league ? [league] : []) : ['Card market qualified at ' + confidence + '% confidence' + (league ? '. League: ' + league : '')];
-  }
-  if (category === 'teamScore') {
-    return ['Team-to-score probability ' + confidence + '%'
-      + (source.team ? '. ' + source.team + ' have a consistent scoring record' : '')
-      + (league ? '. League: ' + league : '')].filter(Boolean);
-  }
-  return ['Model confidence ' + confidence + '%'];
 }
 
 function allCandidates(predictions, date) {
@@ -214,23 +149,9 @@ function applyH2HSupport(candidates, h2hMatches) {
     const entry = entries.find(function(item) { return fixtureKey(item.match) === candidate.fixtureKey; });
     const streaks = entry && entry.streaks && Array.isArray(entry.streaks.all) ? entry.streaks.all : [];
     if (!streaks.length) return;
-    const sorted = streaks.slice().sort(function(a, b) { return Number(b.count || 0) - Number(a.count || 0); });
-    const strongest = sorted[0];
+    const strongest = streaks.slice().sort(function(a, b) { return Number(b.count || 0) - Number(a.count || 0); })[0];
     candidate.confidenceScore = Math.min(95, candidate.confidenceScore + Math.min(4, Math.max(1, Number(strongest.count || 0) - 5)));
-    const relevant = sorted.filter(function(s) {
-      if (candidate.category === '1x2') return s.type === 'win' || s.type === 'unbeaten';
-      if (candidate.category === 'btts' || candidate.category === 'bttsNo') return s.family === 'goals';
-      if (candidate.category === 'corners') return s.family === 'corners';
-      if (candidate.category === 'cards') return s.family === 'cards';
-      if (candidate.category === 'over25' || candidate.category === 'over15') return s.family === 'goals';
-      if (candidate.category === 'teamScore') return s.type === 'win' || s.family === 'goals';
-      return true;
-    }).slice(0, 3);
-    if (relevant.length) {
-      relevant.forEach(function(s) { candidate.evidence.push(s.text); });
-    } else {
-      candidate.evidence.push(strongest.text);
-    }
+    candidate.evidence.push('Reported ' + strongest.count + '-match ' + strongest.type + ' streak (independent history check pending)');
     candidate.h2hStatus = 'unverified';
   });
 }
