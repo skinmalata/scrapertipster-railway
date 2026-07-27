@@ -418,6 +418,31 @@ const { startTelegramBot } = require('./src/services/telegramBot');
 const { startMastodonBot } = require('./src/services/mastodonBot');
 startLiveScrapeLoop();
 
+// Refresh pre-match predictions on startup if stale or missing, then every 12h.
+(async function refreshPredictionsOnBoot() {
+  try {
+    const cached = getScraperService().loadCachedPredictions();
+    if (!cached || cached.isStale || !cached.matches || !cached.matches.length) {
+      console.log('[startup] Pre-match cache missing or stale, refreshing...');
+      await getScraperService().fetchPredictions();
+      console.log('[startup] Pre-match predictions refreshed');
+    } else {
+      console.log('[startup] Pre-match cache OK, matches:', cached.matches.length);
+    }
+  } catch (e) {
+    console.error('[startup] Pre-match refresh failed:', e.message);
+  }
+})();
+setInterval(async function() {
+  try {
+    console.log('[cron] Refreshing pre-match predictions...');
+    await getScraperService().fetchPredictions();
+    console.log('[cron] Pre-match predictions refreshed');
+  } catch (e) {
+    console.error('[cron] Pre-match refresh failed:', e.message);
+  }
+}, 12 * 60 * 60 * 1000);
+
 function getLiveTipsFromCache() {
   var liveData = getCachedLive();
   if (!liveData || !liveData.matches || !liveData.matches.length) return [];

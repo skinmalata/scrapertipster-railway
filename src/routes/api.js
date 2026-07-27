@@ -740,8 +740,15 @@ router.get('/two-odds/today', async function(req, res) {
     if (twoOddsCache && twoOddsCache.date === date && Date.now() - twoOddsCache.createdAt < TWO_ODDS_CACHE_MS) {
       return res.json({ ...twoOddsCache.payload, cached: true });
     }
+    const predictions = vipPredictionData();
+    if (predictions && predictions.isStale) {
+      console.log('[two-odds] Pre-match data is stale, triggering background refresh...');
+      setImmediate(async () => {
+        try { await getScraperService().fetchPredictions(); } catch (e) { console.error('[two-odds] Background refresh failed:', e.message); }
+      });
+    }
     const [oddsResponse, h2hMatches] = await Promise.all([fetchPreMatchOdds(date), fetchTodayStreaks()]);
-    const payload = buildTwoOddsOfDay(vipPredictionData(), { date: date, oddsResponse: oddsResponse, h2hMatches: h2hMatches });
+    const payload = buildTwoOddsOfDay(predictions, { date: date, oddsResponse: oddsResponse, h2hMatches: h2hMatches });
     twoOddsCache = { date, createdAt: Date.now(), payload };
     res.json({ ...payload, isVip: false, freeAccess: true, feature: '2 Odds of the Day' });
   } catch (error) {
