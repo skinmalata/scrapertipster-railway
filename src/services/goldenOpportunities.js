@@ -29,6 +29,11 @@ function getCornerContext(match) {
   return match.cornerContext || null;
 }
 
+function recentTeamPressure(match, isHome) {
+  if (!match || !match.recentPressure) return null;
+  return isHome ? match.recentPressure.home : match.recentPressure.away;
+}
+
 function isFriendlyMatch(match) {
   var competition = String(match && (match.league || match.competition || match.tournament) || '').toLowerCase();
   return /\bfriendly\b|\bfriendlies\b|\bexhibition\b/.test(competition);
@@ -134,7 +139,7 @@ function checkBTTSPressure(match) {
   var elapsed = asNumber(match.minute);
   // BTTS is only offered in the first half, while there is still enough time
   // for the market to develop before the interval.
-  if (elapsed < 10 || elapsed > 30) return null;
+  if (elapsed < 15 || elapsed > 30) return null;
 
   var homeStats = stats.homeTeam || {};
   var awayStats = stats.awayTeam || {};
@@ -143,8 +148,8 @@ function checkBTTSPressure(match) {
   var homeShotsTotal = homeShotsOn + asNumber(homeStats.shotsOffGoal);
   var awayShotsTotal = awayShotsOn + asNumber(awayStats.shotsOffGoal);
 
-  if (homeShotsOn < 2 || awayShotsOn < 2) return null;
-  if (homeShotsTotal + awayShotsTotal < 8) return null;
+  if (homeShotsOn < 3 || awayShotsOn < 3) return null;
+  if (homeShotsTotal + awayShotsTotal < 12) return null;
 
   var signalScore = Math.min(95, 45 + (homeShotsOn + awayShotsOn) * 3.5 + goalTimeFactor(elapsed) * 3);
 
@@ -172,6 +177,13 @@ function checkHighVolumeNoGoal(match) {
 
   if (shotsOn < 6 || totalShots < 12 || corners < 5) return null;
 
+  var recentPressure = match.recentPressure;
+  var recentShots = recentPressure ? asNumber(recentPressure.home && recentPressure.home.shots) + asNumber(recentPressure.away && recentPressure.away.shots) : 0;
+  var recentShotsOn = recentPressure ? asNumber(recentPressure.home && recentPressure.home.shotsOnTarget) + asNumber(recentPressure.away && recentPressure.away.shotsOnTarget) : 0;
+  // Cumulative shots can describe pressure that happened much earlier. Only
+  // publish this difficult 0-0 market when the attack is still active now.
+  if (!recentPressure || recentShots < 6 || recentShotsOn < 2) return null;
+
   var signalScore = Math.min(95, 50 + shotsOn * 1.8 + corners * 1.2 + goalTimeFactor(elapsed) * 4);
 
   return {
@@ -179,7 +191,7 @@ function checkHighVolumeNoGoal(match) {
     rule: 'high-volume-no-goal',
     market: 'Over 0.5 Match Goals',
     signalScore: Math.round(signalScore),
-    reason: 'Exceptional attacking pressure in a 0-0 at minute ' + elapsed + ': ' + shotsOn + ' shots on target, ' + corners + ' corners, ' + totalShots + ' total shots. Goal is statistically overdue.'
+    reason: 'Sustained 0-0 pressure at minute ' + elapsed + ': ' + shotsOn + ' shots on target, ' + corners + ' corners, and ' + recentShots + ' attempts (' + recentShotsOn + ' on target) in the last ' + recentPressure.windowMinutes + ' minutes.'
   };
 }
 
@@ -208,6 +220,14 @@ function checkGoalFest(match) {
 
   if (homeShotsOn < 2 || awayShotsOn < 2) return null;
 
+  var recentPressure = match.recentPressure;
+  var homeRecent = recentTeamPressure(match, true);
+  var awayRecent = recentTeamPressure(match, false);
+  // A 2-goal scoreline is not sufficient by itself. Both teams must still be
+  // producing fresh chances, rather than relying on first-half shot totals.
+  if (!recentPressure || !homeRecent || !awayRecent || homeRecent.shots < 3 || awayRecent.shots < 3 ||
+      homeRecent.shotsOnTarget + awayRecent.shotsOnTarget < 2) return null;
+
   var signalScore = Math.min(95, 50 + shotsOn * 1.5 + totalGoals * 2 + goalTimeFactor(elapsed) * 2);
 
   return {
@@ -215,7 +235,7 @@ function checkGoalFest(match) {
     rule: 'goal-fest',
     market: 'Over ' + totalGoals + '.5 Match Goals',
     signalScore: Math.round(signalScore),
-    reason: 'Open match at ' + s.home + '-' + s.away + ' with ' + shotsOn + ' shots on target and ' + corners + ' corners at minute ' + elapsed + '. Both teams attacking.'
+    reason: 'Open match at ' + s.home + '-' + s.away + ' with ' + shotsOn + ' shots on target and fresh pressure in the last ' + recentPressure.windowMinutes + ' minutes: ' + homeRecent.shots + '-' + awayRecent.shots + ' attempts.'
   };
 }
 
@@ -373,12 +393,12 @@ function checkSecondHalfPush(match) {
   if (homeShotsOn + awayShotsOn < 4) return null;
 
   var dominatorName, domShots, domPossession, isHomeDominant;
-  if (homeShotsOn > awayShotsOn && homePossession >= 52) {
+  if (homeShotsOn > awayShotsOn && homePossession >= 55) {
     dominatorName = match.home;
     domShots = homeShotsOn;
     domPossession = homePossession;
     isHomeDominant = true;
-  } else if (awayShotsOn > homeShotsOn && awayPossession >= 52) {
+  } else if (awayShotsOn > homeShotsOn && awayPossession >= 55) {
     dominatorName = match.away;
     domShots = awayShotsOn;
     domPossession = awayPossession;
@@ -386,6 +406,11 @@ function checkSecondHalfPush(match) {
   } else {
     return null;
   }
+
+  var dominantRecent = recentTeamPressure(match, isHomeDominant);
+  var dominatedRecent = recentTeamPressure(match, !isHomeDominant);
+  if (!dominantRecent || dominantRecent.shots < 4 || dominantRecent.shotsOnTarget < 1 ||
+      dominantRecent.shots - asNumber(dominatedRecent && dominatedRecent.shots) < 2) return null;
 
   var h2h = getH2H(match);
   var h2hBoost = h2hDominanceBoost(h2h, isHomeDominant);
@@ -399,7 +424,7 @@ function checkSecondHalfPush(match) {
     rule: 'second-half-push',
     market: goalMarketForMinute(match, elapsed),
     signalScore: Math.round(signalScore),
-    reason: dominatorName + ' controlling the second half with ' + domPossession + '% possession and ' + domShots + ' shots on target at minute ' + elapsed + '.' + (h2hBoost > 0 ? ' H2H history favors ' + dominatorName + '.' : '') + (recentFormBoost > 0 ? ' Recent form favors ' + dominatorName + '.' : '')
+    reason: dominatorName + ' controlling the second half with ' + domPossession + '% possession, ' + domShots + ' shots on target, and ' + dominantRecent.shots + '-' + asNumber(dominatedRecent && dominatedRecent.shots) + ' attempts in the last ' + match.recentPressure.windowMinutes + ' minutes.' + (h2hBoost > 0 ? ' H2H history favors ' + dominatorName + '.' : '') + (recentFormBoost > 0 ? ' Recent form favors ' + dominatorName + '.' : '')
   };
 }
 

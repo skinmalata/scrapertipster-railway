@@ -4,8 +4,9 @@ const { buildGoldenTips } = require('./goldenOpportunities');
 const { recordTips, settleTips, getPendingTipsForDate, getPendingCornerFixtureIds } = require('./liveTipHistory');
 
 const SCRAPE_INTERVAL_MS = 5 * 60 * 1000;
-const FOTMOB_STATS_DELAY_MS = 200;
-const MAX_FOTMOB_DETAIL_MATCHES = 30;
+const FOTMOB_STATS_DELAY_MS = 300;
+const MAX_FOTMOB_DETAIL_MATCHES = 60;
+const FOTMOB_DETAIL_CONCURRENCY = 4;
 const MAX_FORM_MATCHES_PER_CYCLE = 4;
 const HTTP_TIMEOUT_MS = 8000;
 const TEAM_FORM_CACHE_MS = 6 * 60 * 60 * 1000;
@@ -97,6 +98,32 @@ function addFotMobResults(data) {
   });
 }
 
+function appendLiveMatches(data, matches, seenMatchIds) {
+  if (!data || !data.leagues) return;
+  data.leagues.forEach(function (league) {
+    (league.matches || []).forEach(function (m) {
+      if (!m.status || !m.status.started || m.status.finished || !m.status.ongoing) return;
+      var matchId = String(m.id);
+      if (!matchId || seenMatchIds.has(matchId)) return;
+      seenMatchIds.add(matchId);
+      matches.push({
+        matchId: matchId,
+        home: m.home ? m.home.name : '',
+        away: m.away ? m.away.name : '',
+        homeId: m.home ? m.home.id : null,
+        awayId: m.away ? m.away.id : null,
+        homeNormal: normaliseTeam(m.home ? m.home.name : ''),
+        awayNormal: normaliseTeam(m.away ? m.away.name : ''),
+        league: league.name || '',
+        leagueId: league.id || null,
+        minute: parseLiveMinute(m.status),
+        score: parseScore(m.status),
+        htScore: null
+      });
+    });
+  });
+}
+
 async function fetchFotMobLive() {
   var date = todayStr();
   if (date !== dailyMatchResultsDate) {
@@ -113,33 +140,19 @@ async function fetchFotMobLive() {
   ]);
   var res = responses[0];
   var previousRes = responses[1];
-  if (res.status !== 200 || !res.data || !res.data.leagues) return [];
-
-  if (previousRes && previousRes.status === 200) addFotMobResults(previousRes.data);
-  addFotMobResults(res.data);
-
-  var matches = [];
-  res.data.leagues.forEach(function (league) {
-    league.matches.forEach(function (m) {
-      if (!m.status || !m.status.started || m.status.finished || !m.status.ongoing) return;
-      var minute = parseLiveMinute(m.status);
-      var score = parseScore(m.status);
-      matches.push({
-        matchId: String(m.id),
-        home: m.home ? m.home.name : '',
-        away: m.away ? m.away.name : '',
-        homeId: m.home ? m.home.id : null,
-        awayId: m.away ? m.away.id : null,
-        homeNormal: normaliseTeam(m.home ? m.home.name : ''),
-        awayNormal: normaliseTeam(m.away ? m.away.name : ''),
-        league: league.name || '',
-        leagueId: league.id || null,
-        minute: minute,
-        score: score,
-        htScore: null
-      });
-    });
+  var validResponses = [previousRes, res].filter(function(response) {
+    return response && response.status === 200 && response.data && response.data.leagues;
   });
+  if (!validResponses.length) return [];
+
+  validResponses.forEach(function(response) { addFotMobResults(response.data); });
+
+  // Around midnight, FotMob can keep a match on its previous-date feed until
+  // it is finished. Include live fixtures from both feeds, then de-duplicate
+  // by fixture ID so those matches are analysed rather than silently omitted.
+  var matches = [];
+  var seenMatchIds = new Set();
+  validResponses.forEach(function(response) { appendLiveMatches(response.data, matches, seenMatchIds); });
   return matches;
 }
 
@@ -374,14 +387,32 @@ function detailPriority(match) {
   var scoreGap = Math.abs(homeGoals - awayGoals);
   var priority = 0;
 
-  // The selection rules only operate in the second half and most often on
-  // close, low-scoring matches. Analyse those first when the live slate is
-  // larger than the provider-safe detail cap.
-  if (minute >= 50 && minute <= 85) priority += 100;
-  else if (minute >= 45 && minute <= 90) priority += 40;
+  // Prioritise the actual publication windows: first-half BTTS/HT signals and
+  // second-half goal signals. This prevents inactive late matches from using
+  // the detail budget while eligible fixtures go unanalyzed.
+  if (minute >= 45 && minute <= 75) priority += 120;
+  else if (minute >= 10 && minute <= 30) priority += 100;
+  else if (minute >= 31 && minute < 45) priority += 20;
   if (totalGoals === 0) priority += 20;
   if (scoreGap <= 1) priority += 10;
   return priority;
+}
+
+async function enrichLiveMatchDetails(matches) {
+  for (var start = 0; start < matches.length; start += FOTMOB_DETAIL_CONCURRENCY) {
+    var batch = matches.slice(start, start + FOTMOB_DETAIL_CONCURRENCY);
+    await Promise.all(batch.map(async function(match) {
+      var details = await fetchFotMobMatchDetails(match.matchId, match.minute).catch(function() { return null; });
+      if (!details) return;
+      if (details.stats) match.fotmobStats = details.stats;
+      if (details.h2h) match.h2h = details.h2h;
+      if (details.redCards) match.redCards = details.redCards;
+      if (details.recentPressure) match.recentPressure = details.recentPressure;
+    }));
+    if (start + FOTMOB_DETAIL_CONCURRENCY < matches.length) {
+      await new Promise(function(resolve) { setTimeout(resolve, FOTMOB_STATS_DELAY_MS); });
+    }
+  }
 }
 
 async function scrapeLive() {
@@ -406,17 +437,7 @@ async function scrapeLive() {
       return detailPriority(b) - detailPriority(a);
     });
     var detailLimit = Math.min(detailMatches.length, MAX_FOTMOB_DETAIL_MATCHES);
-    for (var i = 0; i < detailLimit; i++) {
-      var m = detailMatches[i];
-      if (i > 0 && i % 3 === 0) await new Promise(function (r) { setTimeout(r, FOTMOB_STATS_DELAY_MS); });
-      var details = await fetchFotMobMatchDetails(m.matchId, m.minute).catch(function () { return null; });
-      if (details) {
-        if (details.stats) m.fotmobStats = details.stats;
-        if (details.h2h) m.h2h = details.h2h;
-        if (details.redCards) m.redCards = details.redCards;
-        if (details.recentPressure) m.recentPressure = details.recentPressure;
-      }
-    }
+    await enrichLiveMatchDetails(detailMatches.slice(0, detailLimit));
 
     // Form is deliberately limited and cached: it is a pre-match tie-breaker,
     // not a reason to multiply live provider calls or override live pressure.
@@ -504,17 +525,7 @@ async function scrapeLive() {
         var retryMatches = await fetchFotMobLive();
         if (retryMatches && retryMatches.length) {
           var retryDetail = retryMatches.slice().sort(function(a, b) { return detailPriority(b) - detailPriority(a); }).slice(0, MAX_FOTMOB_DETAIL_MATCHES);
-          for (var ri = 0; ri < retryDetail.length; ri++) {
-            var rm = retryDetail[ri];
-            if (ri > 0 && ri % 3 === 0) await new Promise(function(r) { setTimeout(r, FOTMOB_STATS_DELAY_MS); });
-            var rd = await fetchFotMobMatchDetails(rm.matchId, rm.minute).catch(function() { return null; });
-            if (rd) {
-              if (rd.stats) rm.fotmobStats = rd.stats;
-              if (rd.h2h) rm.h2h = rd.h2h;
-              if (rd.redCards) rm.redCards = rd.redCards;
-              if (rd.recentPressure) rm.recentPressure = rd.recentPressure;
-            }
-          }
+          await enrichLiveMatchDetails(retryDetail);
           liveCache = { fetchedAt: new Date().toISOString(), matchCount: retryMatches.length, matches: retryMatches };
           settleTips(retryMatches, dailyMatchResults);
           liveCache.publishedTips = recordTips(buildGoldenTips(liveCache), liveCache.fetchedAt);
