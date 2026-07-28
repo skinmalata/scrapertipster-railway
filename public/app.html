@@ -767,8 +767,8 @@
 
  // In-Play Live Tips + Alerts
  (function() {
-   var API_BASE = 'https://winfulltime-api.onrender.com';
-   var liveGrid = document.getElementById('liveTips');
+    var API_BASE = window.WFT_API || 'https://winfulltime-api.onrender.com';
+    var liveGrid = document.getElementById('liveTips');
    var alertToggle = document.getElementById('alertToggle');
    var liveCountBadge = document.getElementById('liveCount');
    if (!liveGrid || !alertToggle) return;

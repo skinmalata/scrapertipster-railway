@@ -11,3 +11,19 @@ services:
     envVars:
       - key: LIVE_TIP_HISTORY_FILE
         value: /var/data/live-tip-history.json
+      - key: SUPABASE_URL
+        value: https://xogkqpjtxfemcxzsuwke.supabase.co
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        value: sb_publishable_VydS1cmw7_OhFa7e-xUOqQ_tcVRUQoy
+      - key: ALLOWED_ORIGINS
+        value: https://winfulltime.com,https://www.winfulltime.com
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: PAYPAL_MODE
+        value: sandbox
+      - key: API_FOOTBALL_KEY
+        sync: false

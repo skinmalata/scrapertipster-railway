@@ -15,6 +15,8 @@ const { getCachedLive } = require('../services/scrapeLive');
 const { getSettledTodayTips, getSettledTipsForDate } = require('../services/liveTipHistory');
 const { buildTwoOddsOfDay, watDate } = require('../services/twoOddsOfDay');
 const { fetchTodayStreaks } = require('../services/h2hWinningStreaks');
+const { optionalAuth, requireAuth, requirePro: requireProMiddleware } = require('../middleware/auth');
+const payment = require('../services/payment');
 
 // API-Football responses are cached so one busy page does not consume the
 // provider quota for every visitor. The API key is deliberately kept here,
@@ -224,14 +226,28 @@ function vipPredictionData() {
 
 function applyLimits(data, isVip) {
   if (isVip) {
-    return { ...data, isVip: true, isFreeLimited: false };
+    return { ...data, isVip: true, isFreeLimited: false, limit: null, remaining: null };
   }
-  return { ...data, isVip: false, isFreeLimited: true };
+  var limited = { ...data, isVip: false, isFreeLimited: true, limit: FREE_LIMITS };
+  limited.bttsMatches = (data.bttsMatches || []).slice(0, FREE_LIMITS.btts);
+  limited.winstreakMatches = (data.winstreakMatches || []).slice(0, FREE_LIMITS.winstreak);
+  limited.losestreakMatches = (data.losestreakMatches || []).slice(0, FREE_LIMITS.losestreak);
+  limited.drawstreakMatches = (data.drawstreakMatches || []).slice(0, FREE_LIMITS.drawstreak);
+  limited.teamToScoreMatches = (data.teamToScoreMatches || []).slice(0, FREE_LIMITS.teamtoscore);
+  limited.teamToScore2PlusMatches = (data.teamToScore2PlusMatches || []).slice(0, FREE_LIMITS.teamtoscore2plus);
+  return limited;
 }
 
-router.get('/predictions', async (req, res) => {
+router.get('/predictions', optionalAuth, async (req, res) => {
   try {
-    const isVip = await isAuthenticatedVip(req);
+    const isVip = req.user ? await (async function() {
+      if (!supabase) return false;
+      try {
+        const { data: profile } = await supabase.from('profiles').select('vip_status, vip_expires_at').eq('id', req.user.id).single();
+        if (profile && profile.vip_status === 'vip' && new Date(profile.vip_expires_at) > new Date()) return true;
+      } catch (e) {}
+      return false;
+    })() : false;
     
     let data;
     const cached = getScraperService().loadCachedPredictions();
@@ -1147,6 +1163,156 @@ router.get('/golden-tips/history', function(req, res) {
   const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Lagos' }).format(new Date());
   const requestedDate = /^\d{4}-\d{2}-\d{2}$/.test(String(req.query.date || '')) ? String(req.query.date) : today;
   res.json({ available: true, date: requestedDate, today, tips: requestedDate === today ? getSettledTodayTips() : getSettledTipsForDate(requestedDate) });
+});
+
+// ===== PRO MEMBERSHIP ROUTES =====
+
+// POST /api/checkout — create PayPal subscription checkout
+router.post('/checkout', requireAuth, async function (req, res) {
+  try {
+    var planType = req.body.planType;
+    var returnUrl = req.body.returnUrl || 'https://winfulltime.com/account.html';
+    var validPlans = Object.keys(payment.PLANS);
+    if (validPlans.indexOf(planType) === -1) {
+      return res.status(400).json({ error: 'Invalid plan. Choose: ' + validPlans.join(', ') });
+    }
+    var result = await payment.createCheckout({
+      userId: req.user.id,
+      email: req.user.email,
+      planType: planType,
+      returnUrl: returnUrl
+    });
+    res.json(result);
+  } catch (e) {
+    console.error('[checkout] Failed:', e.message);
+    res.status(500).json({ error: 'Failed to create checkout. ' + e.message });
+  }
+});
+
+// POST /api/webhook/payment — PayPal webhook (raw body)
+var RAW_BODY_ROUTES = [];
+router.post('/webhook/payment', function (req, res) {
+  var rawBody = req.rawBody || JSON.stringify(req.body);
+  var headers = req.headers;
+
+  payment.verifyWebhook({ rawBody: rawBody, headers: headers }).then(function (verified) {
+    if (!verified) {
+      console.warn('[webhook] Signature verification failed');
+      return res.status(400).json({ error: 'Invalid signature' });
+    }
+
+    if (!supabase) return res.status(503).json({ error: 'Database not configured' });
+
+    var event = typeof req.body === 'object' ? req.body : JSON.parse(rawBody);
+    var eventId = event.id;
+
+    supabase.from('payment_events').select('provider, event_id').eq('provider', 'paypal').eq('event_id', eventId).single()
+      .then(function (existing) {
+        if (existing.data) {
+          console.log('[webhook] Duplicate event ignored:', eventId);
+          return res.json({ received: true, duplicate: true });
+        }
+
+        return supabase.from('payment_events').insert({ provider: 'paypal', event_id: eventId }).then(function () {
+          return payment.handleEvent(event).then(function (result) {
+            console.log('[webhook] Processed event:', event.event_type, result);
+            res.json({ received: true, handled: true });
+          });
+        });
+      }).catch(function (err) {
+        console.error('[webhook] Error:', err.message);
+        res.status(500).json({ error: 'Webhook processing failed' });
+      });
+  }).catch(function (err) {
+    console.error('[webhook] Verification error:', err.message);
+    res.status(400).json({ error: 'Webhook verification failed' });
+  });
+});
+
+// POST /api/ticket-builder/generate — Pro or free-limited
+router.post('/ticket-builder/generate', optionalAuth, async function (req, res) {
+  try {
+    var isVip = false;
+    var remaining = null;
+
+    if (req.user) {
+      if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+      try {
+        var prof = await supabase.from('profiles').select('vip_status, vip_expires_at').eq('id', req.user.id).single();
+        isVip = prof.data && prof.data.vip_status === 'vip' && new Date(prof.data.vip_expires_at) > new Date();
+      } catch (e) {}
+    }
+
+    if (!isVip) {
+      if (req.user) {
+        try {
+          var rpcResult = await supabase.rpc('consume_free_allowance', { p_user_id: req.user.id, p_action: 'ticket_builder', p_max_daily: 3 });
+          remaining = rpcResult.data && rpcResult.data[0] ? rpcResult.data[0].remaining : 0;
+        } catch (e) {
+          if (e.code === 'LMIT') return res.status(429).json({ error: 'Daily limit reached (3 runs)', isPro: false, remaining: 0 });
+          remaining = 0;
+        }
+      } else {
+        var ip = req.ip || 'anon';
+        var anonKey = 'anon_ticket_' + ip.replace(/[.:]/g, '_') + '_' + new Date().toISOString().slice(0, 10);
+        if (!anonTicketCache) anonTicketCache = new Map();
+        var anonCount = anonTicketCache.get(anonKey) || 0;
+        if (anonCount >= 1) return res.status(429).json({ error: 'Anonymous limit reached (1 run/day). Sign in for 3 free runs.', isPro: false, remaining: 0 });
+        anonTicketCache.set(anonKey, anonCount + 1);
+        remaining = 0;
+      }
+    }
+
+    // Build ticket using existing two-odds logic with the request params
+    var date = watDate();
+    var predictions = vipPredictionData();
+    var oddsResponse = await fetchPreMatchOdds(date);
+    var h2hMatches = await fetchTodayStreaks();
+    var payload = buildTwoOddsOfDay(predictions, { date: date, oddsResponse: oddsResponse, h2hMatches: h2hMatches });
+    res.json({
+      ...payload,
+      isPro: isVip,
+      limit: isVip ? null : 3,
+      remaining: isVip ? null : (remaining !== null ? remaining : 0)
+    });
+  } catch (e) {
+    console.error('[ticket-builder] Error:', e.message);
+    res.status(500).json({ error: 'Failed to generate ticket' });
+  }
+});
+
+var anonTicketCache = null;
+
+// GET /api/me/subscription — caller's subscription info
+router.get('/me/subscription', requireAuth, async function (req, res) {
+  try {
+    if (!supabase) return res.json({ isPro: false, error: 'Service unavailable' });
+
+    var prof = await supabase.from('profiles').select('vip_status, vip_expires_at, created_at').eq('id', req.user.id).single();
+    var sub = await supabase.from('subscriptions').select('plan_type, payment_status, expires_at, started_at')
+      .eq('user_id', req.user.id).order('created_at', { ascending: false }).limit(1).maybeSingle();
+
+    var profile = prof.data;
+    var subscription = sub.data;
+    var isPro = profile && profile.vip_status === 'vip' && new Date(profile.vip_expires_at) > new Date();
+
+    res.json({
+      isPro: isPro,
+      email: req.user.email,
+      plan: subscription ? subscription.plan_type : null,
+      status: subscription ? subscription.payment_status : null,
+      expiresAt: subscription && subscription.expires_at ? subscription.expires_at : null,
+      memberSince: profile ? profile.created_at : null
+    });
+  } catch (e) {
+    console.error('[me/subscription] Error:', e.message);
+    res.json({ isPro: false, error: 'Failed to load subscription' });
+  }
+});
+
+// POST /api/subscription/cancel — cancel subscription
+router.post('/subscription/cancel', requireAuth, function (req, res) {
+  res.json({ message: 'To cancel, visit your PayPal settings:', url: 'https://www.paypal.com/myaccount/autopay/' });
 });
 
 module.exports = router;

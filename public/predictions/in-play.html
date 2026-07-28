@@ -255,7 +255,7 @@
   </footer>
   <script>
     (function() {
-      var API_BASE = 'https://winfulltime-api.onrender.com';
+      var API_BASE = window.WFT_API || 'https://winfulltime-api.onrender.com';
       var container = document.getElementById('tips');
       var historyDate = null;
       var historyRetryTimer = null;

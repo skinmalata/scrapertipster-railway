@@ -1,4 +1,4 @@
-# WinFulltime Pro Membership - Implementation Prompt
+# WinFulltime Pro Membership - Implementation Plan
 
 ## Goal
 
@@ -38,6 +38,41 @@ fetch(window.WFT_API + '/api/checkout')
 Do not blindly prepend the Render API base URL to every relative fetch. That
 would bypass the GitHub Pages deployment data and can serve stale data.
 
+## Completion Status (as of 2026-07-28)
+
+| Area | Status |
+|------|--------|
+| `x-user-id` eliminated | **Done** — never existed in production code |
+| Server-side bearer validation | **Done** — `getAuthenticatedUser()` in `api.js:95` |
+| VIP status check (server) | **Done** — `checkUserVipStatus()` in `api.js:71` |
+| CORS with GitHub Pages origins | **Done** — `server.js:164` |
+| Basic IP rate limiter | **Done** — `server.js:118` (100 req/min/IP) |
+| Service-role key server-only | **Done** — never in browser code |
+| Static data uses relative paths | **Done** — `/data/*.json` requests are relative |
+| Database schema (`profiles`, `subscriptions`, `payments`) | **Done** — in `supabase-schema.sql` (needs prod verification) |
+| `tip_history` / `two_odds_history` tables | **Done** — in schema, used by liveTipHistory |
+| --- | --- |
+| `public/config.js` | **Not started** |
+| `public/supabase-client.js` | **Not started** |
+| `public/auth.js` | **Not started** |
+| Hardcoded Render URLs → `WFT_API` | **Not started** — 4 occurrences in 3 files |
+| `public/signup.html` | **Not started** |
+| `public/login.html` | **Not started** |
+| `public/reset-password.html` | **Not started** |
+| `public/account.html` | **Not started** |
+| `public/pricing.html` | **Not started** |
+| `src/middleware/auth.js` | **Not started** |
+| `src/services/payment.js` | **Not started** |
+| `usage` + `payment_events` tables | **Not started** |
+| Atomic consumption RPC | **Not started** |
+| Pro entitlement in API endpoints | **Not started** — `golden-tips`, `live-tips` have zero auth |
+| Auth nav links (Login, Sign Up, Account, Pricing) | **Not started** — not in header or footer |
+| Frontend gating (blur/lock, upgrade CTAs, Pro badges) | **Not started** |
+| Ticket builder endpoint | **Not started** |
+| Checkout / webhook / cancel routes | **Not started** |
+| `express-rate-limit` | **Not started** |
+| Supabase env vars on Render | **Not started** |
+
 ## Preconditions - Do Not Skip
 
 1. Obtain written approval from the selected payment provider for a
@@ -46,6 +81,7 @@ would bypass the GitHub Pages deployment data and can serve stale data.
    that it does not accept bets or hold customer funds.
 2. Apply and verify Supabase migrations in the production project. The local
    `supabase-schema.sql` file is not proof that production has these tables.
+   Must also add `usage` and `payment_events` tables.
 3. Confirm Supabase Auth Site URL and redirect URLs include:
    - `https://winfulltime.com`
    - `https://winfulltime.com/account.html`
@@ -57,7 +93,8 @@ would bypass the GitHub Pages deployment data and can serve stale data.
 
 These requirements are mandatory before payment launch.
 
-- Remove all use of `x-user-id` for access decisions. It is forgeable.
+- ~~Remove all use of `x-user-id` for access decisions. It is forgeable.~~
+  **Done** — not present in production code.
 - Validate every bearer token server-side with Supabase before trusting a user
   identity.
 - The Supabase **service-role key** must remain on Render only. Never expose it
@@ -79,8 +116,8 @@ These requirements are mandatory before payment launch.
 
 ## Database Changes
 
-Retain the existing `profiles`, `subscriptions`, `payments`, and `tip_history`
-tables. Add a migration for the following tables and policies.
+Retain the existing `profiles`, `subscriptions`, `payments`, `tip_history`,
+and `two_odds_history` tables. Add a migration for the following tables.
 
 ```sql
 CREATE TABLE public.usage (
@@ -99,74 +136,85 @@ CREATE TABLE public.payment_events (
 );
 ```
 
-- Users may read their own `usage` records.
+- Users may read their own `usage` records via RLS.
 - Clients have no write policy for `usage`, `subscriptions`, `payments`, or
   `payment_events`.
 - Add an atomic SQL function/RPC to consume a free usage allowance. It must
   increment and check the daily limit in one transaction.
 - Keep `set_vip_status()` callable only by the server service-role client.
 
-## Shared Frontend Configuration
+## Remaining Work — Detailed Plan
 
-Create `public/config.js`:
+### Phase 1: Foundation (env + database)
 
+**Step 1 — Set Supabase env vars on Render**
+- Add `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `SUPABASE_ANON_KEY`,
+  `ALLOWED_ORIGINS` to Render environment variables.
+- Remove unused PayPal env vars from `.env.example`.
+
+**Step 2 — Apply database migration**
+- Add `usage` and `payment_events` tables to `supabase-schema.sql`.
+- Run migration in Supabase production SQL Editor.
+- Create `consume_free_allowance()` atomic RPC function.
+- Verify RLS policies on all tables.
+- Confirm Supabase Auth Site URL includes required redirect URLs.
+
+### Phase 2: Shared frontend config
+
+**Step 3 — Create `public/config.js`**
 ```javascript
 window.WFT_API = 'https://winfulltime-api.onrender.com';
 ```
 
-Create `public/supabase-client.js` using the Supabase browser CDN client.
-Obtain the Supabase URL and anon key from a public Render configuration endpoint
-or a checked-in public config file. Do not duplicate the values across every
-HTML page.
+**Step 4 — Create `public/supabase-client.js`**
+- Load Supabase browser CDN client.
+- Expose `window.WFT.supabase` client (anon key).
+- Obtain URL + anon key from `config.js` or Render config endpoint.
 
-Create `public/auth.js` with:
+**Step 5 — Create `public/auth.js`**
+- Session restoration via `supabase.auth.getSession()`.
+- `window.WFT.user` — current user display state.
+- `window.WFT.apiFetch(path, options)` — adds bearer token, prefixes with
+  `window.WFT_API` for API paths, leaves `/data/*.json` relative.
+- signOut() and auth-change listener.
+- UI helpers: `renderLoginCta()`, `renderAccountBadge()`, etc.
 
-- session restoration through `supabase.auth.getSession()`;
-- `window.WFT.user` containing only current user display state;
-- `window.WFT.apiFetch(path, options)` that adds the bearer token and prefixes
-  only API paths with `window.WFT_API`;
-- sign-out and auth-change handling;
-- UI helpers for login, account, and Pro calls to action.
+**Step 6 — Replace hardcoded Render URLs**
+- `public/app.html` line 770 → `window.WFT_API + '/api/...'`
+- `public/predictions/in-play.html` line 258 → `window.WFT_API + '/api/...'`
+- `public/2-odds-of-the-day.html` lines 285, 333 → `window.WFT_API + '/api/...'`
+- Static `/data/*.json` fetches stay relative.
 
-Update existing hardcoded Render API URLs to use `window.WFT_API`. Leave static
-`/data/*.json` requests relative to GitHub Pages.
+### Phase 3: Server auth middleware
 
-## Authentication Pages
+**Step 7 — Create `src/middleware/auth.js`**
+- `optionalAuth` — parse Bearer token, validate via Supabase, set `req.user`
+  or continue as anonymous.
+- `requireAuth` — return 401 if no valid token.
+- `requirePro` — return 403 unless `vip_status = 'vip'` and not expired.
+- Refactor `api.js` inline auth functions to use middleware.
+- Apply `optionalAuth` to predictions, golden-tips, live-tips routes.
+- Create a `src/middleware/` directory.
 
-Build responsive vanilla HTML pages in the existing dark theme:
+### Phase 4: Auth pages
 
-- `public/signup.html`: full name, email, password, confirmation-state UI.
-- `public/login.html`: email/password login and password-reset request.
-- `public/reset-password.html`: validates the Supabase recovery session, then
-  calls `updateUser({ password })`.
-- `public/account.html`: requires a valid session; shows profile, plan,
-  subscription state, expiry, upgrade link, provider customer-portal link when
-  available, password update, and logout.
-- `public/pricing.html`: Free, Pro Monthly, Pro Yearly, and Lifetime plans.
-  Show a trial only for eligible recurring plans supported by the approved
-  provider. Never offer a trial for Lifetime automatically.
+**Step 8 — Build auth UI pages**
+All pages: Inter font, dark background, `#ff2448` accent, mobile-first.
 
-Use the existing visual system: Inter, dark backgrounds, accent `#ff2448`, and
-mobile-first layouts.
+- `public/signup.html` — full name, email, password, confirmation state.
+- `public/login.html` — email/password login + password reset link.
+- `public/reset-password.html` — validates Supabase recovery session, calls
+  `updateUser({ password })`.
+- `public/account.html` — session required. Shows profile, plan, subscription
+  state/expiry, upgrade link, provider portal link (when available), password
+  update, logout.
+- `public/pricing.html` — Free, Pro Monthly, Pro Yearly, Lifetime. Trial only
+  for recurring plans (never for Lifetime automatically).
 
-## Render Authentication Middleware
+### Phase 5: Payment system (blocked on provider approval)
 
-Create `src/middleware/auth.js`:
-
-- `optionalAuth`: if a valid bearer token is present, attach
-  `req.user = { id, email }`; otherwise continue as an anonymous visitor.
-- `requireAuth`: return 401 without a valid Supabase user token.
-- `requirePro`: require authentication, read the user profile server-side, and
-  return 403 unless `vip_status = 'vip'` and `vip_expires_at` is in the future.
-
-Replace the current `x-user-id` logic in `/api/predictions` and audit every
-membership-sensitive route for the same vulnerability.
-
-## Payment Provider Adapter
-
-Do not name or configure a provider until compliance approval is complete.
-Create `src/services/payment.js` with a provider-neutral interface:
-
+**Step 9 — Create `src/services/payment.js`**
+Provider-neutral adapter interface:
 ```javascript
 createCheckout({ userId, email, planType, returnUrl })
 verifyWebhook({ rawBody, headers })
@@ -174,62 +222,79 @@ handleEvent(event)
 createCustomerPortal({ userId })
 cancelSubscription({ userId })
 ```
+Webhook handler must:
+1. Verify authenticity before parsing.
+2. Insert into `payment_events`; stop if duplicate.
+3. Activate/renew/cancel/expire/refund based on provider events.
+4. Update `profiles`, `subscriptions`, `payments` with service-role only.
+5. Never trust browser-supplied plan, amount, expiry, or user ID.
 
-The webhook event handler must:
+**Step 10 — Create payment routes in `api.js`**
+- `POST /api/checkout` — `requireAuth`, validate plan, return checkout URL.
+- `POST /api/webhook/payment` — raw-body parser, no browser auth.
+- `POST /api/subscription/cancel` — `requireAuth`, use provider portal.
+- `GET /api/me/subscription` — `requireAuth`, return account + subscription.
 
-1. Verify authenticity before parsing business data.
-2. Insert the provider event ID into `payment_events`; stop safely if it was
-   already processed.
-3. Activate, renew, cancel, expire, or refund access based on authoritative
-   provider events.
-4. Update `profiles`, `subscriptions`, and `payments` with the service-role
-   client only.
-5. Never trust plan, amount, expiry, or user ID received from the browser.
+### Phase 6: Server entitlement enforcement
 
-Routes:
+**Step 11 — Enforce Pro on existing endpoints**
+- `GET /api/predictions` — already has `isAuthenticatedVip()`. Replace inline
+  check with `optionalAuth` middleware. `applyLimits()` must actually filter
+  dataset rows (not just add metadata flags).
+- `GET /api/golden-tips` — add `optionalAuth`. Free users get a limited subset
+  (e.g. 3 tips preview); Pro users get full payload.
+- `GET /api/live-tips` — add `optionalAuth`. Same tiered response.
+- `POST /api/ticket-builder/generate` — `optionalAuth`. Free signed-in users
+  consume daily allowance via `consume_free_allowance()` RPC (max 3/day).
+  Anonymous users get a lower, rate-limited guest allowance.
+- All responses include `{ isPro, limit, remaining }` metadata.
 
-- `POST /api/checkout`: `requireAuth`; validates an allowed plan and returns a
-  hosted checkout URL.
-- `POST /api/webhook/payment`: raw-body parser for this route only; no browser
-  authentication; verifies provider signature.
-- `POST /api/subscription/cancel`: `requireAuth`; use the provider portal when
-  possible.
-- `GET /api/me/subscription`: `requireAuth`; returns the caller's safe account
-  and subscription view.
+### Phase 7: Frontend gating + navigation
 
-## Free and Pro Entitlements
+**Step 12 — Add auth links to navigation**
+- Update `public/index.html` header (lines ~188-194) and footer (~1360-1386):
+  Login, Sign Up, Account, Pricing links.
+- Show account badge when logged in; hide auth links.
 
-Server-side enforcement is the source of truth.
+**Step 13 — Implement frontend gating**
+- Homepage + ticket builder: show free allowance + upgrade CTA.
+- In-play / golden tips page: render free preview from API, blur/lock
+  Pro-only rows. The API response drives what is visible.
+- Pro badge next to capabilities enforced server-side.
+- Chat widget: only show Pro answers when `window.WFT.user?.isPro` is true
+  (confirmed by API, not localStorage).
 
-- `GET /api/predictions`: use `optionalAuth`. Anonymous and Free users retain
-  `FREE_LIMITS`; valid Pro users receive the full allowed dataset.
-- `GET /api/live-tips` and `GET /api/golden-tips`: use `optionalAuth`. Return a
-  small documented free preview and the full payload only to Pro users.
-- `POST /api/ticket-builder/generate`: `optionalAuth`. Pro is unlimited. For
-  signed-in Free users, consume the allowance through the atomic `usage` RPC
-  (maximum three runs per day). Define a separate, rate-limited guest policy;
-  do not pretend localStorage is secure enforcement.
+### Phase 8: Security hardening
 
-The response should include entitlement metadata such as:
+**Step 14 — Replace in-memory rate limiter**
+- Add `express-rate-limit` to package.json.
+- Apply strict limits to `/api/golden-tips`, `/api/live-tips`.
+- Looser limits for `/api/predictions` (static data, cached).
+- Per-endpoint tuning.
 
-```json
-{ "isPro": false, "limit": 3, "remaining": 1 }
+**Step 15 — Audit and final security review**
+- Verify no service-role key, payment secret, or protected payload leaks
+  in GitHub Pages source, browser storage, or public API.
+- Verify existing prediction data loading and in-play results still work.
+- Verify tip_history and two_odds_history persistence unaffected.
+- Test concurrent request handling for ticket-builder allowance.
+
+## Implementation Order
+
 ```
-
-Do not create separate "higher confidence" Pro predictions unless the model
-logic genuinely supports that claim. Prefer the same source data with a clear,
-transparent difference in access depth and volume.
-
-## Frontend Gating and Navigation
-
-- Homepage and ticket builder: show free allowance and a clear upgrade CTA.
-- In-play and golden tips: render the returned free preview; use a non-sensitive
-  blurred/locked UI for the rest. The API must withhold the Pro payload.
-- Add Login, Sign Up, Account, and Pricing links across shared navigation and
-  footer templates.
-- Show a Pro badge only beside capabilities actually enforced by the API.
-- Update the chat widget only after authenticated API access is available; do
-  not grant Pro answers based on browser state alone.
+Phase 1:  Set Supabase env vars on Render
+          Apply database migration (usage, payment_events, RPC)
+Phase 2:  config.js → supabase-client.js → auth.js
+          Replace hardcoded Render URLs
+Phase 3:  src/middleware/auth.js (optionalAuth, requireAuth, requirePro)
+Phase 4:  signup.html, login.html, reset-password.html,
+          account.html, pricing.html
+Phase 5:  [Blocked: payment provider approval]
+          Payment adapter + webhook + checkout routes
+Phase 6:  Pro entitlement enforcement in all API endpoints
+Phase 7:  Navigation links + frontend gating UI
+Phase 8:  express-rate-limit + security audit + regression testing
+```
 
 ## Environment Variables
 
@@ -249,18 +314,6 @@ ALLOWED_ORIGINS=https://winfulltime.com,https://www.winfulltime.com
 
 Add provider-specific credentials only after selection. Do not retain unused
 PayPal, Stripe, Lemon Squeezy, or newsletter environment variables.
-
-## Implementation Order
-
-1. Payment-provider approval and product/legal requirements.
-2. Supabase migration, RLS review, and production verification.
-3. Shared config, Supabase client, and authentication pages.
-4. `optionalAuth`, `requireAuth`, `requirePro`; remove `x-user-id` usage.
-5. Payment adapter, verified webhook, idempotency, subscription lifecycle.
-6. Account and pricing pages, then checkout/customer portal UI.
-7. Server-enforced prediction, in-play, and ticket-builder entitlements.
-8. Frontend Pro gates, navigation, and account status indicators.
-9. Security and regression testing.
 
 ## Acceptance Criteria
 

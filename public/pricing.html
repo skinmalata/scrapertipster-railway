@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pricing - WinFulltime Pro</title>
+<link rel="icon" type="image/png" href="/winfulltimelogo.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #0c0f1a; color: #e2e8f0; min-height: 100vh; }
+.nav { display: flex; align-items: center; gap: 24px; padding: 16px 24px; background: rgba(13,17,32,0.95); border-bottom: 1px solid rgba(255,255,255,0.06); }
+.nav a { color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 500; }
+.nav a:hover { color: #e2e8f0; }
+.nav .logo { font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ff2448, #d41a38); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-right: auto; }
+.pricing-container { max-width: 960px; margin: 48px auto; padding: 0 24px; text-align: center; }
+.pricing-container h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+.pricing-container .subtitle { color: #94a3b8; font-size: 16px; margin-bottom: 40px; }
+.pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-bottom: 32px; }
+.pricing-card { background: rgba(13,17,32,0.95); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 32px 24px; text-align: center; transition: all 0.3s; position: relative; }
+.pricing-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.3); border-color: rgba(255,36,72,0.3); }
+.pricing-card.featured { border: 1px solid #ff2448; background: linear-gradient(135deg, rgba(255,36,72,0.08), rgba(20,28,42,0.95)); }
+.pricing-card.featured::before { content: 'Best Value'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #ff2448, #d41a38); color: white; padding: 4px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.pricing-card h3 { font-size: 18px; margin-bottom: 8px; }
+.pricing-card .price { font-size: 36px; font-weight: 800; background: linear-gradient(135deg, #ff2448, #d41a38); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 4px; }
+.pricing-card .duration { font-size: 14px; color: #94a3b8; margin-bottom: 16px; }
+.pricing-card .features { list-style: none; padding: 0; margin: 0 0 24px; text-align: left; }
+.pricing-card .features li { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 14px; color: #c8d0db; display: flex; align-items: center; gap: 8px; }
+.pricing-card .features li:last-child { border-bottom: none; }
+.pricing-card .features li::before { content: '✓'; color: #68d391; font-weight: 700; }
+.btn-subscribe { display: inline-block; background: linear-gradient(135deg, #ff2448, #d41a38); color: white; padding: 12px 32px; border-radius: 10px; border: none; font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; transition: opacity 0.2s; width: 100%; }
+.btn-subscribe:hover { opacity: 0.9; }
+.btn-subscribe:disabled { opacity: 0.5; cursor: not-allowed; }
+.faq-section { max-width: 640px; margin: 48px auto; text-align: left; }
+.faq-section h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; text-align: center; }
+.faq-item { border-bottom: 1px solid rgba(255,255,255,0.06); padding: 16px 0; }
+.faq-item summary { font-size: 15px; font-weight: 600; cursor: pointer; color: #e2e8f0; }
+.faq-item summary:hover { color: #ff2448; }
+.faq-item p { margin-top: 8px; font-size: 14px; color: #94a3b8; line-height: 1.6; }
+.alert { padding: 12px 16px; border-radius: 8px; font-size: 13px; margin: 16px 0; display: none; }
+.alert-error { background: rgba(255,36,72,0.1); border: 1px solid rgba(255,36,72,0.2); color: #ff6b6b; display: block; }
+.alert-success { background: rgba(72,187,120,0.1); border: 1px solid rgba(72,187,120,0.2); color: #68d391; display: block; }
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 4px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 480px) { .pricing-grid { grid-template-columns: 1fr; } .nav { padding: 12px 16px; gap: 12px; } }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/" class="logo">WinFulltime</a>
+  <a href="/">Home</a>
+  <a href="/pricing.html">Pricing</a>
+  <a href="/login.html" class="wft-auth-login">Sign In</a>
+  <a href="/account.html" class="wft-auth-account" style="display:none">Account</a>
+</nav>
+<div class="pricing-container">
+  <h1>Choose Your Plan</h1>
+  <p class="subtitle">Get expert football predictions and analytics</p>
+  <div id="alert" class="alert"></div>
+  <div class="pricing-grid">
+    <div class="pricing-card" id="free-card">
+      <h3>Free</h3>
+      <div class="price">$0</div>
+      <div class="duration">forever</div>
+      <ul class="features">
+        <li>Daily predictions (limited categories)</li>
+        <li>Basic in-play tips</li>
+        <li>Ticket builder (3 runs/day)</li>
+        <li>Standard analysis</li>
+      </ul>
+      <button class="btn-subscribe" onclick="window.location.href='/signup.html'" style="background:rgba(255,255,255,0.06);color:#94a3b8;cursor:pointer">Get Started</button>
+    </div>
+    <div class="pricing-card featured" id="monthly-card">
+      <h3>Pro Monthly</h3>
+      <div class="price">$9.99</div>
+      <div class="duration">per month</div>
+      <ul class="features">
+        <li>All prediction categories</li>
+        <li>Full in-play & golden tips</li>
+        <li>Unlimited ticket builder</li>
+        <li>Advanced analysis & streaks</li>
+        <li>Priority support</li>
+      </ul>
+      <button class="btn-subscribe" onclick="handleSubscribe('monthly')">Subscribe</button>
+    </div>
+    <div class="pricing-card" id="yearly-card">
+      <h3>Pro Yearly</h3>
+      <div class="price">$79.99</div>
+      <div class="duration">per year <span style="color:#68d391;font-size:12px">(save 33%)</span></div>
+      <ul class="features">
+        <li>All prediction categories</li>
+        <li>Full in-play & golden tips</li>
+        <li>Unlimited ticket builder</li>
+        <li>Advanced analysis & streaks</li>
+        <li>Priority support</li>
+      </ul>
+      <button class="btn-subscribe" onclick="handleSubscribe('yearly')">Subscribe</button>
+    </div>
+    <div class="pricing-card" id="lifetime-card">
+      <h3>Lifetime Pro</h3>
+      <div class="price">$199.99</div>
+      <div class="duration">one-time payment</div>
+      <ul class="features">
+        <li>All prediction categories</li>
+        <li>Full in-play & golden tips</li>
+        <li>Unlimited ticket builder</li>
+        <li>Advanced analysis & streaks</li>
+        <li>Priority support</li>
+        <li>All future features</li>
+      </ul>
+      <button class="btn-subscribe" onclick="handleSubscribe('lifetime')">Subscribe</button>
+    </div>
+  </div>
+</div>
+<div class="faq-section">
+  <h2>Frequently Asked Questions</h2>
+  <div class="faq-item"><summary>What's included in the Pro plan?</summary>
+    <p>Pro members get unlimited access to all prediction categories, full in-play and golden tips data, unlimited ticket builder runs, advanced team analysis, and priority support.</p></div>
+  <div class="faq-item"><summary>Can I switch plans?</summary>
+    <p>Yes. You can upgrade or downgrade at any time. Changes take effect at the start of your next billing cycle.</p></div>
+  <div class="faq-item"><summary>Is there a refund policy?</summary>
+    <p>We offer a 7-day money-back guarantee on all plans. Contact our support team for assistance.</p></div>
+  <div class="faq-item"><summary>How do payments work?</summary>
+    <p>Payments are processed securely through PayPal. Your subscription automatically renews unless cancelled.</p></div>
+</div>
+<script src="/config.js"></script>
+<script src="/supabase-client.js"></script>
+<script src="/auth.js"></script>
+<script>
+function showAlert(msg, type) {
+  var el = document.getElementById('alert');
+  el.textContent = msg;
+  el.className = 'alert alert-' + type;
+}
+
+function handleSubscribe(planType) {
+  var user = window.WFT.getUser && window.WFT.getUser();
+  if (!user) {
+    window.location.href = '/signup.html';
+    return;
+  }
+
+  var btns = document.querySelectorAll('.btn-subscribe');
+  btns.forEach(function(b) { b.disabled = true; b.innerHTML = '<span class="spinner"></span>Redirecting...'; });
+
+  window.WFT.apiFetch('/api/checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ planType: planType, returnUrl: 'https://winfulltime.com/account.html' })
+  }).then(function (data) {
+    btns.forEach(function(b) { b.disabled = false; b.innerHTML = 'Subscribe'; });
+    if (data.checkoutUrl) {
+      window.location.href = data.checkoutUrl;
+    } else {
+      showAlert(data.error || 'Failed to create checkout. Please try again.', 'error');
+    }
+  }).catch(function (err) {
+    btns.forEach(function(b) { b.disabled = false; b.innerHTML = 'Subscribe'; });
+    showAlert(err.message || 'An error occurred', 'error');
+  });
+}
+</script>
+</body>
+</html>

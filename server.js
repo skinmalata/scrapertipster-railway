@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
@@ -115,15 +116,15 @@ function trackVisit(req, res, next) {
 app.set('visitorData', visitorData);
 
 // Rate Limiter
-const rateLimit = new Map();
+const ipRateLimit = new Map();
 const RATE_LIMIT = 100;
 const TIME_WINDOW = 60 * 1000;
 
 setInterval(() => {
   const now = Date.now();
-  for (const [ip, data] of rateLimit.entries()) {
+  for (const [ip, data] of ipRateLimit.entries()) {
     if (now > data.resetTime) {
-      rateLimit.delete(ip);
+      ipRateLimit.delete(ip);
     }
   }
 }, 60 * 1000);
@@ -132,15 +133,15 @@ function rateLimiter(req, res, next) {
   const ip = req.ip || req.connection.remoteAddress;
   const now = Date.now();
   
-  if (!rateLimit.has(ip)) {
-    rateLimit.set(ip, { count: 1, resetTime: now + TIME_WINDOW });
+  if (!ipRateLimit.has(ip)) {
+    ipRateLimit.set(ip, { count: 1, resetTime: now + TIME_WINDOW });
     return next();
   }
   
-  const data = rateLimit.get(ip);
+  const data = ipRateLimit.get(ip);
   
   if (now > data.resetTime) {
-    rateLimit.set(ip, { count: 1, resetTime: now + TIME_WINDOW });
+    ipRateLimit.set(ip, { count: 1, resetTime: now + TIME_WINDOW });
     return next();
   }
   
@@ -165,12 +166,37 @@ app.use(cors({
   origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['https://winfulltime.com', 'https://www.winfulltime.com']
 }));
 app.use((req, res, next) => {
-  res.setHeader('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https: https://i.ytimg.com https://yt3.ggpht.com; connect-src 'self' https: http://localhost http://127.0.0.1 ws://localhost ws://127.0.0.1 https://www.google-analytics.com https://www.googletagmanager.com; frame-src https://www.youtube.com https://youtube.com;");
+  res.setHeader('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: https://www.googletagmanager.com https://www.google-analytics.com https://unpkg.com; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https: https://i.ytimg.com https://yt3.ggpht.com; connect-src 'self' https: http://localhost http://127.0.0.1 ws://localhost ws://127.0.0.1 https://www.google-analytics.com https://www.googletagmanager.com https://xogkqpjtxfemcxzsuwke.supabase.co; frame-src https://www.youtube.com https://youtube.com;");
   next();
 });
 app.use(express.json({ limit: '10kb' }));
+app.use(function (req, res, next) {
+  if (req.path === '/api/webhook/payment') {
+    var chunks = [];
+    req.on('data', function (chunk) { chunks.push(chunk); });
+    req.on('end', function () {
+      req.rawBody = Buffer.concat(chunks).toString('utf8');
+      try { req.body = JSON.parse(req.rawBody); } catch (e) { req.body = {}; }
+      next();
+    });
+  } else {
+    next();
+  }
+});
 app.use(rateLimiter);
 app.use(trackVisit);
+
+// Stricter rate limits for API endpoints
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please slow down.' }
+});
+app.use('/api/golden-tips', apiLimiter);
+app.use('/api/live-tips', apiLimiter);
+
 
 
 // Redirect old ?category= query params to clean URLs

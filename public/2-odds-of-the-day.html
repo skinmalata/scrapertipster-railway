@@ -284,6 +284,7 @@ gtag('config', 'G-HMGZMW9EDP');
   (function(){
     var API = window.WFT_API || 'https://winfulltime-api.onrender.com';
     var card = document.getElementById('twoOddsCard');
+    var isPro = window.WFT && window.WFT.getUser && window.WFT.getUser() && window.WFT.getUser().isPro;
     function escapeHtml(value){return String(value == null ? '' : value).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
     function priceLabel(type){return type==='verified'?'Verified bookmaker prices':type==='mixed'?'Verified + model prices':'Conservative model prices'}
     function formatDate(value){try{return new Date(value).toLocaleString('en-NG',{timeZone:'Africa/Lagos',dateStyle:'medium',timeStyle:'short'})+' WAT'}catch(e){return 'Time unavailable'}}

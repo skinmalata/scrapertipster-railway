@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Account - WinFulltime</title>
+<link rel="icon" type="image/png" href="/winfulltimelogo.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #0c0f1a; color: #e2e8f0; min-height: 100vh; }
+.nav { display: flex; align-items: center; gap: 24px; padding: 16px 24px; background: rgba(13,17,32,0.95); border-bottom: 1px solid rgba(255,255,255,0.06); }
+.nav a { color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 500; }
+.nav a:hover { color: #e2e8f0; }
+.nav .logo { font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ff2448, #d41a38); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-right: auto; }
+.account-container { max-width: 640px; margin: 40px auto; padding: 0 24px; }
+.account-container h1 { font-size: 24px; font-weight: 700; margin-bottom: 24px; }
+.card { background: rgba(13,17,32,0.95); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+.card h3 { font-size: 14px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
+.profile-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.profile-row:last-child { border-bottom: none; }
+.profile-row .label { font-size: 13px; color: #94a3b8; }
+.profile-row .value { font-size: 14px; font-weight: 500; }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+.badge-pro { background: linear-gradient(135deg, #ff2448, #d41a38); color: white; }
+.badge-free { background: rgba(255,255,255,0.06); color: #94a3b8; }
+.btn { display: inline-block; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; border: none; text-decoration: none; }
+.btn-primary { background: linear-gradient(135deg, #ff2448, #d41a38); color: white; }
+.btn-primary:hover { opacity: 0.9; }
+.btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #e2e8f0; }
+.btn-outline:hover { border-color: rgba(255,255,255,0.2); }
+.btn-danger { background: rgba(255,36,72,0.1); color: #ff6b6b; border: 1px solid rgba(255,36,72,0.2); }
+.btn-danger:hover { background: rgba(255,36,72,0.2); }
+.actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.alert { padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+.alert-error { background: rgba(255,36,72,0.1); border: 1px solid rgba(255,36,72,0.2); color: #ff6b6b; display: block; }
+.alert-success { background: rgba(72,187,120,0.1); border: 1px solid rgba(72,187,120,0.2); color: #68d391; display: block; }
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 4px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+.loading-state .spinner { width: 24px; height: 24px; }
+@media (max-width: 480px) { .nav { padding: 12px 16px; gap: 12px; } }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/" class="logo">WinFulltime</a>
+  <a href="/">Home</a>
+  <a href="/pricing.html">Pricing</a>
+  <a href="/login.html" class="wft-auth-login">Sign In</a>
+  <a href="/account.html" class="wft-auth-account" style="display:none">Account</a>
+</nav>
+<div class="account-container">
+  <div id="loading-state" class="loading-state">
+    <div class="spinner"></div>
+    <p style="margin-top:12px">Loading account...</p>
+  </div>
+  <div id="account-content" style="display:none">
+    <h1>My Account</h1>
+    <div id="alert" class="alert"></div>
+
+    <div class="card">
+      <h3>Profile</h3>
+      <div class="profile-row"><span class="label">Name</span><span class="value" id="display-name">—</span></div>
+      <div class="profile-row"><span class="label">Email</span><span class="value" id="display-email">—</span></div>
+      <div class="profile-row"><span class="label">Member since</span><span class="value" id="member-since">—</span></div>
+    </div>
+
+    <div class="card">
+      <h3>Membership</h3>
+      <div class="profile-row">
+        <span class="label">Plan</span>
+        <span class="value"><span id="plan-badge" class="badge badge-free">Free</span></span>
+      </div>
+      <div class="profile-row" id="expires-row" style="display:none">
+        <span class="label">Expires</span>
+        <span class="value" id="expires-at">—</span>
+      </div>
+      <div class="actions">
+        <a href="/pricing.html" class="btn btn-primary" id="upgrade-btn">Upgrade to Pro</a>
+        <button class="btn btn-outline" id="portal-btn" style="display:none" onclick="handlePortal()">Manage Billing</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Security</h3>
+      <div class="actions">
+        <button class="btn btn-outline" onclick="handlePasswordChange()">Change Password</button>
+        <button class="btn btn-danger" onclick="handleSignOut()">Sign Out</button>
+      </div>
+    </div>
+
+    <div id="password-section" style="display:none;margin-top:16px">
+      <div class="card">
+        <h3>New Password</h3>
+        <input type="password" id="new-password" placeholder="At least 6 characters" style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#e2e8f0;font-size:14px;font-family:inherit;outline:none;margin-bottom:12px">
+        <button class="btn btn-primary" onclick="handlePasswordSave()">Save Password</button>
+        <button class="btn btn-outline" onclick="document.getElementById('password-section').style.display='none'" style="margin-left:8px">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <div id="login-prompt" style="display:none;text-align:center;padding:60px 20px">
+    <h2 style="margin-bottom:12px">Sign in to view your account</h2>
+    <p style="color:#94a3b8;margin-bottom:24px">You need to be logged in to access this page.</p>
+    <a href="/login.html" class="btn btn-primary" style="text-decoration:none">Sign In</a>
+  </div>
+</div>
+<script src="/config.js"></script>
+<script src="/supabase-client.js"></script>
+<script src="/auth.js"></script>
+<script>
+function showAlert(msg, type) {
+  var el = document.getElementById('alert');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'alert alert-' + type;
+}
+
+function loadAccount() {
+  window.WFT.onAuthReady(function (user) {
+    document.getElementById('loading-state').style.display = 'none';
+    if (!user) {
+      document.getElementById('login-prompt').style.display = 'block';
+      return;
+    }
+    document.getElementById('account-content').style.display = 'block';
+    document.getElementById('display-name').textContent = user.displayName || user.email;
+    document.getElementById('display-email').textContent = user.email;
+
+    window.WFT.apiFetch('/api/me/subscription').then(function (data) {
+      var badge = document.getElementById('plan-badge');
+      var upgradeBtn = document.getElementById('upgrade-btn');
+      var portalBtn = document.getElementById('portal-btn');
+      var expiresRow = document.getElementById('expires-row');
+      var expiresAt = document.getElementById('expires-at');
+
+      if (data.isPro) {
+        badge.textContent = 'Pro';
+        badge.className = 'badge badge-pro';
+        upgradeBtn.textContent = 'Manage Subscription';
+        portalBtn.style.display = '';
+        if (data.expiresAt) {
+          expiresRow.style.display = '';
+          expiresAt.textContent = new Date(data.expiresAt).toLocaleDateString();
+        }
+      } else {
+        badge.textContent = 'Free';
+        badge.className = 'badge badge-free';
+      }
+    });
+  });
+}
+
+function handlePasswordChange() {
+  document.getElementById('password-section').style.display = 'block';
+}
+
+function handlePasswordSave() {
+  var password = document.getElementById('new-password').value;
+  if (password.length < 6) { showAlert('Must be at least 6 characters', 'error'); return; }
+
+  if (!window.WFT.supabase) { showAlert('Auth service not ready', 'error'); return; }
+  window.WFT.supabase.auth.updateUser({ password: password }).then(function (result) {
+    if (result.error) { showAlert(result.error.message, 'error'); }
+    else { showAlert('Password updated successfully', 'success'); document.getElementById('password-section').style.display = 'none'; }
+  });
+}
+
+function handleSignOut() {
+  window.WFT.signOut();
+}
+
+function handlePortal() {
+  window.WFT.apiFetch('/api/subscription/cancel').then(function () {
+    showAlert('Redirecting to PayPal...', 'success');
+    window.open('https://www.paypal.com/myaccount/autopay/', '_blank');
+  });
+}
+
+loadAccount();
+</script>
+</body>
+</html>
