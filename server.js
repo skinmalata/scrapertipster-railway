@@ -50,6 +50,7 @@ const visitorData = {
 };
 
 setInterval(() => {
+  const now = Date.now();
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   const cutoffDate = thirtyDaysAgo.toISOString().split('T')[0];
@@ -59,7 +60,14 @@ setInterval(() => {
       delete visitorData.dailyStats[dateKey];
     }
   }
-}, 60 * 60 * 1000);
+
+  if (visitorData.visits.length > 5000) {
+    visitorData.visits = visitorData.visits.slice(-3000);
+  }
+
+  const memMB = Math.round(process.memoryUsage().heapUsed / 1024 / 1024);
+  console.log('[memory] Heap:', memMB + 'MB | visits:', visitorData.visits.length, '| dailyStats:', Object.keys(visitorData.dailyStats).length);
+}, 10 * 60 * 1000);
 
 function trackVisit(req, res, next) {
   const today = new Date().toISOString().split('T')[0];
@@ -95,9 +103,9 @@ function trackVisit(req, res, next) {
     timestamp: new Date().toISOString()
   });
   
-  // Keep only last 5000 visits
-  if (visitorData.visits.length > 5000) {
-    visitorData.visits = visitorData.visits.slice(-5000);
+  // Keep only last 3000 visits
+  if (visitorData.visits.length > 3000) {
+    visitorData.visits = visitorData.visits.slice(-3000);
   }
   
   next();
@@ -421,6 +429,11 @@ startLiveScrapeLoop();
 // Refresh pre-match predictions on startup if stale or missing, then every 12h.
 (async function refreshPredictionsOnBoot() {
   try {
+    const memMB = Math.round(process.memoryUsage().heapUsed / 1024 / 1024);
+    if (memMB > 350) {
+      console.warn('[startup] Skipping pre-match refresh — memory too high (' + memMB + 'MB)');
+      return;
+    }
     const cached = getScraperService().loadCachedPredictions();
     if (!cached || cached.isStale || !cached.matches || !cached.matches.length) {
       console.log('[startup] Pre-match cache missing or stale, refreshing...');
@@ -435,6 +448,11 @@ startLiveScrapeLoop();
 })();
 setInterval(async function() {
   try {
+    const memMB = Math.round(process.memoryUsage().heapUsed / 1024 / 1024);
+    if (memMB > 380) {
+      console.warn('[cron] Skipping pre-match refresh — memory too high (' + memMB + 'MB)');
+      return;
+    }
     console.log('[cron] Refreshing pre-match predictions...');
     await getScraperService().fetchPredictions();
     console.log('[cron] Pre-match predictions refreshed');

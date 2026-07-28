@@ -1134,6 +1134,11 @@ async function fetchAndCachePredictions() {
 }
 
 async function fetchPredictions() {
+  const memMB = Math.round(process.memoryUsage().heapUsed / 1024 / 1024);
+  if (memMB > 380) {
+    console.warn('[scraper] Skipping fetchPredictions — memory too high (' + memMB + 'MB)');
+    return loadCachedPredictions() || { matches: [], totalMatches: 0 };
+  }
   const cached = loadCachedPredictions();
   console.log('No cache found, fetching new data...');
   const freshData = await fetchAndCachePredictions();

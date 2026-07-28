@@ -21,6 +21,7 @@ const { fetchTodayStreaks } = require('../services/h2hWinningStreaks');
 // never sent to the browser.
 const footballOddsCache = new Map();
 const FOOTBALL_ODDS_CACHE_MS = 10 * 60 * 1000;
+const MAX_FOOTBALL_ODDS_CACHE = 30;
 let liveTipsCache = null;
 // API-Football's free plan allows 100 requests/day. Live analysis is capped
 // well below that, leaving a reserve for the rest of the site.
@@ -127,6 +128,10 @@ async function fetchPreMatchOdds(date) {
     }
     const payload = { available: true, source: 'API-Football', date: date, fetchedAt: new Date().toISOString(), response: Array.isArray(data.response) ? data.response : [] };
     footballOddsCache.set(date, { createdAt: Date.now(), payload });
+    if (footballOddsCache.size > MAX_FOOTBALL_ODDS_CACHE) {
+      var oldestKey = footballOddsCache.keys().next().value;
+      footballOddsCache.delete(oldestKey);
+    }
     return payload.response;
   } catch (error) {
     console.warn('[two-odds] Pre-match odds fetch failed:', error.message);

@@ -5,6 +5,7 @@ const MAX_STATUS_LENGTH = 500;
 
 let sentKeys = new Map();
 const SENT_KEY_TTL_MS = 6 * 60 * 60 * 1000;
+const MAX_SENT_KEYS = 500;
 
 function formatTip(tip) {
   var minute = tip.minute ? tip.minute + "'" : 'Live';
@@ -68,6 +69,14 @@ function pruneSentKeys() {
   sentKeys.forEach(function(timestamp, key) {
     if (now - timestamp > SENT_KEY_TTL_MS) sentKeys.delete(key);
   });
+  if (sentKeys.size > MAX_SENT_KEYS) {
+    var keys = sentKeys.keys();
+    var toDelete = sentKeys.size - MAX_SENT_KEYS;
+    for (var i = 0; i < toDelete; i++) {
+      var k = keys.next().value;
+      if (k !== undefined) sentKeys.delete(k);
+    }
+  }
 }
 
 async function postToMastodon(status, idempotencyKey, instanceUrl, accessToken) {

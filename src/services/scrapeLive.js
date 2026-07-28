@@ -14,6 +14,11 @@ const CORNER_HISTORY_CACHE_MS = 24 * 60 * 60 * 1000;
 const MAX_CORNER_CONTEXT_MATCHES = 2;
 const MAX_CORNER_HISTORY_FIXTURES = 2;
 const RECENT_PRESSURE_WINDOW_MINUTES = 15;
+const MAX_TEAM_FORM_CACHE = 300;
+const MAX_CORNER_HISTORY_CACHE = 200;
+const MAX_DAILY_RESULTS_CACHE = 500;
+const MAX_FIXTURE_INDEX = 500;
+const MAX_MEMORY_MB = parseInt(process.env.MAX_MEMORY_MB || '400', 10);
 
 let liveCache = null;
 let isScraping = false;
@@ -24,6 +29,30 @@ let dailyMatchResults = new Map();
 let dailyMatchResultsDate = '';
 let fotmobFixtureIndex = new Map();
 let streakCandidateQueue = new Map();
+
+function evictOldest(map, maxSize) {
+  if (map.size <= maxSize) return;
+  const toDelete = map.size - maxSize;
+  var keys = map.keys();
+  for (var i = 0; i < toDelete; i++) {
+    var key = keys.next().value;
+    if (key !== undefined) map.delete(key);
+  }
+}
+
+function getMemoryUsageMB() {
+  try { return Math.round(process.memoryUsage().heapUsed / 1024 / 1024); }
+  catch (e) { return 0; }
+}
+
+function isMemoryPressure() {
+  var usedMB = getMemoryUsageMB();
+  if (usedMB > MAX_MEMORY_MB) {
+    console.warn('[fotmob-live] Memory pressure: ' + usedMB + 'MB > ' + MAX_MEMORY_MB + 'MB limit — skipping scrape');
+    return true;
+  }
+  return false;
+}
 
 function fotMobDateStr(dayOffset) {
   const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Africa/Lagos', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
@@ -98,6 +127,7 @@ function addFotMobResults(data) {
       dailyMatchResults.set(String(m.id), { finished: isFinished, score: parseScore(m.status) });
     });
   });
+  evictOldest(dailyMatchResults, MAX_DAILY_RESULTS_CACHE);
 }
 
 function appendLiveMatches(data, matches, seenMatchIds) {
@@ -149,6 +179,7 @@ function indexFotMobFixtures(data, fixtureIndex) {
       });
     });
   });
+  evictOldest(fixtureIndex, MAX_FIXTURE_INDEX);
 }
 
 function rebuildStreakCandidateQueue() {
@@ -341,6 +372,7 @@ async function fetchHistoricalCornerTotal(matchId) {
   var total = details && details.stats && details.stats.total ? Number(details.stats.total.corners) : null;
   total = Number.isFinite(total) ? total : null;
   cornerHistoryCache.set(String(matchId), { createdAt: Date.now(), total: total });
+  evictOldest(cornerHistoryCache, MAX_CORNER_HISTORY_CACHE);
   return total;
 }
 
@@ -432,6 +464,7 @@ async function fetchTeamRecentForm(teamId) {
   // Cache an unavailable form too, so an upstream schema gap does not turn
   // into repeated calls on every five-minute live refresh.
   teamFormCache.set(teamId, { createdAt: Date.now(), form: form });
+  evictOldest(teamFormCache, MAX_TEAM_FORM_CACHE);
   return form;
 }
 
@@ -473,6 +506,7 @@ async function enrichLiveMatchDetails(matches) {
 
 async function scrapeLive() {
   if (isScraping) return liveCache;
+  if (isMemoryPressure()) return liveCache;
   isScraping = true;
 
   try {
