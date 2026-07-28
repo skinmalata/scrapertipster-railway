@@ -146,7 +146,6 @@ gtag('config', 'G-HMGZMW9EDP');
     .two-leg-league{font-size:12px;font-weight:500;color:#fde68a;margin-bottom:6px}
     .two-leg-market{font-size:13px;color:rgba(255,255,255,.6);margin-bottom:8px}
     .two-leg-market strong{color:rgba(255,255,255,.85)}
-    .two-leg-evidence{font-size:12px;color:#fde68a;line-height:1.55;background:rgba(250,204,21,.04);border:1px solid rgba(250,204,21,.08);border-radius:10px;padding:10px 14px}
     .two-leg-right{text-align:right;flex-shrink:0;min-width:72px}
     .two-leg-price{font-size:24px;font-weight:900;color:#fff;line-height:1.1}
     .two-leg-status{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
@@ -178,7 +177,6 @@ gtag('config', 'G-HMGZMW9EDP');
     .two-history-card .hist-legs{display:flex;flex-direction:column;gap:6px}
     .two-history-card .hist-leg{font-size:13px;color:var(--text-secondary);line-height:1.5}
     .two-history-card .hist-leg strong{color:var(--text-primary);font-weight:700}
-    .two-history-card .hist-leg-evidence{font-size:12px;color:var(--text-muted);margin-top:2px;line-height:1.4}
     .two-history-card .hist-badge{display:inline-block;border-radius:999px;padding:4px 10px;font-size:10px;font-weight:800;margin-top:10px}
     .two-history-card .hist-empty{color:var(--text-muted);font-size:13px;font-style:italic}
 
@@ -320,11 +318,9 @@ gtag('config', 'G-HMGZMW9EDP');
         if(legs.length){
           body+='<div class="two-legs">';
           legs.forEach(function(leg,i){
-            var evidenceList = (leg.evidence||[]).filter(Boolean);
-            var evidenceHtml = evidenceList.map(function(ev){ return '<div style="display:flex;gap:8px;align-items:start"><span style="color:#fde68a;flex-shrink:0;margin-top:1px">&#10003;</span><span>'+escapeHtml(ev)+'</span></div>'; }).join('');
             var leagueLine = (leg.league || leg.time) ? '<div class="two-leg-league">'+(leg.league ? escapeHtml(leg.league) : '')+(leg.time ? ' &bull; '+escapeHtml(leg.time) : '')+'</div>' : '';
             var statusLabel = leg.priceStatus==='verified'?'Verified':'Estimated';
-            body+='<div class="two-leg"><div class="two-leg-num">'+(i+1)+'</div><div class="two-leg-body"><div class="two-leg-match">'+escapeHtml(leg.match)+'</div>'+leagueLine+'<div class="two-leg-market"><strong>'+escapeHtml(leg.selection)+'</strong> &bull; '+escapeHtml(leg.market)+'</div>'+(evidenceHtml?'<div class="two-leg-evidence">'+evidenceHtml+'</div>':'')+'</div><div class="two-leg-right"><div class="two-leg-price">'+Number(leg.price).toFixed(2)+'</div><div class="two-leg-status '+escapeHtml(leg.priceStatus||'estimated')+'">'+escapeHtml(statusLabel)+(leg.bookmaker?' via '+escapeHtml(leg.bookmaker):'')+'</div></div></div>';
+            body+='<div class="two-leg"><div class="two-leg-num">'+(i+1)+'</div><div class="two-leg-body"><div class="two-leg-match">'+escapeHtml(leg.match)+'</div>'+leagueLine+'<div class="two-leg-market"><strong>'+escapeHtml(leg.selection)+'</strong> &bull; '+escapeHtml(leg.market)+'</div></div><div class="two-leg-right"><div class="two-leg-price">'+Number(leg.price).toFixed(2)+'</div><div class="two-leg-status '+escapeHtml(leg.priceStatus||'estimated')+'">'+escapeHtml(statusLabel)+(leg.bookmaker?' via '+escapeHtml(leg.bookmaker):'')+'</div></div></div>';
           });
           body+='</div>';
         }else{
@@ -358,16 +354,18 @@ gtag('config', 'G-HMGZMW9EDP');
         continue;
       }
       var t = d.ticket;
-      html += '<div class="two-history-card"><div class="hist-date">' + d.date + '</div>';
+      var outcomeClass = t.outcome === 'won' ? 'hist-won' : t.outcome === 'lost' ? 'hist-lost' : '';
+      html += '<div class="two-history-card ' + outcomeClass + '"><div class="hist-date">' + d.date + '</div>';
       html += '<div class="hist-odds">' + (t.combinedOdds || 0).toFixed(2) + 'x</div>';
+      if (t.outcome === 'won') html += '<div style="font-size:12px;color:#4ade80;margin-bottom:8px;font-weight:700;">&#10003; Won</div>';
+      else if (t.outcome === 'lost') html += '<div style="font-size:12px;color:#f87171;margin-bottom:8px;font-weight:700;">&#10007; Lost</div>';
       if (t.adjustedProbability) html += '<div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">'+(t.adjustedProbability*100).toFixed(1)+'% adjusted probability</div>';
       html += '<div class="hist-legs">';
       for (var j = 0; j < (t.legs || []).length; j++) {
         var s = t.legs[j];
-        html += '<div class="hist-leg"><strong>' + (s.selection || '') + '</strong> &mdash; ' + (s.match || '') + '</div>';
+        var tick = s.won === true ? '<span style="color:#4ade80;margin-right:4px;">&#10003;</span>' : s.won === false ? '<span style="color:#f87171;margin-right:4px;">&#10007;</span>' : '';
+        html += '<div class="hist-leg">' + tick + '<strong>' + (s.selection || '') + '</strong> &mdash; ' + (s.match || '') + '</div>';
         if (s.league) html += '<div style="font-size:11px;color:#fde68a;margin-top:1px;margin-bottom:4px;">'+escapeHtml(s.league)+'</div>';
-        var evidence=(s.evidence||[]).filter(Boolean).slice(0,2);
-        if(evidence.length) html += '<div class="hist-leg-evidence">' + escapeHtml(evidence.join(' \u00b7 ')) + '</div>';
       }
       html += '</div></div>';
     }

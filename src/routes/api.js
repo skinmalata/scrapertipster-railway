@@ -925,12 +925,85 @@ router.get('/two-odds/history', async function(req, res) {
       return res.json({ ...twoOddsHistoryCache.payload, cached: true });
     }
     const predictions = vipPredictionData();
+
+    let resultsCache = {};
+    try {
+      if (getScraperService().getResultsCache) {
+        resultsCache = getScraperService().getResultsCache();
+      }
+    } catch (e) { /* ignore */ }
+    const resultsByDate = {};
+    for (const dateKey of Object.keys(resultsCache)) {
+      const arr = [];
+      for (const [resultKey, score] of Object.entries(resultsCache[dateKey])) {
+        arr.push({ key: resultKey, score });
+      }
+      resultsByDate[dateKey] = arr;
+    }
+
+    function findLegResult(predMatch, predDate) {
+      const predTeams = splitMatch(predMatch);
+      if (predTeams.length !== 2) return null;
+      const [predHome, predAway] = predTeams;
+      let bestMatch = null, bestScore = 0;
+      const candidates = resultsByDate[predDate] || [];
+      for (const result of candidates) {
+        const resultTeams = splitMatch(result.key);
+        if (resultTeams.length !== 2) continue;
+        const [resHome, resAway] = resultTeams;
+        const comparisons = [
+          { home: teamSimilarity(predHome, resHome), away: teamSimilarity(predAway, resAway), score: result.score },
+          { home: teamSimilarity(predHome, resAway), away: teamSimilarity(predAway, resHome), score: { ...result.score, home: result.score.away, away: result.score.home } }
+        ];
+        for (const comparison of comparisons) {
+          const combined = (comparison.home + comparison.away) / 2;
+          if (comparison.home >= 0.5 && comparison.away >= 0.5 && combined > bestScore && combined >= 0.7) {
+            bestScore = combined;
+            bestMatch = comparison.score;
+          }
+        }
+      }
+      return bestMatch;
+    }
+
+    function didLegWin(leg, score) {
+      if (!score || score.home == null || score.away == null) return null;
+      const h = Number(score.home), a = Number(score.away);
+      const cat = (leg.category || '').toLowerCase();
+      const sel = (leg.selection || '').toLowerCase();
+      if (cat === '1x2') {
+        if (sel === 'home win' || sel === '1') return h > a;
+        if (sel === 'away win' || sel === '2') return a > h;
+        if (sel === 'draw' || sel === 'x') return h === a;
+        if (sel === '1x') return h >= a;
+        if (sel === 'x2') return a >= h;
+        if (sel === '12') return h !== a;
+      }
+      if (cat === 'over15') return (h + a) > 1.5;
+      if (cat === 'over25') return (h + a) > 2.5;
+      if (cat === 'btts') return h > 0 && a > 0;
+      if (cat === 'bttsno') return h === 0 || a === 0;
+      return null;
+    }
+
     const results = [];
     for (let i = 1; i <= TWO_ODDS_HISTORY_DAYS; i++) {
       const date = watDateOffset(-i);
       try {
         const [oddsResponse, h2hMatches] = await Promise.all([fetchPreMatchOdds(date), fetchTodayStreaks()]);
         const payload = buildTwoOddsOfDay(predictions, { date, oddsResponse, h2hMatches });
+        if (payload.ticket && payload.ticket.legs) {
+          payload.ticket.legs.forEach(function(leg) {
+            const matchScore = findLegResult(leg.match, date);
+            if (matchScore) {
+              leg.resultScore = matchScore;
+              leg.won = didLegWin(leg, matchScore);
+            }
+          });
+          const allResolved = payload.ticket.legs.every(function(l) { return l.won !== null; });
+          const allWon = allResolved && payload.ticket.legs.every(function(l) { return l.won === true; });
+          payload.ticket.outcome = allResolved ? (allWon ? 'won' : 'lost') : 'pending';
+        }
         results.push({ date, available: payload.available, ticket: payload.ticket, generatedAt: payload.generatedAt });
       } catch (e) {
         results.push({ date, available: false, ticket: null });
