@@ -172,7 +172,7 @@ gtag('config', 'G-HMGZMW9EDP');
     .two-history h2{font-size:22px;margin-bottom:14px;letter-spacing:-.02em}
     .two-history-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
     .two-history-card{padding:18px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
-    .two-history-card .hist-date{font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+    .two-history-card .hist-date{display:block;width:100%;padding:10px 14px;margin-bottom:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:8px;font-size:13px;font-weight:800;color:var(--text-primary);text-transform:uppercase;letter-spacing:.06em;text-align:center}
     .two-history-card .hist-odds{font-size:28px;font-weight:900;color:#fff;line-height:1.1;margin-bottom:8px}
     .two-history-card .hist-legs{display:flex;flex-direction:column;gap:6px}
     .two-history-card .hist-leg{font-size:13px;color:var(--text-secondary);line-height:1.5}
@@ -345,17 +345,23 @@ gtag('config', 'G-HMGZMW9EDP');
     var res = await fetch(API + '/api/two-odds/history');
     var data = await res.json();
     var days = data.days || [];
+    function formatHistDate(ds) {
+      try {
+        var d = new Date(ds + 'T12:00:00');
+        return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+      } catch(e) { return ds; }
+    }
     if (!days.length) { el.innerHTML = '<div style="padding:20px;color:var(--text-muted);font-size:13px;">No recent tickets available.</div>'; return; }
     var html = '';
     for (var i = 0; i < days.length; i++) {
       var d = days[i];
       if (!d.available || !d.ticket) {
-        html += '<div class="two-history-card"><div class="hist-date">' + d.date + '</div><div class="hist-empty">No ticket available</div></div>';
+        html += '<div class="two-history-card"><div class="hist-date">' + formatHistDate(d.date) + '</div><div class="hist-empty">No ticket available</div></div>';
         continue;
       }
       var t = d.ticket;
       var outcomeClass = t.outcome === 'won' ? 'hist-won' : t.outcome === 'lost' ? 'hist-lost' : '';
-      html += '<div class="two-history-card ' + outcomeClass + '"><div class="hist-date">' + d.date + '</div>';
+      html += '<div class="two-history-card ' + outcomeClass + '"><div class="hist-date">' + formatHistDate(d.date) + '</div>';
       html += '<div class="hist-odds">' + (t.combinedOdds || 0).toFixed(2) + 'x</div>';
       if (t.outcome === 'won') html += '<div style="font-size:12px;color:#4ade80;margin-bottom:8px;font-weight:700;">&#10003; Won</div>';
       else if (t.outcome === 'lost') html += '<div style="font-size:12px;color:#f87171;margin-bottom:8px;font-weight:700;">&#10007; Lost</div>';
