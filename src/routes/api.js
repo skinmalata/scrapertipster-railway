@@ -32,6 +32,8 @@ const MAX_LIVE_TIP_CANDIDATES = 3;
 let liveTipsBudget = { day: '', used: 0, remaining: null };
 const headToHeadCache = new Map();
 const HEAD_TO_HEAD_CACHE_MS = 12 * 60 * 60 * 1000;
+const fixtureResultsCache = new Map();
+const FIXTURE_RESULTS_CACHE_MS = 24 * 60 * 60 * 1000;
 
 let scraperService = null;
 let cornersLastScrape = null;
@@ -137,6 +139,78 @@ async function fetchPreMatchOdds(date) {
     console.warn('[two-odds] Pre-match odds fetch failed:', error.message);
     return [];
   }
+}
+
+async function fetchFixtureResults(date) {
+  const apiKey = process.env.API_FOOTBALL_KEY;
+  if (!apiKey) return [];
+  const cached = fixtureResultsCache.get(date);
+  if (cached && Date.now() - cached.createdAt < FIXTURE_RESULTS_CACHE_MS) return cached.data;
+  try {
+    const upstream = await fetch('https://v3.football.api-sports.io/fixtures?date=' + encodeURIComponent(date) + '&timezone=Africa%2FLagos', {
+      headers: { 'x-apisports-key': apiKey, accept: 'application/json' },
+      signal: AbortSignal.timeout(25000)
+    });
+    const data = await upstream.json();
+    if (!upstream.ok || (data.errors && Object.keys(data.errors).length)) return [];
+    const finished = (data.response || []).filter(function(f) {
+      return f.fixture && f.fixture.status && f.fixture.status.short === 'FT';
+    }).map(function(f) {
+      return {
+        key: (f.teams.home.name || '') + ' - ' + (f.teams.away.name || ''),
+        score: { home: Number(f.goals.home), away: Number(f.goals.away) }
+      };
+    });
+    fixtureResultsCache.set(date, { createdAt: Date.now(), data: finished });
+    return finished;
+  } catch (error) {
+    console.warn('[two-odds-history] Fixture results fetch failed for', date, error.message);
+    return [];
+  }
+}
+
+function findLegResult(predMatch, fixtureResults) {
+  const predTeams = splitMatch(predMatch);
+  if (predTeams.length !== 2) return null;
+  const [predHome, predAway] = predTeams;
+  let bestMatch = null, bestScore = 0;
+  for (const result of fixtureResults) {
+    const resultTeams = splitMatch(result.key);
+    if (resultTeams.length !== 2) continue;
+    const [resHome, resAway] = resultTeams;
+    const comparisons = [
+      { home: teamSimilarity(predHome, resHome), away: teamSimilarity(predAway, resAway), score: result.score },
+      { home: teamSimilarity(predHome, resAway), away: teamSimilarity(predAway, resHome), score: { home: result.score.away, away: result.score.home } }
+    ];
+    for (const comparison of comparisons) {
+      const combined = (comparison.home + comparison.away) / 2;
+      if (comparison.home >= 0.5 && comparison.away >= 0.5 && combined > bestScore && combined >= 0.7) {
+        bestScore = combined;
+        bestMatch = comparison.score;
+      }
+    }
+  }
+  return bestMatch;
+}
+
+function didLegWin(leg, score) {
+  if (!score || score.home == null || score.away == null) return null;
+  const h = Number(score.home), a = Number(score.away);
+  const cat = (leg.category || '').toLowerCase();
+  const sel = (leg.selection || '').toLowerCase();
+  if (cat === '1x2') {
+    if (sel === 'home win' || sel === '1') return h > a;
+    if (sel === 'away win' || sel === '2') return a > h;
+    if (sel === 'draw' || sel === 'x') return h === a;
+    if (sel === '1x') return h >= a;
+    if (sel === 'x2') return a >= h;
+    if (sel === '12') return h !== a;
+  }
+  if (cat === 'over15') return (h + a) > 1.5;
+  if (cat === 'over25') return (h + a) > 2.5;
+  if (cat === 'btts') return h > 0 && a > 0;
+  if (cat === 'bttsno') return h === 0 || a === 0;
+  return null;
 }
 
 function vipPredictionData() {
@@ -926,82 +1000,26 @@ router.get('/two-odds/history', async function(req, res) {
     }
     const predictions = vipPredictionData();
 
-    let resultsCache = {};
-    try {
-      if (getScraperService().getResultsCache) {
-        resultsCache = getScraperService().getResultsCache();
-      }
-    } catch (e) { /* ignore */ }
-    const resultsByDate = {};
-    for (const dateKey of Object.keys(resultsCache)) {
-      const arr = [];
-      for (const [resultKey, score] of Object.entries(resultsCache[dateKey])) {
-        arr.push({ key: resultKey, score });
-      }
-      resultsByDate[dateKey] = arr;
-    }
-
-    function findLegResult(predMatch, predDate) {
-      const predTeams = splitMatch(predMatch);
-      if (predTeams.length !== 2) return null;
-      const [predHome, predAway] = predTeams;
-      let bestMatch = null, bestScore = 0;
-      const candidates = resultsByDate[predDate] || [];
-      for (const result of candidates) {
-        const resultTeams = splitMatch(result.key);
-        if (resultTeams.length !== 2) continue;
-        const [resHome, resAway] = resultTeams;
-        const comparisons = [
-          { home: teamSimilarity(predHome, resHome), away: teamSimilarity(predAway, resAway), score: result.score },
-          { home: teamSimilarity(predHome, resAway), away: teamSimilarity(predAway, resHome), score: { ...result.score, home: result.score.away, away: result.score.home } }
-        ];
-        for (const comparison of comparisons) {
-          const combined = (comparison.home + comparison.away) / 2;
-          if (comparison.home >= 0.5 && comparison.away >= 0.5 && combined > bestScore && combined >= 0.7) {
-            bestScore = combined;
-            bestMatch = comparison.score;
-          }
-        }
-      }
-      return bestMatch;
-    }
-
-    function didLegWin(leg, score) {
-      if (!score || score.home == null || score.away == null) return null;
-      const h = Number(score.home), a = Number(score.away);
-      const cat = (leg.category || '').toLowerCase();
-      const sel = (leg.selection || '').toLowerCase();
-      if (cat === '1x2') {
-        if (sel === 'home win' || sel === '1') return h > a;
-        if (sel === 'away win' || sel === '2') return a > h;
-        if (sel === 'draw' || sel === 'x') return h === a;
-        if (sel === '1x') return h >= a;
-        if (sel === 'x2') return a >= h;
-        if (sel === '12') return h !== a;
-      }
-      if (cat === 'over15') return (h + a) > 1.5;
-      if (cat === 'over25') return (h + a) > 2.5;
-      if (cat === 'btts') return h > 0 && a > 0;
-      if (cat === 'bttsno') return h === 0 || a === 0;
-      return null;
-    }
-
     const results = [];
     for (let i = 1; i <= TWO_ODDS_HISTORY_DAYS; i++) {
       const date = watDateOffset(-i);
       try {
-        const [oddsResponse, h2hMatches] = await Promise.all([fetchPreMatchOdds(date), fetchTodayStreaks()]);
+        const [oddsResponse, h2hMatches, fixtureResults] = await Promise.all([
+          fetchPreMatchOdds(date),
+          fetchTodayStreaks(),
+          fetchFixtureResults(date)
+        ]);
         const payload = buildTwoOddsOfDay(predictions, { date, oddsResponse, h2hMatches });
         if (payload.ticket && payload.ticket.legs) {
           payload.ticket.legs.forEach(function(leg) {
-            const matchScore = findLegResult(leg.match, date);
+            var matchScore = findLegResult(leg.match, fixtureResults);
             if (matchScore) {
               leg.resultScore = matchScore;
               leg.won = didLegWin(leg, matchScore);
             }
           });
-          const allResolved = payload.ticket.legs.every(function(l) { return l.won !== null; });
-          const allWon = allResolved && payload.ticket.legs.every(function(l) { return l.won === true; });
+          var allResolved = payload.ticket.legs.every(function(l) { return l.won !== null; });
+          var allWon = allResolved && payload.ticket.legs.every(function(l) { return l.won === true; });
           payload.ticket.outcome = allResolved ? (allWon ? 'won' : 'lost') : 'pending';
         }
         results.push({ date, available: payload.available, ticket: payload.ticket, generatedAt: payload.generatedAt });
