@@ -708,7 +708,6 @@ function buildGoldenTips(liveData) {
   liveData.matches.forEach(function (match) {
     // Friendly and exhibition fixtures have volatile line-ups and incentives,
     // so they are never eligible for an in-play recommendation.
-    if (isFriendlyMatch(match)) { filterStats.friendly++; return; }
     // Never publish a tip with fewer than 15 minutes remaining in either half.
     if (!hasAtLeastFifteenMinutesRemaining(match)) { filterStats.noTimeLeft++; return; }
     // Skip matches with 3+ goals already scored (over 2.5)
