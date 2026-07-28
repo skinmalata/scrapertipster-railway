@@ -833,6 +833,14 @@ router.get('/two-odds/today', async function(req, res) {
     const payload = buildTwoOddsOfDay(predictions, { date: date, oddsResponse: oddsResponse, h2hMatches: h2hMatches });
     if (payload && payload.available) {
       twoOddsCache = { date, createdAt: Date.now(), payload };
+      try {
+        const disk = loadTwoOddsHistoryDisk();
+        if (!disk[date]) {
+          disk[date] = { date: date, available: true, ticket: payload.ticket, generatedAt: payload.generatedAt, savedAt: new Date().toISOString() };
+          saveTwoOddsHistoryDisk(disk);
+          console.log('[two-odds] Saved ticket for', date, 'to history disk cache');
+        }
+      } catch (e) { console.warn('[two-odds] Failed to save to history disk:', e.message); }
     } else {
       twoOddsCache = null;
     }
@@ -986,6 +994,8 @@ router.get('/live-tips', async (req, res) => {
 const TWO_ODDS_HISTORY_DAYS = 4;
 let twoOddsHistoryCache = null;
 const TWO_ODDS_HISTORY_CACHE_MS = 30 * 60 * 1000;
+const TWO_ODDS_HISTORY_DISK = path.join(__dirname, '..', '..', 'two-odds-history.json');
+const TWO_ODDS_HISTORY_MAX_DAYS = 30;
 
 function watDateOffset(dayOffset) {
   const d = new Date();
@@ -993,40 +1003,87 @@ function watDateOffset(dayOffset) {
   return watDate(d);
 }
 
+function loadTwoOddsHistoryDisk() {
+  try {
+    if (fs.existsSync(TWO_ODDS_HISTORY_DISK)) {
+      return JSON.parse(fs.readFileSync(TWO_ODDS_HISTORY_DISK, 'utf8'));
+    }
+  } catch (e) {
+    console.warn('[two-odds-history] Failed to load disk cache:', e.message);
+  }
+  return {};
+}
+
+function saveTwoOddsHistoryDisk(data) {
+  try {
+    fs.writeFileSync(TWO_ODDS_HISTORY_DISK, JSON.stringify(data, null, 2));
+  } catch (e) {
+    console.warn('[two-odds-history] Failed to save disk cache:', e.message);
+  }
+}
+
+function pruneTwoOddsHistory(disk) {
+  const cutoff = watDateOffset(-TWO_ODDS_HISTORY_MAX_DAYS);
+  let pruned = false;
+  for (const key of Object.keys(disk)) {
+    if (key < cutoff) { delete disk[key]; pruned = true; }
+  }
+  if (pruned) saveTwoOddsHistoryDisk(disk);
+}
+
 router.get('/two-odds/history', async function(req, res) {
   try {
     if (twoOddsHistoryCache && Date.now() - twoOddsHistoryCache.createdAt < TWO_ODDS_HISTORY_CACHE_MS) {
       return res.json({ ...twoOddsHistoryCache.payload, cached: true });
     }
+
+    const disk = loadTwoOddsHistoryDisk();
+    pruneTwoOddsHistory(disk);
     const predictions = vipPredictionData();
 
-    const results = [];
+    const neededDates = [];
     for (let i = 1; i <= TWO_ODDS_HISTORY_DAYS; i++) {
-      const date = watDateOffset(-i);
-      try {
-        const [oddsResponse, h2hMatches, fixtureResults] = await Promise.all([
-          fetchPreMatchOdds(date),
-          fetchTodayStreaks(),
-          fetchFixtureResults(date)
-        ]);
-        const payload = buildTwoOddsOfDay(predictions, { date, oddsResponse, h2hMatches });
-        if (payload.ticket && payload.ticket.legs) {
-          payload.ticket.legs.forEach(function(leg) {
-            var matchScore = findLegResult(leg.match, fixtureResults);
-            if (matchScore) {
-              leg.resultScore = matchScore;
-              leg.won = didLegWin(leg, matchScore);
-            }
-          });
-          var allResolved = payload.ticket.legs.every(function(l) { return l.won !== null; });
-          var allWon = allResolved && payload.ticket.legs.every(function(l) { return l.won === true; });
-          payload.ticket.outcome = allResolved ? (allWon ? 'won' : 'lost') : 'pending';
-        }
-        results.push({ date, available: payload.available, ticket: payload.ticket, generatedAt: payload.generatedAt });
-      } catch (e) {
-        results.push({ date, available: false, ticket: null });
-      }
+      neededDates.push(watDateOffset(-i));
     }
+
+    const missingDates = neededDates.filter(function(d, idx) {
+      if (disk[d] && disk[d].available) return false;
+      if (idx > 0 && (!disk[d] || !disk[d].available)) return false;
+      return true;
+    });
+
+    if (missingDates.length > 0) {
+      console.log('[two-odds-history] Rebuilding tickets for:', missingDates.join(', '));
+      var diskChanged = false;
+      for (const date of missingDates) {
+        try {
+          const [oddsResponse, fixtureResults] = await Promise.all([
+            fetchPreMatchOdds(date),
+            fetchFixtureResults(date)
+          ]);
+          const payload = buildTwoOddsOfDay(predictions, { date, oddsResponse });
+          if (payload.ticket && payload.ticket.legs) {
+            payload.ticket.legs.forEach(function(leg) {
+              var matchScore = findLegResult(leg.match, fixtureResults);
+              if (matchScore) {
+                leg.resultScore = matchScore;
+                leg.won = didLegWin(leg, matchScore);
+              }
+            });
+            var allResolved = payload.ticket.legs.every(function(l) { return l.won !== null; });
+            var allWon = allResolved && payload.ticket.legs.every(function(l) { return l.won === true; });
+            payload.ticket.outcome = allResolved ? (allWon ? 'won' : 'lost') : 'pending';
+            disk[date] = { date: date, available: true, ticket: payload.ticket, generatedAt: payload.generatedAt, savedAt: new Date().toISOString() };
+            diskChanged = true;
+          }
+        } catch (e) {
+          console.warn('[two-odds-history] Failed to build ticket for', date, e.message);
+        }
+      }
+      if (diskChanged) saveTwoOddsHistoryDisk(disk);
+    }
+
+    const results = neededDates.map(function(d) { return disk[d] || { date: d, available: false, ticket: null }; });
     const payload = { days: results };
     twoOddsHistoryCache = { createdAt: Date.now(), payload };
     res.json(payload);
