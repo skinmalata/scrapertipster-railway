@@ -994,7 +994,10 @@ router.get('/live-tips', async (req, res) => {
 const TWO_ODDS_HISTORY_DAYS = 4;
 let twoOddsHistoryCache = null;
 const TWO_ODDS_HISTORY_CACHE_MS = 30 * 60 * 1000;
-const TWO_ODDS_HISTORY_DISK = path.join(__dirname, '..', '..', 'two-odds-history.json');
+const TWO_ODDS_HISTORY_DISK = process.env.TWO_ODDS_HISTORY_FILE || path.join(
+  process.env.RAILWAY_VOLUME_MOUNT_PATH || process.env.RENDER_DISK_PATH || process.cwd(),
+  'two-odds-history.json'
+);
 const TWO_ODDS_HISTORY_MAX_DAYS = 30;
 
 function watDateOffset(dayOffset) {
