@@ -31,28 +31,28 @@
    .picks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
    .pick-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; transition: border-color 0.2s; }
    .pick-card:hover { border-color: rgba(255,255,255,0.12); }
-   .pick-category { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #000; background: var(--primary); padding: 3px 10px; border-radius: 6px; margin-bottom: 10px; }
-   .pick-match { font-size: 15px; font-weight: 600; color: #fff; line-height: 1.4; margin-bottom: 6px; }
-   .pick-tip { display: inline-block; font-size: 13px; font-weight: 600; padding: 3px 10px; border-radius: 6px; background: rgba(250,204,21,0.15); color: var(--primary); }
-   .pick-prob { font-size: 22px; font-weight: 800; color: #4ade80; margin-top: 8px; }
-   .pick-prob-label { font-size: 12px; color: var(--text-dim); }
-   .pick-meta { font-size: 13px; color: var(--text-dim); margin-top: 6px; }
+   .pick-category { display: inline-block; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #000; background: var(--primary); padding: 5px 14px; border-radius: 8px; margin-bottom: 12px; }
+   .pick-match { font-size: 18px; font-weight: 600; color: #fff; line-height: 1.4; margin-bottom: 8px; }
+   .pick-tip { display: inline-block; font-size: 16px; font-weight: 600; padding: 4px 12px; border-radius: 8px; background: rgba(250,204,21,0.15); color: var(--primary); }
+   .pick-prob { font-size: 28px; font-weight: 800; color: #4ade80; margin-top: 10px; }
+   .pick-prob-label { font-size: 14px; color: var(--text-dim); }
+   .pick-meta { font-size: 15px; color: var(--text-dim); margin-top: 6px; }
    .pick-card.empty { opacity: 0.5; display: flex; align-items: center; justify-content: center; min-height: 100px; color: var(--text-dim); font-size: 13px; }
 
    .history-section { margin-top: 40px; }
    .history-day { margin-bottom: 24px; }
-   .history-date { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+   .history-date { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
    .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
    .history-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 12px; }
-   .history-card .outcome { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+   .history-card .outcome { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; flex-shrink: 0; }
    .history-card .outcome.won { background: rgba(74,222,128,0.15); color: #4ade80; }
    .history-card .outcome.lost { background: rgba(239,68,68,0.15); color: #ef4444; }
    .history-card .outcome.pending { background: rgba(255,255,255,0.06); color: var(--text-dim); }
    .history-card .h-info { flex: 1; min-width: 0; }
-   .history-card .h-cat { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--primary); }
-   .history-card .h-match { font-size: 14px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-   .history-card .h-tip { font-size: 13px; color: var(--text-dim); }
-   .history-card .h-score { font-size: 13px; font-weight: 700; color: var(--text); flex-shrink: 0; }
+   .history-card .h-cat { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--primary); }
+   .history-card .h-match { font-size: 17px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+   .history-card .h-tip { font-size: 15px; color: var(--text-dim); }
+   .history-card .h-score { font-size: 16px; font-weight: 700; color: var(--text); flex-shrink: 0; }
 
    .loading { text-align: center; padding: 60px 20px; color: var(--text-dim); }
    .loading .spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
