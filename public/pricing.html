@@ -159,6 +159,24 @@ function handleSubscribe(planType) {
     showAlert(err.message || 'An error occurred', 'error');
   });
 }
+
+window.WFT.onAuthReady(function (user) {
+  if (!user) return;
+  window.WFT.apiFetch('/api/me/subscription').then(function (data) {
+    if (!data.isPro || !data.plan) return;
+    var cardId = data.plan === 'monthly' ? 'monthly-card' : data.plan === 'yearly' ? 'yearly-card' : 'lifetime-card';
+    var card = document.getElementById(cardId);
+    if (!card) return;
+    var btn = card.querySelector('.btn-subscribe');
+    if (!btn) return;
+    btn.textContent = 'Current Plan';
+    btn.disabled = true;
+    btn.style.background = 'rgba(72,187,120,0.15)';
+    btn.style.color = '#68d391';
+    btn.style.cursor = 'default';
+    card.style.borderColor = '#68d391';
+  });
+});
 </script>
 </body>
 </html>
