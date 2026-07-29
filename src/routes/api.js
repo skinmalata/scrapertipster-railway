@@ -1330,19 +1330,47 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
 // GET /api/best-picks — top pick per category + historical results
 router.get('/best-picks', async function (req, res) {
   try {
-    var predictionsPath = path.join(__dirname, '../../public/data/predictions.json');
+    var predictions = vipPredictionData();
+    if (!predictions || Object.keys(predictions).length === 0) {
+      try { predictions = await getScraperService().fetchPredictions(); } catch (e) {}
+    }
+    if (!predictions || Object.keys(predictions).length === 0) { predictions = { matches: [] }; }
+
+    var staticPath = path.join(__dirname, '../../public/data/predictions.json');
     var h2hPath = path.join(__dirname, '../../public/data/h2h-unbeaten.json');
 
-    var predictions = { matches: [] };
-    try { predictions = JSON.parse(fs.readFileSync(predictionsPath, 'utf8')); } catch (e) {}
+    var staticData = null;
+    try { staticData = JSON.parse(fs.readFileSync(staticPath, 'utf8')); } catch (e) {}
 
     var h2hData = { dates: {} };
     try { h2hData = JSON.parse(fs.readFileSync(h2hPath, 'utf8')); } catch (e) {}
 
-    var dataDate = predictions.date || '';
-    var sampleMatches = predictions.matches || predictions.winstreakMatches || predictions.losestreakMatches || [];
-    if (!dataDate && sampleMatches.length > 0) { dataDate = sampleMatches[0].date || ''; }
-    var today = dataDate || new Date().toISOString().slice(0, 10);
+    var CATEGORIES = [
+      { key: 'matches', label: '1X2', type: '1x2' },
+      { key: 'over15Matches', label: 'Over 1.5', type: 'over15' },
+      { key: 'over25Matches', label: 'Over 2.5', type: 'over25' },
+      { key: 'bttsMatches', label: 'BTTS Yes', type: 'btts' },
+      { key: 'bttsNoMatches', label: 'BTTS No', type: 'bttsNo' },
+      { key: 'cornersMatches', label: 'Corners', type: 'corners' },
+      { key: 'cardsMatches', label: 'Cards', type: 'cards' },
+      { key: 'teamToScore2PlusMatches', label: 'To Score 2+', type: 'teamScore' },
+      { key: 'winstreakMatches', label: 'Win Streak', type: 'winStreak' },
+      { key: 'h2hUnbeaten', label: 'Unbeaten', type: 'unbeaten' },
+      { key: 'losestreakMatches', label: 'Loss Streak', type: 'lossStreak' },
+      { key: 'drawstreakMatches', label: 'Draw Streak', type: 'drawStreak' }
+    ];
+
+    CATEGORIES.forEach(function(cat) {
+      if ((!Array.isArray(predictions[cat.key]) || predictions[cat.key].length === 0) && staticData && Array.isArray(staticData[cat.key])) {
+        predictions[cat.key] = staticData[cat.key];
+      }
+    });
+
+    if (predictions.matches && !predictions.date && staticData && staticData.date) {
+      predictions.date = staticData.date;
+    }
+
+    var today = predictions.date || new Date().toISOString().slice(0, 10);
 
     function getBestPick(arr) {
       if (!Array.isArray(arr) || arr.length === 0) return null;
@@ -1385,28 +1413,13 @@ router.get('/best-picks', async function (req, res) {
       return 'pending';
     }
 
-    var CATEGORIES = [
-      { key: 'matches', label: '1X2', type: '1x2' },
-      { key: 'over15Matches', label: 'Over 1.5', type: 'over15' },
-      { key: 'over25Matches', label: 'Over 2.5', type: 'over25' },
-      { key: 'bttsMatches', label: 'BTTS Yes', type: 'btts' },
-      { key: 'bttsNoMatches', label: 'BTTS No', type: 'bttsNo' },
-      { key: 'cornersMatches', label: 'Corners', type: 'corners' },
-      { key: 'cardsMatches', label: 'Cards', type: 'cards' },
-      { key: 'teamToScore2PlusMatches', label: 'To Score 2+', type: 'teamScore' },
-      { key: 'winstreakMatches', label: 'Win Streak', type: 'winStreak' },
-      { key: 'h2hUnbeaten', label: 'Unbeaten', type: 'unbeaten' },
-      { key: 'losestreakMatches', label: 'Loss Streak', type: 'lossStreak' },
-      { key: 'drawstreakMatches', label: 'Draw Streak', type: 'drawStreak' }
-    ];
-
     var resultsPath = path.join(process.cwd(), 'results-cache.json');
     var resultsCache = {};
     try { resultsCache = JSON.parse(fs.readFileSync(resultsPath, 'utf8')); } catch (e) {}
 
     var todayPicks = [];
     CATEGORIES.forEach(function(cat) {
-        if (cat.type === 'winStreak' || cat.type === 'unbeaten') {
+      if (cat.type === 'winStreak' || cat.type === 'unbeaten') {
         var h2hDate = h2hData.dates[today] ? today : Object.keys(h2hData.dates).sort().pop() || '';
         var streakMatches = h2hData.dates[h2hDate] || [];
         var picks = [];
