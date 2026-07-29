@@ -92,16 +92,17 @@ function handleEvent(event) {
   if (!data) return Promise.resolve({ handled: false, eventName: eventName });
 
   var attributes = data.attributes;
+  var meta = event.meta;
 
   switch (eventName) {
     case 'order_created':
-      return onOrderCreated(attributes, data);
+      return onOrderCreated(attributes, data, meta);
     case 'subscription_created':
-      return onSubscriptionCreated(attributes, data);
+      return onSubscriptionCreated(attributes, data, meta);
     case 'subscription_updated':
-      return onSubscriptionUpdated(attributes, data);
+      return onSubscriptionUpdated(attributes, data, meta);
     case 'subscription_cancelled':
-      return onSubscriptionCancelled(attributes, data);
+      return onSubscriptionCancelled(attributes, data, meta);
     default:
       return Promise.resolve({ handled: false, eventName: eventName });
   }
@@ -121,18 +122,20 @@ var supabase = null;
   }
 })();
 
-function getCustomData(attributes) {
+function getCustomData(attributes, meta) {
   var custom = {};
   if (attributes.first_order && attributes.first_order.attributes && attributes.first_order.attributes.custom_data) {
     custom = attributes.first_order.attributes.custom_data;
   } else if (attributes.custom_data) {
     custom = attributes.custom_data;
+  } else if (meta && meta.custom_data) {
+    custom = meta.custom_data;
   }
   return custom;
 }
 
-function onOrderCreated(attributes, data) {
-  var custom = getCustomData(attributes) || {};
+function onOrderCreated(attributes, data, meta) {
+  var custom = getCustomData(attributes, meta) || {};
   var userId = custom.user_id;
   var planType = custom.plan_type || 'lifetime';
   var email = attributes.user_email || '';
@@ -148,8 +151,8 @@ function onOrderCreated(attributes, data) {
   return recordPayment(userId, email, planType, orderId, expiresAt, amount);
 }
 
-function onSubscriptionCreated(attributes, data) {
-  var custom = getCustomData(attributes) || {};
+function onSubscriptionCreated(attributes, data, meta) {
+  var custom = getCustomData(attributes, meta) || {};
   var userId = custom.user_id;
   var planType = custom.plan_type || 'monthly';
   var email = attributes.user_email || '';
@@ -167,16 +170,35 @@ function onSubscriptionCreated(attributes, data) {
   return recordPayment(userId, email, planType, subscriptionId, expiresAt, amount);
 }
 
-function onSubscriptionUpdated(attributes, data) {
+function onSubscriptionUpdated(attributes, data, meta) {
   var status = attributes.status;
   var subscriptionId = String(data.id);
   if (!supabase) return Promise.resolve({ handled: false });
 
   if (status === 'active' || status === 'on_trial') {
-    return supabase.from('subscriptions')
-      .update({ payment_status: 'active' })
-      .eq('payment_id', subscriptionId)
-      .then(function () { return { handled: true, eventName: 'subscription_updated', status: status }; });
+    var action = supabase.from('subscriptions').update({ payment_status: 'active' }).eq('payment_id', subscriptionId);
+    var custom = getCustomData(attributes, meta);
+    if (custom.user_id) {
+      var now = new Date();
+      var expiresAt = new Date(now);
+      var planType = custom.plan_type || 'monthly';
+      if (planType === 'yearly') expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+      else expiresAt.setMonth(expiresAt.getMonth() + 1);
+      action = action.then(function () {
+        return supabase.from('subscriptions').upsert({
+          user_id: custom.user_id,
+          plan_type: planType,
+          payment_id: subscriptionId,
+          payment_status: 'active',
+          amount: PLANS[planType].price,
+          currency: 'USD',
+          expires_at: expiresAt.toISOString()
+        }, { onConflict: 'payment_id' });
+      }).then(function () {
+        return supabase.rpc('set_vip_status', { user_uuid: custom.user_id, vip_expires: expiresAt.toISOString() });
+      });
+    }
+    return action.then(function () { return { handled: true, eventName: 'subscription_updated', status: status }; });
   }
 
   if (status === 'cancelled' || status === 'expired') {

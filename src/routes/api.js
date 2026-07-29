@@ -1191,6 +1191,7 @@ router.post('/checkout', requireAuth, async function (req, res) {
 
 // POST /api/webhook/payment — Lemon Squeezy webhook (raw body)
 router.post('/webhook/payment', function (req, res) {
+  console.log('[webhook] Received event');
   var rawBody = req.rawBody || JSON.stringify(req.body);
   var headers = req.headers;
 
