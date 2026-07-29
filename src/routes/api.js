@@ -1330,15 +1330,16 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
 // GET /api/best-picks — top pick per category + historical results
 router.get('/best-picks', async function (req, res) {
   try {
-    var predictions = vipPredictionData();
-    if (!predictions || !Array.isArray(predictions.matches)) {
-      return res.json({ today: [], history: [], dates: [] });
-    }
+    var predictionsPath = path.join(__dirname, '../../public/data/predictions.json');
+    var h2hPath = path.join(__dirname, '../../public/data/h2h-unbeaten.json');
 
-    var resultsCache = {};
-    try { resultsCache = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'results-cache.json'), 'utf8')); } catch (e) {}
+    var predictions = { matches: [] };
+    try { predictions = JSON.parse(fs.readFileSync(predictionsPath, 'utf8')); } catch (e) {}
 
-    var today = predictions.date || new Date().toISOString().slice(0, 10);
+    var h2hData = { dates: {} };
+    try { h2hData = JSON.parse(fs.readFileSync(h2hPath, 'utf8')); } catch (e) {}
+
+    var today = new Date().toISOString().slice(0, 10);
 
     function getBestPick(arr) {
       if (!Array.isArray(arr) || arr.length === 0) return null;
@@ -1391,12 +1392,55 @@ router.get('/best-picks', async function (req, res) {
       { key: 'cardsMatches', label: 'Cards', type: 'cards' },
       { key: 'teamToScore2PlusMatches', label: 'To Score 2+', type: 'teamScore' },
       { key: 'winstreakMatches', label: 'Win Streak', type: 'winStreak' },
+      { key: 'h2hUnbeaten', label: 'Unbeaten', type: 'unbeaten' },
       { key: 'losestreakMatches', label: 'Loss Streak', type: 'lossStreak' },
       { key: 'drawstreakMatches', label: 'Draw Streak', type: 'drawStreak' }
     ];
 
+    var resultsPath = path.join(process.cwd(), 'results-cache.json');
+    var resultsCache = {};
+    try { resultsCache = JSON.parse(fs.readFileSync(resultsPath, 'utf8')); } catch (e) {}
+
     var todayPicks = [];
     CATEGORIES.forEach(function(cat) {
+        if (cat.type === 'winStreak' || cat.type === 'unbeaten') {
+        var streakMatches = h2hData.dates[today] || [];
+        var picks = [];
+        streakMatches.forEach(function(m) {
+          var home = String(m.home || '').trim();
+          var away = String(m.away || '').trim();
+          (m.streaks || []).forEach(function(s) {
+            var isHome = s.team === home;
+            var raw = String(s.text || '').toLowerCase();
+            if (cat.type === 'winStreak') {
+              if (!raw.includes(' won') && !raw.includes('won ')) return;
+            } else {
+              if (!raw.includes('unbeaten') && !raw.includes('no losses')) return;
+            }
+            var tip = cat.type === 'winStreak'
+              ? (isHome ? home + ' to Win' : away + ' to Win')
+              : s.team + ' Unbeaten (' + s.count + ')';
+            var prob = Math.min(s.count * 4, 85);
+            picks.push({
+              match: m.match, nextMatch: m.match,
+              tip: tip, probability: prob,
+              league: m.league || '', time: m.time || '',
+              streak: s.count, streakTeam: s.team, isHome: isHome
+            });
+          });
+        });
+        var best = getBestPick(picks);
+        if (best) {
+          todayPicks.push({
+            category: cat.label, type: cat.type,
+            match: best.match, tip: best.tip,
+            probability: best.probability, league: best.league,
+            time: best.time, streak: best.streak,
+            streakTeam: best.streakTeam, isHome: best.isHome
+          });
+        }
+        return;
+      }
       var matches = Array.isArray(predictions[cat.key]) ? predictions[cat.key].filter(function(m) { return (m.date || today) === today; }) : [];
       var best = getBestPick(matches);
       if (!best) return;
@@ -1409,8 +1453,8 @@ router.get('/best-picks', async function (req, res) {
         league: best.league || '',
         time: best.time || '',
         streak: best.streak || null,
-        streakTeam: cat.type === 'winStreak' || cat.type === 'lossStreak' || cat.type === 'drawStreak' ? (best.match || '') : null,
-        isHome: cat.type === 'winStreak' || cat.type === 'lossStreak' || cat.type === 'drawStreak' ? (best.isHome === true) : null
+        streakTeam: null,
+        isHome: null
       });
     });
 
@@ -1433,8 +1477,8 @@ router.get('/best-picks', async function (req, res) {
           probability: Number(best.probability) || 0,
           outcome: 'pending',
           score: null,
-          streakTeam: cat.type === 'winStreak' || cat.type === 'lossStreak' || cat.type === 'drawStreak' ? (best.match || '') : null,
-          isHome: cat.type === 'winStreak' || cat.type === 'lossStreak' || cat.type === 'drawStreak' ? (best.isHome === true) : null
+          streakTeam: null,
+          isHome: null
         };
         if (result) {
           enriched.outcome = evaluatePick(enriched, result);
