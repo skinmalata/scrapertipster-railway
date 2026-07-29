@@ -56,11 +56,15 @@ function marketDetails(category, source) {
   if (category === 'corners') return { market: 'Corners Over/Under', selection: tip, values: [tip.toLowerCase()] };
   if (category === 'cards') return { market: 'Cards Over/Under', selection: tip, values: [tip.toLowerCase()] };
   if (category === 'teamScore') return { market: 'Team to Score', selection: source.team + ' to Score', values: [] };
+  if (category === 'winStreak' || category === 'lossStreak' || category === 'drawStreak') {
+    var streakLabel = { winStreak: 'Win Streak', lossStreak: 'Loss Streak', drawStreak: 'Draw Streak' }[category] || category;
+    return { market: streakLabel, selection: source.tip || tip, values: [String(source.tip || tip).toLowerCase()] };
+  }
   return null;
 }
 
 function marketPriority(category) {
-  return { teamScore: 6, over15: 5, bttsNo: 4, corners: 3, cards: 2, btts: 2, '1x2': 1, over25: 1 }[category] || 0;
+  return { teamScore: 6, over15: 5, bttsNo: 4, corners: 3, cards: 2, btts: 2, '1x2': 1, over25: 1, winStreak: 2, lossStreak: 2, drawStreak: 2 }[category] || 0;
 }
 
 function candidateFrom(category, source, date) {
@@ -135,7 +139,8 @@ function allCandidates(predictions, date) {
   const groups = [
     ['matches', '1x2'], ['over15Matches', 'over15'], ['over25Matches', 'over25'],
     ['bttsMatches', 'btts'], ['bttsNoMatches', 'bttsNo'], ['cornersMatches', 'corners'],
-    ['cardsMatches', 'cards'], ['teamToScoreMatches', 'teamScore']
+    ['cardsMatches', 'cards'], ['teamToScoreMatches', 'teamScore'],
+    ['winstreakMatches', 'winStreak'], ['losestreakMatches', 'lossStreak'], ['drawstreakMatches', 'drawStreak']
   ];
   const candidates = [];
   groups.forEach(function(group) {

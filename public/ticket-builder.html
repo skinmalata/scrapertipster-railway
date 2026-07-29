@@ -220,10 +220,10 @@
   </div>
 
   <div class="legs-row">
-   <label for="numLegs">Number of Legs</label>
-   <div class="legs-slider-wrap">
-    <input type="range" id="numLegs" min="2" max="30" value="3">
-    <span class="legs-value" id="numLegsValue">3</span>
+   <label for="numLegs">Number of Legs <span class="pro-badge">PRO</span></label>
+   <div class="legs-input-wrap">
+    <input type="number" id="numLegs" min="2" max="30" value="3" step="1">
+    <span class="legs-value" id="numLegsValue">Legs</span>
    </div>
   </div>
 
@@ -234,22 +234,6 @@
   <label for="ticketTarget">Target Odds</label>
 
   <input type="number" id="ticketTarget" value="20" step="any">
-
-</div>
-
-  <div>
-
-  <label for="ticketMinOdds">Min Odds per Leg</label>
-
-  <input type="number" id="ticketMinOdds" value="1.20" step="any">
-
-</div>
-
-  <div>
-
-  <label for="ticketMaxOdds">Max Odds per Leg</label>
-
-  <input type="number" id="ticketMaxOdds" value="100" step="any">
 
 </div>
 
@@ -271,7 +255,7 @@
   <div style="font-size:12px;color:rgba(255,255,255,0.85);text-align:center;margin-top:14px;letter-spacing:0.2px;">Odds include estimated bookmaker margin (~5%)</div>
 
   <div id="telegramSection" style="display:none;text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06);">
-   <p style="font-size:13px;color:rgba(232,237,245,0.5);margin-bottom:8px;">Lifetime members get exclusive Telegram tips</p>
+   <p style="font-size:13px;color:rgba(232,237,245,0.8);margin-bottom:8px;">Lifetime members get exclusive Telegram tips</p>
    <a class="telegram-link" href="https://t.me/winfulltime" target="_blank" rel="noopener">&#9992; Join Telegram Group</a>
   </div>
 
@@ -510,7 +494,7 @@ nav.open { display: flex !important; }
  .ticket-table tbody td {
    display: block;
    padding: 2px 0;
-   font-size: 14px;
+   font-size: 15px;
    border: none;
  }
   .ticket-table tbody td.ticket-cell-num { display: none; }
@@ -530,11 +514,11 @@ nav.open { display: flex !important; }
  .ticket-cell-tip .tip-badge { font-size: 16px; padding: 5px 14px; }
  
  .ticket-actions { flex-direction: column; gap: 8px; }
- .copy-btn, .bet-btn { font-size: 13px; padding: 12px 16px; }
+ .copy-btn, .bet-btn { font-size: 15px; padding: 12px 16px; }
  .hero h1 { font-size: 24px; }
- .hero-subtext { font-size: 14px; }
+ .hero-subtext { font-size: 15px; }
  .ticket-form { padding: 20px 16px; }
- .ticket-form input[type="number"] { font-size: 14px; padding: 10px 12px; }
+ .ticket-form input[type="number"] { font-size: 15px; padding: 10px 12px; }
  .no-matches { padding: 32px 16px; }
  .how-it-works { margin-top: 32px; }
  }
@@ -544,13 +528,13 @@ nav.open { display: flex !important; }
 
  nav a {
 
- color: rgba(232, 237, 245, 0.55);
+ color: rgba(232, 237, 245, 0.8);
 
  text-decoration: none;
 
  font-weight: 500;
 
- font-size: 14px;
+ font-size: 15px;
 
  letter-spacing: 0.2px;
 
@@ -588,7 +572,7 @@ nav.open { display: flex !important; }
 
  .hero h1 {
 
- font-size: 36px;
+ font-size: 40px;
 
  font-weight: 800;
 
@@ -622,7 +606,7 @@ nav.open { display: flex !important; }
 
  font-size: 16px;
 
- color: rgba(232, 237, 245, 0.5);
+ color: rgba(232, 237, 245, 0.8);
 
  margin-top: 12px;
 
@@ -670,11 +654,11 @@ nav.open { display: flex !important; }
 
  display: block;
 
- font-size: 12px;
+ font-size: 15px;
 
  font-weight: 600;
 
- color: rgba(232, 237, 245, 0.5);
+ color: rgba(232, 237, 245, 0.8);
 
  text-transform: uppercase;
 
@@ -750,8 +734,13 @@ nav.open { display: flex !important; }
 
  .ticket-form input[type="number"]::placeholder {
 
- color: rgba(232, 237, 245, 0.25);
+ color: rgba(232, 237, 245, 0.8);
 
+ }
+
+ .ticket-form input[type="number"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
  }
 
 
@@ -1021,7 +1010,7 @@ nav.open { display: flex !important; }
 
  padding: 14px 18px;
 
- font-size: 13px;
+ font-size: 15px;
 
  font-weight: 700;
 
@@ -1029,7 +1018,7 @@ nav.open { display: flex !important; }
 
  letter-spacing: 0.8px;
 
- color: rgba(232,237,245,0.4);
+ color: rgba(232,237,245,0.7);
 
  background: rgba(21,26,44,0.5);
 
@@ -1083,7 +1072,7 @@ nav.open { display: flex !important; }
 
  text-align: center;
 
- color: rgba(232,237,245,0.4);
+ color: rgba(232,237,245,0.7);
 
  font-weight: 600;
 
@@ -1109,7 +1098,7 @@ nav.open { display: flex !important; }
 .ticket-odds-note {
  display: block;
  margin-top: 2px;
- color: rgba(232, 237, 245, 0.5);
+ color: rgba(232, 237, 245, 0.8);
  font-size: 11px;
  font-weight: 600;
  text-align: right;
@@ -1118,8 +1107,8 @@ nav.open { display: flex !important; }
 .ticket-detail {
  display: block;
  margin-top: 5px;
- color: rgba(232, 237, 245, 0.52);
- font-size: 12px;
+ color: rgba(232, 237, 245, 0.8);
+ font-size: 15px;
  font-weight: 500;
  line-height: 1.4;
 }
@@ -1159,7 +1148,7 @@ nav.open { display: flex !important; }
 
  color: #e8edf5;
 
- font-size: 13px;
+ font-size: 15px;
 
  min-width: 72px;
 
@@ -1205,7 +1194,7 @@ nav.open { display: flex !important; }
 
  border-radius: 10px;
 
- font-size: 14px;
+ font-size: 15px;
 
  font-weight: 700;
 
@@ -1270,7 +1259,7 @@ nav.open { display: flex !important; }
   gap: 6px;
   padding: 10px 16px;
   border-radius: 10px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   font-family: 'Inter', sans-serif;
   cursor: pointer;
@@ -1302,7 +1291,7 @@ nav.open { display: flex !important; }
  .share-option {
   display: block;
   padding: 10px 14px;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: rgba(232,237,245,0.75);
   text-decoration: none;
@@ -1360,7 +1349,7 @@ nav.open { display: flex !important; }
 
  padding: 56px 24px;
 
- color: rgba(232, 237, 245, 0.35);
+ color: rgba(232, 237, 245, 0.8);
 
  background: rgba(20, 28, 42, 0.4);
 
@@ -1416,9 +1405,9 @@ nav.open { display: flex !important; }
 
  .loading-text {
 
- font-size: 14px;
+ font-size: 15px;
 
- color: rgba(232, 237, 245, 0.45);
+ color: rgba(232, 237, 245, 0.75);
 
  letter-spacing: 0.3px;
 
@@ -1472,9 +1461,9 @@ nav.open { display: flex !important; }
 
  .how-it-works p {
 
- font-size: 14px;
+ font-size: 15px;
 
- color: rgba(232, 237, 245, 0.5);
+ color: rgba(232, 237, 245, 0.8);
 
  line-height: 1.8;
 
@@ -1496,9 +1485,9 @@ nav.open { display: flex !important; }
 
  .how-it-works ul li {
 
- font-size: 14px;
+ font-size: 15px;
 
- color: rgba(232, 237, 245, 0.55);
+ color: rgba(232, 237, 245, 0.8);
 
  line-height: 1.7;
 
@@ -1556,9 +1545,9 @@ nav.open { display: flex !important; }
 
  .disclaimer p {
 
- font-size: 12px;
+ font-size: 15px;
 
- color: rgba(232, 237, 245, 0.25);
+ color: rgba(232, 237, 245, 0.8);
 
  line-height: 1.6;
 
@@ -1568,11 +1557,11 @@ nav.open { display: flex !important; }
 
  .disclaimer p:first-child {
 
- font-size: 13px;
+ font-size: 15px;
 
  font-weight: 600;
 
- color: rgba(232, 237, 245, 0.4);
+ color: rgba(232, 237, 245, 0.75);
 
  text-transform: uppercase;
 
@@ -1624,11 +1613,11 @@ nav.open { display: flex !important; }
 
  .footer-links a {
 
- color: rgba(232, 237, 245, 0.35);
+ color: rgba(232, 237, 245, 0.8);
 
  text-decoration: none;
 
- font-size: 13px;
+ font-size: 15px;
 
  transition: color 0.25s;
 
@@ -1644,9 +1633,9 @@ nav.open { display: flex !important; }
 
  text-align: center;
 
- font-size: 12px;
+ font-size: 15px;
 
- color: rgba(232, 237, 245, 0.2);
+ color: rgba(232, 237, 245, 0.55);
 
  }
 
@@ -1654,7 +1643,7 @@ nav.open { display: flex !important; }
 
  .footer-copyright a {
 
- color: rgba(232, 237, 245, 0.3);
+ color: rgba(232, 237, 245, 0.8);
 
  text-decoration: none;
 
@@ -1667,9 +1656,9 @@ nav.open { display: flex !important; }
 
  .ticket-confidence {
 
- font-size: 13px;
+ font-size: 15px;
 
- color: rgba(232, 237, 245, 0.6);
+ color: rgba(232, 237, 245, 0.8);
 
  margin-top: 8px;
 
@@ -1693,9 +1682,9 @@ nav.open { display: flex !important; }
  /* Breadcrumbs */
  .breadcrumbs { max-width: 900px; margin: 0 auto; padding: 16px 16px 0; }
  .breadcrumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 0; }
- .breadcrumbs li { font-size: 13px; color: rgba(232,237,245,0.35); display: flex; align-items: center; gap: 6px; }
- .breadcrumbs li + li::before { content: '\203A'; color: rgba(232,237,245,0.25); font-size: 16px; }
- .breadcrumbs a { color: rgba(232,237,245,0.5); text-decoration: none; transition: color 0.2s; }
+ .breadcrumbs li { font-size: 15px; color: rgba(232,237,245,0.65); display: flex; align-items: center; gap: 6px; }
+ .breadcrumbs li + li::before { content: '\203A'; color: rgba(232,237,245,0.8); font-size: 16px; }
+ .breadcrumbs a { color: rgba(232,237,245,0.8); text-decoration: none; transition: color 0.2s; }
  .breadcrumbs a:hover { color: #ff2448; }
  .breadcrumbs [aria-current] { color: rgba(232,237,245,0.7); font-weight: 500; }
 
@@ -1703,35 +1692,35 @@ nav.open { display: flex !important; }
  .faq-section h2 { text-align: center; font-size: 22px; margin-bottom: 24px; }
  .faq-list { display: flex; flex-direction: column; gap: 8px; }
  .faq-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(232,237,245,0.1); border-radius: 8px; overflow: hidden; transition: border-color 0.2s; }
- .faq-item:hover { border-color: rgba(232,237,245,0.2); }
+ .faq-item:hover { border-color: rgba(232,237,245,0.8); }
  .faq-item[open] { border-color: rgba(255,36,72,0.3); }
  .faq-item summary { padding: 16px 20px; font-weight: 600; font-size: 15px; color: rgba(232,237,245,0.9); cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
  .faq-item summary::-webkit-details-marker { display: none; }
  .faq-item summary::after { content: '+'; font-size: 20px; font-weight: 700; color: #ff2448; transition: transform 0.2s; flex-shrink: 0; }
  .faq-item[open] summary::after { content: '\2212'; }
- .faq-item p { padding: 0 20px 16px; font-size: 14px; line-height: 1.7; color: rgba(232,237,245,0.55); margin: 0; }
+ .faq-item p { padding: 0 20px 16px; font-size: 15px; line-height: 1.7; color: rgba(232,237,245,0.8); margin: 0; }
 
  /* SEO content section */
  .seo-content { max-width: 700px; margin: 48px auto 0; padding: 0 16px; }
  .seo-content h2 { font-size: 20px; font-weight: 700; color: #e8edf5; margin-bottom: 16px; letter-spacing: -0.3px; }
- .seo-content p { font-size: 14px; color: rgba(232,237,245,0.55); line-height: 1.8; margin-bottom: 12px; }
+ .seo-content p { font-size: 15px; color: rgba(232,237,245,0.8); line-height: 1.8; margin-bottom: 12px; }
  .seo-content strong { color: rgba(232,237,245,0.8); font-weight: 600; }
  .seo-content ul { list-style: none; margin: 0 0 16px; }
- .seo-content ul li { font-size: 14px; color: rgba(232,237,245,0.55); line-height: 1.7; padding: 4px 0 4px 20px; position: relative; }
+ .seo-content ul li { font-size: 15px; color: rgba(232,237,245,0.8); line-height: 1.7; padding: 4px 0 4px 20px; position: relative; }
  .seo-content ul li::before { content: ''; position: absolute; left: 0; top: 12px; width: 6px; height: 6px; border-radius: 50%; background: #ff2448; }
  .seo-content a { color: #ff2448; text-decoration: none; transition: color 0.2s; }
  .seo-content a:hover { color: #ff6b8a; text-decoration: underline; }
 
  @media (max-width: 480px) {
   .faq-section h2 { font-size: 19px; }
-  .faq-item summary { padding: 14px 16px; font-size: 14px; }
-  .faq-item p { padding: 0 16px 14px; font-size: 13px; }
+  .faq-item summary { padding: 14px 16px; font-size: 15px; }
+  .faq-item p { padding: 0 16px 14px; font-size: 15px; }
   .seo-content h2 { font-size: 18px; }
  }
 
 
 /* Tier banner */
-.tier-banner { text-align: center; padding: 10px 16px; background: rgba(255,36,72,0.1); border: 1px solid rgba(255,36,72,0.2); border-radius: 10px; margin-bottom: 20px; font-size: 13px; color: rgba(232,237,245,0.7); line-height: 1.6; }
+.tier-banner { text-align: center; padding: 10px 16px; background: rgba(255,36,72,0.1); border: 1px solid rgba(255,36,72,0.2); border-radius: 10px; margin-bottom: 20px; font-size: 15px; color: rgba(232,237,245,0.7); line-height: 1.6; }
 .tier-banner strong { color: #ff6b8a; }
 .tier-banner a { color: #ff2448; text-decoration: none; font-weight: 600; }
 .tier-banner a:hover { text-decoration: underline; }
@@ -1741,7 +1730,7 @@ nav.open { display: flex !important; }
 
 /* Market grid */
 .market-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 20px; }
-.market-grid label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: rgba(232,237,245,0.7); cursor: pointer; padding: 6px 10px; background: rgba(21,26,44,0.4); border-radius: 8px; border: 1px solid rgba(255,255,255,0.04); transition: border-color 0.2s, background 0.2s; }
+.market-grid label { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; color: rgba(232,237,245,0.7); cursor: pointer; padding: 6px 10px; background: rgba(21,26,44,0.4); border-radius: 8px; border: 1px solid rgba(255,255,255,0.04); transition: border-color 0.2s, background 0.2s; }
 .market-grid label:hover { border-color: rgba(255,255,255,0.1); background: rgba(21,26,44,0.6); }
 .market-grid input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.15); border-radius: 4px; cursor: pointer; flex-shrink: 0; transition: background 0.2s, border-color 0.2s; position: relative; }
 .market-grid input[type="checkbox"]:checked { background: #ff2448; border-color: #ff2448; }
@@ -1751,22 +1740,22 @@ nav.open { display: flex !important; }
 
 /* Legs slider */
 .legs-row { margin-bottom: 20px; }
-.legs-row label { display: block; font-size: 12px; font-weight: 600; color: rgba(232,237,245,0.5); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
-.legs-slider-wrap { display: flex; align-items: center; gap: 12px; }
-.legs-slider-wrap input[type="range"] { flex: 1; appearance: none; -webkit-appearance: none; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; outline: none; }
-.legs-slider-wrap input[type="range"]::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; background: #ff2448; border-radius: 50%; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(255,36,72,0.3); }
-.legs-slider-wrap input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; background: #ff2448; border-radius: 50%; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(255,36,72,0.3); }
-.legs-value { font-size: 20px; font-weight: 800; min-width: 30px; text-align: center; background: linear-gradient(135deg,#4ade80,#22c55e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.legs-row label { display: block; font-size: 15px; font-weight: 600; color: rgba(232,237,245,0.8); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+.legs-input-wrap { display: flex; align-items: center; gap: 12px; }
+.legs-input-wrap input[type="number"] { flex: 1; max-width: 100px; font-size: 16px; font-weight: 700; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(255,255,255,0.05); color: #e8edf5; outline: none; transition: border-color 0.2s; }
+.legs-input-wrap input[type="number"]:focus { border-color: #ff2448; }
+.legs-input-wrap input[type="number"]:disabled { opacity: 0.5; cursor: not-allowed; }
+.legs-value { font-size: 14px; font-weight: 500; color: rgba(232,237,245,0.6); }
 
 /* Form section label */
-.form-section-label { font-size: 12px; font-weight: 600; color: rgba(232,237,245,0.5); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; display: block; }
+.form-section-label { font-size: 15px; font-weight: 600; color: rgba(232,237,245,0.8); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; display: block; }
 
 /* Disabled overlay for gated controls */
 .gate-disabled { position: relative; }
 .gate-disabled::after { content: ''; position: absolute; inset: 0; background: rgba(21,26,44,0.6); border-radius: 8px; z-index: 1; pointer-events: auto; }
 
 /* Telegram link for lifetime */
-.telegram-link { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg,#1e96c8,#1a7da8); color: #fff; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 14px; margin-top: 16px; transition: transform 0.2s, box-shadow 0.3s; }
+.telegram-link { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg,#1e96c8,#1a7da8); color: #fff; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 15px; margin-top: 16px; transition: transform 0.2s, box-shadow 0.3s; }
 .telegram-link:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(30,150,200,0.3); }
 
 @media (max-width: 640px) {
@@ -1787,11 +1776,6 @@ nav.open { display: flex !important; }
   <script>
   (function() { var WFT = window.WFT;
 
-  var allPicks = [];
-  var allUnbeaten = [];
-  var lastData = null;
-  var lastUbData = null;
-  var lastOddsData = null;
   var lastTarget = 20;
   var lastMinOdds = 1.20;
   var currentTier = 'free_anon';
@@ -1803,21 +1787,7 @@ nav.open { display: flex !important; }
     lifetime: { maxLegs: 30, maxOdds: 500, safeTips: true, marketSelector: true, shuffle: true, dailyLimit: null, telegramLink: true, label: 'Lifetime' }
   };
 
-  var MARKET_CATS = {
-    '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5',
-    'btts': 'BTTS YES', 'bttsNo': 'BTTS NO',
-    'corners': 'Corners', 'cards': 'Cards', 'teamScore': 'To Score 2+',
-    'winStreak': 'Win Streak', 'lossStreak': 'Loss Streak', 'drawStreak': 'Draw Streak',
-    'unbeaten': 'Unbeaten'
-  };
 
-  var MARKET_ADD = {
-    '1x2': 'matches', 'over15': 'over15Matches', 'over25': 'over25Matches',
-    'btts': 'bttsMatches', 'bttsNo': 'bttsNoMatches',
-    'corners': 'cornersMatches', 'cards': 'cardsMatches', 'teamScore': 'teamToScore2PlusMatches',
-    'winStreak': 'winstreakMatches', 'lossStreak': 'losestreakMatches', 'drawStreak': 'drawstreakMatches',
-    'unbeaten': null
-  };
 
   function getTier() {
     var user = WFT.getUser();
@@ -1863,11 +1833,23 @@ nav.open { display: flex !important; }
       safeCheck.disabled = false;
     }
 
-    var legsSlider = document.getElementById('numLegs');
-    legsSlider.max = limits.maxLegs;
-    if (parseInt(legsSlider.value, 10) > limits.maxLegs) {
-      legsSlider.value = limits.maxLegs;
-      document.getElementById('numLegsValue').textContent = limits.maxLegs;
+    var targetInput = document.getElementById('ticketTarget');
+    var legsInput = document.getElementById('numLegs');
+    if (tier === 'free_anon' || tier === 'free_registered') {
+      targetInput.disabled = true;
+      targetInput.title = 'Upgrade to Pro to change target odds';
+      legsInput.disabled = true;
+      legsInput.title = 'Upgrade to Pro to change legs';
+      legsInput.value = 3;
+    } else {
+      targetInput.disabled = false;
+      targetInput.title = '';
+      legsInput.disabled = false;
+      legsInput.title = '';
+      legsInput.max = limits.maxLegs;
+      if (parseInt(legsInput.value, 10) > limits.maxLegs) {
+        legsInput.value = limits.maxLegs;
+      }
     }
 
     var shuffleBtn = document.getElementById('shuffleBtn');
@@ -1889,776 +1871,182 @@ nav.open { display: flex !important; }
     return selected;
   }
 
-  function escapeHtml(value) {
-  return String(value ?? '').replace(/[&<>'"]/g, function(char) {
-   return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char];
-  });
- }
-
- function normaliseTeam(value) {
-  return String(value || '').toLowerCase().replace(/\b(fc|afc|cf|the)\b/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
- }
-
- function matchIdentity(value) {
-  const teams = String(value || '').split(/\s+(?:-|vs)\s+/i).map(normaliseTeam).filter(Boolean);
-  return teams.length === 2 ? teams.sort().join('|') : normaliseTeam(value);
- }
-
- function findLiveOdd(matchName, category, tip) {
-  if (!lastOddsData || !lastOddsData.available || !Array.isArray(lastOddsData.response)) return null;
-  const teams = String(matchName || '').split(/\s+-\s+/);
-  if (teams.length !== 2) return null;
-  const home = normaliseTeam(teams[0]);
-  const away = normaliseTeam(teams[1]);
-  const fixture = lastOddsData.response.find(function(item) {
-   return normaliseTeam(item.teams && item.teams.home && item.teams.home.name) === home && normaliseTeam(item.teams && item.teams.away && item.teams.away.name) === away;
-  });
-  if (!fixture) return null;
-
-  const tipValue = String(tip || '').trim();
-  let marketNames = [];
-  let acceptableValues = [];
-  if (category === '1X2') {
-   marketNames = ['match winner'];
-   if (tipValue === '1') acceptableValues = ['1', 'home', teams[0]];
-   if (tipValue === 'X') acceptableValues = ['x', 'draw'];
-   if (tipValue === '2') acceptableValues = ['2', 'away', teams[1]];
-  } else if (category === 'Double Chance') {
-   marketNames = ['double chance'];
-   if (tipValue === '1X') acceptableValues = ['1x', 'home/draw', 'home or draw'];
-   if (tipValue === 'X2') acceptableValues = ['x2', 'away/draw', 'away or draw'];
-   if (tipValue === '12') acceptableValues = ['12', 'home/away', 'home or away'];
-  } else if (/^Over\s+[0-9.]+$/i.test(tipValue) || /^Under\s+[0-9.]+$/i.test(tipValue)) {
-   marketNames = ['goals over/under', 'over/under'];
-   acceptableValues = [tipValue];
-  } else if (category === 'BTTS YES' || category === 'BTTS NO') {
-   marketNames = ['both teams score', 'both teams to score'];
-   acceptableValues = [category === 'BTTS YES' ? 'yes' : 'no'];
-  } else {
-   return null;
-  }
-
-  const bookmakers = Array.isArray(fixture.bookmakers) ? fixture.bookmakers : [];
-  for (const bookmaker of bookmakers) {
-   const bets = Array.isArray(bookmaker.bets) ? bookmaker.bets : [];
-   for (const bet of bets) {
-    if (!marketNames.includes(String(bet.name || '').toLowerCase())) continue;
-    const value = (bet.values || []).find(function(candidate) {
-     return acceptableValues.some(function(acceptable) { return normaliseTeam(candidate.value) === normaliseTeam(acceptable); });
+    function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>'"]/g, function(char) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char];
     });
-    const odds = value && Number.parseFloat(value.odd);
-    if (Number.isFinite(odds) && odds > 1) return { odds: Number(odds.toFixed(2)), bookmaker: bookmaker.name || 'API-Football' };
-   }
-  }
-  return null;
- }
-
- async function generateTickets(shuffle) {
-
- const target = parseFloat(document.getElementById('ticketTarget').value);
-
- const minOdds = parseFloat(document.getElementById('ticketMinOdds').value);
-
- const maxOdds = parseFloat(document.getElementById('ticketMaxOdds').value);
-
- const todayOnly = document.getElementById('ticketTodayOnly').checked;
-
- const results = document.getElementById('ticketResults');
-
- lastTarget = target;
-
- lastMinOdds = minOdds;
-
- if (!Number.isFinite(target) || !Number.isFinite(minOdds) || !Number.isFinite(maxOdds) || target <= 1 || minOdds <= 1 || maxOdds < minOdds) {
-  results.innerHTML = '<div class="no-matches"><p>Enter a target above 1.00 and a valid minimum/maximum odds range.</p></div>';
-  return;
- }
-
- results.innerHTML = '<div class="loading"><div class="spinner"></div><div class="loading-text">Building tickets...</div></div>';
-
- try {
-
- {
-
- const res = await fetch('/data/predictions.json', { cache: 'no-store' });
-
- if (!res.ok) throw new Error('Failed to load predictions');
-
- lastData = await res.json();
-
- }
-
- {
-
- try {
-
- const ubRes = await fetch('/data/h2h-unbeaten.json', { cache: 'no-store' });
-
- if (ubRes.ok) lastUbData = await ubRes.json();
-
- } catch (e) {}
-
- }
-
- const data = lastData;
-
- const today = new Date().toISOString().split('T')[0];
- const dataDate = data.date || '';
-
- try {
-  const oddsRes = await fetch('/api/football-odds?date=' + encodeURIComponent(dataDate || today), { cache: 'no-store' });
-  lastOddsData = oddsRes.ok ? await oddsRes.json() : null;
- } catch (e) {
-  lastOddsData = null;
- }
-
- if (todayOnly && dataDate !== today) {
-  results.innerHTML = '<div class="no-matches"><p>Today\'s prediction data is not available yet. The latest data is dated ' + escapeHtml(dataDate || 'unknown date') + '. Disable ï¿½Only Today\'s Matchesï¿½ to review the latest available fixtures.</p></div>';
-  return;
- }
-
- let unbeatenMatches = [];
-
- if (lastUbData) {
-
- unbeatenMatches = (lastUbData.dates && lastUbData.dates[today]) || [];
-
- }
-
- allPicks = [];
-
- const seen = new Set();
-
- function addPicks(matches, category) {
-
- if (!matches) return;
-
- for (const m of matches) {
-
- const matchName = m.nextMatch || m.match;
-
- const listedOdds = category === 'Corners' ? (function() {
-  const directOdds = Number.parseFloat(m.odds);
-  if (Number.isFinite(directOdds) && directOdds > 1) return directOdds;
-  const oddsInsight = Array.isArray(m.insights) ? m.insights.find(function(insight) { return /^Odds:\s*/i.test(String(insight)); }) : '';
-  const insightOdds = Number.parseFloat(String(oddsInsight).replace(/^Odds:\s*/i, ''));
-  return Number.isFinite(insightOdds) && insightOdds > 1 ? insightOdds : null;
- })() : null;
- const hasProbability = Number.isFinite(Number(m.probability)) && Number(m.probability) > 0 && Number(m.probability) <= 100;
- if (!matchName || !m.tip || (!hasProbability && !listedOdds)) continue;
-
- const effectiveProb = hasProbability ? Number(m.probability) : null;
-
- if (todayOnly && m.date !== today) continue;
-
- if (effectiveProb !== null && effectiveProb < 40) continue;
-
- const isDoubleChance = category === '1X2' && /^(1X|X2|12)$/.test(String(m.tip).trim());
- const displayCategory = isDoubleChance ? 'Double Chance' : category;
- const liveOdd = findLiveOdd(matchName, displayCategory, m.tip);
- // Corner picks supply their listed market price; other picks use live or model odds.
- const odds = liveOdd ? liveOdd.odds : (listedOdds || parseFloat(((100 / effectiveProb) / 1.05).toFixed(2)));
-
- if (odds < minOdds || odds > maxOdds) continue;
-
- let tipText = m.tip;
-
- if (m.streak && m.match && matchName !== m.match) {
-
- tipText = m.match + ' - ' + m.tip;
-
- }
-
- const key = matchName + '|' + tipText + '|' + m.date;
-
- if (seen.has(key)) continue;
-
- seen.add(key);
-
- allPicks.push({
-
- match: matchName,
-
- tip: tipText,
-
- odds: odds,
-
- probability: effectiveProb,
-
- date: m.date,
-
- time: m.time || '',
-
- league: m.league || '',
-
- category: displayCategory,
-
- oddsSource: liveOdd ? 'API-Football' : (listedOdds ? 'Listed corner price' : 'Estimated'),
-
- bookmaker: liveOdd ? liveOdd.bookmaker : ''
-
- });
-
- }
-
- }
-
- function addUnbeatenPicks(matches) {
-
- if (!matches) return;
-
- for (const m of matches) {
-
- if (!m.match || !m.streaks) continue;
-
- const matchDate = today;
-
- for (const s of m.streaks) {
-
- const tipText = s.team + ' or Draw';
-
- const key = m.match + '|' + tipText + '|' + matchDate;
-
- if (seen.has(key)) continue;
-
- const prob = Math.min(85, Math.max(42, 50 + s.count * 2));
-
- // Streak data has no matching API-Football market, so it remains explicitly estimated.
- const odds = parseFloat(((100 / prob) / 1.05).toFixed(2));
-
- if (odds < minOdds || odds > maxOdds) continue;
-
- seen.add(key);
-
- allPicks.push({
-
- match: m.match,
-
- tip: tipText,
-
- odds: odds,
-
- probability: prob,
-
- date: matchDate,
-
- time: m.time || '',
-
- league: m.league || '',
-
- category: 'Unbeaten',
-
- oddsSource: 'Estimated',
-
- bookmaker: ''
-
- });
-
- }
-
- }
-
- }
-  var selectedMarkets = getSelectedMarkets();
-  var marketSet = {};
-  selectedMarkets.forEach(function(m) { marketSet[m] = true; });
-
-  if (marketSet['1x2']) addPicks(data.matches, '1X2');
-
-  if (marketSet['over15']) addPicks(data.over15Matches, 'Over 1.5');
-
-  if (marketSet['over25']) addPicks(data.over25Matches, 'Over 2.5');
-
-  if (marketSet['btts']) addPicks(data.bttsMatches, 'BTTS YES');
-
-  if (marketSet['bttsNo']) addPicks(data.bttsNoMatches, 'BTTS NO');
-
-  if (marketSet['corners']) addPicks(data.cornersMatches, 'Corners');
-
-  if (marketSet['cards']) addPicks(data.cardsMatches, 'Cards');
-
-  if (marketSet['teamScore']) addPicks(data.teamToScore2PlusMatches, 'To Score 2+');
-
-  if (marketSet['winStreak']) addPicks(data.winstreakMatches, 'Win Streak');
-
-  if (marketSet['lossStreak']) addPicks(data.losestreakMatches, 'Loss Streak');
-
-  if (marketSet['drawStreak']) addPicks(data.drawstreakMatches, 'Draw Streak');
-
-  if (marketSet['unbeaten']) addUnbeatenPicks(unbeatenMatches);
-
-  if (document.getElementById('safeTips').checked) {
-    allPicks = allPicks.filter(function(p) { return p.probability >= 80; });
   }
 
-  if (allPicks.length === 0) {
-
-  results.innerHTML = '<div class="no-matches"><p>No picks match the criteria. Try adjusting your odds range, selecting different markets, or disable "Only Today\'s Matches".</p></div>';
-
-  return;
-
+  function normaliseTeam(value) {
+    return String(value || '').toLowerCase().replace(/\b(fc|afc|cf|the)\b/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
   }
 
-  var limits = TIER_LIMITS[getTier()];
-  var numLegs = parseInt(document.getElementById('numLegs').value, 10) || limits.maxLegs;
-  buildTickets(target, shuffle, minOdds, numLegs, limits.maxOdds);
+  function matchIdentity(value) {
+    var teams = String(value || '').split(/\s+(?:-|vs)\s+/i).map(normaliseTeam).filter(Boolean);
+    return teams.length === 2 ? teams.sort().join('|') : normaliseTeam(value);
+  }
 
- } catch (e) {
+  function renderTickets(res) {
+    var results = document.getElementById('ticketResults');
+    var target = lastTarget;
+    var tickets = res.tickets || [];
+    var AFFILIATE_URL = '';
 
- results.innerHTML = '<div class="no-matches"><p>Unable to generate tickets. The prediction data may be unavailable. Try again later.</p></div>';
+    if (!tickets.length) {
+      results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(res.reason || 'No tickets generated.') + '</p></div>';
+      return;
+    }
 
- }
+    var html = tickets.map(function(ticket, tidx) {
+      var legLines = ticket.selections.map(function(s, i) {
+        return (i + 1) + '. ' + s.match + ' - ' + s.tip;
+      });
 
- }
+      var copyData = encodeURIComponent(JSON.stringify({
+        legs: legLines, total: ticket.totalOdds, num: tidx + 1, target: target, aff: AFFILIATE_URL
+      })).replace(/'/g, '%27');
+
+      var oddsSrc = function(s) {
+        if (s.oddsSource === 'verified') return 'Live API-Football market price';
+        if (s.bookmaker && s.oddsSource !== 'estimated') return 'Live ' + s.bookmaker + ' price';
+        return 'Estimated probability ' + Number(s.probability || 0).toFixed(0) + '%';
+      };
+
+      var isAllVerified = ticket.selections.every(function(s) { return s.oddsSource === 'verified' || (s.bookmaker && s.oddsSource !== 'estimated'); });
+      var anyVerified = ticket.selections.some(function(s) { return s.oddsSource === 'verified' || (s.bookmaker && s.oddsSource !== 'estimated'); });
+      var sourceNote = isAllVerified ? 'Live API-Football market odds' : (anyVerified ? 'Mixed live and estimated odds' : 'Estimated odds \u2014 not bookmaker prices');
+
+      var tableRows = ticket.selections.map(function(s, si) {
+        return '<tr class="ticket-row fade-in" style="animation-delay: ' + (tidx * 80 + si * 30) + 'ms">' +
+          '<td class="ticket-cell-num">' + (si + 1) + '</td>' +
+          '<td class="ticket-cell-match">' + escapeHtml(s.match) +
+          '<span class="ticket-detail">' + escapeHtml([s.league, s.date, s.time].filter(Boolean).join(' \u2014 ') || 'Match details unavailable') + '</span></td>' +
+          '<td class="ticket-cell-tip"><span class="tip-badge">' + escapeHtml(s.tip) + '</span>' +
+          '<div class="ticket-confidence"><strong>' + escapeHtml(s.category) + '</strong> \u2014 ' + oddsSrc(s) + '</div></td>' +
+          '</tr>';
+      }).join('');
+
+      return '<div class="ticket-table-wrap fade-in" style="animation-delay: ' + (tidx * 80) + 'ms">' +
+        '<div class="ticket-table-header">' +
+        '<span class="ticket-table-title">Ticket ' + (tidx + 1) + ' \u2014 ' + ticket.selections.length + ' Legs</span>' +
+        '<span><span class="ticket-odds">' + ticket.totalOdds + ' odds</span><span class="ticket-odds-note">' + escapeHtml(sourceNote) + '</span></span>' +
+        '</div>' +
+        '<table class="ticket-table">' +
+        '<thead><tr><th class="th-num">#</th><th class="th-match">Match</th><th class="th-tip">Selection</th></tr></thead>' +
+        '<tbody>' + tableRows + '</tbody></table>' +
+        '<div class="ticket-table-footer"><div class="ticket-actions">' +
+        '<button class="copy-btn" data-copy=\'' + copyData + '\'><span class="copy-icon"></span> Copy Selections</button>' +
+        '<div class="share-wrap"><button class="share-btn" data-toggle="share-' + tidx + '">\u2605 Share</button>' +
+        '<div class="share-dropdown" id="share-' + tidx + '">' +
+        '<a class="share-option" href="https://api.whatsapp.com/send?text=' + encodeURIComponent('WinFulltime Ticket ' + (tidx + 1) + ' - ' + ticket.selections.length + ' Legs @ ' + ticket.totalOdds + ' odds') + '" target="_blank" rel="noopener">WhatsApp</a>' +
+        '<a class="share-option" href="https://twitter.com/intent/tweet?text=' + encodeURIComponent('Check out this accumulator from @winfulltime! ' + ticket.totalOdds + ' odds, ' + ticket.selections.length + ' legs') + '" target="_blank" rel="noopener">X / Twitter</a>' +
+        '<a class="share-option" href="https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent('https://winfulltime.com/ticket-builder.html') + '&quote=' + encodeURIComponent('Football Accumulator @ ' + ticket.totalOdds + ' odds') + '" target="_blank" rel="noopener">Facebook</a>' +
+        '<a class="share-option" href="https://t.me/share/url?url=' + encodeURIComponent('https://winfulltime.com/ticket-builder.html') + '&text=' + encodeURIComponent('Football Accumulator @ ' + ticket.totalOdds + ' odds - ' + ticket.selections.length + ' legs') + '" target="_blank" rel="noopener">Telegram</a>' +
+        '<a class="share-option share-copy" data-copy=\'' + copyData + '\'>Copy Link</a>' +
+        '</div></div>' +
+        (AFFILIATE_URL ? '<a href="' + AFFILIATE_URL + '" target="_blank" rel="noopener" class="bet-btn"> Bet Now</a>' : '') +
+        '</div></div></div>';
+    }).join('');
+
+    results.innerHTML = '<div class="matches-grid">' + html + '</div>';
+  }
+
+  async function generateTickets(shuffle) {
+    var target = parseFloat(document.getElementById('ticketTarget').value);
+    var minOdds = 1.20;
+    var maxOdds = 100;
+    var todayOnly = document.getElementById('ticketTodayOnly').checked;
+    var numLegs = parseInt(document.getElementById('numLegs').value, 10) || 3;
+    var safeTips = document.getElementById('safeTips').checked;
+    var selectedMarkets = getSelectedMarkets();
+    var results = document.getElementById('ticketResults');
+
+    lastTarget = target;
+    lastMinOdds = minOdds;
+
+    if (!Number.isFinite(target) || !Number.isFinite(minOdds) || !Number.isFinite(maxOdds) || target <= 1 || minOdds <= 1 || maxOdds < minOdds) {
+      results.innerHTML = '<div class="no-matches"><p>Enter a target odds above 1.00.</p></div>';
+      return;
+    }
+
+    results.innerHTML = '<div class="loading"><div class="spinner"></div><div class="loading-text">Building tickets...</div></div>';
+
+    try {
+      var res = await WFT.apiFetch('/api/ticket-builder/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          targetOdds: target,
+          minOddsPerLeg: minOdds,
+          maxOddsPerLeg: maxOdds,
+          numLegs: numLegs,
+          safeOnly: safeTips,
+          markets: selectedMarkets,
+          todayOnly: todayOnly,
+          shuffle: shuffle === true
+        })
+      });
+
+      if (res.error) {
+        results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(res.error) + '</p></div>';
+        return;
+      }
+
+      if (!res.available) {
+        results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(res.reason || 'No tickets could be generated with the current settings. Try adjusting the target odds, number of legs, or odds range.') + '</p></div>';
+        return;
+      }
+
+      renderTickets(res);
+    } catch (e) {
+      results.innerHTML = '<div class="no-matches"><p>Unable to generate tickets. The service may be unavailable. Try again later.</p></div>';
+    }
+  }
 
   function shuffleTickets() {
-
-  if (allPicks.length === 0) {
-
-  generateTickets(true);
-
-  return;
-
+    generateTickets(true);
   }
 
-  var limits = TIER_LIMITS[getTier()];
-  var numLegs = parseInt(document.getElementById('numLegs').value, 10) || limits.maxLegs;
-  buildTickets(lastTarget, true, lastMinOdds, numLegs, limits.maxOdds);
-
-  }
-
-  function buildTickets(target, shuffle, selectedMinOdds, numLegs, maxTotalOdds) {
-
-  const results = document.getElementById('ticketResults');
-
-  const picks = shuffle ? shuffleArray([...allPicks]) : [...allPicks];
-
-  picks.sort(function(a, b) { return a.odds - b.odds; });
-
-  var maxLegs = numLegs || 8;
-
-  var minTicketOdds = target * 0.8;
-
-  var maxTicketOdds = target * 1.2;
-  if (maxTotalOdds && maxTicketOdds > maxTotalOdds) { maxTicketOdds = maxTotalOdds; }
-
- const scored = picks.map(function(p) {
-
- var score = Infinity;
-
- for (var legCount = 2; legCount <= maxLegs; legCount++) {
-
- score = Math.min(score, Math.abs(Math.log(p.odds) - Math.log(target) / legCount));
-
- }
-
- return Object.assign({}, p, {
-
- score: score,
-
- rank: score + (shuffle ? Math.random() * 0.08 : 0)
-
- });
-
- });
-
- scored.sort(function(a, b) { return a.rank - b.rank; });
-
- var pool = [];
-
- var perCategory = {};
-
- for (var ci = 0; ci < scored.length; ci++) {
-
- var cat = scored[ci].category;
-
- if (!perCategory[cat]) perCategory[cat] = [];
-
- perCategory[cat].push(scored[ci]);
-
- }
-
- var cats = Object.keys(perCategory);
-
- var poolMatchCount = new Map();
-
- var poolLeagueCount = new Map();
-
- var catIdx = 0;
-
- for (var i = 0; i < 120; i++) {
-
- var catKey = cats[catIdx % cats.length];
-
- var catPicks = perCategory[catKey];
-
- var idx = Math.floor(catIdx / cats.length);
-
- if (idx < catPicks.length) {
-
- var pick = catPicks[idx];
-
- var mcnt = poolMatchCount.get(pick.match) || 0;
-
- var lcnt = poolLeagueCount.get(pick.league) || 0;
-
- if (mcnt < 2 && lcnt < 6) {
-
- poolMatchCount.set(pick.match, mcnt + 1);
-
- poolLeagueCount.set(pick.league, lcnt + 1);
-
- pool.push(pick);
-
- }
-
- }
-
- catIdx++;
-
- }
-
- var extraPicks = scored.filter(function(p) {
-
- return p.probability >= 40 && p.probability <= 55;
-
- });
-
- for (var ei = 0; ei < extraPicks.length && pool.length < 150; ei++) {
-
- var ep = extraPicks[ei];
-
- var emcnt = poolMatchCount.get(ep.match) || 0;
-
- if (emcnt < 2) {
-
- poolMatchCount.set(ep.match, emcnt + 1);
-
- pool.push(ep);
-
- }
-
- }
-
- pool.sort(function(a, b) { return a.odds - b.odds; });
-
- var tickets = [];
-
- var seenKeys = new Set();
-
- var iterations = 0;
-
- var MAX_ITER = 50000;
-
- function backtrack(start, current, product, usedMatches) {
-
- if (iterations >= MAX_ITER) return;
-
- if (current.length >= 2 && product >= minTicketOdds) {
-
- iterations++;
-
- var key = current.map(function(s) { return matchIdentity(s.match) + '|' + normaliseTeam(s.tip); }).sort().join('||');
-
- if (!seenKeys.has(key)) {
-
- seenKeys.add(key);
-
- tickets.push({
-
- selections: current.slice(),
-
- totalOdds: parseFloat(product.toFixed(2)),
-
- diff: Math.abs(product - target)
-
- });
-
- }
-
- }
-
- if (current.length >= maxLegs) return;
-
- for (var j = start; j < pool.length; j++) {
-
- if (iterations >= MAX_ITER) return;
-
- var p = pool[j];
-
- var matchId = matchIdentity(p.match);
- if (usedMatches.has(matchId)) continue;
-
- var newProduct = product * p.odds;
-
- if (newProduct > maxTicketOdds) break;
-
- usedMatches.add(matchId);
-
- current.push(p);
-
- backtrack(j + 1, current, newProduct, usedMatches);
-
- current.pop();
-
- usedMatches.delete(matchId);
-
- }
-
- }
-
- backtrack(0, [], 1, new Set());
-
- if (tickets.length === 0) {
-
- results.innerHTML = '<div class="no-matches"><p>No tickets are within 20% of your ' + target.toFixed(2) + ' target using a minimum leg odds of ' + Number(selectedMinOdds).toFixed(2) + '. Try lowering the minimum, increasing the target, or widening the maximum odds.</p></div>';
-
- return;
-
- }
-
- tickets.sort(function(a, b) { return a.diff - b.diff; });
-
- var top = [];
-
- var usedPairs = new Set();
-
- var usedMatchIds = new Set();
-
- var taken = new Set();
-
- var maxTickets = 8;
-
- for (var round = 0; round < maxTickets; round++) {
-
- var bestIdx = -1;
-
- // Prefer an entirely fresh fixture list. Only reuse a fixture when that is
- // impossible, and never repeat the same fixture/selection combination.
- for (var pass = 0; pass < 2 && bestIdx === -1; pass++) {
-  var bestScore = -Infinity;
-
-  for (var ti = 0; ti < tickets.length; ti++) {
-
-  if (taken.has(ti)) continue;
-
-  var pairs = tickets[ti].selections.map(function(s) { return matchIdentity(s.match) + '|' + normaliseTeam(s.tip); });
-  var matchIds = tickets[ti].selections.map(function(s) { return matchIdentity(s.match); });
-
-  if (pairs.some(function(pair) { return usedPairs.has(pair); })) continue;
-  if (pass === 0 && matchIds.some(function(matchId) { return usedMatchIds.has(matchId); })) continue;
-
-  var freshMatchCount = matchIds.filter(function(matchId) { return !usedMatchIds.has(matchId); }).length;
-  var sc = freshMatchCount * 100 - tickets[ti].diff;
-
-  if (sc > bestScore) {
-
-  bestScore = sc;
-
-  bestIdx = ti;
-
-  }
-
-  }
- }
-
- if (bestIdx === -1) break;
-
- var t = tickets[bestIdx];
-
- taken.add(bestIdx);
-
- top.push(t);
-
- var tpairs = t.selections.map(function(s) { return matchIdentity(s.match) + '|' + normaliseTeam(s.tip); });
-
- for (var pi = 0; pi < tpairs.length; pi++) {
-
- usedPairs.add(tpairs[pi]);
-
- usedMatchIds.add(matchIdentity(t.selections[pi].match));
-
- }
-
- }
-
- var AFFILIATE_URL = '';
-
- var html = top.map(function(ticket, tidx) {
-
- var legLines = ticket.selections.map(function(s, i) {
-
- return (i + 1) + '. ' + s.match + ' - ' + s.tip;
-
- });
-
- var copyData = encodeURIComponent(JSON.stringify({
-
- legs: legLines,
-
- total: ticket.totalOdds,
-
- num: tidx + 1,
-
- target: target,
-
- aff: AFFILIATE_URL
-
- })).replace(/'/g, '%27');
-
-  var liveOddsCount = ticket.selections.filter(function(s) { return s.oddsSource === 'API-Football'; }).length;
-  var listedCornerCount = ticket.selections.filter(function(s) { return s.oddsSource === 'Listed corner price'; }).length;
-  var sourceNote = liveOddsCount === ticket.selections.length ? 'Live API-Football market odds' : (listedCornerCount === ticket.selections.length ? 'Listed corner-market odds' : (liveOddsCount || listedCornerCount ? 'Mixed live, listed, and estimated odds' : 'Estimated odds ï¿½ not bookmaker prices'));
- var tableRows = ticket.selections.map(function(s, si) {
-
- return '<tr class="ticket-row fade-in" style="animation-delay: ' + (tidx * 80 + si * 30) + 'ms">' +
-
- '<td class="ticket-cell-num">' + (si + 1) + '</td>' +
-
- '<td class="ticket-cell-match">' + escapeHtml(s.match) + '<span class="ticket-detail">' + escapeHtml([s.league, s.date, s.time].filter(Boolean).join(' ï¿½ ') || 'Match details unavailable') + '</span></td>' +
-
-  '<td class="ticket-cell-tip"><span class="tip-badge">' + escapeHtml(s.tip) + '</span><div class="ticket-confidence"><strong>' + escapeHtml(s.category) + '</strong> ï¿½ ' + escapeHtml(s.oddsSource === 'API-Football' ? 'Live API-Football market price' : (s.oddsSource === 'Listed corner price' ? 'Listed corner-market price' : 'Estimated probability ' + Number(s.probability).toFixed(0) + '%')) + '</div></td>' +
-
- '</tr>'; }).join('');
-
- return '<div class="ticket-table-wrap fade-in" style="animation-delay: ' + (tidx * 80) + 'ms">' +
-
- '<div class="ticket-table-header">' +
-
- '<span class="ticket-table-title">Ticket ' + (tidx + 1) + ' &mdash; ' + ticket.selections.length + ' Legs</span>' +
-
- '<span><span class="ticket-odds">' + ticket.totalOdds + ' odds</span><span class="ticket-odds-note">' + escapeHtml(sourceNote) + '</span></span>' +
-
- '</div>' +
-
- '<table class="ticket-table">' +
-
- '<thead><tr>' +
-
- '<th class="th-num">#</th>' +
-
- '<th class="th-match">Match</th>' +
-
- '<th class="th-tip">Selection</th>' +
-
- '</tr></thead>' +
-
- '<tbody>' + tableRows + '</tbody>' +
-
- '</table>' +
-
- '<div class="ticket-table-footer">' +
-
-
-
- '<div class="ticket-actions">' +
-
- '<button class="copy-btn" data-copy=\'' + copyData + '\'>' +
-
- '<span class="copy-icon"></span> Copy Selections</button>' +
-
- '<div class="share-wrap"><button class="share-btn" data-toggle="share-' + tidx + '">&#9733; Share</button><div class="share-dropdown" id="share-' + tidx + '">' +
-
- '<a class="share-option" href="https://api.whatsapp.com/send?text=' + encodeURIComponent('WinFulltime Ticket ' + (tidx+1) + ' - ' + ticket.selections.length + ' Legs @ ' + ticket.totalOdds + ' odds') + '" target="_blank" rel="noopener">WhatsApp</a>' +
-
- '<a class="share-option" href="https://twitter.com/intent/tweet?text=' + encodeURIComponent('Check out this accumulator from @winfulltime! ' + ticket.totalOdds + ' odds, ' + ticket.selections.length + ' legs') + '" target="_blank" rel="noopener">X / Twitter</a>' +
-
- '<a class="share-option" href="https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent('https://winfulltime.com/ticket-builder.html') + '&quote=' + encodeURIComponent('Football Accumulator @ ' + ticket.totalOdds + ' odds') + '" target="_blank" rel="noopener">Facebook</a>' +
-
- '<a class="share-option" href="https://t.me/share/url?url=' + encodeURIComponent('https://winfulltime.com/ticket-builder.html') + '&text=' + encodeURIComponent('Football Accumulator @ ' + ticket.totalOdds + ' odds - ' + ticket.selections.length + ' legs') + '" target="_blank" rel="noopener">Telegram</a>' +
-
- '<a class="share-option share-copy" data-copy=\'' + copyData + '\'>' + 'Copy Link</a>' +
-
- '</div></div>' +
-
- (AFFILIATE_URL ? '<a href="' + AFFILIATE_URL + '" target="_blank" rel="noopener" class="bet-btn"> Bet Now</a>' : '') +
-
- '</div></div></div>';
-
- }).join('');
-
- results.innerHTML = '<div class="matches-grid">' + html + '</div>';
-
- }
-
- function shuffleArray(arr) {
-
- for (var i = arr.length - 1; i > 0; i--) {
-
- var j = Math.floor(Math.random() * (i + 1));
-
- var tmp = arr[i];
-
- arr[i] = arr[j];
-
- arr[j] = tmp;
-
- }
-
- return arr;
-
- }
-
- document.addEventListener('click', function(e) {
-
- var btn = e.target.closest('[data-copy]');
-
- if (!btn) return;
-
- var data = JSON.parse(decodeURIComponent(btn.dataset.copy));
-
- var aff = data.aff ? '\n\n ' + data.aff : '';
-
- var text = 'WinFulltime Ticket ' + data.num + ' - ' + data.legs.length + ' Legs @ ' + data.total + ' odds\n\n' +
-
- data.legs.join('\n') + '\n\nTotal Odds: ' + data.total + '\nTarget: ' + data.target + aff;
-
- navigator.clipboard.writeText(text).then(function() {
-
- btn.classList.add('copied');
-
- var orig = btn.innerHTML;
-
- btn.innerHTML = '<span class="copy-icon"></span> Copied!';
-
- setTimeout(function() {
-
- btn.innerHTML = orig;
-
- btn.classList.remove('copied');
-
- }, 2000);
-
- }).catch(function() {
-
- alert('Failed to copy. Select and copy manually.');
-
- });
-
- });
-
-
- document.addEventListener('click', function(e) {
-  var toggle = e.target.closest('[data-toggle]');
-  if (toggle) {
-   var dd = document.getElementById(toggle.dataset.toggle);
-   if (dd) {
-    var isOpen = dd.classList.contains('open');
-    document.querySelectorAll('.share-dropdown.open').forEach(function(d){ d.classList.remove('open'); });
-    if (!isOpen) dd.classList.add('open');
-   }
-   return;
-  }
-  if (!e.target.closest('.share-wrap')) {
-   document.querySelectorAll('.share-dropdown.open').forEach(function(d){ d.classList.remove('open'); });
-   }
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-copy]');
+    if (!btn) return;
+    var data = JSON.parse(decodeURIComponent(btn.dataset.copy));
+    var aff = data.aff ? '\n\n ' + data.aff : '';
+    var text = 'WinFulltime Ticket ' + data.num + ' - ' + data.legs.length + ' Legs @ ' + data.total + ' odds\n\n' +
+      data.legs.join('\n') + '\n\nTotal Odds: ' + data.total + '\nTarget: ' + data.target + aff;
+    navigator.clipboard.writeText(text).then(function() {
+      btn.classList.add('copied');
+      var orig = btn.innerHTML;
+      btn.innerHTML = '<span class="copy-icon"></span> Copied!';
+      setTimeout(function() { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
+    }).catch(function() { alert('Failed to copy. Select and copy manually.'); });
+  });
+
+  document.addEventListener('click', function(e) {
+    var toggle = e.target.closest('[data-toggle]');
+    if (toggle) {
+      var dd = document.getElementById(toggle.dataset.toggle);
+      if (dd) {
+        var isOpen = dd.classList.contains('open');
+        document.querySelectorAll('.share-dropdown.open').forEach(function(d) { d.classList.remove('open'); });
+        if (!isOpen) dd.classList.add('open');
+      }
+      return;
+    }
+    if (!e.target.closest('.share-wrap')) {
+      document.querySelectorAll('.share-dropdown.open').forEach(function(d) { d.classList.remove('open'); });
+    }
   });
 
   document.getElementById('genBtn').addEventListener('click', function() { generateTickets(); });
   document.getElementById('shuffleBtn').addEventListener('click', function() { shuffleTickets(); });
 
-  document.getElementById('numLegs').addEventListener('input', function() {
-    document.getElementById('numLegsValue').textContent = this.value;
+  document.getElementById('numLegs').addEventListener('change', function() {
+    var v = parseInt(this.value, 10);
+    var min = parseInt(this.min, 10) || 2;
+    var max = parseInt(this.max, 10) || 30;
+    if (v < min) this.value = min;
+    if (v > max) this.value = max;
   });
 
   WFT.onAuthReady(function() {
@@ -2703,3 +2091,4 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
 </body>
 
 </html>
+
