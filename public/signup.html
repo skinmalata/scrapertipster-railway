@@ -146,6 +146,8 @@ function handleSignUp() {
         showAlert(result.error.message, 'error');
       } else if (result.data.user && result.data.user.identities && result.data.user.identities.length === 0) {
         showAlert('An account with this email already exists.', 'error');
+      } else if (result.data.session) {
+        window.location.href = '/';
       } else {
         document.getElementById('confirmation-email').textContent = email;
         document.getElementById('confirmation').style.display = 'block';
