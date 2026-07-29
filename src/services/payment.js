@@ -75,15 +75,21 @@ function createCheckout(_a) {
 }
 
 function verifyWebhook(_a) {
-  var rawBody = _a.rawBody, headers = _a.headers;
+  try {
+    var rawBody = _a.rawBody, headers = _a.headers;
 
-  if (!LS_WEBHOOK_SECRET) return Promise.resolve(false);
+    if (!LS_WEBHOOK_SECRET) return Promise.resolve(false);
 
-  var signature = headers['x-signature'];
-  if (!signature) return Promise.resolve(false);
+    var signature = headers['x-signature'];
+    if (!signature) return Promise.resolve(false);
 
-  var hash = crypto.createHmac('sha256', LS_WEBHOOK_SECRET).update(rawBody, 'utf8').digest('hex');
-  return Promise.resolve(crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(signature)));
+    if (typeof rawBody !== 'string') return Promise.resolve(false);
+
+    var hash = crypto.createHmac('sha256', LS_WEBHOOK_SECRET).update(rawBody, 'utf8').digest('hex');
+    return Promise.resolve(crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(signature)));
+  } catch (e) {
+    return Promise.resolve(false);
+  }
 }
 
 function handleEvent(event) {
