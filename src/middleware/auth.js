@@ -13,7 +13,7 @@ if (supabaseUrl && supabaseKey) {
 }
 
 var REQUIRED_ENV = ['SUPABASE_URL', 'SUPABASE_SERVICE_KEY', 'SUPABASE_ANON_KEY',
-  'PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET'];
+  'LEMONSQUEEZY_API_KEY'];
 
 function optionalAuth(req, res, next) {
   if (!supabase) { req.user = null; return next(); }

@@ -1189,8 +1189,7 @@ router.post('/checkout', requireAuth, async function (req, res) {
   }
 });
 
-// POST /api/webhook/payment — PayPal webhook (raw body)
-var RAW_BODY_ROUTES = [];
+// POST /api/webhook/payment — Lemon Squeezy webhook (raw body)
 router.post('/webhook/payment', function (req, res) {
   var rawBody = req.rawBody || JSON.stringify(req.body);
   var headers = req.headers;
@@ -1204,18 +1203,19 @@ router.post('/webhook/payment', function (req, res) {
     if (!supabase) return res.status(503).json({ error: 'Database not configured' });
 
     var event = typeof req.body === 'object' ? req.body : JSON.parse(rawBody);
-    var eventId = event.id;
+    var eventId = event.data ? String(event.data.id) : 'unknown';
+    var eventName = event.meta ? event.meta.event_name : 'unknown';
 
-    supabase.from('payment_events').select('provider, event_id').eq('provider', 'paypal').eq('event_id', eventId).single()
+    supabase.from('payment_events').select('provider, event_id').eq('provider', 'lemonsqueezy').eq('event_id', eventId).single()
       .then(function (existing) {
         if (existing.data) {
           console.log('[webhook] Duplicate event ignored:', eventId);
           return res.json({ received: true, duplicate: true });
         }
 
-        return supabase.from('payment_events').insert({ provider: 'paypal', event_id: eventId }).then(function () {
+        return supabase.from('payment_events').insert({ provider: 'lemonsqueezy', event_id: eventId }).then(function () {
           return payment.handleEvent(event).then(function (result) {
-            console.log('[webhook] Processed event:', event.event_type, result);
+            console.log('[webhook] Processed event:', eventName, JSON.stringify(result));
             res.json({ received: true, handled: true });
           });
         });
@@ -1312,7 +1312,27 @@ router.get('/me/subscription', requireAuth, async function (req, res) {
 
 // POST /api/subscription/cancel — cancel subscription
 router.post('/subscription/cancel', requireAuth, function (req, res) {
-  res.json({ message: 'To cancel, visit your PayPal settings:', url: 'https://www.paypal.com/myaccount/autopay/' });
+  if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+  supabase.from('subscriptions')
+    .select('provider_subscription_id')
+    .eq('user_id', req.user.id)
+    .eq('payment_status', 'active')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single()
+    .then(function (sub) {
+      if (!sub.data || !sub.data.provider_subscription_id) {
+        return res.json({ error: 'No active subscription found' });
+      }
+      return payment.cancelSubscription(sub.data.provider_subscription_id)
+        .then(function () {
+          res.json({ message: 'Subscription cancelled' });
+        });
+    }).catch(function (err) {
+      console.error('[cancel] Error:', err.message);
+      res.status(500).json({ error: 'Failed to cancel subscription' });
+    });
 });
 
 module.exports = router;

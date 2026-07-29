@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS public.payments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   subscription_id UUID REFERENCES public.subscriptions(id) ON DELETE SET NULL,
-  payment_method TEXT NOT NULL DEFAULT 'paypal',
+  payment_method TEXT NOT NULL DEFAULT 'lemonsqueezy',
   provider_payment_id TEXT UNIQUE,
   amount DECIMAL(10,2) NOT NULL,
   currency TEXT DEFAULT 'USD',

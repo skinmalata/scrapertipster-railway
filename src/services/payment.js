@@ -1,20 +1,27 @@
-var PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
-var PAYSTACK_PUBLIC_KEY = process.env.PAYSTACK_PUBLIC_KEY;
-var PAYSTACK_API = 'https://api.paystack.co';
-
 var crypto = require('crypto');
 
-var PLANS = {
-  monthly: { name: 'Pro Monthly', price: '500', amountKobo: 50000, currency: 'NGN', interval: 'monthly' },
-  yearly: { name: 'Pro Yearly', price: '3500', amountKobo: 350000, currency: 'NGN', interval: 'annually' },
-  lifetime: { name: 'Lifetime Pro', price: '7500', amountKobo: 750000, currency: 'NGN', interval: null }
+var LS_API = 'https://api.lemonsqueezy.com/v1';
+var LS_API_KEY = process.env.LEMONSQUEEZY_API_KEY;
+var LS_STORE_ID = process.env.LEMONSQUEEZY_STORE_ID || '441411';
+var LS_WEBHOOK_SECRET = process.env.LEMONSQUEEZY_WEBHOOK_SECRET;
+
+var VARIANT_IDS = {
+  monthly: '1960067',
+  yearly: '1960068',
+  lifetime: '1960073'
 };
 
-function paystackHeaders() {
+var PLANS = {
+  monthly: { name: 'Pro Monthly', price: '9.99', variantId: '1960067', interval: 'monthly' },
+  yearly: { name: 'Pro Yearly', price: '79.99', variantId: '1960068', interval: 'annually' },
+  lifetime: { name: 'Lifetime Pro', price: '399.99', variantId: '1960073', interval: null }
+};
+
+function lsHeaders() {
   return {
-    'Authorization': 'Bearer ' + PAYSTACK_SECRET_KEY,
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
+    'Authorization': 'Bearer ' + LS_API_KEY,
+    'Accept': 'application/vnd.api+json',
+    'Content-Type': 'application/vnd.api+json'
   };
 }
 
@@ -25,25 +32,42 @@ function createCheckout(_a) {
 
   var plan = PLANS[planType];
 
-  return fetch(PAYSTACK_API + '/transaction/initialize', {
+  return fetch(LS_API + '/checkouts', {
     method: 'POST',
-    headers: paystackHeaders(),
+    headers: lsHeaders(),
     body: JSON.stringify({
-      email: email,
-      amount: plan.amountKobo,
-      currency: plan.currency,
-      callback_url: returnUrl || 'https://winfulltime.com/account.html',
-      metadata: {
-        userId: userId,
-        planType: planType
+      data: {
+        type: 'checkouts',
+        attributes: {
+          checkout_data: {
+            email: email,
+            name: email.split('@')[0],
+            custom: {
+              user_id: userId,
+              plan_type: planType
+            }
+          },
+          product_options: {
+            redirect_url: returnUrl || 'https://winfulltime.com/account.html',
+            enabled_variants: [Number(plan.variantId)]
+          },
+          expires_at: new Date(Date.now() + 86400000).toISOString()
+        },
+        relationships: {
+          store: {
+            data: { type: 'stores', id: LS_STORE_ID }
+          },
+          variant: {
+            data: { type: 'variants', id: plan.variantId }
+          }
+        }
       }
     })
   }).then(function (res) { return res.json(); }).then(function (data) {
-    if (!data.status) throw new Error(data.message || 'Paystack init failed');
+    if (!data.data || !data.data.attributes) throw new Error(data.errors ? data.errors[0].detail : 'Lemon Squeezy checkout creation failed');
     return {
-      checkoutUrl: data.data.authorization_url,
-      accessCode: data.data.access_code,
-      reference: data.data.reference,
+      checkoutUrl: data.data.attributes.url,
+      variantId: plan.variantId,
       planType: planType,
       amount: plan.price
     };
@@ -53,41 +77,34 @@ function createCheckout(_a) {
 function verifyWebhook(_a) {
   var rawBody = _a.rawBody, headers = _a.headers;
 
-  var signature = headers['x-paystack-signature'];
+  if (!LS_WEBHOOK_SECRET) return Promise.resolve(false);
+
+  var signature = headers['x-signature'];
   if (!signature) return Promise.resolve(false);
 
-  var hash = crypto.createHmac('sha512', PAYSTACK_SECRET_KEY).update(rawBody).digest('hex');
-  return Promise.resolve(hash === signature);
+  var hash = crypto.createHmac('sha256', LS_WEBHOOK_SECRET).update(rawBody, 'utf8').digest('hex');
+  return Promise.resolve(crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(signature)));
 }
 
 function handleEvent(event) {
-  var eventType = event.event;
+  var eventName = event.meta ? event.meta.event_name : '';
+  var data = event.data;
+  if (!data) return Promise.resolve({ handled: false, eventName: eventName });
 
-  switch (eventType) {
-    case 'charge.success':
-      return onChargeSuccess(event.data);
-    case 'subscription.create':
-    case 'subscription.disable':
-      return Promise.resolve({ handled: true, eventType: eventType });
+  var attributes = data.attributes;
+
+  switch (eventName) {
+    case 'order_created':
+      return onOrderCreated(attributes, data);
+    case 'subscription_created':
+      return onSubscriptionCreated(attributes, data);
+    case 'subscription_updated':
+      return onSubscriptionUpdated(attributes, data);
+    case 'subscription_cancelled':
+      return onSubscriptionCancelled(attributes, data);
     default:
-      return Promise.resolve({ handled: false, eventType: eventType });
+      return Promise.resolve({ handled: false, eventName: eventName });
   }
-}
-
-function onChargeSuccess(data) {
-  var metadata = data.metadata || {};
-  var userId = metadata.userId;
-  var planType = metadata.planType || 'monthly';
-  var reference = data.reference;
-  var email = data.customer ? data.customer.email : '';
-
-  var now = new Date();
-  var expiresAt = new Date(now);
-  if (planType === 'monthly') expiresAt.setMonth(expiresAt.getMonth() + 1);
-  else if (planType === 'yearly') expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-  else expiresAt.setFullYear(expiresAt.getFullYear() + 99);
-
-  return recordPayment(userId, email, planType, reference, expiresAt, data);
 }
 
 var supabase = null;
@@ -104,26 +121,117 @@ var supabase = null;
   }
 })();
 
-function recordPayment(userId, email, planType, reference, expiresAt, data) {
-  if (!supabase) return Promise.resolve({ error: 'No database' });
+function getCustomData(attributes) {
+  var custom = {};
+  if (attributes.first_order && attributes.first_order.attributes && attributes.first_order.attributes.custom_data) {
+    custom = attributes.first_order.attributes.custom_data;
+  } else if (attributes.custom_data) {
+    custom = attributes.custom_data;
+  }
+  return custom;
+}
 
-  var amount = data.amount ? (data.amount / 100).toFixed(2) : PLANS[planType].price;
+function onOrderCreated(attributes, data) {
+  var custom = getCustomData({ first_order: { attributes: { custom_data: attributes.custom_data || {} } } }) || {};
+  var userId = custom.user_id;
+  var planType = custom.plan_type || 'lifetime';
+  var email = attributes.user_email || '';
+  var orderId = String(data.id);
+  var amount = attributes.total ? (attributes.total / 100).toFixed(2) : PLANS.lifetime.price;
+
+  if (!userId) return Promise.resolve({ handled: false, reason: 'No user_id in custom_data' });
+
+  var now = new Date();
+  var expiresAt = new Date(now);
+  expiresAt.setFullYear(expiresAt.getFullYear() + 99);
+
+  return recordPayment(userId, email, planType, orderId, expiresAt, amount);
+}
+
+function onSubscriptionCreated(attributes, data) {
+  var custom = getCustomData({ first_order: { attributes: { custom_data: attributes.custom_data || {} } } }) || {};
+  var userId = custom.user_id;
+  var planType = custom.plan_type || 'monthly';
+  var email = attributes.user_email || '';
+  var subscriptionId = String(data.id);
+
+  if (!userId) return Promise.resolve({ handled: false, reason: 'No user_id in custom_data' });
+
+  var now = new Date();
+  var expiresAt = new Date(now);
+  if (planType === 'yearly') expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+  else expiresAt.setMonth(expiresAt.getMonth() + 1);
+
+  var amount = attributes.total ? (attributes.total / 100).toFixed(2) : PLANS[planType].price;
+
+  return recordPayment(userId, email, planType, subscriptionId, expiresAt, amount);
+}
+
+function onSubscriptionUpdated(attributes, data) {
+  var status = attributes.status;
+  var subscriptionId = String(data.id);
+  if (!supabase) return Promise.resolve({ handled: false });
+
+  if (status === 'active' || status === 'on_trial') {
+    return supabase.from('subscriptions')
+      .update({ payment_status: 'active' })
+      .eq('provider_subscription_id', subscriptionId)
+      .then(function () { return { handled: true, eventName: 'subscription_updated', status: status }; });
+  }
+
+  if (status === 'cancelled' || status === 'expired') {
+    return supabase.from('subscriptions')
+      .update({ payment_status: 'cancelled', cancelled_at: new Date().toISOString() })
+      .eq('provider_subscription_id', subscriptionId)
+      .select('user_id')
+      .single()
+      .then(function (result) {
+        if (result.data && result.data.user_id) {
+          return supabase.rpc('revoke_vip_status', { user_uuid: result.data.user_id });
+        }
+      })
+      .then(function () { return { handled: true, eventName: 'subscription_updated', status: status }; });
+  }
+
+  return Promise.resolve({ handled: true, eventName: 'subscription_updated', status: status });
+}
+
+function onSubscriptionCancelled(attributes, data) {
+  var subscriptionId = String(data.id);
+  if (!supabase) return Promise.resolve({ handled: false });
+
+  return supabase.from('subscriptions')
+    .update({ payment_status: 'cancelled', cancelled_at: new Date().toISOString() })
+    .eq('provider_subscription_id', subscriptionId)
+    .select('user_id')
+    .single()
+    .then(function (result) {
+      if (result.data && result.data.user_id) {
+        return supabase.rpc('revoke_vip_status', { user_uuid: result.data.user_id });
+      }
+    })
+    .then(function () { return { handled: true, eventName: 'subscription_cancelled' }; });
+}
+
+function recordPayment(userId, email, planType, providerId, expiresAt, amount) {
+  if (!supabase) return Promise.resolve({ error: 'No database' });
 
   return supabase.from('payments').insert({
     user_id: userId,
-    payment_method: 'paystack',
-    provider_payment_id: reference,
+    payment_method: 'lemonsqueezy',
+    provider_payment_id: providerId,
     amount: amount,
-    currency: data.currency || 'USD',
+    currency: 'USD',
     status: 'completed',
-    payment_details: { reference: reference, planType: planType, email: email }
+    payment_details: { provider: 'lemonsqueezy', providerId: providerId, planType: planType, email: email }
   }).then(function () {
     return supabase.from('subscriptions').upsert({
       user_id: userId,
       plan_type: planType,
-      provider_subscription_id: reference,
+      provider_subscription_id: providerId,
       payment_status: 'active',
       amount: amount,
+      currency: 'USD',
       expires_at: expiresAt.toISOString()
     }, { onConflict: 'provider_subscription_id' });
   }).then(function () {
@@ -132,7 +240,7 @@ function recordPayment(userId, email, planType, reference, expiresAt, data) {
       vip_expires: expiresAt.toISOString()
     });
   }).then(function () {
-    return { handled: true, reference: reference, userId: userId, planType: planType, expiresAt: expiresAt };
+    return { handled: true, reference: providerId, userId: userId, planType: planType, expiresAt: expiresAt };
   });
 }
 
@@ -158,5 +266,5 @@ function cancelSubscription(subscriptionId) {
 module.exports = {
   createCheckout, verifyWebhook, handleEvent,
   createCustomerPortal, cancelSubscription,
-  PLANS, PAYSTACK_PUBLIC_KEY
+  PLANS, VARIANT_IDS, LS_STORE_ID
 };

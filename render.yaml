@@ -19,9 +19,9 @@ services:
         value: sb_publishable_VydS1cmw7_OhFa7e-xUOqQ_tcVRUQoy
       - key: ALLOWED_ORIGINS
         value: https://winfulltime.com,https://www.winfulltime.com
-      - key: PAYSTACK_SECRET_KEY
+      - key: LEMONSQUEEZY_API_KEY
         sync: false
-      - key: PAYSTACK_PUBLIC_KEY
-        sync: false
+      - key: LEMONSQUEEZY_STORE_ID
+        value: "441411"
       - key: API_FOOTBALL_KEY
         sync: false
