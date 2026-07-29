@@ -1290,7 +1290,7 @@ router.get('/me/subscription', requireAuth, async function (req, res) {
     if (!supabase) return res.json({ isPro: false, error: 'Service unavailable' });
 
     var prof = await supabase.from('profiles').select('vip_status, vip_expires_at, created_at').eq('id', req.user.id).single();
-    var sub = await supabase.from('subscriptions').select('plan_type, payment_status, expires_at, started_at')
+    var sub = await supabase.from('subscriptions').select('plan_type, payment_status, expires_at, started_at, payment_id')
       .eq('user_id', req.user.id).order('created_at', { ascending: false }).limit(1).maybeSingle();
 
     var profile = prof.data;
@@ -1303,7 +1303,8 @@ router.get('/me/subscription', requireAuth, async function (req, res) {
       plan: subscription ? subscription.plan_type : null,
       status: subscription ? subscription.payment_status : null,
       expiresAt: subscription && subscription.expires_at ? subscription.expires_at : null,
-      memberSince: profile ? profile.created_at : null
+      memberSince: profile ? profile.created_at : null,
+      paymentId: subscription ? subscription.payment_id : null
     });
   } catch (e) {
     console.error('[me/subscription] Error:', e.message);
@@ -1311,22 +1312,48 @@ router.get('/me/subscription', requireAuth, async function (req, res) {
   }
 });
 
+// GET /api/portal — Lemon Squeezy customer portal
+router.get('/portal', requireAuth, function (req, res) {
+  if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+  supabase.from('subscriptions')
+    .select('payment_id')
+    .eq('user_id', req.user.id)
+    .eq('payment_status', 'active')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+    .then(function (sub) {
+      if (!sub.data || !sub.data.payment_id) {
+        return res.json({ error: 'No active subscription' });
+      }
+      return payment.createCustomerPortal({ subscriptionId: sub.data.payment_id })
+        .then(function (result) {
+          if (result.error) return res.json({ error: result.error });
+          res.json({ url: result.url });
+        });
+    }).catch(function (err) {
+      console.error('[portal] Error:', err.message);
+      res.status(500).json({ error: 'Failed to get portal URL' });
+    });
+});
+
 // POST /api/subscription/cancel — cancel subscription
 router.post('/subscription/cancel', requireAuth, function (req, res) {
   if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
 
   supabase.from('subscriptions')
-    .select('provider_subscription_id')
+    .select('payment_id')
     .eq('user_id', req.user.id)
     .eq('payment_status', 'active')
     .order('created_at', { ascending: false })
     .limit(1)
     .single()
     .then(function (sub) {
-      if (!sub.data || !sub.data.provider_subscription_id) {
+      if (!sub.data || !sub.data.payment_id) {
         return res.json({ error: 'No active subscription found' });
       }
-      return payment.cancelSubscription(sub.data.provider_subscription_id)
+      return payment.cancelSubscription(sub.data.payment_id)
         .then(function () {
           res.json({ message: 'Subscription cancelled' });
         });

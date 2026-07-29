@@ -78,7 +78,7 @@ body { font-family: 'Inter', sans-serif; background: #0c0f1a; color: #e2e8f0; mi
       </div>
       <div class="actions">
         <a href="/pricing.html" class="btn btn-primary" id="upgrade-btn">Upgrade to Pro</a>
-        <button class="btn btn-outline" id="portal-btn" style="display:none" onclick="handlePortal()">Manage Billing</button>
+        <button class="btn btn-outline" id="portal-btn" style="display:none" onclick="handlePortal()">Manage Subscription</button>
       </div>
     </div>
 
@@ -137,7 +137,7 @@ function loadAccount() {
       if (data.isPro) {
         badge.textContent = 'Pro';
         badge.className = 'badge badge-pro';
-        upgradeBtn.textContent = 'Manage Subscription';
+        upgradeBtn.style.display = 'none';
         portalBtn.style.display = '';
         if (data.expiresAt) {
           expiresRow.style.display = '';
@@ -146,6 +146,8 @@ function loadAccount() {
       } else {
         badge.textContent = 'Free';
         badge.className = 'badge badge-free';
+        upgradeBtn.style.display = '';
+        portalBtn.style.display = 'none';
       }
     });
   });
@@ -171,9 +173,12 @@ function handleSignOut() {
 }
 
 function handlePortal() {
-  window.WFT.apiFetch('/api/subscription/cancel').then(function () {
-    showAlert('Redirecting to PayPal...', 'success');
-    window.open('https://www.paypal.com/myaccount/autopay/', '_blank');
+  window.WFT.apiFetch('/api/portal').then(function (data) {
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      showAlert(data.error || 'Failed to open billing portal', 'error');
+    }
   });
 }
 

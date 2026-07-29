@@ -273,7 +273,22 @@ function recordPayment(userId, email, planType, providerId, expiresAt, amount) {
 }
 
 function createCustomerPortal(_a) {
-  return Promise.resolve({ url: 'mailto:support@winfulltime.com' });
+  var subscriptionId = _a.subscriptionId;
+  if (!subscriptionId) return Promise.resolve({ error: 'No subscription ID' });
+
+  return fetch(LS_API + '/subscriptions/' + subscriptionId, {
+    headers: {
+      'Authorization': 'Bearer ' + LS_API_KEY,
+      'Accept': 'application/vnd.api+json'
+    }
+  }).then(function (res) { return res.json(); }).then(function (data) {
+    if (!data.data || !data.data.attributes || !data.data.attributes.urls) {
+      return { error: 'Failed to get portal URL' };
+    }
+    return { url: data.data.attributes.urls.customer_portal };
+  }).catch(function (e) {
+    return { error: e.message };
+  });
 }
 
 function cancelSubscription(subscriptionId) {
