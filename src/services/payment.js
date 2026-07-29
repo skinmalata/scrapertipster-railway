@@ -149,7 +149,7 @@ function onOrderCreated(attributes, data) {
 }
 
 function onSubscriptionCreated(attributes, data) {
-  var custom = getCustomData({ first_order: { attributes: { custom_data: attributes.custom_data || {} } } }) || {};
+  var custom = getCustomData(attributes) || {};
   var userId = custom.user_id;
   var planType = custom.plan_type || 'monthly';
   var email = attributes.user_email || '';
