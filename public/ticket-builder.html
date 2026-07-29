@@ -201,20 +201,25 @@
 
   <div id="tierBanner" class="tier-banner" style="display:none;"></div>
 
-  <span class="form-section-label">Markets</span>
-  <div class="market-grid" id="marketGrid">
-   <label><input type="checkbox" value="1x2" checked> 1X2</label>
-   <label><input type="checkbox" value="over15" checked> Over 1.5</label>
-   <label><input type="checkbox" value="over25" checked> Over 2.5</label>
-   <label><input type="checkbox" value="btts" checked> BTTS Yes</label>
-   <label><input type="checkbox" value="bttsNo" checked> BTTS No</label>
-   <label><input type="checkbox" value="corners" checked> Corners</label>
-   <label><input type="checkbox" value="cards"> Cards</label>
-   <label><input type="checkbox" value="teamScore"> To Score 2+</label>
-   <label><input type="checkbox" value="winStreak" checked> Win Streak</label>
-   <label><input type="checkbox" value="lossStreak"> Loss Streak</label>
-   <label><input type="checkbox" value="drawStreak"> Draw Streak</label>
-   <label><input type="checkbox" value="unbeaten" checked> Unbeaten (DC)</label>
+  <div class="market-dropdown" id="marketGrid">
+   <button class="market-dropdown-toggle" type="button" id="marketToggle">
+    Markets <span class="market-count" id="marketCount"></span>
+    <svg class="chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+   </button>
+   <div class="market-dropdown-panel">
+    <label><input type="checkbox" value="1x2" checked> 1X2</label>
+    <label><input type="checkbox" value="over15" checked> Over 1.5</label>
+    <label><input type="checkbox" value="over25" checked> Over 2.5</label>
+    <label><input type="checkbox" value="btts" checked> BTTS Yes</label>
+    <label><input type="checkbox" value="bttsNo" checked> BTTS No</label>
+    <label><input type="checkbox" value="corners" checked> Corners</label>
+    <label><input type="checkbox" value="cards"> Cards</label>
+    <label><input type="checkbox" value="teamScore"> To Score 2+</label>
+    <label><input type="checkbox" value="winStreak" checked> Win Streak</label>
+    <label><input type="checkbox" value="lossStreak"> Loss Streak</label>
+    <label><input type="checkbox" value="drawStreak"> Draw Streak</label>
+    <label><input type="checkbox" value="unbeaten" checked> Unbeaten (DC)</label>
+   </div>
   </div>
 
   <div class="toggle-row" id="safeTipsRow">
@@ -1732,14 +1737,21 @@ nav.open { display: flex !important; }
 .pro-badge { display: inline-block; background: linear-gradient(135deg,#ff2448,#d41a38); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; vertical-align: middle; margin-left: 6px; }
 
 /* Market grid */
-.market-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 20px; }
-.market-grid label { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; color: rgba(232,237,245,0.7); cursor: pointer; padding: 6px 10px; background: rgba(21,26,44,0.4); border-radius: 8px; border: 1px solid rgba(255,255,255,0.04); transition: border-color 0.2s, background 0.2s; }
-.market-grid label:hover { border-color: rgba(255,255,255,0.1); background: rgba(21,26,44,0.6); }
-.market-grid input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.15); border-radius: 4px; cursor: pointer; flex-shrink: 0; transition: background 0.2s, border-color 0.2s; position: relative; }
-.market-grid input[type="checkbox"]:checked { background: #ff2448; border-color: #ff2448; }
-.market-grid input[type="checkbox"]:checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
-.market-grid input[type="checkbox"]:disabled { opacity: 0.4; cursor: not-allowed; }
-.market-grid label.disabled { opacity: 0.4; cursor: not-allowed; }
+.market-dropdown { position: relative; margin-bottom: 20px; }
+.market-dropdown-toggle { display: flex; align-items: center; gap: 8px; width: 100%; padding: 12px 14px; background: rgba(21,26,44,0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: rgba(232,237,245,0.85); font-size: 14px; font-weight: 600; cursor: pointer; transition: border-color 0.2s; text-align: left; }
+.market-dropdown-toggle:hover { border-color: rgba(255,255,255,0.15); }
+.market-dropdown-toggle .chevron { width: 18px; height: 18px; margin-left: auto; transition: transform 0.25s; }
+.market-dropdown.open .chevron { transform: rotate(180deg); }
+.market-count { font-weight: 400; color: rgba(232,237,245,0.55); font-size: 13px; margin-left: 4px; }
+.market-dropdown-panel { display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #151a2c; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 8px; z-index: 20; max-height: 320px; overflow-y: auto; }
+.market-dropdown.open .market-dropdown-panel { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
+.market-dropdown-panel label { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: rgba(232,237,245,0.7); cursor: pointer; padding: 6px 10px; background: rgba(21,26,44,0.4); border-radius: 8px; border: 1px solid transparent; transition: border-color 0.2s, background 0.2s; }
+.market-dropdown-panel label:hover { border-color: rgba(255,255,255,0.1); background: rgba(21,26,44,0.6); }
+.market-dropdown-panel input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.15); border-radius: 4px; cursor: pointer; flex-shrink: 0; transition: background 0.2s, border-color 0.2s; position: relative; }
+.market-dropdown-panel input[type="checkbox"]:checked { background: #ff2448; border-color: #ff2448; }
+.market-dropdown-panel input[type="checkbox"]:checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.market-dropdown-panel input[type="checkbox"]:disabled { opacity: 0.4; cursor: not-allowed; }
+.market-dropdown-panel label.disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* Legs slider */
 .legs-row { margin-bottom: 20px; }
@@ -1762,7 +1774,7 @@ nav.open { display: flex !important; }
 .telegram-link:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(30,150,200,0.3); }
 
 @media (max-width: 640px) {
-  .market-grid { grid-template-columns: 1fr; }
+  .market-dropdown.open .market-dropdown-panel { grid-template-columns: 1fr; }
 }
 
 /* Hamburger menu ï¿½ mobile */
@@ -1824,6 +1836,7 @@ nav.open { display: flex !important; }
     checkboxes.forEach(function(cb) { cb.disabled = false; });
     marketGrid.querySelectorAll('label').forEach(function(l) { l.classList.remove('disabled'); });
     marketGrid._freeLock = !limits.marketSelector;
+    updateMarketCount();
 
     var safeCheck = document.getElementById('safeTips');
     if (!limits.safeTips) {
@@ -1857,6 +1870,12 @@ nav.open { display: flex !important; }
 
     var telegramSection = document.getElementById('telegramSection');
     telegramSection.style.display = limits.telegramLink ? '' : 'none';
+  }
+
+  function updateMarketCount() {
+    var checked = document.querySelectorAll('#marketGrid input[type="checkbox"]:checked').length;
+    var total = document.querySelectorAll('#marketGrid input[type="checkbox"]').length;
+    document.getElementById('marketCount').textContent = '(' + checked + '/' + total + ' selected)';
   }
 
   function getSelectedMarkets() {
@@ -2058,6 +2077,19 @@ nav.open { display: flex !important; }
     var cb = e.target.closest('input[type="checkbox"]');
     if (cb && this._freeLock) {
       cb.checked = true;
+    }
+    updateMarketCount();
+  });
+
+  document.getElementById('marketToggle').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('marketGrid').classList.toggle('open');
+  });
+
+  document.addEventListener('click', function(e) {
+    var grid = document.getElementById('marketGrid');
+    if (!grid.contains(e.target)) {
+      grid.classList.remove('open');
     }
   });
 
