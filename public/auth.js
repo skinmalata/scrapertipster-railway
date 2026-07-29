@@ -60,8 +60,10 @@
         userState.user.expiresAt = data.expiresAt || null;
         updateUI(userState.user);
       }
+      document.dispatchEvent(new CustomEvent('wft-pro-status'));
     }).catch(function () {
       if (userState.user) updateUI(userState.user);
+      document.dispatchEvent(new CustomEvent('wft-pro-status'));
     });
   }
 

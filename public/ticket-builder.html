@@ -164,12 +164,15 @@
  
 
  <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
-<nav id="nav">
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/blog/">Blog</a>
- <a href="/predictions/in-play">In-Play</a>
-</nav>
+ <nav id="nav">
+  <a href="/">Home</a>
+  <a href="/ticket-builder.html">Ticket Builder</a>
+  <a href="/pricing.html">Pricing</a>
+  <a href="/blog/">Blog</a>
+  <a href="/predictions/in-play">In-Play</a>
+  <a href="/account.html" class="wft-auth-account" style="display:none">Account</a>
+  <a href="/login.html" class="wft-auth-login">Log In</a>
+ </nav>
 
 </div>
 
@@ -2049,15 +2052,20 @@ nav.open { display: flex !important; }
     if (v > max) this.value = max;
   });
 
-  WFT.onAuthReady(function() {
+  function refreshTier() {
     currentTier = getTier();
     setupUI();
+  }
+
+  WFT.onAuthReady(function() {
+    refreshTier();
   });
+
+  document.addEventListener('wft-pro-status', refreshTier);
 
   setTimeout(function() {
     if (document.getElementById('tierBanner').style.display === 'none') {
-      currentTier = getTier();
-      setupUI();
+      refreshTier();
     }
   }, 5000);
 })();
