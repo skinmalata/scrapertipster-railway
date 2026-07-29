@@ -99,9 +99,14 @@ function buildPool(predictions, options) {
   addPicks('cards', predictions.cardsMatches);
   addPicks('teamScore', predictions.teamToScore2PlusMatches);
 
-  addPicks('winStreak', predictions.winstreakMatches);
-  addPicks('lossStreak', predictions.losestreakMatches);
-  addPicks('drawStreak', predictions.drawstreakMatches);
+  function streakTip(s, word) {
+    var team = s.match || '';
+    var count = s.streak || '';
+    return team + ' to ' + word + ' (Back To Back: ' + count + ')';
+  }
+  addPicks('winStreak', predictions.winstreakMatches, function(s) { return streakTip(s, 'Win'); });
+  addPicks('lossStreak', predictions.losestreakMatches, function(s) { return streakTip(s, 'Lose'); });
+  addPicks('drawStreak', predictions.drawstreakMatches, function(s) { return streakTip(s, 'Draw'); });
 
   if (unbeatenData && Array.isArray(unbeatenData)) {
     if (!Array.isArray(markets) || markets.length === 0 || markets.includes('unbeaten')) {
