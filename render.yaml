@@ -23,5 +23,7 @@ services:
         sync: false
       - key: LEMONSQUEEZY_STORE_ID
         value: "441411"
+      - key: LEMONSQUEEZY_WEBHOOK_SECRET
+        sync: false
       - key: API_FOOTBALL_KEY
         sync: false
