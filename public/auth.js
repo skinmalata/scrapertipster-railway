@@ -39,7 +39,7 @@
       };
       userState.session = session;
       userState.loading = false;
-      fetchProStatus(user.access_token);
+      fetchProStatus(session.access_token);
     } else {
       userState.user = null;
       userState.session = null;
