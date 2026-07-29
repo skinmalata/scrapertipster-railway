@@ -171,6 +171,7 @@ app.use((req, res, next) => {
 });
 app.use(function (req, res, next) {
   if (req.path === '/api/webhook/payment') {
+    req._body = true;
     var chunks = [];
     req.on('data', function (chunk) { chunks.push(chunk); });
     req.on('end', function () {
