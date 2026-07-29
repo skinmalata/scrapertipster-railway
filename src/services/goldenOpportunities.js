@@ -696,7 +696,7 @@ function hasAtLeastFifteenMinutesRemaining(match) {
 
   // A match at minute 30 or 75 has exactly 15 minutes remaining in that half.
   // Do not publish once it moves beyond either cutoff.
-  return elapsed <= 35 || (elapsed >= 40 && elapsed <= 82);
+  return elapsed <= 30 || (elapsed >= 45 && elapsed <= 75);
 }
 
 function buildGoldenTips(liveData) {
