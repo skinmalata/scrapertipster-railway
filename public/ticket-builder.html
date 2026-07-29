@@ -2058,11 +2058,6 @@ nav.open { display: flex !important; }
     if (v > max) this.value = max;
   });
 
-  function refreshTier() {
-    currentTier = getTier();
-    setupUI();
-  }
-
   document.getElementById('marketGrid').addEventListener('change', function(e) {
     var cb = e.target.closest('input[type="checkbox"]');
     if (cb && this._freeLock) {
@@ -2083,17 +2078,32 @@ nav.open { display: flex !important; }
     }
   });
 
-  WFT.onAuthReady(function() {
-    refreshTier();
-  });
+  function renderTier() {
+    currentTier = getTier();
+    setupUI();
+  }
 
-  document.addEventListener('wft-pro-status', refreshTier);
+  function waitForPro(guardMs) {
+    var elapsed = 0;
+    var interval = 250;
+    function check() {
+      var user = WFT.getUser();
+      if (!user || user.isPro !== undefined) { renderTier(); return; }
+      elapsed += interval;
+      if (elapsed >= guardMs) { renderTier(); return; }
+      setTimeout(check, interval);
+    }
+    check();
+  }
+
+  WFT.onAuthReady(function() { waitForPro(8000); });
+  document.addEventListener('wft-pro-status', function() { renderTier(); });
 
   setTimeout(function() {
     if (document.getElementById('tierBanner').style.display === 'none') {
-      refreshTier();
+      renderTier();
     }
-  }, 5000);
+  }, 10000);
 })();
 </script>
 <script src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP" async></script>

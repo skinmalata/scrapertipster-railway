@@ -37,7 +37,9 @@
       userState.user = {
         id: user.id,
         email: user.email,
-        displayName: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'
+        displayName: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+        isPro: false,
+        plan: null
       };
       userState.session = session;
       userState.loading = false;
@@ -62,7 +64,11 @@
       }
       document.dispatchEvent(new CustomEvent('wft-pro-status'));
     }).catch(function () {
-      if (userState.user) updateUI(userState.user);
+      if (userState.user) {
+        userState.user.isPro = false;
+        userState.user.plan = null;
+        updateUI(userState.user);
+      }
       document.dispatchEvent(new CustomEvent('wft-pro-status'));
     });
   }
