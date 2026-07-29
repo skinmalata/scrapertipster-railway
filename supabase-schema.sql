@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS public.subscriptions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   plan_type TEXT NOT NULL CHECK (plan_type IN ('monthly', 'yearly', 'lifetime')),
-  provider_subscription_id TEXT UNIQUE,
+  payment_id TEXT UNIQUE,
   payment_status TEXT DEFAULT 'pending' CHECK (payment_status IN ('pending', 'active', 'completed', 'failed', 'cancelled', 'expired')),
   amount DECIMAL(10,2),
   currency TEXT DEFAULT 'USD',

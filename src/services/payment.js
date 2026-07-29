@@ -175,14 +175,14 @@ function onSubscriptionUpdated(attributes, data) {
   if (status === 'active' || status === 'on_trial') {
     return supabase.from('subscriptions')
       .update({ payment_status: 'active' })
-      .eq('provider_subscription_id', subscriptionId)
+      .eq('payment_id', subscriptionId)
       .then(function () { return { handled: true, eventName: 'subscription_updated', status: status }; });
   }
 
   if (status === 'cancelled' || status === 'expired') {
     return supabase.from('subscriptions')
       .update({ payment_status: 'cancelled', cancelled_at: new Date().toISOString() })
-      .eq('provider_subscription_id', subscriptionId)
+      .eq('payment_id', subscriptionId)
       .select('user_id')
       .single()
       .then(function (result) {
@@ -202,7 +202,7 @@ function onSubscriptionCancelled(attributes, data) {
 
   return supabase.from('subscriptions')
     .update({ payment_status: 'cancelled', cancelled_at: new Date().toISOString() })
-    .eq('provider_subscription_id', subscriptionId)
+    .eq('payment_id', subscriptionId)
     .select('user_id')
     .single()
     .then(function (result) {
@@ -228,12 +228,12 @@ function recordPayment(userId, email, planType, providerId, expiresAt, amount) {
     return supabase.from('subscriptions').upsert({
       user_id: userId,
       plan_type: planType,
-      provider_subscription_id: providerId,
+      payment_id: providerId,
       payment_status: 'active',
       amount: amount,
       currency: 'USD',
       expires_at: expiresAt.toISOString()
-    }, { onConflict: 'provider_subscription_id' });
+    }, { onConflict: 'payment_id' });
   }).then(function () {
     return supabase.rpc('set_vip_status', {
       user_uuid: userId,
@@ -253,7 +253,7 @@ function cancelSubscription(subscriptionId) {
 
   return supabase.from('subscriptions')
     .update({ payment_status: 'cancelled', cancelled_at: new Date().toISOString() })
-    .eq('provider_subscription_id', subscriptionId)
+    .eq('payment_id', subscriptionId)
     .select('user_id')
     .single()
     .then(function (result) {
