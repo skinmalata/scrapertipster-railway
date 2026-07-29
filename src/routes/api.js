@@ -1306,11 +1306,16 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
     var clampedLegs = Math.min(requestedLegs, maxLegs);
     var clampedMaxOdds = Math.min(requestedMaxOdds, maxTotalOdds);
 
+    console.log('[ticket-builder] Step: watDate');
     var date = watDate();
+    console.log('[ticket-builder] Step: vipPredictionData');
     var predictions = vipPredictionData();
+    console.log('[ticket-builder] Step: fetchPreMatchOdds');
     var oddsResponse = await fetchPreMatchOdds(date);
+    console.log('[ticket-builder] Step: fetchTodayStreaks');
     var h2hMatches = await fetchTodayStreaks();
 
+    console.log('[ticket-builder] Step: buildTicket');
     var buildOpts = {
       date: date,
       oddsResponse: oddsResponse,
@@ -1326,6 +1331,7 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
     };
 
     var payload = buildTicket(predictions, buildOpts);
+    console.log('[ticket-builder] Step: res.json, tickets=' + (payload.tickets||[]).length);
     res.json({
       ...payload,
       tier: tier,
@@ -1338,6 +1344,7 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
     });
   } catch (e) {
     console.error('[ticket-builder] Error:', e.message);
+    console.error('[ticket-builder] Stack:', e.stack);
     res.status(500).json({ error: 'Failed to generate ticket' });
   }
 });
