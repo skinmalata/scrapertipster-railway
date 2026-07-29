@@ -1328,7 +1328,6 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
     };
 
     var payload = buildTicket(predictions, buildOpts);
-    console.log('[ticket-builder] Step: res.json, tickets=' + (payload.tickets||[]).length);
     res.json({
       ...payload,
       tier: tier,
@@ -1386,6 +1385,17 @@ router.get('/best-picks', async function (req, res) {
       }
       if (/^btts\s+yes/i.test(tip) || tip === 'BTTS YES') return home > 0 && away > 0 ? 'won' : 'lost';
       if (/^btts\s+no/i.test(tip) || tip === 'BTTS NO') return home === 0 || away === 0 ? 'won' : 'lost';
+      if (/to (Win|Lose|Draw)/.test(tip) && typeof pick.streakTeam === 'string' && typeof pick.isHome === 'boolean') {
+        if (pick.isHome) {
+          if (/to Win/.test(tip)) return home > away ? 'won' : 'lost';
+          if (/to Lose/.test(tip)) return away > home ? 'won' : 'lost';
+          if (/to Draw/.test(tip)) return home === away ? 'won' : 'lost';
+        } else {
+          if (/to Win/.test(tip)) return away > home ? 'won' : 'lost';
+          if (/to Lose/.test(tip)) return home > away ? 'won' : 'lost';
+          if (/to Draw/.test(tip)) return home === away ? 'won' : 'lost';
+        }
+      }
       return 'pending';
     }
 
@@ -1416,7 +1426,9 @@ router.get('/best-picks', async function (req, res) {
         probability: Number(best.probability) || 0,
         league: best.league || '',
         time: best.time || '',
-        streak: best.streak || null
+        streak: best.streak || null,
+        streakTeam: cat.type === 'winStreak' || cat.type === 'lossStreak' || cat.type === 'drawStreak' ? (best.match || '') : null,
+        isHome: cat.type === 'winStreak' || cat.type === 'lossStreak' || cat.type === 'drawStreak' ? (best.isHome === true) : null
       });
     });
 
@@ -1431,15 +1443,22 @@ router.get('/best-picks', async function (req, res) {
         if (!best) return;
         var matchName = best.nextMatch || best.match || '';
         var result = dayResults[matchName] || null;
-        dayPicks.push({
+        var enriched = {
           category: cat.label,
           type: cat.type,
           match: matchName,
           tip: best.tip || '',
           probability: Number(best.probability) || 0,
-          outcome: result ? evaluatePick(best, result) : 'pending',
-          score: result ? result.home + '-' + result.away : null
-        });
+          outcome: 'pending',
+          score: null,
+          streakTeam: cat.type === 'winStreak' || cat.type === 'lossStreak' || cat.type === 'drawStreak' ? (best.match || '') : null,
+          isHome: cat.type === 'winStreak' || cat.type === 'lossStreak' || cat.type === 'drawStreak' ? (best.isHome === true) : null
+        };
+        if (result) {
+          enriched.outcome = evaluatePick(enriched, result);
+          enriched.score = result.home + '-' + result.away;
+        }
+        dayPicks.push(enriched);
       });
       if (dayPicks.length > 0) {
         history.push({ date: date, picks: dayPicks });
