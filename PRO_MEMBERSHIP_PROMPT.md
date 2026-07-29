@@ -68,8 +68,10 @@ would bypass the GitHub Pages deployment data and can serve stale data.
 | Pro entitlement in API endpoints | **Not started** — `golden-tips`, `live-tips` have zero auth |
 | Auth nav links (Login, Sign Up, Account, Pricing) | **Not started** — not in header or footer |
 | Frontend gating (blur/lock, upgrade CTAs, Pro badges) | **Not started** |
-| Ticket builder endpoint | **Not started** |
-| Checkout / webhook / cancel routes | **Not started** |
+| Ticket builder endpoint | **Done** — `POST /api/ticket-builder/generate` with tier-gated params (markets, safeOnly, numLegs, maxOdds) |
+| Enhanced ticket builder service | **Done** — `src/services/ticketBuilder.js` with `buildTicket()` supporting market filter, safe tips, variable legs, odds cap |
+| Ticket builder UI (markets, safe tips, legs selector, tier gating) | **Done** — `public/ticket-builder.html` rewritten with market checkboxes, safe tips toggle, legs slider, tier banner, shuffle/legs/telegram gated by membership |
+| Checkout / webhook / cancel routes | **Done** — Lemon Squeezy integrated and live on Render |
 | `express-rate-limit` | **Not started** |
 | Supabase env vars on Render | **Not started** |
 

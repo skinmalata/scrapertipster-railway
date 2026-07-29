@@ -194,51 +194,86 @@
 
 
 
- <div class="ticket-form">
+  <div class="ticket-form">
 
- <div class="form-row">
+  <div id="tierBanner" class="tier-banner" style="display:none;"></div>
 
- <div>
+  <span class="form-section-label">Markets</span>
+  <div class="market-grid" id="marketGrid">
+   <label><input type="checkbox" value="1x2" checked> 1X2</label>
+   <label><input type="checkbox" value="over15" checked> Over 1.5</label>
+   <label><input type="checkbox" value="over25" checked> Over 2.5</label>
+   <label><input type="checkbox" value="btts" checked> BTTS Yes</label>
+   <label><input type="checkbox" value="bttsNo" checked> BTTS No</label>
+   <label><input type="checkbox" value="corners" checked> Corners</label>
+   <label><input type="checkbox" value="cards"> Cards</label>
+   <label><input type="checkbox" value="teamScore"> To Score 2+</label>
+   <label><input type="checkbox" value="winStreak" checked> Win Streak</label>
+   <label><input type="checkbox" value="lossStreak"> Loss Streak</label>
+   <label><input type="checkbox" value="drawStreak"> Draw Streak</label>
+   <label><input type="checkbox" value="unbeaten" checked> Unbeaten (DC)</label>
+  </div>
 
- <label for="ticketTarget">Target Odds</label>
+  <div class="toggle-row" id="safeTipsRow">
+   <input type="checkbox" id="safeTips">
+   <label for="safeTips">Safe Tips Only (&ge;80% confidence)<span class="pro-badge">PRO</span></label>
+  </div>
 
- <input type="number" id="ticketTarget" value="20" step="any">
+  <div class="legs-row">
+   <label for="numLegs">Number of Legs</label>
+   <div class="legs-slider-wrap">
+    <input type="range" id="numLegs" min="2" max="30" value="3">
+    <span class="legs-value" id="numLegsValue">3</span>
+   </div>
+  </div>
+
+  <div class="form-row">
+
+  <div>
+
+  <label for="ticketTarget">Target Odds</label>
+
+  <input type="number" id="ticketTarget" value="20" step="any">
 
 </div>
 
- <div>
+  <div>
 
- <label for="ticketMinOdds">Min Odds per Leg</label>
+  <label for="ticketMinOdds">Min Odds per Leg</label>
 
- <input type="number" id="ticketMinOdds" value="1.20" step="any">
-
-</div>
-
- <div>
-
- <label for="ticketMaxOdds">Max Odds per Leg</label>
-
- <input type="number" id="ticketMaxOdds" value="3.00" step="any">
+  <input type="number" id="ticketMinOdds" value="1.20" step="any">
 
 </div>
 
-</div>
+  <div>
 
- <div class="toggle-row">
+  <label for="ticketMaxOdds">Max Odds per Leg</label>
 
- <input type="checkbox" id="ticketTodayOnly" checked>
-
- <label for="ticketTodayOnly">Only Today's Matches</label>
+  <input type="number" id="ticketMaxOdds" value="100" step="any">
 
 </div>
 
+</div>
 
- <div style="display:flex;gap:10px;margin-top:16px;">
-  <button class="gen-btn" id="genBtn" style="flex:1;">Generate Tickets</button>
-  <button class="gen-btn" id="shuffleBtn" style="flex:1;background:linear-gradient(135deg,#4ade80,#22c55e);color:#0a0e17;">Shuffle</button>
- </div>
- <div style="font-size:12px;color:rgba(255,255,255,0.85);text-align:center;margin-top:14px;letter-spacing:0.2px;">Odds include estimated bookmaker margin (~5%)</div>
+  <div class="toggle-row">
 
+  <input type="checkbox" id="ticketTodayOnly" checked>
+
+  <label for="ticketTodayOnly">Only Today's Matches</label>
+
+</div>
+
+
+  <div style="display:flex;gap:10px;margin-top:16px;">
+   <button class="gen-btn" id="genBtn" style="flex:1;">Generate Tickets</button>
+   <button class="gen-btn" id="shuffleBtn" style="flex:1;background:linear-gradient(135deg,#4ade80,#22c55e);color:#0a0e17;">Shuffle <span class="pro-badge">PRO</span></button>
+  </div>
+  <div style="font-size:12px;color:rgba(255,255,255,0.85);text-align:center;margin-top:14px;letter-spacing:0.2px;">Odds include estimated bookmaker margin (~5%)</div>
+
+  <div id="telegramSection" style="display:none;text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06);">
+   <p style="font-size:13px;color:rgba(232,237,245,0.5);margin-bottom:8px;">Lifetime members get exclusive Telegram tips</p>
+   <a class="telegram-link" href="https://t.me/winfulltime" target="_blank" rel="noopener">&#9992; Join Telegram Group</a>
+  </div>
 
 </div>
 
@@ -290,7 +325,7 @@
 
   <details class="faq-item"><summary>Can I filter accumulator tickets by odds range?</summary><p>Yes. Set a target total odds, a minimum odds per leg, and a maximum odds per leg. The builder then finds the optimal combination of selections within your specified range.</p></details>
 
-  <details class="faq-item"><summary>Is the accumulator ticket builder free to use?</summary><p>Yes, the WinFulltime accumulator ticket builder is completely free. No sign-ups, no subscriptions, no hidden fees. Generate unlimited accumulator tickets every day.</p></details>
+  <details class="faq-item"><summary>Is the accumulator ticket builder free to use?</summary><p>Yes, the WinFulltime accumulator ticket builder is free to use. Free users get max 3 legs, max 4.00 odds, and 3-5 tickets per day (depending on sign-in status). <a href="/pricing.html">Pro members</a> get up to 30 legs, 500 odds, market filtering, safe tips mode, and unlimited daily usage.</p></details>
 
   <details class="faq-item"><summary>What does double chance mean in an accumulator?</summary><p>Double chance covers two of three possible match outcomes in a single selection. For example, "Home or Draw" wins if the home team wins or the match ends in a draw. This increases your probability of winning each leg, making it popular for accumulators.</p></details>
 
@@ -1695,6 +1730,49 @@ nav.open { display: flex !important; }
  }
 
 
+/* Tier banner */
+.tier-banner { text-align: center; padding: 10px 16px; background: rgba(255,36,72,0.1); border: 1px solid rgba(255,36,72,0.2); border-radius: 10px; margin-bottom: 20px; font-size: 13px; color: rgba(232,237,245,0.7); line-height: 1.6; }
+.tier-banner strong { color: #ff6b8a; }
+.tier-banner a { color: #ff2448; text-decoration: none; font-weight: 600; }
+.tier-banner a:hover { text-decoration: underline; }
+
+/* Pro badge */
+.pro-badge { display: inline-block; background: linear-gradient(135deg,#ff2448,#d41a38); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; vertical-align: middle; margin-left: 6px; }
+
+/* Market grid */
+.market-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 20px; }
+.market-grid label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: rgba(232,237,245,0.7); cursor: pointer; padding: 6px 10px; background: rgba(21,26,44,0.4); border-radius: 8px; border: 1px solid rgba(255,255,255,0.04); transition: border-color 0.2s, background 0.2s; }
+.market-grid label:hover { border-color: rgba(255,255,255,0.1); background: rgba(21,26,44,0.6); }
+.market-grid input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.15); border-radius: 4px; cursor: pointer; flex-shrink: 0; transition: background 0.2s, border-color 0.2s; position: relative; }
+.market-grid input[type="checkbox"]:checked { background: #ff2448; border-color: #ff2448; }
+.market-grid input[type="checkbox"]:checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.market-grid input[type="checkbox"]:disabled { opacity: 0.4; cursor: not-allowed; }
+.market-grid label.disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Legs slider */
+.legs-row { margin-bottom: 20px; }
+.legs-row label { display: block; font-size: 12px; font-weight: 600; color: rgba(232,237,245,0.5); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+.legs-slider-wrap { display: flex; align-items: center; gap: 12px; }
+.legs-slider-wrap input[type="range"] { flex: 1; appearance: none; -webkit-appearance: none; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; outline: none; }
+.legs-slider-wrap input[type="range"]::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; background: #ff2448; border-radius: 50%; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(255,36,72,0.3); }
+.legs-slider-wrap input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; background: #ff2448; border-radius: 50%; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(255,36,72,0.3); }
+.legs-value { font-size: 20px; font-weight: 800; min-width: 30px; text-align: center; background: linear-gradient(135deg,#4ade80,#22c55e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+/* Form section label */
+.form-section-label { font-size: 12px; font-weight: 600; color: rgba(232,237,245,0.5); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; display: block; }
+
+/* Disabled overlay for gated controls */
+.gate-disabled { position: relative; }
+.gate-disabled::after { content: ''; position: absolute; inset: 0; background: rgba(21,26,44,0.6); border-radius: 8px; z-index: 1; pointer-events: auto; }
+
+/* Telegram link for lifetime */
+.telegram-link { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg,#1e96c8,#1a7da8); color: #fff; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 14px; margin-top: 16px; transition: transform 0.2s, box-shadow 0.3s; }
+.telegram-link:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(30,150,200,0.3); }
+
+@media (max-width: 640px) {
+  .market-grid { grid-template-columns: 1fr; }
+}
+
 /* Hamburger menu ï¿½ mobile */
 .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 1001; }
 .hamburger span { display: block; width: 22px; height: 2px; background: var(--text-primary, #e8edf5); margin: 5px 0; transition: all 0.3s; border-radius: 2px; }
@@ -1703,25 +1781,115 @@ nav.open { display: flex !important; }
 .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
 </style>
 
+<script src="/supabase-client.js"></script>
+<script src="/auth.js"></script>
 
+  <script>
+  (function() { var WFT = window.WFT;
 
- <script>
+  var allPicks = [];
+  var allUnbeaten = [];
+  var lastData = null;
+  var lastUbData = null;
+  var lastOddsData = null;
+  var lastTarget = 20;
+  var lastMinOdds = 1.20;
+  var currentTier = 'free_anon';
 
- let allPicks = [];
+  var TIER_LIMITS = {
+    free_anon: { maxLegs: 3, maxOdds: 4.0, safeTips: false, marketSelector: false, shuffle: false, dailyLimit: 3, telegramLink: false, label: 'Free (not signed in)' },
+    free_registered: { maxLegs: 3, maxOdds: 4.0, safeTips: false, marketSelector: false, shuffle: false, dailyLimit: 5, telegramLink: false, label: 'Free' },
+    pro: { maxLegs: 30, maxOdds: 500, safeTips: true, marketSelector: true, shuffle: true, dailyLimit: null, telegramLink: false, label: 'Pro' },
+    lifetime: { maxLegs: 30, maxOdds: 500, safeTips: true, marketSelector: true, shuffle: true, dailyLimit: null, telegramLink: true, label: 'Lifetime' }
+  };
 
- let allUnbeaten = [];
+  var MARKET_CATS = {
+    '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5',
+    'btts': 'BTTS YES', 'bttsNo': 'BTTS NO',
+    'corners': 'Corners', 'cards': 'Cards', 'teamScore': 'To Score 2+',
+    'winStreak': 'Win Streak', 'lossStreak': 'Loss Streak', 'drawStreak': 'Draw Streak',
+    'unbeaten': 'Unbeaten'
+  };
 
- let lastData = null;
+  var MARKET_ADD = {
+    '1x2': 'matches', 'over15': 'over15Matches', 'over25': 'over25Matches',
+    'btts': 'bttsMatches', 'bttsNo': 'bttsNoMatches',
+    'corners': 'cornersMatches', 'cards': 'cardsMatches', 'teamScore': 'teamToScore2PlusMatches',
+    'winStreak': 'winstreakMatches', 'lossStreak': 'losestreakMatches', 'drawStreak': 'drawstreakMatches',
+    'unbeaten': null
+  };
 
- let lastUbData = null;
+  function getTier() {
+    var user = WFT.getUser();
+    if (!user) return 'free_anon';
+    if (!user.isPro) return 'free_registered';
+    if (user.plan === 'lifetime') return 'lifetime';
+    return 'pro';
+  }
 
- let lastOddsData = null;
+  function setupUI() {
+    var tier = getTier();
+    var limits = TIER_LIMITS[tier];
+    var banner = document.getElementById('tierBanner');
+    var body = '';
 
- let lastTarget = 20;
+    if (tier === 'free_anon') {
+      body = '<strong>Free Tier (Not Signed In)</strong> - Max ' + limits.maxLegs + ' legs, max ' + limits.maxOdds.toFixed(2) + ' odds, ' + limits.dailyLimit + ' tickets/day. <a href="/pricing.html">Sign in or upgrade to Pro</a> for more.';
+    } else if (tier === 'free_registered') {
+      body = '<strong>Free Tier</strong> - Max ' + limits.maxLegs + ' legs, max ' + limits.maxOdds.toFixed(2) + ' odds, ' + limits.dailyLimit + ' tickets/day. <a href="/pricing.html">Upgrade to Pro</a> for unlimited.';
+    } else if (tier === 'lifetime') {
+      body = '<strong>Lifetime Member</strong> - Full access with exclusive Telegram tips.';
+    } else {
+      body = '<strong>Pro Member</strong> - Full access enabled.';
+    }
+    banner.innerHTML = body;
+    banner.style.display = '';
 
- let lastMinOdds = 1.20;
+    var marketGrid = document.getElementById('marketGrid');
+    var checkboxes = marketGrid.querySelectorAll('input[type="checkbox"]');
+    if (!limits.marketSelector) {
+      checkboxes.forEach(function(cb) { cb.disabled = true; });
+      marketGrid.querySelectorAll('label').forEach(function(l) { l.classList.add('disabled'); });
+    } else {
+      checkboxes.forEach(function(cb) { cb.disabled = false; });
+      marketGrid.querySelectorAll('label').forEach(function(l) { l.classList.remove('disabled'); });
+    }
 
- function escapeHtml(value) {
+    var safeCheck = document.getElementById('safeTips');
+    if (!limits.safeTips) {
+      safeCheck.disabled = true;
+      safeCheck.checked = false;
+    } else {
+      safeCheck.disabled = false;
+    }
+
+    var legsSlider = document.getElementById('numLegs');
+    legsSlider.max = limits.maxLegs;
+    if (parseInt(legsSlider.value, 10) > limits.maxLegs) {
+      legsSlider.value = limits.maxLegs;
+      document.getElementById('numLegsValue').textContent = limits.maxLegs;
+    }
+
+    var shuffleBtn = document.getElementById('shuffleBtn');
+    shuffleBtn.style.display = limits.shuffle ? '' : 'none';
+
+    var telegramSection = document.getElementById('telegramSection');
+    telegramSection.style.display = limits.telegramLink ? '' : 'none';
+  }
+
+  function getSelectedMarkets() {
+    var limits = TIER_LIMITS[getTier()];
+    if (!limits.marketSelector) {
+      return ['1x2', 'over15', 'over25', 'btts', 'bttsNo', 'corners', 'teamScore', 'winStreak', 'unbeaten'];
+    }
+    var selected = [];
+    document.querySelectorAll('#marketGrid input[type="checkbox"]').forEach(function(cb) {
+      if (cb.checked) selected.push(cb.value);
+    });
+    return selected;
+  }
+
+  function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>'"]/g, function(char) {
    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char];
   });
@@ -1991,40 +2159,49 @@ nav.open { display: flex !important; }
  }
 
  }
+  var selectedMarkets = getSelectedMarkets();
+  var marketSet = {};
+  selectedMarkets.forEach(function(m) { marketSet[m] = true; });
 
- addPicks(data.matches, '1X2');
+  if (marketSet['1x2']) addPicks(data.matches, '1X2');
 
- addPicks(data.over15Matches, 'Over 1.5');
+  if (marketSet['over15']) addPicks(data.over15Matches, 'Over 1.5');
 
- addPicks(data.over25Matches, 'Over 2.5');
+  if (marketSet['over25']) addPicks(data.over25Matches, 'Over 2.5');
 
- addPicks(data.bttsMatches, 'BTTS YES');
+  if (marketSet['btts']) addPicks(data.bttsMatches, 'BTTS YES');
 
- addPicks(data.bttsNoMatches, 'BTTS NO');
+  if (marketSet['bttsNo']) addPicks(data.bttsNoMatches, 'BTTS NO');
 
- addPicks(data.cornersMatches, 'Corners');
+  if (marketSet['corners']) addPicks(data.cornersMatches, 'Corners');
 
- addPicks(data.cardsMatches, 'Cards');
+  if (marketSet['cards']) addPicks(data.cardsMatches, 'Cards');
 
- addPicks(data.teamToScore2PlusMatches, 'To Score 2+');
+  if (marketSet['teamScore']) addPicks(data.teamToScore2PlusMatches, 'To Score 2+');
 
- addPicks(data.winstreakMatches, 'Win Streak');
+  if (marketSet['winStreak']) addPicks(data.winstreakMatches, 'Win Streak');
 
- addPicks(data.losestreakMatches, 'Loss Streak');
+  if (marketSet['lossStreak']) addPicks(data.losestreakMatches, 'Loss Streak');
 
- addPicks(data.drawstreakMatches, 'Draw Streak');
+  if (marketSet['drawStreak']) addPicks(data.drawstreakMatches, 'Draw Streak');
 
- addUnbeatenPicks(unbeatenMatches);
+  if (marketSet['unbeaten']) addUnbeatenPicks(unbeatenMatches);
 
- if (allPicks.length === 0) {
+  if (document.getElementById('safeTips').checked) {
+    allPicks = allPicks.filter(function(p) { return p.probability >= 80; });
+  }
 
- results.innerHTML = '<div class="no-matches"><p>No picks match the criteria. Try adjusting your odds range or disable "Only Today\'s Matches".</p></div>';
+  if (allPicks.length === 0) {
 
- return;
+  results.innerHTML = '<div class="no-matches"><p>No picks match the criteria. Try adjusting your odds range, selecting different markets, or disable "Only Today\'s Matches".</p></div>';
 
- }
+  return;
 
- buildTickets(target, shuffle, minOdds);
+  }
+
+  var limits = TIER_LIMITS[getTier()];
+  var numLegs = parseInt(document.getElementById('numLegs').value, 10) || limits.maxLegs;
+  buildTickets(target, shuffle, minOdds, numLegs, limits.maxOdds);
 
  } catch (e) {
 
@@ -2034,33 +2211,36 @@ nav.open { display: flex !important; }
 
  }
 
- function shuffleTickets() {
+  function shuffleTickets() {
 
- if (allPicks.length === 0) {
+  if (allPicks.length === 0) {
 
- generateTickets(true);
+  generateTickets(true);
 
- return;
+  return;
 
- }
+  }
 
- buildTickets(lastTarget, true, lastMinOdds);
+  var limits = TIER_LIMITS[getTier()];
+  var numLegs = parseInt(document.getElementById('numLegs').value, 10) || limits.maxLegs;
+  buildTickets(lastTarget, true, lastMinOdds, numLegs, limits.maxOdds);
 
- }
+  }
 
- function buildTickets(target, shuffle, selectedMinOdds) {
+  function buildTickets(target, shuffle, selectedMinOdds, numLegs, maxTotalOdds) {
 
- const results = document.getElementById('ticketResults');
+  const results = document.getElementById('ticketResults');
 
- const picks = shuffle ? shuffleArray([...allPicks]) : [...allPicks];
+  const picks = shuffle ? shuffleArray([...allPicks]) : [...allPicks];
 
- picks.sort(function(a, b) { return a.odds - b.odds; });
+  picks.sort(function(a, b) { return a.odds - b.odds; });
 
- var maxLegs = 8;
+  var maxLegs = numLegs || 8;
 
- var minTicketOdds = target * 0.8;
+  var minTicketOdds = target * 0.8;
 
- var maxTicketOdds = target * 1.2;
+  var maxTicketOdds = target * 1.2;
+  if (maxTotalOdds && maxTicketOdds > maxTotalOdds) { maxTicketOdds = maxTotalOdds; }
 
  const scored = picks.map(function(p) {
 
@@ -2471,13 +2651,28 @@ nav.open { display: flex !important; }
   }
   if (!e.target.closest('.share-wrap')) {
    document.querySelectorAll('.share-dropdown.open').forEach(function(d){ d.classList.remove('open'); });
-  }
+   }
   });
-</script>
 
-<script>
- document.getElementById('genBtn').addEventListener('click', function() { generateTickets(); });
- document.getElementById('shuffleBtn').addEventListener('click', function() { shuffleTickets(); });
+  document.getElementById('genBtn').addEventListener('click', function() { generateTickets(); });
+  document.getElementById('shuffleBtn').addEventListener('click', function() { shuffleTickets(); });
+
+  document.getElementById('numLegs').addEventListener('input', function() {
+    document.getElementById('numLegsValue').textContent = this.value;
+  });
+
+  WFT.onAuthReady(function() {
+    currentTier = getTier();
+    setupUI();
+  });
+
+  setTimeout(function() {
+    if (document.getElementById('tierBanner').style.display === 'none') {
+      currentTier = getTier();
+      setupUI();
+    }
+  }, 5000);
+})();
 </script>
 <script src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP" async></script>
  <script>

@@ -304,4 +304,4 @@ function publicPreview(payload) {
   };
 }
 
-module.exports = { buildTwoOddsOfDay, publicPreview, watDate, fixtureKey, estimatedOdds, TWO_ODDS_MIN, TWO_ODDS_MAX };
+module.exports = { buildTwoOddsOfDay, publicPreview, watDate, fixtureKey, estimatedOdds, TWO_ODDS_MIN, TWO_ODDS_MAX, candidateFrom, allCandidates, applyOdds, applyH2HSupport, selectPerFixture, combinations, evaluateTicket, MIN_PROBABILITY };
