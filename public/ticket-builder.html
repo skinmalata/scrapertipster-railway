@@ -1925,23 +1925,14 @@ nav.open { display: flex !important; }
         legs: legLines, total: ticket.totalOdds, num: tidx + 1, target: target, aff: AFFILIATE_URL
       })).replace(/'/g, '%27');
 
-      var oddsSrc = function(s) {
-        if (s.oddsSource === 'verified') return 'Live API-Football market price';
-        if (s.bookmaker && s.oddsSource !== 'estimated') return 'Live ' + s.bookmaker + ' price';
-        return 'Estimated probability ' + Number(s.probability || 0).toFixed(0) + '%';
-      };
-
-      var isAllVerified = ticket.selections.every(function(s) { return s.oddsSource === 'verified' || (s.bookmaker && s.oddsSource !== 'estimated'); });
-      var anyVerified = ticket.selections.some(function(s) { return s.oddsSource === 'verified' || (s.bookmaker && s.oddsSource !== 'estimated'); });
-      var sourceNote = isAllVerified ? 'Live API-Football market odds' : (anyVerified ? 'Mixed live and estimated odds' : 'Estimated odds \u2014 not bookmaker prices');
+      var sourceNote = 'Estimated odds \u2014 not bookmaker prices';
 
       var tableRows = ticket.selections.map(function(s, si) {
         return '<tr class="ticket-row fade-in" style="animation-delay: ' + (tidx * 80 + si * 30) + 'ms">' +
           '<td class="ticket-cell-num">' + (si + 1) + '</td>' +
           '<td class="ticket-cell-match">' + escapeHtml(s.match) +
           '<span class="ticket-detail">' + escapeHtml([s.league, s.date, s.time].filter(Boolean).join(' \u2014 ') || 'Match details unavailable') + '</span></td>' +
-          '<td class="ticket-cell-tip"><span class="tip-badge">' + escapeHtml(s.tip) + '</span>' +
-          '<div class="ticket-confidence"><strong>' + escapeHtml(s.category) + '</strong> \u2014 ' + oddsSrc(s) + '</div></td>' +
+          '<td class="ticket-cell-tip"><span class="tip-badge">' + escapeHtml(s.tip) + '</span></td>' +
           '</tr>';
       }).join('');
 
