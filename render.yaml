@@ -19,11 +19,9 @@ services:
         value: sb_publishable_VydS1cmw7_OhFa7e-xUOqQ_tcVRUQoy
       - key: ALLOWED_ORIGINS
         value: https://winfulltime.com,https://www.winfulltime.com
-      - key: PAYPAL_CLIENT_ID
+      - key: PAYSTACK_SECRET_KEY
         sync: false
-      - key: PAYPAL_CLIENT_SECRET
+      - key: PAYSTACK_PUBLIC_KEY
         sync: false
-      - key: PAYPAL_MODE
-        value: sandbox
       - key: API_FOOTBALL_KEY
         sync: false
