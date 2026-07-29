@@ -1355,9 +1355,7 @@ router.get('/best-picks', async function (req, res) {
       { key: 'cardsMatches', label: 'Cards', type: 'cards' },
       { key: 'teamToScore2PlusMatches', label: 'To Score 2+', type: 'teamScore' },
       { key: 'winstreakMatches', label: 'Win Streak', type: 'winStreak' },
-      { key: 'h2hUnbeaten', label: 'Unbeaten', type: 'unbeaten' },
-      { key: 'losestreakMatches', label: 'Loss Streak', type: 'lossStreak' },
-      { key: 'drawstreakMatches', label: 'Draw Streak', type: 'drawStreak' }
+      { key: 'h2hUnbeaten', label: 'Unbeaten', type: 'unbeaten' }
     ];
 
     CATEGORIES.forEach(function(cat) {
