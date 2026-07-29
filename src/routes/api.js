@@ -736,24 +736,6 @@ router.get('/articles', (req, res) => {
   }
 });
 
-function requireAdmin(req, res, next) {
-  const token = req.headers['x-admin-token'];
-  const expected = process.env.ADMIN_TOKEN;
-  if (!token || !expected) {
-    return res.status(403).json({ success: false, error: 'Forbidden' });
-  }
-  try {
-    const a = Buffer.from(String(token));
-    const b = Buffer.from(String(expected));
-    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
-      return res.status(403).json({ success: false, error: 'Forbidden' });
-    }
-  } catch (e) {
-    return res.status(403).json({ success: false, error: 'Forbidden' });
-  }
-  next();
-}
-
 router.post('/articles/publish', requireAdmin, async (req, res) => {
   const { slug } = req.body;
   if (!slug) {
