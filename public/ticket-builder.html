@@ -1930,8 +1930,7 @@ nav.open { display: flex !important; }
       var tableRows = ticket.selections.map(function(s, si) {
         return '<tr class="ticket-row fade-in" style="animation-delay: ' + (tidx * 80 + si * 30) + 'ms">' +
           '<td class="ticket-cell-num">' + (si + 1) + '</td>' +
-          '<td class="ticket-cell-match">' + escapeHtml(s.match) +
-          '<span class="ticket-detail">' + escapeHtml([s.league, s.date, s.time].filter(Boolean).join(' \u2014 ') || 'Match details unavailable') + '</span></td>' +
+'<td class="ticket-cell-match">' + escapeHtml(s.match) + '</td>' +
           '<td class="ticket-cell-tip"><span class="tip-badge">' + escapeHtml(s.tip) + '</span></td>' +
           '</tr>';
       }).join('');
