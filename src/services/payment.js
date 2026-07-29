@@ -5,9 +5,9 @@ var PAYSTACK_API = 'https://api.paystack.co';
 var crypto = require('crypto');
 
 var PLANS = {
-  monthly: { name: 'Pro Monthly', price: '9.99', amountKobo: 999, currency: 'USD', interval: 'monthly' },
-  yearly: { name: 'Pro Yearly', price: '79.99', amountKobo: 7999, currency: 'USD', interval: 'annually' },
-  lifetime: { name: 'Lifetime Pro', price: '199.99', amountKobo: 19999, currency: 'USD', interval: null }
+  monthly: { name: 'Pro Monthly', price: '500', amountKobo: 50000, currency: 'NGN', interval: 'monthly' },
+  yearly: { name: 'Pro Yearly', price: '3500', amountKobo: 350000, currency: 'NGN', interval: 'annually' },
+  lifetime: { name: 'Lifetime Pro', price: '7500', amountKobo: 750000, currency: 'NGN', interval: null }
 };
 
 function paystackHeaders() {
