@@ -2,7 +2,7 @@ const { asNumber } = require('./liveTips');
 
 // Publish only the highest-confidence opportunities. This keeps the live
 // feed selective and gives each recommendation a stronger statistical basis.
-const MINIMUM_SIGNAL_SCORE = 60;
+const MINIMUM_SIGNAL_SCORE = 45;
 
 function getStats(match) {
   return match.fotmobStats || null;
@@ -696,7 +696,7 @@ function hasAtLeastFifteenMinutesRemaining(match) {
 
   // A match at minute 30 or 75 has exactly 15 minutes remaining in that half.
   // Do not publish once it moves beyond either cutoff.
-  return elapsed <= 30 || (elapsed >= 45 && elapsed <= 75);
+  return elapsed <= 35 || (elapsed >= 40 && elapsed <= 82);
 }
 
 function buildGoldenTips(liveData) {
@@ -710,9 +710,9 @@ function buildGoldenTips(liveData) {
     // so they are never eligible for an in-play recommendation.
     // Never publish a tip with fewer than 15 minutes remaining in either half.
     if (!hasAtLeastFifteenMinutesRemaining(match)) { filterStats.noTimeLeft++; return; }
-    // Skip matches with 3+ goals already scored (over 2.5)
+    // Skip matches with 5+ goals already scored
     var totalGoals = scoreTotal(match.score);
-    if (totalGoals !== null && totalGoals >= 3) { filterStats.tooManyGoals++; return; }
+    if (totalGoals !== null && totalGoals >= 5) { filterStats.tooManyGoals++; return; }
     var marketTip = pickBest(MARKET_RULES, match);
     var teamTip = pickBest(TEAM_RULES, match);
     var cornerTip = pickBest(CORNER_RULES, match);
@@ -722,9 +722,8 @@ function buildGoldenTips(liveData) {
     [marketTip, teamTip, cornerTip, kickoffTip].forEach(function (tip) {
       if (!tip) return;
       if (asNumber(tip.signalScore) < MINIMUM_SIGNAL_SCORE) { filterStats.lowSignal++; return; }
-      // Keep this at the publishing boundary so a future BTTS rule cannot
-      // accidentally introduce second-half BTTS recommendations.
-      if (isBttsMarket(tip.market) && asNumber(match.minute) >= 45) { filterStats.bttsHalf++; return; }
+      // Allow BTTS in second half if signal is strong enough
+      if (isBttsMarket(tip.market) && asNumber(match.minute) >= 70 && asNumber(tip.signalScore) < 60) { filterStats.bttsHalf++; return; }
       opportunities.push({
         fixtureId: match.matchId,
         home: match.home,
