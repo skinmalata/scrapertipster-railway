@@ -2084,16 +2084,24 @@ nav.open { display: flex !important; }
   }
 
   function waitForPro(guardMs) {
+    renderTier();
     var elapsed = 0;
     var interval = 250;
     function check() {
       var user = WFT.getUser();
-      if (!user || user.isPro !== undefined) { renderTier(); return; }
+      if (!user) { return; }
+      if (user.isPro !== undefined) {
+        renderTier();
+        return;
+      }
       elapsed += interval;
-      if (elapsed >= guardMs) { renderTier(); return; }
+      if (elapsed >= guardMs) {
+        renderTier();
+        return;
+      }
       setTimeout(check, interval);
     }
-    check();
+    setTimeout(check, interval);
   }
 
   WFT.onAuthReady(function() { waitForPro(8000); });

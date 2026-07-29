@@ -37,9 +37,7 @@
       userState.user = {
         id: user.id,
         email: user.email,
-        displayName: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
-        isPro: false,
-        plan: null
+        displayName: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'
       };
       userState.session = session;
       userState.loading = false;
