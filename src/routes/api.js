@@ -1339,7 +1339,10 @@ router.get('/best-picks', async function (req, res) {
     var h2hData = { dates: {} };
     try { h2hData = JSON.parse(fs.readFileSync(h2hPath, 'utf8')); } catch (e) {}
 
-    var today = new Date().toISOString().slice(0, 10);
+    var dataDate = predictions.date || '';
+    var sampleMatches = predictions.matches || predictions.winstreakMatches || predictions.losestreakMatches || [];
+    if (!dataDate && sampleMatches.length > 0) { dataDate = sampleMatches[0].date || ''; }
+    var today = dataDate || new Date().toISOString().slice(0, 10);
 
     function getBestPick(arr) {
       if (!Array.isArray(arr) || arr.length === 0) return null;
@@ -1404,7 +1407,8 @@ router.get('/best-picks', async function (req, res) {
     var todayPicks = [];
     CATEGORIES.forEach(function(cat) {
         if (cat.type === 'winStreak' || cat.type === 'unbeaten') {
-        var streakMatches = h2hData.dates[today] || [];
+        var h2hDate = h2hData.dates[today] ? today : Object.keys(h2hData.dates).sort().pop() || '';
+        var streakMatches = h2hData.dates[h2hDate] || [];
         var picks = [];
         streakMatches.forEach(function(m) {
           var home = String(m.home || '').trim();
