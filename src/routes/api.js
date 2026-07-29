@@ -37,6 +37,7 @@ const headToHeadCache = new Map();
 const HEAD_TO_HEAD_CACHE_MS = 12 * 60 * 60 * 1000;
 const fixtureResultsCache = new Map();
 const FIXTURE_RESULTS_CACHE_MS = 24 * 60 * 60 * 1000;
+var anonTicketCache = null;
 
 let scraperService = null;
 let cornersLastScrape = null;
@@ -1306,16 +1307,12 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
     var clampedLegs = Math.min(requestedLegs, maxLegs);
     var clampedMaxOdds = Math.min(requestedMaxOdds, maxTotalOdds);
 
-    console.log('[ticket-builder] Step: watDate');
     var date = watDate();
-    console.log('[ticket-builder] Step: vipPredictionData');
     var predictions = vipPredictionData();
-    console.log('[ticket-builder] Step: fetchPreMatchOdds');
     var oddsResponse = await fetchPreMatchOdds(date);
-    console.log('[ticket-builder] Step: fetchTodayStreaks');
     var h2hMatches = await fetchTodayStreaks();
 
-    console.log('[ticket-builder] Step: buildTicket');
+
     var buildOpts = {
       date: date,
       oddsResponse: oddsResponse,
