@@ -16,7 +16,7 @@ const { getSettledTodayTips, getSettledTipsForDate } = require('../services/live
 const { buildTwoOddsOfDay, watDate } = require('../services/twoOddsOfDay');
 const { buildTicket } = require('../services/ticketBuilder');
 const { fetchTodayStreaks } = require('../services/h2hWinningStreaks');
-const { optionalAuth, requireAuth, requirePro: requireProMiddleware } = require('../middleware/auth');
+const { optionalAuth, requireAuth, requirePro: requireProMiddleware, requireAdmin } = require('../middleware/auth');
 const payment = require('../services/payment');
 
 // API-Football responses are cached so one busy page does not consume the
@@ -1357,12 +1357,14 @@ router.get('/me/subscription', requireAuth, async function (req, res) {
 
     var profile = prof.data;
     var subscription = sub.data;
-    var isPro = profile && profile.vip_status === 'vip' && new Date(profile.vip_expires_at) > new Date();
+    var isAdmin = profile && profile.vip_status === 'admin';
+    var isPro = isAdmin || (profile && profile.vip_status === 'vip' && new Date(profile.vip_expires_at) > new Date());
 
     res.json({
       isPro: isPro,
+      isAdmin: isAdmin,
       email: req.user.email,
-      plan: subscription ? subscription.plan_type : null,
+      plan: isAdmin ? 'admin' : (subscription ? subscription.plan_type : null),
       status: subscription ? subscription.payment_status : null,
       expiresAt: subscription && subscription.expires_at ? subscription.expires_at : null,
       memberSince: profile ? profile.created_at : null,
@@ -1423,6 +1425,221 @@ router.post('/subscription/cancel', requireAuth, function (req, res) {
       console.error('[cancel] Error:', err.message);
       res.status(500).json({ error: 'Failed to cancel subscription' });
     });
+});
+
+// ===== ADMIN ROUTES =====
+
+// GET /api/admin/users — list users with search + pagination
+router.get('/admin/users', requireAdmin, async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+    var page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    var perPage = Math.min(100, Math.max(1, parseInt(req.query.perPage, 10) || 20));
+    var search = String(req.query.search || '').trim();
+
+    var fromRow = (page - 1) * perPage;
+    var toRow = fromRow + perPage - 1;
+
+    var query = supabase.from('profiles')
+      .select('id, email, full_name, vip_status, vip_expires_at, created_at', { count: 'exact' })
+      .order('created_at', { ascending: false });
+
+    if (search) {
+      query = query.ilike('email', '%' + search + '%');
+    }
+
+    var result = await query.range(fromRow, toRow);
+    if (result.error) return res.status(500).json({ error: result.error.message });
+
+    var userIds = (result.data || []).map(function(u) { return u.id; });
+    var subs = [];
+    if (userIds.length) {
+      var subRes = await supabase.from('subscriptions')
+        .select('user_id, plan_type, payment_status, expires_at, created_at')
+        .in('user_id', userIds)
+        .order('created_at', { ascending: false });
+      if (!subRes.error) subs = subRes.data || [];
+    }
+
+    var subMap = {};
+    subs.forEach(function(s) {
+      if (!subMap[s.user_id]) subMap[s.user_id] = s;
+    });
+
+    var users = (result.data || []).map(function(u) {
+      var sub = subMap[u.id] || null;
+      return {
+        id: u.id,
+        email: u.email,
+        fullName: u.full_name,
+        vipStatus: u.vip_status,
+        vipExpiresAt: u.vip_expires_at,
+        joinedAt: u.created_at,
+        plan: sub ? sub.plan_type : null,
+        paymentStatus: sub ? sub.payment_status : null,
+        expiresAt: sub ? sub.expires_at : null
+      };
+    });
+
+    res.json({
+      users: users,
+      total: result.count || users.length,
+      page: page,
+      perPage: perPage,
+      search: search || null
+    });
+  } catch (e) {
+    console.error('[admin/users] Error:', e.message);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
+// GET /api/admin/users/:id — full user details
+router.get('/admin/users/:id', requireAdmin, async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+    var userId = req.params.id;
+    var prof = await supabase.from('profiles').select('*').eq('id', userId).single();
+    if (prof.error) return res.status(404).json({ error: 'User not found' });
+
+    var subs = await supabase.from('subscriptions')
+      .select('*').eq('user_id', userId).order('created_at', { ascending: false });
+    var pymts = await supabase.from('payments')
+      .select('*').eq('user_id', userId).order('created_at', { ascending: false });
+    var usg = await supabase.from('usage')
+      .select('*').eq('user_id', userId).order('usage_date', { ascending: false }).limit(30);
+
+    res.json({
+      profile: prof.data,
+      subscriptions: subs.data || [],
+      payments: pymts.data || [],
+      usage: usg.data || []
+    });
+  } catch (e) {
+    console.error('[admin/users/:id] Error:', e.message);
+    res.status(500).json({ error: 'Failed to fetch user details' });
+  }
+});
+
+// POST /api/admin/users/:id/set-vip — manually set VIP
+router.post('/admin/users/:id/set-vip', requireAdmin, async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+    var userId = req.params.id;
+    var planType = req.body.planType || 'monthly';
+    var expiresAt = req.body.expiresAt || null;
+
+    if (['monthly', 'yearly', 'lifetime'].indexOf(planType) === -1) {
+      return res.status(400).json({ error: 'Invalid plan type' });
+    }
+
+    var expiryDate = expiresAt ? new Date(expiresAt) : new Date();
+    if (!expiresAt) {
+      if (planType === 'yearly') expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+      else if (planType === 'lifetime') expiryDate.setFullYear(expiryDate.getFullYear() + 99);
+      else expiryDate.setMonth(expiryDate.getMonth() + 1);
+    }
+
+    var pid = 'manual_' + userId + '_' + Date.now();
+
+    await supabase.from('subscriptions').upsert({
+      user_id: userId,
+      plan_type: planType,
+      payment_id: pid,
+      payment_status: 'active',
+      amount: 0,
+      currency: 'USD',
+      expires_at: expiryDate.toISOString()
+    }, { onConflict: 'payment_id' });
+
+    var rpcResult = await supabase.rpc('set_vip_status', {
+      user_uuid: userId,
+      vip_expires: expiryDate.toISOString()
+    });
+
+    if (rpcResult.error) return res.status(500).json({ error: rpcResult.error.message });
+
+    res.json({ success: true, planType: planType, expiresAt: expiryDate.toISOString() });
+  } catch (e) {
+    console.error('[admin/set-vip] Error:', e.message);
+    res.status(500).json({ error: 'Failed to set VIP status' });
+  }
+});
+
+// POST /api/admin/users/:id/revoke-vip — revoke VIP
+router.post('/admin/users/:id/revoke-vip', requireAdmin, async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+    var userId = req.params.id;
+
+    await supabase.from('subscriptions')
+      .update({ payment_status: 'cancelled', cancelled_at: new Date().toISOString() })
+      .eq('user_id', userId)
+      .eq('payment_status', 'active');
+
+    var rpcResult = await supabase.rpc('revoke_vip_status', { user_uuid: userId });
+    if (rpcResult.error) return res.status(500).json({ error: rpcResult.error.message });
+
+    res.json({ success: true });
+  } catch (e) {
+    console.error('[admin/revoke-vip] Error:', e.message);
+    res.status(500).json({ error: 'Failed to revoke VIP' });
+  }
+});
+
+// POST /api/admin/users/:id/extend-vip — extend VIP by N days
+router.post('/admin/users/:id/extend-vip', requireAdmin, async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+    var userId = req.params.id;
+    var days = Math.max(1, Math.min(3650, parseInt(req.body.days, 10) || 30));
+
+    var prof = await supabase.from('profiles').select('vip_expires_at').eq('id', userId).single();
+    if (prof.error) return res.status(404).json({ error: 'User not found' });
+
+    var currentExpiry = prof.data && prof.data.vip_expires_at ? new Date(prof.data.vip_expires_at) : new Date();
+    if (currentExpiry < new Date()) currentExpiry = new Date();
+    currentExpiry.setDate(currentExpiry.getDate() + days);
+
+    await supabase.rpc('set_vip_status', {
+      user_uuid: userId,
+      vip_expires: currentExpiry.toISOString()
+    });
+
+    res.json({ success: true, newExpiresAt: currentExpiry.toISOString(), extendedByDays: days });
+  } catch (e) {
+    console.error('[admin/extend-vip] Error:', e.message);
+    res.status(500).json({ error: 'Failed to extend VIP' });
+  }
+});
+
+// GET /api/admin/stats — system stats
+router.get('/admin/stats', requireAdmin, async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+    var totalProfiles = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+    var proUsers = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('vip_status', 'vip');
+    var adminUsers = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('vip_status', 'admin');
+    var freeUsers = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('vip_status', 'free');
+    var lifetimeSubs = await supabase.from('subscriptions').select('*', { count: 'exact', head: true }).eq('plan_type', 'lifetime').eq('payment_status', 'active');
+
+    res.json({
+      totalUsers: totalProfiles.count || 0,
+      proUsers: proUsers.count || 0,
+      adminUsers: adminUsers.count || 0,
+      freeUsers: freeUsers.count || 0,
+      activeLifetimeSubs: lifetimeSubs.count || 0
+    });
+  } catch (e) {
+    console.error('[admin/stats] Error:', e.message);
+    res.status(500).json({ error: 'Failed to fetch stats' });
+  }
 });
 
 module.exports = router;

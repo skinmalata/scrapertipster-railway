@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - WinFulltime</title>
+<link rel="stylesheet" href="/styles.css">
+<script src="/config.js"></script>
+<script src="/supabase-client.js"></script>
+<script src="/auth.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #151a2c; color: #e8edf5; min-height: 100vh; }
+header { background: rgba(21,26,44,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
+.header-content { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; max-width: 1200px; margin: 0 auto; }
+.logo { display: flex; align-items: center; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.logo a { display: inline-flex; align-items: center; color: #fff; text-decoration: none; gap: 8px; }
+.logo span { color: #ff7e7e; }
+nav { display: flex; gap: 20px; align-items: center; }
+nav a { color: rgba(232,237,245,0.55); text-decoration: none; font-weight: 500; font-size: 13px; transition: color 0.25s; }
+nav a:hover { color: #ff2448; }
+main { padding: 32px 16px 64px; max-width: 1200px; margin: 0 auto; }
+h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 24px; }
+h1 small { font-size: 14px; font-weight: 400; color: rgba(232,237,245,0.4); margin-left: 12px; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 28px; }
+.stat-card { background: rgba(37,46,64,0.5); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 18px 20px; }
+.stat-card .stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: rgba(232,237,245,0.4); margin-bottom: 6px; }
+.stat-card .stat-value { font-size: 28px; font-weight: 800; background: linear-gradient(135deg,#e8edf5,#ff6b8a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+.search-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+.search-bar input { flex: 1; background: rgba(21,26,44,0.6); border: 1px solid rgba(255,255,255,0.08); color: #e8edf5; padding: 12px 14px; border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.25s; }
+.search-bar input:focus { border-color: rgba(255,36,72,0.5); }
+.search-bar button { background: linear-gradient(135deg,#ff2448,#d41a38); color: #fff; border: none; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; }
+
+.table-wrap { background: rgba(30,38,56,0.85); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; overflow: hidden; margin-bottom: 20px; }
+table { width: 100%; border-collapse: collapse; }
+thead th { padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: rgba(232,237,245,0.35); background: rgba(21,26,44,0.4); border-bottom: 1px solid rgba(255,255,255,0.04); text-align: left; white-space: nowrap; }
+tbody td { padding: 12px 16px; font-size: 13px; color: rgba(232,237,245,0.75); border-bottom: 1px solid rgba(255,255,255,0.03); vertical-align: middle; }
+tbody tr { cursor: pointer; transition: background 0.15s; }
+tbody tr:hover { background: rgba(255,255,255,0.03); }
+tbody tr:last-child td { border-bottom: none; }
+
+.badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
+.badge-vip { background: rgba(74,222,128,0.15); color: #4ade80; }
+.badge-admin { background: rgba(255,36,72,0.2); color: #ff6b8a; }
+.badge-free { background: rgba(255,255,255,0.06); color: rgba(232,237,245,0.45); }
+.badge-expired { background: rgba(255,36,72,0.1); color: #ff2448; }
+
+.detail-panel { background: rgba(30,38,56,0.9); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+.detail-panel h2 { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; margin-bottom: 20px; }
+.detail-field { }
+.detail-field .field-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(232,237,245,0.35); margin-bottom: 2px; }
+.detail-field .field-value { font-size: 14px; color: rgba(232,237,245,0.85); }
+
+.action-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); }
+.action-btn { padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; font-family: 'Inter', sans-serif; border: none; cursor: pointer; transition: transform 0.15s, box-shadow 0.2s; }
+.action-btn:hover { transform: translateY(-1px); }
+.action-pro { background: linear-gradient(135deg,#4ade80,#22c55e); color: #0a0e17; }
+.action-revoke { background: linear-gradient(135deg,#ff2448,#d41a38); color: #fff; }
+.action-extend { background: linear-gradient(135deg,#3b82f6,#2563eb); color: #fff; }
+.action-default { background: rgba(255,255,255,0.08); color: rgba(232,237,245,0.7); }
+
+.pagination { display: flex; justify-content: center; gap: 8px; margin-top: 16px; }
+.pagination button { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: rgba(232,237,245,0.7); padding: 8px 14px; border-radius: 8px; font-size: 13px; font-family: 'Inter', sans-serif; cursor: pointer; transition: background 0.2s; }
+.pagination button:hover { background: rgba(255,255,255,0.1); }
+.pagination button:disabled { opacity: 0.3; cursor: not-allowed; }
+.pagination .page-info { padding: 8px 14px; font-size: 13px; color: rgba(232,237,245,0.4); }
+
+.error-msg { background: rgba(255,36,72,0.1); border: 1px solid rgba(255,36,72,0.2); border-radius: 10px; padding: 16px 20px; color: #ff6b8a; font-size: 14px; margin-bottom: 20px; }
+.success-msg { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2); border-radius: 10px; padding: 16px 20px; color: #4ade80; font-size: 14px; margin-bottom: 20px; }
+.access-denied { text-align: center; padding: 80px 20px; }
+.access-denied h2 { font-size: 24px; margin-bottom: 12px; }
+.access-denied p { color: rgba(232,237,245,0.5); }
+
+.loading { text-align: center; padding: 56px; }
+.spinner { width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.06); border-top-color: #ff2448; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 768px) {
+  .detail-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .search-bar { flex-direction: column; }
+  .search-bar button { width: 100%; }
+}
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+<div class="header-content">
+<div class="logo"><a href="/"><span>Win</span>Fulltime</a></div>
+<nav>
+<a href="/">Home</a>
+<a href="/ticket-builder.html">Ticket Builder</a>
+<a href="/pricing.html">Pricing</a>
+<a href="/account.html">Account</a>
+<a href="/admin.html" class="admin-nav-link" style="display:none;">Admin</a>
+</nav>
+</div>
+</header>
+
+<main>
+<h1>Admin Dashboard <small id="adminEmail"></small></h1>
+
+<div id="statsRow" class="stats-grid hidden">
+<div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value" id="statTotal">-</div></div>
+<div class="stat-card"><div class="stat-label">Pro</div><div class="stat-value" id="statPro">-</div></div>
+<div class="stat-card"><div class="stat-label">Free</div><div class="stat-value" id="statFree">-</div></div>
+<div class="stat-card"><div class="stat-label">Lifetime</div><div class="stat-value" id="statLifetime">-</div></div>
+</div>
+
+<div id="errorBox" class="error-msg hidden"></div>
+<div id="successBox" class="success-msg hidden"></div>
+
+<div id="accessDenied" class="access-denied hidden">
+<h2>Access Denied</h2>
+<p>You need admin privileges to access this page.</p>
+<p style="margin-top:16px;"><a href="/account.html" style="color:#ff2448;">Go to Account</a></p>
+</div>
+
+<div id="mainContent">
+<div class="search-bar">
+<input type="text" id="searchInput" placeholder="Search by email..." onkeydown="if(event.key==='Enter'){loadUsers(1);}">
+<button onclick="loadUsers(1)">Search</button>
+</div>
+
+<div class="table-wrap">
+<table>
+<thead><tr>
+<th>Email</th><th>Name</th><th>Status</th><th>Plan</th><th>Expires</th><th>Joined</th>
+</tr></thead>
+<tbody id="userBody"><tr><td colspan="6" style="text-align:center;padding:40px;color:rgba(232,237,245,0.3);">Loading...</td></tr></tbody>
+</table>
+</div>
+
+<div class="pagination">
+<button id="prevPage" onclick="loadUsers(curPage-1)" disabled>Previous</button>
+<span class="page-info" id="pageInfo"></span>
+<button id="nextPage" onclick="loadUsers(curPage+1)">Next</button>
+</div>
+
+<div id="detailPanel" class="detail-panel hidden">
+<h2 id="detailTitle">User Details</h2>
+<div class="detail-grid">
+<div class="detail-field"><div class="field-label">Email</div><div class="field-value" id="detEmail">-</div></div>
+<div class="detail-field"><div class="field-label">Full Name</div><div class="field-value" id="detName">-</div></div>
+<div class="detail-field"><div class="field-label">Status</div><div class="field-value" id="detStatus">-</div></div>
+<div class="detail-field"><div class="field-label">Plan</div><div class="field-value" id="detPlan">-</div></div>
+<div class="detail-field"><div class="field-label">VIP Expires</div><div class="field-value" id="detExpires">-</div></div>
+<div class="detail-field"><div class="field-label">Joined</div><div class="field-value" id="detJoined">-</div></div>
+</div>
+
+<div class="action-bar">
+<button class="action-btn action-pro" onclick="setVip('monthly')">Set Monthly</button>
+<button class="action-btn action-pro" onclick="setVip('yearly')">Set Yearly</button>
+<button class="action-btn action-pro" onclick="setVip('lifetime')">Set Lifetime</button>
+<button class="action-btn action-extend" onclick="extendVip()">Extend 30d</button>
+<button class="action-btn action-revoke" onclick="revokeVip()">Revoke VIP</button>
+</div>
+</div>
+</div>
+</main>
+
+<script>
+(function() {
+var WFT = window.WFT;
+var curPage = 1;
+var selectedUserId = null;
+
+function showError(msg) {
+  var el = document.getElementById('errorBox');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  setTimeout(function() { el.classList.add('hidden'); }, 5000);
+}
+
+function showSuccess(msg) {
+  var el = document.getElementById('successBox');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  setTimeout(function() { el.classList.add('hidden'); }, 5000);
+}
+
+function hideAll() {
+  document.getElementById('mainContent').classList.add('hidden');
+  document.getElementById('statsRow').classList.add('hidden');
+  document.getElementById('accessDenied').classList.add('hidden');
+}
+
+function loadStats() {
+  WFT.apiFetch('/api/admin/stats').then(function(data) {
+    if (data && typeof data.totalUsers !== 'undefined') {
+      document.getElementById('statTotal').textContent = data.totalUsers;
+      document.getElementById('statPro').textContent = data.proUsers;
+      document.getElementById('statFree').textContent = data.freeUsers;
+      document.getElementById('statLifetime').textContent = data.activeLifetimeSubs;
+      document.getElementById('statsRow').classList.remove('hidden');
+    }
+  }).catch(function() {});
+}
+
+function loadUsers(page) {
+  curPage = page;
+  var search = document.getElementById('searchInput').value.trim();
+  var url = '/api/admin/users?page=' + page + '&perPage=20';
+  if (search) url += '&search=' + encodeURIComponent(search);
+
+  document.getElementById('userBody').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:rgba(232,237,245,0.3);"><div class="spinner"></div></td></tr>';
+
+  WFT.apiFetch(url).then(function(data) {
+    if (data.error) { showError(data.error); return; }
+    var tbody = document.getElementById('userBody');
+    if (!data.users || !data.users.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:rgba(232,237,245,0.3);">No users found.</td></tr>';
+      document.getElementById('prevPage').disabled = true;
+      document.getElementById('nextPage').disabled = true;
+      document.getElementById('pageInfo').textContent = '';
+      return;
+    }
+
+    tbody.innerHTML = data.users.map(function(u) {
+      var badge = '';
+      if (u.vipStatus === 'admin') badge = '<span class="badge badge-admin">Admin</span>';
+      else if (u.vipStatus === 'vip') {
+        var expired = u.vipExpiresAt && new Date(u.vipExpiresAt) <= new Date();
+        badge = '<span class="badge ' + (expired ? 'badge-expired' : 'badge-vip') + '">' + (expired ? 'Expired' : 'VIP') + '</span>';
+      } else badge = '<span class="badge badge-free">Free</span>';
+
+      var expires = u.vipExpiresAt ? new Date(u.vipExpiresAt).toLocaleDateString() : '-';
+      var joined = u.joinedAt ? new Date(u.joinedAt).toLocaleDateString() : '-';
+      var plan = u.plan || '-';
+
+      return '<tr onclick="selectUser(\'' + u.id + '\',\'' + escapeHtml(u.email) + '\',\'' + escapeHtml(u.fullName || '') + '\',\'' + u.vipStatus + '\',\'' + (u.vipExpiresAt || '') + '\',\'' + (u.joinedAt || '') + '\',\'' + plan + '\')">' +
+        '<td>' + escapeHtml(u.email) + '</td>' +
+        '<td>' + escapeHtml(u.fullName || '-') + '</td>' +
+        '<td>' + badge + '</td>' +
+        '<td>' + plan + '</td>' +
+        '<td>' + expires + '</td>' +
+        '<td>' + joined + '</td></tr>';
+    }).join('');
+
+    var totalPages = Math.ceil(data.total / data.perPage);
+    document.getElementById('prevPage').disabled = page <= 1;
+    document.getElementById('nextPage').disabled = page >= totalPages;
+    document.getElementById('pageInfo').textContent = 'Page ' + page + ' of ' + totalPages + ' (' + data.total + ' users)';
+  }).catch(function() { showError('Failed to load users'); });
+}
+
+function selectUser(id, email, name, status, expires, joined, plan) {
+  selectedUserId = id;
+  document.getElementById('detailPanel').classList.remove('hidden');
+  document.getElementById('detailTitle').textContent = 'User: ' + email;
+  document.getElementById('detEmail').textContent = email;
+  document.getElementById('detName').textContent = name || '-';
+  document.getElementById('detStatus').textContent = status;
+  document.getElementById('detPlan').textContent = plan || '-';
+  document.getElementById('detExpires').textContent = expires ? new Date(expires).toLocaleString() : '-';
+  document.getElementById('detJoined').textContent = joined ? new Date(joined).toLocaleString() : '-';
+}
+
+function setVip(planType) {
+  if (!selectedUserId) return;
+  WFT.apiFetch('/api/admin/users/' + selectedUserId + '/set-vip', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ planType: planType })
+  }).then(function(data) {
+    if (data.error) { showError(data.error); return; }
+    showSuccess('Set ' + planType + ' successfully. Expires: ' + new Date(data.expiresAt).toLocaleDateString());
+    loadUsers(curPage);
+  }).catch(function() { showError('Failed to set VIP'); });
+}
+
+function revokeVip() {
+  if (!selectedUserId) return;
+  if (!confirm('Revoke VIP for this user?')) return;
+  WFT.apiFetch('/api/admin/users/' + selectedUserId + '/revoke-vip', {
+    method: 'POST'
+  }).then(function(data) {
+    if (data.error) { showError(data.error); return; }
+    showSuccess('VIP revoked successfully.');
+    loadUsers(curPage);
+  }).catch(function() { showError('Failed to revoke VIP'); });
+}
+
+function extendVip() {
+  if (!selectedUserId) return;
+  WFT.apiFetch('/api/admin/users/' + selectedUserId + '/extend-vip', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ days: 30 })
+  }).then(function(data) {
+    if (data.error) { showError(data.error); return; }
+    showSuccess('Extended by 30 days. New expiry: ' + new Date(data.newExpiresAt).toLocaleDateString());
+    loadUsers(curPage);
+  }).catch(function() { showError('Failed to extend VIP'); });
+}
+
+window.selectUser = selectUser;
+window.loadUsers = loadUsers;
+window.setVip = setVip;
+window.revokeVip = revokeVip;
+window.extendVip = extendVip;
+window.curPage = 1;
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>'"]/g, function(ch) {
+    return { '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch];
+  });
+}
+window.escapeHtml = escapeHtml;
+
+function init() {
+  var user = WFT.getUser();
+
+  if (!user) {
+    hideAll();
+    document.getElementById('accessDenied').classList.remove('hidden');
+    document.getElementById('accessDenied').innerHTML = '<h2>Sign In Required</h2><p>Please sign in to access the admin panel.</p><p style="margin-top:16px;"><a href="/login.html" style="color:#ff2448;">Sign In</a></p>';
+    return;
+  }
+
+  if (!user.isAdmin) {
+    hideAll();
+    document.getElementById('accessDenied').classList.remove('hidden');
+    return;
+  }
+
+  document.getElementById('adminEmail').textContent = '(' + user.email + ')';
+  var adminLinks = document.querySelectorAll('.admin-nav-link');
+  adminLinks.forEach(function(l) { l.style.display = ''; });
+
+  document.getElementById('mainContent').classList.remove('hidden');
+  document.getElementById('statsRow').classList.remove('hidden');
+  loadStats();
+  loadUsers(1);
+}
+
+WFT.onAuthReady(function() {
+  var checkCount = 0;
+  function poll() {
+    var user = WFT.getUser();
+    checkCount++;
+    if (user && user.isAdmin !== undefined) { init(); return; }
+    if (!user && checkCount > 5) { init(); return; }
+    if (checkCount > 30) { init(); return; }
+    setTimeout(poll, 300);
+  }
+  poll();
+});
+
+document.addEventListener('wft-pro-status', function() {
+  var user = WFT.getUser();
+  if (user && user.isAdmin) {
+    document.getElementById('adminEmail').textContent = '(' + user.email + ')';
+    loadStats();
+  }
+});
+})();
+</script>
+</body>
+</html>

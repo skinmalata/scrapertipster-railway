@@ -74,4 +74,24 @@ function requirePro(req, res, next) {
   });
 }
 
-module.exports = { optionalAuth, requireAuth, requirePro, supabase, REQUIRED_ENV };
+function requireAdmin(req, res, next) {
+  requireAuth(req, res, function () {
+    if (!supabase) return res.status(503).json({ error: 'Auth service unavailable' });
+
+    supabase.from('profiles')
+      .select('vip_status')
+      .eq('id', req.user.id)
+      .single()
+      .then(function (result) {
+        if (result.error) return res.status(500).json({ error: 'Failed to check admin status' });
+        if (!result.data || result.data.vip_status !== 'admin') {
+          return res.status(403).json({ error: 'Admin access required', code: 'ADMIN_REQUIRED' });
+        }
+        next();
+      }).catch(function () {
+        res.status(500).json({ error: 'Failed to check admin status' });
+      });
+  });
+}
+
+module.exports = { optionalAuth, requireAuth, requirePro, requireAdmin, supabase, REQUIRED_ENV };

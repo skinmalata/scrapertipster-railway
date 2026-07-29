@@ -56,6 +56,7 @@
     }).then(function (r) { return r.json(); }).then(function (data) {
       if (userState.user) {
         userState.user.isPro = data.isPro || false;
+        userState.user.isAdmin = data.isAdmin || false;
         userState.user.plan = data.plan || null;
         userState.user.expiresAt = data.expiresAt || null;
         updateUI(userState.user);
@@ -64,6 +65,7 @@
     }).catch(function () {
       if (userState.user) {
         userState.user.isPro = false;
+        userState.user.isAdmin = false;
         userState.user.plan = null;
         updateUI(userState.user);
       }

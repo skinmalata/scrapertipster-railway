@@ -1800,7 +1800,8 @@ nav.open { display: flex !important; }
     free_anon: { maxLegs: 3, maxOdds: 4.0, safeTips: false, marketSelector: false, shuffle: false, dailyLimit: 3, telegramLink: false, label: 'Free (not signed in)' },
     free_registered: { maxLegs: 3, maxOdds: 4.0, safeTips: false, marketSelector: false, shuffle: false, dailyLimit: 5, telegramLink: false, label: 'Free' },
     pro: { maxLegs: 30, maxOdds: 500, safeTips: true, marketSelector: true, shuffle: true, dailyLimit: null, telegramLink: false, label: 'Pro' },
-    lifetime: { maxLegs: 30, maxOdds: 500, safeTips: true, marketSelector: true, shuffle: true, dailyLimit: null, telegramLink: true, label: 'Lifetime' }
+    lifetime: { maxLegs: 30, maxOdds: 500, safeTips: true, marketSelector: true, shuffle: true, dailyLimit: null, telegramLink: true, label: 'Lifetime' },
+    admin: { maxLegs: 30, maxOdds: 500, safeTips: true, marketSelector: true, shuffle: true, dailyLimit: null, telegramLink: true, label: 'Admin' }
   };
 
 
@@ -1808,6 +1809,7 @@ nav.open { display: flex !important; }
   function getTier() {
     var user = WFT.getUser();
     if (!user) return 'free_anon';
+    if (user.isAdmin) return 'admin';
     if (!user.isPro) return 'free_registered';
     if (user.plan === 'lifetime') return 'lifetime';
     return 'pro';
@@ -1825,6 +1827,8 @@ nav.open { display: flex !important; }
       body = '<strong>Free Tier</strong> - Max ' + limits.maxLegs + ' legs, max ' + limits.maxOdds.toFixed(2) + ' odds, ' + limits.dailyLimit + ' tickets/day. <a href="/pricing.html">Upgrade to Pro</a> for unlimited.';
     } else if (tier === 'lifetime') {
       body = '<strong>Lifetime Member</strong> - Full access with exclusive Telegram tips.';
+    } else if (tier === 'admin') {
+      body = '<strong>Admin</strong> - Full access enabled.';
     } else {
       body = '<strong>Pro Member</strong> - Full access enabled.';
     }
