@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Best Picks of The Day — AI Top Predictions | WinFulltime</title>
+ <meta name="description" content="Best Picks of The Day — see the highest-confidence prediction in every market (1X2, Over/Under, BTTS, Corners, Cards, Streaks) with 3-day historical results.">
+ <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+ <link rel="canonical" href="https://winfulltime.com/best-picks.html">
+ <link rel="icon" href="/icons/icon-192.png" type="image/png">
+ <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+ <link rel="manifest" href="/manifest.json">
+ <meta name="theme-color" content="#ff2448">
+ <meta name="apple-mobile-web-app-capable" content="yes">
+ <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+ <meta name="apple-mobile-web-app-title" content="WinFulltime">
+ <link rel="stylesheet" href="/styles.css">
+ <style>
+  :root { --primary: #ff2448; --bg: #0a0e17; --card-bg: #111624; --border: rgba(255,255,255,0.06); --text: rgba(232,237,245,0.85); --text-dim: rgba(232,237,245,0.5); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 20px 40px; }
+  .hero { text-align: center; padding: 40px 0 28px; }
+  .hero h1 { font-size: 36px; font-weight: 800; background: linear-gradient(135deg,#fff 40%,var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero-subtext { color: var(--text-dim); font-size: 15px; margin-top: 10px; line-height: 1.6; max-width: 640px; margin-left: auto; margin-right: auto; }
+  .hero-date { font-size: 13px; color: var(--text-dim); margin-top: 6px; }
+
+  .section-title { font-size: 20px; font-weight: 700; margin: 32px 0 16px; display: flex; align-items: center; gap: 10px; }
+  .section-title .badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: var(--primary); color: #fff; }
+
+  .picks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .pick-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; transition: border-color 0.2s; }
+  .pick-card:hover { border-color: rgba(255,255,255,0.12); }
+  .pick-category { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--primary); margin-bottom: 8px; }
+  .pick-match { font-size: 14px; font-weight: 600; color: #fff; line-height: 1.4; margin-bottom: 6px; }
+  .pick-tip { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 6px; background: rgba(255,36,72,0.15); color: var(--primary); }
+  .pick-prob { font-size: 22px; font-weight: 800; color: #4ade80; margin-top: 8px; }
+  .pick-prob-label { font-size: 11px; color: var(--text-dim); }
+  .pick-meta { font-size: 12px; color: var(--text-dim); margin-top: 6px; }
+  .pick-card.empty { opacity: 0.5; display: flex; align-items: center; justify-content: center; min-height: 100px; color: var(--text-dim); font-size: 13px; }
+
+  .history-section { margin-top: 40px; }
+  .history-day { margin-bottom: 24px; }
+  .history-date { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+  .history-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 12px; }
+  .history-card .outcome { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .history-card .outcome.won { background: rgba(74,222,128,0.15); color: #4ade80; }
+  .history-card .outcome.lost { background: rgba(255,36,72,0.15); color: var(--primary); }
+  .history-card .outcome.pending { background: rgba(255,255,255,0.06); color: var(--text-dim); }
+  .history-card .h-info { flex: 1; min-width: 0; }
+  .history-card .h-cat { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--primary); }
+  .history-card .h-match { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .history-card .h-tip { font-size: 12px; color: var(--text-dim); }
+  .history-card .h-score { font-size: 13px; font-weight: 700; color: var(--text); flex-shrink: 0; }
+
+  .loading { text-align: center; padding: 60px 20px; color: var(--text-dim); }
+  .loading .spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .no-data { text-align: center; padding: 40px 20px; color: var(--text-dim); font-size: 14px; }
+
+  .faq-section { margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border); }
+  .faq-section h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+  .faq-item { border-bottom: 1px solid var(--border); padding: 14px 0; }
+  .faq-item summary { font-size: 15px; font-weight: 600; cursor: pointer; color: #fff; }
+  .faq-item p { font-size: 14px; color: var(--text-dim); margin-top: 8px; line-height: 1.6; }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 26px; }
+    .picks-grid { grid-template-columns: 1fr; }
+    .history-grid { grid-template-columns: 1fr; }
+  }
+ </style>
+</head>
+<body>
+<header>
+ <div class="header-content">
+  <div class="logo"><a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a></div>
+  <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <nav id="nav">
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/pricing.html">Pricing</a>
+   <a href="/blog/">Blog</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/account.html" class="wft-auth-account" style="display:none">Account</a>
+   <a href="/login.html" class="wft-auth-login">Log In</a>
+  </nav>
+ </div>
+</header>
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+ <ol>
+  <li><a href="/">Home</a></li>
+  <li aria-current="page">Best Picks of The Day</li>
+ </ol>
+</nav>
+
+<main class="container">
+ <div class="hero">
+  <h1>Best Picks of The Day</h1>
+  <p class="hero-subtext">The highest-confidence prediction in every market, selected by our AI. Updated daily with 3-day historical results.</p>
+  <div class="hero-date" id="heroDate"></div>
+ </div>
+
+ <div id="content">
+  <div class="loading">
+   <div class="spinner"></div>
+   <div class="loading-text">Loading best picks...</div>
+  </div>
+ </div>
+
+ <section class="faq-section">
+  <h2>Frequently Asked Questions</h2>
+  <details class="faq-item"><summary>How are Best Picks selected?</summary><p>Our AI scans every prediction across all markets (1X2, Over/Under, BTTS, Corners, Cards, Streaks) and picks the single selection with the highest confidence probability in each category.</p></details>
+  <details class="faq-item"><summary>What markets are covered?</summary><p>Best Picks covers 1X2 (match result), Over 1.5 goals, Over 2.5 goals, BTTS Yes, BTTS No, Corners, Cards, To Score 2+, Win Streak, Loss Streak, and Draw Streak.</p></details>
+  <details class="faq-item"><summary>How is historical accuracy tracked?</summary><p>Each day's top picks are compared against actual match results. A pick is marked Won when the outcome matches the prediction, Lost when it doesn't, or Pending if the match hasn't been played yet.</p></details>
+  <details class="faq-item"><summary>Are these picks guaranteed to win?</summary><p>No prediction is guaranteed. Best Picks highlight the highest-confidence selections from our AI models, but all sports betting carries risk. Please gamble responsibly.</p></details>
+ </section>
+</main>
+
+<footer>
+ <div class="footer-content">
+  <div class="footer-links">
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/2-odds-of-the-day.html">2 Odds</a>
+   <a href="/blog/">Blog</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/predictions/1x2.html">1X2</a>
+   <a href="/predictions/over-2-5.html">Over 2.5</a>
+   <a href="/predictions/over-1-5.html">Over 1.5</a>
+   <a href="/predictions/btts.html">BTTS Yes</a>
+   <a href="/predictions/btts-no.html">BTTS No</a>
+   <a href="/predictions/unbeaten.html">Unbeaten</a>
+   <a href="/predictions/corners.html">Corners</a>
+   <a href="/predictions/cards.html">Cards</a>
+   <a href="/advertise.html">Advertise</a>
+   <a href="/betting-guide.html">Betting Guide</a>
+   <a href="/contact.html">Contact</a>
+   <a href="/terms.html">Terms</a>
+   <a href="/privacy.html">Privacy</a>
+  </div>
+  <p class="disclaimer">18+ Only. Predictions are for informational purposes only. Please gamble responsibly.</p>
+  <p class="copyright">&copy; 2026 WinFulltime. All rights reserved. | Website Built by Mesigo</p>
+ </div>
+</footer>
+
+<script src="/config.js"></script>
+<script src="/pwa.js"></script>
+<script>
+(function() {
+  var API = window.WFT_API || 'https://winfulltime-api.onrender.com';
+  var content = document.getElementById('content');
+  var heroDate = document.getElementById('heroDate');
+
+  function getDateLabel() {
+    var d = new Date();
+    var opts = { timeZone: 'Africa/Lagos', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    return new Intl.DateTimeFormat('en-US', opts).format(d);
+  }
+  heroDate.textContent = getDateLabel();
+
+  function escapeHtml(v) { return String(v ?? '').replace(/[&<>'"]/g, function(c) { return { '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]; }); }
+
+  function buildPicksGrid(picks) {
+    if (!picks || picks.length === 0) return '<div class="no-data">No picks available for today.</div>';
+    return '<div class="picks-grid">' + picks.map(function(p) {
+      return '<div class="pick-card">' +
+        '<div class="pick-category">' + escapeHtml(p.category) + '</div>' +
+        '<div class="pick-match">' + escapeHtml(p.match) + '</div>' +
+        '<div><span class="pick-tip">' + escapeHtml(p.tip) + '</span></div>' +
+        '<div class="pick-prob">' + p.probability + '%</div>' +
+        '<div class="pick-prob-label">confidence</div>' +
+        (p.league ? '<div class="pick-meta">' + escapeHtml(p.league) + (p.time ? ' &middot; ' + escapeHtml(p.time) : '') + '</div>' : '') +
+        '</div>';
+    }).join('') + '</div>';
+  }
+
+  function buildHistory(history) {
+    if (!history || history.length === 0) return '';
+    return '<div class="history-section">' +
+      '<div class="section-title">Recent Results <span class="badge">Last ' + history.length + ' day(s)</span></div>' +
+      history.map(function(day) {
+        return '<div class="history-day">' +
+          '<div class="history-date">' + escapeHtml(day.date) + '</div>' +
+          '<div class="history-grid">' +
+          (day.picks || []).map(function(p) {
+            var out = p.outcome || 'pending';
+            var score = p.score || '';
+            return '<div class="history-card">' +
+              '<div class="outcome ' + out + '">' + (out === 'won' ? 'W' : out === 'lost' ? 'L' : '?') + '</div>' +
+              '<div class="h-info">' +
+              '<div class="h-cat">' + escapeHtml(p.category) + '</div>' +
+              '<div class="h-match">' + escapeHtml(p.match) + '</div>' +
+              '<div class="h-tip">' + escapeHtml(p.tip) + '</div>' +
+              '</div>' +
+              (score ? '<div class="h-score">' + escapeHtml(score) + '</div>' : '') +
+              '</div>';
+          }).join('') +
+          '</div></div>';
+      }).join('') + '</div>';
+  }
+
+  fetch(API + '/api/best-picks').then(function(r) { return r.json(); }).then(function(data) {
+    if (data.error) { content.innerHTML = '<div class="no-data">' + escapeHtml(data.error) + '</div>'; return; }
+    content.innerHTML = '<div class="section-title">Today\'s Best Picks <span class="badge">' + (data.today || []).length + ' markets</span></div>' +
+      buildPicksGrid(data.today) +
+      buildHistory(data.history);
+  }).catch(function() {
+    content.innerHTML = '<div class="no-data">Unable to load best picks. Try again later.</div>';
+  });
+})();
+</script>
+</body>
+</html>

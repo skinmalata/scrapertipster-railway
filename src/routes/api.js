@@ -1346,6 +1346,113 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
   }
 });
 
+// GET /api/best-picks — top pick per category + historical results
+router.get('/best-picks', async function (req, res) {
+  try {
+    var predictions = vipPredictionData();
+    if (!predictions || !Array.isArray(predictions.matches)) {
+      return res.json({ today: [], history: [], dates: [] });
+    }
+
+    var resultsCache = {};
+    try { resultsCache = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'results-cache.json'), 'utf8')); } catch (e) {}
+
+    var today = predictions.date || new Date().toISOString().slice(0, 10);
+
+    function getBestPick(arr) {
+      if (!Array.isArray(arr) || arr.length === 0) return null;
+      return arr.reduce(function(best, item) {
+        var prob = Number(item.probability) || 0;
+        var bestProb = Number(best.probability) || 0;
+        return prob > bestProb ? item : best;
+      });
+    }
+
+    function evaluatePick(pick, result) {
+      if (!result || typeof result.home !== 'number') return 'pending';
+      var tip = String(pick.tip || '');
+      var home = Number(result.home);
+      var away = Number(result.away);
+      if (tip === '1') return home > away ? 'won' : 'lost';
+      if (tip === '2') return away > home ? 'won' : 'lost';
+      if (tip === 'X') return home === away ? 'won' : 'lost';
+      if (/^over\s+([\d.]+)/i.test(tip)) {
+        var threshold = parseFloat(RegExp.$1);
+        return (home + away) > threshold ? 'won' : 'lost';
+      }
+      if (/^under\s+([\d.]+)/i.test(tip)) {
+        var threshold = parseFloat(RegExp.$1);
+        return (home + away) < threshold ? 'won' : 'lost';
+      }
+      if (/^btts\s+yes/i.test(tip) || tip === 'BTTS YES') return home > 0 && away > 0 ? 'won' : 'lost';
+      if (/^btts\s+no/i.test(tip) || tip === 'BTTS NO') return home === 0 || away === 0 ? 'won' : 'lost';
+      return 'pending';
+    }
+
+    var CATEGORIES = [
+      { key: 'matches', label: '1X2', type: '1x2' },
+      { key: 'over15Matches', label: 'Over 1.5', type: 'over15' },
+      { key: 'over25Matches', label: 'Over 2.5', type: 'over25' },
+      { key: 'bttsMatches', label: 'BTTS Yes', type: 'btts' },
+      { key: 'bttsNoMatches', label: 'BTTS No', type: 'bttsNo' },
+      { key: 'cornersMatches', label: 'Corners', type: 'corners' },
+      { key: 'cardsMatches', label: 'Cards', type: 'cards' },
+      { key: 'teamToScore2PlusMatches', label: 'To Score 2+', type: 'teamScore' },
+      { key: 'winstreakMatches', label: 'Win Streak', type: 'winStreak' },
+      { key: 'losestreakMatches', label: 'Loss Streak', type: 'lossStreak' },
+      { key: 'drawstreakMatches', label: 'Draw Streak', type: 'drawStreak' }
+    ];
+
+    var todayPicks = [];
+    CATEGORIES.forEach(function(cat) {
+      var matches = Array.isArray(predictions[cat.key]) ? predictions[cat.key].filter(function(m) { return (m.date || today) === today; }) : [];
+      var best = getBestPick(matches);
+      if (!best) return;
+      todayPicks.push({
+        category: cat.label,
+        type: cat.type,
+        match: best.nextMatch || best.match || '',
+        tip: best.tip || '',
+        probability: Number(best.probability) || 0,
+        league: best.league || '',
+        time: best.time || '',
+        streak: best.streak || null
+      });
+    });
+
+    var dates = (predictions.dates || []).filter(function(d) { return d !== today; }).slice(-3).sort();
+    var history = [];
+    dates.forEach(function(date) {
+      var dayResults = resultsCache[date] || {};
+      var dayPicks = [];
+      CATEGORIES.forEach(function(cat) {
+        var matches = Array.isArray(predictions[cat.key]) ? predictions[cat.key].filter(function(m) { return m.date === date; }) : [];
+        var best = getBestPick(matches);
+        if (!best) return;
+        var matchName = best.nextMatch || best.match || '';
+        var result = dayResults[matchName] || null;
+        dayPicks.push({
+          category: cat.label,
+          type: cat.type,
+          match: matchName,
+          tip: best.tip || '',
+          probability: Number(best.probability) || 0,
+          outcome: result ? evaluatePick(best, result) : 'pending',
+          score: result ? result.home + '-' + result.away : null
+        });
+      });
+      if (dayPicks.length > 0) {
+        history.push({ date: date, picks: dayPicks });
+      }
+    });
+
+    res.json({ today: todayPicks, history: history, dates: predictions.dates || [] });
+  } catch (e) {
+    console.error('[best-picks] Error:', e.message);
+    res.status(500).json({ error: 'Failed to load best picks' });
+  }
+});
+
 // GET /api/me/subscription — caller's subscription info
 router.get('/me/subscription', requireAuth, async function (req, res) {
   try {
