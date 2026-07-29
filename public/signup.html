@@ -51,7 +51,7 @@ body { font-family: 'Inter', sans-serif; background: #0c0f1a; color: #e2e8f0; mi
   </div>
   <div class="auth-card" id="signup-form">
     <h2>Create Account</h2>
-    <p class="subtitle">Get started with your free account</p>
+    <p class="subtitle">Start your 7-day free Pro trial</p>
     <div id="alert" class="alert"></div>
     <div id="confirmation" class="confirmation-sent" style="display:none">
       <div class="icon">&#9993;</div>
@@ -92,6 +92,27 @@ body { font-family: 'Inter', sans-serif; background: #0c0f1a; color: #e2e8f0; mi
 <script>
 var SUBMIT_TIMEOUT = null;
 
+var DISPOSABLE_DOMAINS = [
+  'mailinator.com', 'guerrillamail.com', '10minutemail.com', 'tempmail.com',
+  'throwaway.email', 'yopmail.com', 'trashmail.com', 'mailnator.com',
+  'temp-mail.org', 'disposablemail.com', 'mailmetrash.com', 'trash2009.com',
+  'spamgourmet.com', '33mail.com', 'jetable.org', 'trashmail.net',
+  'mailexpire.com', 'spambox.us', 'mytrashmail.com', 'mytemp.email',
+  'fakemailgenerator.com', 'getairmail.com', 'emailondeck.com',
+  'maildrop.cc', 'inboxbear.com', 'tempinbox.com', 'sharklasers.com',
+  'guerrillamail.info', 'grr.la', 'pokemail.net', 'spam4.me'
+];
+
+function isDisposableEmail(email) {
+  var domain = email.split('@')[1];
+  if (!domain) return false;
+  domain = domain.toLowerCase().trim();
+  var parts = domain.split('.');
+  while (parts.length > 2) { parts.shift(); }
+  var baseDomain = parts.join('.');
+  return DISPOSABLE_DOMAINS.indexOf(baseDomain) !== -1;
+}
+
 function showAlert(msg, type) {
   var el = document.getElementById('alert');
   el.textContent = msg;
@@ -124,6 +145,7 @@ function handleSignUp() {
 
   if (!fullName) { document.getElementById('name-error').textContent = 'Name is required'; document.getElementById('name-error').style.display = 'block'; return; }
   if (!email) { document.getElementById('email-error').textContent = 'Email is required'; document.getElementById('email-error').style.display = 'block'; return; }
+  if (isDisposableEmail(email)) { showAlert('Temporary email addresses are not allowed. Please use a permanent email.', 'error'); return; }
   if (password.length < 6) { document.getElementById('password-error').textContent = 'Must be at least 6 characters'; document.getElementById('password-error').style.display = 'block'; return; }
 
   setLoading(true);

@@ -140,16 +140,17 @@ CREATE POLICY "Public can read two_odds_history" ON public.two_odds_history
 
 -- === FUNCTIONS ===
 
--- Auto-create profile on signup
+-- Auto-create profile on signup with 7-day free Pro trial
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, full_name, vip_status)
+  INSERT INTO public.profiles (id, email, full_name, vip_status, vip_expires_at)
   VALUES (
     NEW.id,
     NEW.email,
     NEW.raw_user_meta_data->>'full_name',
-    'free'
+    'vip',
+    NOW() + INTERVAL '7 days'
   );
   RETURN NEW;
 END;
