@@ -32,6 +32,8 @@
   function onAuthChange(event, session) {
     if (session) {
       var user = session.user;
+      var tok = session.access_token;
+      console.log('[auth] onAuthChange event:', event, 'token first 20:', tok ? tok.substring(0, 20) : 'MISSING', 'token length:', tok ? tok.length : 0);
       userState.user = {
         id: user.id,
         email: user.email,
@@ -39,7 +41,7 @@
       };
       userState.session = session;
       userState.loading = false;
-      fetchProStatus(session.access_token);
+      fetchProStatus(tok);
     } else {
       userState.user = null;
       userState.session = null;
@@ -70,7 +72,11 @@
 
     if (userState.session) {
       options.headers = options.headers || {};
-      options.headers['Authorization'] = 'Bearer ' + userState.session.access_token;
+      var token = userState.session.access_token;
+      console.log('[apiFetch] Token first 20:', token ? token.substring(0, 20) : 'MISSING', 'Length:', token ? token.length : 0);
+      options.headers['Authorization'] = 'Bearer ' + token;
+    } else {
+      console.log('[apiFetch] No session, sending without auth');
     }
 
     return fetch(url, options).then(function (res) {
@@ -106,7 +112,9 @@
   document.addEventListener('wft-supabase-ready', function () {
     var sb = window.WFT.supabase;
     sb.auth.getSession().then(function (res) {
-      if (res.data.session) {
+      if (res.data && res.data.session) {
+        var tok = res.data.session.access_token;
+        console.log('[auth] getSession token first 20:', tok ? tok.substring(0, 20) : 'MISSING');
         onAuthChange(null, res.data.session);
       } else {
         userState.loading = false;
@@ -121,7 +129,9 @@
     var ready = function () {
       var sb = window.WFT.supabase;
       sb.auth.getSession().then(function (res) {
-        if (res.data.session) {
+        if (res.data && res.data.session) {
+          var tok = res.data.session.access_token;
+          console.log('[auth fallback] getSession token first 20:', tok ? tok.substring(0, 20) : 'MISSING');
           onAuthChange(null, res.data.session);
         } else {
           userState.loading = false;
