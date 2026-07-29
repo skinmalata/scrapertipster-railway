@@ -132,7 +132,7 @@ function getCustomData(attributes) {
 }
 
 function onOrderCreated(attributes, data) {
-  var custom = getCustomData({ first_order: { attributes: { custom_data: attributes.custom_data || {} } } }) || {};
+  var custom = getCustomData(attributes) || {};
   var userId = custom.user_id;
   var planType = custom.plan_type || 'lifetime';
   var email = attributes.user_email || '';
