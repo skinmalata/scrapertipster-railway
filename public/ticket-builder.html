@@ -1820,13 +1820,9 @@ nav.open { display: flex !important; }
 
     var marketGrid = document.getElementById('marketGrid');
     var checkboxes = marketGrid.querySelectorAll('input[type="checkbox"]');
-    if (!limits.marketSelector) {
-      checkboxes.forEach(function(cb) { cb.disabled = true; });
-      marketGrid.querySelectorAll('label').forEach(function(l) { l.classList.add('disabled'); });
-    } else {
-      checkboxes.forEach(function(cb) { cb.disabled = false; });
-      marketGrid.querySelectorAll('label').forEach(function(l) { l.classList.remove('disabled'); });
-    }
+    checkboxes.forEach(function(cb) { cb.disabled = false; });
+    marketGrid.querySelectorAll('label').forEach(function(l) { l.classList.remove('disabled'); });
+    marketGrid._freeLock = !limits.marketSelector;
 
     var safeCheck = document.getElementById('safeTips');
     if (!limits.safeTips) {
@@ -2056,6 +2052,13 @@ nav.open { display: flex !important; }
     currentTier = getTier();
     setupUI();
   }
+
+  document.getElementById('marketGrid').addEventListener('change', function(e) {
+    var cb = e.target.closest('input[type="checkbox"]');
+    if (cb && this._freeLock) {
+      cb.checked = true;
+    }
+  });
 
   WFT.onAuthReady(function() {
     refreshTier();
