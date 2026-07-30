@@ -57,34 +57,26 @@
     _proFetchScheduled = true;
     setTimeout(function() {
       var sb = window.WFT.supabase;
-      if (!sb) { _proFetchScheduled = false; return; }
-      sb.auth.getSession().then(function(s) {
-        var tok = s.data.session?.access_token;
-        if (!tok) { _proFetchScheduled = false; return; }
-        fetch(window.WFT_API + '/api/me/subscription', {
-          headers: { 'Authorization': 'Bearer ' + tok }
-        }).then(function (r) {
-          if (!r.ok) { console.warn('[fetchProStatus] HTTP ' + r.status); throw new Error('HTTP ' + r.status); }
-          return r.json();
-        }).then(function (data) {
-          if (userState.user) {
-            userState.user.isPro = data.isPro || false;
-            userState.user.isAdmin = data.isAdmin || false;
-            userState.user.plan = data.plan || null;
-            userState.user.expiresAt = data.expiresAt || null;
-            updateUI(userState.user);
-          }
-          document.dispatchEvent(new CustomEvent('wft-pro-status'));
-        }).catch(function () {
-          if (userState.user) {
-            userState.user.isPro = false;
-            userState.user.isAdmin = false;
-            userState.user.plan = null;
-            updateUI(userState.user);
-          }
-          document.dispatchEvent(new CustomEvent('wft-pro-status'));
-        }).finally(function() { _proFetchScheduled = false; });
-      });
+      if (!sb || !userState.user) { _proFetchScheduled = false; return; }
+      sb.from('profiles').select('vip_status, vip_expires_at').eq('id', userState.user.id).single().then(function(res) {
+        if (res.data) {
+          var p = res.data;
+          var isAdmin = p.vip_status === 'admin';
+          var isVip = p.vip_status === 'vip' && (!p.vip_expires_at || new Date(p.vip_expires_at) > new Date());
+          userState.user.isPro = isAdmin || isVip;
+          userState.user.isAdmin = isAdmin;
+          userState.user.expiresAt = p.vip_expires_at || null;
+          updateUI(userState.user);
+        }
+        document.dispatchEvent(new CustomEvent('wft-pro-status'));
+      }).catch(function() {
+        if (userState.user) {
+          userState.user.isPro = false;
+          userState.user.isAdmin = false;
+          updateUI(userState.user);
+        }
+        document.dispatchEvent(new CustomEvent('wft-pro-status'));
+      }).finally(function() { _proFetchScheduled = false; });
     }, 1000);
   }
 
@@ -93,21 +85,20 @@
     var isApiPath = path.startsWith('/api/');
     var url = isApiPath ? window.WFT_API + path : path;
 
-    if (userState.session) {
-      options.headers = options.headers || {};
-      var token = userState.session.access_token;
-      console.log('[apiFetch] Token first 20:', token ? token.substring(0, 20) : 'MISSING', 'Length:', token ? token.length : 0);
-      options.headers['Authorization'] = 'Bearer ' + token;
-    } else {
-      console.log('[apiFetch] No session, sending without auth');
-    }
-
-    return fetch(url, options).then(function (res) {
-      return res.json().then(function (data) {
-        if (data && typeof data.isPro !== 'undefined' && userState.user) {
-          userState.user.isPro = data.isPro;
-        }
-        return data;
+    var sb = window.WFT.supabase;
+    var tokenPromise = sb ? sb.auth.getSession().then(function(s) { return s.data.session?.access_token || null; }) : Promise.resolve(null);
+    return tokenPromise.then(function(token) {
+      if (token) {
+        options.headers = options.headers || {};
+        options.headers['Authorization'] = 'Bearer ' + token;
+      }
+      return fetch(url, options).then(function (res) {
+        return res.json().then(function (data) {
+          if (data && typeof data.isPro !== 'undefined' && userState.user) {
+            userState.user.isPro = data.isPro;
+          }
+          return data;
+        });
       });
     });
   };
