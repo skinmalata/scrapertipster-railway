@@ -1467,6 +1467,8 @@ router.get('/best-picks', async function (req, res) {
         ].forEach(function(cat) {
           var arr = Array.isArray(preds[cat.key]) ? preds[cat.key] : [];
           if (arr.length === 0) return;
+          arr = arr.filter(function(x) { return x.date === TODAY_SYSTEM || !x.date; });
+          if (arr.length === 0) return;
           var best = arr.reduce(function(a, b) { return (Number(b.probability) || 0) > (Number(a.probability) || 0) ? b : a; });
           var tip = best.tip || '';
           if (cat.type === 'cards' && /^Over 9\.5 Cards/i.test(tip)) tip = 'Over 3.5 Cards';
