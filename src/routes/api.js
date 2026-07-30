@@ -1484,7 +1484,7 @@ router.get('/best-picks', async function (req, res) {
         }
         return;
       }
-      var matches = Array.isArray(predictions[cat.key]) ? predictions[cat.key].filter(function(m) { return m.date === today; }) : [];
+      var matches = Array.isArray(predictions[cat.key]) ? predictions[cat.key] : [];
       var best = getBestPick(matches);
       if (!best) return;
       todayPicks.push({
