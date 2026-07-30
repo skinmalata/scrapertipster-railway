@@ -17,7 +17,7 @@ const { buildTwoOddsOfDay, watDate } = require('../services/twoOddsOfDay');
 const { buildTicket } = require('../services/ticketBuilder');
 const { buildGiantPool, getGiantPoolHistory } = require('../services/authorPicks');
 const { fetchTodayStreaks } = require('../services/h2hWinningStreaks');
-const { optionalAuth, requireAuth, requirePro: requireProMiddleware, requireAdmin } = require('../middleware/auth');
+const { optionalAuth, requireAuth, requirePro: requireProMiddleware, requireAdmin, logAdminAction } = require('../middleware/auth');
 const payment = require('../services/payment');
 
 // API-Football responses are cached so one busy page does not consume the
@@ -38,8 +38,6 @@ const headToHeadCache = new Map();
 const HEAD_TO_HEAD_CACHE_MS = 12 * 60 * 60 * 1000;
 const fixtureResultsCache = new Map();
 const FIXTURE_RESULTS_CACHE_MS = 24 * 60 * 60 * 1000;
-var anonTicketCache = null;
-
 let scraperService = null;
 let cornersLastScrape = null;
 const SCRAPE_INTERVAL_MS = 2 * 60 * 60 * 1000;
@@ -72,6 +70,48 @@ const FREE_LIMITS = {
   teamtoscore: 4,
   teamtoscore2plus: 4
 };
+
+const DISPOSABLE_DOMAINS = [
+  'mailinator.com', 'guerrillamail.com', '10minutemail.com', 'tempmail.com',
+  'throwaway.email', 'yopmail.com', 'trashmail.com', 'mailnator.com',
+  'temp-mail.org', 'disposablemail.com', 'mailmetrash.com', 'trash2009.com',
+  'spamgourmet.com', '33mail.com', 'jetable.org', 'trashmail.net',
+  'mailexpire.com', 'spambox.us', 'mytrashmail.com', 'mytemp.email',
+  'fakemailgenerator.com', 'getairmail.com', 'emailondeck.com',
+  'maildrop.cc', 'inboxbear.com', 'tempinbox.com', 'sharklasers.com',
+  'guerrillamail.info', 'grr.la', 'pokemail.net', 'spam4.me'
+];
+
+function isDisposableEmail(email) {
+  var domain = (email || '').split('@')[1];
+  if (!domain) return false;
+  domain = domain.toLowerCase().trim();
+  var parts = domain.split('.');
+  while (parts.length > 2) { parts.shift(); }
+  var baseDomain = parts.join('.');
+  return DISPOSABLE_DOMAINS.indexOf(baseDomain) !== -1;
+}
+
+const ANON_RATE_FILE = path.join(__dirname, '..', '..', 'anon-rate-cache.json');
+
+function loadAnonRateCache() {
+  try {
+    if (fs.existsSync(ANON_RATE_FILE)) {
+      return JSON.parse(fs.readFileSync(ANON_RATE_FILE, 'utf8'));
+    }
+  } catch (e) {
+    console.warn('[anon-rate] Failed to load cache:', e.message);
+  }
+  return {};
+}
+
+function saveAnonRateCache(data) {
+  try {
+    fs.writeFileSync(ANON_RATE_FILE, JSON.stringify(data));
+  } catch (e) {
+    console.warn('[anon-rate] Failed to save cache:', e.message);
+  }
+}
 
 async function checkUserVipStatus(userId) {
   if (!userId || !supabase) return { isVip: false };
@@ -1273,12 +1313,13 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
           remaining = 0;
         }
       } else {
-        if (!anonTicketCache) anonTicketCache = new Map();
+        var anonRateData = loadAnonRateCache();
         var ip = req.ip || 'anon';
         var anonKey = 'anon_ticket_' + ip.replace(/[.:]/g, '_') + '_' + new Date().toISOString().slice(0, 10);
-        var anonCount = anonTicketCache.get(anonKey) || 0;
+        var anonCount = anonRateData[anonKey] || 0;
         if (anonCount >= FREE_ANON_DAILY) return res.status(429).json({ error: 'Anonymous limit reached (' + FREE_ANON_DAILY + ' run/day). Sign in for ' + FREE_REG_DAILY + ' free runs.', isPro: false, remaining: 0 });
-        anonTicketCache.set(anonKey, anonCount + 1);
+        anonRateData[anonKey] = anonCount + 1;
+        saveAnonRateCache(anonRateData);
         remaining = 0;
       }
     }
@@ -1584,10 +1625,23 @@ router.get('/me/subscription', requireAuth, async function (req, res) {
     var isAdmin = profile && profile.vip_status === 'admin';
     var isPro = isAdmin || (profile && profile.vip_status === 'vip' && new Date(profile.vip_expires_at) > new Date());
 
+    var emailConfirmed = false;
+    var header = String(req.headers.authorization || '');
+    var tokenMatch = header.match(/^Bearer\s+(.+)$/i);
+    if (tokenMatch && supabase) {
+      try {
+        var userResult = await supabase.auth.getUser(tokenMatch[1]);
+        if (userResult.data && userResult.data.user) {
+          emailConfirmed = !!userResult.data.user.email_confirmed_at;
+        }
+      } catch (e) {}
+    }
+
     res.json({
       isPro: isPro,
       isAdmin: isAdmin,
       email: req.user.email,
+      emailConfirmed: emailConfirmed,
       plan: isAdmin ? 'admin' : (subscription ? subscription.plan_type : null),
       status: subscription ? subscription.payment_status : null,
       expiresAt: subscription && subscription.expires_at ? subscription.expires_at : null,
@@ -1649,6 +1703,29 @@ router.post('/subscription/cancel', requireAuth, function (req, res) {
       console.error('[cancel] Error:', err.message);
       res.status(500).json({ error: 'Failed to cancel subscription' });
     });
+});
+
+// POST /api/validate-email — server-side email validation
+router.post('/validate-email', async function (req, res) {
+  try {
+    var email = String(req.body.email || '').trim().toLowerCase();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.json({ valid: false, error: 'Invalid email format' });
+    }
+    if (isDisposableEmail(email)) {
+      return res.json({ valid: false, error: 'Temporary email addresses are not allowed' });
+    }
+    if (supabase) {
+      var existing = await supabase.from('profiles').select('id').eq('email', email).maybeSingle();
+      if (existing.data) {
+        return res.json({ valid: false, error: 'An account with this email already exists' });
+      }
+    }
+    res.json({ valid: true });
+  } catch (e) {
+    console.error('[validate-email] Error:', e.message);
+    res.json({ valid: false, error: 'Validation service unavailable' });
+  }
 });
 
 // ===== ADMIN ROUTES =====
@@ -1760,6 +1837,9 @@ router.post('/admin/users/:id/set-vip', requireAdmin, async function (req, res) 
       return res.status(400).json({ error: 'Invalid plan type' });
     }
 
+    var targetProfile = await supabase.from('profiles').select('email').eq('id', userId).single();
+    if (targetProfile.error) return res.status(404).json({ error: 'User not found' });
+
     var expiryDate = expiresAt ? new Date(expiresAt) : new Date();
     if (!expiresAt) {
       if (planType === 'yearly') expiryDate.setFullYear(expiryDate.getFullYear() + 1);
@@ -1786,6 +1866,8 @@ router.post('/admin/users/:id/set-vip', requireAdmin, async function (req, res) 
 
     if (rpcResult.error) return res.status(500).json({ error: rpcResult.error.message });
 
+    logAdminAction(req.user, 'set_vip', userId, targetProfile.data.email, { planType: planType, expiresAt: expiryDate.toISOString() });
+
     res.json({ success: true, planType: planType, expiresAt: expiryDate.toISOString() });
   } catch (e) {
     console.error('[admin/set-vip] Error:', e.message);
@@ -1800,6 +1882,8 @@ router.post('/admin/users/:id/revoke-vip', requireAdmin, async function (req, re
 
     var userId = req.params.id;
 
+    var targetProfile = await supabase.from('profiles').select('email').eq('id', userId).single();
+
     await supabase.from('subscriptions')
       .update({ payment_status: 'cancelled', cancelled_at: new Date().toISOString() })
       .eq('user_id', userId)
@@ -1807,6 +1891,10 @@ router.post('/admin/users/:id/revoke-vip', requireAdmin, async function (req, re
 
     var rpcResult = await supabase.rpc('revoke_vip_status', { user_uuid: userId });
     if (rpcResult.error) return res.status(500).json({ error: rpcResult.error.message });
+
+    if (!targetProfile.error) {
+      logAdminAction(req.user, 'revoke_vip', userId, targetProfile.data.email);
+    }
 
     res.json({ success: true });
   } catch (e) {
@@ -1823,7 +1911,7 @@ router.post('/admin/users/:id/extend-vip', requireAdmin, async function (req, re
     var userId = req.params.id;
     var days = Math.max(1, Math.min(3650, parseInt(req.body.days, 10) || 30));
 
-    var prof = await supabase.from('profiles').select('vip_expires_at').eq('id', userId).single();
+    var prof = await supabase.from('profiles').select('vip_expires_at, email').eq('id', userId).single();
     if (prof.error) return res.status(404).json({ error: 'User not found' });
 
     var currentExpiry = prof.data && prof.data.vip_expires_at ? new Date(prof.data.vip_expires_at) : new Date();
@@ -1835,10 +1923,76 @@ router.post('/admin/users/:id/extend-vip', requireAdmin, async function (req, re
       vip_expires: currentExpiry.toISOString()
     });
 
+    logAdminAction(req.user, 'extend_vip', userId, prof.data.email, { days: days, newExpiresAt: currentExpiry.toISOString() });
+
     res.json({ success: true, newExpiresAt: currentExpiry.toISOString(), extendedByDays: days });
   } catch (e) {
     console.error('[admin/extend-vip] Error:', e.message);
     res.status(500).json({ error: 'Failed to extend VIP' });
+  }
+});
+
+// POST /api/admin/users/:id/set-admin — grant admin privileges
+router.post('/admin/users/:id/set-admin', requireAdmin, async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+    var userId = req.params.id;
+
+    var targetProfile = await supabase.from('profiles').select('email').eq('id', userId).single();
+    if (targetProfile.error) return res.status(404).json({ error: 'User not found' });
+
+    await supabase.from('profiles').update({
+      vip_status: 'admin',
+      vip_expires_at: null,
+      updated_at: new Date().toISOString()
+    }).eq('id', userId);
+
+    await supabase.from('subscriptions').upsert({
+      user_id: userId,
+      plan_type: 'admin',
+      payment_id: 'admin_' + userId,
+      payment_status: 'active',
+      amount: 0,
+      currency: 'USD',
+      expires_at: new Date(Date.now() + 864e11).toISOString()
+    }, { onConflict: 'payment_id' });
+
+    logAdminAction(req.user, 'set_admin', userId, targetProfile.data.email);
+
+    res.json({ success: true, message: 'Admin privileges granted' });
+  } catch (e) {
+    console.error('[admin/set-admin] Error:', e.message);
+    res.status(500).json({ error: 'Failed to set admin' });
+  }
+});
+
+// POST /api/admin/users/:id/revoke-admin — revoke admin privileges
+router.post('/admin/users/:id/revoke-admin', requireAdmin, async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+    var userId = req.params.id;
+
+    if (userId === req.user.id) {
+      return res.status(400).json({ error: 'You cannot revoke your own admin privileges' });
+    }
+
+    var targetProfile = await supabase.from('profiles').select('email').eq('id', userId).single();
+    if (targetProfile.error) return res.status(404).json({ error: 'User not found' });
+
+    await supabase.from('profiles').update({
+      vip_status: 'free',
+      vip_expires_at: null,
+      updated_at: new Date().toISOString()
+    }).eq('id', userId);
+
+    logAdminAction(req.user, 'revoke_admin', userId, targetProfile.data.email);
+
+    res.json({ success: true, message: 'Admin privileges revoked' });
+  } catch (e) {
+    console.error('[admin/revoke-admin] Error:', e.message);
+    res.status(500).json({ error: 'Failed to revoke admin' });
   }
 });
 

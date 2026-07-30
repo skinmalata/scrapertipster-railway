@@ -138,6 +138,28 @@ DROP POLICY IF EXISTS "Public can read two_odds_history" ON public.two_odds_hist
 CREATE POLICY "Public can read two_odds_history" ON public.two_odds_history
   FOR SELECT USING (true);
 
+-- 8. Admin audit log
+CREATE TABLE IF NOT EXISTS public.admin_audit_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  admin_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  admin_email TEXT NOT NULL,
+  action TEXT NOT NULL,
+  target_user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  target_email TEXT,
+  details JSONB,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_admin_audit_log_admin_id ON public.admin_audit_log(admin_id);
+CREATE INDEX IF NOT EXISTS idx_admin_audit_log_action ON public.admin_audit_log(action);
+CREATE INDEX IF NOT EXISTS idx_admin_audit_log_created_at ON public.admin_audit_log(created_at);
+
+ALTER TABLE public.admin_audit_log ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "No client access to admin_audit_log" ON public.admin_audit_log;
+CREATE POLICY "No client access to admin_audit_log" ON public.admin_audit_log
+  FOR ALL USING (false);
+
 -- === FUNCTIONS ===
 
 -- Auto-create profile on signup with 7-day free Pro trial

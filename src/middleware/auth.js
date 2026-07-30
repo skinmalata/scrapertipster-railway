@@ -15,6 +15,22 @@ if (supabaseUrl && supabaseKey) {
 var REQUIRED_ENV = ['SUPABASE_URL', 'SUPABASE_SERVICE_KEY', 'SUPABASE_ANON_KEY',
   'LEMONSQUEEZY_API_KEY'];
 
+async function logAdminAction(adminUser, action, targetUserId, targetEmail, details) {
+  if (!supabase) return;
+  try {
+    await supabase.from('admin_audit_log').insert({
+      admin_id: adminUser.id,
+      admin_email: adminUser.email,
+      action: action,
+      target_user_id: targetUserId || null,
+      target_email: targetEmail || null,
+      details: details || null
+    });
+  } catch (e) {
+    console.warn('[audit] Failed to log admin action:', e.message);
+  }
+}
+
 function optionalAuth(req, res, next) {
   if (!supabase) { req.user = null; return next(); }
 
@@ -48,29 +64,44 @@ function requirePro(req, res, next) {
   requireAuth(req, res, function () {
     if (!supabase) return res.status(503).json({ error: 'Auth service unavailable' });
 
-    supabase.from('profiles')
-      .select('vip_status, vip_expires_at')
-      .eq('id', req.user.id)
-      .single()
-      .then(function (result) {
-        if (result.error) return res.status(500).json({ error: 'Failed to check membership' });
-
-        var profile = result.data;
-        if (!profile || profile.vip_status !== 'vip') {
-          return res.status(403).json({ error: 'Pro membership required', code: 'PRO_REQUIRED', isPro: false });
+    // Check email confirmation
+    var header = String(req.headers.authorization || '');
+    var match = header.match(/^Bearer\s+(.+)$/i);
+    if (match) {
+      supabase.auth.getUser(match[1]).then(function (userResult) {
+        if (userResult.data && userResult.data.user && !userResult.data.user.email_confirmed_at) {
+          return res.status(403).json({ error: 'Please verify your email before accessing Pro features', code: 'EMAIL_NOT_CONFIRMED', isPro: false });
         }
 
-        var expiresAt = new Date(profile.vip_expires_at);
-        if (expiresAt <= new Date()) {
-          return res.status(403).json({ error: 'Pro membership has expired', code: 'PRO_EXPIRED', isPro: false });
-        }
+        supabase.from('profiles')
+          .select('vip_status, vip_expires_at')
+          .eq('id', req.user.id)
+          .single()
+          .then(function (result) {
+            if (result.error) return res.status(500).json({ error: 'Failed to check membership' });
 
-        req.profile = profile;
-        req.isPro = true;
-        next();
-      }).catch(function (err) {
-        res.status(500).json({ error: 'Failed to check membership' });
+            var profile = result.data;
+            if (!profile || profile.vip_status !== 'vip') {
+              return res.status(403).json({ error: 'Pro membership required', code: 'PRO_REQUIRED', isPro: false });
+            }
+
+            var expiresAt = new Date(profile.vip_expires_at);
+            if (expiresAt <= new Date()) {
+              return res.status(403).json({ error: 'Pro membership has expired', code: 'PRO_EXPIRED', isPro: false });
+            }
+
+            req.profile = profile;
+            req.isPro = true;
+            next();
+          }).catch(function (err) {
+            res.status(500).json({ error: 'Failed to check membership' });
+          });
+      }).catch(function () {
+        res.status(500).json({ error: 'Failed to verify authentication' });
       });
+    } else {
+      res.status(401).json({ error: 'Authentication required' });
+    }
   });
 }
 
@@ -94,4 +125,4 @@ function requireAdmin(req, res, next) {
   });
 }
 
-module.exports = { optionalAuth, requireAuth, requirePro, requireAdmin, supabase, REQUIRED_ENV };
+module.exports = { optionalAuth, requireAuth, requirePro, requireAdmin, supabase, REQUIRED_ENV, logAdminAction };

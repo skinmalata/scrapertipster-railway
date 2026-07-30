@@ -145,45 +145,60 @@ function handleSignUp() {
 
   if (!fullName) { document.getElementById('name-error').textContent = 'Name is required'; document.getElementById('name-error').style.display = 'block'; return; }
   if (!email) { document.getElementById('email-error').textContent = 'Email is required'; document.getElementById('email-error').style.display = 'block'; return; }
-  if (isDisposableEmail(email)) { showAlert('Temporary email addresses are not allowed. Please use a permanent email.', 'error'); return; }
   if (password.length < 6) { document.getElementById('password-error').textContent = 'Must be at least 6 characters'; document.getElementById('password-error').style.display = 'block'; return; }
 
   setLoading(true);
   SUBMIT_TIMEOUT = setTimeout(function() { SUBMIT_TIMEOUT = null; }, 5000);
 
-  var ready = function () {
-    if (!window.WFT || !window.WFT.supabase) {
-      showAlert('Auth service loading. Please try again.', 'error');
+  // Server-side email validation
+  fetch(window.WFT_API + '/api/validate-email', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email })
+  }).then(function (r) { return r.json(); }).then(function (validation) {
+    if (!validation.valid) {
       setLoading(false); SUBMIT_TIMEOUT = null;
+      showAlert(validation.error || 'Invalid email address', 'error');
       return;
     }
 
-    window.WFT.supabase.auth.signUp({
-      email: email,
-      password: password,
-      options: { data: { full_name: fullName } }
-    }).then(function (result) {
-      setLoading(false); SUBMIT_TIMEOUT = null;
-      if (result.error) {
-        showAlert(result.error.message, 'error');
-      } else if (result.data.user && result.data.user.identities && result.data.user.identities.length === 0) {
-        showAlert('An account with this email already exists.', 'error');
-      } else if (result.data.session) {
-        window.location.href = '/';
-      } else {
-        document.getElementById('confirmation-email').textContent = email;
-        document.getElementById('confirmation').style.display = 'block';
-        document.getElementById('form-fields').style.display = 'none';
+    var ready = function () {
+      if (!window.WFT || !window.WFT.supabase) {
+        showAlert('Auth service loading. Please try again.', 'error');
+        setLoading(false); SUBMIT_TIMEOUT = null;
+        return;
       }
-    }).catch(function (err) {
-      setLoading(false); SUBMIT_TIMEOUT = null;
-      showAlert(err.message || 'An unexpected error occurred', 'error');
-    });
-  };
 
-  if (window.WFT && window.WFT.supabase) { ready(); return; }
-  document.addEventListener('wft-supabase-ready', ready);
-  setTimeout(function() { if (SUBMIT_TIMEOUT) { setLoading(false); SUBMIT_TIMEOUT = null; showAlert('Auth service timed out. Please refresh.', 'error'); } }, 8000);
+      window.WFT.supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: { data: { full_name: fullName } }
+      }).then(function (result) {
+        setLoading(false); SUBMIT_TIMEOUT = null;
+        if (result.error) {
+          showAlert(result.error.message, 'error');
+        } else if (result.data.user && result.data.user.identities && result.data.user.identities.length === 0) {
+          showAlert('An account with this email already exists.', 'error');
+        } else if (result.data.session) {
+          window.location.href = '/';
+        } else {
+          document.getElementById('confirmation-email').textContent = email;
+          document.getElementById('confirmation').style.display = 'block';
+          document.getElementById('form-fields').style.display = 'none';
+        }
+      }).catch(function (err) {
+        setLoading(false); SUBMIT_TIMEOUT = null;
+        showAlert(err.message || 'An unexpected error occurred', 'error');
+      });
+    };
+
+    if (window.WFT && window.WFT.supabase) { ready(); return; }
+    document.addEventListener('wft-supabase-ready', ready);
+    setTimeout(function() { if (SUBMIT_TIMEOUT) { setLoading(false); SUBMIT_TIMEOUT = null; showAlert('Auth service timed out. Please refresh.', 'error'); } }, 8000);
+  }).catch(function () {
+    setLoading(false); SUBMIT_TIMEOUT = null;
+    showAlert('Failed to validate email. Please try again.', 'error');
+  });
 }
 
 function handleGoogleSignUp() {

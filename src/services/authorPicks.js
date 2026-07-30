@@ -293,9 +293,9 @@ function predictCards(cardValues) {
   if (!cardValues || cardValues.length < 3) return null;
   var total = cardValues.reduce(function (a, b) { return a + b; }, 0);
   var avg = total / cardValues.length;
-  if (avg < 6.5) return null;
-  var conf = Math.min(90, 70 + Math.round((avg - 6.5) * 4));
-  return { tip: 'Over 5.5 Cards', market: 'Cards', selection: 'Over 5.5 Cards', confidence: conf, reason: 'Averaging ' + avg.toFixed(1) + ' cards across ' + cardValues.length + ' recent meetings' };
+  if (avg < 4.5) return null;
+  var conf = Math.min(85, 65 + Math.round((avg - 4.5) * 5));
+  return { tip: 'Over 3.5 Cards', market: 'Cards', selection: 'Over 3.5 Cards', confidence: conf, reason: 'Averaging ' + avg.toFixed(1) + ' cards across ' + cardValues.length + ' recent meetings' };
 }
 
 var MARKET_PRIORITY = {
