@@ -1467,7 +1467,12 @@ router.get('/best-picks', async function (req, res) {
         ].forEach(function(cat) {
           var arr = Array.isArray(preds[cat.key]) ? preds[cat.key] : [];
           if (arr.length === 0) return;
-          arr = arr.filter(function(x) { return x.date === TODAY_SYSTEM || !x.date; });
+          // Prefer today's matches, fall back to latest available date
+          var dates = {};
+          arr.forEach(function(x) { if (x.date) dates[x.date] = true; });
+          var dateKeys = Object.keys(dates).sort();
+          var targetDate = dateKeys.indexOf(TODAY_SYSTEM) !== -1 ? TODAY_SYSTEM : (dateKeys.pop() || '');
+          if (targetDate) arr = arr.filter(function(x) { return x.date === targetDate || !x.date; });
           if (arr.length === 0) return;
           var best = arr.reduce(function(a, b) { return (Number(b.probability) || 0) > (Number(a.probability) || 0) ? b : a; });
           var tip = best.tip || '';
