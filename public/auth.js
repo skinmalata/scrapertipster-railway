@@ -57,7 +57,11 @@
       return fetch(window.WFT_API + '/api/me/subscription', {
         headers: { 'Authorization': 'Bearer ' + tok }
       });
-    }).then(function (r) { return r.json(); }).then(function (data) {
+    }).then(function (r) {
+      if (r.status === 401) { console.warn('[fetchProStatus] 401 - token invalid'); }
+      if (!r.ok) { throw new Error('HTTP ' + r.status); }
+      return r.json();
+    }).then(function (data) {
       if (userState.user) {
         userState.user.isPro = data.isPro || false;
         userState.user.isAdmin = data.isAdmin || false;
