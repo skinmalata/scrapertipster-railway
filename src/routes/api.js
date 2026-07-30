@@ -1418,6 +1418,31 @@ router.get('/best-picks', async function (req, res) {
     var resultsCache = {};
     try { resultsCache = JSON.parse(fs.readFileSync(resultsPath, 'utf8')); } catch (e) {}
 
+    var fotmobDateCache = {};
+    async function fetchFotMobForDate(dateStr) {
+      try {
+        var fmDate = dateStr.replace(/-/g, '');
+        var url = 'https://www.fotmob.com/api/data/matches?date=' + fmDate;
+        var res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' } });
+        var data = await res.json();
+        var out = {};
+        if (data && data.leagues) {
+          data.leagues.forEach(function(l) {
+            (l.matches || []).forEach(function(m) {
+              if (m.status && m.status.finished && !m.status.ongoing && m.status.scoreStr) {
+                var parts = String(m.status.scoreStr).match(/(\d+)\s*-\s*(\d+)/);
+                if (parts) {
+                  var key = (m.home ? m.home.name : '') + ' - ' + (m.away ? m.away.name : '');
+                  out[key] = { home: parseInt(parts[1], 10), away: parseInt(parts[2], 10), league: l.name || '' };
+                }
+              }
+            });
+          });
+        }
+        return out;
+      } catch (e) { return {}; }
+    }
+
     var todayPicks = [];
     CATEGORIES.forEach(function(cat) {
       if (cat.type === 'winStreak' || cat.type === 'unbeaten') {
@@ -1478,15 +1503,21 @@ router.get('/best-picks', async function (req, res) {
 
     var dates = (predictions.dates || []).filter(function(d) { return d !== today; }).slice(-3).sort();
     var history = [];
-    dates.forEach(function(date) {
+    for (var hi = 0; hi < dates.length; hi++) {
+      var date = dates[hi];
       var dayResults = resultsCache[date] || {};
+      if (Object.keys(dayResults).length === 0 && !fotmobDateCache[date]) {
+        fotmobDateCache[date] = await fetchFotMobForDate(date);
+      }
+      var fotmobResults = fotmobDateCache[date] || {};
       var dayPicks = [];
       CATEGORIES.forEach(function(cat) {
+        if (cat.type === 'winStreak' || cat.type === 'unbeaten') return;
         var matches = Array.isArray(predictions[cat.key]) ? predictions[cat.key].filter(function(m) { return m.date === date; }) : [];
         var best = getBestPick(matches);
         if (!best) return;
         var matchName = best.nextMatch || best.match || '';
-        var result = dayResults[matchName] || null;
+        var result = dayResults[matchName] || fotmobResults[matchName] || null;
         var enriched = {
           category: cat.label,
           type: cat.type,
@@ -1507,7 +1538,7 @@ router.get('/best-picks', async function (req, res) {
       if (dayPicks.length > 0) {
         history.push({ date: date, picks: dayPicks });
       }
-    });
+    }
 
     res.json({ today: todayPicks, history: history, dates: predictions.dates || [] });
   } catch (e) {
