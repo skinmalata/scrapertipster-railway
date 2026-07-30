@@ -51,8 +51,12 @@
   }
 
   function fetchProStatus(accessToken) {
-    fetch(window.WFT_API + '/api/me/subscription', {
-      headers: { 'Authorization': 'Bearer ' + accessToken }
+    var sb = window.WFT.supabase;
+    var p = sb ? sb.auth.getSession().then(function(s) { return s.data.session?.access_token || accessToken; }) : Promise.resolve(accessToken);
+    p.then(function(tok) {
+      return fetch(window.WFT_API + '/api/me/subscription', {
+        headers: { 'Authorization': 'Bearer ' + tok }
+      });
     }).then(function (r) { return r.json(); }).then(function (data) {
       if (userState.user) {
         userState.user.isPro = data.isPro || false;
