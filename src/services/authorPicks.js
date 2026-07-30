@@ -5,11 +5,8 @@ var HTTP_TIMEOUT_MS = 10000;
 var MAX_MATCHES = 80;
 var DETAIL_CONCURRENCY = 3;
 var DETAIL_DELAY_MS = 500;
-var CACHE_TTL_MS = 30 * 60 * 1000;
 var MIN_CONFIDENCE = 55;
 var DATA_DIR = path.join(__dirname, '../../data/author-picks');
-
-var cache = { data: null, fetchedAt: null };
 
 try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch (e) {}
 
@@ -400,11 +397,18 @@ async function enrichFixture(match) {
 }
 
 async function buildGiantPool() {
-  if (cache.data && cache.fetchedAt && (Date.now() - cache.fetchedAt) < CACHE_TTL_MS) {
-    return cache.data;
-  }
-
   var date = todayStr();
+  var filePath = path.join(DATA_DIR, date + '.json');
+
+  // Serve from today's file if it exists — once per day
+  try {
+    var saved = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    if (saved && saved.matches) {
+      console.log('[author-picks] Serving from saved file for', date);
+      return { matches: saved.matches, totalFixtures: saved.totalFixtures || saved.matches.length, analyzedFixtures: saved.matches.length, generatedAt: saved.generatedAt };
+    }
+  } catch (e) {}
+
   var res = await httpGet('https://www.fotmob.com/api/data/matches?date=' + date);
   if (!res || res.status !== 200 || !res.data) return { matches: [], generatedAt: new Date().toISOString(), totalFixtures: 0 };
 
@@ -428,9 +432,8 @@ async function buildGiantPool() {
   });
 
   var result = { matches: enriched, totalFixtures: allFixtures.length, analyzedFixtures: enriched.length, generatedAt: new Date().toISOString() };
-  cache = { data: result, fetchedAt: Date.now() };
-  try { fs.writeFileSync(path.join(DATA_DIR, date + '.json'), JSON.stringify({ matches: enriched, generatedAt: result.generatedAt }), 'utf8'); } catch (e) {}
-  console.log('[author-picks] Enriched', enriched.length, 'of', limited.length, 'fixtures');
+  try { fs.writeFileSync(filePath, JSON.stringify({ matches: enriched, generatedAt: result.generatedAt }), 'utf8'); } catch (e) {}
+  console.log('[author-picks] Built and saved', enriched.length, 'of', limited.length, 'fixtures for', date);
   return result;
 }
 
