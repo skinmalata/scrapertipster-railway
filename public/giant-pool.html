@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giant Pool - WinFulltime</title>
+<link rel="stylesheet" href="/styles.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #0d111c; color: #e8edf5; min-height: 100vh; }
+header { background: rgba(13,17,28,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
+.header-content { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; max-width: 1200px; margin: 0 auto; }
+.logo { display: flex; align-items: center; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.logo a { display: inline-flex; align-items: center; color: #fff; text-decoration: none; gap: 8px; }
+.logo span { color: #ff7e7e; }
+nav { display: flex; gap: 20px; align-items: center; }
+nav a { color: rgba(232,237,245,0.55); text-decoration: none; font-weight: 500; font-size: 13px; transition: color 0.25s; }
+nav a:hover { color: #ff2448; }
+main { padding: 32px 16px 64px; max-width: 1300px; margin: 0 auto; }
+
+.hero { text-align: center; padding: 20px 0 32px; }
+.hero h1 { font-size: clamp(26px, 4vw, 38px); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+.hero p { color: rgba(232,237,245,0.45); font-size: 14px; max-width: 600px; margin: 0 auto; }
+.hero .meta { display: flex; justify-content: center; gap: 16px; margin-top: 14px; font-size: 13px; color: rgba(232,237,245,0.35); }
+.hero .meta span { display: flex; align-items: center; gap: 4px; }
+
+.stats-bar { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
+.stat-pill { background: rgba(37,46,64,0.3); border: 1px solid rgba(255,255,255,0.06); padding: 8px 16px; border-radius: 999px; font-size: 12px; color: rgba(232,237,245,0.6); }
+.stat-pill strong { color: #e8edf5; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+.card { background: rgba(21,26,44,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; overflow: hidden; transition: border-color 0.2s; }
+.card:hover { border-color: rgba(255,255,255,0.12); }
+.card-top { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.04); }
+.card-top .league { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(232,237,245,0.4); }
+.card-top .badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
+.badge-live { background: rgba(74,222,128,0.15); color: #4ade80; }
+.badge-upcoming { background: rgba(59,130,246,0.15); color: #60a5fa; }
+
+.card-body { padding: 14px; }
+.teams { font-size: 17px; font-weight: 700; color: #fff; line-height: 1.35; margin-bottom: 2px; }
+.kickoff { font-size: 12px; color: rgba(232,237,245,0.35); margin-bottom: 12px; }
+
+.tip-row { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; }
+.tip-market { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: rgba(232,237,245,0.35); margin-bottom: 2px; }
+.tip-selection { font-size: 16px; font-weight: 800; color: #4ade80; }
+.tip-reason { font-size: 12px; color: rgba(255,255,255,0.65); line-height: 1.55; margin-top: 8px; }
+.tip-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.04); }
+.confidence { font-size: 20px; font-weight: 800; }
+.conf-high { color: #4ade80; }.conf-mid { color: #facc15; }.conf-low { color: #ff6b7e; }
+.tip-rule { font-size: 11px; color: rgba(232,237,245,0.3); }
+
+.h2h-row { display: flex; gap: 10px; margin-top: 10px; font-size: 11px; color: rgba(232,237,245,0.3); }
+.h2h-row span { display: flex; align-items: center; gap: 3px; }
+
+.empty-state { text-align: center; padding: 60px 20px; border: 1px dashed rgba(255,255,255,0.08); border-radius: 16px; }
+.empty-state h2 { font-size: 20px; margin-bottom: 8px; }
+.empty-state p { color: rgba(232,237,245,0.4); }
+
+.loading { text-align: center; padding: 80px 20px; }
+.spinner { width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.06); border-top-color: #ff2448; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 700px) {
+  .grid { grid-template-columns: 1fr; }
+  .hero .meta { flex-direction: column; align-items: center; gap: 6px; }
+}
+</style>
+</head>
+<body>
+<header>
+<div class="header-content">
+<div class="logo"><a href="/"><span>Win</span>Fulltime</a></div>
+<nav>
+<a href="/">Home</a>
+<a href="/ticket-builder.html">Ticket Builder</a>
+<a href="/best-picks.html">Best Picks</a>
+<a href="/giant-pool.html">Giant Pool</a>
+<a href="/predictions/in-play">In-Play</a>
+</nav>
+</div>
+</header>
+
+<main>
+<section class="hero">
+<h1>Giant Pool</h1>
+<p>Every fixture analyzed. Every market considered. One best pick per match.</p>
+<div class="meta">
+<span id="matchCount">-</span>
+<span id="analyzedCount">-</span>
+<span id="generatedAt">-</span>
+</div>
+</section>
+
+<div class="stats-bar" id="statsBar"></div>
+
+<div id="content"><div class="loading"><div class="spinner"></div>Building giant pool...</div></div>
+</main>
+
+<script>
+(function() {
+  var API_BASE = window.WFT_API || 'https://winfulltime-api.onrender.com';
+
+  function esc(v) { return String(v || '').replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  function formatTime(kickoff) {
+    if (!kickoff) return '';
+    try {
+      var d = new Date(kickoff);
+      return d.toLocaleTimeString('en-NG', { timeZone: 'Africa/Lagos', hour: '2-digit', minute: '2-digit', hour12: false }) + ' WAT';
+    } catch (e) { return ''; }
+  }
+
+  function confClass(score) {
+    if (score >= 70) return 'conf-high';
+    if (score >= 55) return 'conf-mid';
+    return 'conf-low';
+  }
+
+  function render(data) {
+    var content = document.getElementById('content');
+
+    if (!data || !data.matches || !data.matches.length) {
+      content.innerHTML = '<div class="empty-state"><h2>No matches analyzed</h2><p>Not enough fixture data available to build the pool right now.</p></div>';
+      document.getElementById('matchCount').textContent = '0 matches';
+      document.getElementById('analyzedCount').textContent = '0 analyzed';
+      return;
+    }
+
+    document.getElementById('matchCount').textContent = data.totalFixtures + ' total fixtures';
+    document.getElementById('analyzedCount').textContent = data.analyzedFixtures + ' qualified';
+    document.getElementById('generatedAt').textContent = data.generatedAt ? new Date(data.generatedAt).toLocaleTimeString('en-NG', { timeZone: 'Africa/Lagos', hour: '2-digit', minute: '2-digit' }) + ' WAT' : '';
+
+    var byMarket = {};
+    data.matches.forEach(function(m) {
+      var mk = m.tip.market || 'Other';
+      byMarket[mk] = (byMarket[mk] || 0) + 1;
+    });
+    var statsHtml = Object.keys(byMarket).sort().map(function(k) {
+      return '<span class="stat-pill">' + esc(k) + ': <strong>' + byMarket[k] + '</strong></span>';
+    }).join('');
+    document.getElementById('statsBar').innerHTML = statsHtml;
+
+    content.innerHTML = '<div class="grid">' + data.matches.map(function(m) {
+      var liveHtml = m.isLive ? '<span class="badge badge-live">LIVE ' + (m.minute || '') + '</span>' : '<span class="badge badge-upcoming">' + formatTime(m.kickoff) + '</span>';
+
+      var h2hHtml = m.h2h ? '<div class="h2h-row"><span>H2H: ' + m.h2h.homeWins + '-' + m.h2h.draws + '-' + m.h2h.awayWins + '</span></div>' : '';
+
+      var conf = m.tip.confidence || 0;
+
+      return '<article class="card"><div class="card-top"><span class="league">' + esc(m.league) + '</span>' + liveHtml + '</div>' +
+        '<div class="card-body"><div class="teams">' + esc(m.home) + ' vs ' + esc(m.away) + '</div>' +
+        '<div class="kickoff">' + (m.isLive ? (m.score ? esc(m.score.home + '-' + m.score.away) : 'Live') : formatTime(m.kickoff)) + '</div>' +
+        '<div class="tip-row"><div class="tip-market">' + esc(m.tip.market) + '</div>' +
+        '<div class="tip-selection">' + esc(m.tip.selection) + '</div>' +
+        '<div class="tip-reason">' + esc(m.tip.reason) + '</div>' +
+        '<div class="tip-footer"><span class="confidence ' + confClass(conf) + '">' + conf + '%</span>' +
+        '<span class="tip-rule">' + esc(m.tip.tip) + '</span></div></div>' +
+        h2hHtml + '</div></article>';
+    }).join('') + '</div>';
+  }
+
+  async function load() {
+    try {
+      var res = await fetch(API_BASE + '/api/giant-pool', { mode: 'cors', cache: 'no-store' });
+      var data = await res.json();
+      render(data);
+    } catch (e) {
+      document.getElementById('content').innerHTML = '<div class="empty-state"><h2>Failed to load</h2><p>The pool is being built. Check back shortly.</p></div>';
+    }
+  }
+
+  load();
+})();
+</script>
+</body>
+</html>

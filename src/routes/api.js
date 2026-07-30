@@ -15,6 +15,7 @@ const { getCachedLive } = require('../services/scrapeLive');
 const { getSettledTodayTips, getSettledTipsForDate } = require('../services/liveTipHistory');
 const { buildTwoOddsOfDay, watDate } = require('../services/twoOddsOfDay');
 const { buildTicket } = require('../services/ticketBuilder');
+const { buildGiantPool } = require('../services/giantPool');
 const { fetchTodayStreaks } = require('../services/h2hWinningStreaks');
 const { optionalAuth, requireAuth, requirePro: requireProMiddleware, requireAdmin } = require('../middleware/auth');
 const payment = require('../services/payment');
@@ -1512,6 +1513,17 @@ router.get('/best-picks', async function (req, res) {
   } catch (e) {
     console.error('[best-picks] Error:', e.message);
     res.status(500).json({ error: 'Failed to load best picks' });
+  }
+});
+
+// GET /api/giant-pool — all today's fixtures with best tip per match
+router.get('/giant-pool', async function (req, res) {
+  try {
+    var data = await buildGiantPool();
+    res.json(data);
+  } catch (e) {
+    console.error('[giant-pool] Error:', e.message);
+    res.status(500).json({ error: 'Failed to build giant pool' });
   }
 });
 
