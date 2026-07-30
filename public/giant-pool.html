@@ -53,6 +53,29 @@ main { padding: 32px 16px 64px; max-width: 1300px; margin: 0 auto; }
 .h2h-row { display: flex; gap: 10px; margin-top: 10px; font-size: 11px; color: rgba(232,237,245,0.3); }
 .h2h-row span { display: flex; align-items: center; gap: 3px; }
 
+.perf-section { margin-top: 52px; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.06); }
+.perf-section h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.perf-section > p { font-size: 13px; color: rgba(232,237,245,0.4); margin-bottom: 20px; }
+.perf-summary { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.perf-stat { background: rgba(37,46,64,0.3); border: 1px solid rgba(255,255,255,0.06); padding: 10px 18px; border-radius: 10px; font-size: 13px; color: rgba(232,237,245,0.5); }
+.perf-stat strong { font-size: 18px; }
+.perf-stat.won strong { color: #4ade80; }
+.perf-stat.lost strong { color: #ff6b7e; }
+.perf-stat.pending strong { color: #facc15; }
+
+.perf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+.perf-card { background: rgba(21,26,44,0.4); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; }
+.perf-card .p-league { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(232,237,245,0.35); margin-bottom: 3px; }
+.perf-card .p-teams { font-size: 14px; font-weight: 600; color: #fff; }
+.perf-card .p-score { font-size: 13px; color: rgba(232,237,245,0.5); margin: 2px 0 6px; }
+.perf-card .p-tip { font-size: 13px; font-weight: 600; color: #4ade80; }
+.perf-card .p-market { font-size: 11px; color: rgba(232,237,245,0.35); }
+.outcome-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
+.outcome-won { background: rgba(74,222,128,0.15); color: #4ade80; }
+.outcome-lost { background: rgba(255,36,72,0.15); color: #ff6b7e; }
+.outcome-push { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.outcome-pending { background: rgba(250,204,21,0.15); color: #facc15; }
+
 .empty-state { text-align: center; padding: 60px 20px; border: 1px dashed rgba(255,255,255,0.08); border-radius: 16px; }
 .empty-state h2 { font-size: 20px; margin-bottom: 8px; }
 .empty-state p { color: rgba(232,237,245,0.4); }
@@ -95,6 +118,13 @@ main { padding: 32px 16px 64px; max-width: 1300px; margin: 0 auto; }
 <div class="stats-bar" id="statsBar"></div>
 
 <div id="content"><div class="loading"><div class="spinner"></div>Building giant pool...</div></div>
+
+<section class="perf-section" id="perfSection">
+<h2>Performance</h2>
+<p>How past predictions performed against actual results.</p>
+<div id="perfSummary" class="perf-summary"></div>
+<div id="perfGrid" class="perf-grid"><div class="loading"><div class="spinner"></div>Loading history...</div></div>
+</section>
 </main>
 
 <script>
@@ -160,6 +190,67 @@ main { padding: 32px 16px 64px; max-width: 1300px; margin: 0 auto; }
     }).join('') + '</div>';
   }
 
+  function renderHistory(data) {
+    var summaryEl = document.getElementById('perfSummary');
+    var gridEl = document.getElementById('perfGrid');
+
+    if (!data || !data.days || !data.days.length) {
+      gridEl.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><h2>No history yet</h2></div>';
+      return;
+    }
+
+    var summaryHtml = '';
+    var allCards = [];
+
+    data.days.forEach(function (day) {
+      var pct = day.total > 0 ? Math.round((day.won / (day.won + day.lost)) * 100) : 0;
+      summaryHtml += '<div class="perf-stat"><span>' + esc(day.date) + '</span><br><strong>' + day.won + '</strong>W / <strong>' + day.lost + '</strong>L' +
+        (day.push ? ' / <strong>' + day.push + '</strong>P' : '') +
+        ' <span style="color:rgba(232,237,245,0.35)">(' + pct + '%)</span></div>';
+
+      (day.matches || []).forEach(function (m) {
+        if (!m.tip) return;
+        var outcome = m.outcome || 'pending';
+        var scoreStr = m.score ? esc(m.score.home + '-' + m.score.away) : '-';
+        allCards.push({
+          date: day.date,
+          league: m.league || '',
+          home: m.home, away: m.away,
+          score: scoreStr,
+          market: m.tip.market || '',
+          selection: m.tip.selection || '',
+          outcome: outcome
+        });
+      });
+    });
+
+    summaryEl.innerHTML = summaryHtml;
+
+    if (!allCards.length) {
+      gridEl.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><h2>No analyzed predictions yet</h2></div>';
+      return;
+    }
+
+    gridEl.innerHTML = allCards.map(function (c) {
+      var outcomeClass = 'outcome-' + (c.outcome === 'won' ? 'won' : c.outcome === 'lost' ? 'lost' : c.outcome === 'push' ? 'push' : 'pending');
+      var outcomeLabel = c.outcome === 'won' ? 'Won' : c.outcome === 'lost' ? 'Lost' : c.outcome === 'push' ? 'Push' : 'Pending';
+      return '<div class="perf-card"><div class="p-league">' + esc(c.league) + ' <span style="color:rgba(232,237,245,0.2)">' + esc(c.date) + '</span></div>' +
+        '<div class="p-teams">' + esc(c.home) + ' vs ' + esc(c.away) + '</div>' +
+        '<div class="p-score">' + c.score + ' <span class="outcome-badge ' + outcomeClass + '">' + outcomeLabel + '</span></div>' +
+        '<div class="p-market">' + esc(c.market) + '</div><div class="p-tip">' + esc(c.selection) + '</div></div>';
+    }).join('');
+  }
+
+  async function loadHistory() {
+    try {
+      var res = await fetch(API_BASE + '/api/giant-pool/history?days=2', { mode: 'cors', cache: 'no-store' });
+      var data = await res.json();
+      renderHistory(data);
+    } catch (e) {
+      document.getElementById('perfGrid').innerHTML = '<div class="empty-state" style="grid-column:1/-1"><h2>History unavailable</h2></div>';
+    }
+  }
+
   async function load() {
     try {
       var res = await fetch(API_BASE + '/api/giant-pool', { mode: 'cors', cache: 'no-store' });
@@ -168,6 +259,7 @@ main { padding: 32px 16px 64px; max-width: 1300px; margin: 0 auto; }
     } catch (e) {
       document.getElementById('content').innerHTML = '<div class="empty-state"><h2>Failed to load</h2><p>The pool is being built. Check back shortly.</p></div>';
     }
+    loadHistory();
   }
 
   load();

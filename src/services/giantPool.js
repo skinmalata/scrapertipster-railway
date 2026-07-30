@@ -1,12 +1,17 @@
 var https = require('https');
+var fs = require('fs');
+var path = require('path');
 var HTTP_TIMEOUT_MS = 10000;
 var MAX_MATCHES = 80;
 var DETAIL_CONCURRENCY = 3;
 var DETAIL_DELAY_MS = 500;
 var CACHE_TTL_MS = 30 * 60 * 1000;
 var MIN_CONFIDENCE = 55;
+var DATA_DIR = path.join(__dirname, '../../data/giant-pool');
 
 var cache = { data: null, fetchedAt: null };
+
+try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch (e) {}
 
 function fotMobDateStr(dayOffset) {
   var parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Africa/Lagos', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
@@ -339,8 +344,119 @@ async function buildGiantPool() {
 
   var result = { matches: enriched, totalFixtures: allFixtures.length, analyzedFixtures: enriched.length, generatedAt: new Date().toISOString() };
   cache = { data: result, fetchedAt: Date.now() };
+  try { fs.writeFileSync(path.join(DATA_DIR, date + '.json'), JSON.stringify({ matches: enriched, generatedAt: result.generatedAt }), 'utf8'); } catch (e) {}
   console.log('[giant-pool] Enriched', enriched.length, 'of', limited.length, 'fixtures');
   return result;
 }
 
-module.exports = { buildGiantPool };
+function evaluateTip(tip, score) {
+  if (!score || typeof score.home !== 'number') return 'pending';
+  var total = score.home + score.away;
+  var tipStr = String(tip.tip || '');
+  var sel = String(tip.selection || '');
+
+  if (tipStr === '1' || sel === 'Home Win') return score.home > score.away ? 'won' : 'lost';
+  if (tipStr === '2' || sel === 'Away Win') return score.away > score.home ? 'won' : 'lost';
+  if (tipStr === 'X' || sel === 'Draw') return score.home === score.away ? 'won' : 'lost';
+
+  if (tipStr === 'Home (DNB)') return score.home > score.away ? 'won' : (score.home === score.away ? 'push' : 'lost');
+  if (tipStr === 'Away (DNB)') return score.away > score.home ? 'won' : (score.home === score.away ? 'push' : 'lost');
+
+  if (/^Over (\d+\.?\d*)$/.test(tipStr)) { var ov = parseFloat(RegExp.$1); return total > ov ? 'won' : 'lost'; }
+  if (/^Under (\d+\.?\d*)$/.test(tipStr)) { var uv = parseFloat(RegExp.$1); return total < uv ? 'won' : 'lost'; }
+  if (tipStr === 'BTTS Yes') return score.home > 0 && score.away > 0 ? 'won' : 'lost';
+  if (tipStr === 'BTTS No') return score.home === 0 || score.away === 0 ? 'won' : 'lost';
+
+  return 'pending';
+}
+
+function formatDate(dateStr) {
+  var y = dateStr.slice(0, 4), m = dateStr.slice(4, 6), d = dateStr.slice(6, 8);
+  return y + '-' + m + '-' + d;
+}
+
+function isoTodateStr(isoStr) {
+  return isoStr ? isoStr.slice(0, 10).replace(/-/g, '') : '';
+}
+
+async function getGiantPoolHistory(days) {
+  days = days || 2;
+  var results = [];
+  var today = todayStr();
+
+  for (var offset = 1; offset <= days; offset++) {
+    var date = fotMobDateStr(-offset);
+    var dateNice = formatDate(date);
+    var filePath = path.join(DATA_DIR, date + '.json');
+    var predictions = null;
+    try { predictions = JSON.parse(fs.readFileSync(filePath, 'utf8')); } catch (e) {}
+
+    var matches = [];
+    var res = await httpGet('https://www.fotmob.com/api/data/matches?date=' + date).catch(function () { return null; });
+
+    if (res && res.status === 200 && res.data && res.data.leagues) {
+      var resultsByMatchId = {};
+      res.data.leagues.forEach(function (league) {
+        (league.matches || []).forEach(function (m) {
+          if (m.status && m.status.finished) {
+            var score = parseScore(m.status);
+            if (score) resultsByMatchId[String(m.id)] = score;
+          }
+        });
+      });
+
+      if (predictions && predictions.matches) {
+        predictions.matches.forEach(function (m) {
+          var score = resultsByMatchId[String(m.matchId)];
+          var outcome = score ? evaluateTip(m.tip, score) : 'pending';
+          matches.push({
+            matchId: m.matchId, home: m.home, away: m.away, league: m.league,
+            tip: m.tip, score: score, outcome: outcome
+          });
+        });
+      } else {
+        // No saved predictions; evaluate from fixture list + fresh enrichment
+        var allFixtures = [];
+        res.data.leagues.forEach(function (league) {
+          (league.matches || []).forEach(function (m) {
+            if (!m || !m.id || !m.home || !m.away || !m.status || !m.status.finished) return;
+            if (/friendly|friendlies|u\d{2}|reserve|reserves|women/i.test(String(league.name || ''))) return;
+            var score = parseScore(m.status);
+            if (!score) return;
+            allFixtures.push({
+              matchId: String(m.id), home: m.home.name, away: m.away.name,
+              league: league.name, score: score
+            });
+          });
+        });
+        allFixtures.forEach(function (f) {
+          matches.push({
+            matchId: f.matchId, home: f.home, away: f.away, league: f.league,
+            tip: null, score: f.score, outcome: 'unanalyzed'
+          });
+        });
+      }
+    }
+
+    // Count outcomes
+    var won = 0, lost = 0, push = 0, pending = 0, unanalyzed = 0;
+    matches.forEach(function (m) {
+      if (m.outcome === 'won') won++;
+      else if (m.outcome === 'lost') lost++;
+      else if (m.outcome === 'push') push++;
+      else if (m.outcome === 'pending') pending++;
+      else if (m.outcome === 'unanalyzed') unanalyzed++;
+    });
+
+    results.push({
+      date: dateNice,
+      total: matches.length,
+      won: won, lost: lost, push: push, pending: pending, unanalyzed: unanalyzed,
+      matches: matches
+    });
+  }
+
+  return results;
+}
+
+module.exports = { buildGiantPool, getGiantPoolHistory };
