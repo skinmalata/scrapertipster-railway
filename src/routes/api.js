@@ -1385,23 +1385,26 @@ router.get('/best-picks', async function (req, res) {
       }
     } catch (e) {}
 
-    // Build — load Author Picks data
+    // Build todayPicks — try Author Picks first, then fallback to scraper data
+    var h2hData = { dates: {} };
+    try { h2hData = JSON.parse(fs.readFileSync(path.join(__dirname, '../../public/data/h2h-unbeaten.json'), 'utf8')); } catch (e) {}
+
     var AUTHOR_DIR = path.join(__dirname, '../../data/author-picks');
+    var todayPicks = [];
+
+    function fmtTime(kickoff) {
+      if (!kickoff) return '';
+      try { return new Date(kickoff).toLocaleTimeString('en-NG', { timeZone: 'Africa/Lagos', hour: '2-digit', minute: '2-digit', hour12: false }) + ' WAT'; } catch (e) { return ''; }
+    }
+
+    // Try Author Picks
     var authorPicks = [];
     try {
       var raw = JSON.parse(fs.readFileSync(path.join(AUTHOR_DIR, TODAY_FM + '.json'), 'utf8'));
       authorPicks = raw.matches || [];
     } catch (e) {
-      try {
-        var built = await buildGiantPool();
-        authorPicks = (built && built.matches) || [];
-      } catch (e2) {}
+      try { var built = await buildGiantPool(); authorPicks = (built && built.matches) || []; } catch (e2) {}
     }
-
-
-
-    var h2hData = { dates: {} };
-    try { h2hData = JSON.parse(fs.readFileSync(path.join(__dirname, '../../public/data/h2h-unbeaten.json'), 'utf8')); } catch (e) {}
 
     function mapTip(match) {
       var tip = match.tip;
@@ -1409,62 +1412,69 @@ router.get('/best-picks', async function (req, res) {
       var sel = String(tip.selection || tip.tip || '');
       var conf = Number(tip.confidence) || 0;
       var market = tip.market;
-      if (market === 'Match Winner' && /^[1X2]$/.test(sel)) {
-        return { label: '1X2', type: '1x2', tip: sel, probability: conf, match: match };
-      }
+      if (market === 'Match Winner' && /^[1X2]$/.test(sel)) return { type: '1x2', label: '1X2', tip: sel, probability: conf, match: match };
       if (market === 'Goals Over/Under') {
         var m = sel.match(/^Over\s+(\d+\.?\d*)$/);
-        if (m) {
-          var ov = parseFloat(m[1]);
-          if (ov === 1.5) return { label: 'Over 1.5', type: 'over15', tip: sel, probability: conf, match: match };
-          if (ov === 2.5) return { label: 'Over 2.5', type: 'over25', tip: sel, probability: conf, match: match };
+        if (m) { var ov = parseFloat(m[1]);
+          if (ov === 1.5) return { type: 'over15', label: 'Over 1.5', tip: sel, probability: conf, match: match };
+          if (ov === 2.5) return { type: 'over25', label: 'Over 2.5', tip: sel, probability: conf, match: match };
         }
       }
       if (market === 'Both Teams Score') {
-        if (sel === 'BTTS Yes') return { label: 'BTTS Yes', type: 'btts', tip: 'BTTS YES', probability: conf, match: match };
-        if (sel === 'BTTS No') return { label: 'BTTS No', type: 'bttsNo', tip: 'BTTS NO', probability: conf, match: match };
+        if (sel === 'BTTS Yes') return { type: 'btts', label: 'BTTS Yes', tip: 'BTTS YES', probability: conf, match: match };
+        if (sel === 'BTTS No') return { type: 'bttsNo', label: 'BTTS No', tip: 'BTTS NO', probability: conf, match: match };
       }
-      if (market === 'Corners') return { label: 'Corners', type: 'corners', tip: sel, probability: conf, match: match };
-      if (market === 'Cards') return { label: 'Cards', type: 'cards', tip: sel, probability: conf, match: match };
+      if (market === 'Corners') return { type: 'corners', label: 'Corners', tip: sel, probability: conf, match: match };
+      if (market === 'Cards') return { type: 'cards', label: 'Cards', tip: sel, probability: conf, match: match };
       return null;
     }
-
-    var bestByType = {};
-    authorPicks.forEach(function(m) {
-      var mapped = mapTip(m);
-      if (!mapped) return;
-      var t = mapped.type;
-      if (!bestByType[t] || mapped.probability > bestByType[t].probability) bestByType[t] = mapped;
-    });
-
     var CATEGORY_DEFS = [
-      { type: '1x2', label: '1X2' },
-      { type: 'over15', label: 'Over 1.5' },
-      { type: 'over25', label: 'Over 2.5' },
-      { type: 'btts', label: 'BTTS Yes' },
-      { type: 'bttsNo', label: 'BTTS No' },
-      { type: 'corners', label: 'Corners' },
-      { type: 'cards', label: 'Cards' }
+      { type: '1x2', label: '1X2' }, { type: 'over15', label: 'Over 1.5' }, { type: 'over25', label: 'Over 2.5' },
+      { type: 'btts', label: 'BTTS Yes' }, { type: 'bttsNo', label: 'BTTS No' },
+      { type: 'corners', label: 'Corners' }, { type: 'cards', label: 'Cards' }
     ];
 
-    function fmtTime(kickoff) {
-      if (!kickoff) return '';
-      try { return new Date(kickoff).toLocaleTimeString('en-NG', { timeZone: 'Africa/Lagos', hour: '2-digit', minute: '2-digit', hour12: false }) + ' WAT'; } catch (e) { return ''; }
+    if (authorPicks && authorPicks.length > 0) {
+      var bestByType = {};
+      authorPicks.forEach(function(m) {
+        var mapped = mapTip(m);
+        if (!mapped) return;
+        var t = mapped.type;
+        if (!bestByType[t] || mapped.probability > bestByType[t].probability) bestByType[t] = mapped;
+      });
+      CATEGORY_DEFS.forEach(function(def) {
+        var entry = bestByType[def.type];
+        if (!entry) return;
+        var m = entry.match;
+        todayPicks.push({ category: def.label, type: def.type, match: m.home + ' - ' + m.away,
+          tip: entry.tip, probability: entry.probability, league: m.league || '', time: fmtTime(m.kickoff),
+          streak: null, streakTeam: null, isHome: null });
+      });
     }
 
-    var todayPicks = [];
-    CATEGORY_DEFS.forEach(function(def) {
-      var entry = bestByType[def.type];
-      if (!entry) return;
-      var m = entry.match;
-      todayPicks.push({
-        category: def.label, type: def.type,
-        match: m.home + ' - ' + m.away,
-        tip: entry.tip, probability: entry.probability,
-        league: m.league || '', time: fmtTime(m.kickoff),
-        streak: null, streakTeam: null, isHome: null
-      });
-    });
+    // Fallback to scraper data if Author Picks returned no picks
+    if (todayPicks.length === 0) {
+      var preds = vipPredictionData();
+      if (preds && Object.keys(preds).length > 0) {
+        [
+          { key: 'matches', label: '1X2', type: '1x2' },
+          { key: 'over15Matches', label: 'Over 1.5', type: 'over15' },
+          { key: 'over25Matches', label: 'Over 2.5', type: 'over25' },
+          { key: 'bttsMatches', label: 'BTTS Yes', type: 'btts' },
+          { key: 'bttsNoMatches', label: 'BTTS No', type: 'bttsNo' },
+          { key: 'cornersMatches', label: 'Corners', type: 'corners' },
+          { key: 'cardsMatches', label: 'Cards', type: 'cards' }
+        ].forEach(function(cat) {
+          var arr = Array.isArray(preds[cat.key]) ? preds[cat.key] : [];
+          if (arr.length === 0) return;
+          var best = arr.reduce(function(a, b) { return (Number(b.probability) || 0) > (Number(a.probability) || 0) ? b : a; });
+          todayPicks.push({ category: cat.label, type: cat.type, match: best.nextMatch || best.match || '',
+            tip: best.tip || '', probability: Number(best.probability) || 0,
+            league: best.league || '', time: best.time || '',
+            streak: null, streakTeam: null, isHome: null });
+        });
+      }
+    }
 
     // Win Streak & Unbeaten from h2h data
     ['winStreak', 'unbeaten'].forEach(function(streakType) {
