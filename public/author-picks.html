@@ -3,8 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Author Picks - WinFulltime</title>
-<meta name="description" content="Every fixture analyzed. Every market considered. One best pick per match.">
+<title>Author Picks - Expert Football Predictions & Match Analysis | WinFulltime</title>
+<meta name="description" content="WinFulltime Author Picks: Expert football predictions powered by data-driven analysis of fixtures, head-to-head stats, and team form. Best pick per match across 1X2, Over/Under, BTTS, DNB, Corners & Cards.">
+<meta name="keywords" content="football predictions, soccer tips, expert picks, match analysis, betting tips, 1X2 predictions, over under, BTTS, DNB, football betting, today's predictions">
+<link rel="canonical" href="https://winfulltime.com/author-picks.html">
+<meta property="og:title" content="Author Picks - Expert Football Predictions & Match Analysis | WinFulltime">
+<meta property="og:description" content="Data-driven football predictions with the best pick per match across all major markets.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://winfulltime.com/author-picks.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Author Picks - Expert Football Predictions | WinFulltime">
+<meta name="twitter:description" content="Data-driven football predictions with the best pick per match across all major markets.">
 <link rel="icon" href="/icons/icon-192.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,6 +55,7 @@
   .empty-state p { color: var(--text-muted); }
   .loading { display: flex; flex-direction: column; align-items: center; padding: 80px 20px; gap: 16px; }
   .loading-text { font-size: 14px; color: var(--text-muted); }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
   @media (max-width: 700px) {
     .meta-row { flex-direction: column; align-items: center; gap: 6px; }
     .stats-bar { gap: 6px; }
@@ -67,10 +77,24 @@
 </div>
 </header>
 
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Author Picks - Expert Football Predictions",
+  "description": "Data-driven football predictions across all major markets including 1X2, Over/Under, BTTS, DNB, Corners and Cards. One best pick per match.",
+  "url": "https://winfulltime.com/author-picks.html",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "WinFulltime",
+    "url": "https://winfulltime.com"
+  }
+}
+</script>
 <main>
 <div class="hero">
-<h1>Author Picks</h1>
-<p class="hero-subtext">Every fixture analyzed. Every market considered. One best pick per match.</p>
+<h1>Author Picks <span class="sr-only">- Expert Football Predictions &amp; Match Analysis</span></h1>
+
 <div class="meta-row">
 <span id="matchCount">-</span>
 <span id="analyzedCount">-</span>
@@ -80,7 +104,19 @@
 
 <div class="stats-bar" id="statsBar"></div>
 
-<div id="content"><div class="loading"><div class="spinner"></div><span class="loading-text">Building giant pool...</span></div></div>
+<div id="content"><div class="loading"><div class="spinner"></div><span class="loading-text">Analyzing today's fixtures across all markets...</span></div></div>
+
+<section class="faq-section" aria-label="Frequently asked questions">
+<h2>Frequently Asked Questions</h2>
+<div class="faq-list">
+<details class="faq-item" open><summary>What are Author Picks?</summary><p>Author Picks are WinFulltime's curated daily football predictions. Every fixture from today's calendar is analyzed across multiple markets — 1X2, Over/Under, BTTS, Draw No Bet, Corners, and Cards. The strongest independent selection per match becomes that fixture's Author Pick.</p></details>
+<details class="faq-item"><summary>How is each pick determined?</summary><p>Each fixture is evaluated using head-to-head history, recent team form, and matchup-specific statistical models. Markets compete on confidence score, and the highest-confidence selection per match is chosen. Only one market per fixture is used to avoid correlated picks.</p></details>
+<details class="faq-item"><summary>What markets does Author Picks cover?</summary><p>Author Picks scans Match Winner (1X2), Goals Over/Under, Both Teams to Score (BTTS), Draw No Bet (DNB), Corners, and Cards. The best-performing market for each individual fixture is selected based on historical and statistical strength.</p></details>
+<details class="faq-item"><summary>How is historical accuracy tracked?</summary><p>Each day's published picks are matched against actual match results the following day. Picks are marked Won, Lost, Push, or Pending depending on the outcome. The Performance section below shows win/loss records for recent days with full match details.</p></details>
+<details class="faq-item"><summary>Is this feature free?</summary><p>Yes, Author Picks is completely free. All predictions, market data, and the performance history are shown without any paywall or VIP gate. WinFulltime provides analytical information only and does not accept bets.</p></details>
+<details class="faq-item"><summary>Are these predictions guaranteed?</summary><p>No prediction is guaranteed. Author Picks are based on statistical analysis and historical data, but all sports betting carries risk. Past performance does not guarantee future results. Please gamble responsibly.</p></details>
+</div>
+</section>
 
 <section class="perf-section" id="perfSection">
 <h2>Performance</h2>
