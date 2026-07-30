@@ -1859,25 +1859,25 @@ async function scrapeCards() {
       
       const kickoffTime = startDate ? new Date(startDate).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) : '';
       
-      const insight1 = `Over ${threshold} Cards`;
+      const insight1 = 'Over 3.5 Cards';
       const insight2 = league;
       const insight3 = gamesSample > 0 ? `Pattern across ${gamesSample} recent fixtures` : '';
 
       const reasonTemplates = [
-        `${refTeam} tend to accumulate cards — ${threshold}+ bookings in ${gamesSample} recent matches`,
-        `Consistent high-card pattern for ${refTeam}: ${threshold}+ shown across ${gamesSample} fixtures`,
-        `Based on ${gamesSample} recent games, ${refTeam} regularly exceed ${threshold} card threshold`,
-        `${refTeam} bookings trend: ${threshold}+ cards in ${gamesSample} of their latest fixtures`,
-        `Card-heavy profile — ${refTeam} averaged ${threshold}+ bookings over ${gamesSample} matches`
+        `${refTeam} tend to accumulate cards — frequent bookings in ${gamesSample} recent matches`,
+        `Consistent high-card pattern for ${refTeam} shown across ${gamesSample} fixtures`,
+        `Based on ${gamesSample} recent games, ${refTeam} regularly see card activity`,
+        `${refTeam} bookings trend: elevated cards in ${gamesSample} of their latest fixtures`,
+        `Card-heavy profile — ${refTeam} averaged frequent bookings over ${gamesSample} matches`
       ];
       const templateIdx = matchKey.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0) % reasonTemplates.length;
-      const generatedReason = gamesSample > 0 ? reasonTemplates[templateIdx] : `Card-heavy fixture with strong booking history`;
+      const generatedReason = gamesSample > 0 ? reasonTemplates[templateIdx] : 'Card-heavy fixture with strong booking history';
 
       const insights = [insight1, insight2, insight3].filter(Boolean);
       
       cardsMatches.push({
         match: matchKey,
-        tip: `Over ${threshold} Cards`,
+        tip: 'Over 3.5 Cards',
         insights,
         probability: gamesSample > 0 ? Math.min(85, 60 + gamesSample) : 65,
         league,

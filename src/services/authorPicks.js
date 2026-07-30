@@ -284,9 +284,9 @@ function predictCorners(cornerValues) {
   if (!cornerValues || cornerValues.length < 3) return null;
   var total = cornerValues.reduce(function (a, b) { return a + b; }, 0);
   var avg = total / cornerValues.length;
-  if (avg < 10.5) return null;
-  var conf = Math.min(90, 70 + Math.round((avg - 10.5) * 4));
-  return { tip: 'Over 9.5 Corners', market: 'Corners', selection: 'Over 9.5 Corners', confidence: conf, reason: 'Averaging ' + avg.toFixed(1) + ' corners across ' + cornerValues.length + ' recent meetings' };
+  if (avg < 9.5) return null;
+  var conf = Math.min(90, 70 + Math.round((avg - 9.5) * 4));
+  return { tip: 'Over 8.5 Corners', market: 'Corners', selection: 'Over 8.5 Corners', confidence: conf, reason: 'Averaging ' + avg.toFixed(1) + ' corners across ' + cornerValues.length + ' recent meetings' };
 }
 
 function predictCards(cardValues) {
