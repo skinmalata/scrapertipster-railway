@@ -224,11 +224,89 @@ function predictBTTS(h2h, homeForm, awayForm) {
   return null;
 }
 
+function extractMatchCorners(matchDetails) {
+  try {
+    var stats = matchDetails.content.stats.Periods.All.stats;
+    var total = null;
+    stats.forEach(function (group) {
+      if (total !== null) return;
+      (group.stats || []).forEach(function (s) {
+        if (s.key === 'corners') total = (parseFloat(s.stats[0]) || 0) + (parseFloat(s.stats[1]) || 0);
+      });
+    });
+    return total;
+  } catch (e) { return null; }
+}
+
+function extractMatchCards(matchDetails) {
+  try {
+    var stats = matchDetails.content.stats.Periods.All.stats;
+    var yellows = 0;
+    stats.forEach(function (group) {
+      (group.stats || []).forEach(function (s) {
+        if (s.key === 'yellow_cards') yellows += (parseFloat(s.stats[0]) || 0) + (parseFloat(s.stats[1]) || 0);
+      });
+    });
+    var header = matchDetails && matchDetails.header && matchDetails.header.status;
+    var reds = header ? (header.numberOfHomeRedCards || 0) + (header.numberOfAwayRedCards || 0) : 0;
+    return yellows + reds;
+  } catch (e) { return null; }
+}
+
+async function fetchH2HStats(fixtureIds, limit) {
+  var ids = (fixtureIds || []).slice(0, limit || 3).filter(Boolean);
+  var corners = [], cards = [];
+  for (var i = 0; i < ids.length; i += 3) {
+    var batch = ids.slice(i, i + 3);
+    var results = await Promise.all(batch.map(function (id) {
+      return httpGet('https://www.fotmob.com/api/data/matchDetails?matchId=' + encodeURIComponent(id))
+        .then(function (res) { return (res && res.status === 200 && res.data) ? res.data : null; })
+        .catch(function () { return null; });
+    }));
+    results.forEach(function (data) {
+      if (data) {
+        var c = extractMatchCorners(data);
+        if (c !== null) corners.push(c);
+        var cd = extractMatchCards(data);
+        if (cd !== null) cards.push(cd);
+      }
+    });
+    if (i + 3 < ids.length) await new Promise(function (r) { setTimeout(r, 300); });
+  }
+  return { corners: corners, cards: cards };
+}
+
+function predictCorners(cornerValues) {
+  if (!cornerValues || cornerValues.length < 2) return null;
+  var avg = cornerValues.reduce(function (a, b) { return a + b; }, 0) / cornerValues.length;
+  var tip, conf;
+  if (avg >= 10) { tip = 'Over 9.5 Corners'; conf = Math.min(85, 55 + (avg - 10) * 5); }
+  else if (avg >= 9) { tip = 'Over 9.5 Corners'; conf = Math.min(80, 50 + (avg - 9) * 8); }
+  else if (avg >= 8) { tip = 'Over 8.5 Corners'; conf = Math.min(75, 50 + (avg - 8) * 5); }
+  else return null;
+  if (conf < MIN_CONFIDENCE) return null;
+  return { tip: tip, market: 'Corners', selection: tip, confidence: Math.round(conf), reason: 'Averaging ' + avg.toFixed(1) + ' corners in recent H2H meetings' };
+}
+
+function predictCards(cardValues) {
+  if (!cardValues || cardValues.length < 2) return null;
+  var avg = cardValues.reduce(function (a, b) { return a + b; }, 0) / cardValues.length;
+  var tip, conf;
+  if (avg >= 6) { tip = 'Over 5.5 Cards'; conf = Math.min(85, 55 + (avg - 6) * 5); }
+  else if (avg >= 5) { tip = 'Over 4.5 Cards'; conf = Math.min(80, 50 + (avg - 5) * 8); }
+  else if (avg >= 4) { tip = 'Over 4.5 Cards'; conf = Math.min(75, 45 + (avg - 4) * 5); }
+  else return null;
+  if (conf < MIN_CONFIDENCE) return null;
+  return { tip: tip, market: 'Cards', selection: tip, confidence: Math.round(conf), reason: 'Averaging ' + avg.toFixed(1) + ' cards in recent H2H meetings' };
+}
+
 var MARKET_PRIORITY = {
   'Match Winner': 6,
   'Draw No Bet': 5,
   'Goals Over/Under': 4,
-  'Both Teams Score': 3
+  'Both Teams Score': 3,
+  'Corners': 2,
+  'Cards': 1
 };
 
 function pickBestTip(tips) {
@@ -283,15 +361,21 @@ async function enrichFixture(match) {
   var awayForm = await fetchTeamForm(match.awayId);
   if (!homeForm && !awayForm) return null;
 
+  var h2hStats = await fetchH2HStats(h2h.fixtures, 3);
+
   var tips = [];
   var t1 = predict1X2(h2h, homeForm, awayForm);
   var t2 = predictOverUnder(h2h, homeForm, awayForm);
   var t3 = predictBTTS(h2h, homeForm, awayForm);
   var t4 = predictDNB(h2h, homeForm, awayForm);
+  var t5 = predictCorners(h2hStats.corners);
+  var t6 = predictCards(h2hStats.cards);
   if (t1) tips.push(t1);
   if (t2) tips.push(t2);
   if (t3) tips.push(t3);
   if (t4) tips.push(t4);
+  if (t5) tips.push(t5);
+  if (t6) tips.push(t6);
 
   var best = pickBestTip(tips);
   if (!best) return null;
@@ -349,7 +433,7 @@ async function buildGiantPool() {
   return result;
 }
 
-function evaluateTip(tip, score) {
+function evaluateTip(tip, score, matchDetails) {
   if (!score || typeof score.home !== 'number') return 'pending';
   var total = score.home + score.away;
   var tipStr = String(tip.tip || '');
@@ -362,10 +446,21 @@ function evaluateTip(tip, score) {
   if (tipStr === 'Home (DNB)') return score.home > score.away ? 'won' : (score.home === score.away ? 'push' : 'lost');
   if (tipStr === 'Away (DNB)') return score.away > score.home ? 'won' : (score.home === score.away ? 'push' : 'lost');
 
-  if (/^Over (\d+\.?\d*)$/.test(tipStr)) { var ov = parseFloat(RegExp.$1); return total > ov ? 'won' : 'lost'; }
+  if (/^Over (\d+\.?\d*)$/.test(tipStr) && !/Corners|Cards/.test(tip.market)) { var ov = parseFloat(RegExp.$1); return total > ov ? 'won' : 'lost'; }
   if (/^Under (\d+\.?\d*)$/.test(tipStr)) { var uv = parseFloat(RegExp.$1); return total < uv ? 'won' : 'lost'; }
   if (tipStr === 'BTTS Yes') return score.home > 0 && score.away > 0 ? 'won' : 'lost';
   if (tipStr === 'BTTS No') return score.home === 0 || score.away === 0 ? 'won' : 'lost';
+
+  if (/^Over (\d+\.?\d*) Corners$/.test(tipStr)) {
+    var ct = parseFloat(RegExp.$1);
+    if (matchDetails) { var c = extractMatchCorners(matchDetails); if (c !== null) return c > ct ? 'won' : 'lost'; }
+    return 'pending';
+  }
+  if (/^Over (\d+\.?\d*) Cards$/.test(tipStr)) {
+    var cdt = parseFloat(RegExp.$1);
+    if (matchDetails) { var cd = extractMatchCards(matchDetails); if (cd !== null) return cd > cdt ? 'won' : 'lost'; }
+    return 'pending';
+  }
 
   return 'pending';
 }
@@ -406,9 +501,19 @@ async function getGiantPoolHistory(days) {
       });
 
       if (predictions && predictions.matches) {
+        var needsDetail = predictions.matches.filter(function (m) {
+          return m.tip && (/Corners|Cards/.test(m.tip.market || '') || /Corners|Cards/.test(m.tip.tip || ''));
+        });
+        var detailCache = {};
+        for (var di = 0; di < needsDetail.length; di++) {
+          var detRes = await httpGet('https://www.fotmob.com/api/data/matchDetails?matchId=' + encodeURIComponent(needsDetail[di].matchId)).catch(function () { return null; });
+          if (detRes && detRes.status === 200 && detRes.data) detailCache[needsDetail[di].matchId] = detRes.data;
+        }
+
         predictions.matches.forEach(function (m) {
           var score = resultsByMatchId[String(m.matchId)];
-          var outcome = score ? evaluateTip(m.tip, score) : 'pending';
+          var details = detailCache[m.matchId] || null;
+          var outcome = score ? evaluateTip(m.tip, score, details) : 'pending';
           matches.push({
             matchId: m.matchId, home: m.home, away: m.away, league: m.league,
             tip: m.tip, score: score, outcome: outcome
