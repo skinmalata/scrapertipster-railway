@@ -1368,100 +1368,155 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
   }
 });
 
-// GET /api/best-picks — top pick per category + historical results
+// GET /api/best-picks — top pick per category from Author Picks data
 router.get('/best-picks', async function (req, res) {
   try {
-    var predictions = vipPredictionData();
-    if (!predictions || Object.keys(predictions).length === 0) {
-      try { predictions = await getScraperService().fetchPredictions(); } catch (e) {}
-    }
-    if (!predictions || Object.keys(predictions).length === 0) { predictions = { matches: [] }; }
+    var AUTHOR_DIR = path.join(__dirname, '../../data/author-picks');
+    var TODAY_FM = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    var TODAY_SYSTEM = new Date().toISOString().slice(0, 10);
 
-    var staticPath = path.join(__dirname, '../../public/data/predictions.json');
-    var h2hPath = path.join(__dirname, '../../public/data/h2h-unbeaten.json');
+    // Load today's Author Picks
+    var authorPicks = [];
+    try {
+      var raw = JSON.parse(fs.readFileSync(path.join(AUTHOR_DIR, TODAY_FM + '.json'), 'utf8'));
+      authorPicks = raw.matches || [];
+    } catch (e) {}
 
-    var staticData = null;
-    try { staticData = JSON.parse(fs.readFileSync(staticPath, 'utf8')); } catch (e) {}
-
+    // Load h2h-unbeaten for Win Streak / Unbeaten categories
     var h2hData = { dates: {} };
-    try { h2hData = JSON.parse(fs.readFileSync(h2hPath, 'utf8')); } catch (e) {}
+    try { h2hData = JSON.parse(fs.readFileSync(path.join(__dirname, '../../public/data/h2h-unbeaten.json'), 'utf8')); } catch (e) {}
 
-    var CATEGORIES = [
-      { key: 'matches', label: '1X2', type: '1x2' },
-      { key: 'over15Matches', label: 'Over 1.5', type: 'over15' },
-      { key: 'over25Matches', label: 'Over 2.5', type: 'over25' },
-      { key: 'bttsMatches', label: 'BTTS Yes', type: 'btts' },
-      { key: 'bttsNoMatches', label: 'BTTS No', type: 'bttsNo' },
-      { key: 'cornersMatches', label: 'Corners', type: 'corners' },
-      { key: 'cardsMatches', label: 'Cards', type: 'cards' },
-      { key: 'teamToScore2PlusMatches', label: 'To Score 2+', type: 'teamScore' },
-      { key: 'winstreakMatches', label: 'Win Streak', type: 'winStreak' },
-      { key: 'h2hUnbeaten', label: 'Unbeaten', type: 'unbeaten' }
-    ];
+    // Map an Author Picks tip to a Best Picks category
+    function mapTip(match) {
+      var tip = match.tip;
+      if (!tip || !tip.market) return null;
+      var sel = String(tip.selection || tip.tip || '');
+      var conf = Number(tip.confidence) || 0;
+      var market = tip.market;
 
-    CATEGORIES.forEach(function(cat) {
-      if ((!Array.isArray(predictions[cat.key]) || predictions[cat.key].length === 0) && staticData && Array.isArray(staticData[cat.key])) {
-        predictions[cat.key] = staticData[cat.key];
+      if (market === 'Match Winner' && /^[1X2]$/.test(sel)) {
+        return { label: '1X2', type: '1x2', tip: sel, probability: conf, match: match };
+      }
+      if (market === 'Goals Over/Under') {
+        var m = sel.match(/^Over\s+(\d+\.?\d*)$/);
+        if (m) {
+          var ov = parseFloat(m[1]);
+          if (ov === 1.5) return { label: 'Over 1.5', type: 'over15', tip: sel, probability: conf, match: match };
+          if (ov === 2.5) return { label: 'Over 2.5', type: 'over25', tip: sel, probability: conf, match: match };
+        }
+      }
+      if (market === 'Both Teams Score') {
+        if (sel === 'BTTS Yes') return { label: 'BTTS Yes', type: 'btts', tip: 'BTTS YES', probability: conf, match: match };
+        if (sel === 'BTTS No') return { label: 'BTTS No', type: 'bttsNo', tip: 'BTTS NO', probability: conf, match: match };
+      }
+      if (market === 'Corners') {
+        return { label: 'Corners', type: 'corners', tip: sel, probability: conf, match: match };
+      }
+      if (market === 'Cards') {
+        return { label: 'Cards', type: 'cards', tip: sel, probability: conf, match: match };
+      }
+      return null;
+    }
+
+    // Build today's picks per category from Author Picks
+    var bestByType = {};
+    authorPicks.forEach(function(m) {
+      var mapped = mapTip(m);
+      if (!mapped) return;
+      var t = mapped.type;
+      if (!bestByType[t] || mapped.probability > bestByType[t].probability) {
+        bestByType[t] = mapped;
       }
     });
 
-    if (predictions.matches && !predictions.date && staticData && staticData.date) {
-      predictions.date = staticData.date;
+    var CATEGORY_DEFS = [
+      { type: '1x2', label: '1X2' },
+      { type: 'over15', label: 'Over 1.5' },
+      { type: 'over25', label: 'Over 2.5' },
+      { type: 'btts', label: 'BTTS Yes' },
+      { type: 'bttsNo', label: 'BTTS No' },
+      { type: 'corners', label: 'Corners' },
+      { type: 'cards', label: 'Cards' }
+    ];
+
+    function fmtTime(kickoff) {
+      if (!kickoff) return '';
+      try { return new Date(kickoff).toLocaleTimeString('en-NG', { timeZone: 'Africa/Lagos', hour: '2-digit', minute: '2-digit', hour12: false }) + ' WAT'; } catch (e) { return ''; }
     }
 
-    var systemToday = new Date().toISOString().slice(0, 10);
-    var dates = predictions.dates || [];
-    var today = dates.indexOf(systemToday) !== -1 ? systemToday : (predictions.date || systemToday);
-
-    function getBestPick(arr) {
-      if (!Array.isArray(arr) || arr.length === 0) return null;
-      return arr.reduce(function(best, item) {
-        var prob = Number(item.probability) || 0;
-        var bestProb = Number(best.probability) || 0;
-        return prob > bestProb ? item : best;
+    var todayPicks = [];
+    CATEGORY_DEFS.forEach(function(def) {
+      var entry = bestByType[def.type];
+      if (!entry) return;
+      var m = entry.match;
+      todayPicks.push({
+        category: def.label,
+        type: def.type,
+        match: m.home + ' - ' + m.away,
+        tip: entry.tip,
+        probability: entry.probability,
+        league: m.league || '',
+        time: fmtTime(m.kickoff),
+        streak: null,
+        streakTeam: null,
+        isHome: null
       });
-    }
+    });
 
-    function evaluatePick(pick, result) {
-      if (!result || typeof result.home !== 'number') return 'pending';
-      var tip = String(pick.tip || '');
-      var home = Number(result.home);
-      var away = Number(result.away);
-      if (tip === '1') return home > away ? 'won' : 'lost';
-      if (tip === '2') return away > home ? 'won' : 'lost';
-      if (tip === 'X') return home === away ? 'won' : 'lost';
-      if (/^over\s+([\d.]+)/i.test(tip)) {
-        var threshold = parseFloat(RegExp.$1);
-        return (home + away) > threshold ? 'won' : 'lost';
+    // Win Streak & Unbeaten from h2h data (unchanged)
+    ['winStreak', 'unbeaten'].forEach(function(streakType) {
+      var label = streakType === 'winStreak' ? 'Win Streak' : 'Unbeaten';
+      var h2hDate = h2hData.dates[TODAY_SYSTEM] ? TODAY_SYSTEM : Object.keys(h2hData.dates).sort().pop() || '';
+      var streakMatches = h2hData.dates[h2hDate] || [];
+      var picks = [];
+      streakMatches.forEach(function(m) {
+        var home = String(m.home || '').trim();
+        var away = String(m.away || '').trim();
+        (m.streaks || []).forEach(function(s) {
+          var isHome = s.team === home;
+          var raw = String(s.text || '').toLowerCase();
+          if (streakType === 'winStreak') {
+            if (!raw.includes(' won') && !raw.includes('won ')) return;
+          } else {
+            if (!raw.includes('unbeaten') && !raw.includes('no losses')) return;
+          }
+          var tip = streakType === 'winStreak'
+            ? (isHome ? home + ' to Win' : away + ' to Win')
+            : s.team + ' Unbeaten (' + s.count + ')';
+          var prob = Math.min(s.count * 4, 85);
+          picks.push({
+            match: m.match, nextMatch: m.match,
+            tip: tip, probability: prob,
+            league: m.league || '', time: m.time || '',
+            streak: s.count, streakTeam: s.team, isHome: isHome
+          });
+        });
+      });
+      var best = picks.reduce(function(b, item) {
+        var bp = b ? b.probability : 0;
+        return item.probability > bp ? item : b;
+      }, null);
+      if (best) {
+        todayPicks.push({
+          category: label, type: streakType,
+          match: best.match, tip: best.tip,
+          probability: best.probability, league: best.league,
+          time: best.time, streak: best.streak,
+          streakTeam: best.streakTeam, isHome: best.isHome
+        });
       }
-      if (/^under\s+([\d.]+)/i.test(tip)) {
-        var threshold = parseFloat(RegExp.$1);
-        return (home + away) < threshold ? 'won' : 'lost';
-      }
-      if (/^btts\s+yes/i.test(tip) || tip === 'BTTS YES') return home > 0 && away > 0 ? 'won' : 'lost';
-      if (/^btts\s+no/i.test(tip) || tip === 'BTTS NO') return home === 0 || away === 0 ? 'won' : 'lost';
-      if (/to (Win|Lose|Draw)/.test(tip) && typeof pick.streakTeam === 'string' && typeof pick.isHome === 'boolean') {
-        if (pick.isHome) {
-          if (/to Win/.test(tip)) return home > away ? 'won' : 'lost';
-          if (/to Lose/.test(tip)) return away > home ? 'won' : 'lost';
-          if (/to Draw/.test(tip)) return home === away ? 'won' : 'lost';
-        } else {
-          if (/to Win/.test(tip)) return away > home ? 'won' : 'lost';
-          if (/to Lose/.test(tip)) return home > away ? 'won' : 'lost';
-          if (/to Draw/.test(tip)) return home === away ? 'won' : 'lost';
-        }
-      }
-      return 'pending';
-    }
+    });
 
-    var resultsPath = path.join(process.cwd(), 'results-cache.json');
-    var resultsCache = {};
-    try { resultsCache = JSON.parse(fs.readFileSync(resultsPath, 'utf8')); } catch (e) {}
+    // History — load previous days' Author Picks and evaluate against FotMob results
+    var allDates = [];
+    try {
+      var files = fs.readdirSync(AUTHOR_DIR).filter(function(f) { return /^\d{8}\.json$/.test(f) && f.slice(0, 8) !== TODAY_FM; }).sort().slice(-3);
+      files.forEach(function(f) { allDates.push(f.slice(0, 8)); });
+    } catch (e) {}
 
     var fotmobDateCache = {};
-    async function fetchFotMobForDate(dateStr) {
+    async function fetchFotMobForDate(fmDate) {
       try {
-        var fmDate = dateStr.replace(/-/g, '');
         var url = 'https://www.fotmob.com/api/data/matches?date=' + fmDate;
         var res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' } });
         var data = await res.json();
@@ -1483,104 +1538,66 @@ router.get('/best-picks', async function (req, res) {
       } catch (e) { return {}; }
     }
 
-    var todayPicks = [];
-    CATEGORIES.forEach(function(cat) {
-      if (cat.type === 'winStreak' || cat.type === 'unbeaten') {
-        var h2hDate = h2hData.dates[today] ? today : Object.keys(h2hData.dates).sort().pop() || '';
-        var streakMatches = h2hData.dates[h2hDate] || [];
-        var picks = [];
-        streakMatches.forEach(function(m) {
-          var home = String(m.home || '').trim();
-          var away = String(m.away || '').trim();
-          (m.streaks || []).forEach(function(s) {
-            var isHome = s.team === home;
-            var raw = String(s.text || '').toLowerCase();
-            if (cat.type === 'winStreak') {
-              if (!raw.includes(' won') && !raw.includes('won ')) return;
-            } else {
-              if (!raw.includes('unbeaten') && !raw.includes('no losses')) return;
-            }
-            var tip = cat.type === 'winStreak'
-              ? (isHome ? home + ' to Win' : away + ' to Win')
-              : s.team + ' Unbeaten (' + s.count + ')';
-            var prob = Math.min(s.count * 4, 85);
-            picks.push({
-              match: m.match, nextMatch: m.match,
-              tip: tip, probability: prob,
-              league: m.league || '', time: m.time || '',
-              streak: s.count, streakTeam: s.team, isHome: isHome
-            });
+    function evaluateTip(tipStr, score) {
+      if (!score || typeof score.home !== 'number') return 'pending';
+      var total = score.home + score.away;
+      var t = String(tipStr || '');
+      if (t === '1') return score.home > score.away ? 'won' : 'lost';
+      if (t === '2') return score.away > score.home ? 'won' : 'lost';
+      if (t === 'X') return score.home === score.away ? 'won' : 'lost';
+      if (/^Over\s+(\d+\.?\d*)$/.test(t)) { var ov = parseFloat(RegExp.$1); return total > ov ? 'won' : 'lost'; }
+      if (/^Under\s+(\d+\.?\d*)$/.test(t)) { var uv = parseFloat(RegExp.$1); return total < uv ? 'won' : 'lost'; }
+      if (/^BTTS\s+YES/i.test(t)) return score.home > 0 && score.away > 0 ? 'won' : 'lost';
+      if (/^BTTS\s+NO/i.test(t)) return score.home === 0 || score.away === 0 ? 'won' : 'lost';
+      return 'pending';
+    }
+
+    var history = [];
+    for (var hi = 0; hi < allDates.length; hi++) {
+      var fmDate = allDates[hi];
+      var niceDate = fmDate.slice(0, 4) + '-' + fmDate.slice(4, 6) + '-' + fmDate.slice(6, 8);
+
+      var dayPicks = [];
+      try {
+        var dayData = JSON.parse(fs.readFileSync(path.join(AUTHOR_DIR, fmDate + '.json'), 'utf8'));
+        var dayMatches = dayData.matches || [];
+
+        if (!fotmobDateCache[fmDate]) fotmobDateCache[fmDate] = await fetchFotMobForDate(fmDate);
+        var fotmobResults = fotmobDateCache[fmDate] || {};
+
+        // Build best per category for this day (same logic as todayPicks)
+        var dayBest = {};
+        dayMatches.forEach(function(m) {
+          var mapped = mapTip(m);
+          if (!mapped) return;
+          var t = mapped.type;
+          if (!dayBest[t] || mapped.probability > dayBest[t].probability) dayBest[t] = mapped;
+        });
+
+        CATEGORY_DEFS.forEach(function(def) {
+          var entry = dayBest[def.type];
+          if (!entry) return;
+          var mm = entry.match;
+          var matchName = mm.home + ' - ' + mm.away;
+          var score = fotmobResults[matchName] || null;
+          var outcome = score ? evaluateTip(entry.tip, score) : 'pending';
+          dayPicks.push({
+            category: def.label, type: def.type,
+            match: matchName, tip: entry.tip,
+            probability: entry.probability,
+            outcome: outcome,
+            score: score ? score.home + '-' + score.away : null,
+            streakTeam: null, isHome: null
           });
         });
-        var best = getBestPick(picks);
-        if (best) {
-          todayPicks.push({
-            category: cat.label, type: cat.type,
-            match: best.match, tip: best.tip,
-            probability: best.probability, league: best.league,
-            time: best.time, streak: best.streak,
-            streakTeam: best.streakTeam, isHome: best.isHome
-          });
-        }
-        return;
-      }
-      var matches = Array.isArray(predictions[cat.key]) ? predictions[cat.key] : [];
-      var best = getBestPick(matches);
-      if (!best) return;
-      todayPicks.push({
-        category: cat.label,
-        type: cat.type,
-        match: best.nextMatch || best.match || '',
-        tip: best.tip || '',
-        probability: Number(best.probability) || 0,
-        league: best.league || '',
-        time: best.time || '',
-        streak: best.streak || null,
-        streakTeam: null,
-        isHome: null
-      });
-    });
+      } catch (e) {}
 
-    var dates = (predictions.dates || []).filter(function(d) { return d !== today; }).slice(-3).sort();
-    var history = [];
-    for (var hi = 0; hi < dates.length; hi++) {
-      var date = dates[hi];
-      var dayResults = resultsCache[date] || {};
-      if (Object.keys(dayResults).length === 0 && !fotmobDateCache[date]) {
-        fotmobDateCache[date] = await fetchFotMobForDate(date);
-      }
-      var fotmobResults = fotmobDateCache[date] || {};
-      var dayPicks = [];
-      CATEGORIES.forEach(function(cat) {
-        if (cat.type === 'winStreak' || cat.type === 'unbeaten') return;
-        var matches = Array.isArray(predictions[cat.key]) ? predictions[cat.key].filter(function(m) { return m.date === date; }) : [];
-        var best = getBestPick(matches);
-        if (!best) return;
-        var matchName = best.nextMatch || best.match || '';
-        var result = dayResults[matchName] || fotmobResults[matchName] || null;
-        var enriched = {
-          category: cat.label,
-          type: cat.type,
-          match: matchName,
-          tip: best.tip || '',
-          probability: Number(best.probability) || 0,
-          outcome: 'pending',
-          score: null,
-          streakTeam: null,
-          isHome: null
-        };
-        if (result) {
-          enriched.outcome = evaluatePick(enriched, result);
-          enriched.score = result.home + '-' + result.away;
-        }
-        dayPicks.push(enriched);
-      });
       if (dayPicks.length > 0) {
-        history.push({ date: date, picks: dayPicks });
+        history.push({ date: niceDate, picks: dayPicks });
       }
     }
 
-    res.json({ today: todayPicks, history: history, dates: predictions.dates || [] });
+    res.json({ today: todayPicks, history: history });
   } catch (e) {
     console.error('[best-picks] Error:', e.message);
     res.status(500).json({ error: 'Failed to load best picks' });

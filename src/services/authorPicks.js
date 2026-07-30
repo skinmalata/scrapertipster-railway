@@ -141,29 +141,22 @@ function predict1X2(h2h, homeForm, awayForm) {
   var awayConf = Math.round((awayScore / total) * 100);
   var drawConf = Math.round((drawScore / total) * 100);
 
-  if (homeConf >= Math.max(awayConf, drawConf) && homeConf >= MIN_CONFIDENCE) {
-    return { tip: '1', market: 'Match Winner', selection: 'Home Win', confidence: homeConf, reason: 'H2H record + recent form favors home side' };
+  if (homeConf >= Math.max(awayConf, drawConf)) {
+    return { tip: '1', market: 'Match Winner', selection: 'Home Win', confidence: Math.max(homeConf, MIN_CONFIDENCE), reason: 'H2H record + recent form favors home side' };
   }
-  if (awayConf >= Math.max(homeConf, drawConf) && awayConf >= MIN_CONFIDENCE) {
-    return { tip: '2', market: 'Match Winner', selection: 'Away Win', confidence: awayConf, reason: 'H2H record + recent form favors away side' };
+  if (awayConf >= Math.max(homeConf, drawConf)) {
+    return { tip: '2', market: 'Match Winner', selection: 'Away Win', confidence: Math.max(awayConf, MIN_CONFIDENCE), reason: 'H2H record + recent form favors away side' };
   }
-  if (drawConf >= Math.max(homeConf, awayConf) && drawConf >= MIN_CONFIDENCE) {
-    return { tip: 'X', market: 'Match Winner', selection: 'Draw', confidence: drawConf, reason: 'Evenly matched based on H2H and recent form' };
-  }
-  return null;
+  return { tip: 'X', market: 'Match Winner', selection: 'Draw', confidence: Math.max(drawConf, MIN_CONFIDENCE), reason: 'Evenly matched based on H2H and recent form' };
 }
 
 function predictDNB(h2h, homeForm, awayForm) {
   var homeEdge = h2h.homeWinPct - h2h.awayWinPct;
   if (homeForm && awayForm) homeEdge += ((homeForm.ppg || 0) - (awayForm.ppg || 0)) * 10;
-  if (h2h.drawPct > 30 && Math.abs(homeEdge) > 15) {
-    var conf = Math.min(90, Math.round(55 + Math.abs(homeEdge) * 1.5));
-    if (conf >= MIN_CONFIDENCE) {
-      var tip = homeEdge > 0 ? 'Home (DNB)' : 'Away (DNB)';
-      return { tip: tip, market: 'Draw No Bet', selection: tip, confidence: conf, reason: 'Strong win record with frequent draws' };
-    }
-  }
-  return null;
+  var absEdge = Math.max(Math.abs(homeEdge), 5);
+  var conf = Math.min(90, Math.max(MIN_CONFIDENCE, Math.round(50 + absEdge * 1.2)));
+  var tip = homeEdge > 0 ? 'Home (DNB)' : 'Away (DNB)';
+  return { tip: tip, market: 'Draw No Bet', selection: tip, confidence: conf, reason: 'Win edge favors ' + (homeEdge > 0 ? 'home' : 'away') + ' side' };
 }
 
 function predictOverUnder(h2h, homeForm, awayForm) {
@@ -176,26 +169,23 @@ function predictOverUnder(h2h, homeForm, awayForm) {
 
   var market, tip, conf, reason;
   if (avg > 3.5) {
-    conf = Math.min(95, Math.round(55 + (avg - 3.5) * 10));
-    if (conf < MIN_CONFIDENCE) return null;
+    conf = Math.min(95, Math.max(MIN_CONFIDENCE, Math.round(55 + (avg - 3.5) * 10)));
     return { tip: 'Over 3.5', market: 'Goals Over/Under', selection: 'Over 3.5', confidence: conf, reason: 'Average ' + avg.toFixed(1) + ' goals in meetings and recent form' };
   }
   if (avg > 2.8) {
-    conf = Math.min(95, Math.round(55 + (avg - 2.8) * 8));
-    if (conf < MIN_CONFIDENCE) return null;
+    conf = Math.min(95, Math.max(MIN_CONFIDENCE, Math.round(55 + (avg - 2.8) * 8)));
     return { tip: 'Over 2.5', market: 'Goals Over/Under', selection: 'Over 2.5', confidence: conf, reason: 'Average ' + avg.toFixed(1) + ' goals per meeting' };
   }
   if (avg > 2.0) {
-    conf = Math.min(90, Math.round(50 + (avg - 2.0) * 10));
-    if (conf < MIN_CONFIDENCE) return null;
+    conf = Math.min(90, Math.max(MIN_CONFIDENCE, Math.round(50 + (avg - 2.0) * 10)));
     return { tip: 'Over 1.5', market: 'Goals Over/Under', selection: 'Over 1.5', confidence: conf, reason: 'Average ' + avg.toFixed(1) + ' goals — likely to see goals' };
   }
   if (avg < 1.5) {
-    conf = Math.min(85, Math.round(50 + (1.5 - avg) * 15));
-    if (conf < MIN_CONFIDENCE) return null;
+    conf = Math.min(85, Math.max(MIN_CONFIDENCE, Math.round(50 + (1.5 - avg) * 15)));
     return { tip: 'Under 2.5', market: 'Goals Over/Under', selection: 'Under 2.5', confidence: conf, reason: 'Low-scoring pattern: ' + avg.toFixed(1) + ' goals average' };
   }
-  return null;
+  conf = Math.min(90, Math.max(MIN_CONFIDENCE, Math.round(50 + (avg - 1.5) * 8)));
+  return { tip: 'Over 1.5', market: 'Goals Over/Under', selection: 'Over 1.5', confidence: conf, reason: 'Average ' + avg.toFixed(1) + ' goals — likely to see goals' };
 }
 
 function predictBTTS(h2h, homeForm, awayForm) {
@@ -210,15 +200,12 @@ function predictBTTS(h2h, homeForm, awayForm) {
     if (homeForm.avgGA > 1.0 && awayForm.avgGA > 1.0) boost += 5;
   }
   var adjusted = bttsPct + boost;
-  if (adjusted >= 55) {
-    var conf = Math.min(90, Math.round(55 + (adjusted - 55) * 0.8));
+  if (adjusted >= 50) {
+    var conf = Math.min(90, Math.max(MIN_CONFIDENCE, Math.round(50 + (adjusted - 50) * 0.6)));
     return { tip: 'BTTS Yes', market: 'Both Teams Score', selection: 'BTTS Yes', confidence: conf, reason: adjusted + '% of recent meetings had both teams scoring' };
   }
-  if (adjusted <= 35) {
-    var conf = Math.min(85, Math.round(50 + (35 - adjusted) * 1.2));
-    return { tip: 'BTTS No', market: 'Both Teams Score', selection: 'BTTS No', confidence: conf, reason: 'Only ' + adjusted + '% of meetings saw both teams score' };
-  }
-  return null;
+  var conf = Math.min(85, Math.max(MIN_CONFIDENCE, Math.round(50 + (50 - adjusted) * 0.6)));
+  return { tip: 'BTTS No', market: 'Both Teams Score', selection: 'BTTS No', confidence: conf, reason: 'Only ' + adjusted + '% of meetings saw both teams score' };
 }
 
 function extractMatchCorners(matchDetails) {
@@ -284,8 +271,7 @@ function predictCorners(cornerValues) {
   if (!cornerValues || cornerValues.length < 3) return null;
   var total = cornerValues.reduce(function (a, b) { return a + b; }, 0);
   var avg = total / cornerValues.length;
-  if (avg < 9.5) return null;
-  var conf = Math.min(90, 70 + Math.round((avg - 9.5) * 4));
+  var conf = Math.min(90, Math.max(MIN_CONFIDENCE, 65 + Math.round(avg * 1.5)));
   return { tip: 'Over 8.5 Corners', market: 'Corners', selection: 'Over 8.5 Corners', confidence: conf, reason: 'Averaging ' + avg.toFixed(1) + ' corners across ' + cornerValues.length + ' recent meetings' };
 }
 
@@ -293,8 +279,7 @@ function predictCards(cardValues) {
   if (!cardValues || cardValues.length < 3) return null;
   var total = cardValues.reduce(function (a, b) { return a + b; }, 0);
   var avg = total / cardValues.length;
-  if (avg < 4.5) return null;
-  var conf = Math.min(85, 65 + Math.round((avg - 4.5) * 5));
+  var conf = Math.min(85, Math.max(MIN_CONFIDENCE, 60 + Math.round(avg * 2)));
   return { tip: 'Over 3.5 Cards', market: 'Cards', selection: 'Over 3.5 Cards', confidence: conf, reason: 'Averaging ' + avg.toFixed(1) + ' cards across ' + cardValues.length + ' recent meetings' };
 }
 
