@@ -1760,77 +1760,25 @@ nav.open { display: flex !important; }
   var lastMinOdds = 1.20;
   var currentTier = 'free_anon';
 
-  var TIER_LIMITS = {
-    free_anon: { maxLegs: 3, maxOdds: 4.0, safeTips: false, shuffle: false, dailyLimit: 3, telegramLink: false, label: 'Free (not signed in)' },
-    free_registered: { maxLegs: 3, maxOdds: 4.0, safeTips: false, shuffle: false, dailyLimit: 5, telegramLink: false, label: 'Free' },
-    pro: { maxLegs: 30, maxOdds: 500, safeTips: true, shuffle: true, dailyLimit: null, telegramLink: false, label: 'Pro' },
-    lifetime: { maxLegs: 30, maxOdds: 500, safeTips: true, shuffle: true, dailyLimit: null, telegramLink: true, label: 'Lifetime' },
-    admin: { maxLegs: 30, maxOdds: 500, safeTips: true, shuffle: true, dailyLimit: null, telegramLink: true, label: 'Admin' }
-  };
-
-
-
-  function getTier() {
-    var user = WFT.getUser();
-    if (!user) return 'free_anon';
-    if (user.isAdmin) return 'admin';
-    if (!user.isPro) return 'free_registered';
-    if (user.plan === 'lifetime') return 'lifetime';
-    return 'pro';
-  }
+  var MAX_LEGS = 30;
+  var MAX_ODDS = 500;
 
   function setupUI() {
-    var tier = getTier();
-    var limits = TIER_LIMITS[tier];
     var banner = document.getElementById('tierBanner');
-    var body = '';
-
-    if (tier === 'free_anon') {
-      body = '<strong>Free Tier (Not Signed In)</strong> - Max ' + limits.maxLegs + ' legs, max ' + limits.maxOdds.toFixed(2) + ' odds, ' + limits.dailyLimit + ' tickets/day. <a href="/pricing.html">Sign in or upgrade to Pro</a> for more.';
-    } else if (tier === 'free_registered') {
-      body = '<strong>Free Tier</strong> - Max ' + limits.maxLegs + ' legs, max ' + limits.maxOdds.toFixed(2) + ' odds, ' + limits.dailyLimit + ' tickets/day. <a href="/pricing.html">Upgrade to Pro</a> for unlimited.';
-    } else if (tier === 'lifetime') {
-      body = '<strong>Lifetime Member</strong> - Full access with exclusive Telegram tips.';
-    } else if (tier === 'admin') {
-      body = '<strong>Admin</strong> - Full access enabled.';
-    } else {
-      body = '<strong>Pro Member</strong> - Full access enabled.';
-    }
-    banner.innerHTML = body;
+    banner.innerHTML = '<strong>Full Access</strong> - Build unlimited tickets with up to ' + MAX_LEGS + ' legs.';
     banner.style.display = '';
 
-    var safeCheck = document.getElementById('safeTips');
-    if (!limits.safeTips) {
-      safeCheck.disabled = true;
-      safeCheck.checked = false;
-    } else {
-      safeCheck.disabled = false;
-    }
-
+    document.getElementById('safeTips').disabled = false;
     var targetInput = document.getElementById('ticketTarget');
+    targetInput.disabled = false;
+    targetInput.title = '';
     var legsInput = document.getElementById('numLegs');
-    if (tier === 'free_anon' || tier === 'free_registered') {
-      targetInput.disabled = true;
-      targetInput.title = 'Upgrade to Pro to change target odds';
-      legsInput.disabled = true;
-      legsInput.title = 'Upgrade to Pro to change legs';
-      legsInput.value = 3;
-    } else {
-      targetInput.disabled = false;
-      targetInput.title = '';
-      legsInput.disabled = false;
-      legsInput.title = '';
-      legsInput.max = limits.maxLegs;
-      if (parseInt(legsInput.value, 10) > limits.maxLegs) {
-        legsInput.value = limits.maxLegs;
-      }
-    }
+    legsInput.disabled = false;
+    legsInput.title = '';
+    legsInput.max = MAX_LEGS;
 
     var shuffleBtn = document.getElementById('shuffleBtn');
-    shuffleBtn.style.display = limits.shuffle ? '' : 'none';
-
-    var telegramSection = document.getElementById('telegramSection');
-    telegramSection.style.display = limits.telegramLink ? '' : 'none';
+    shuffleBtn.style.display = '';
   }
 
   function getSelectedMarkets() {

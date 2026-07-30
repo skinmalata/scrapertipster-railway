@@ -1255,93 +1255,26 @@ router.post('/webhook/payment', function (req, res) {
 });
 
 // POST /api/ticket-builder/generate — tier-gated ticket builder
-router.post('/ticket-builder/generate', optionalAuth, async function (req, res) {
+router.post('/ticket-builder/generate', async function (req, res) {
   try {
-    var isLifetime = false;
-    var isVip = false;
-    var remaining = null;
-
-    if (req.user) {
-      if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
-      try {
-        var prof = await supabase.from('profiles').select('vip_status, vip_expires_at').eq('id', req.user.id).single();
-        isVip = prof.data && (prof.data.vip_status === 'vip' || prof.data.vip_status === 'admin') && (!prof.data.vip_expires_at || new Date(prof.data.vip_expires_at) > new Date());
-      } catch (e) {}
-      if (isVip) {
-        try {
-          var sub = await supabase.from('subscriptions').select('plan_type').eq('user_id', req.user.id).order('created_at', { ascending: false }).limit(1).maybeSingle();
-          isLifetime = sub.data && sub.data.plan_type === 'lifetime';
-        } catch (e) {}
-      }
-    }
-
-    var FREE_ANON_MAX_LEGS = 3;
-    var FREE_ANON_MAX_ODDS = 4.0;
-    var FREE_ANON_DAILY = 1;
-    var FREE_REG_MAX_LEGS = 3;
-    var FREE_REG_MAX_ODDS = 4.0;
-    var FREE_REG_DAILY = 5;
-    var PRO_MAX_LEGS = 30;
-    var PRO_MAX_ODDS = 500;
-
-    var tier;
-    var maxLegs;
-    var maxTotalOdds;
-
-    if (isVip) {
-      tier = isLifetime ? 'lifetime' : 'pro';
-      maxLegs = PRO_MAX_LEGS;
-      maxTotalOdds = PRO_MAX_ODDS;
-    } else if (req.user) {
-      tier = 'free_registered';
-      maxLegs = FREE_REG_MAX_LEGS;
-      maxTotalOdds = FREE_REG_MAX_ODDS;
-    } else {
-      tier = 'free_anon';
-      maxLegs = FREE_ANON_MAX_LEGS;
-      maxTotalOdds = FREE_ANON_MAX_ODDS;
-    }
-
-    if (!isVip) {
-      if (req.user) {
-        try {
-          var rpcResult = await supabase.rpc('consume_free_allowance', { p_user_id: req.user.id, p_action: 'ticket_builder', p_max_daily: FREE_REG_DAILY });
-          remaining = rpcResult.data && rpcResult.data[0] ? rpcResult.data[0].remaining : 0;
-        } catch (e) {
-          if (e.code === 'LMIT') return res.status(429).json({ error: 'Daily limit reached (' + FREE_REG_DAILY + ' runs)', isPro: false, remaining: 0 });
-          remaining = 0;
-        }
-      } else {
-        var anonRateData = loadAnonRateCache();
-        var ip = req.ip || 'anon';
-        var anonKey = 'anon_ticket_' + ip.replace(/[.:]/g, '_') + '_' + new Date().toISOString().slice(0, 10);
-        var anonCount = anonRateData[anonKey] || 0;
-        if (anonCount >= FREE_ANON_DAILY) return res.status(429).json({ error: 'Anonymous limit reached (' + FREE_ANON_DAILY + ' run/day). Sign in for ' + FREE_REG_DAILY + ' free runs.', isPro: false, remaining: 0 });
-        anonRateData[anonKey] = anonCount + 1;
-        saveAnonRateCache(anonRateData);
-        remaining = 0;
-      }
-    }
-
     var body = req.body || {};
     var requestedLegs = parseInt(body.numLegs, 10) || 3;
-    var requestedMaxOdds = parseFloat(body.maxOdds) || maxTotalOdds;
+    var requestedMaxOdds = parseFloat(body.maxOdds) || 500;
 
-    var clampedLegs = Math.min(requestedLegs, maxLegs);
-    var clampedMaxOdds = Math.min(requestedMaxOdds, maxTotalOdds);
+    var clampedLegs = Math.min(requestedLegs, 30);
+    var clampedMaxOdds = Math.min(requestedMaxOdds, 500);
 
     var date = watDate();
     var predictions = vipPredictionData();
     var oddsResponse = await fetchPreMatchOdds(date);
     var h2hMatches = await fetchTodayStreaks();
 
-
     var buildOpts = {
       date: date,
       oddsResponse: oddsResponse,
       h2hMatches: h2hMatches,
-      markets: isVip ? body.markets : undefined,
-      safeOnly: isVip ? (body.safeOnly === true) : false,
+      markets: body.markets,
+      safeOnly: body.safeOnly === true,
       numLegs: clampedLegs,
       maxOdds: clampedMaxOdds,
       minOddsPerLeg: parseFloat(body.minOddsPerLeg) || 1.20,
@@ -1353,13 +1286,8 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
     var payload = buildTicket(predictions, buildOpts);
     res.json({
       ...payload,
-      tier: tier,
-      isPro: isVip,
-      isLifetime: isLifetime,
-      limit: isVip ? null : (tier === 'free_registered' ? FREE_REG_DAILY : FREE_ANON_DAILY),
-      remaining: isVip ? null : (remaining !== null ? remaining : 0),
-      maxLegs: maxLegs,
-      maxOdds: maxTotalOdds
+      maxLegs: 30,
+      maxOdds: 500
     });
   } catch (e) {
     console.error('[ticket-builder] Error:', e.message);
