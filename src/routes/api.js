@@ -1368,7 +1368,9 @@ router.get('/best-picks', async function (req, res) {
       predictions.date = staticData.date;
     }
 
-    var today = predictions.date || new Date().toISOString().slice(0, 10);
+    var systemToday = new Date().toISOString().slice(0, 10);
+    var dates = predictions.dates || [];
+    var today = dates.indexOf(systemToday) !== -1 ? systemToday : (predictions.date || systemToday);
 
     function getBestPick(arr) {
       if (!Array.isArray(arr) || arr.length === 0) return null;
@@ -1456,7 +1458,7 @@ router.get('/best-picks', async function (req, res) {
         }
         return;
       }
-      var matches = Array.isArray(predictions[cat.key]) ? predictions[cat.key].filter(function(m) { return (m.date || today) === today; }) : [];
+      var matches = Array.isArray(predictions[cat.key]) ? predictions[cat.key].filter(function(m) { return m.date === today; }) : [];
       var best = getBestPick(matches);
       if (!best) return;
       todayPicks.push({
