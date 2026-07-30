@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Giant Pool - WinFulltime</title>
+<title>Author Picks - WinFulltime</title>
 <meta name="description" content="Every fixture analyzed. Every market considered. One best pick per match.">
 <link rel="icon" href="/icons/icon-192.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -61,7 +61,7 @@
 <a href="/">Home</a>
 <a href="/ticket-builder.html">Ticket Builder</a>
 <a href="/best-picks.html">Best Picks</a>
-<a href="/giant-pool.html">Giant Pool</a>
+<a href="/author-picks.html">Author Picks</a>
 <a href="/predictions/in-play">In-Play</a>
 </nav>
 </div>
@@ -69,7 +69,7 @@
 
 <main>
 <div class="hero">
-<h1>Giant Pool</h1>
+<h1>Author Picks</h1>
 <p class="hero-subtext">Every fixture analyzed. Every market considered. One best pick per match.</p>
 <div class="meta-row">
 <span id="matchCount">-</span>
@@ -207,7 +207,7 @@
 
   async function loadHistory() {
     try {
-      var res = await fetch(API_BASE + '/api/giant-pool/history?days=2', { mode: 'cors', cache: 'no-store' });
+      var res = await fetch(API_BASE + '/api/author-picks/history?days=2', { mode: 'cors', cache: 'no-store' });
       var data = await res.json();
       renderHistory(data);
     } catch (e) {
@@ -217,7 +217,7 @@
 
   async function load() {
     try {
-      var res = await fetch(API_BASE + '/api/giant-pool', { mode: 'cors', cache: 'no-store' });
+      var res = await fetch(API_BASE + '/api/author-picks', { mode: 'cors', cache: 'no-store' });
       var data = await res.json();
       render(data);
     } catch (e) {

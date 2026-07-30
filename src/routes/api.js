@@ -15,7 +15,7 @@ const { getCachedLive } = require('../services/scrapeLive');
 const { getSettledTodayTips, getSettledTipsForDate } = require('../services/liveTipHistory');
 const { buildTwoOddsOfDay, watDate } = require('../services/twoOddsOfDay');
 const { buildTicket } = require('../services/ticketBuilder');
-const { buildGiantPool, getGiantPoolHistory } = require('../services/giantPool');
+const { buildGiantPool, getGiantPoolHistory } = require('../services/authorPicks');
 const { fetchTodayStreaks } = require('../services/h2hWinningStreaks');
 const { optionalAuth, requireAuth, requirePro: requireProMiddleware, requireAdmin } = require('../middleware/auth');
 const payment = require('../services/payment');
@@ -1547,25 +1547,25 @@ router.get('/best-picks', async function (req, res) {
   }
 });
 
-// GET /api/giant-pool — all today's fixtures with best tip per match
-router.get('/giant-pool', async function (req, res) {
+// GET /api/author-picks — all today's fixtures with best tip per match
+router.get('/author-picks', async function (req, res) {
   try {
     var data = await buildGiantPool();
     res.json(data);
   } catch (e) {
-    console.error('[giant-pool] Error:', e.message);
-    res.status(500).json({ error: 'Failed to build giant pool' });
+    console.error('[author-picks] Error:', e.message);
+    res.status(500).json({ error: 'Failed to build author picks' });
   }
 });
 
-// GET /api/giant-pool/history — past performance
-router.get('/giant-pool/history', async function (req, res) {
+// GET /api/author-picks/history — past performance
+router.get('/author-picks/history', async function (req, res) {
   try {
     var days = Math.min(5, Math.max(1, parseInt(req.query.days, 10) || 2));
     var data = await getGiantPoolHistory(days);
     res.json({ days: data });
   } catch (e) {
-    console.error('[giant-pool/history] Error:', e.message);
+    console.error('[author-picks/history] Error:', e.message);
     res.status(500).json({ error: 'Failed to load history' });
   }
 });

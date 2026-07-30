@@ -7,7 +7,7 @@ var DETAIL_CONCURRENCY = 3;
 var DETAIL_DELAY_MS = 500;
 var CACHE_TTL_MS = 30 * 60 * 1000;
 var MIN_CONFIDENCE = 55;
-var DATA_DIR = path.join(__dirname, '../../data/giant-pool');
+var DATA_DIR = path.join(__dirname, '../../data/author-picks');
 
 var cache = { data: null, fetchedAt: null };
 
@@ -409,7 +409,7 @@ async function buildGiantPool() {
   if (!res || res.status !== 200 || !res.data) return { matches: [], generatedAt: new Date().toISOString(), totalFixtures: 0 };
 
   var allFixtures = extractAllFixtures(res.data);
-  console.log('[giant-pool] Total fixtures for', date, ':', allFixtures.length);
+  console.log('[author-picks] Total fixtures for', date, ':', allFixtures.length);
 
   var limited = allFixtures.slice(0, MAX_MATCHES);
   var enriched = [];
@@ -430,7 +430,7 @@ async function buildGiantPool() {
   var result = { matches: enriched, totalFixtures: allFixtures.length, analyzedFixtures: enriched.length, generatedAt: new Date().toISOString() };
   cache = { data: result, fetchedAt: Date.now() };
   try { fs.writeFileSync(path.join(DATA_DIR, date + '.json'), JSON.stringify({ matches: enriched, generatedAt: result.generatedAt }), 'utf8'); } catch (e) {}
-  console.log('[giant-pool] Enriched', enriched.length, 'of', limited.length, 'fixtures');
+  console.log('[author-picks] Enriched', enriched.length, 'of', limited.length, 'fixtures');
   return result;
 }
 
