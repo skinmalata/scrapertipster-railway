@@ -1468,8 +1468,11 @@ router.get('/best-picks', async function (req, res) {
           var arr = Array.isArray(preds[cat.key]) ? preds[cat.key] : [];
           if (arr.length === 0) return;
           var best = arr.reduce(function(a, b) { return (Number(b.probability) || 0) > (Number(a.probability) || 0) ? b : a; });
+          var tip = best.tip || '';
+          if (cat.type === 'cards' && /^Over 9\.5 Cards/i.test(tip)) tip = 'Over 3.5 Cards';
+          if (cat.type === 'corners' && /^Over 9\.5 Corners/i.test(tip)) tip = 'Over 8.5 Corners';
           todayPicks.push({ category: cat.label, type: cat.type, match: best.nextMatch || best.match || '',
-            tip: best.tip || '', probability: Number(best.probability) || 0,
+            tip: tip, probability: Number(best.probability) || 0,
             league: best.league || '', time: best.time || '',
             streak: null, streakTeam: null, isHome: null });
         });
