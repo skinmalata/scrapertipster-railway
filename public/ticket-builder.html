@@ -2016,8 +2016,7 @@ nav.open { display: flex !important; }
     var interval = 250;
     function check() {
       var user = WFT.getUser();
-      if (!user) { return; }
-      if (user.isPro !== undefined) {
+      if (user && user.isPro !== undefined) {
         renderTier();
         return;
       }

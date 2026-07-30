@@ -61,11 +61,11 @@
       sb.auth.getSession().then(function(s) {
         var tok = s.data.session?.access_token;
         if (!tok) { _proFetchScheduled = false; return; }
-        fetch('https://xogkqpjtxfemcxzsuwke.supabase.co/rest/v1/profiles?id=eq.' + userState.user.id + '&select=vip_status,vip_expires_at', {
-          headers: {
-            'Authorization': 'Bearer ' + tok,
-            'apikey': 'sb_publishable_VydS1cmw7_OhFa7e-xUOqQ_tcVRUQoy'
-          }
+        var SUPABASE_URL = 'https://xogkqpjtxfemcxzsuwke.supabase.co';
+        var ANON_KEY = 'sb_publishable_VydS1cmw7_OhFa7e-xUOqQ_tcVRUQoy';
+        var headers = { 'Authorization': 'Bearer ' + tok, 'apikey': ANON_KEY };
+        fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.' + userState.user.id + '&select=vip_status,vip_expires_at', {
+          headers: headers
         }).then(function(r) {
           if (!r.ok) throw new Error('Profile fetch failed');
           return r.json();
@@ -78,8 +78,21 @@
             userState.user.isAdmin = isAdmin;
             userState.user.expiresAt = p.vip_expires_at || null;
             updateUI(userState.user);
+            if (isVip) {
+              fetch(SUPABASE_URL + '/rest/v1/subscriptions?user_id=eq.' + userState.user.id + '&select=plan_type&order=created_at.desc&limit=1', {
+                headers: headers
+              }).then(function(r2) {
+                if (!r2.ok) return;
+                return r2.json();
+              }).then(function(subs) {
+                if (subs && subs[0]) {
+                  userState.user.plan = subs[0].plan_type;
+                }
+              }).catch(function(e2) {
+                console.warn('[scheduleProFetch] Subscription fetch failed:', e2);
+              });
+            }
           }
-          document.dispatchEvent(new CustomEvent('wft-pro-status'));
         }).catch(function(e) {
           console.warn('[scheduleProFetch] Error:', e);
           if (userState.user) {
@@ -87,8 +100,10 @@
             userState.user.isAdmin = false;
             updateUI(userState.user);
           }
+        }).finally(function() {
           document.dispatchEvent(new CustomEvent('wft-pro-status'));
-        }).finally(function() { _proFetchScheduled = false; });
+          _proFetchScheduled = false;
+        });
       });
     }, 1000);
   }
@@ -107,8 +122,15 @@
       }
       return fetch(url, options).then(function (res) {
         return res.json().then(function (data) {
-          if (data && typeof data.isPro !== 'undefined' && userState.user) {
-            userState.user.isPro = data.isPro;
+          if (userState.user) {
+            if (typeof data.isPro !== 'undefined') {
+              userState.user.isPro = data.isPro;
+            }
+            if (data.plan) {
+              userState.user.plan = data.plan;
+            } else if (typeof data.isLifetime !== 'undefined') {
+              userState.user.plan = data.isLifetime ? 'lifetime' : 'pro';
+            }
           }
           return data;
         });
@@ -136,8 +158,9 @@
     }, 100);
   };
 
-  document.addEventListener('wft-supabase-ready', function () {
+  function initAuth() {
     var sb = window.WFT.supabase;
+    if (!sb) return;
     sb.auth.getSession().then(function (res) {
       if (res.data && res.data.session) {
         var tok = res.data.session.access_token;
@@ -148,34 +171,23 @@
         updateUI(null);
       }
     });
-
     sb.auth.onAuthStateChange(onAuthChange);
-  });
+  }
 
-  if (!window.WFT.supabase) {
-    var ready = function () {
-      var sb = window.WFT.supabase;
-      sb.auth.getSession().then(function (res) {
-        if (res.data && res.data.session) {
-          var tok = res.data.session.access_token;
-          console.log('[auth fallback] getSession token first 20:', tok ? tok.substring(0, 20) : 'MISSING');
-          onAuthChange(null, res.data.session);
-        } else {
-          userState.loading = false;
-          updateUI(null);
-        }
-      });
-      sb.auth.onAuthStateChange(onAuthChange);
-    };
+  document.addEventListener('wft-supabase-ready', initAuth);
+
+  if (window.WFT.supabase) {
+    initAuth();
+  } else {
     if (document.readyState === 'complete') {
       setTimeout(function () {
-        if (window.WFT.supabase) ready();
+        if (window.WFT.supabase) initAuth();
         else { userState.loading = false; updateUI(null); }
       }, 2000);
     } else {
       window.addEventListener('load', function () {
         setTimeout(function () {
-          if (window.WFT.supabase) ready();
+          if (window.WFT.supabase) initAuth();
           else { userState.loading = false; updateUI(null); }
         }, 2000);
       });
