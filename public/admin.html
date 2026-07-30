@@ -373,8 +373,8 @@ WFT.onAuthReady(function() {
     var user = WFT.getUser();
     checkCount++;
     if (user && user.isAdmin !== undefined) { init(); return; }
-    if (!user && checkCount > 5) { init(); return; }
-    if (checkCount > 30) { init(); return; }
+    if (!user && checkCount > 10) { init(); return; }
+    if (checkCount > 66) { init(); return; }
     setTimeout(poll, 300);
   }
   poll();
@@ -383,8 +383,13 @@ WFT.onAuthReady(function() {
 document.addEventListener('wft-pro-status', function() {
   var user = WFT.getUser();
   if (user && user.isAdmin) {
-    document.getElementById('adminEmail').textContent = '(' + user.email + ')';
-    loadStats();
+    var denied = document.getElementById('accessDenied');
+    if (!denied.classList.contains('hidden')) {
+      init();
+    } else {
+      document.getElementById('adminEmail').textContent = '(' + user.email + ')';
+      loadStats();
+    }
   }
 });
 })();
