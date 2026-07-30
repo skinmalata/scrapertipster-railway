@@ -341,9 +341,7 @@ function escapeHtml(value) {
 }
 window.escapeHtml = escapeHtml;
 
-function init() {
-  var user = WFT.getUser();
-
+function initWithUser(user) {
   if (!user) {
     hideAll();
     document.getElementById('accessDenied').classList.remove('hidden');
@@ -351,46 +349,54 @@ function init() {
     return;
   }
 
-  if (!user.isAdmin) {
-    hideAll();
-    document.getElementById('accessDenied').classList.remove('hidden');
-    return;
-  }
+  // Directly check admin status via API (bypasses shared auth.js fetchProStatus)
+  window.WFT.supabase.auth.getSession().then(function(sessionResult) {
+    var session = sessionResult.data.session;
+    if (!session) {
+      hideAll();
+      document.getElementById('accessDenied').classList.remove('hidden');
+      document.getElementById('accessDenied').innerHTML = '<h2>Sign In Required</h2><p>Please sign in to access the admin panel.</p><p style="margin-top:16px;"><a href="/login.html" style="color:#ff2448;">Sign In</a></p>';
+      return;
+    }
 
-  document.getElementById('adminEmail').textContent = '(' + user.email + ')';
-  var adminLinks = document.querySelectorAll('.admin-nav-link');
-  adminLinks.forEach(function(l) { l.style.display = ''; });
-
-  document.getElementById('mainContent').classList.remove('hidden');
-  document.getElementById('statsRow').classList.remove('hidden');
-  loadStats();
-  loadUsers(1);
+    fetch('https://winfulltime-api.onrender.com/api/me/subscription', {
+      headers: { 'Authorization': 'Bearer ' + session.access_token }
+    }).then(function(r) { return r.json(); }).then(function(data) {
+      if (data.isAdmin) {
+        document.getElementById('adminEmail').textContent = '(' + user.email + ')';
+        var adminLinks = document.querySelectorAll('.admin-nav-link');
+        adminLinks.forEach(function(l) { l.style.display = ''; });
+        document.getElementById('mainContent').classList.remove('hidden');
+        document.getElementById('statsRow').classList.remove('hidden');
+        loadStats();
+        loadUsers(1);
+      } else {
+        hideAll();
+        document.getElementById('accessDenied').classList.remove('hidden');
+      }
+    }).catch(function() {
+      hideAll();
+      document.getElementById('accessDenied').classList.remove('hidden');
+    });
+  });
 }
 
 WFT.onAuthReady(function() {
+  var user = WFT.getUser();
+  if (user) { initWithUser(user); return; }
+
   var checkCount = 0;
   function poll() {
     var user = WFT.getUser();
     checkCount++;
-    if (user && user.isAdmin !== undefined) { init(); return; }
-    if (!user && checkCount > 10) { init(); return; }
-    if (checkCount > 66) { init(); return; }
+    if (user) { initWithUser(user); return; }
+    if (checkCount > 40) {
+      initWithUser(null);
+      return;
+    }
     setTimeout(poll, 300);
   }
   poll();
-});
-
-document.addEventListener('wft-pro-status', function() {
-  var user = WFT.getUser();
-  if (user && user.isAdmin) {
-    var denied = document.getElementById('accessDenied');
-    if (!denied.classList.contains('hidden')) {
-      init();
-    } else {
-      document.getElementById('adminEmail').textContent = '(' + user.email + ')';
-      loadStats();
-    }
-  }
 });
 })();
 </script>
