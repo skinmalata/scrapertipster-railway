@@ -39,14 +39,13 @@
   .outcome-lost { background: rgba(255,36,72,0.15); color: #ff6b7e; }
   .outcome-push { background: rgba(59,130,246,0.15); color: #60a5fa; }
   .outcome-pending { background: rgba(250,204,21,0.15); color: #facc15; }
-  .h2h-row { display: flex; gap: 10px; font-size: 11px; color: var(--text-muted); justify-content: center; }
+  .h2h-row { display: flex; gap: 6px; font-size: 11px; color: var(--text-muted); justify-content: center; margin-top: 4px; }
   .h2h-row span { display: flex; align-items: center; gap: 3px; }
   .empty-state { text-align: center; padding: 60px 20px; border: 1px dashed var(--border); border-radius: var(--radius-lg); }
   .empty-state h2 { font-size: 20px; margin-bottom: 8px; color: var(--text-primary); }
   .empty-state p { color: var(--text-muted); }
   .loading { display: flex; flex-direction: column; align-items: center; padding: 80px 20px; gap: 16px; }
   .loading-text { font-size: 14px; color: var(--text-muted); }
-  .card-score { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 12px; }
   @media (max-width: 700px) {
     .meta-row { flex-direction: column; align-items: center; gap: 6px; }
     .stats-bar { gap: 6px; }
@@ -132,8 +131,6 @@
     content.innerHTML = '<div class="matches-grid">' + data.matches.map(function(m, i) {
       var liveHtml = m.isLive ? '<span>' + (m.minute ? esc(m.minute) + "'" : 'Live') + '</span>' : '<span>' + formatTime(m.kickoff) + '</span>';
 
-      var scoreHtml = m.isLive && m.score ? '<div class="card-score">' + esc(m.score.home + ' - ' + m.score.away) + '</div>' : '';
-
       var home = esc(m.home);
       var away = esc(m.away);
       var league = esc(m.league);
@@ -141,7 +138,6 @@
 
       return '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms">' +
         '<div class="match-header"><span>' + league + '</span>' + liveHtml + '</div>' +
-        scoreHtml +
         '<div class="match-teams">' +
         '<span class="team team-home">' + home + '</span>' +
         '<span class="vs-score">vs</span>' +
@@ -152,10 +148,6 @@
         '<span class="tip-badge">' + esc(m.tip.selection) + '</span>' +
         '<div class="probability">' + conf + '%</div>' +
         '</div>' +
-        '<div style="text-align:center">' +
-        '<span style="font-size:12px;color:var(--text-muted)">' + esc(m.tip.market) + '</span>' +
-        '</div>' +
-        (m.tip.reason ? '<div style="text-align:center;font-size:11px;color:var(--text-muted);line-height:1.5">' + esc(m.tip.reason) + '</div>' : '') +
         (m.h2h ? '<div class="h2h-row"><span>H2H: ' + m.h2h.homeWins + '-' + m.h2h.draws + '-' + m.h2h.awayWins + '</span></div>' : '') +
         '</div>' +
         '</div>';
