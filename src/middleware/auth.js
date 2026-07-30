@@ -81,13 +81,16 @@ function requirePro(req, res, next) {
             if (result.error) return res.status(500).json({ error: 'Failed to check membership' });
 
             var profile = result.data;
-            if (!profile || profile.vip_status !== 'vip') {
+            var isVip = profile && (profile.vip_status === 'vip' || profile.vip_status === 'admin');
+            if (!isVip) {
               return res.status(403).json({ error: 'Pro membership required', code: 'PRO_REQUIRED', isPro: false });
             }
 
-            var expiresAt = new Date(profile.vip_expires_at);
-            if (expiresAt <= new Date()) {
-              return res.status(403).json({ error: 'Pro membership has expired', code: 'PRO_EXPIRED', isPro: false });
+            if (profile.vip_status !== 'admin' && profile.vip_expires_at) {
+              var expiresAt = new Date(profile.vip_expires_at);
+              if (expiresAt <= new Date()) {
+                return res.status(403).json({ error: 'Pro membership has expired', code: 'PRO_EXPIRED', isPro: false });
+              }
             }
 
             req.profile = profile;

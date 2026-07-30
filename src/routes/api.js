@@ -123,9 +123,8 @@ async function checkUserVipStatus(userId) {
       .eq('id', userId)
       .single();
     
-    if (profile && profile.vip_status === 'vip') {
-      const expiresAt = new Date(profile.vip_expires_at);
-      const isValid = expiresAt > new Date();
+    if (profile && (profile.vip_status === 'vip' || profile.vip_status === 'admin')) {
+      const isValid = !profile.vip_expires_at || new Date(profile.vip_expires_at) > new Date();
       if (isValid) return { isVip: true };
     }
   } catch (e) {
@@ -287,7 +286,7 @@ router.get('/predictions', optionalAuth, async (req, res) => {
       if (!supabase) return false;
       try {
         const { data: profile } = await supabase.from('profiles').select('vip_status, vip_expires_at').eq('id', req.user.id).single();
-        if (profile && profile.vip_status === 'vip' && new Date(profile.vip_expires_at) > new Date()) return true;
+        if (profile && (profile.vip_status === 'vip' || profile.vip_status === 'admin') && (!profile.vip_expires_at || new Date(profile.vip_expires_at) > new Date())) return true;
       } catch (e) {}
       return false;
     })() : false;
@@ -1266,7 +1265,7 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
       if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
       try {
         var prof = await supabase.from('profiles').select('vip_status, vip_expires_at').eq('id', req.user.id).single();
-        isVip = prof.data && prof.data.vip_status === 'vip' && new Date(prof.data.vip_expires_at) > new Date();
+        isVip = prof.data && (prof.data.vip_status === 'vip' || prof.data.vip_status === 'admin') && (!prof.data.vip_expires_at || new Date(prof.data.vip_expires_at) > new Date());
       } catch (e) {}
       if (isVip) {
         try {
