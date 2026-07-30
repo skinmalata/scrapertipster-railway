@@ -4,97 +4,61 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Giant Pool - WinFulltime</title>
+<meta name="description" content="Every fixture analyzed. Every market considered. One best pick per match.">
+<link rel="icon" href="/icons/icon-192.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/app.css">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #0d111c; color: #e8edf5; min-height: 100vh; }
-header { background: rgba(13,17,28,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
-.header-content { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; max-width: 1200px; margin: 0 auto; }
-.logo { display: flex; align-items: center; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-.logo a { display: inline-flex; align-items: center; color: #fff; text-decoration: none; gap: 8px; }
-.logo span { color: #ff7e7e; }
-nav { display: flex; gap: 20px; align-items: center; }
-nav a { color: rgba(232,237,245,0.55); text-decoration: none; font-weight: 500; font-size: 13px; transition: color 0.25s; }
-nav a:hover { color: #ff2448; }
-main { padding: 32px 16px 64px; max-width: 1300px; margin: 0 auto; }
-
-.hero { text-align: center; padding: 20px 0 32px; }
-.hero h1 { font-size: clamp(26px, 4vw, 38px); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
-.hero p { color: rgba(232,237,245,0.45); font-size: 14px; max-width: 600px; margin: 0 auto; }
-.hero .meta { display: flex; justify-content: center; gap: 16px; margin-top: 14px; font-size: 13px; color: rgba(232,237,245,0.35); }
-.hero .meta span { display: flex; align-items: center; gap: 4px; }
-
-.stats-bar { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
-.stat-pill { background: rgba(37,46,64,0.3); border: 1px solid rgba(255,255,255,0.06); padding: 8px 16px; border-radius: 999px; font-size: 12px; color: rgba(232,237,245,0.6); }
-.stat-pill strong { color: #e8edf5; }
-
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
-.card { background: rgba(21,26,44,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; overflow: hidden; transition: border-color 0.2s; }
-.card:hover { border-color: rgba(255,255,255,0.12); }
-.card-top { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.04); }
-.card-top .league { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(232,237,245,0.4); }
-.card-top .badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
-.badge-live { background: rgba(74,222,128,0.15); color: #4ade80; }
-.badge-upcoming { background: rgba(59,130,246,0.15); color: #60a5fa; }
-
-.card-body { padding: 14px; }
-.teams { font-size: 17px; font-weight: 700; color: #fff; line-height: 1.35; margin-bottom: 2px; }
-.kickoff { font-size: 12px; color: rgba(232,237,245,0.35); margin-bottom: 12px; }
-
-.tip-row { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; }
-.tip-market { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: rgba(232,237,245,0.35); margin-bottom: 2px; }
-.tip-selection { font-size: 16px; font-weight: 800; color: #4ade80; }
-.tip-reason { font-size: 12px; color: rgba(255,255,255,0.65); line-height: 1.55; margin-top: 8px; }
-.tip-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.04); }
-.confidence { font-size: 20px; font-weight: 800; }
-.conf-high { color: #4ade80; }.conf-mid { color: #facc15; }.conf-low { color: #ff6b7e; }
-.tip-rule { font-size: 11px; color: rgba(232,237,245,0.3); }
-
-.h2h-row { display: flex; gap: 10px; margin-top: 10px; font-size: 11px; color: rgba(232,237,245,0.3); }
-.h2h-row span { display: flex; align-items: center; gap: 3px; }
-
-.perf-section { margin-top: 52px; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.06); }
-.perf-section h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-.perf-section > p { font-size: 13px; color: rgba(232,237,245,0.4); margin-bottom: 20px; }
-.perf-summary { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
-.perf-stat { background: rgba(37,46,64,0.3); border: 1px solid rgba(255,255,255,0.06); padding: 10px 18px; border-radius: 10px; font-size: 13px; color: rgba(232,237,245,0.5); }
-.perf-stat strong { font-size: 18px; }
-.perf-stat.won strong { color: #4ade80; }
-.perf-stat.lost strong { color: #ff6b7e; }
-.perf-stat.pending strong { color: #facc15; }
-
-.perf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
-.perf-card { background: rgba(21,26,44,0.4); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; }
-.perf-card .p-league { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(232,237,245,0.35); margin-bottom: 3px; }
-.perf-card .p-teams { font-size: 14px; font-weight: 600; color: #fff; }
-.perf-card .p-score { font-size: 13px; color: rgba(232,237,245,0.5); margin: 2px 0 6px; }
-.perf-card .p-tip { font-size: 13px; font-weight: 600; color: #4ade80; }
-.perf-card .p-market { font-size: 11px; color: rgba(232,237,245,0.35); }
-.outcome-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
-.outcome-won { background: rgba(74,222,128,0.15); color: #4ade80; }
-.outcome-lost { background: rgba(255,36,72,0.15); color: #ff6b7e; }
-.outcome-push { background: rgba(59,130,246,0.15); color: #60a5fa; }
-.outcome-pending { background: rgba(250,204,21,0.15); color: #facc15; }
-
-.empty-state { text-align: center; padding: 60px 20px; border: 1px dashed rgba(255,255,255,0.08); border-radius: 16px; }
-.empty-state h2 { font-size: 20px; margin-bottom: 8px; }
-.empty-state p { color: rgba(232,237,245,0.4); }
-
-.loading { text-align: center; padding: 80px 20px; }
-.spinner { width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.06); border-top-color: #ff2448; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-@media (max-width: 700px) {
-  .grid { grid-template-columns: 1fr; }
-  .hero .meta { flex-direction: column; align-items: center; gap: 6px; }
-}
+  header { position: static !important; }
+  .hero-subtext { margin-bottom: 8px; }
+  .meta-row { display: flex; justify-content: center; gap: 20px; font-size: 13px; color: var(--text-muted); margin-top: 12px; flex-wrap: wrap; }
+  .stats-bar { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
+  .stat-pill { background: var(--bg-card); border: 1px solid var(--border); padding: 8px 16px; border-radius: 999px; font-size: 12px; color: var(--text-muted); }
+  .stat-pill strong { color: var(--text-primary); }
+  .perf-section { margin-top: 52px; padding-top: 32px; border-top: 1px solid var(--border); }
+  .perf-section h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .perf-section > p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+  .perf-summary { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  .perf-stat { background: var(--bg-card); border: 1px solid var(--border); padding: 10px 18px; border-radius: 10px; font-size: 13px; color: var(--text-muted); }
+  .perf-stat strong { font-size: 18px; }
+  .perf-stat.won strong { color: #4ade80; }
+  .perf-stat.lost strong { color: #ff6b7e; }
+  .perf-stat.pending strong { color: #facc15; }
+  .perf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+  .perf-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+  .perf-card .p-league { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 3px; }
+  .perf-card .p-teams { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+  .perf-card .p-score { font-size: 13px; color: var(--text-muted); margin: 2px 0 6px; }
+  .perf-card .p-tip { font-size: 13px; font-weight: 600; color: #4ade80; }
+  .perf-card .p-market { font-size: 11px; color: var(--text-muted); }
+  .outcome-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .outcome-won { background: rgba(74,222,128,0.15); color: #4ade80; }
+  .outcome-lost { background: rgba(255,36,72,0.15); color: #ff6b7e; }
+  .outcome-push { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .outcome-pending { background: rgba(250,204,21,0.15); color: #facc15; }
+  .h2h-row { display: flex; gap: 10px; font-size: 11px; color: var(--text-muted); justify-content: center; }
+  .h2h-row span { display: flex; align-items: center; gap: 3px; }
+  .empty-state { text-align: center; padding: 60px 20px; border: 1px dashed var(--border); border-radius: var(--radius-lg); }
+  .empty-state h2 { font-size: 20px; margin-bottom: 8px; color: var(--text-primary); }
+  .empty-state p { color: var(--text-muted); }
+  .loading { display: flex; flex-direction: column; align-items: center; padding: 80px 20px; gap: 16px; }
+  .loading-text { font-size: 14px; color: var(--text-muted); }
+  .card-score { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 12px; }
+  @media (max-width: 700px) {
+    .meta-row { flex-direction: column; align-items: center; gap: 6px; }
+    .stats-bar { gap: 6px; }
+  }
 </style>
 </head>
 <body>
 <header>
 <div class="header-content">
-<div class="logo"><a href="/"><span>Win</span>Fulltime</a></div>
-<nav>
+<div class="logo"><a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a></div>
+<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+<nav id="nav">
 <a href="/">Home</a>
 <a href="/ticket-builder.html">Ticket Builder</a>
 <a href="/best-picks.html">Best Picks</a>
@@ -105,25 +69,25 @@ main { padding: 32px 16px 64px; max-width: 1300px; margin: 0 auto; }
 </header>
 
 <main>
-<section class="hero">
+<div class="hero">
 <h1>Giant Pool</h1>
-<p>Every fixture analyzed. Every market considered. One best pick per match.</p>
-<div class="meta">
+<p class="hero-subtext">Every fixture analyzed. Every market considered. One best pick per match.</p>
+<div class="meta-row">
 <span id="matchCount">-</span>
 <span id="analyzedCount">-</span>
 <span id="generatedAt">-</span>
 </div>
-</section>
+</div>
 
 <div class="stats-bar" id="statsBar"></div>
 
-<div id="content"><div class="loading"><div class="spinner"></div>Building giant pool...</div></div>
+<div id="content"><div class="loading"><div class="spinner"></div><span class="loading-text">Building giant pool...</span></div></div>
 
 <section class="perf-section" id="perfSection">
 <h2>Performance</h2>
 <p>How past predictions performed against actual results.</p>
 <div id="perfSummary" class="perf-summary"></div>
-<div id="perfGrid" class="perf-grid"><div class="loading"><div class="spinner"></div>Loading history...</div></div>
+<div id="perfGrid" class="perf-grid"><div class="loading"><div class="spinner"></div><span class="loading-text">Loading history...</span></div></div>
 </section>
 </main>
 
@@ -139,12 +103,6 @@ main { padding: 32px 16px 64px; max-width: 1300px; margin: 0 auto; }
       var d = new Date(kickoff);
       return d.toLocaleTimeString('en-NG', { timeZone: 'Africa/Lagos', hour: '2-digit', minute: '2-digit', hour12: false }) + ' WAT';
     } catch (e) { return ''; }
-  }
-
-  function confClass(score) {
-    if (score >= 70) return 'conf-high';
-    if (score >= 55) return 'conf-mid';
-    return 'conf-low';
   }
 
   function render(data) {
@@ -171,22 +129,36 @@ main { padding: 32px 16px 64px; max-width: 1300px; margin: 0 auto; }
     }).join('');
     document.getElementById('statsBar').innerHTML = statsHtml;
 
-    content.innerHTML = '<div class="grid">' + data.matches.map(function(m) {
-      var liveHtml = m.isLive ? '<span class="badge badge-live">LIVE ' + (m.minute || '') + '</span>' : '<span class="badge badge-upcoming">' + formatTime(m.kickoff) + '</span>';
+    content.innerHTML = '<div class="matches-grid">' + data.matches.map(function(m, i) {
+      var liveHtml = m.isLive ? '<span>' + (m.minute ? esc(m.minute) + "'" : 'Live') + '</span>' : '<span>' + formatTime(m.kickoff) + '</span>';
 
-      var h2hHtml = m.h2h ? '<div class="h2h-row"><span>H2H: ' + m.h2h.homeWins + '-' + m.h2h.draws + '-' + m.h2h.awayWins + '</span></div>' : '';
+      var scoreHtml = m.isLive && m.score ? '<div class="card-score">' + esc(m.score.home + ' - ' + m.score.away) + '</div>' : '';
 
+      var home = esc(m.home);
+      var away = esc(m.away);
+      var league = esc(m.league);
       var conf = m.tip.confidence || 0;
 
-      return '<article class="card"><div class="card-top"><span class="league">' + esc(m.league) + '</span>' + liveHtml + '</div>' +
-        '<div class="card-body"><div class="teams">' + esc(m.home) + ' vs ' + esc(m.away) + '</div>' +
-        '<div class="kickoff">' + (m.isLive ? (m.score ? esc(m.score.home + '-' + m.score.away) : 'Live') : formatTime(m.kickoff)) + '</div>' +
-        '<div class="tip-row"><div class="tip-market">' + esc(m.tip.market) + '</div>' +
-        '<div class="tip-selection">' + esc(m.tip.selection) + '</div>' +
-        '<div class="tip-reason">' + esc(m.tip.reason) + '</div>' +
-        '<div class="tip-footer"><span class="confidence ' + confClass(conf) + '">' + conf + '%</span>' +
-        '<span class="tip-rule">' + esc(m.tip.tip) + '</span></div></div>' +
-        h2hHtml + '</div></article>';
+      return '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms">' +
+        '<div class="match-header"><span>' + league + '</span>' + liveHtml + '</div>' +
+        scoreHtml +
+        '<div class="match-teams">' +
+        '<span class="team team-home">' + home + '</span>' +
+        '<span class="vs-score">vs</span>' +
+        '<span class="team team-away">' + away + '</span>' +
+        '</div>' +
+        '<div class="match-footer" style="flex-direction:column;gap:8px">' +
+        '<div style="display:flex;flex-direction:column;align-items:center;gap:2px">' +
+        '<span class="tip-badge">' + esc(m.tip.selection) + '</span>' +
+        '<div class="probability">' + conf + '%</div>' +
+        '</div>' +
+        '<div style="text-align:center">' +
+        '<span style="font-size:12px;color:var(--text-muted)">' + esc(m.tip.market) + '</span>' +
+        '</div>' +
+        (m.tip.reason ? '<div style="text-align:center;font-size:11px;color:var(--text-muted);line-height:1.5">' + esc(m.tip.reason) + '</div>' : '') +
+        (m.h2h ? '<div class="h2h-row"><span>H2H: ' + m.h2h.homeWins + '-' + m.h2h.draws + '-' + m.h2h.awayWins + '</span></div>' : '') +
+        '</div>' +
+        '</div>';
     }).join('') + '</div>';
   }
 
@@ -206,7 +178,7 @@ main { padding: 32px 16px 64px; max-width: 1300px; margin: 0 auto; }
       var pct = day.total > 0 ? Math.round((day.won / (day.won + day.lost)) * 100) : 0;
       summaryHtml += '<div class="perf-stat"><span>' + esc(day.date) + '</span><br><strong>' + day.won + '</strong>W / <strong>' + day.lost + '</strong>L' +
         (day.push ? ' / <strong>' + day.push + '</strong>P' : '') +
-        ' <span style="color:rgba(232,237,245,0.35)">(' + pct + '%)</span></div>';
+        ' <span style="color:var(--text-muted)">(' + pct + '%)</span></div>';
 
       (day.matches || []).forEach(function (m) {
         if (!m.tip) return;
@@ -234,7 +206,7 @@ main { padding: 32px 16px 64px; max-width: 1300px; margin: 0 auto; }
     gridEl.innerHTML = allCards.map(function (c) {
       var outcomeClass = 'outcome-' + (c.outcome === 'won' ? 'won' : c.outcome === 'lost' ? 'lost' : c.outcome === 'push' ? 'push' : 'pending');
       var outcomeLabel = c.outcome === 'won' ? 'Won' : c.outcome === 'lost' ? 'Lost' : c.outcome === 'push' ? 'Push' : 'Pending';
-      return '<div class="perf-card"><div class="p-league">' + esc(c.league) + ' <span style="color:rgba(232,237,245,0.2)">' + esc(c.date) + '</span></div>' +
+      return '<div class="perf-card"><div class="p-league">' + esc(c.league) + ' <span style="color:var(--text-muted)">' + esc(c.date) + '</span></div>' +
         '<div class="p-teams">' + esc(c.home) + ' vs ' + esc(c.away) + '</div>' +
         '<div class="p-score">' + c.score + ' <span class="outcome-badge ' + outcomeClass + '">' + outcomeLabel + '</span></div>' +
         '<div class="p-market">' + esc(c.market) + '</div><div class="p-tip">' + esc(c.selection) + '</div></div>';
@@ -264,6 +236,12 @@ main { padding: 32px 16px 64px; max-width: 1300px; margin: 0 auto; }
 
   load();
 })();
+</script>
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('nav')?.classList.toggle('open');
+});
 </script>
 </body>
 </html>

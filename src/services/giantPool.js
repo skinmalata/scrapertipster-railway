@@ -115,7 +115,7 @@ function extractRecentForm(teamData, teamId) {
   var points = results.reduce(function (sum, r) { return sum + (r.won ? 3 : r.drew ? 1 : 0); }, 0);
   var gf = results.reduce(function (s, r) { return s + r.goalsFor; }, 0);
   var ga = results.reduce(function (s, r) { return s + r.goalsAgainst; }, 0);
-  return { matches: results.length, points: points, ppg: points / results.length, gf: gf, ga: ga, avgGF: gf / results.length, avgGA: ga / results.length };
+  return { matches: results.length, points: points, ppg: points / results.length, gf: gf, ga: ga, avgGF: gf / results.length, avgGA: ga / results.length, fixtureIds: fixtureIds };
 }
 
 async function fetchTeamForm(teamId) {
@@ -253,8 +253,15 @@ function extractMatchCards(matchDetails) {
   } catch (e) { return null; }
 }
 
-async function fetchH2HStats(fixtureIds, limit) {
-  var ids = (fixtureIds || []).slice(0, limit || 3).filter(Boolean);
+async function fetchH2HStats(fixtureIdSets) {
+  var seen = new Set();
+  var ids = [];
+  (fixtureIdSets || []).forEach(function (set) {
+    (set || []).forEach(function (id) {
+      if (id && !seen.has(id)) { seen.add(id); ids.push(id); }
+    });
+  });
+  ids = ids.slice(0, 10);
   var corners = [], cards = [];
   for (var i = 0; i < ids.length; i += 3) {
     var batch = ids.slice(i, i + 3);
@@ -277,27 +284,21 @@ async function fetchH2HStats(fixtureIds, limit) {
 }
 
 function predictCorners(cornerValues) {
-  if (!cornerValues || cornerValues.length < 2) return null;
-  var avg = cornerValues.reduce(function (a, b) { return a + b; }, 0) / cornerValues.length;
-  var tip, conf;
-  if (avg >= 10) { tip = 'Over 9.5 Corners'; conf = Math.min(85, 55 + (avg - 10) * 5); }
-  else if (avg >= 9) { tip = 'Over 9.5 Corners'; conf = Math.min(80, 50 + (avg - 9) * 8); }
-  else if (avg >= 8) { tip = 'Over 8.5 Corners'; conf = Math.min(75, 50 + (avg - 8) * 5); }
-  else return null;
-  if (conf < MIN_CONFIDENCE) return null;
-  return { tip: tip, market: 'Corners', selection: tip, confidence: Math.round(conf), reason: 'Averaging ' + avg.toFixed(1) + ' corners in recent H2H meetings' };
+  if (!cornerValues || cornerValues.length < 3) return null;
+  var total = cornerValues.reduce(function (a, b) { return a + b; }, 0);
+  var avg = total / cornerValues.length;
+  if (avg < 10.5) return null;
+  var conf = Math.min(90, 70 + Math.round((avg - 10.5) * 4));
+  return { tip: 'Over 9.5 Corners', market: 'Corners', selection: 'Over 9.5 Corners', confidence: conf, reason: 'Averaging ' + avg.toFixed(1) + ' corners across ' + cornerValues.length + ' recent meetings' };
 }
 
 function predictCards(cardValues) {
-  if (!cardValues || cardValues.length < 2) return null;
-  var avg = cardValues.reduce(function (a, b) { return a + b; }, 0) / cardValues.length;
-  var tip, conf;
-  if (avg >= 6) { tip = 'Over 5.5 Cards'; conf = Math.min(85, 55 + (avg - 6) * 5); }
-  else if (avg >= 5) { tip = 'Over 4.5 Cards'; conf = Math.min(80, 50 + (avg - 5) * 8); }
-  else if (avg >= 4) { tip = 'Over 4.5 Cards'; conf = Math.min(75, 45 + (avg - 4) * 5); }
-  else return null;
-  if (conf < MIN_CONFIDENCE) return null;
-  return { tip: tip, market: 'Cards', selection: tip, confidence: Math.round(conf), reason: 'Averaging ' + avg.toFixed(1) + ' cards in recent H2H meetings' };
+  if (!cardValues || cardValues.length < 3) return null;
+  var total = cardValues.reduce(function (a, b) { return a + b; }, 0);
+  var avg = total / cardValues.length;
+  if (avg < 6.5) return null;
+  var conf = Math.min(90, 70 + Math.round((avg - 6.5) * 4));
+  return { tip: 'Over 5.5 Cards', market: 'Cards', selection: 'Over 5.5 Cards', confidence: conf, reason: 'Averaging ' + avg.toFixed(1) + ' cards across ' + cardValues.length + ' recent meetings' };
 }
 
 var MARKET_PRIORITY = {
@@ -361,7 +362,7 @@ async function enrichFixture(match) {
   var awayForm = await fetchTeamForm(match.awayId);
   if (!homeForm && !awayForm) return null;
 
-  var h2hStats = await fetchH2HStats(h2h.fixtures, 3);
+  var h2hStats = await fetchH2HStats([h2h.fixtures, homeForm && homeForm.fixtureIds, awayForm && awayForm.fixtureIds]);
 
   var tips = [];
   var t1 = predict1X2(h2h, homeForm, awayForm);
