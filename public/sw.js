@@ -1,7 +1,7 @@
-const CACHE_NAME = 'winfulltime-v2';
-const STATIC_CACHE = 'winfulltime-static-v2';
-const DYNAMIC_CACHE = 'winfulltime-dynamic-v2';
-const IMAGE_CACHE = 'winfulltime-images-v2';
+const CACHE_NAME = 'winfulltime-v3';
+const STATIC_CACHE = 'winfulltime-static-v3';
+const DYNAMIC_CACHE = 'winfulltime-dynamic-v3';
+const IMAGE_CACHE = 'winfulltime-images-v3';
 
 const STATIC_ASSETS = [
   '/',
@@ -9,6 +9,9 @@ const STATIC_ASSETS = [
   '/ticket-builder.html',
   '/styles.css',
   '/app.css',
+  '/auth.js',
+  '/config.js',
+  '/supabase-client.js',
   '/winfulltimelogo.png',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
