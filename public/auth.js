@@ -57,19 +57,36 @@
     _proFetchScheduled = true;
     setTimeout(function() {
       var sb = window.WFT.supabase;
-      if (!sb || !userState.user) { _proFetchScheduled = false; return; }
+      if (!sb || !userState.user) {
+        console.log('[scheduleProFetch] No supabase or user');
+        _proFetchScheduled = false;
+        document.dispatchEvent(new CustomEvent('wft-pro-status'));
+        return;
+      }
       sb.auth.getSession().then(function(s) {
         var tok = s.data.session?.access_token;
-        if (!tok) { _proFetchScheduled = false; return; }
+        if (!tok) {
+          console.log('[scheduleProFetch] No token');
+          _proFetchScheduled = false;
+          if (userState.user) {
+            userState.user.isPro = false;
+            userState.user.isAdmin = false;
+            updateUI(userState.user);
+          }
+          document.dispatchEvent(new CustomEvent('wft-pro-status'));
+          return;
+        }
         var SUPABASE_URL = 'https://xogkqpjtxfemcxzsuwke.supabase.co';
         var ANON_KEY = 'sb_publishable_VydS1cmw7_OhFa7e-xUOqQ_tcVRUQoy';
         var headers = { 'Authorization': 'Bearer ' + tok, 'apikey': ANON_KEY };
+        console.log('[scheduleProFetch] Fetching profile for', userState.user.id);
         fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.' + userState.user.id + '&select=vip_status,vip_expires_at', {
           headers: headers
         }).then(function(r) {
-          if (!r.ok) throw new Error('Profile fetch failed');
+          if (!r.ok) throw new Error('Profile fetch failed: ' + r.status);
           return r.json();
         }).then(function(rows) {
+          console.log('[scheduleProFetch] Profile result:', JSON.stringify(rows));
           if (rows && rows[0]) {
             var p = rows[0];
             var isAdmin = p.vip_status === 'admin';
@@ -77,6 +94,7 @@
             userState.user.isPro = isAdmin || isVip;
             userState.user.isAdmin = isAdmin;
             userState.user.expiresAt = p.vip_expires_at || null;
+            console.log('[scheduleProFetch] isVip:', isVip, 'isAdmin:', isAdmin);
             updateUI(userState.user);
             if (isVip) {
               fetch(SUPABASE_URL + '/rest/v1/subscriptions?user_id=eq.' + userState.user.id + '&select=plan_type&order=created_at.desc&limit=1', {
@@ -87,10 +105,18 @@
               }).then(function(subs) {
                 if (subs && subs[0]) {
                   userState.user.plan = subs[0].plan_type;
+                  console.log('[scheduleProFetch] Plan:', subs[0].plan_type);
                 }
               }).catch(function(e2) {
                 console.warn('[scheduleProFetch] Subscription fetch failed:', e2);
               });
+            }
+          } else {
+            console.log('[scheduleProFetch] No profile found, setting isPro=false');
+            if (userState.user) {
+              userState.user.isPro = false;
+              userState.user.isAdmin = false;
+              updateUI(userState.user);
             }
           }
         }).catch(function(e) {
@@ -101,6 +127,7 @@
             updateUI(userState.user);
           }
         }).finally(function() {
+          console.log('[scheduleProFetch] Dispatching wft-pro-status, isPro:', userState.user ? userState.user.isPro : 'no user');
           document.dispatchEvent(new CustomEvent('wft-pro-status'));
           _proFetchScheduled = false;
         });
