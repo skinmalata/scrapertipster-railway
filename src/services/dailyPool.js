@@ -149,7 +149,7 @@ function buildPool(predictions, options) {
   }
 
   if (safeOnly) {
-    pool = pool.filter(function(p) { return p.sourceProbability >= 0.8; });
+    pool = pool.filter(function(p) { return p.sourceProbability >= 0.7; });
   }
 
   if (maxEntries && pool.length > maxEntries) {
