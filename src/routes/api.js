@@ -1375,12 +1375,17 @@ router.get('/best-picks', async function (req, res) {
     var TODAY_FM = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     var TODAY_SYSTEM = new Date().toISOString().slice(0, 10);
 
-    // Load today's Author Picks
+    // Load today's Author Picks (trigger build if missing)
     var authorPicks = [];
     try {
       var raw = JSON.parse(fs.readFileSync(path.join(AUTHOR_DIR, TODAY_FM + '.json'), 'utf8'));
       authorPicks = raw.matches || [];
-    } catch (e) {}
+    } catch (e) {
+      try {
+        var built = await buildGiantPool();
+        authorPicks = (built && built.matches) || [];
+      } catch (e2) {}
+    }
 
     // Load h2h-unbeaten for Win Streak / Unbeaten categories
     var h2hData = { dates: {} };
