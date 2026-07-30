@@ -240,7 +240,8 @@
 
 
   <div style="display:flex;gap:10px;margin-top:16px;">
-    <button class="gen-btn" id="genBtn" style="flex:1;">Generate Tickets</button>
+   <button class="gen-btn" id="genBtn" style="flex:1;">Generate Tickets</button>
+   <button class="gen-btn" id="shuffleBtn" style="flex:1;background:linear-gradient(135deg,#4ade80,#22c55e);color:#0a0e17;">Shuffle <span class="pro-badge">PRO</span></button>
   </div>
   <div style="font-size:12px;color:rgba(255,255,255,0.85);text-align:center;margin-top:14px;letter-spacing:0.2px;">Odds include estimated bookmaker margin (~5%)</div>
 
@@ -1760,11 +1761,11 @@ nav.open { display: flex !important; }
   var currentTier = 'free_anon';
 
   var TIER_LIMITS = {
-    free_anon: { maxLegs: 3, maxOdds: 4.0, safeTips: false, dailyLimit: 3, telegramLink: false, label: 'Free (not signed in)' },
-    free_registered: { maxLegs: 3, maxOdds: 4.0, safeTips: false, dailyLimit: 5, telegramLink: false, label: 'Free' },
-    pro: { maxLegs: 30, maxOdds: 500, safeTips: true, dailyLimit: null, telegramLink: false, label: 'Pro' },
-    lifetime: { maxLegs: 30, maxOdds: 500, safeTips: true, dailyLimit: null, telegramLink: true, label: 'Lifetime' },
-    admin: { maxLegs: 30, maxOdds: 500, safeTips: true, dailyLimit: null, telegramLink: true, label: 'Admin' }
+    free_anon: { maxLegs: 3, maxOdds: 4.0, safeTips: false, shuffle: false, dailyLimit: 3, telegramLink: false, label: 'Free (not signed in)' },
+    free_registered: { maxLegs: 3, maxOdds: 4.0, safeTips: false, shuffle: false, dailyLimit: 5, telegramLink: false, label: 'Free' },
+    pro: { maxLegs: 30, maxOdds: 500, safeTips: true, shuffle: true, dailyLimit: null, telegramLink: false, label: 'Pro' },
+    lifetime: { maxLegs: 30, maxOdds: 500, safeTips: true, shuffle: true, dailyLimit: null, telegramLink: true, label: 'Lifetime' },
+    admin: { maxLegs: 30, maxOdds: 500, safeTips: true, shuffle: true, dailyLimit: null, telegramLink: true, label: 'Admin' }
   };
 
 
@@ -1824,6 +1825,9 @@ nav.open { display: flex !important; }
         legsInput.value = limits.maxLegs;
       }
     }
+
+    var shuffleBtn = document.getElementById('shuffleBtn');
+    shuffleBtn.style.display = limits.shuffle ? '' : 'none';
 
     var telegramSection = document.getElementById('telegramSection');
     telegramSection.style.display = limits.telegramLink ? '' : 'none';
@@ -1903,7 +1907,7 @@ nav.open { display: flex !important; }
     results.innerHTML = '<div class="matches-grid">' + html + '</div>';
   }
 
-  async function generateTickets() {
+  async function generateTickets(shuffle) {
     var target = parseFloat(document.getElementById('ticketTarget').value);
     var minOdds = 1.20;
     var maxOdds = 100;
@@ -1934,7 +1938,8 @@ nav.open { display: flex !important; }
           numLegs: numLegs,
           safeOnly: safeTips,
           markets: selectedMarkets,
-          todayOnly: todayOnly
+          todayOnly: todayOnly,
+          shuffle: shuffle === true
         })
       });
 
@@ -1952,6 +1957,10 @@ nav.open { display: flex !important; }
     } catch (e) {
       results.innerHTML = '<div class="no-matches"><p>Unable to generate tickets. The service may be unavailable. Try again later.</p></div>';
     }
+  }
+
+  function shuffleTickets() {
+    generateTickets(true);
   }
 
   document.addEventListener('click', function(e) {
@@ -1986,6 +1995,7 @@ nav.open { display: flex !important; }
   });
 
   document.getElementById('genBtn').addEventListener('click', function() { generateTickets(); });
+  document.getElementById('shuffleBtn').addEventListener('click', function() { shuffleTickets(); });
 
   document.getElementById('numLegs').addEventListener('change', function() {
     var v = parseInt(this.value, 10);

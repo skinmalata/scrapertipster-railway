@@ -1346,7 +1346,8 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
       maxOdds: clampedMaxOdds,
       minOddsPerLeg: parseFloat(body.minOddsPerLeg) || 1.20,
       maxOddsPerLeg: parseFloat(body.maxOddsPerLeg) || 100,
-      targetOdds: parseFloat(body.targetOdds) || 20
+      targetOdds: parseFloat(body.targetOdds) || 20,
+      shuffle: body.shuffle === true
     };
 
     var payload = buildTicket(predictions, buildOpts);
