@@ -1368,14 +1368,25 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
   }
 });
 
-// GET /api/best-picks — top pick per category from Author Picks data
+// GET /api/best-picks — top pick per category, cached once per day
 router.get('/best-picks', async function (req, res) {
   try {
-    var AUTHOR_DIR = path.join(__dirname, '../../data/author-picks');
+    var CACHE_DIR = path.join(__dirname, '../../data/best-picks');
+    try { fs.mkdirSync(CACHE_DIR, { recursive: true }); } catch (e) {}
     var TODAY_FM = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     var TODAY_SYSTEM = new Date().toISOString().slice(0, 10);
+    var CACHE_PATH = path.join(CACHE_DIR, TODAY_FM + '.json');
 
-    // Load today's Author Picks (trigger build if missing)
+    // Serve from cache if exists
+    try {
+      var cached = JSON.parse(fs.readFileSync(CACHE_PATH, 'utf8'));
+      if (cached && cached.generatedAt) {
+        return res.json(cached);
+      }
+    } catch (e) {}
+
+    // Build — load Author Picks data
+    var AUTHOR_DIR = path.join(__dirname, '../../data/author-picks');
     var authorPicks = [];
     try {
       var raw = JSON.parse(fs.readFileSync(path.join(AUTHOR_DIR, TODAY_FM + '.json'), 'utf8'));
@@ -1387,18 +1398,15 @@ router.get('/best-picks', async function (req, res) {
       } catch (e2) {}
     }
 
-    // Load h2h-unbeaten for Win Streak / Unbeaten categories
     var h2hData = { dates: {} };
     try { h2hData = JSON.parse(fs.readFileSync(path.join(__dirname, '../../public/data/h2h-unbeaten.json'), 'utf8')); } catch (e) {}
 
-    // Map an Author Picks tip to a Best Picks category
     function mapTip(match) {
       var tip = match.tip;
       if (!tip || !tip.market) return null;
       var sel = String(tip.selection || tip.tip || '');
       var conf = Number(tip.confidence) || 0;
       var market = tip.market;
-
       if (market === 'Match Winner' && /^[1X2]$/.test(sel)) {
         return { label: '1X2', type: '1x2', tip: sel, probability: conf, match: match };
       }
@@ -1414,24 +1422,17 @@ router.get('/best-picks', async function (req, res) {
         if (sel === 'BTTS Yes') return { label: 'BTTS Yes', type: 'btts', tip: 'BTTS YES', probability: conf, match: match };
         if (sel === 'BTTS No') return { label: 'BTTS No', type: 'bttsNo', tip: 'BTTS NO', probability: conf, match: match };
       }
-      if (market === 'Corners') {
-        return { label: 'Corners', type: 'corners', tip: sel, probability: conf, match: match };
-      }
-      if (market === 'Cards') {
-        return { label: 'Cards', type: 'cards', tip: sel, probability: conf, match: match };
-      }
+      if (market === 'Corners') return { label: 'Corners', type: 'corners', tip: sel, probability: conf, match: match };
+      if (market === 'Cards') return { label: 'Cards', type: 'cards', tip: sel, probability: conf, match: match };
       return null;
     }
 
-    // Build today's picks per category from Author Picks
     var bestByType = {};
     authorPicks.forEach(function(m) {
       var mapped = mapTip(m);
       if (!mapped) return;
       var t = mapped.type;
-      if (!bestByType[t] || mapped.probability > bestByType[t].probability) {
-        bestByType[t] = mapped;
-      }
+      if (!bestByType[t] || mapped.probability > bestByType[t].probability) bestByType[t] = mapped;
     });
 
     var CATEGORY_DEFS = [
@@ -1455,20 +1456,15 @@ router.get('/best-picks', async function (req, res) {
       if (!entry) return;
       var m = entry.match;
       todayPicks.push({
-        category: def.label,
-        type: def.type,
+        category: def.label, type: def.type,
         match: m.home + ' - ' + m.away,
-        tip: entry.tip,
-        probability: entry.probability,
-        league: m.league || '',
-        time: fmtTime(m.kickoff),
-        streak: null,
-        streakTeam: null,
-        isHome: null
+        tip: entry.tip, probability: entry.probability,
+        league: m.league || '', time: fmtTime(m.kickoff),
+        streak: null, streakTeam: null, isHome: null
       });
     });
 
-    // Win Streak & Unbeaten from h2h data (unchanged)
+    // Win Streak & Unbeaten from h2h data
     ['winStreak', 'unbeaten'].forEach(function(streakType) {
       var label = streakType === 'winStreak' ? 'Win Streak' : 'Unbeaten';
       var h2hDate = h2hData.dates[TODAY_SYSTEM] ? TODAY_SYSTEM : Object.keys(h2hData.dates).sort().pop() || '';
@@ -1498,8 +1494,7 @@ router.get('/best-picks', async function (req, res) {
         });
       });
       var best = picks.reduce(function(b, item) {
-        var bp = b ? b.probability : 0;
-        return item.probability > bp ? item : b;
+        return (item.probability > (b ? b.probability : 0)) ? item : b;
       }, null);
       if (best) {
         todayPicks.push({
@@ -1512,7 +1507,7 @@ router.get('/best-picks', async function (req, res) {
       }
     });
 
-    // History — load previous days' Author Picks and evaluate against FotMob results
+    // History from past Author Picks files
     var allDates = [];
     try {
       var files = fs.readdirSync(AUTHOR_DIR).filter(function(f) { return /^\d{8}\.json$/.test(f) && f.slice(0, 8) !== TODAY_FM; }).sort().slice(-3);
@@ -1561,16 +1556,12 @@ router.get('/best-picks', async function (req, res) {
     for (var hi = 0; hi < allDates.length; hi++) {
       var fmDate = allDates[hi];
       var niceDate = fmDate.slice(0, 4) + '-' + fmDate.slice(4, 6) + '-' + fmDate.slice(6, 8);
-
       var dayPicks = [];
       try {
         var dayData = JSON.parse(fs.readFileSync(path.join(AUTHOR_DIR, fmDate + '.json'), 'utf8'));
         var dayMatches = dayData.matches || [];
-
         if (!fotmobDateCache[fmDate]) fotmobDateCache[fmDate] = await fetchFotMobForDate(fmDate);
         var fotmobResults = fotmobDateCache[fmDate] || {};
-
-        // Build best per category for this day (same logic as todayPicks)
         var dayBest = {};
         dayMatches.forEach(function(m) {
           var mapped = mapTip(m);
@@ -1578,7 +1569,6 @@ router.get('/best-picks', async function (req, res) {
           var t = mapped.type;
           if (!dayBest[t] || mapped.probability > dayBest[t].probability) dayBest[t] = mapped;
         });
-
         CATEGORY_DEFS.forEach(function(def) {
           var entry = dayBest[def.type];
           if (!entry) return;
@@ -1596,13 +1586,12 @@ router.get('/best-picks', async function (req, res) {
           });
         });
       } catch (e) {}
-
-      if (dayPicks.length > 0) {
-        history.push({ date: niceDate, picks: dayPicks });
-      }
+      if (dayPicks.length > 0) history.push({ date: niceDate, picks: dayPicks });
     }
 
-    res.json({ today: todayPicks, history: history });
+    var payload = { today: todayPicks, history: history, generatedAt: new Date().toISOString() };
+    try { fs.writeFileSync(CACHE_PATH, JSON.stringify(payload), 'utf8'); } catch (e) {}
+    res.json(payload);
   } catch (e) {
     console.error('[best-picks] Error:', e.message);
     res.status(500).json({ error: 'Failed to load best picks' });
