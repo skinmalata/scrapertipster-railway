@@ -1945,6 +1945,13 @@ nav.open { display: flex !important; }
   document.getElementById('genBtn').addEventListener('click', function() { generateTickets(); });
   document.getElementById('shuffleBtn').addEventListener('click', function() { shuffleTickets(); });
 
+  document.getElementById('ticketTarget').addEventListener('input', function() {
+    var target = parseFloat(this.value);
+    if (isNaN(target) || target <= 1) return;
+    var legs = Math.max(2, Math.min(30, Math.round(Math.log(target) / Math.log(1.30))));
+    document.getElementById('numLegs').value = legs;
+  });
+
   document.getElementById('numLegs').addEventListener('change', function() {
     var v = parseInt(this.value, 10);
     var min = parseInt(this.min, 10) || 2;
