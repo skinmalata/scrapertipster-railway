@@ -594,11 +594,11 @@ async function scrapeLive() {
     // never in the active in-play feed.
     var liveById = new Map((matches || []).map(function(m) { return [String(m.matchId), m]; }));
     var currentKeys = {};
-    currentTips.forEach(function(t) { currentKeys[String(t.fixtureId) + '|' + String(t.rule)] = true; });
+    currentTips.forEach(function(t) { currentKeys[String(t.fixtureId) + '|' + String(t.market || '').toLowerCase()] = true; });
     var pendingTips = getPendingTipsForDate();
     var activeTips = currentTips.slice();
     pendingTips.forEach(function(pt) {
-      var key = String(pt.fixtureId) + '|' + String(pt.rule);
+      var key = String(pt.fixtureId) + '|' + String(pt.market || '').toLowerCase();
       if (currentKeys[key]) return;
       var live = liveById.get(String(pt.fixtureId));
       if (!live) return;
