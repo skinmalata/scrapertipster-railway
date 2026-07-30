@@ -58,25 +58,38 @@
     setTimeout(function() {
       var sb = window.WFT.supabase;
       if (!sb || !userState.user) { _proFetchScheduled = false; return; }
-      sb.from('profiles').select('vip_status, vip_expires_at').eq('id', userState.user.id).single().then(function(res) {
-        if (res.data) {
-          var p = res.data;
-          var isAdmin = p.vip_status === 'admin';
-          var isVip = p.vip_status === 'vip' && (!p.vip_expires_at || new Date(p.vip_expires_at) > new Date());
-          userState.user.isPro = isAdmin || isVip;
-          userState.user.isAdmin = isAdmin;
-          userState.user.expiresAt = p.vip_expires_at || null;
-          updateUI(userState.user);
-        }
-        document.dispatchEvent(new CustomEvent('wft-pro-status'));
-      }).catch(function() {
-        if (userState.user) {
-          userState.user.isPro = false;
-          userState.user.isAdmin = false;
-          updateUI(userState.user);
-        }
-        document.dispatchEvent(new CustomEvent('wft-pro-status'));
-      }).finally(function() { _proFetchScheduled = false; });
+      sb.auth.getSession().then(function(s) {
+        var tok = s.data.session?.access_token;
+        if (!tok) { _proFetchScheduled = false; return; }
+        fetch('https://xogkqpjtxfemcxzsuwke.supabase.co/rest/v1/profiles?id=eq.' + userState.user.id + '&select=vip_status,vip_expires_at', {
+          headers: {
+            'Authorization': 'Bearer ' + tok,
+            'apikey': 'sb_publishable_VydS1cmw7_OhFa7e-xUOqQ_tcVRUQoy'
+          }
+        }).then(function(r) {
+          if (!r.ok) throw new Error('Profile fetch failed');
+          return r.json();
+        }).then(function(rows) {
+          if (rows && rows[0]) {
+            var p = rows[0];
+            var isAdmin = p.vip_status === 'admin';
+            var isVip = p.vip_status === 'vip' && (!p.vip_expires_at || new Date(p.vip_expires_at) > new Date());
+            userState.user.isPro = isAdmin || isVip;
+            userState.user.isAdmin = isAdmin;
+            userState.user.expiresAt = p.vip_expires_at || null;
+            updateUI(userState.user);
+          }
+          document.dispatchEvent(new CustomEvent('wft-pro-status'));
+        }).catch(function(e) {
+          console.warn('[scheduleProFetch] Error:', e);
+          if (userState.user) {
+            userState.user.isPro = false;
+            userState.user.isAdmin = false;
+            updateUI(userState.user);
+          }
+          document.dispatchEvent(new CustomEvent('wft-pro-status'));
+        }).finally(function() { _proFetchScheduled = false; });
+      });
     }, 1000);
   }
 
