@@ -1377,10 +1377,10 @@ router.get('/best-picks', async function (req, res) {
     var TODAY_SYSTEM = new Date().toISOString().slice(0, 10);
     var CACHE_PATH = path.join(CACHE_DIR, TODAY_FM + '.json');
 
-    // Serve from cache if exists
+    // Serve from cache if exists and has picks
     try {
       var cached = JSON.parse(fs.readFileSync(CACHE_PATH, 'utf8'));
-      if (cached && cached.generatedAt) {
+      if (cached && cached.generatedAt && cached.today && cached.today.length > 0) {
         return res.json(cached);
       }
     } catch (e) {}
@@ -1397,6 +1397,8 @@ router.get('/best-picks', async function (req, res) {
         authorPicks = (built && built.matches) || [];
       } catch (e2) {}
     }
+
+
 
     var h2hData = { dates: {} };
     try { h2hData = JSON.parse(fs.readFileSync(path.join(__dirname, '../../public/data/h2h-unbeaten.json'), 'utf8')); } catch (e) {}
