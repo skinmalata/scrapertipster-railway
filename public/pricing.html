@@ -40,6 +40,9 @@ body { font-family: 'Inter', sans-serif; background: #0c0f1a; color: #e2e8f0; mi
 .alert { padding: 12px 16px; border-radius: 8px; font-size: 13px; margin: 16px 0; display: none; }
 .alert-error { background: rgba(255,36,72,0.1); border: 1px solid rgba(255,36,72,0.2); color: #ff6b6b; display: block; }
 .alert-success { background: rgba(72,187,120,0.1); border: 1px solid rgba(72,187,120,0.2); color: #68d391; display: block; }
+.plan-status { display: inline-block; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 600; margin-bottom: 24px; }
+.plan-status.pro { background: rgba(72,187,120,0.12); border: 1px solid rgba(72,187,120,0.3); color: #68d391; }
+.plan-status.free { background: rgba(148,163,184,0.1); border: 1px solid rgba(148,163,184,0.25); color: #94a3b8; }
 .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 4px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (max-width: 480px) { .pricing-grid { grid-template-columns: 1fr; } .nav { padding: 12px 16px; gap: 12px; } }
@@ -56,6 +59,7 @@ body { font-family: 'Inter', sans-serif; background: #0c0f1a; color: #e2e8f0; mi
 <div class="pricing-container">
   <h1>Choose Your Plan</h1>
   <p class="subtitle">Get expert football predictions and analytics</p>
+  <div id="plan-status" class="plan-status" style="display:none"></div>
   <div id="alert" class="alert"></div>
   <div class="pricing-grid">
     <div class="pricing-card" id="free-card">
@@ -121,7 +125,7 @@ body { font-family: 'Inter', sans-serif; background: #0c0f1a; color: #e2e8f0; mi
   <div class="faq-item"><summary>Is there a refund policy?</summary>
     <p>We offer a 7-day money-back guarantee on all plans. Contact our support team for assistance.</p></div>
   <div class="faq-item"><summary>How do payments work?</summary>
-    <p>Payments are processed securely through Lemon Squeezy. Your subscription automatically renews unless cancelled.</p></div>
+    <p>Payments are processed securely through Whop. Your subscription automatically renews unless cancelled.</p></div>
 </div>
 <script src="/config.js"></script>
 <script src="/supabase-client.js"></script>
@@ -163,18 +167,46 @@ function handleSubscribe(planType) {
 window.WFT.onAuthReady(function (user) {
   if (!user) return;
   window.WFT.apiFetch('/api/me/subscription').then(function (data) {
-    if (!data.isPro || !data.plan) return;
-    var cardId = data.plan === 'monthly' ? 'monthly-card' : data.plan === 'yearly' ? 'yearly-card' : 'lifetime-card';
-    var card = document.getElementById(cardId);
-    if (!card) return;
-    var btn = card.querySelector('.btn-subscribe');
-    if (!btn) return;
-    btn.textContent = 'Current Plan';
-    btn.disabled = true;
-    btn.style.background = 'rgba(72,187,120,0.15)';
-    btn.style.color = '#68d391';
-    btn.style.cursor = 'default';
-    card.style.borderColor = '#68d391';
+    var banner = document.getElementById('plan-status');
+    var expiresAt = data.expiresAt || (user.expiresAt ? user.expiresAt : null);
+
+    function markCurrentPlan(cardId, label) {
+      var card = document.getElementById(cardId);
+      if (!card) return;
+      card.style.borderColor = '#68d391';
+      card.style.boxShadow = '0 0 0 1px #68d391';
+      var btn = card.querySelector('.btn-subscribe');
+      if (!btn) return;
+      btn.textContent = label;
+      btn.disabled = true;
+      btn.style.background = 'rgba(72,187,120,0.15)';
+      btn.style.color = '#68d391';
+      btn.style.cursor = 'default';
+    }
+
+    function showBanner(msg, kind) {
+      if (!banner) return;
+      banner.textContent = msg;
+      banner.className = 'plan-status ' + kind;
+      banner.style.display = 'inline-block';
+    }
+
+    var planNames = { monthly: 'Pro Monthly', yearly: 'Pro Yearly', lifetime: 'Lifetime Pro', admin: 'Admin' };
+
+    if (data.isPro) {
+      var cardId = data.plan === 'monthly' ? 'monthly-card' : data.plan === 'yearly' ? 'yearly-card' : data.plan === 'lifetime' ? 'lifetime-card' : null;
+      if (cardId) {
+        markCurrentPlan(cardId, 'Current Plan');
+        showBanner('You are on ' + planNames[data.plan] + (expiresAt ? ' — active until ' + new Date(expiresAt).toLocaleDateString() : ''), 'pro');
+      } else if (data.plan === 'admin') {
+        showBanner('You have admin access to all Pro features.', 'pro');
+      } else {
+        showBanner('You are on a free Pro trial' + (expiresAt ? ' — ends ' + new Date(expiresAt).toLocaleDateString() : '') + '. Upgrade anytime to keep Pro.', 'pro');
+      }
+    } else {
+      markCurrentPlan('free-card', 'Current Plan');
+      showBanner('You are on the free plan. Upgrade to unlock all Pro features.', 'free');
+    }
   });
 });
 </script>
