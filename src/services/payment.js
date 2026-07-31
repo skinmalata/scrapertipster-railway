@@ -181,7 +181,7 @@ function onSubscriptionUpdated(attributes, data, meta) {
   var subscriptionId = String(data.id);
   if (!supabase) return Promise.resolve({ handled: false });
 
-  if (status === 'active' || status === 'on_trial') {
+  if (status === 'active') {
     var action = supabase.from('subscriptions').update({ payment_status: 'active' }).eq('payment_id', subscriptionId);
     var custom = getCustomData(attributes, meta);
     if (custom.user_id) {

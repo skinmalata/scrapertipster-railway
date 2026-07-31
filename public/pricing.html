@@ -328,7 +328,7 @@ window.WFT.onAuthReady(function (user) {
       } else if (data.plan === 'admin') {
         showBanner('You have admin access to all Pro features.', 'pro');
       } else {
-        showBanner('You are on a free Pro trial' + (expiresAt ? ' — ends ' + new Date(expiresAt).toLocaleDateString() : '') + '. Upgrade anytime to keep Pro.', 'pro');
+        showBanner('Pro membership active' + (expiresAt ? ' — until ' + new Date(expiresAt).toLocaleDateString() : '') + '.', 'pro');
       }
     } else {
       markCurrentPlan('free-card', 'Current Plan');
