@@ -19,6 +19,14 @@ const { buildGiantPool, getGiantPoolHistory } = require('../services/authorPicks
 const { fetchTodayStreaks } = require('../services/h2hWinningStreaks');
 const { optionalAuth, requireAuth, requirePro: requireProMiddleware, requireAdmin, logAdminAction } = require('../middleware/auth');
 const payment = require('../services/payment');
+const whop = require('../services/whop');
+
+// Active payment provider: set PAYMENT_PROVIDER=whop to route the existing
+// /api/checkout, /api/portal and /api/subscription/cancel endpoints to Whop
+// instead of Lemon Squeezy. Defaults to Lemon Squeezy.
+function activePayment() {
+  return process.env.PAYMENT_PROVIDER === 'whop' ? whop : payment;
+}
 
 // API-Football responses are cached so one busy page does not consume the
 // provider quota for every visitor. The API key is deliberately kept here,
@@ -1191,16 +1199,17 @@ router.get('/golden-tips/history', function(req, res) {
 
 // ===== PRO MEMBERSHIP ROUTES =====
 
-// POST /api/checkout — create PayPal subscription checkout
+// POST /api/checkout — create subscription checkout (Lemon Squeezy or Whop)
 router.post('/checkout', requireAuth, async function (req, res) {
   try {
     var planType = req.body.planType;
     var returnUrl = req.body.returnUrl || 'https://winfulltime.com/account.html';
-    var validPlans = Object.keys(payment.PLANS);
+    var provider = activePayment();
+    var validPlans = Object.keys(provider.PLANS);
     if (validPlans.indexOf(planType) === -1) {
       return res.status(400).json({ error: 'Invalid plan. Choose: ' + validPlans.join(', ') });
     }
-    var result = await payment.createCheckout({
+    var result = await provider.createCheckout({
       userId: req.user.id,
       email: req.user.email,
       planType: planType,
@@ -1216,6 +1225,10 @@ router.post('/checkout', requireAuth, async function (req, res) {
 // POST /api/webhook/payment — Lemon Squeezy webhook (raw body)
 router.post('/webhook/payment', function (req, res) {
   console.log('[webhook] Received event');
+  if (process.env.PAYMENT_PROVIDER === 'whop') {
+    console.log('[webhook] Lemon Squeezy webhook ignored — PAYMENT_PROVIDER=whop');
+    return res.status(200).json({ received: true, ignored: true });
+  }
   var rawBody = req.rawBody || JSON.stringify(req.body);
   var headers = req.headers;
 
@@ -1252,6 +1265,119 @@ router.post('/webhook/payment', function (req, res) {
     console.error('[webhook] Verification error:', err.message);
     res.status(400).json({ error: 'Webhook verification failed' });
   });
+});
+
+// POST /api/whop/checkout — Whop checkout (parallel to /api/checkout for A/B testing)
+router.post('/whop/checkout', requireAuth, async function (req, res) {
+  try {
+    var planType = req.body.planType;
+    var returnUrl = req.body.returnUrl || 'https://winfulltime.com/account.html';
+    var validPlans = Object.keys(whop.PLANS);
+    if (validPlans.indexOf(planType) === -1) {
+      return res.status(400).json({ error: 'Invalid plan. Choose: ' + validPlans.join(', ') });
+    }
+    var result = await whop.createCheckout({
+      userId: req.user.id,
+      email: req.user.email,
+      planType: planType,
+      returnUrl: returnUrl
+    });
+    res.json(result);
+  } catch (e) {
+    console.error('[whop/checkout] Failed:', e.message);
+    res.status(500).json({ error: 'Failed to create Whop checkout. ' + e.message });
+  }
+});
+
+// POST /api/webhook/whop — Whop webhook (Standard Webhooks, raw body)
+router.post('/webhook/whop', function (req, res) {
+  console.log('[whop-webhook] Received event');
+  var rawBody = req.rawBody || JSON.stringify(req.body);
+  var headers = req.headers;
+
+  whop.verifyWebhook({ rawBody: rawBody, headers: headers }).then(function (verified) {
+    if (!verified) {
+      console.warn('[whop-webhook] Signature verification failed');
+      return res.status(400).json({ error: 'Invalid signature' });
+    }
+
+    if (!supabase) return res.status(503).json({ error: 'Database not configured' });
+
+    var event = typeof req.body === 'object' ? req.body : JSON.parse(rawBody);
+    var eventId = String(headers['webhook-id'] || (event.id || 'unknown'));
+    var eventName = event.type || 'unknown';
+
+    supabase.from('payment_events').select('provider, event_id').eq('provider', 'whop').eq('event_id', eventId).single()
+      .then(function (existing) {
+        if (existing.data) {
+          console.log('[whop-webhook] Duplicate event ignored:', eventId);
+          return res.json({ received: true, duplicate: true });
+        }
+
+        return supabase.from('payment_events').insert({ provider: 'whop', event_id: eventId }).then(function () {
+          return whop.handleEvent(event).then(function (result) {
+            console.log('[whop-webhook] Processed event:', eventName, JSON.stringify(result));
+            res.json({ received: true, handled: true });
+          });
+        });
+      }).catch(function (err) {
+        console.error('[whop-webhook] Error:', err.message);
+        res.status(500).json({ error: 'Webhook processing failed' });
+      });
+  }).catch(function (err) {
+    console.error('[whop-webhook] Verification error:', err.message);
+    res.status(400).json({ error: 'Webhook verification failed' });
+  });
+});
+
+// GET /api/whop/portal — Whop manage/cancel (parallel to /api/portal)
+router.get('/whop/portal', requireAuth, function (req, res) {
+  if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+  supabase.from('subscriptions')
+    .select('payment_id')
+    .eq('user_id', req.user.id)
+    .eq('payment_status', 'active')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+    .then(function (sub) {
+      if (!sub.data || !sub.data.payment_id) {
+        return res.json({ error: 'No active subscription found' });
+      }
+      return whop.createCustomerPortal({ subscriptionId: sub.data.payment_id }).then(function (result) {
+        res.json(result);
+      });
+    })
+    .catch(function (err) {
+      console.error('[whop/portal] Error:', err.message);
+      res.status(500).json({ error: 'Failed to get portal URL' });
+    });
+});
+
+// POST /api/whop/cancel — cancel active Whop subscription (parallel to /api/cancel)
+router.post('/whop/cancel', requireAuth, function (req, res) {
+  if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+  supabase.from('subscriptions')
+    .select('payment_id')
+    .eq('user_id', req.user.id)
+    .eq('payment_status', 'active')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+    .then(function (sub) {
+      if (!sub.data || !sub.data.payment_id) {
+        return res.json({ error: 'No active subscription found' });
+      }
+      return whop.cancelSubscription(sub.data.payment_id).then(function () {
+        res.json({ ok: true });
+      });
+    })
+    .catch(function (err) {
+      console.error('[whop/cancel] Error:', err.message);
+      res.status(500).json({ error: 'Failed to cancel subscription' });
+    });
 });
 
 // POST /api/ticket-builder/generate — tier-gated ticket builder
@@ -1688,7 +1814,7 @@ router.get('/me/subscription', requireAuth, async function (req, res) {
   }
 });
 
-// GET /api/portal — Lemon Squeezy customer portal
+// GET /api/portal — customer portal (Lemon Squeezy or Whop)
 router.get('/portal', requireAuth, function (req, res) {
   if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
 
@@ -1703,7 +1829,7 @@ router.get('/portal', requireAuth, function (req, res) {
       if (!sub.data || !sub.data.payment_id) {
         return res.json({ error: 'No active subscription' });
       }
-      return payment.createCustomerPortal({ subscriptionId: sub.data.payment_id })
+      return activePayment().createCustomerPortal({ subscriptionId: sub.data.payment_id })
         .then(function (result) {
           if (result.error) return res.json({ error: result.error });
           res.json({ url: result.url });
@@ -1714,7 +1840,7 @@ router.get('/portal', requireAuth, function (req, res) {
     });
 });
 
-// POST /api/subscription/cancel — cancel subscription
+// POST /api/subscription/cancel — cancel subscription (Lemon Squeezy or Whop)
 router.post('/subscription/cancel', requireAuth, function (req, res) {
   if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
 
@@ -1729,7 +1855,7 @@ router.post('/subscription/cancel', requireAuth, function (req, res) {
       if (!sub.data || !sub.data.payment_id) {
         return res.json({ error: 'No active subscription found' });
       }
-      return payment.cancelSubscription(sub.data.payment_id)
+      return activePayment().cancelSubscription(sub.data.payment_id)
         .then(function () {
           res.json({ message: 'Subscription cancelled' });
         });
