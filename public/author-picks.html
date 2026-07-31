@@ -142,6 +142,17 @@
 </section>
 </main>
 
+
+<script>
+document.getElementById('hamburger')?.addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('nav')?.classList.toggle('open');
+});
+</script>
+<script src="/responsible-gambling.js"></script>
+<script src="/config.js"></script>
+<script src="/supabase-client.js"></script>
+<script src="/auth.js?v=20260801"></script>
 <script>
 (function() {
   var API_BASE = window.WFT_API || 'https://winfulltime-api.onrender.com';
@@ -321,16 +332,6 @@
   }
 })();
 </script>
-<script>
-document.getElementById('hamburger')?.addEventListener('click', function() {
-  this.classList.toggle('active');
-  document.getElementById('nav')?.classList.toggle('open');
-});
-</script>
-<script src="/responsible-gambling.js"></script>
-<script src="/config.js"></script>
-<script src="/supabase-client.js"></script>
-<script src="/auth.js?v=20260801"></script>
 <footer>
  <div class="footer-content">
   <div style="text-align:center;margin-bottom:24px;">
