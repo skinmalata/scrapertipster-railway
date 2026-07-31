@@ -58,6 +58,7 @@
   .gate-banner .gb-btn:hover { opacity: 0.9; }
   .locked-grid { margin-top: 12px; }
   .pick-card.locked { opacity: 0.45; display: flex; align-items: center; justify-content: center; min-height: 110px; color: var(--text-dim); font-size: 13px; gap: 8px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; }
+  .pick-card.locked h1 { margin: 0; font-size: 16px; font-weight: 700; color: var(--text-dim); }
   .empty-state { text-align: center; padding: 60px 20px; border: 1px dashed var(--border); border-radius: var(--radius-lg); }
   .empty-state h2 { font-size: 20px; margin-bottom: 8px; color: var(--text-primary); }
   .empty-state p { color: var(--text-muted); }
@@ -160,7 +161,7 @@
   function buildLockedGrid(lockedCount) {
     if (!lockedCount || lockedCount <= 0) return '';
     return '<div class="picks-grid locked-grid">' +
-      '<div class="pick-card locked"><span>&#128274;</span> ' + lockedCount + ' more Author Picks &mdash; Pro only</div>' +
+      '<div class="pick-card locked"><span>&#128274;</span> <h1>' + lockedCount + ' more Author Picks &mdash; Pro only</h1></div>' +
       '</div>';
   }
 
