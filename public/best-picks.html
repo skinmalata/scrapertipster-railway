@@ -149,6 +149,14 @@
 
   .no-data { text-align: center; padding: 40px 20px; color: var(--text-dim); font-size: 14px; }
 
+  .gate-banner { max-width: 640px; margin: 0 auto 28px; padding: 28px 24px; text-align: center; background: linear-gradient(135deg, rgba(250,204,21,0.06), rgba(17,22,36,0.9)); border: 1px solid rgba(250,204,21,0.25); border-radius: 14px; }
+  .gate-banner .gb-icon { font-size: 32px; margin-bottom: 8px; }
+  .gate-banner .gb-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+  .gate-banner p { font-size: 14px; color: var(--text-dim); line-height: 1.7; margin-bottom: 16px; }
+  .gate-banner .gb-btn { display: inline-block; background: linear-gradient(135deg, #ff2448, #d41a38); color: #fff; font-size: 14px; font-weight: 700; padding: 11px 32px; border-radius: 8px; text-decoration: none; }
+  .gate-banner .gb-btn:hover { opacity: 0.9; }
+  .pick-card.locked { opacity: 0.45; display: flex; align-items: center; justify-content: center; min-height: 110px; color: var(--text-dim); font-size: 13px; gap: 8px; }
+
   .faq-section { margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border); }
   .faq-section h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #fff; }
   .faq-item { border-bottom: 1px solid var(--border); padding: 14px 0; }
@@ -206,7 +214,7 @@
 <footer>
   <div class="footer-content">
     <div style="text-align:center;margin-bottom:24px;">
-      <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">The Best Pick Per Category — free every day.</p>
+      <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">The Best Pick Per Category — updated daily. Free accounts get 1X2 and Over 1.5; Pro unlocks all categories.</p>
       <a href="/best-picks.html" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Best Pick Per Category</a>
     </div>
     <div class="footer-links">
@@ -243,9 +251,10 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 </script>
 <script src="/responsible-gambling.js"></script>
 <script src="/config.js"></script>
+<script src="/supabase-client.js"></script>
+<script src="/auth.js?v=20260801"></script>
 <script>
 (function() {
-  var API = window.WFT_API || 'https://winfulltime-api.onrender.com';
   var content = document.getElementById('content');
   var heroDate = document.getElementById('heroDate');
 
@@ -334,11 +343,34 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       '</div>';
   }
 
-  fetch(API + '/api/best-picks').then(function(r) { return r.json(); }).then(function(data) {
-    if (data.error) { content.innerHTML = '<div class="no-data">' + escapeHtml(data.error) + '</div>'; return; }
-    content.innerHTML = buildPerformance(data.history) + buildPicksGrid(data.today) + buildHistory(data.history);
-  }).catch(function() {
-    content.innerHTML = '<div class="no-data">Unable to load best picks. Try again later.</div>';
+  function buildLockedGrid() {
+    var locked = ['Over 2.5', 'BTTS Yes', 'BTTS No', 'Corners', 'Cards', 'Win Streak', 'Unbeaten'];
+    return '<div class="picks-grid">' + locked.map(function(c) {
+      return '<div class="pick-card locked"><span>&#128274;</span> ' + c + ' &mdash; Pro only</div>';
+    }).join('') + '</div>';
+  }
+
+  function gateBanner() {
+    return '<div class="gate-banner">' +
+      '<div class="gb-icon">&#128274;</div>' +
+      '<div class="gb-title">Pro Members Only</div>' +
+      '<p>Free accounts see <strong>1X2</strong> and <strong>Over 1.5</strong> picks only. Upgrade to Pro to unlock Over 2.5, BTTS, Corners, Cards, Win Streak &amp; Unbeaten, plus full results history and performance.</p>' +
+      '<a href="/pricing.html" class="gb-btn">Go Pro &rarr;</a>' +
+      '</div>';
+  }
+
+  window.WFT.onAuthReady(function() {
+    window.WFT.apiFetch('/api/best-picks').then(function(data) {
+      if (data.error) { content.innerHTML = '<div class="no-data">' + escapeHtml(data.error) + '</div>'; return; }
+      var isPro = !!data.isPro;
+      var html = gateBanner();
+      html += buildPicksGrid(data.today);
+      if (!isPro) html += buildLockedGrid();
+      html += buildHistory(data.history) + buildPerformance(data.history);
+      content.innerHTML = html;
+    }).catch(function() {
+      content.innerHTML = '<div class="no-data">Unable to load best picks. Try again later.</div>';
+    });
   });
 })();
 </script>
