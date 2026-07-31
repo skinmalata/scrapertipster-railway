@@ -8,12 +8,12 @@
 
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
- <title>Free Football Accumulator Ticket Builder | Daily Acca Tips &amp; Predictions - WinFulltime</title>
+ <title>Football Accumulator Ticket Builder | Daily Acca Tips &amp; Predictions - WinFulltime</title>
 
  <meta name="description" content="Build Accumulator Tickets using AI-powered football predictions. Set your target odds, choose selections from 1X2, Over/Under, BTTS, corners, cards, and streak markets.">
  <meta name="keywords" content="accumulator builder, football acca generator, betting ticket builder, multi bet builder, football accumulator tips, bet builder, parlay builder, free acca tips, daily football predictions, acca insurance tips, double chance accumulator, over 2.5 accumulator, BTTS accumulator">
 
- <meta property="og:title" content="Free Football Accumulator Ticket Builder - WinFulltime">
+ <meta property="og:title" content="Football Accumulator Ticket Builder - WinFulltime">
 
  <meta property="og:url" content="https://winfulltime.com/ticket-builder.html">
 
@@ -25,7 +25,7 @@
 
  <meta name="twitter:card" content="summary_large_image">
 
- <meta name="twitter:title" content="Free Football Accumulator Ticket Builder - WinFulltime">
+ <meta name="twitter:title" content="Football Accumulator Ticket Builder - WinFulltime">
 
  <meta name="twitter:description" content="Free football accumulator ticket builder. Generate winning acca bets daily with AI predictions.">
 
@@ -199,6 +199,14 @@
 
 
 
+  <div id="builderPaywall" class="builder-paywall" style="display:none;">
+    <div class="bp-icon">&#128274;</div>
+    <h2>Pro Members Only</h2>
+    <p>The Accumulator Ticket Builder is available exclusively to <strong>Pro members</strong>. Unlock 30-leg accumulators, market filters, safe-tips mode, and unlimited daily tickets.</p>
+    <a href="/pricing.html" class="bp-btn">Go Pro &rarr;</a>
+    <p class="bp-login">Already a member? <a href="/login.html">Log in</a> to access the builder.</p>
+  </div>
+
   <div class="ticket-form">
 
   <div id="tierBanner" class="tier-banner" style="display:none;"></div>
@@ -300,7 +308,7 @@
 
   <details class="faq-item"><summary>Can I filter accumulator tickets by odds range?</summary><p>Yes. Set a target total odds, a minimum odds per leg, and a maximum odds per leg. The builder then finds the optimal combination of selections within your specified range.</p></details>
 
-  <details class="faq-item"><summary>Is the accumulator ticket builder free to use?</summary><p>Yes, the WinFulltime accumulator ticket builder is free to use. Free users get max 3 legs, max 4.00 odds, and 3-5 tickets per day (depending on sign-in status). <a href="/pricing.html">Pro members</a> get up to 30 legs, 500 odds, market filtering, safe tips mode, and unlimited daily usage.</p></details>
+  <details class="faq-item"><summary>Is the accumulator ticket builder free to use?</summary><p>The WinFulltime accumulator ticket builder is a <strong>Pro members only</strong> feature. <a href="/pricing.html">Pro members</a> get up to 30 legs, 500 odds, market filtering, safe tips mode, and unlimited daily usage.</p></details>
 
   <details class="faq-item"><summary>What does double chance mean in an accumulator?</summary><p>Double chance covers two of three possible match outcomes in a single selection. For example, "Home or Draw" wins if the home team wins or the match ends in a draw. This increases your probability of winning each leg, making it popular for accumulators.</p></details>
 
@@ -1718,6 +1726,17 @@ nav.open { display: flex !important; }
 .tier-banner a { color: #ff2448; text-decoration: none; font-weight: 600; }
 .tier-banner a:hover { text-decoration: underline; }
 
+/* Paywall */
+.builder-paywall { max-width: 560px; margin: 24px auto 40px; padding: 48px 32px; text-align: center; background: linear-gradient(135deg, rgba(37,46,64,0.85), rgba(30,38,56,0.95)); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,0.3); }
+.builder-paywall .bp-icon { font-size: 44px; margin-bottom: 14px; }
+.builder-paywall h2 { font-size: 26px; font-weight: 800; margin: 0 0 12px; background: linear-gradient(135deg, #fff 40%, #ff2448); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.builder-paywall p { font-size: 15px; color: rgba(232,237,245,0.75); line-height: 1.7; margin: 0 0 24px; }
+.builder-paywall .bp-btn { display: inline-block; background: linear-gradient(135deg, #ff2448, #d41a38); color: #fff; font-size: 16px; font-weight: 700; padding: 13px 44px; border-radius: 10px; text-decoration: none; transition: transform 0.15s, box-shadow 0.15s; }
+.builder-paywall .bp-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(255,36,72,0.35); }
+.builder-paywall .bp-login { font-size: 13px; margin: 18px 0 0; }
+.builder-paywall .bp-login a { color: #ff2448; text-decoration: none; font-weight: 600; }
+.builder-paywall .bp-login a:hover { text-decoration: underline; }
+
 /* Pro badge */
 .pro-badge { display: inline-block; background: linear-gradient(135deg,#ff2448,#d41a38); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; vertical-align: middle; margin-left: 6px; }
 
@@ -1758,7 +1777,6 @@ nav.open { display: flex !important; }
 
   var lastTarget = 20;
   var lastMinOdds = 1.20;
-  var currentTier = 'free_anon';
 
   var MAX_LEGS = 30;
   var MAX_ODDS = 500;
@@ -1960,24 +1978,36 @@ nav.open { display: flex !important; }
     if (v > max) this.value = max;
   });
 
-  function renderTier() {
-    currentTier = getTier();
-    setupUI();
+  function applyAccess() {
+    var user = WFT.getUser();
+    var isPro = !!(user && user.isPro);
+    var paywall = document.getElementById('builderPaywall');
+    var form = document.querySelector('.ticket-form');
+    var results = document.getElementById('ticketResults');
+    if (isPro) {
+      if (paywall) paywall.style.display = 'none';
+      if (form) form.style.display = '';
+      if (results) results.style.display = '';
+      setupUI();
+    } else {
+      if (paywall) paywall.style.display = '';
+      if (form) form.style.display = 'none';
+      if (results) results.style.display = 'none';
+    }
   }
 
   function waitForPro(guardMs) {
-    renderTier();
     var elapsed = 0;
     var interval = 250;
     function check() {
       var user = WFT.getUser();
       if (user && user.isPro !== undefined) {
-        renderTier();
+        applyAccess();
         return;
       }
       elapsed += interval;
       if (elapsed >= guardMs) {
-        renderTier();
+        applyAccess();
         return;
       }
       setTimeout(check, interval);
@@ -1985,14 +2015,9 @@ nav.open { display: flex !important; }
     setTimeout(check, interval);
   }
 
-  WFT.onAuthReady(function() { waitForPro(8000); });
-  document.addEventListener('wft-pro-status', function() { renderTier(); });
-
-  setTimeout(function() {
-    if (document.getElementById('tierBanner').style.display === 'none') {
-      renderTier();
-    }
-  }, 10000);
+  applyAccess();
+  WFT.onAuthReady(function() { waitForPro(10000); });
+  document.addEventListener('wft-pro-status', function() { applyAccess(); });
 })();
 </script>
 <script src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP" async></script>
