@@ -37,6 +37,7 @@ function createCheckout(_a) {
   if (!plan.productId) return Promise.reject(new Error('WHOP_PRODUCT_' + planType.toUpperCase() + ' not set for ' + planType));
 
   var planBody = {
+    company_id: WHOP_COMPANY_ID,
     product_id: plan.productId,
     currency: 'usd',
     plan_type: plan.interval ? 'renewal' : 'one_time',
@@ -55,7 +56,6 @@ function createCheckout(_a) {
     method: 'POST',
     headers: whopHeaders(),
     body: JSON.stringify({
-      company_id: WHOP_COMPANY_ID,
       plan: planBody,
       metadata: { user_id: userId, plan_type: planType, email: email },
       redirect_url: returnUrl || 'https://winfulltime.com/account.html',
