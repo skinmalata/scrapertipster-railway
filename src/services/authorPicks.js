@@ -381,6 +381,8 @@ async function enrichFixture(match) {
   };
 }
 
+var buildPromise = null;
+
 async function buildGiantPool() {
   var date = todayStr();
   var filePath = path.join(DATA_DIR, date + '.json');
@@ -388,12 +390,24 @@ async function buildGiantPool() {
   // Serve from today's file if it exists — once per day
   try {
     var saved = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    if (saved && saved.matches) {
+    if (saved && saved.matches && saved.matches.length) {
       console.log('[author-picks] Serving from saved file for', date);
       return { matches: saved.matches, totalFixtures: saved.totalFixtures || saved.matches.length, analyzedFixtures: saved.matches.length, generatedAt: saved.generatedAt };
     }
   } catch (e) {}
 
+  // Share an in-flight build so concurrent visitors don't each trigger the heavy work
+  if (buildPromise) {
+    console.log('[author-picks] Reusing in-flight build for', date);
+    return buildPromise;
+  }
+
+  buildPromise = doBuild(date).finally(function () { buildPromise = null; });
+  return buildPromise;
+}
+
+async function doBuild(date) {
+  var filePath = path.join(DATA_DIR, date + '.json');
   var res = await httpGet('https://www.fotmob.com/api/data/matches?date=' + date);
   if (!res || res.status !== 200 || !res.data) return { matches: [], generatedAt: new Date().toISOString(), totalFixtures: 0 };
 
@@ -417,8 +431,12 @@ async function buildGiantPool() {
   });
 
   var result = { matches: enriched, totalFixtures: allFixtures.length, analyzedFixtures: enriched.length, generatedAt: new Date().toISOString() };
-  try { fs.writeFileSync(filePath, JSON.stringify({ matches: enriched, generatedAt: result.generatedAt }), 'utf8'); } catch (e) {}
-  console.log('[author-picks] Built and saved', enriched.length, 'of', limited.length, 'fixtures for', date);
+  if (enriched.length > 0) {
+    try { fs.writeFileSync(filePath, JSON.stringify({ matches: enriched, generatedAt: result.generatedAt }), 'utf8'); } catch (e) {}
+    console.log('[author-picks] Built and saved', enriched.length, 'of', limited.length, 'fixtures for', date);
+  } else {
+    console.warn('[author-picks] Build returned no picks for', date, '— not caching, next visit will retry');
+  }
   return result;
 }
 

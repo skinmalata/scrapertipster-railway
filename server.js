@@ -449,6 +449,7 @@ app.get('/blog/:slug', (req, res, next) => {
 // FotMob live scraping + API-Football stats — replaces Forebet (Cloudflare blocked axios on Render).
 const { startLiveScrapeLoop, getCachedLive } = require('./src/services/scrapeLive');
 const { buildGoldenTips } = require('./src/services/goldenOpportunities');
+const { buildGiantPool } = require('./src/services/authorPicks');
 const { startTelegramBot } = require('./src/services/telegramBot');
 const { startMastodonBot } = require('./src/services/mastodonBot');
 startLiveScrapeLoop();
@@ -487,6 +488,27 @@ setInterval(async function() {
     console.error('[cron] Pre-match refresh failed:', e.message);
   }
 }, 12 * 60 * 60 * 1000);
+
+// Pre-build Author Picks on startup, then refresh every 6h, so visitors never
+// wait for the heavy multi-minute build (it has its own once-per-day cache).
+(async function buildAuthorPicksOnBoot() {
+  try {
+    console.log('[startup] Building Author Picks pool...');
+    const result = await buildGiantPool();
+    console.log('[startup] Author Picks ready:', result.analyzedFixtures, 'analyzed of', result.totalFixtures, 'fixtures');
+  } catch (e) {
+    console.error('[startup] Author Picks build failed:', e.message);
+  }
+})();
+setInterval(async function() {
+  try {
+    console.log('[cron] Refreshing Author Picks pool...');
+    const result = await buildGiantPool();
+    console.log('[cron] Author Picks refreshed:', result.analyzedFixtures, 'analyzed of', result.totalFixtures, 'fixtures');
+  } catch (e) {
+    console.error('[cron] Author Picks refresh failed:', e.message);
+  }
+}, 6 * 60 * 60 * 1000);
 
 function getLiveTipsFromCache() {
   var liveData = getCachedLive();
