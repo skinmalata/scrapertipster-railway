@@ -25,8 +25,7 @@ function navLinksHtml(activePath) {
     html += `\n <a href="${link.href}"${active}>${link.label}</a>`;
   }
   html += '\n <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">';
-  html += `\n  <a href="/login.html" class="wft-auth-login" style="display:inline-block;${AUTH_BTN_STYLE}">Sign In</a>`;
-  html += `\n  <a href="/signup.html" class="wft-auth-login" style="display:inline-block;${AUTH_BTN_STYLE}">Sign Up</a>`;
+  html += `\n  <a href="/login.html" class="wft-auth-login" style="display:inline-block;${AUTH_BTN_STYLE}">Login</a>`;
   html += `\n  <a href="/account.html" class="wft-auth-account" style="display:none;${AUTH_BTN_STYLE}">Account</a>`;
   html += '\n </span>';
   return html;
