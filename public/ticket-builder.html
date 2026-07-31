@@ -1385,15 +1385,55 @@ nav.open { display: flex !important; }
 
 
 
- .loading-text {
+  .loading-text {
 
- font-size: 15px;
+  font-size: 15px;
 
- color: rgba(232, 237, 245, 0.75);
+  color: rgba(232, 237, 245, 0.75);
 
- letter-spacing: 0.3px;
+  letter-spacing: 0.3px;
 
- }
+  }
+
+  .progress-bar-container {
+
+  width: 260px;
+
+  height: 8px;
+
+  background: rgba(255,255,255,0.06);
+
+  border-radius: 4px;
+
+  overflow: hidden;
+
+  margin: 0 auto 16px;
+
+  }
+
+  .progress-bar {
+
+  height: 100%;
+
+  background: linear-gradient(135deg, #ff2448, #d41a38);
+
+  border-radius: 4px;
+
+  width: 0%;
+
+  animation: progress 1.5s ease-in-out infinite;
+
+  }
+
+  @keyframes progress {
+
+  0% { width: 0%; margin-left: 0%; }
+
+  50% { width: 70%; margin-left: 15%; }
+
+  100% { width: 0%; margin-left: 100%; }
+
+  }
 
 
 
@@ -1877,38 +1917,61 @@ nav.open { display: flex !important; }
       return;
     }
 
-    results.innerHTML = '<div class="loading"><div class="spinner"></div><div class="loading-text">Building tickets...</div></div>';
+    results.innerHTML = '<div class="loading"><div class="progress-bar-container"><div class="progress-bar"></div></div><div class="loading-text">Building tickets...</div></div>';
 
-    try {
-      var res = await WFT.apiFetch('/api/ticket-builder/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          targetOdds: target,
-          minOddsPerLeg: minOdds,
-          maxOddsPerLeg: maxOdds,
-          numLegs: numLegs,
-          safeOnly: safeTips,
-          markets: selectedMarkets,
-          todayOnly: todayOnly,
-          shuffle: shuffle === true
-        })
+    var payload = {
+      targetOdds: target,
+      minOddsPerLeg: minOdds,
+      maxOddsPerLeg: maxOdds,
+      numLegs: numLegs,
+      safeOnly: safeTips,
+      markets: selectedMarkets,
+      todayOnly: todayOnly,
+      shuffle: shuffle === true
+    };
+
+    function postGenerate(ms) {
+      return new Promise(function(resolve, reject) {
+        var ctrl = new AbortController();
+        var timer = setTimeout(function() { ctrl.abort(); reject(new Error('Request timed out')); }, ms);
+        WFT.apiFetch('/api/ticket-builder/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: ctrl.signal
+        }).then(function(d) { clearTimeout(timer); resolve(d); }, function(e) { clearTimeout(timer); reject(e); });
       });
-
-      if (res.error) {
-        results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(res.error) + '</p></div>';
-        return;
-      }
-
-      if (!res.available) {
-        results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(res.reason || 'No tickets could be generated with the current settings. Try adjusting the target odds, number of legs, or odds range.') + '</p></div>';
-        return;
-      }
-
-      renderTickets(res);
-    } catch (e) {
-      results.innerHTML = '<div class="no-matches"><p>Unable to generate tickets. The service may be unavailable. Try again later.</p></div>';
     }
+
+    var lastErr = null;
+    var attempt;
+    for (attempt = 0; attempt < 2; attempt++) {
+      try {
+        var res = await postGenerate(30000);
+
+        if (res.error) {
+          results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(res.error) + '</p></div>';
+          return;
+        }
+
+        if (!res.available) {
+          results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(res.reason || 'No tickets could be generated with the current settings. Try adjusting the target odds, number of legs, or odds range.') + '</p></div>';
+          return;
+        }
+
+        renderTickets(res);
+        return;
+      } catch (e) {
+        lastErr = e;
+        if (attempt === 0) {
+          results.innerHTML = '<div class="loading"><div class="progress-bar-container"><div class="progress-bar"></div></div><div class="loading-text">Still building... service is warming up</div></div>';
+          await new Promise(function(r) { setTimeout(r, 2500); });
+        }
+      }
+    }
+
+    console.error('[ticket-builder] Generate failed after retries:', lastErr);
+    results.innerHTML = '<div class="no-matches"><p>Unable to generate tickets. The service may still be warming up. Please try again in a few seconds.</p></div>';
   }
 
   function shuffleTickets() {
