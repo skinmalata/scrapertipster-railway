@@ -1157,37 +1157,54 @@ let goldenTipsCache = null;
 const GOLDEN_TIPS_CACHE_MS = 60 * 1000;
 const MAX_LIVE_DATA_AGE_MS = 20 * 60 * 1000;
 
-router.get('/golden-tips', async function (req, res) {
+router.get('/golden-tips', optionalAuth, async function (req, res) {
+  let payload;
   if (goldenTipsCache && Date.now() - goldenTipsCache.createdAt < GOLDEN_TIPS_CACHE_MS) {
-    return res.json({ ...goldenTipsCache.payload, cached: true });
+    payload = { ...goldenTipsCache.payload, cached: true };
+  } else {
+    const liveData = getCachedLive();
+    const liveDataAge = liveData && liveData.fetchedAt ? Date.now() - new Date(liveData.fetchedAt).getTime() : Infinity;
+    if (!liveData || liveDataAge > MAX_LIVE_DATA_AGE_MS || !liveData.matches || liveData.matches.length === 0) {
+      var reason = !liveData ? 'noLiveCache' : liveDataAge > MAX_LIVE_DATA_AGE_MS ? 'stale (' + Math.round(liveDataAge / 1000) + 's old)' : 'noMatches';
+      console.log('[golden-tips] API returning empty — reason: ' + reason);
+      return res.json({ available: false, opportunities: [], message: 'Live data is not available yet. Tips will appear once live matches are detected.' });
+    }
+
+    // Return only new, first-time tips published during the current live-data
+    // cycle. A fixture is never suggested twice on the same day.
+    const opportunities = Array.isArray(liveData.publishedTips) ? liveData.publishedTips : [];
+
+    payload = {
+      available: true,
+      fetchedAt: new Date().toISOString(),
+      matchCount: liveData.matchCount,
+      analyzedMatchCount: liveData.detailedMatchCount || 0,
+      formMatchCount: liveData.formMatchCount || 0,
+      streakMatchCount: liveData.streakMatchCount || 0,
+      matchStreakCount: liveData.matchStreakCount || 0,
+      refreshSeconds: GOLDEN_TIPS_CACHE_MS / 1000,
+      opportunities: opportunities
+    };
+
+    console.log('[golden-tips] matches=' + liveData.matchCount + ' opportunities=' + opportunities.length);
+    goldenTipsCache = { createdAt: Date.now(), payload };
   }
 
-  const liveData = getCachedLive();
-  const liveDataAge = liveData && liveData.fetchedAt ? Date.now() - new Date(liveData.fetchedAt).getTime() : Infinity;
-  if (!liveData || liveDataAge > MAX_LIVE_DATA_AGE_MS || !liveData.matches || liveData.matches.length === 0) {
-    var reason = !liveData ? 'noLiveCache' : liveDataAge > MAX_LIVE_DATA_AGE_MS ? 'stale (' + Math.round(liveDataAge / 1000) + 's old)' : 'noMatches';
-    console.log('[golden-tips] API returning empty — reason: ' + reason);
-    return res.json({ available: false, opportunities: [], message: 'Live data is not available yet. Tips will appear once live matches are detected.' });
+  // Tips with a signal strength above 70% are Pro only. Free users still see
+  // the cards, but the tip details are masked with a Pro-only message.
+  const isPro = await resolveIsPro(req);
+  const allOpportunities = Array.isArray(payload.opportunities) ? payload.opportunities : [];
+  const lockedTips = allOpportunities.filter(function (o) { return Number(o.signalScore || 0) > 70; });
+  if (!isPro) {
+    payload.opportunities = allOpportunities.map(function (o) {
+      if (Number(o.signalScore || 0) > 70) {
+        return Object.assign({}, o, { locked: true, market: '', reason: '' });
+      }
+      return o;
+    });
   }
-
-  // Return only new, first-time tips published during the current live-data
-  // cycle. A fixture is never suggested twice on the same day.
-  const opportunities = Array.isArray(liveData.publishedTips) ? liveData.publishedTips : [];
-
-  const payload = {
-    available: true,
-    fetchedAt: new Date().toISOString(),
-    matchCount: liveData.matchCount,
-    analyzedMatchCount: liveData.detailedMatchCount || 0,
-    formMatchCount: liveData.formMatchCount || 0,
-    streakMatchCount: liveData.streakMatchCount || 0,
-    matchStreakCount: liveData.matchStreakCount || 0,
-    refreshSeconds: GOLDEN_TIPS_CACHE_MS / 1000,
-    opportunities: opportunities
-  };
-
-  console.log('[golden-tips] matches=' + liveData.matchCount + ' opportunities=' + opportunities.length);
-  goldenTipsCache = { createdAt: Date.now(), payload };
+  payload.isPro = !!isPro;
+  payload.lockedCount = lockedTips.length;
   res.json(payload);
 });
 

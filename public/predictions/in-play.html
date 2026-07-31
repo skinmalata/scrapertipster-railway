@@ -102,7 +102,7 @@
         "name": "Are the live betting tips free?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes, all in-play betting tips on WinFulltime are completely free. There are no paywalls, no premium tiers, and no hidden fees. We provide live football betting tips powered by real-time data analysis."
+          "text": "Most in-play betting tips on WinFulltime are free. Tips with a signal strength above 70% are available exclusively to Pro members. Upgrade to Pro to unlock every high-confidence in-play tip."
         }
       }
     ]
@@ -156,6 +156,11 @@
     .empty h2 { margin:12px 0 8px; font-size:21px; }
     .empty p { color:var(--text-secondary); margin:0; line-height:1.65; }
     .empty-icon { font-size:32px; }
+    .locked-note { margin: 14px 0 10px; padding: 12px; border: 1px solid rgba(250,204,21,0.25); border-radius: 10px; background: rgba(250,204,21,0.06); color: var(--text-secondary); font-size: 13px; line-height: 1.6; }
+    .locked-note .locked-btn { display: inline-block; margin-top: 8px; background: linear-gradient(135deg, #ff2448, #d41a38); color: #fff; font-size: 13px; font-weight: 700; padding: 8px 18px; border-radius: 8px; text-decoration: none; }
+    .locked-note .locked-btn:hover { opacity: 0.9; }
+    .tip-card.locked h3 { margin: 0; color: #fff; font-size: 16px; }
+
     .faq-section { max-width:830px; margin:42px auto; padding:24px; border-top:1px solid var(--border); }
     .faq-section h2 { color:var(--text-primary); font-size:20px; margin:0 0 14px; }
     .faq-list { display:flex; flex-direction:column; gap:8px; }
@@ -224,7 +229,7 @@
         <details class="faq-item"><summary>Why are there no live betting tips right now?</summary><p>Live betting tips only appear when a strategy rule qualifies during an in-progress match. During off-peak hours, early match stages, or when matches don't generate enough attacking pressure, the page will correctly show no opportunities. No tip is not a missing prediction ï¿½ it means no edge was found.</p></details>
 
         <details class="faq-item"><summary>What is the difference between in-play tips and pre-match predictions?</summary><p>Pre-match predictions are generated before kick-off using historical data, team form and pre-match odds. In-play betting tips use live match statistics from the ongoing game, such as real-time shots, corners and possession, to identify betting opportunities that only exist during the match.</p></details>
-        <details class="faq-item"><summary>Are the live betting tips free?</summary><p>Yes, all in-play betting tips on WinFulltime are completely free. There are no paywalls, no premium tiers, and no hidden fees. We provide live football betting tips powered by real-time data analysis.</p></details>
+        <details class="faq-item"><summary>Are the live betting tips free?</summary><p>Most in-play betting tips on WinFulltime are free. Tips with a signal strength above 70% are available exclusively to Pro members. Upgrade to <a href="/pricing.html">Pro</a> to unlock every high-confidence in-play tip.</p></details>
       </div>
     </section>
 
@@ -259,7 +264,14 @@
  </div>
  <div style="text-align:center;padding:12px 0;"><button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">Light</button></div>
 </footer>
-  <script>
+  
+  <script src="/responsible-gambling.js"></script>
+  <script src="/pwa.js"></script>
+
+<script src="/config.js"></script>
+<script src="/supabase-client.js"></script>
+<script src="/auth.js?v=20260801"></script>
+<script>
     (function() {
       var API_BASE = window.WFT_API || 'https://winfulltime-api.onrender.com';
       var container = document.getElementById('tips');
@@ -273,21 +285,30 @@
           container.innerHTML = empty('No in-play betting tips currently', 'Tips appear when live match data meets our strategy rules. Bet Responsibly.');
           return;
         }
+        var isPro = !!data.isPro;
         container.innerHTML = data.opportunities.map(function(o) {
           var minute = o.minute ? o.minute + '\'' : 'Live';
           var score = o.signalScore ? Math.round(o.signalScore) : null;
           var scoreColor = score >= 70 ? '#4ade80' : score >= 50 ? '#facc15' : '#ff6b7e';
           var categoryBadge = o.category ? '<span class="qualified">' + escapeHtml(o.category.toUpperCase()) + '</span>' : '';
+          var body;
+          if (o.locked) {
+            body = '<div class="market-row"><div><small>Market</small><div class="market" style="color:var(--text-dim);">Available to Pro</div></div></div>' +
+              '<div class="locked-note">&#128274; In-play tips with a signal strength of 70% and above are available only to <strong>Pro members</strong>. <a href="/pricing.html" class="locked-btn">Go Pro</a></div>' +
+              '<div class="tip-meta"><span>Signal: <strong style="color:' + scoreColor + ';">' + score + '%</strong></span><span>' + escapeHtml(o.rule || '') + '</span></div>';
+          } else {
+            body = '<div class="market-row"><div><small>Market</small><div class="market">' + escapeHtml(o.market) + '</div></div></div>' +
+              '<div class="reason">' + escapeHtml(o.reason || '') + '</div>' +
+              (score ? '<div class="tip-meta"><span>Signal: <strong style="color:' + scoreColor + ';">' + score + '%</strong></span><span>' + escapeHtml(o.rule || '') + '</span></div>' : '');
+          }
           return '<article class="tip-card"><div class="tip-top">' + categoryBadge + '<span class="minute">' + escapeHtml(minute) + '</span></div>' +
             '<div class="tip-body"><div class="league">' + escapeHtml(o.league || '') + '</div><div class="teams">' + escapeHtml(o.home) + ' <span aria-hidden="true">vs</span> ' + escapeHtml(o.away) + '</div>' +
             '<div class="score">' + escapeHtml(o.score || '0 - 0') + '</div>' +
-            '<div class="market-row"><div><small>Market</small><div class="market">' + escapeHtml(o.market) + '</div></div></div>' +
-            '<div class="reason">' + escapeHtml(o.reason || '') + '</div>' +
-            (score ? '<div class="tip-meta"><span>Signal: <strong style="color:' + scoreColor + ';">' + score + '%</strong></span><span>' + escapeHtml(o.rule || '') + '</span></div>' : '') +
+            body +
             '</div></article>';
         }).join('');
       }
-      function outcomeLabel(outcome) { return outcome === 'won' ? 'Won' : outcome === 'lost' ? 'Lost' : outcome === 'unresolved' ? 'Not settled' : 'Pending'; }
+            function outcomeLabel(outcome) { return outcome === 'won' ? 'Won' : outcome === 'lost' ? 'Lost' : outcome === 'unresolved' ? 'Not settled' : 'Pending'; }
       function displayHistoryDate(date) {
         if (!date) return '';
         return new Date(date + 'T12:00:00Z').toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
@@ -319,16 +340,19 @@
         value.setUTCDate(value.getUTCDate() - 1);
         return value.toISOString().slice(0, 10);
       }
+      function fetchJson(path) {
+        if (window.WFT && window.WFT.apiFetch) return window.WFT.apiFetch(path);
+        return fetch(API_BASE + path, { mode: 'cors', cache: 'no-store' }).then(function(r) { return r.json(); });
+      }
       async function loadHistory(date, retryOnFailure) {
         var requestedDate = date === 'today' ? null : (date || historyDate);
-        var url = API_BASE + '/api/golden-tips/history' + (requestedDate ? '?date=' + encodeURIComponent(requestedDate) : '');
+        var path = '/api/golden-tips/history' + (requestedDate ? '?date=' + encodeURIComponent(requestedDate) : '');
         try {
-          var res = await fetch(url, {mode:'cors', cache:'no-store'});
-          if (!res.ok) throw new Error('History request failed');
-          renderHistory(await res.json());
+          var data = await fetchJson(path);
+          renderHistory(data);
           if (historyRetryTimer) { clearTimeout(historyRetryTimer); historyRetryTimer = null; }
         } catch (e) {
-          document.getElementById('history').innerHTML = empty('Todayâ€™s results unavailable', 'Please check again shortly.');
+          document.getElementById('history').innerHTML = empty('Today\u00e2\u20ac\u2122s results unavailable', 'Please check again shortly.');
           if (retryOnFailure !== false && !historyRetryTimer) historyRetryTimer = setTimeout(function() { historyRetryTimer = null; loadHistory(requestedDate, false); }, 10000);
         }
       }
@@ -343,14 +367,18 @@
 
       async function loadLive() {
         try {
-          var res = await fetch(API_BASE + '/api/golden-tips', {mode:'cors', cache:'no-store'});
-          var data = await res.json();
+          var data = await fetchJson('/api/golden-tips');
           renderOpportunities(data);
         } catch (e) {
           container.innerHTML = empty('Live data unavailable', 'The live data feed is warming up. Retrying shortly...');
         }
         loadHistory(historyDate, false);
         schedulePoll(POLL_INTERVAL);
+      }
+
+      function start() {
+        loadLive();
+        loadHistory('today', true);
       }
 
       document.addEventListener('visibilitychange', function() {
@@ -361,17 +389,15 @@
       });
       document.getElementById('previousHistoryButton').addEventListener('click', function() { loadHistory(previousDate(historyDate || new Date().toISOString().slice(0, 10))); });
       document.getElementById('todayHistoryButton').addEventListener('click', function() { loadHistory('today'); });
-      loadLive();
-      loadHistory('today', true);
+
+      if (window.WFT && window.WFT.onAuthReady) {
+        window.WFT.onAuthReady(start);
+      } else {
+        start();
+      }
     })();
     document.getElementById('hamburger')?.addEventListener('click', function() { this.classList.toggle('active'); document.getElementById('nav')?.classList.toggle('open'); });
   </script>
-  <script src="/responsible-gambling.js"></script>
-  <script src="/pwa.js"></script>
-
-<script src="/config.js"></script>
-<script src="/supabase-client.js"></script>
-<script src="/auth.js?v=20260801"></script>
 <script>
 (function() {
   const saved = localStorage.getItem("wf-theme");
