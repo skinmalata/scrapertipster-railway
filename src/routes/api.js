@@ -1190,14 +1190,14 @@ router.get('/golden-tips', optionalAuth, async function (req, res) {
     goldenTipsCache = { createdAt: Date.now(), payload };
   }
 
-  // Tips with a signal strength above 70% are Pro only. Free users still see
-  // the cards, but the tip details are masked with a Pro-only message.
+  // Tips with a signal strength of 70% and above are Pro only. Free users
+  // still see the cards, but the tip details are masked with a Pro-only message.
   const isPro = await resolveIsPro(req);
   const allOpportunities = Array.isArray(payload.opportunities) ? payload.opportunities : [];
-  const lockedTips = allOpportunities.filter(function (o) { return Number(o.signalScore || 0) > 70; });
+  const lockedTips = allOpportunities.filter(function (o) { return Number(o.signalScore || 0) >= 70; });
   if (!isPro) {
     payload.opportunities = allOpportunities.map(function (o) {
-      if (Number(o.signalScore || 0) > 70) {
+      if (Number(o.signalScore || 0) >= 70) {
         return Object.assign({}, o, { locked: true, market: '', reason: '' });
       }
       return o;

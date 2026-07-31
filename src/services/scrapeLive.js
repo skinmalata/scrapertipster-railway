@@ -595,8 +595,22 @@ async function scrapeLive() {
     var liveById = new Map((matches || []).map(function(m) { return [String(m.matchId), m]; }));
     var currentKeys = {};
     currentTips.forEach(function(t) { currentKeys[String(t.fixtureId) + '|' + String(t.market || '').toLowerCase()] = true; });
+    // Once a tip is published, its gating class is fixed for the lifetime of
+    // the match. The signal score used for the feed is the original one recorded
+    // at publication time, so a tip issued at 70%+ never becomes visible to
+    // free users even if the live signal later drops below the threshold.
     var pendingTips = getPendingTipsForDate();
-    var activeTips = currentTips.slice();
+    var publishedSignalById = {};
+    pendingTips.forEach(function(pt) {
+      publishedSignalById[String(pt.fixtureId) + '|' + String(pt.market || '').toLowerCase()] = pt.signalScore;
+    });
+    var activeTips = currentTips.map(function(t) {
+      var key = String(t.fixtureId) + '|' + String(t.market || '').toLowerCase();
+      if (Object.prototype.hasOwnProperty.call(publishedSignalById, key)) {
+        return Object.assign({}, t, { signalScore: publishedSignalById[key] });
+      }
+      return t;
+    });
     pendingTips.forEach(function(pt) {
       var key = String(pt.fixtureId) + '|' + String(pt.market || '').toLowerCase();
       if (currentKeys[key]) return;
