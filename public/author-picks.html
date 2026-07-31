@@ -50,7 +50,7 @@
   .outcome-pending { background: rgba(250,204,21,0.15); color: #facc15; }
   .h2h-row { display: flex; gap: 6px; font-size: 16px; color: #facc15; font-weight: 700; justify-content: center; margin-top: 4px; }
   .h2h-row span { display: flex; align-items: center; gap: 3px; }
-  .gate-banner { max-width: 640px; margin: 0 auto 28px; padding: 28px 24px; text-align: center; background: linear-gradient(135deg, rgba(250,204,21,0.06), rgba(17,22,36,0.9)); border: 1px solid rgba(250,204,21,0.25); border-radius: 14px; }
+  .gate-banner { max-width: 640px; margin: 28px auto 0; padding: 28px 24px; text-align: center; background: linear-gradient(135deg, rgba(250,204,21,0.06), rgba(17,22,36,0.9)); border: 1px solid rgba(250,204,21,0.25); border-radius: 14px; }
   .gate-banner .gb-icon { font-size: 32px; margin-bottom: 8px; }
   .gate-banner .gb-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 8px; }
   .gate-banner p { font-size: 14px; color: var(--text-dim); line-height: 1.7; margin-bottom: 16px; }
@@ -192,7 +192,6 @@
 
     var lockedCount = isPro ? 0 : (Number(data.totalTips) || data.matches.length) - data.matches.length;
     var html = '';
-    if (!isPro) html += gateBanner();
     html += '<div class="matches-grid">' + data.matches.map(function(m, i) {
       var liveHtml = m.isLive ? '<span>' + (m.minute ? esc(m.minute) + "'" : 'Live') + '</span>' : '<span>' + formatTime(m.kickoff) + '</span>';
 
@@ -217,6 +216,7 @@
         '</div>';
     }).join('') + '</div>';
     html += buildLockedGrid(lockedCount);
+    if (!isPro) html += gateBanner();
     content.innerHTML = html;
   }
 
