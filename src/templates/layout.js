@@ -12,8 +12,7 @@ const NAV_LINKS = [
   { href: '/best-picks.html', label: 'Best Picks', match: (p) => p.startsWith('/best-picks') },
   { href: '/author-picks.html', label: 'Author Picks', match: (p) => p.startsWith('/author-picks') },
   { href: '/predictions/in-play', label: 'In-Play', match: (p) => p.startsWith('/predictions/in-play') },
-  { href: '/blog/', label: 'Blog', match: (p) => p.startsWith('/blog') },
-  { href: '/pricing.html', label: 'Pro', match: (p) => p.startsWith('/pricing') }
+  { href: '/blog/', label: 'Blog', match: (p) => p.startsWith('/blog') }
 ];
 
 const AUTH_BTN_STYLE = 'background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;';
