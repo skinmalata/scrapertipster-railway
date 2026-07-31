@@ -270,7 +270,10 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
   }
 
   function buildHistory(history) {
-    if (!history || history.length === 0) return '';
+    if (!history || history.length === 0) return '<div class="history-section">' +
+      '<div class="section-title">Results <span class="badge">Last 3 days</span></div>' +
+      '<div class="no-data">Results appear here once today\'s picks have been evaluated against actual match results. Check back tomorrow.</div>' +
+      '</div>';
     return '<div class="history-section">' +
       '<div class="section-title">Recent Results <span class="badge">Last ' + history.length + ' day(s)</span></div>' +
       history.map(function(day) {
@@ -295,7 +298,11 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
   }
 
   function buildPerformance(history) {
-    if (!history || history.length === 0) return '';
+    if (!history || history.length === 0) return '<div class="perf-section">' +
+      '<h2>Performance</h2>' +
+      '<p>How the Best Pick Per Category performed against actual results over the past 3 days.</p>' +
+      '<div class="perf-summary"><div class="perf-stat"><span>No results yet</span></div></div>' +
+      '</div>';
     var totalWon = 0, totalLost = 0, totalPending = 0;
     var statsHtml = '';
     history.forEach(function(day) {
