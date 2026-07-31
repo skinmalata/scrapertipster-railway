@@ -126,6 +126,9 @@
  color: var(--text-primary);
  }
 
+ .wft-auth-login,
+ .wft-auth-account { display: inline-block; }
+
  .theme-toggle {
  background: none;
  border: 1px solid var(--border);

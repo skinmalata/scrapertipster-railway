@@ -7,6 +7,7 @@ const path = require('path');
 const axios = require('axios');
 const apiRoutes = require('./src/routes/api');
 const chatRoutes = require('./src/routes/chat');
+const { applyLayout, staticWithLayout } = require('./src/templates/layout');
 
 const YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@winfulltime/videos';
 
@@ -239,7 +240,7 @@ function serveBlogPost(req, res, next) {
     const enhancedHtml = html.includes('/article-tools-cta.js')
       ? html
       : html.replace(/<\/body>/i, '<script src="/article-tools-cta.js" defer></script></body>');
-    return res.type('html').send(enhancedHtml);
+    return res.type('html').send(applyLayout(enhancedHtml, req));
   } catch (error) {
     return next(error);
   }
@@ -247,6 +248,10 @@ function serveBlogPost(req, res, next) {
 
 // Serve article pages through one reusable conversion panel, including direct .html URLs.
 app.get('/blog/:slug.html', serveBlogPost);
+
+// Serve every other HTML page through the shared nav/footer template. Non-HTML
+// assets (css/js/images) fall through to express.static below.
+app.use((req, res, next) => staticWithLayout(req, res, next, path.join(__dirname, 'public')));
 
 app.use(express.static('public', {
   maxAge: 0,
