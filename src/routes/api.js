@@ -1369,9 +1369,11 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
 });
 
 // GET /api/best-picks — top pick per category, cached once per day
+var DATA_ROOT = process.env.RAILWAY_VOLUME_MOUNT_PATH || process.env.RENDER_DISK_PATH || path.join(__dirname, '../../data');
+
 router.get('/best-picks', async function (req, res) {
   try {
-    var CACHE_DIR = path.join(__dirname, '../../data/best-picks');
+    var CACHE_DIR = path.join(DATA_ROOT, 'best-picks');
     try { fs.mkdirSync(CACHE_DIR, { recursive: true }); } catch (e) {}
     var TODAY_FM = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     var TODAY_SYSTEM = new Date().toISOString().slice(0, 10);
@@ -1389,7 +1391,7 @@ router.get('/best-picks', async function (req, res) {
     var h2hData = { dates: {} };
     try { h2hData = JSON.parse(fs.readFileSync(path.join(__dirname, '../../public/data/h2h-unbeaten.json'), 'utf8')); } catch (e) {}
 
-    var AUTHOR_DIR = path.join(__dirname, '../../data/author-picks');
+    var AUTHOR_DIR = path.join(DATA_ROOT, 'author-picks');
     var todayPicks = [];
 
     function fmtTime(kickoff) {
@@ -1634,7 +1636,7 @@ router.get('/author-picks', async function (req, res) {
 // GET /api/author-picks/history — past performance
 router.get('/author-picks/history', async function (req, res) {
   try {
-    var days = Math.min(5, Math.max(1, parseInt(req.query.days, 10) || 2));
+    var days = Math.min(5, Math.max(1, parseInt(req.query.days, 10) || 3));
     var data = await getGiantPoolHistory(days);
     res.json({ days: data });
   } catch (e) {

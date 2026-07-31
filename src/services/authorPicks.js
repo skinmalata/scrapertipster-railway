@@ -6,7 +6,10 @@ var MAX_MATCHES = 80;
 var DETAIL_CONCURRENCY = 3;
 var DETAIL_DELAY_MS = 500;
 var MIN_CONFIDENCE = 55;
-var DATA_DIR = path.join(__dirname, '../../data/author-picks');
+var DATA_DIR = process.env.AUTHOR_PICKS_DATA_DIR || path.join(
+  process.env.RAILWAY_VOLUME_MOUNT_PATH || process.env.RENDER_DISK_PATH || __dirname,
+  '../../data/author-picks'
+);
 
 try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch (e) {}
 

@@ -203,7 +203,8 @@
     var allCards = [];
 
     data.days.forEach(function (day) {
-      var pct = day.total > 0 ? Math.round((day.won / (day.won + day.lost)) * 100) : 0;
+      var resolved = day.won + day.lost;
+      var pct = resolved > 0 ? Math.round((day.won / resolved) * 100) : 0;
       summaryHtml += '<div class="perf-stat"><span>' + esc(day.date) + '</span><br><strong>' + day.won + '</strong>W / <strong>' + day.lost + '</strong>L' +
         (day.push ? ' / <strong>' + day.push + '</strong>P' : '') +
         ' <span style="color:var(--text-muted)">(' + pct + '%)</span></div>';
@@ -243,7 +244,7 @@
 
   async function loadHistory() {
     try {
-      var res = await fetch(API_BASE + '/api/author-picks/history?days=2', { mode: 'cors', cache: 'no-store' });
+      var res = await fetch(API_BASE + '/api/author-picks/history?days=3', { mode: 'cors', cache: 'no-store' });
       var data = await res.json();
       renderHistory(data);
     } catch (e) {
