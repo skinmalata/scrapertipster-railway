@@ -110,9 +110,7 @@
 <h1>Author Picks <span class="sr-only">- Expert Football Predictions &amp; Match Analysis</span></h1>
 
 <div class="meta-row">
-<span id="matchCount">-</span>
-<span id="analyzedCount">-</span>
-<span id="generatedAt">-</span>
+<span>Author Picks are selected based on head-to-head (H2H) analysis.</span>
 </div>
 </div>
 
@@ -177,16 +175,11 @@
     var content = document.getElementById('content');
 
     if (!data || !data.matches || !data.matches.length) {
-      content.innerHTML = '<div class="empty-state"><h2>No matches analyzed</h2><p>Not enough fixture data available to build the pool right now.</p></div>';
-      document.getElementById('matchCount').textContent = '0 matches';
-      document.getElementById('analyzedCount').textContent = '0 analyzed';
+      document.getElementById('content').innerHTML = '<div class="empty-state"><h2>No matches analyzed</h2><p>Not enough fixture data available to build the pool right now.</p></div>';
       return;
     }
 
     var isPro = !!data.isPro;
-    document.getElementById('matchCount').textContent = data.totalFixtures + ' total fixtures';
-    document.getElementById('analyzedCount').textContent = data.analyzedFixtures + ' qualified';
-    document.getElementById('generatedAt').textContent = data.generatedAt ? new Date(data.generatedAt).toLocaleTimeString('en-NG', { timeZone: 'Africa/Lagos', hour: '2-digit', minute: '2-digit' }) + ' WAT' : '';
 
     var byMarket = {};
     data.matches.forEach(function(m) {
