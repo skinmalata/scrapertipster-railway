@@ -1731,23 +1731,60 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
   }
 });
 
-// GET /api/author-picks — all today's fixtures with best tip per match
-router.get('/author-picks', async function (req, res) {
+async function resolveIsPro(req) {
+  if (!req.user) return false;
+  try {
+    var prof = await supabase.from('profiles').select('vip_status, vip_expires_at').eq('id', req.user.id).single();
+    return !!(prof.data && (prof.data.vip_status === 'vip' || prof.data.vip_status === 'admin') && (!prof.data.vip_expires_at || new Date(prof.data.vip_expires_at) > new Date()));
+  } catch (e) { return false; }
+}
+
+// GET /api/author-picks — all today's fixtures with best tip per match.
+// Free users get a preview of only 4 tips; Pro members see all picks.
+router.get('/author-picks', optionalAuth, async function (req, res) {
   try {
     var data = await buildGiantPool();
-    res.json(data);
+    var isPro = await resolveIsPro(req);
+    var matches = data.matches || [];
+    var payload = {
+      matches: matches,
+      totalFixtures: data.totalFixtures,
+      analyzedFixtures: data.analyzedFixtures,
+      generatedAt: data.generatedAt,
+      isPro: isPro
+    };
+    if (!isPro) {
+      payload.totalTips = matches.length;
+      payload.matches = matches.slice(0, 4);
+    }
+    res.json(payload);
   } catch (e) {
     console.error('[author-picks] Error:', e.message);
     res.status(500).json({ error: 'Failed to build author picks' });
   }
 });
 
-// GET /api/author-picks/history — past performance
-router.get('/author-picks/history', async function (req, res) {
+// GET /api/author-picks/history — past performance.
+// Free users get a preview of only 4 tips per day.
+router.get('/author-picks/history', optionalAuth, async function (req, res) {
   try {
     var days = Math.min(5, Math.max(1, parseInt(req.query.days, 10) || 3));
     var data = await getGiantPoolHistory(days);
-    res.json({ days: data });
+    var isPro = await resolveIsPro(req);
+    if (!isPro) {
+      data = (data || []).map(function (day) {
+        var matches = (day.matches || []).slice(0, 4);
+        var won = 0, lost = 0, push = 0, pending = 0;
+        matches.forEach(function (m) {
+          if (m.outcome === 'won') won++;
+          else if (m.outcome === 'lost') lost++;
+          else if (m.outcome === 'push') push++;
+          else pending++;
+        });
+        return Object.assign({}, day, { matches: matches, won: won, lost: lost, push: push, pending: pending });
+      });
+    }
+    res.json({ days: data, isPro: isPro });
   } catch (e) {
     console.error('[author-picks/history] Error:', e.message);
     res.status(500).json({ error: 'Failed to load history' });

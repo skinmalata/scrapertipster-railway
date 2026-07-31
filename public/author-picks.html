@@ -50,6 +50,14 @@
   .outcome-pending { background: rgba(250,204,21,0.15); color: #facc15; }
   .h2h-row { display: flex; gap: 6px; font-size: 16px; color: #facc15; font-weight: 700; justify-content: center; margin-top: 4px; }
   .h2h-row span { display: flex; align-items: center; gap: 3px; }
+  .gate-banner { max-width: 640px; margin: 0 auto 28px; padding: 28px 24px; text-align: center; background: linear-gradient(135deg, rgba(250,204,21,0.06), rgba(17,22,36,0.9)); border: 1px solid rgba(250,204,21,0.25); border-radius: 14px; }
+  .gate-banner .gb-icon { font-size: 32px; margin-bottom: 8px; }
+  .gate-banner .gb-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+  .gate-banner p { font-size: 14px; color: var(--text-dim); line-height: 1.7; margin-bottom: 16px; }
+  .gate-banner .gb-btn { display: inline-block; background: linear-gradient(135deg, #ff2448, #d41a38); color: #fff; font-size: 14px; font-weight: 700; padding: 11px 32px; border-radius: 8px; text-decoration: none; }
+  .gate-banner .gb-btn:hover { opacity: 0.9; }
+  .locked-grid { margin-top: 12px; }
+  .pick-card.locked { opacity: 0.45; display: flex; align-items: center; justify-content: center; min-height: 110px; color: var(--text-dim); font-size: 13px; gap: 8px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; }
   .empty-state { text-align: center; padding: 60px 20px; border: 1px dashed var(--border); border-radius: var(--radius-lg); }
   .empty-state h2 { font-size: 20px; margin-bottom: 8px; color: var(--text-primary); }
   .empty-state p { color: var(--text-muted); }
@@ -113,7 +121,7 @@
 <details class="faq-item"><summary>How is each pick determined?</summary><p>Each fixture is evaluated using head-to-head history, recent team form, and matchup-specific statistical models. Markets compete on confidence score, and the highest-confidence selection per match is chosen. Only one market per fixture is used to avoid correlated picks.</p></details>
 <details class="faq-item"><summary>What markets does Author Picks cover?</summary><p>Author Picks scans Match Winner (1X2), Goals Over/Under, Both Teams to Score (BTTS), Draw No Bet (DNB), Corners, and Cards. The best-performing market for each individual fixture is selected based on historical and statistical strength.</p></details>
 <details class="faq-item"><summary>How is historical accuracy tracked?</summary><p>Each day's published picks are matched against actual match results the following day. Picks are marked Won, Lost, Push, or Pending depending on the outcome. The Performance section below shows win/loss records for recent days with full match details.</p></details>
-<details class="faq-item"><summary>Is this feature free?</summary><p>Yes, Author Picks is completely free. All predictions, market data, and the performance history are shown without any paywall or VIP gate. WinFulltime provides analytical information only and does not accept bets.</p></details>
+<details class="faq-item"><summary>Is this feature free?</summary><p>Free accounts get a preview of 4 Author Picks per day. Upgrading to Pro unlocks the full pool of analyzed fixtures across every market, plus complete results history and performance. WinFulltime provides analytical information only and does not accept bets.</p></details>
 <details class="faq-item"><summary>Are these predictions guaranteed?</summary><p>No prediction is guaranteed. Author Picks are based on statistical analysis and historical data, but all sports betting carries risk. Past performance does not guarantee future results. Please gamble responsibly.</p></details>
 </div>
 </section>
@@ -140,6 +148,22 @@
     } catch (e) { return ''; }
   }
 
+  function gateBanner() {
+    return '<div class="gate-banner">' +
+      '<div class="gb-icon">&#128274;</div>' +
+      '<div class="gb-title">Pro Members Only</div>' +
+      '<p>Free accounts see only <strong>4 preview tips</strong> from today\'s Author Picks. Upgrade to Pro to unlock the full pool of analyzed fixtures across every market, plus complete results history and performance.</p>' +
+      '<a href="/pricing.html" class="gb-btn">Go Pro &rarr;</a>' +
+      '</div>';
+  }
+
+  function buildLockedGrid(lockedCount) {
+    if (!lockedCount || lockedCount <= 0) return '';
+    return '<div class="picks-grid locked-grid">' +
+      '<div class="pick-card locked"><span>&#128274;</span> ' + lockedCount + ' more Author Picks &mdash; Pro only</div>' +
+      '</div>';
+  }
+
   function render(data) {
     var content = document.getElementById('content');
 
@@ -150,6 +174,7 @@
       return;
     }
 
+    var isPro = !!data.isPro;
     document.getElementById('matchCount').textContent = data.totalFixtures + ' total fixtures';
     document.getElementById('analyzedCount').textContent = data.analyzedFixtures + ' qualified';
     document.getElementById('generatedAt').textContent = data.generatedAt ? new Date(data.generatedAt).toLocaleTimeString('en-NG', { timeZone: 'Africa/Lagos', hour: '2-digit', minute: '2-digit' }) + ' WAT' : '';
@@ -164,7 +189,10 @@
     }).join('');
     document.getElementById('statsBar').innerHTML = statsHtml;
 
-    content.innerHTML = '<div class="matches-grid">' + data.matches.map(function(m, i) {
+    var lockedCount = isPro ? 0 : (Number(data.totalTips) || data.matches.length) - data.matches.length;
+    var html = '';
+    if (!isPro) html += gateBanner();
+    html += '<div class="matches-grid">' + data.matches.map(function(m, i) {
       var liveHtml = m.isLive ? '<span>' + (m.minute ? esc(m.minute) + "'" : 'Live') + '</span>' : '<span>' + formatTime(m.kickoff) + '</span>';
 
       var home = esc(m.home);
@@ -187,6 +215,8 @@
         '</div>' +
         '</div>';
     }).join('') + '</div>';
+    html += buildLockedGrid(lockedCount);
+    content.innerHTML = html;
   }
 
   function renderHistory(data) {
@@ -243,8 +273,19 @@
 
   async function loadHistory() {
     try {
-      var res = await fetch(API_BASE + '/api/author-picks/history?days=3', { mode: 'cors', cache: 'no-store' });
-      var data = await res.json();
+      var data;
+      if (window.WFT && window.WFT.apiFetch) {
+        data = await window.WFT.apiFetch('/api/author-picks/history?days=3');
+      } else {
+        var res = await fetch(API_BASE + '/api/author-picks/history?days=3', { mode: 'cors', cache: 'no-store' });
+        data = await res.json();
+      }
+      if (data && !data.isPro && data.days && data.days.length) {
+        var note = '<div class="empty-state" style="grid-column:1/-1"><h2>Full history is Pro only</h2><p>Upgrade to Pro to see the complete Author Picks results history and performance.</p><a href="/pricing.html" class="gb-btn">Go Pro &rarr;</a></div>';
+        document.getElementById('perfGrid').innerHTML = note;
+        document.getElementById('perfSummary').innerHTML = '';
+        return;
+      }
       renderHistory(data);
     } catch (e) {
       document.getElementById('perfGrid').innerHTML = '<div class="empty-state" style="grid-column:1/-1"><h2>History unavailable</h2></div>';
@@ -253,8 +294,13 @@
 
   async function load() {
     try {
-      var res = await fetch(API_BASE + '/api/author-picks', { mode: 'cors', cache: 'no-store' });
-      var data = await res.json();
+      var data;
+      if (window.WFT && window.WFT.apiFetch) {
+        data = await window.WFT.apiFetch('/api/author-picks');
+      } else {
+        var res = await fetch(API_BASE + '/api/author-picks', { mode: 'cors', cache: 'no-store' });
+        data = await res.json();
+      }
       render(data);
     } catch (e) {
       document.getElementById('content').innerHTML = '<div class="empty-state"><h2>Failed to load</h2><p>The pool is being built. Check back shortly.</p></div>';
@@ -262,7 +308,11 @@
     loadHistory();
   }
 
-  load();
+  if (window.WFT && window.WFT.onAuthReady) {
+    window.WFT.onAuthReady(function() { load(); });
+  } else {
+    load();
+  }
 })();
 </script>
 <script>
@@ -271,5 +321,9 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
   document.getElementById('nav')?.classList.toggle('open');
 });
 </script>
+<script src="/responsible-gambling.js"></script>
+<script src="/config.js"></script>
+<script src="/supabase-client.js"></script>
+<script src="/auth.js?v=20260801"></script>
 </body>
 </html>
