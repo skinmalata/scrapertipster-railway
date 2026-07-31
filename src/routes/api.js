@@ -1460,25 +1460,8 @@ var DATA_ROOT = process.env.RAILWAY_VOLUME_MOUNT_PATH || process.env.RENDER_DISK
 
 router.get('/best-picks', optionalAuth, async function (req, res) {
   try {
-    var isPro = false;
-    if (req.user) {
-      try {
-        var prof = await supabase.from('profiles').select('vip_status, vip_expires_at').eq('id', req.user.id).single();
-        isPro = !!(prof.data && (prof.data.vip_status === 'vip' || prof.data.vip_status === 'admin') && (!prof.data.vip_expires_at || new Date(prof.data.vip_expires_at) > new Date()));
-      } catch (e) {}
-    }
-
     function applyTier(payload) {
-      if (!isPro) {
-        payload = {
-          ...payload,
-          today: (payload.today || []).filter(function(p) { return p.type === '1x2' || p.type === 'over15'; }),
-          history: (payload.history || []).map(function(day) {
-            return { date: day.date, picks: (day.picks || []).filter(function(p) { return p.type === '1x2' || p.type === 'over15'; }) };
-          })
-        };
-      }
-      payload.isPro = !!isPro;
+      payload.isPro = true;
       return payload;
     }
 
