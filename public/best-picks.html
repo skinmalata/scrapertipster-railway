@@ -265,9 +265,6 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
         '<div class="pick-category">' + escapeHtml(p.category) + '</div>' +
         '<div class="pick-match">' + escapeHtml(p.match) + '</div>' +
         '<div><span class="pick-tip">' + escapeHtml(p.tip) + '</span></div>' +
-        '<div class="pick-prob">' + p.probability + '%</div>' +
-        '<div class="pick-prob-label">confidence</div>' +
-        (p.league ? '<div class="pick-meta">' + escapeHtml(p.league) + (p.time ? ' &middot; ' + escapeHtml(p.time) : '') + '</div>' : '') +
         '</div>';
     }).join('') + '</div>';
   }
