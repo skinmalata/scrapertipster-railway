@@ -77,6 +77,7 @@ function headerHtml(activePath) {
 }
 
 const HEADER_STYLE_OVERRIDE = `
+<!-- wf-layout-styles -->
 <style>
 body > header, header {
   background: rgba(24,30,48,0.85);
@@ -194,8 +195,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 const SKIP_PAGES = new Set(['admin.html', 'app.html', 'offline.html']);
 
 function applyLayout(html, req) {
-  const activePath = (req && req.path) || '/';
+  return applyLayoutToHtml(html, (req && req.path) || '/');
+}
 
+function applyLayoutToHtml(html, activePath) {
   const navRe = /(<nav id="nav">)[\s\S]*?(<\/nav>)/;
   const footerRe = /(<footer[^>]*>)[\s\S]*?(<\/footer>)/;
 
@@ -211,7 +214,7 @@ function applyLayout(html, req) {
 
   // 2. Pages that don't load app.css need the header/theme styles so the
   //    injected header + theme toggle render like the rest of the site.
-  if (!/app\.css/.test(html)) {
+  if (!/app\.css/.test(html) && !/wf-layout-styles/.test(html)) {
     html = html.replace(/<\/head>/i, HEADER_STYLE_OVERRIDE + '\n</head>');
   }
 
@@ -310,4 +313,4 @@ function staticWithLayout(req, res, next, publicDir) {
   }
 }
 
-module.exports = { applyLayout, staticWithLayout };
+module.exports = { applyLayout, applyLayoutToHtml, staticWithLayout, SKIP_PAGES };

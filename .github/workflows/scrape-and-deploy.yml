@@ -9,6 +9,8 @@ on:
       - main
     paths:
       - 'public/**'
+      - 'src/templates/**'
+      - 'scripts/bake-layout.js'
       - '.github/workflows/scrape-and-deploy.yml'
   schedule:
     - cron: '3 0 * * *'
@@ -56,6 +58,9 @@ jobs:
 
       - name: Run scraper
         run: node scripts/gh-pages-scraper.js
+
+      - name: Bake shared nav/footer layout into static pages
+        run: node scripts/bake-layout.js
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
