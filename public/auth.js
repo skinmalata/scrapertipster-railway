@@ -79,6 +79,23 @@
         var SUPABASE_URL = 'https://xogkqpjtxfemcxzsuwke.supabase.co';
         var ANON_KEY = 'sb_publishable_VydS1cmw7_OhFa7e-xUOqQ_tcVRUQoy';
         var headers = { 'Authorization': 'Bearer ' + tok, 'apikey': ANON_KEY };
+
+        function verifyWithBackend() {
+          return WFT.apiFetch('/api/me/subscription').then(function(d) {
+            if (userState.user && d && d.isPro) {
+              userState.user.isPro = true;
+              userState.user.isAdmin = !!(d.isAdmin);
+              if (d.expiresAt) userState.user.expiresAt = d.expiresAt;
+              if (d.plan) userState.user.plan = d.plan;
+              console.log('[scheduleProFetch] Backend confirmed Pro:', d.isPro, d.plan);
+            } else {
+              console.log('[scheduleProFetch] Backend also says not Pro:', d && d.isPro);
+            }
+          }).catch(function(e) {
+            console.warn('[scheduleProFetch] Backend fallback failed:', e);
+          });
+        }
+
         console.log('[scheduleProFetch] Fetching profile for', userState.user.id);
         fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.' + userState.user.id + '&select=vip_status,vip_expires_at', {
           headers: headers
@@ -119,6 +136,9 @@
               updateUI(userState.user);
             }
           }
+          if (userState.user && !userState.user.isPro) {
+            return verifyWithBackend();
+          }
         }).catch(function(e) {
           console.warn('[scheduleProFetch] Error:', e);
           if (userState.user) {
@@ -126,6 +146,7 @@
             userState.user.isAdmin = false;
             updateUI(userState.user);
           }
+          return verifyWithBackend();
         }).finally(function() {
           console.log('[scheduleProFetch] Dispatching wft-pro-status, isPro:', userState.user ? userState.user.isPro : 'no user');
           document.dispatchEvent(new CustomEvent('wft-pro-status'));
