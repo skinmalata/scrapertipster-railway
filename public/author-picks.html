@@ -56,6 +56,11 @@
   .gate-banner p { font-size: 14px; color: var(--text-dim); line-height: 1.7; margin-bottom: 16px; }
   .gate-banner .gb-btn { display: inline-block; background: linear-gradient(135deg, #ff2448, #d41a38); color: #fff; font-size: 14px; font-weight: 700; padding: 11px 32px; border-radius: 8px; text-decoration: none; }
   .gate-banner .gb-btn:hover { opacity: 0.9; }
+  .gate-banner .gb-btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.18); color: rgba(232,237,245,0.9); }
+  .gate-banner .gb-btn-ghost:hover { border-color: rgba(255,255,255,0.35); box-shadow: none; }
+  .gate-banner .gb-trial-note { font-size: 14px; color: var(--text-dim); margin: 14px 0 0; }
+  .gate-banner .gb-sep { display: flex; align-items: center; gap: 12px; color: var(--text-dim); font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin: 18px 0 16px; }
+  .gate-banner .gb-sep::before, .gate-banner .gb-sep::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.1); }
   .locked-grid { margin-top: 12px; }
   .pick-card.locked { opacity: 0.45; display: flex; align-items: center; justify-content: center; min-height: 110px; color: var(--text-dim); font-size: 13px; gap: 8px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; }
   .pick-card.locked h1 { margin: 0; font-size: 16px; font-weight: 700; color: #fff; }
@@ -154,7 +159,10 @@
       '<div class="gb-icon">&#128274;</div>' +
       '<div class="gb-title">Pro Members Only</div>' +
       '<p>Free accounts see only <strong>4 preview tips</strong> from today\'s Author Picks. Upgrade to Pro to unlock the full pool of analyzed fixtures across every market, plus complete results history and performance.</p>' +
-      '<a href="/pricing.html" class="gb-btn">Go Pro &rarr;</a>' +
+      '<a href="/signup.html" class="gb-btn">Start 7-Day Free Trial &rarr;</a>' +
+      '<p class="gb-trial-note">New here? Create a free account and get a <strong>7-day Pro trial</strong> &mdash; no card required.</p>' +
+      '<p class="gb-sep">or</p>' +
+      '<a href="/pricing.html" class="gb-btn gb-btn-ghost">Go Pro &rarr;</a>' +
       '</div>';
   }
 
