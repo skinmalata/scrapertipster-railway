@@ -11,10 +11,11 @@ var WHOP_WEBHOOK_SECRET = process.env.WHOP_WEBHOOK_SECRET;
 
 // Whop plans are created per-checkout (inline plans), so there are no static variant
 // IDs. variantId is kept for interface parity with payment.js and filled after checkout.
+// Each plan references the product created in the Whop dashboard (WHOP_PRODUCT_* env vars).
 var PLANS = {
-  monthly: { name: 'Pro Monthly', price: '9.99', variantId: null, interval: 'monthly' },
-  yearly: { name: 'Pro Yearly', price: '79.99', variantId: null, interval: 'yearly' },
-  lifetime: { name: 'Lifetime Pro', price: '399.99', variantId: null, interval: null }
+  monthly: { name: 'Pro Monthly', price: '9.99', productId: 'prod_nefnMoSf6OLTC', interval: 'monthly' },
+  yearly: { name: 'Pro Yearly', price: '79.99', productId: 'prod_gfimWW2Emb3OA', interval: 'yearly' },
+  lifetime: { name: 'Lifetime Pro', price: '399.99', productId: 'prod_CyZONnoXIpkjz', interval: null }
 };
 
 var VARIANT_IDS = {}; // populated at runtime by createCheckout
@@ -33,9 +34,22 @@ function createCheckout(_a) {
   if (!PLANS[planType]) return Promise.reject(new Error('Invalid plan type'));
   var plan = PLANS[planType];
   if (!WHOP_COMPANY_ID) return Promise.reject(new Error('WHOP_COMPANY_ID not set'));
+  if (!plan.productId) return Promise.reject(new Error('WHOP_PRODUCT_' + planType.toUpperCase() + ' not set for ' + planType));
 
-  var planBody = { initial_price: Number(plan.price), plan_type: plan.interval ? 'renewal' : 'one_time' };
-  if (plan.interval) planBody.renewal_interval = plan.interval;
+  var planBody = {
+    product_id: plan.productId,
+    currency: 'usd',
+    plan_type: plan.interval ? 'renewal' : 'one_time',
+    force_create_new_plan: false
+  };
+  if (plan.interval) {
+    planBody.renewal_price = Number(plan.price);
+    planBody.initial_price = 0;
+    if (plan.interval === 'monthly') planBody.billing_period = 30;
+    if (plan.interval === 'yearly') planBody.billing_period = 365;
+  } else {
+    planBody.initial_price = Number(plan.price);
+  }
 
   return fetch(WHOP_API + '/checkout_configurations', {
     method: 'POST',
@@ -43,16 +57,18 @@ function createCheckout(_a) {
     body: JSON.stringify({
       company_id: WHOP_COMPANY_ID,
       plan: planBody,
-      metadata: { user_id: userId, plan_type: planType, email: email }
+      metadata: { user_id: userId, plan_type: planType, email: email },
+      redirect_url: returnUrl || 'https://winfulltime.com/account.html',
+      mode: 'payment'
     })
   }).then(function (res) { return res.json(); }).then(function (data) {
-    var config = (data && (data.checkout_configuration || data.data || data)) || null;
+    var config = data && (data.data || data);
     if (!config || !config.id) {
       throw new Error(data && data.error ? JSON.stringify(data.error) : 'Whop checkout creation failed');
     }
     var planId = (config.plan && config.plan.id) || plan.variantId;
     if (planId) VARIANT_IDS[planType] = planId;
-    var url = config.url || config.checkout_url || config.checkoutUrl || ('https://whop.com/checkout/' + config.id);
+    var url = config.purchase_url || config.url || config.checkout_url || config.checkoutUrl || ('https://whop.com/checkout/' + config.id);
     return {
       checkoutUrl: url,
       variantId: planId,
@@ -65,7 +81,9 @@ function createCheckout(_a) {
 
 // Standard Webhooks spec (https://github.com/standard-webhooks/standard-webhooks)
 // Signed content: "{webhook-id}.{webhook-timestamp}.{raw body}"
-// Secret: base64-decoded WHOP_WEBHOOK_SECRET; signature header "v1,<base64-hmac>"
+// Whop's dashboard secret is a plain-text string; the HMAC key is its raw UTF-8
+// bytes (Whop's SDK base64-encodes it before handing it to the verifier).
+// Signature header: "v1,<base64-hmac-sha256>" (may contain multiple, space-separated).
 function verifyWebhook(_a) {
   try {
     var rawBody = _a.rawBody, headers = _a.headers;
@@ -73,21 +91,27 @@ function verifyWebhook(_a) {
 
     var msgId = headers['webhook-id'];
     var timestamp = headers['webhook-timestamp'];
-    var signature = headers['webhook-signature'];
+    var signature = String(headers['webhook-signature'] || '');
     if (!msgId || !timestamp || !signature) return Promise.resolve(false);
     if (typeof rawBody !== 'string') return Promise.resolve(false);
 
-    var parts = String(signature).split(',');
-    if (parts[0] !== 'v1' || !parts[1]) return Promise.resolve(false);
+    var sigs = signature.split(',');
+    if (sigs[0] !== 'v1') return Promise.resolve(false);
+    var candidates = sigs.slice(1).join(',').trim().split(/\s+/).filter(Boolean);
+    if (!candidates.length) return Promise.resolve(false);
 
     var signedContent = msgId + '.' + timestamp + '.' + rawBody;
-    var secretBytes = Buffer.from(WHOP_WEBHOOK_SECRET, 'base64');
+    var secretBytes = Buffer.from(WHOP_WEBHOOK_SECRET, 'utf8');
     var hmac = crypto.createHmac('sha256', secretBytes).update(signedContent, 'utf8').digest('base64');
 
-    var a = Buffer.from(parts[1], 'base64');
-    var b = Buffer.from(hmac, 'base64');
-    if (a.length !== b.length) return Promise.resolve(false);
-    return Promise.resolve(crypto.timingSafeEqual(a, b));
+    var expected = Buffer.from(hmac, 'base64');
+    for (var i = 0; i < candidates.length; i++) {
+      var a = Buffer.from(candidates[i], 'base64');
+      if (a.length === expected.length && crypto.timingSafeEqual(a, expected)) {
+        return Promise.resolve(true);
+      }
+    }
+    return Promise.resolve(false);
   } catch (e) {
     return Promise.resolve(false);
   }
