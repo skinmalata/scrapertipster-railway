@@ -180,15 +180,15 @@ tbody tr:last-child td { border-bottom: none; }
 </div>
 
 <div class="action-bar">
-      <button class="action-btn action-pro" onclick="setVip('monthly')">Set Monthly</button>
-            <button class="action-btn action-pro" onclick="setVip('yearly')">Set Yearly</button>
-            <button class="action-btn action-pro" onclick="setVip('lifetime')">Set Lifetime</button>
-            <button class="action-btn action-extend" onclick="extendVip()">Extend 30d</button>
-            <button class="action-btn action-revoke" onclick="revokeVip()">Revoke VIP</button>
-            <button class="action-btn action-pro" onclick="setAdmin()" style="background:linear-gradient(135deg,#a855f7,#7c3aed);">Set Admin</button>
-            <button class="action-btn action-revoke" onclick="revokeAdmin()">Revoke Admin</button>
-            <button class="action-btn action-extend" onclick="openEdit()" style="background:linear-gradient(135deg,#38bdf8,#0284c7);">Edit User</button>
-            <button class="action-btn action-revoke" onclick="deleteUser()">Delete User</button>
+      <button id="btnSetMonthly" class="action-btn action-pro" onclick="setVip('monthly')">Set Monthly</button>
+            <button id="btnSetYearly" class="action-btn action-pro" onclick="setVip('yearly')">Set Yearly</button>
+            <button id="btnSetLifetime" class="action-btn action-pro" onclick="setVip('lifetime')">Set Lifetime</button>
+            <button id="btnExtend" class="action-btn action-extend" onclick="extendVip()">Extend 30d</button>
+            <button id="btnRevokeVip" class="action-btn action-revoke" onclick="revokeVip()">Revoke VIP</button>
+            <button id="btnSetAdmin" class="action-btn action-pro" onclick="setAdmin()" style="background:linear-gradient(135deg,#a855f7,#7c3aed);">Set Admin</button>
+            <button id="btnRevokeAdmin" class="action-btn action-revoke" onclick="revokeAdmin()">Revoke Admin</button>
+            <button id="btnEdit" class="action-btn action-extend" onclick="openEdit()" style="background:linear-gradient(135deg,#38bdf8,#0284c7);">Edit User</button>
+            <button id="btnDelete" class="action-btn action-revoke" onclick="deleteUser()">Delete User</button>
 </div>
 
 <div id="editPanel" class="edit-panel hidden">
@@ -211,6 +211,7 @@ tbody tr:last-child td { border-bottom: none; }
 var WFT = window.WFT;
 var curPage = 1;
 var selectedUserId = null;
+var selectedSelfId = null;
 
 function showError(msg) {
   var el = document.getElementById('errorBox');
@@ -301,6 +302,14 @@ function selectUser(id, email, name, status, expires, joined, plan) {
   document.getElementById('detPlan').textContent = plan || '-';
   document.getElementById('detExpires').textContent = expires ? new Date(expires).toLocaleString() : '-';
   document.getElementById('detJoined').textContent = joined ? new Date(joined).toLocaleString() : '-';
+
+  var isAdmin = status === 'admin';
+  ['btnSetMonthly', 'btnSetYearly', 'btnSetLifetime', 'btnExtend', 'btnRevokeVip', 'btnDelete'].forEach(function(btnId) {
+    var el = document.getElementById(btnId);
+    if (el) el.style.display = isAdmin ? 'none' : '';
+  });
+  var revokeAdminBtn = document.getElementById('btnRevokeAdmin');
+  if (revokeAdminBtn) revokeAdminBtn.style.display = isAdmin && id !== selectedSelfId ? '' : 'none';
 }
 
 function setVip(planType) {
@@ -474,6 +483,7 @@ function initWithUser(user) {
     document.getElementById('accessDenied').innerHTML = '<h2>Sign In Required</h2><p>Please sign in to access the admin panel.</p><p style="margin-top:16px;"><a href="/login.html" style="color:#ff2448;">Sign In</a></p>';
     return;
   }
+  selectedSelfId = user.id;
 
   // Directly check admin status via API (bypasses shared auth.js fetchProStatus)
   window.WFT.supabase.auth.getSession().then(function(sessionResult) {

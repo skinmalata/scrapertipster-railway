@@ -2171,8 +2171,11 @@ router.post('/admin/users/:id/set-vip', requireAdmin, async function (req, res) 
       return res.status(400).json({ error: 'Invalid plan type' });
     }
 
-    var targetProfile = await supabase.from('profiles').select('email').eq('id', userId).single();
+    var targetProfile = await supabase.from('profiles').select('email, vip_status').eq('id', userId).single();
     if (targetProfile.error) return res.status(404).json({ error: 'User not found' });
+    if (targetProfile.data.vip_status === 'admin') {
+      return res.status(400).json({ error: 'Cannot change VIP on an admin account' });
+    }
 
     var expiryDate = expiresAt ? new Date(expiresAt) : new Date();
     if (!expiresAt) {
@@ -2216,7 +2219,11 @@ router.post('/admin/users/:id/revoke-vip', requireAdmin, async function (req, re
 
     var userId = req.params.id;
 
-    var targetProfile = await supabase.from('profiles').select('email').eq('id', userId).single();
+    var targetProfile = await supabase.from('profiles').select('email, vip_status').eq('id', userId).single();
+    if (targetProfile.error) return res.status(404).json({ error: 'User not found' });
+    if (targetProfile.data.vip_status === 'admin') {
+      return res.status(400).json({ error: 'Cannot revoke VIP on an admin account' });
+    }
 
     await supabase.from('subscriptions')
       .update({ payment_status: 'cancelled', cancelled_at: new Date().toISOString() })
@@ -2226,9 +2233,7 @@ router.post('/admin/users/:id/revoke-vip', requireAdmin, async function (req, re
     var rpcResult = await supabase.rpc('revoke_vip_status', { user_uuid: userId });
     if (rpcResult.error) return res.status(500).json({ error: rpcResult.error.message });
 
-    if (!targetProfile.error) {
-      logAdminAction(req.user, 'revoke_vip', userId, targetProfile.data.email);
-    }
+    logAdminAction(req.user, 'revoke_vip', userId, targetProfile.data.email);
 
     res.json({ success: true });
   } catch (e) {
@@ -2245,8 +2250,11 @@ router.post('/admin/users/:id/extend-vip', requireAdmin, async function (req, re
     var userId = req.params.id;
     var days = Math.max(1, Math.min(3650, parseInt(req.body.days, 10) || 30));
 
-    var prof = await supabase.from('profiles').select('vip_expires_at, email').eq('id', userId).single();
+    var prof = await supabase.from('profiles').select('vip_expires_at, email, vip_status').eq('id', userId).single();
     if (prof.error) return res.status(404).json({ error: 'User not found' });
+    if (prof.data.vip_status === 'admin') {
+      return res.status(400).json({ error: 'Cannot extend VIP on an admin account' });
+    }
 
     var currentExpiry = prof.data && prof.data.vip_expires_at ? new Date(prof.data.vip_expires_at) : new Date();
     if (currentExpiry < new Date()) currentExpiry = new Date();
