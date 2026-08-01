@@ -8,7 +8,7 @@ const axios = require('axios');
 const apiRoutes = require('./src/routes/api');
 const chatRoutes = require('./src/routes/chat');
 const { applyLayout, staticWithLayout } = require('./src/templates/layout');
-const { forceRestartIfMemoryCritical } = require('./src/services/memoryGuard');
+const { forceRestartIfMemoryCritical, startMemoryWatchdog } = require('./src/services/memoryGuard');
 
 // On small Render instances Node's heap limit is auto-tuned close to the
 // container ceiling; crossing it aborts the process (SIGABRT → exit 134),
@@ -24,6 +24,11 @@ process.on('uncaughtException', (err) => {
 process.on('unhandledRejection', (reason) => {
   console.error('[unhandledRejection]', reason && reason.stack ? reason.stack : reason);
 });
+
+// Sample heap every 500ms so a fast mid-job memory spike (e.g. the 6h Author
+// Picks build or 12h prediction refresh) triggers a clean restart BEFORE V8's
+// ceiling aborts the process (exit 134).
+startMemoryWatchdog();
 
 const YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@winfulltime/videos';
 
