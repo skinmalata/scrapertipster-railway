@@ -1889,6 +1889,7 @@ nav.open { display: flex !important; }
 <script src="/supabase-client.js"></script>
 
 <script src="/auth.js?v=20260801"></script>
+<script src="/ticket-builder-core.js?v=20260801"></script>
 
   <script>
   (function() { var WFT = window.WFT;
@@ -1992,6 +1993,12 @@ nav.open { display: flex !important; }
   }
 
   async function generateTickets(shuffle) {
+    var user = WFT.getUser();
+    if (!(user && user.isPro)) {
+      applyAccess();
+      return;
+    }
+
     var target = parseFloat(document.getElementById('ticketTarget').value);
     var minOdds = 1.20;
     var maxOdds = 100;
@@ -2011,59 +2018,71 @@ nav.open { display: flex !important; }
 
     results.innerHTML = '<div class="loading"><div class="progress-bar-container"><div class="progress-bar"></div></div><div class="loading-text">Building tickets...</div></div>';
 
-    var payload = {
-      targetOdds: target,
-      minOddsPerLeg: minOdds,
-      maxOddsPerLeg: maxOdds,
-      numLegs: numLegs,
-      safeOnly: safeTips,
-      markets: selectedMarkets,
-      todayOnly: todayOnly,
-      shuffle: shuffle === true
-    };
-
-    function postGenerate(ms) {
-      return new Promise(function(resolve, reject) {
-        var ctrl = new AbortController();
-        var timer = setTimeout(function() { ctrl.abort(); reject(new Error('Request timed out')); }, ms);
-        WFT.apiFetch('/api/ticket-builder/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-          signal: ctrl.signal
-        }).then(function(d) { clearTimeout(timer); resolve(d); }, function(e) { clearTimeout(timer); reject(e); });
-      });
+    var core = window.WFTTicketBuilder;
+    if (!core) {
+      results.innerHTML = '<div class="no-matches"><p>The ticket builder engine is not loaded yet. Please refresh the page.</p></div>';
+      return;
     }
 
-    var lastErr = null;
-    var attempt;
-    for (attempt = 0; attempt < 2; attempt++) {
-      try {
-        var res = await postGenerate(30000);
+    function fetchJson(url, timeoutMs) {
+      var ctrl = new AbortController();
+      var timer = setTimeout(function() { ctrl.abort(); }, timeoutMs);
+      return fetch(url, { signal: ctrl.signal, cache: 'no-store' }).then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      }).finally(function() { clearTimeout(timer); });
+    }
 
-        if (res.error) {
-          results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(res.error) + '</p></div>';
-          return;
-        }
+    var date = core.watDate();
 
-        if (!res.available) {
-          results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(res.reason || 'No tickets could be generated with the current settings. Try adjusting the target odds, number of legs, or odds range.') + '</p></div>';
-          return;
-        }
+    try {
+      var pred = null;
+      var unbeaten = null;
+      var oddsResponse = null;
 
-        renderTickets(res);
+      var dataResults = await Promise.allSettled([
+        fetchJson('/data/predictions.json', 20000),
+        fetchJson('/data/h2h-unbeaten.json', 15000)
+      ]);
+      if (dataResults[0].status === 'fulfilled') pred = dataResults[0].value;
+      if (dataResults[1].status === 'fulfilled') unbeaten = dataResults[1].value;
+
+      if (!pred || !Array.isArray(pred.matches)) {
+        results.innerHTML = '<div class="no-matches"><p>Pre-match data is not available yet. Please try again shortly.</p></div>';
         return;
-      } catch (e) {
-        lastErr = e;
-        if (attempt === 0) {
-          results.innerHTML = '<div class="loading"><div class="progress-bar-container"><div class="progress-bar"></div></div><div class="loading-text">Still building... service is warming up</div></div>';
-          await new Promise(function(r) { setTimeout(r, 2500); });
-        }
       }
-    }
 
-    console.error('[ticket-builder] Generate failed after retries:', lastErr);
-    results.innerHTML = '<div class="no-matches"><p>Unable to generate tickets. The service may still be warming up. Please try again in a few seconds.</p></div>';
+      var oddsResult = await Promise.allSettled([
+        fetchJson((window.WFT_API || 'https://winfulltime-api.onrender.com') + '/api/football-odds?date=' + encodeURIComponent(date), 6000)
+      ]);
+      if (oddsResult[0].status === 'fulfilled' && oddsResult[0].value && Array.isArray(oddsResult[0].value.response)) {
+        oddsResponse = oddsResult[0].value.response;
+      }
+
+      var res = core.build(pred, {
+        date: date,
+        oddsResponse: oddsResponse,
+        markets: selectedMarkets,
+        safeOnly: safeTips,
+        numLegs: numLegs,
+        maxOdds: maxOdds,
+        minOddsPerLeg: minOdds,
+        maxOddsPerLeg: maxOdds,
+        targetOdds: target,
+        shuffle: shuffle === true,
+        unbeatenData: unbeaten
+      });
+
+      if (!res.available) {
+        results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(res.reason || 'No tickets could be generated with the current settings. Try adjusting the target odds, number of legs, or odds range.') + '</p></div>';
+        return;
+      }
+
+      renderTickets(res);
+    } catch (e) {
+      console.error('[ticket-builder] Generate failed:', e);
+      results.innerHTML = '<div class="no-matches"><p>Unable to generate tickets. Please try again in a few seconds.</p></div>';
+    }
   }
 
   function shuffleTickets() {
