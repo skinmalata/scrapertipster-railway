@@ -1501,11 +1501,12 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
     var TODAY_FM = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     var TODAY_SYSTEM = new Date().toISOString().slice(0, 10);
     var CACHE_PATH = path.join(CACHE_DIR, TODAY_FM + '.json');
+    var CACHE_VERSION = 3;
 
-    // Serve from cache if exists and has picks
+    // Serve from cache if exists, has picks, and was written by this build.
     try {
       var cached = JSON.parse(fs.readFileSync(CACHE_PATH, 'utf8'));
-      if (cached && cached.generatedAt && cached.today && cached.today.length > 0) {
+      if (cached && cached.cacheVersion === CACHE_VERSION && cached.generatedAt && cached.today && cached.today.length > 0) {
         return res.json(applyTier(cached));
       }
     } catch (e) {}
@@ -1859,7 +1860,7 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
       }
     }
 
-    var payload = { today: todayPicks, history: history, generatedAt: new Date().toISOString() };
+    var payload = { today: todayPicks, history: history, generatedAt: new Date().toISOString(), cacheVersion: CACHE_VERSION };
     try { fs.writeFileSync(CACHE_PATH, JSON.stringify(payload), 'utf8'); } catch (e) {}
     res.json(applyTier(payload));
   } catch (e) {
