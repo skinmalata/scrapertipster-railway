@@ -29,7 +29,7 @@ function whopHeaders() {
 }
 
 function createCheckout(_a) {
-  var userId = _a.userId, email = _a.email, planType = _a.planType, returnUrl = _a.returnUrl;
+  var userId = _a.userId, email = _a.email, planType = _a.planType, returnUrl = _a.returnUrl, regToken = _a.regToken, fullName = _a.fullName;
 
   if (!PLANS[planType]) return Promise.reject(new Error('Invalid plan type'));
   var plan = PLANS[planType];
@@ -52,12 +52,23 @@ function createCheckout(_a) {
     planBody.initial_price = Number(plan.price);
   }
 
+  // Registration checkout: there is no account yet, so the custom metadata
+  // carries a registration token instead of a user id. The webhook uses it to
+  // create the account after payment succeeds (paywall-first signup).
+  var metadata = { plan_type: planType, email: email };
+  if (regToken) {
+    metadata.reg_token = regToken;
+    metadata.full_name = fullName || '';
+  } else {
+    metadata.user_id = userId;
+  }
+
   return fetch(WHOP_API + '/checkout_configurations', {
     method: 'POST',
     headers: whopHeaders(),
     body: JSON.stringify({
       plan: planBody,
-      metadata: { user_id: userId, plan_type: planType, email: email },
+      metadata: metadata,
       redirect_url: returnUrl || 'https://winfulltime.com/account.html',
       mode: 'payment'
     })
@@ -170,7 +181,22 @@ function onPaymentSucceeded(data, event) {
   var planType = meta.plan_type || 'lifetime';
   var email = meta.email || (data && data.email) || (data && data.member && data.member.email) || '';
   var paymentId = String(data.id || '');
-  if (!userId || !paymentId) return Promise.resolve({ handled: false, reason: 'Missing user_id or payment id' });
+  if (!paymentId) return Promise.resolve({ handled: false, reason: 'Missing payment id' });
+
+  // Paywall-first signup: no account exists yet. Create it after payment.
+  if (!userId && meta.reg_token) {
+    return completeRegistration({
+      regToken: meta.reg_token,
+      email: email || '',
+      fullName: meta.full_name || '',
+      planType: planType,
+      providerId: paymentId,
+      expiresAt: computeExpiry(planType),
+      amount: amountOf(data, planType)
+    });
+  }
+
+  if (!userId) return Promise.resolve({ handled: false, reason: 'Missing user_id or reg_token' });
   var amount = amountOf(data, planType);
   return recordPayment(userId, email, planType, paymentId, computeExpiry(planType), amount);
 }
@@ -181,12 +207,89 @@ function onMembershipActivated(data, event) {
   var planType = meta.plan_type || (data && data.plan && data.plan.plan_type) || 'monthly';
   var email = meta.email || (data && ((data.user && data.user.email) || (data.member && data.member.email) || data.email)) || '';
   var membershipId = String(data.id || '');
-  if (!userId || !membershipId) return Promise.resolve({ handled: false, reason: 'Missing user_id or membership id' });
+  if (!membershipId) return Promise.resolve({ handled: false, reason: 'Missing membership id' });
+
+  // Paywall-first signup: no account exists yet. Create it after payment.
+  if (!userId && meta.reg_token) {
+    return completeRegistration({
+      regToken: meta.reg_token,
+      email: email || '',
+      fullName: meta.full_name || '',
+      planType: planType,
+      providerId: membershipId,
+      expiresAt: data.expires_at || data.expires || data.end_at ? (new Date(data.expires_at || data.expires || data.end_at)) : computeExpiry(planType),
+      amount: amountOf(data, planType)
+    });
+  }
+
+  if (!userId) return Promise.resolve({ handled: false, reason: 'Missing user_id or reg_token' });
   var expiresAt = data.expires_at || data.expires || data.end_at;
   if (!expiresAt) expiresAt = computeExpiry(planType);
   else expiresAt = new Date(expiresAt);
   var amount = amountOf(data, planType);
   return recordPayment(userId, email, planType, membershipId, expiresAt, amount);
+}
+
+function completeRegistration(_a) {
+  var regToken = _a.regToken, email = _a.email, fullName = _a.fullName, planType = _a.planType, providerId = _a.providerId, expiresAt = _a.expiresAt, amount = _a.amount;
+  if (!supabase) return Promise.resolve({ handled: false, reason: 'No database' });
+  if (!regToken) return Promise.resolve({ handled: false, reason: 'Missing reg_token' });
+
+  return supabase.from('pending_registrations')
+    .select('*')
+    .eq('reg_token', regToken)
+    .single()
+    .then(function (regResult) {
+      if (regResult.error || !regResult.data) {
+        return { handled: false, reason: 'Pending registration not found for token' };
+      }
+      var reg = regResult.data;
+      var regEmail = reg.email || email;
+      var regName = reg.full_name || fullName;
+      if (!regEmail) return { handled: false, reason: 'Pending registration has no email' };
+
+      // Create the Supabase account (confirmed) now that payment succeeded.
+      return supabase.auth.admin.createUser({
+        email: regEmail,
+        email_confirm: true,
+        user_metadata: { full_name: regName }
+      }).then(function (createResult) {
+        if (createResult.error) {
+          // User may already exist from a prior flow; attach the payment to the
+          // existing account in that case.
+          if (createResult.error.message && /already/i.test(createResult.error.message)) {
+            return supabase.from('profiles').select('id').eq('email', regEmail).maybeSingle()
+              .then(function (profileResult) {
+                if (profileResult.error || !profileResult.data) {
+                  return { handled: false, reason: 'User exists but profile not found: ' + regEmail };
+                }
+                return attachRegistration(reg, profileResult.data.id, planType, providerId, expiresAt, amount);
+              });
+          }
+          return { handled: false, reason: 'Account creation failed: ' + createResult.error.message };
+        }
+        var userId = createResult.data && createResult.data.user && createResult.data.user.id;
+        if (!userId) return { handled: false, reason: 'Account created without a user id' };
+        return attachRegistration(reg, userId, planType, providerId, expiresAt, amount);
+      });
+    });
+}
+
+function attachRegistration(reg, userId, planType, providerId, expiresAt, amount) {
+  var regEmail = reg.email;
+  var cleanExpiry = expiresAt instanceof Date ? expiresAt : computeExpiry(planType);
+  return recordPayment(userId, regEmail, planType, providerId, cleanExpiry, amount)
+    .then(function (paymentResult) {
+      return supabase.from('pending_registrations')
+        .update({ status: 'completed', completed_at: new Date().toISOString() })
+        .eq('reg_token', reg.reg_token)
+        .then(function () {
+          return { handled: true, registration: true, userId: userId, planType: planType, providerId: providerId };
+        });
+    })
+    .catch(function (err) {
+      return { handled: false, reason: 'Payment recording failed: ' + err.message };
+    });
 }
 
 function onMembershipDeactivated(data, event) {

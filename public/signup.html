@@ -20,6 +20,10 @@ body { font-family: 'Inter', sans-serif; background: #0c0f1a; color: #e2e8f0; mi
 .form-group label { display: block; font-size: 13px; font-weight: 600; color: #94a3b8; margin-bottom: 6px; }
 .form-group input { width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: #e2e8f0; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s; }
 .form-group input:focus { border-color: #ff2448; }
+.form-group select { width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: #e2e8f0; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s; }
+.form-group select:focus { border-color: #ff2448; }
+.form-group select option { background: #0c0f1a; color: #e2e8f0; }
+.auth-note { margin-top: 14px; font-size: 12px; color: #4a5568; text-align: center; line-height: 1.5; }
 .form-group .error { color: #ff2448; font-size: 12px; margin-top: 4px; display: none; }
 .btn-primary { width: 100%; padding: 12px; background: linear-gradient(135deg, #ff2448, #d41a38); border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; transition: opacity 0.2s; }
 .btn-primary:hover { opacity: 0.9; }
@@ -184,14 +188,22 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
   <div class="auth-card" id="signup-form">
     <h2>Create Account</h2>
-    <p class="subtitle">Join WinFulltime to track your picks and manage your membership.</p>
+    <p class="subtitle">Choose a plan and pay securely, then your account is created automatically.</p>
     <div id="alert" class="alert"></div>
-    <div id="confirmation" class="confirmation-sent" style="display:none">
-      <div class="icon">&#9993;</div>
-      <h3>Check your email</h3>
-      <p>We sent a confirmation link to <strong id="confirmation-email"></strong>. Click the link to activate your account.</p>
+    <div id="paid" class="confirmation-sent" style="display:none">
+      <div class="icon">&#128274;</div>
+      <h3>Payment received!</h3>
+      <p>Your Pro account is being activated. Check your email — we sent you a confirmation link. Once confirmed, <a href="/login.html" style="color:#ff2448;font-weight:600;">sign in here</a>.</p>
     </div>
     <div id="form-fields">
+      <div class="form-group">
+        <label for="plan">Choose your plan</label>
+        <select id="plan">
+          <option value="monthly">Pro Monthly — $9.99/month</option>
+          <option value="yearly">Pro Yearly — $79.99/year</option>
+          <option value="lifetime">Lifetime Pro — $399.99 one-time</option>
+        </select>
+      </div>
       <div class="form-group">
         <label for="fullName">Full Name</label>
         <input type="text" id="fullName" placeholder="Your full name" autocomplete="name">
@@ -202,18 +214,8 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
         <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
         <div class="error" id="email-error"></div>
       </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="At least 6 characters" autocomplete="new-password">
-        <div class="password-hint">Must be at least 6 characters</div>
-        <div class="error" id="password-error"></div>
-      </div>
-      <button class="btn-primary" id="signup-btn" onclick="handleSignUp()">Create Account</button>
-      <div class="divider">or</div>
-      <button class="btn-google" onclick="handleGoogleSignUp()">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        Continue with Google
-      </button>
+      <button class="btn-primary" id="signup-btn" onclick="handleSignUp()">Pay &amp; Create Account</button>
+      <p class="auth-note">No free accounts. Your account is created only after your payment is confirmed.</p>
     </div>
   </div>
   <div class="auth-footer">
@@ -224,27 +226,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 <script src="/supabase-client.js"></script>
 <script>
 var SUBMIT_TIMEOUT = null;
-
-var DISPOSABLE_DOMAINS = [
-  'mailinator.com', 'guerrillamail.com', '10minutemail.com', 'tempmail.com',
-  'throwaway.email', 'yopmail.com', 'trashmail.com', 'mailnator.com',
-  'temp-mail.org', 'disposablemail.com', 'mailmetrash.com', 'trash2009.com',
-  'spamgourmet.com', '33mail.com', 'jetable.org', 'trashmail.net',
-  'mailexpire.com', 'spambox.us', 'mytrashmail.com', 'mytemp.email',
-  'fakemailgenerator.com', 'getairmail.com', 'emailondeck.com',
-  'maildrop.cc', 'inboxbear.com', 'tempinbox.com', 'sharklasers.com',
-  'guerrillamail.info', 'grr.la', 'pokemail.net', 'spam4.me'
-];
-
-function isDisposableEmail(email) {
-  var domain = email.split('@')[1];
-  if (!domain) return false;
-  domain = domain.toLowerCase().trim();
-  var parts = domain.split('.');
-  while (parts.length > 2) { parts.shift(); }
-  var baseDomain = parts.join('.');
-  return DISPOSABLE_DOMAINS.indexOf(baseDomain) !== -1;
-}
 
 function showAlert(msg, type) {
   var el = document.getElementById('alert');
@@ -261,10 +242,10 @@ function setLoading(loading) {
   var btn = document.getElementById('signup-btn');
   if (loading) {
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Creating account...';
+    btn.innerHTML = '<span class="spinner"></span>Creating checkout...';
   } else {
     btn.disabled = false;
-    btn.innerHTML = 'Create Account';
+    btn.innerHTML = 'Pay &amp; Create Account';
   }
 }
 
@@ -274,73 +255,44 @@ function handleSignUp() {
 
   var fullName = document.getElementById('fullName').value.trim();
   var email = document.getElementById('email').value.trim();
-  var password = document.getElementById('password').value;
+  var planType = document.getElementById('plan').value;
 
   if (!fullName) { document.getElementById('name-error').textContent = 'Name is required'; document.getElementById('name-error').style.display = 'block'; return; }
   if (!email) { document.getElementById('email-error').textContent = 'Email is required'; document.getElementById('email-error').style.display = 'block'; return; }
-  if (password.length < 6) { document.getElementById('password-error').textContent = 'Must be at least 6 characters'; document.getElementById('password-error').style.display = 'block'; return; }
 
   setLoading(true);
-  SUBMIT_TIMEOUT = setTimeout(function() { SUBMIT_TIMEOUT = null; }, 5000);
+  SUBMIT_TIMEOUT = setTimeout(function() { SUBMIT_TIMEOUT = null; }, 15000);
 
-  // Server-side email validation
-  fetch(window.WFT_API + '/api/validate-email', {
+  fetch(window.WFT_API + '/api/register-checkout', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: email })
-  }).then(function (r) { return r.json(); }).then(function (validation) {
-    if (!validation.valid) {
-      setLoading(false); SUBMIT_TIMEOUT = null;
-      showAlert(validation.error || 'Invalid email address', 'error');
+    body: JSON.stringify({ email: email, fullName: fullName, planType: planType })
+  }).then(function (r) {
+    return r.json().then(function (data) { return { ok: r.ok, status: r.status, data: data }; });
+  }).then(function (res) {
+    setLoading(false); SUBMIT_TIMEOUT = null;
+    if (!res.ok) {
+      showAlert(res.data.error || 'Failed to create checkout. Please try again.', 'error');
       return;
     }
-
-    var ready = function () {
-      if (!window.WFT || !window.WFT.supabase) {
-        showAlert('Auth service loading. Please try again.', 'error');
-        setLoading(false); SUBMIT_TIMEOUT = null;
-        return;
-      }
-
-      window.WFT.supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: { data: { full_name: fullName } }
-      }).then(function (result) {
-        setLoading(false); SUBMIT_TIMEOUT = null;
-        if (result.error) {
-          showAlert(result.error.message, 'error');
-        } else if (result.data.user && result.data.user.identities && result.data.user.identities.length === 0) {
-          showAlert('An account with this email already exists.', 'error');
-        } else if (result.data.session) {
-          window.location.href = '/';
-        } else {
-          document.getElementById('confirmation-email').textContent = email;
-          document.getElementById('confirmation').style.display = 'block';
-          document.getElementById('form-fields').style.display = 'none';
-        }
-      }).catch(function (err) {
-        setLoading(false); SUBMIT_TIMEOUT = null;
-        showAlert(err.message || 'An unexpected error occurred', 'error');
-      });
-    };
-
-    if (window.WFT && window.WFT.supabase) { ready(); return; }
-    document.addEventListener('wft-supabase-ready', ready);
-    setTimeout(function() { if (SUBMIT_TIMEOUT) { setLoading(false); SUBMIT_TIMEOUT = null; showAlert('Auth service timed out. Please refresh.', 'error'); } }, 8000);
+    if (res.data.checkoutUrl) {
+      window.location.href = res.data.checkoutUrl;
+    } else {
+      showAlert('Failed to create checkout. Please try again.', 'error');
+    }
   }).catch(function () {
     setLoading(false); SUBMIT_TIMEOUT = null;
-    showAlert('Failed to validate email. Please try again.', 'error');
+    showAlert('Failed to create checkout. Please try again.', 'error');
   });
 }
 
-function handleGoogleSignUp() {
-  if (!window.WFT || !window.WFT.supabase) {
-    showAlert('Auth service loading. Please try again.', 'error');
-    return;
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('paid') === '1') {
+    document.getElementById('paid').style.display = 'block';
+    document.getElementById('form-fields').style.display = 'none';
   }
-  window.WFT.supabase.auth.signInWithOAuth({ provider: 'google' });
-}
+})();
 </script>
 <footer>
  <div class="footer-content">

@@ -73,6 +73,22 @@ CREATE TABLE IF NOT EXISTS public.two_odds_history (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- 8. Pending registrations (paywall-first signup: an account is only created
+-- after the payment webhook fires, so no unpaid accounts can exist).
+CREATE TABLE IF NOT EXISTS public.pending_registrations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  reg_token TEXT UNIQUE NOT NULL,
+  email TEXT NOT NULL,
+  full_name TEXT,
+  plan_type TEXT NOT NULL CHECK (plan_type IN ('monthly', 'yearly', 'lifetime')),
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'expired')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  completed_at TIMESTAMP WITH TIME ZONE
+);
+
+CREATE INDEX IF NOT EXISTS idx_pending_registrations_reg_token ON public.pending_registrations(reg_token);
+CREATE INDEX IF NOT EXISTS idx_pending_registrations_email ON public.pending_registrations(email);
+
 -- === INDEXES ===
 CREATE INDEX IF NOT EXISTS idx_profiles_email ON public.profiles(email);
 CREATE INDEX IF NOT EXISTS idx_profiles_vip_status ON public.profiles(vip_status);
@@ -90,6 +106,7 @@ ALTER TABLE public.usage ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.payment_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.tip_history ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.two_odds_history ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.pending_registrations ENABLE ROW LEVEL SECURITY;
 
 -- === RLS POLICIES ===
 
@@ -138,7 +155,12 @@ DROP POLICY IF EXISTS "Public can read two_odds_history" ON public.two_odds_hist
 CREATE POLICY "Public can read two_odds_history" ON public.two_odds_history
   FOR SELECT USING (true);
 
--- 8. Admin audit log
+-- Pending registrations: no client access (service-role only)
+DROP POLICY IF EXISTS "No client access to pending_registrations" ON public.pending_registrations;
+CREATE POLICY "No client access to pending_registrations" ON public.pending_registrations
+  FOR ALL USING (false);
+
+-- 9. Admin audit log
 CREATE TABLE IF NOT EXISTS public.admin_audit_log (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   admin_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -162,7 +184,9 @@ CREATE POLICY "No client access to admin_audit_log" ON public.admin_audit_log
 
 -- === FUNCTIONS ===
 
--- Auto-create profile on signup with 7-day free Pro trial
+-- Auto-create profile on signup. No free trial is granted: accounts created
+-- through the paywall-first signup flow are activated by the payment webhook
+-- (set_vip_status), so new users start as 'free' until they have paid.
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -171,8 +195,8 @@ BEGIN
     NEW.id,
     NEW.email,
     NEW.raw_user_meta_data->>'full_name',
-    'vip',
-    NOW() + INTERVAL '7 days'
+    'free',
+    NULL
   );
   RETURN NEW;
 END;

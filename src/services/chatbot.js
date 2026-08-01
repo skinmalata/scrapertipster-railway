@@ -1,8 +1,8 @@
 const knowledge = {
   business: {
     name: 'WinFulltime',
-    tagline: 'Free AI Football Predictions',
-    description: 'WinFulltime is a free football prediction website providing AI-driven betting tips across 50+ global leagues including Premier League, La Liga, Serie A, Bundesliga, Ligue 1, and Champions League. No registration required. Covers 750+ teams worldwide.',
+    tagline: 'AI Football Predictions',
+    description: 'WinFulltime provides AI-driven betting tips across 50+ global leagues including Premier League, La Liga, Serie A, Bundesliga, Ligue 1, and Champions League. Membership requires a paid plan — accounts are created only after payment is confirmed. Covers 750+ teams worldwide.',
     founded: '2026',
     email: 'mesigotochukwu@gmail.com',
     website: 'https://winfulltime.com',
@@ -10,7 +10,7 @@ const knowledge = {
     youtubeUrl: 'https://www.youtube.com/@winfulltime/videos'
   },
   features: {
-    free: 'WinFulltime is completely free. No registration required. No hidden fees.',
+    free: 'WinFulltime is a paid membership. Sign up by choosing a plan and paying at /signup.html. Your account is created after payment is confirmed.',
     predictions: 'Daily predictions: 1X2 (match result), Over 1.5 Goals (80%+ threshold), Over 2.5 Goals (60%+ threshold), BTTS YES, BTTS NO, Winning Streaks, Losing Streaks, Draw Streaks, Team to Score, Corners (Over 9.5), Cards (Over 4.5/8.5), and Unbeaten Teams.',
     leagues: '50+ leagues: Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, Eredivisie, Primeira Liga, Belgian Pro League, Brazilian Serie A, Argentine League, MLS, Liga MX, Saudi Pro League, Turkish Super Lig, Championship, and 35+ more.',
     sources: 'Statistical analysis combining team form data, head-to-head records, and league-wide performance metrics.',
@@ -65,7 +65,7 @@ const faq = [
   { keywords: ['app', 'install', 'pwa', 'mobile', 'home screen', 'offline'], response: knowledge.features.app },
   { keywords: ['responsible', 'gamble', 'gambling', 'addict', 'problem', '18+'], response: 'WinFulltime promotes responsible gambling. All predictions are for informational purposes. Set limits, never chase losses, seek help at BeGambleAware.org if needed.' },
   { keywords: ['youtube', 'video', 'channel', 'subscribe'], response: `YouTube: ${knowledge.business.youtube} at ${knowledge.business.youtubeUrl}` },
-  { keywords: ['register', 'sign up', 'signup', 'account', 'login', 'create', 'password'], response: 'No registration needed. Completely free and open to everyone.' },
+  { keywords: ['register', 'sign up', 'signup', 'account', 'login', 'create', 'password'], response: 'WinFulltime is a paid membership. Create your account by choosing a plan and paying at /signup.html — your account is activated once payment is confirmed.' },
   { keywords: ['accuracy', 'accurate', 'reliable', 'confidence', 'probability', 'percentage'], response: knowledge.features.accuracy },
   { keywords: ['source', 'data', 'where', 'api', 'method', 'statistical', 'analysis'], response: knowledge.features.sources },
   { keywords: ['features', 'what do', 'offer', 'provide', 'services'], response: knowledge.features.predictions },
