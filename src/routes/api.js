@@ -17,6 +17,7 @@ const { buildTwoOddsOfDay, watDate } = require('../services/twoOddsOfDay');
 const { buildTicket } = require('../services/ticketBuilder');
 const { buildGiantPool, getGiantPoolHistory } = require('../services/authorPicks');
 const { fetchTodayStreaks } = require('../services/h2hWinningStreaks');
+const { findMatchingResult } = require('../utils/helpers');
 const { optionalAuth, requireAuth, requirePro: requireProMiddleware, requireAdmin, logAdminAction } = require('../middleware/auth');
 const payment = require('../services/payment');
 const whop = require('../services/whop');
@@ -1501,7 +1502,7 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
     var TODAY_FM = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     var TODAY_SYSTEM = new Date().toISOString().slice(0, 10);
     var CACHE_PATH = path.join(CACHE_DIR, TODAY_FM + '.json');
-    var CACHE_VERSION = 3;
+    var CACHE_VERSION = 4;
 
     // Serve from cache if exists, has picks, and was written by this build.
     try {
@@ -1729,67 +1730,106 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
       return 'pending';
     }
 
-    // History — prefer the CI-enriched CDN predictions (results embedded),
-    // which works without any author-picks files on the server.
+    // History — build from the server's own local prediction + result caches
+    // first (reliable from Render, no external fetch). Fall back to the
+    // CI-enriched CDN predictions, then to author-picks files.
     var history = [];
     try {
-      var cdnPred = null;
-      var PRED_ORIGINS = [
-        'https://winfulltime.com/data/predictions.json',
-        'https://skinmalata.github.io/scrapertipster-railway/data/predictions.json'
+      var HISTORY_KEYS = [
+        { key: 'matches', label: '1X2', type: '1x2' },
+        { key: 'over15Matches', label: 'Over 1.5', type: 'over15' },
+        { key: 'over25Matches', label: 'Over 2.5', type: 'over25' },
+        { key: 'bttsMatches', label: 'BTTS Yes', type: 'btts' },
+        { key: 'bttsNoMatches', label: 'BTTS No', type: 'bttsNo' },
+        { key: 'cornersMatches', label: 'Corners', type: 'corners' },
+        { key: 'cardsMatches', label: 'Cards', type: 'cards' }
       ];
-      for (var predOriginIdx = 0; predOriginIdx < PRED_ORIGINS.length; predOriginIdx++) {
-        try {
-          var cdnRes = await fetch(PRED_ORIGINS[predOriginIdx], { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }, signal: AbortSignal.timeout(10000) });
-          var candidate = await cdnRes.json();
-          if (candidate && Array.isArray(candidate.matches) && candidate.matches.length > 0) { cdnPred = candidate; break; }
-        } catch (e) {}
-      }
-
-      if (cdnPred) {
-        var HISTORY_KEYS = [
-          { key: 'matches', label: '1X2', type: '1x2' },
-          { key: 'over15Matches', label: 'Over 1.5', type: 'over15' },
-          { key: 'over25Matches', label: 'Over 2.5', type: 'over25' },
-          { key: 'bttsMatches', label: 'BTTS Yes', type: 'btts' },
-          { key: 'bttsNoMatches', label: 'BTTS No', type: 'bttsNo' },
-          { key: 'cornersMatches', label: 'Corners', type: 'corners' },
-          { key: 'cardsMatches', label: 'Cards', type: 'cards' }
-        ];
-        var byDate = {};
-        HISTORY_KEYS.forEach(function(mk) {
-          var arr = Array.isArray(cdnPred[mk.key]) ? cdnPred[mk.key] : [];
-          arr.forEach(function(m) {
-            var d = String(m.date || '').slice(0, 10);
-            if (!d || d >= TODAY_SYSTEM) return;
-            var prob = Number(m.probability) || 0;
-            if (!byDate[d]) byDate[d] = {};
-            var cur = byDate[d][mk.type];
-            if (!cur || prob > cur.probability) {
-              byDate[d][mk.type] = { category: mk.label, type: mk.type, match: m.match || m.nextMatch || '',
-                tip: m.tip || '', probability: prob, result: m.result || null };
-            }
-          });
+      var localResults = (getScraperService().getResultsCache && getScraperService().getResultsCache()) || {};
+      var localByDate = {};
+      HISTORY_KEYS.forEach(function(mk) {
+        var arr = Array.isArray(preds[mk.key]) ? preds[mk.key] : [];
+        arr.forEach(function(m) {
+          var d = String(m.date || '').slice(0, 10);
+          if (!d || d >= TODAY_SYSTEM) return;
+          var prob = Number(m.probability) || 0;
+          if (!localByDate[d]) localByDate[d] = {};
+          var cur = localByDate[d][mk.type];
+          if (!cur || prob > cur.probability) {
+            localByDate[d][mk.type] = { category: mk.label, type: mk.type, match: m.nextMatch || m.match || '',
+              tip: m.tip || '', probability: prob };
+          }
         });
-        Object.keys(byDate).sort().slice(-3).forEach(function(d) {
-          var dayPicks = [];
-          CATEGORY_DEFS.forEach(function(def) {
-            var entry = byDate[d][def.type];
-            if (!entry) return;
-            var outcome = 'pending';
-            var scoreStr = null;
-            if (entry.result && typeof entry.result.home === 'number') {
-              outcome = evaluateTip(entry.tip, entry.result);
-              scoreStr = entry.result.home + '-' + entry.result.away;
-            }
-            dayPicks.push({ category: def.label, type: def.type, match: entry.match, tip: entry.tip,
-              probability: entry.probability, outcome: outcome, score: scoreStr,
-              streakTeam: null, isHome: null });
-          });
-          if (dayPicks.length > 0) history.push({ date: d, picks: dayPicks });
+      });
+      Object.keys(localByDate).sort().slice(-3).forEach(function(d) {
+        var dayPicks = [];
+        var dayResults = localResults[d] || {};
+        CATEGORY_DEFS.forEach(function(def) {
+          var entry = localByDate[d][def.type];
+          if (!entry) return;
+          var score = findMatchingResult(entry.match, dayResults);
+          var outcome = score ? evaluateTip(entry.tip, score) : 'pending';
+          dayPicks.push({ category: def.label, type: def.type, match: entry.match, tip: entry.tip,
+            probability: entry.probability, outcome: outcome,
+            score: score ? score.home + '-' + score.away : null,
+            streakTeam: null, isHome: null });
         });
-      }
+        if (dayPicks.length > 0) history.push({ date: d, picks: dayPicks });
+      });
     } catch (e) {}
+
+    // History — prefer the CI-enriched CDN predictions (results embedded),
+    // which works without any author-picks files on the server.
+    if (history.length === 0) {
+      try {
+        var cdnPred = null;
+        var PRED_ORIGINS = [
+          'https://winfulltime.com/data/predictions.json',
+          'https://skinmalata.github.io/scrapertipster-railway/data/predictions.json'
+        ];
+        for (var predOriginIdx = 0; predOriginIdx < PRED_ORIGINS.length; predOriginIdx++) {
+          try {
+            var cdnRes = await fetch(PRED_ORIGINS[predOriginIdx], { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }, signal: AbortSignal.timeout(10000) });
+            var candidate = await cdnRes.json();
+            if (candidate && Array.isArray(candidate.matches) && candidate.matches.length > 0) { cdnPred = candidate; break; }
+          } catch (e) {}
+        }
+
+        if (cdnPred) {
+          var byDate = {};
+          HISTORY_KEYS.forEach(function(mk) {
+            var arr = Array.isArray(cdnPred[mk.key]) ? cdnPred[mk.key] : [];
+            arr.forEach(function(m) {
+              var d = String(m.date || '').slice(0, 10);
+              if (!d || d >= TODAY_SYSTEM) return;
+              var prob = Number(m.probability) || 0;
+              if (!byDate[d]) byDate[d] = {};
+              var cur = byDate[d][mk.type];
+              if (!cur || prob > cur.probability) {
+                byDate[d][mk.type] = { category: mk.label, type: mk.type, match: m.match || m.nextMatch || '',
+                  tip: m.tip || '', probability: prob, result: m.result || null };
+              }
+            });
+          });
+          Object.keys(byDate).sort().slice(-3).forEach(function(d) {
+            var dayPicks = [];
+            CATEGORY_DEFS.forEach(function(def) {
+              var entry = byDate[d][def.type];
+              if (!entry) return;
+              var outcome = 'pending';
+              var scoreStr = null;
+              if (entry.result && typeof entry.result.home === 'number') {
+                outcome = evaluateTip(entry.tip, entry.result);
+                scoreStr = entry.result.home + '-' + entry.result.away;
+              }
+              dayPicks.push({ category: def.label, type: def.type, match: entry.match, tip: entry.tip,
+                probability: entry.probability, outcome: outcome, score: scoreStr,
+                streakTeam: null, isHome: null });
+            });
+            if (dayPicks.length > 0) history.push({ date: d, picks: dayPicks });
+          });
+        }
+      } catch (e) {}
+    }
 
     // Fallback: evaluate past Author Picks files (local dev / when present).
     if (history.length === 0) {
