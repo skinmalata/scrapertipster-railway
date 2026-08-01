@@ -2235,6 +2235,102 @@ router.post('/admin/users/:id/revoke-admin', requireAdmin, async function (req, 
   }
 });
 
+// PATCH /api/admin/users/:id — edit user (full name / email)
+router.patch('/admin/users/:id', requireAdmin, async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+    var userId = req.params.id;
+    var fullName = req.body.fullName;
+    var email = req.body.email;
+
+    if (fullName !== undefined && fullName !== null) fullName = String(fullName).trim();
+    if (email !== undefined && email !== null) email = String(email).trim().toLowerCase();
+
+    var targetProfile = await supabase.from('profiles').select('email, vip_status').eq('id', userId).single();
+    if (targetProfile.error) return res.status(404).json({ error: 'User not found' });
+    var oldEmail = targetProfile.data.email;
+
+    if (fullName !== undefined && !fullName) {
+      return res.status(400).json({ error: 'Full name cannot be empty' });
+    }
+
+    var profilePatch = {};
+    if (email !== undefined && email !== oldEmail) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ error: 'Invalid email format' });
+      }
+      if (isDisposableEmail(email)) {
+        return res.status(400).json({ error: 'Temporary email addresses are not allowed' });
+      }
+      var dup = await supabase.from('profiles').select('id').eq('email', email).maybeSingle();
+      if (dup.data && dup.data.id !== userId) {
+        return res.status(409).json({ error: 'Another account already uses this email' });
+      }
+      var authRes = await supabase.auth.admin.updateUserById(userId, { email: email });
+      if (authRes.error) {
+        return res.status(500).json({ error: 'Failed to update email: ' + authRes.error.message });
+      }
+      profilePatch.email = email;
+    }
+    if (fullName !== undefined && fullName !== null) {
+      profilePatch.full_name = fullName;
+    }
+
+    if (Object.keys(profilePatch).length) {
+      profilePatch.updated_at = new Date().toISOString();
+      var upd = await supabase.from('profiles').update(profilePatch).eq('id', userId);
+      if (upd.error) return res.status(500).json({ error: upd.error.message });
+    }
+
+    logAdminAction(req.user, 'edit_user', userId, oldEmail, { fullName: fullName || null, email: email || null });
+
+    res.json({ success: true, message: 'User updated' });
+  } catch (e) {
+    console.error('[admin/edit-user] Error:', e.message);
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
+// DELETE /api/admin/users/:id — permanently delete a user
+router.delete('/admin/users/:id', requireAdmin, async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+    var userId = req.params.id;
+    if (userId === req.user.id) {
+      return res.status(400).json({ error: 'You cannot delete your own account' });
+    }
+
+    var targetProfile = await supabase.from('profiles').select('email').eq('id', userId).single();
+    if (targetProfile.error) return res.status(404).json({ error: 'User not found' });
+    var email = targetProfile.data.email;
+
+    // Clean up child rows that reference the user (payments has ON DELETE SET NULL).
+    await Promise.all([
+      supabase.from('payments').delete().eq('user_id', userId),
+      supabase.from('subscriptions').delete().eq('user_id', userId),
+      supabase.from('usage').delete().eq('user_id', userId),
+      supabase.from('pending_registrations').delete().eq('email', email)
+    ]);
+
+    var delRes = await supabase.auth.admin.deleteUser(userId);
+    if (delRes.error) {
+      var fallback = await supabase.from('profiles').delete().eq('id', userId);
+      if (fallback.error) {
+        return res.status(500).json({ error: 'Failed to delete user: ' + delRes.error.message });
+      }
+    }
+
+    logAdminAction(req.user, 'delete_user', userId, email);
+
+    res.json({ success: true, message: 'User deleted' });
+  } catch (e) {
+    console.error('[admin/delete-user] Error:', e.message);
+    res.status(500).json({ error: 'Failed to delete user' });
+  }
+});
+
 // GET /api/admin/stats — system stats
 router.get('/admin/stats', requireAdmin, async function (req, res) {
   try {

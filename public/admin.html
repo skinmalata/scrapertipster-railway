@@ -61,6 +61,10 @@ tbody tr:last-child td { border-bottom: none; }
 .action-extend { background: linear-gradient(135deg,#3b82f6,#2563eb); color: #fff; }
 .action-default { background: rgba(255,255,255,0.08); color: #fff; }
 
+.edit-panel { margin-top: 16px; padding: 16px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); }
+.edit-input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.25); color: #fff; font-size: 14px; font-family: 'Inter', sans-serif; }
+.edit-input:focus { outline: none; border-color: #38bdf8; }
+
 .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 16px; }
 .pagination button { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif; cursor: pointer; transition: background 0.2s; }
 .pagination button:hover { background: rgba(255,255,255,0.1); }
@@ -160,6 +164,20 @@ tbody tr:last-child td { border-bottom: none; }
             <button class="action-btn action-revoke" onclick="revokeVip()">Revoke VIP</button>
             <button class="action-btn action-pro" onclick="setAdmin()" style="background:linear-gradient(135deg,#a855f7,#7c3aed);">Set Admin</button>
             <button class="action-btn action-revoke" onclick="revokeAdmin()">Revoke Admin</button>
+            <button class="action-btn action-extend" onclick="openEdit()" style="background:linear-gradient(135deg,#38bdf8,#0284c7);">Edit User</button>
+            <button class="action-btn action-revoke" onclick="deleteUser()">Delete User</button>
+</div>
+
+<div id="editPanel" class="edit-panel hidden">
+<h3 style="margin:0 0 12px;font-size:16px;">Edit User</h3>
+<div class="detail-grid">
+<div class="detail-field"><div class="field-label">Full Name</div><input type="text" id="editName" class="edit-input" placeholder="Full name"></div>
+<div class="detail-field"><div class="field-label">Email</div><input type="email" id="editEmail" class="edit-input" placeholder="user@example.com"></div>
+</div>
+<div class="action-bar" style="border-top:none;margin-top:12px;padding-top:0;">
+<button class="action-btn action-pro" onclick="saveEdit()">Save Changes</button>
+<button class="action-btn action-default" onclick="closeEdit()" style="background:rgba(255,255,255,0.06);color:#e2e8f0;">Cancel</button>
+</div>
 </div>
 </div>
 </div>
@@ -324,6 +342,51 @@ function revokeAdmin() {
   }).catch(function() { showError('Failed to revoke admin'); });
 }
 
+function openEdit() {
+  if (!selectedUserId) return;
+  document.getElementById('editName').value = document.getElementById('detName').textContent === '-' ? '' : document.getElementById('detName').textContent;
+  document.getElementById('editEmail').value = document.getElementById('detEmail').textContent === '-' ? '' : document.getElementById('detEmail').textContent;
+  document.getElementById('editPanel').classList.remove('hidden');
+}
+
+function closeEdit() {
+  document.getElementById('editPanel').classList.add('hidden');
+}
+
+function saveEdit() {
+  if (!selectedUserId) return;
+  var name = document.getElementById('editName').value.trim();
+  var email = document.getElementById('editEmail').value.trim();
+  if (!name) { showError('Full name cannot be empty.'); return; }
+  if (!email) { showError('Email cannot be empty.'); return; }
+
+  WFT.apiFetch('/api/admin/users/' + selectedUserId, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fullName: name, email: email })
+  }).then(function(data) {
+    if (data.error) { showError(data.error); return; }
+    showSuccess('User updated successfully.');
+    closeEdit();
+    loadUsers(curPage);
+  }).catch(function() { showError('Failed to update user'); });
+}
+
+function deleteUser() {
+  if (!selectedUserId) return;
+  if (!confirm('Delete this user permanently? This cannot be undone.')) return;
+  if (!confirm('Are you absolutely sure? All their data (subscriptions, payments, usage) will be removed.')) return;
+  WFT.apiFetch('/api/admin/users/' + selectedUserId, {
+    method: 'DELETE'
+  }).then(function(data) {
+    if (data.error) { showError(data.error); return; }
+    showSuccess('User deleted.');
+    document.getElementById('detailPanel').classList.add('hidden');
+    selectedUserId = null;
+    loadUsers(curPage);
+  }).catch(function() { showError('Failed to delete user'); });
+}
+
 window.selectUser = selectUser;
 window.loadUsers = loadUsers;
 window.setVip = setVip;
@@ -331,6 +394,10 @@ window.revokeVip = revokeVip;
 window.extendVip = extendVip;
 window.setAdmin = setAdmin;
 window.revokeAdmin = revokeAdmin;
+window.openEdit = openEdit;
+window.closeEdit = closeEdit;
+window.saveEdit = saveEdit;
+window.deleteUser = deleteUser;
 window.curPage = 1;
 
 function escapeHtml(value) {
