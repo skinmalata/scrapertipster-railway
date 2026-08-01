@@ -1512,12 +1512,20 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
 
     // Win Streak & Unbeaten from h2h data — the fresh copy is regenerated
     // daily by CI and served on the CDN; fall back to committed/static copies.
+    // Try multiple origins: Cloudflare CDN can block datacenter IPs, so also
+    // try the GitHub Pages origin and github.io raw endpoint.
+    var H2H_ORIGINS = [
+      'https://winfulltime.com/data/h2h-unbeaten.json',
+      'https://skinmalata.github.io/scrapertipster-railway/data/h2h-unbeaten.json'
+    ];
     var h2hData = { dates: {} };
-    try {
-      var h2hRes = await fetch('https://winfulltime.com/data/h2h-unbeaten.json', { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }, signal: AbortSignal.timeout(8000) });
-      var h2hJson = await h2hRes.json();
-      if (h2hJson && h2hJson.dates && Object.keys(h2hJson.dates).length > 0) h2hData = h2hJson;
-    } catch (e) {}
+    for (var h2hOriginIdx = 0; h2hOriginIdx < H2H_ORIGINS.length; h2hOriginIdx++) {
+      try {
+        var h2hRes = await fetch(H2H_ORIGINS[h2hOriginIdx], { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }, signal: AbortSignal.timeout(10000) });
+        var h2hJson = await h2hRes.json();
+        if (h2hJson && h2hJson.dates && Object.keys(h2hJson.dates).length > 0) { h2hData = h2hJson; break; }
+      } catch (e) {}
+    }
     if (!h2hData || Object.keys(h2hData.dates).length === 0) {
       try { h2hData = JSON.parse(fs.readFileSync(path.join(__dirname, '../../h2h-unbeaten-cache.json'), 'utf8')); } catch (e) {}
     }
@@ -1631,35 +1639,67 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
         streak: entry.streak, streakTeam: entry.streakTeam, isHome: entry.isHome });
     });
 
-    // Win Streak & Unbeaten from h2h data
+    // Win Streak & Unbeaten — prefer the server-side h2hstats fetch (reachable
+    // from Render, includes both win and unbeaten streaks), fall back to the
+    // CI/CDN h2h file which only carries unbeaten data.
+    var liveStreakMatches = [];
+    try { liveStreakMatches = await fetchTodayStreaks(); } catch (e) {}
+
     ['winStreak', 'unbeaten'].forEach(function(streakType) {
       var label = streakType === 'winStreak' ? 'Win Streak' : 'Unbeaten';
-      var h2hDate = h2hData.dates[TODAY_SYSTEM] ? TODAY_SYSTEM : Object.keys(h2hData.dates).sort().pop() || '';
-      var streakMatches = h2hData.dates[h2hDate] || [];
       var picks = [];
-      streakMatches.forEach(function(m) {
+
+      (liveStreakMatches || []).forEach(function(m) {
         var home = String(m.home || '').trim();
         var away = String(m.away || '').trim();
-        (m.streaks || []).forEach(function(s) {
+        (m.streaks && m.streaks.all || []).forEach(function(s) {
           var isHome = s.team === home;
-          var raw = String(s.text || '').toLowerCase();
           if (streakType === 'winStreak') {
-            if (!raw.includes(' won') && !raw.includes('won ')) return;
+            if (s.type !== 'win') return;
+            var prob = Math.min(s.count * 4, 85);
+            picks.push({ match: m.match, nextMatch: m.match,
+              tip: (isHome ? home : away) + ' to Win', probability: prob,
+              league: m.league || '', time: m.time || '',
+              streak: s.count, streakTeam: s.team, isHome: isHome });
           } else {
-            if (!raw.includes('unbeaten') && !raw.includes('no losses')) return;
+            if (s.type !== 'unbeaten') return;
+            var prob = Math.min(s.count * 4, 85);
+            picks.push({ match: m.match, nextMatch: m.match,
+              tip: s.team + ' Unbeaten (' + s.count + ')', probability: prob,
+              league: m.league || '', time: m.time || '',
+              streak: s.count, streakTeam: s.team, isHome: isHome });
           }
-          var tip = streakType === 'winStreak'
-            ? (isHome ? home + ' to Win' : away + ' to Win')
-            : s.team + ' Unbeaten (' + s.count + ')';
-          var prob = Math.min(s.count * 4, 85);
-          picks.push({
-            match: m.match, nextMatch: m.match,
-            tip: tip, probability: prob,
-            league: m.league || '', time: m.time || '',
-            streak: s.count, streakTeam: s.team, isHome: isHome
-          });
         });
       });
+
+      if (picks.length === 0) {
+        var h2hDate = h2hData.dates[TODAY_SYSTEM] ? TODAY_SYSTEM : Object.keys(h2hData.dates).sort().pop() || '';
+        var streakMatches = h2hData.dates[h2hDate] || [];
+        streakMatches.forEach(function(m) {
+          var home = String(m.home || '').trim();
+          var away = String(m.away || '').trim();
+          (m.streaks || []).forEach(function(s) {
+            var isHome = s.team === home;
+            var raw = String(s.text || '').toLowerCase();
+            if (streakType === 'winStreak') {
+              if (!raw.includes(' won') && !raw.includes('won ')) return;
+            } else {
+              if (!raw.includes('unbeaten') && !raw.includes('no losses')) return;
+            }
+            var tip = streakType === 'winStreak'
+              ? (isHome ? home + ' to Win' : away + ' to Win')
+              : s.team + ' Unbeaten (' + s.count + ')';
+            var prob = Math.min(s.count * 4, 85);
+            picks.push({
+              match: m.match, nextMatch: m.match,
+              tip: tip, probability: prob,
+              league: m.league || '', time: m.time || '',
+              streak: s.count, streakTeam: s.team, isHome: isHome
+            });
+          });
+        });
+      }
+
       var best = picks.reduce(function(b, item) {
         return (item.probability > (b ? b.probability : 0)) ? item : b;
       }, null);
@@ -1693,10 +1733,17 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
     var history = [];
     try {
       var cdnPred = null;
-      try {
-        var cdnRes = await fetch('https://winfulltime.com/data/predictions.json', { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }, signal: AbortSignal.timeout(10000) });
-        cdnPred = await cdnRes.json();
-      } catch (e) {}
+      var PRED_ORIGINS = [
+        'https://winfulltime.com/data/predictions.json',
+        'https://skinmalata.github.io/scrapertipster-railway/data/predictions.json'
+      ];
+      for (var predOriginIdx = 0; predOriginIdx < PRED_ORIGINS.length; predOriginIdx++) {
+        try {
+          var cdnRes = await fetch(PRED_ORIGINS[predOriginIdx], { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }, signal: AbortSignal.timeout(10000) });
+          var candidate = await cdnRes.json();
+          if (candidate && Array.isArray(candidate.matches) && candidate.matches.length > 0) { cdnPred = candidate; break; }
+        } catch (e) {}
+      }
 
       if (cdnPred) {
         var HISTORY_KEYS = [
