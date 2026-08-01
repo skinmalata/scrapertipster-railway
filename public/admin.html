@@ -128,6 +128,29 @@ tbody tr:last-child td { border-bottom: none; }
 <div class="search-bar">
 <input type="text" id="searchInput" placeholder="Search by email..." onkeydown="if(event.key==='Enter'){loadUsers(1);}">
 <button onclick="loadUsers(1)">Search</button>
+<button onclick="openCreate()" style="background:linear-gradient(135deg,#4ade80,#22c55e);color:#0a0e17;">+ Add User</button>
+</div>
+
+<div id="createPanel" class="edit-panel hidden">
+<h3 style="margin:0 0 12px;font-size:16px;">Add New User</h3>
+<div class="detail-grid">
+<div class="detail-field"><div class="field-label">Full Name</div><input type="text" id="createName" class="edit-input" placeholder="Full name"></div>
+<div class="detail-field"><div class="field-label">Email</div><input type="email" id="createEmail" class="edit-input" placeholder="user@example.com"></div>
+<div class="detail-field"><div class="field-label">Password</div><input type="text" id="createPassword" class="edit-input" placeholder="Min 6 characters"></div>
+<div class="detail-field"><div class="field-label">Plan / Status</div>
+<select id="createPlan" class="edit-input">
+<option value="free">Free</option>
+<option value="monthly">Monthly</option>
+<option value="yearly">Yearly</option>
+<option value="lifetime">Lifetime</option>
+<option value="admin">Admin</option>
+</select>
+</div>
+</div>
+<div class="action-bar" style="border-top:none;margin-top:12px;padding-top:0;">
+<button class="action-btn action-pro" onclick="createUser()">Create User</button>
+<button class="action-btn action-default" onclick="closeCreate()" style="background:rgba(255,255,255,0.06);color:#e2e8f0;">Cancel</button>
+</div>
 </div>
 
 <div class="table-wrap">
@@ -387,6 +410,40 @@ function deleteUser() {
   }).catch(function() { showError('Failed to delete user'); });
 }
 
+function openCreate() {
+  document.getElementById('createName').value = '';
+  document.getElementById('createEmail').value = '';
+  document.getElementById('createPassword').value = '';
+  document.getElementById('createPlan').value = 'free';
+  document.getElementById('createPanel').classList.remove('hidden');
+}
+
+function closeCreate() {
+  document.getElementById('createPanel').classList.add('hidden');
+}
+
+function createUser() {
+  var name = document.getElementById('createName').value.trim();
+  var email = document.getElementById('createEmail').value.trim();
+  var password = document.getElementById('createPassword').value;
+  var planType = document.getElementById('createPlan').value;
+
+  if (!name) { showError('Full name is required.'); return; }
+  if (!email) { showError('Email is required.'); return; }
+  if (password.length < 6) { showError('Password must be at least 6 characters.'); return; }
+
+  WFT.apiFetch('/api/admin/users', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fullName: name, email: email, password: password, planType: planType })
+  }).then(function(data) {
+    if (data.error) { showError(data.error); return; }
+    showSuccess('User created: ' + data.email + ' (' + data.planType + ')');
+    closeCreate();
+    loadUsers(curPage);
+  }).catch(function() { showError('Failed to create user'); });
+}
+
 window.selectUser = selectUser;
 window.loadUsers = loadUsers;
 window.setVip = setVip;
@@ -398,6 +455,9 @@ window.openEdit = openEdit;
 window.closeEdit = closeEdit;
 window.saveEdit = saveEdit;
 window.deleteUser = deleteUser;
+window.openCreate = openCreate;
+window.closeCreate = closeCreate;
+window.createUser = createUser;
 window.curPage = 1;
 
 function escapeHtml(value) {

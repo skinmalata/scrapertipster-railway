@@ -2035,6 +2035,101 @@ router.get('/admin/users', requireAdmin, async function (req, res) {
   }
 });
 
+// POST /api/admin/users — create a new user with an admin-chosen password and plan
+router.post('/admin/users', requireAdmin, async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+    var email = String(req.body.email || '').trim().toLowerCase();
+    var fullName = String(req.body.fullName || '').trim();
+    var password = req.body.password ? String(req.body.password) : '';
+    var planType = req.body.planType || 'free';
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+    if (isDisposableEmail(email)) {
+      return res.status(400).json({ error: 'Temporary email addresses are not allowed' });
+    }
+    if (!fullName) {
+      return res.status(400).json({ error: 'Full name is required' });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+    if (['free', 'monthly', 'yearly', 'lifetime', 'admin'].indexOf(planType) === -1) {
+      return res.status(400).json({ error: 'Invalid plan. Choose: free, monthly, yearly, lifetime, admin' });
+    }
+
+    var existing = await supabase.from('profiles').select('id').eq('email', email).maybeSingle();
+    if (existing.data) {
+      return res.status(409).json({ error: 'An account with this email already exists', code: 'EMAIL_EXISTS' });
+    }
+
+    var createResult = await supabase.auth.admin.createUser({
+      email: email,
+      password: password,
+      email_confirm: true,
+      user_metadata: { full_name: fullName }
+    });
+    if (createResult.error) {
+      return res.status(500).json({ error: 'Failed to create user: ' + createResult.error.message });
+    }
+    var userId = createResult.data && createResult.data.user && createResult.data.user.id;
+    if (!userId) {
+      return res.status(500).json({ error: 'Account created without a user id' });
+    }
+
+    // Apply the chosen plan/status in the same step.
+    if (planType === 'admin') {
+      await supabase.from('profiles').update({
+        vip_status: 'admin',
+        vip_expires_at: null,
+        updated_at: new Date().toISOString()
+      }).eq('id', userId);
+      await supabase.from('subscriptions').upsert({
+        user_id: userId,
+        plan_type: 'admin',
+        payment_id: 'admin_' + userId,
+        payment_status: 'active',
+        amount: 0,
+        currency: 'USD',
+        expires_at: new Date(Date.now() + 864e11).toISOString()
+      }, { onConflict: 'payment_id' });
+    } else if (planType !== 'free') {
+      var expiryDate = new Date();
+      if (planType === 'yearly') expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+      else if (planType === 'lifetime') expiryDate.setFullYear(expiryDate.getFullYear() + 99);
+      else expiryDate.setMonth(expiryDate.getMonth() + 1);
+
+      await supabase.from('subscriptions').upsert({
+        user_id: userId,
+        plan_type: planType,
+        payment_id: 'manual_' + userId + '_' + Date.now(),
+        payment_status: 'active',
+        amount: 0,
+        currency: 'USD',
+        expires_at: expiryDate.toISOString()
+      }, { onConflict: 'payment_id' });
+
+      var rpcResult = await supabase.rpc('set_vip_status', {
+        user_uuid: userId,
+        vip_expires: expiryDate.toISOString()
+      });
+      if (rpcResult.error) {
+        return res.status(500).json({ error: 'User created but VIP setup failed: ' + rpcResult.error.message });
+      }
+    }
+
+    logAdminAction(req.user, 'create_user', userId, email, { fullName: fullName, planType: planType });
+
+    res.json({ success: true, userId: userId, email: email, planType: planType, message: 'User created' });
+  } catch (e) {
+    console.error('[admin/create-user] Error:', e.message);
+    res.status(500).json({ error: 'Failed to create user' });
+  }
+});
+
 // GET /api/admin/users/:id — full user details
 router.get('/admin/users/:id', requireAdmin, async function (req, res) {
   try {
