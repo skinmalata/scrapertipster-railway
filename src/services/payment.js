@@ -7,14 +7,12 @@ var LS_WEBHOOK_SECRET = process.env.LEMONSQUEEZY_WEBHOOK_SECRET;
 
 var VARIANT_IDS = {
   monthly: '1960067',
-  yearly: '1960068',
-  lifetime: '1960073'
+  yearly: '1960068'
 };
 
 var PLANS = {
-  monthly: { name: 'Pro Monthly', price: '9.99', variantId: '1960067', interval: 'monthly' },
-  yearly: { name: 'Pro Yearly', price: '79.99', variantId: '1960068', interval: 'annually' },
-  lifetime: { name: 'Lifetime Pro', price: '399.99', variantId: '1960073', interval: null }
+  monthly: { name: 'Pro Monthly', price: '20', variantId: '1960067', interval: 'monthly' },
+  yearly: { name: 'Pro Yearly', price: '150', variantId: '1960068', interval: 'annually' }
 };
 
 function lsHeaders() {
@@ -143,10 +141,10 @@ function getCustomData(attributes, meta) {
 function onOrderCreated(attributes, data, meta) {
   var custom = getCustomData(attributes, meta) || {};
   var userId = custom.user_id;
-  var planType = custom.plan_type || 'lifetime';
+  var planType = custom.plan_type || 'monthly';
   var email = attributes.user_email || '';
   var orderId = String(data.id);
-  var amount = attributes.total ? (attributes.total / 100).toFixed(2) : PLANS.lifetime.price;
+  var amount = attributes.total ? (attributes.total / 100).toFixed(2) : PLANS.monthly.price;
 
   if (!userId) return Promise.resolve({ handled: false, reason: 'No user_id in custom_data' });
 

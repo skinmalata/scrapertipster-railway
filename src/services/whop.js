@@ -13,9 +13,8 @@ var WHOP_WEBHOOK_SECRET = process.env.WHOP_WEBHOOK_SECRET;
 // IDs. variantId is kept for interface parity with payment.js and filled after checkout.
 // Each plan references the product created in the Whop dashboard (WHOP_PRODUCT_* env vars).
 var PLANS = {
-  monthly: { name: 'Pro Monthly', price: '9.99', productId: 'prod_nefnMoSf6OLTC', interval: 'monthly' },
-  yearly: { name: 'Pro Yearly', price: '79.99', productId: 'prod_gfimWW2Emb3OA', interval: 'yearly' },
-  lifetime: { name: 'Lifetime Pro', price: '399.99', productId: 'prod_CyZONnoXIpkjz', interval: null }
+  monthly: { name: 'Pro Monthly', price: '20', productId: 'prod_nefnMoSf6OLTC', interval: 'monthly' },
+  yearly: { name: 'Pro Yearly', price: '150', productId: 'prod_gfimWW2Emb3OA', interval: 'yearly' }
 };
 
 var VARIANT_IDS = {}; // populated at runtime by createCheckout
@@ -178,7 +177,7 @@ function amountOf(data, planType, fallback) {
 function onPaymentSucceeded(data, event) {
   var meta = extractMeta(data, event) || {};
   var userId = meta.user_id;
-  var planType = meta.plan_type || 'lifetime';
+  var planType = meta.plan_type || 'monthly';
   var email = meta.email || (data && data.email) || (data && data.member && data.member.email) || '';
   var paymentId = String(data.id || '');
   if (!paymentId) return Promise.resolve({ handled: false, reason: 'Missing payment id' });
