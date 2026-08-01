@@ -83,6 +83,12 @@ h3 { font-size: 18px; margin-bottom: 16px; font-weight: 700; border-bottom: 1px 
 .h2h-item span:first-child { text-align: left; flex: 1; }
 .h2h-item span:nth-child(2) { text-align: center; flex: 0 0 auto; min-width: 60px; font-weight: bold; color: #e8edf5; }
 .h2h-item span:last-child { text-align: right; flex: 1; }
+.today-match-link { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 16px; background: rgba(255,255,255,0.03); border-radius: 8px; font-size: 14px; color: #c8d0db; text-decoration: none; transition: background 0.2s, color 0.2s; }
+.today-match-link:hover { background: rgba(255,255,255,0.07); color: #ffffff; }
+.today-match-link .today-match-vs { color: #ff2448; font-weight: 700; flex: 0 0 auto; }
+.today-match-link .today-match-team { flex: 1; text-align: center; }
+.today-match-link .today-match-team:first-child { text-align: left; }
+.today-match-link .today-match-team:last-child { text-align: right; }
 .summary-section { background: #1e2538; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
 .summary-section h3 { font-size: 18px; margin-bottom: 16px; border-bottom: 2px solid #ff2448; padding-bottom: 10px; }
 .summary-text { line-height: 1.8; color: #c8d0db; font-size: 15px; }
@@ -384,9 +390,17 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
 </div>
 
+ </div>
+
 </div>
 
 </div>
+
+ <div class="analysis-section" id="todayListSection" style="display: none;">
+
+ <h3 id="todayListTitle">Today's Analyzed Matches</h3>
+
+ <div id="todayList" class="h2h-list"></div>
 
 </div>
 
@@ -395,8 +409,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
  <div id="content" style="display: none;">
 
  <div class="loading"><div class="spinner"></div></div>
-
-</div>
 
 </div>
 
@@ -427,10 +439,14 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   return '';
  }
 
+ function cleanTeamName(name) {
+  return String(name || '').split('(')[0].trim();
+ }
+
  function renderForm(team, form) {
   return `
   <div class="analysis-card">
-   <h4>${escapeHtml(team)}</h4>
+   <h4>${escapeHtml(cleanTeamName(team))}</h4>
    <div class="form-bar">
     ${String(form || '').slice(-5).split('').map(f => `<span class="form-result ${getFormClass(f)}">${escapeHtml(f)}</span>`).join('')}
    </div>
@@ -441,13 +457,13 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   const s = stats || {};
   return `
   <div class="analysis-card">
-   <h4>${escapeHtml(team)}</h4>
+   <h4>${escapeHtml(cleanTeamName(team))}</h4>
    <div class="stats-grid">
     <div class="stat-item"><div class="stat-label">W</div><div class="stat-value">${s.wins || 0}</div></div>
     <div class="stat-item"><div class="stat-label">D</div><div class="stat-value">${s.draws || 0}</div></div>
     <div class="stat-item"><div class="stat-label">L</div><div class="stat-value">${s.losses || 0}</div></div>
-    <div class="stat-item"><div class="stat-label">Scored</div><div class="stat-value">${s.avgScored ? Number(s.avgScored).toFixed(1) : 0}</div></div>
-    <div class="stat-item"><div class="stat-label">Conceded</div><div class="stat-value">${s.avgConceded ? Number(s.avgConceded).toFixed(1) : 0}</div></div>
+    <div class="stat-item"><div class="stat-label">Scored</div><div class="stat-value">${Number(s.avgScored || 0).toFixed(1)}</div></div>
+    <div class="stat-item"><div class="stat-label">Conceded</div><div class="stat-value">${Number(s.avgConceded || 0).toFixed(1)}</div></div>
    </div>
   </div>`;
  }
@@ -533,8 +549,8 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
     return;
    }
    const data = await response.json();
-   const homeClean = decodeURIComponent(homeTeam).trim();
-   const awayClean = decodeURIComponent(awayTeam).trim();
+   const homeClean = (homeTeam || '').trim();
+   const awayClean = (awayTeam || '').trim();
    let analysis;
    if (homeClean && awayClean) {
     const key = homeClean.toLowerCase() + '|' + awayClean.toLowerCase();
@@ -554,32 +570,71 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   }
  }
 
- if (homeTeam) {
+  async function loadTodayMatches() {
+   const section = document.getElementById('todayListSection');
+   const list = document.getElementById('todayList');
+   if (!section || !list) return;
+   try {
+    const [predRes, linksRes] = await Promise.all([
+     fetch('/data/predictions.json', { cache: 'no-store' }),
+     fetch('/data/analysis-links.json').then(r => r.ok ? r.json() : {}).catch(() => ({}))
+    ]);
+    if (!predRes.ok) return;
+    const preds = await predRes.json();
+    const links = linksRes || {};
+    const seen = new Set();
+    const items = [];
+    const categories = [preds.matches, preds.over15Matches, preds.over25Matches, preds.bttsMatches, preds.bttsNoMatches];
+    categories.forEach(cat => (cat || []).forEach(m => {
+     const parts = String(m.match || m.nextMatch || '').split(/\s+-\s+|\s+vs\s+/i);
+     if (parts.length !== 2) return;
+     const home = (parts[0] || '').trim();
+     const away = (parts[1] || '').trim();
+     if (!home || !away) return;
+     const key = (home + '|' + away).toLowerCase();
+     if (seen.has(key)) return;
+     seen.add(key);
+     const href = links[key];
+     if (!href) return;
+     items.push('<a class="today-match-link" href="' + href + '"><span class="today-match-team">' + escapeHtml(cleanTeamName(home)) + '</span><span class="today-match-vs">vs</span><span class="today-match-team">' + escapeHtml(cleanTeamName(away)) + '</span></a>');
+    }));
+    if (items.length === 0) return;
+    document.getElementById('todayListTitle').textContent = "Today's Analyzed Matches (" + items.length + ')';
+    section.style.display = '';
+    list.innerHTML = items.join('');
+   } catch (error) {
+    console.error('Error loading today matches:', error);
+   }
+  }
 
-  document.getElementById('staticContent').style.display = 'none';
+  if (homeTeam) {
 
-  document.getElementById('matchTitle').style.display = 'block';
+   document.getElementById('staticContent').style.display = 'none';
 
-  document.getElementById('content').style.display = 'block';
+   document.getElementById('matchTitle').style.display = 'block';
 
-  const titleHome = decodeURIComponent(homeTeam);
+   document.getElementById('content').style.display = 'block';
 
-  const titleAway = awayTeam ? decodeURIComponent(awayTeam) : '';
+   const titleHome = (homeTeam || '').trim();
 
-  document.getElementById('matchTitle').textContent = titleAway ? titleHome + ' vs ' + titleAway : titleHome;
+   const titleAway = awayTeam ? (awayTeam || '').trim() : '';
 
-  document.title = (titleAway ? titleHome + ' vs ' + titleAway : titleHome) + ' - WinFulltime';
+   document.getElementById('matchTitle').textContent = titleAway ? cleanTeamName(titleHome) + ' vs ' + cleanTeamName(titleAway) : cleanTeamName(titleHome);
 
-  loadAnalysis();
+   document.title = (titleAway ? cleanTeamName(titleHome) + ' vs ' + cleanTeamName(titleAway) : cleanTeamName(titleHome)) + ' - WinFulltime';
 
- }
+   loadAnalysis();
 
-</script>
+  }
 
- 
- <h3 style="margin: 0 0 10px; font-size: 20px; font-weight: 700; color: #e8edf5;">Build Winning Accumulator Tickets</h3>
- <p style="margin: 0 auto 16px; font-size: 14px; color: rgba(232,237,245,0.55); line-height: 1.6; max-width: 440px;">Generate optimized accumulator combinations from today's AI-powered predictions. Set your target odds and get instant ticket suggestions.</p>
- <a href="/ticket-builder.html" style="display: inline-block; background: linear-gradient(135deg, #ff2448, #d41a38); color: #fff; padding: 12px 32px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 15px;">Free Ticket Builder &rarr;</a>
+  if (!homeTeam) {
+
+   loadTodayMatches();
+
+  }
+
+ </script>
+
 </div>
 
  <footer>

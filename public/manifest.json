@@ -1,7 +1,7 @@
 {
   "name": "WinFulltime - Free AI Football Predictions",
   "short_name": "WinFulltime",
-  "description": "Free AI-powered football predictions. 1X2, Over/Under, BTTS, Corners, Cards tips updated daily.",
+  "description": "Free AI-powered football predictions and match analysis. 1X2, Over/Under, BTTS, Corners, Cards tips, accumulator builder, and in-play alerts.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -44,6 +44,30 @@
       "name": "1X2 Predictions",
       "short_name": "1X2",
       "url": "/predictions/1x2.html",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Match Analysis",
+      "short_name": "Analysis",
+      "url": "/analysis.html",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Best Picks",
+      "short_name": "Best Picks",
+      "url": "/best-picks.html",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Author Picks",
+      "short_name": "Author Picks",
+      "url": "/author-picks.html",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "2 Odds of the Day",
+      "short_name": "2 Odds",
+      "url": "/2-odds-of-the-day.html",
       "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     },
     {

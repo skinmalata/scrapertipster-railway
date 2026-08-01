@@ -14,6 +14,10 @@ const MAX_H2H_ENTRIES = 10;
 const MIN_SIMILARITY = 0.7;
 const OUTPUT_FILE = path.join(process.cwd(), 'public', 'data', 'analysis.json');
 const ANALYSIS_CACHE_FILE = path.join(process.cwd(), 'analysis-cache.json');
+const LINKS_FILE = path.join(process.cwd(), 'public', 'data', 'analysis-links.json');
+const PRERENDER_DIR = path.join(process.cwd(), 'public', 'analysis');
+const ANALYSIS_TEMPLATE_FILE = path.join(process.cwd(), 'public', 'analysis.html');
+const SITE_URL = 'https://winfulltime.com';
 
 const COMMON_WORDS = new Set(['fc', 'sc', 'ac', 'rc', 'us', 'ud', 'utd', 'as', 'ss', 'cf', 'cd', 'de', 'da', 'do', 'el', 'la', 'le', 'il', 'al', 'united', 'city', 'club', 'team', 'sporting', 'athletic', 'association', 'real', 'inter', 'san', 'saint', 'st']);
 
@@ -228,16 +232,16 @@ function generateSummary(analysis) {
 
   let formDescription = '';
   if (homeWins > awayWins + 1) {
-    formDescription = homeClean + ' comes into this match in excellent form with ' + homeWins + ' wins from their last 5 matches, including home performances yielding an average of ' + homeAvgScored + ' goals scored.';
+    formDescription = homeClean + ' comes into this match in excellent form with ' + homeWins + ' wins from their last 5 matches, recently averaging ' + homeAvgScored + ' goals scored per game.';
   } else if (awayWins > homeWins + 1) {
-    formDescription = awayClean + ' enters this fixture in superior condition, winning ' + awayWins + ' of their last 5 games and averaging ' + awayAvgScored + ' goals per match on the road.';
+    formDescription = awayClean + ' enters this fixture in superior condition, winning ' + awayWins + ' of their last 5 games and averaging ' + awayAvgScored + ' goals scored per game.';
   } else if (homeWins === awayWins && homeWins > 0) {
     formDescription = 'Both teams arrive with identical recent records, each winning ' + homeWins + ' of their last 5 matches, setting up what promises to be a closely contested encounter.';
   } else {
     formDescription = 'Both teams show similar recent form with ' + homeWins + ' wins for ' + homeClean + ' and ' + awayWins + ' for ' + awayClean + ', making this a difficult match to predict confidently.';
   }
 
-  const statsDescription = 'Defensively, ' + homeClean + ' has conceded an average of ' + homeAvgConceded + ' goals per home game while ' + awayClean + ' has shipped ' + awayAvgConceded + ' away, suggesting potential for goals in either direction.';
+  const statsDescription = 'Defensively, ' + homeClean + ' has conceded an average of ' + homeAvgConceded + ' goals per game while ' + awayClean + ' has shipped ' + awayAvgConceded + ', keeping things competitive at both ends.';
 
   let h2hDescription = '';
   const h2h = analysis.h2h || [];
@@ -260,16 +264,182 @@ function generateSummary(analysis) {
   return (formDescription + ' ' + statsDescription + h2hDescription + ' ' + predictionHint).replace(/\s+/g, ' ').trim();
 }
 
+function sideHasTeamData(form, last10) {
+  const s = last10 || {};
+  return !!(form && form.length) ||
+    (s.wins || 0) + (s.draws || 0) + (s.losses || 0) > 0 ||
+    Number(s.avgScored || 0) > 0;
+}
+
+// Reject matchups where either team has no form or statistics, otherwise the
+// page renders misleading zeroed-out stats and summaries for that side.
 function isEmptyAnalysis(a) {
   if (!a) return true;
-  const hf = a.homeForm || '';
-  const af = a.awayForm || '';
-  const h10 = a.homeLast10 || {};
-  const a10 = a.awayLast10 || {};
-  const hasStats = (h10.wins || 0) || (h10.draws || 0) || (h10.losses || 0) ||
-    (a10.wins || 0) || (a10.draws || 0) || (a10.losses || 0) ||
-    (h10.avgScored || 0) > 0 || (a10.avgScored || 0) > 0;
-  return !hf && !af && !(a.h2h && a.h2h.length) && !hasStats;
+  return !sideHasTeamData(a.homeForm, a.homeLast10) || !sideHasTeamData(a.awayForm, a.awayLast10);
+}
+
+function escapeHtml(value) {
+  return String(value || '').replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+function cleanTeamName(name) {
+  return String(name || '').split('(')[0].trim();
+}
+
+function slugifyTeam(name) {
+  return String(name || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/['’]/g, '')
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function matchupSlug(home, away) {
+  const slug = slugifyTeam(home) + '-vs-' + slugifyTeam(away);
+  return slug === '-vs-' ? '' : slug;
+}
+
+function renderForm(team, form) {
+  return '<div class="analysis-card"><h4>' + escapeHtml(cleanTeamName(team)) + '</h4><div class="form-bar">' +
+    String(form || '').slice(-5).split('').map(function (f) {
+      return '<span class="form-result ' + (f === 'W' ? 'form-win' : f === 'D' ? 'form-draw' : f === 'L' ? 'form-loss' : '') + '">' + escapeHtml(f) + '</span>';
+    }).join('') +
+    '</div></div>';
+}
+
+function renderStats(team, stats) {
+  const s = stats || {};
+  return '<div class="analysis-card"><h4>' + escapeHtml(cleanTeamName(team)) + '</h4><div class="stats-grid">' +
+    '<div class="stat-item"><div class="stat-label">W</div><div class="stat-value">' + (s.wins || 0) + '</div></div>' +
+    '<div class="stat-item"><div class="stat-label">D</div><div class="stat-value">' + (s.draws || 0) + '</div></div>' +
+    '<div class="stat-item"><div class="stat-label">L</div><div class="stat-value">' + (s.losses || 0) + '</div></div>' +
+    '<div class="stat-item"><div class="stat-label">Scored</div><div class="stat-value">' + Number(s.avgScored || 0).toFixed(1) + '</div></div>' +
+    '<div class="stat-item"><div class="stat-label">Conceded</div><div class="stat-value">' + Number(s.avgConceded || 0).toFixed(1) + '</div></div>' +
+    '</div></div>';
+}
+
+function hasStats(stats) {
+  const s = stats || {};
+  return (s.wins || 0) + (s.draws || 0) + (s.losses || 0) > 0 || Number(s.avgScored || 0) > 0;
+}
+
+function buildContentHtml(analysis, home, away) {
+  const hasForm = !!(analysis.homeForm && analysis.awayForm);
+  const hasStat = hasStats(analysis.homeLast10) || hasStats(analysis.awayLast10);
+  const h2h = analysis.h2h || [];
+  const summary = analysis.summary || '';
+  let html = '';
+  if (hasForm) {
+    html += '<div class="analysis-section"><h3>Recent Form</h3><div class="analysis-grid">' +
+      renderForm(analysis.homeTeam || home, analysis.homeForm) +
+      renderForm(analysis.awayTeam || away, analysis.awayForm) +
+      '</div></div>';
+  }
+  if (hasStat) {
+    html += '<div class="analysis-section"><h3>Statistics (Last 10 Matches)</h3><div class="analysis-grid">' +
+      renderStats(analysis.homeTeam || home, analysis.homeLast10) +
+      renderStats(analysis.awayTeam || away, analysis.awayLast10) +
+      '</div></div>';
+  }
+  if (h2h.length > 0) {
+    html += '<div class="analysis-section"><h3>Head to Head</h3><div class="h2h-list">' +
+      h2h.slice(0, 5).map(function (h) {
+        return '<div class="h2h-item"><span>' + escapeHtml(h.homeTeam) + '</span><span>' + (Number(h.homeGoals) || 0) + ' - ' + (Number(h.awayGoals) || 0) + '</span><span>' + escapeHtml(h.awayTeam) + '</span></div>';
+      }).join('') +
+      '</div></div>';
+  }
+  if (summary) {
+    html += '<div class="summary-section"><h3>Match Summary</h3><div class="summary-text"><p>' + escapeHtml(summary) + '</p></div></div>';
+  }
+  html += '<div class="disclaimer"><p><strong>18+ Only</strong></p><p>Predictions are for informational purposes only. Gambling involves financial risk and may lead to addiction. Please play responsibly.</p></div>';
+  return html;
+}
+
+function buildUnavailableHtml() {
+  return '<div class="analysis-section" style="background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.2);">' +
+    '<h3 style="color: #ef4444;">Analysis Unavailable</h3>' +
+    '<p style="margin-bottom: 12px; line-height: 1.6;">We could not find analysis data for this fixture. It may not be covered by today\'s predictions yet. View all predictions on the <a href="/" style="color: #ef4444;">home page</a>.</p>' +
+    '</div>' +
+    '<div class="disclaimer"><p><strong>18+ Only</strong></p><p>Predictions are for informational purposes only. Gambling involves financial risk and may lead to addiction. Please play responsibly.</p></div>';
+}
+
+function buildStaticPage(home, away, slug, analysis, template) {
+  const cleanTitle = (home + ' vs ' + away).trim();
+  const url = SITE_URL + '/analysis/' + slug + '/';
+  const hasContent = !!analysis;
+  const desc = hasContent
+    ? cleanTitle + ' - detailed football match analysis: recent form, head-to-head results, team statistics and a betting summary.'
+    : 'Match analysis for ' + cleanTitle + ' from WinFulltime.';
+
+  let page = template;
+  page = page.replace('<title>Match Analysis - WinFulltime</title>', '<title>' + escapeHtml(cleanTitle + ' - Analysis - WinFulltime') + '</title>');
+  page = page.replace('<meta name="description" content="Detailed football match analysis including recent form, head-to-head statistics, team performance metrics, and predictions.">', '<meta name="description" content="' + escapeHtml(desc) + '">');
+  page = page.replace('<link rel="canonical" href="https://winfulltime.com/analysis.html">', '<link rel="canonical" href="' + url + '">');
+  page = page.replace('<meta property="og:title" content="Match Analysis - WinFulltime">', '<meta property="og:title" content="' + escapeHtml(cleanTitle + ' - Analysis - WinFulltime') + '">');
+  page = page.replace('<meta property="og:description" content="Detailed football match analysis with statistics and predictions.">', '<meta property="og:description" content="' + escapeHtml(desc) + '">');
+  page = page.replace('<meta name="robots" content="index, follow">', hasContent ? '<meta name="robots" content="index, follow">' : '<meta name="robots" content="noindex, nofollow">');
+
+  const start = page.indexOf('<div id="staticContent">');
+  if (start < 0) throw new Error('Template missing <div id="staticContent">');
+
+  // Anchor on the analysis script itself so additional inline scripts do not
+  // shift the replacement region. Fall back to the first script after the
+  // static content block if the anchor is missing.
+  const jsAnchor = page.indexOf('async function loadAnalysis');
+  let scriptIdx = page.lastIndexOf('<script>', jsAnchor);
+  let scriptClose = jsAnchor >= 0 ? page.indexOf('</script>', jsAnchor) : -1;
+  if (jsAnchor < 0 || scriptIdx < start || scriptClose < 0) {
+    scriptIdx = page.indexOf('<script>', start);
+    scriptClose = page.indexOf('</script>', scriptIdx);
+    if (scriptIdx < 0 || scriptClose < 0) throw new Error('Template missing analysis script');
+  }
+  scriptClose += '</script>'.length;
+
+  const body = hasContent ? buildContentHtml(analysis, home, away) : buildUnavailableHtml();
+  const contentHtml = '<h1 id="matchTitle" style="font-size: 28px; margin-bottom: 20px;">' + escapeHtml(cleanTitle) + '</h1>\n\n<div id="content" style="display: block;">\n' + body + '\n</div>\n';
+
+  return page.slice(0, start) + contentHtml + page.slice(scriptClose);
+}
+
+function writePrerenderedPages(matchups, result, links, template) {
+  const usedSlugs = new Set();
+  fs.mkdirSync(PRERENDER_DIR, { recursive: true });
+  let written = 0;
+  matchups.forEach(function (m, i) {
+    const key = m.home.toLowerCase() + '|' + m.away.toLowerCase();
+    const analysis = result[key] || null;
+    if (!analysis || isEmptyAnalysis(analysis)) return;
+    let slug = matchupSlug(m.home, m.away);
+    if (!slug) slug = 'match-' + (i + 1);
+    let finalSlug = slug;
+    let n = 2;
+    while (usedSlugs.has(finalSlug)) {
+      finalSlug = slug + '-' + (n++);
+    }
+    usedSlugs.add(finalSlug);
+    links[key] = '/analysis/' + finalSlug + '/';
+
+    const page = buildStaticPage(m.home, m.away, finalSlug, analysis, template);
+    const dir = path.join(PRERENDER_DIR, finalSlug);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'index.html'), page);
+    written++;
+  });
+  fs.mkdirSync(path.dirname(LINKS_FILE), { recursive: true });
+  fs.writeFileSync(LINKS_FILE, JSON.stringify(links));
+
+  fs.readdirSync(PRERENDER_DIR).forEach(function (d) {
+    if (usedSlugs.has(d)) return;
+    const dir = path.join(PRERENDER_DIR, d);
+    if (!fs.statSync(dir).isDirectory()) return;
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  console.log('[analysis] Prerendered', written, 'static pages to', PRERENDER_DIR);
 }
 
 function collectMatchups(predictions) {
@@ -322,7 +492,7 @@ async function runStatareaPhase() {
   return loadAnalysisCacheFile();
 }
 
-async function buildFotMobAnalysis(home, away, date, fixturesByDate, fixturesCache) {
+async function buildFotMobAnalysis(home, away, date, fixturesCache) {
   const candidates = [date];
   const prev = addDays(date, -1);
   const next = addDays(date, 1);
@@ -424,7 +594,7 @@ async function main() {
       return { key: key, value: cached };
     }
     try {
-      const analysis = await buildFotMobAnalysis(m.home, m.away, m.date, null, fixturesCache);
+      const analysis = await buildFotMobAnalysis(m.home, m.away, m.date, fixturesCache);
       if (analysis && !isEmptyAnalysis(analysis)) {
         console.log('[analysis] fotmob: ' + m.home + ' vs ' + m.away);
         return { key: key, value: analysis };
@@ -441,10 +611,28 @@ async function main() {
     if (entry) result[entry.key] = entry.value;
   });
 
+  // Include cached analyses for matchups beyond the per-run processing cap so
+  // previously-analyzed fixtures still get a prerendered page.
+  matchups.slice(maxMatchups).forEach(function (m) {
+    const key = m.home.toLowerCase() + '|' + m.away.toLowerCase();
+    if (result[key]) return;
+    const reverseKey = m.away.toLowerCase() + '|' + m.home.toLowerCase();
+    const cached = statareaCache[key] || statareaCache[reverseKey];
+    if (cached && !isEmptyAnalysis(cached)) result[key] = cached;
+  });
+
   const out = { generatedAt: new Date().toISOString(), matchups: result };
   fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
   fs.writeFileSync(OUTPUT_FILE, JSON.stringify(out));
   console.log('[analysis] Saved', OUTPUT_FILE, 'with', Object.keys(result).length, 'matchups');
+
+  if (fs.existsSync(ANALYSIS_TEMPLATE_FILE)) {
+    const template = fs.readFileSync(ANALYSIS_TEMPLATE_FILE, 'utf8');
+    const links = {};
+    writePrerenderedPages(matchups, result, links, template);
+  } else {
+    console.warn('[analysis] No public/analysis.html template — skipping prerender');
+  }
 }
 
 if (require.main === module) {
@@ -461,5 +649,10 @@ module.exports = {
   isEmptyAnalysis,
   extractTeamStats,
   extractH2HList,
+  slugifyTeam,
+  matchupSlug,
+  buildContentHtml,
+  buildStaticPage,
+  writePrerenderedPages,
   main
 };

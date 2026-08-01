@@ -1,22 +1,31 @@
-const CACHE_NAME = 'winfulltime-v3';
-const STATIC_CACHE = 'winfulltime-static-v3';
-const DYNAMIC_CACHE = 'winfulltime-dynamic-v3';
-const IMAGE_CACHE = 'winfulltime-images-v3';
+const CACHE_NAME = 'winfulltime-v4';
+const STATIC_CACHE = 'winfulltime-static-v4';
+const DYNAMIC_CACHE = 'winfulltime-dynamic-v4';
+const IMAGE_CACHE = 'winfulltime-images-v4';
 
 const STATIC_ASSETS = [
   '/',
   '/index.html',
+  '/app.html',
   '/ticket-builder.html',
+  '/best-picks.html',
+  '/author-picks.html',
+  '/2-odds-of-the-day.html',
+  '/analysis.html',
+  '/about.html',
+  '/options.html',
+  '/offline.html',
   '/styles.css',
   '/app.css',
   '/auth.js',
   '/config.js',
+  '/pwa.js',
   '/supabase-client.js',
+  '/responsible-gambling.js',
   '/winfulltimelogo.png',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
   '/manifest.json',
-  '/offline.html',
   '/predictions/1x2.html',
   '/predictions/over-2-5.html',
   '/predictions/over-1-5.html',
@@ -65,6 +74,11 @@ self.addEventListener('fetch', event => {
   }
 
   if (url.pathname.startsWith('/predictions/')) {
+    event.respondWith(networkFirst(request, DYNAMIC_CACHE));
+    return;
+  }
+
+  if (url.pathname.startsWith('/data/')) {
     event.respondWith(networkFirst(request, DYNAMIC_CACHE));
     return;
   }

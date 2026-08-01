@@ -1288,43 +1288,6 @@ function getAllMatchupsFromPredictions() {
   return Array.from(matchups);
 }
 
-let backgroundScrapingInProgress = false;
-
-async function scrapeSingleAnalysis(homeTeam, awayTeam) {
-  console.log(`[Single Analysis] Scraping: ${homeTeam} vs ${awayTeam}`);
-  const analysis = await getTeamAnalysis(homeTeam, awayTeam);
-  
-  const currentCache = loadAnalysisCache();
-  const key1 = `${homeTeam.toLowerCase()}|${awayTeam.toLowerCase()}`;
-  const key2 = `${awayTeam.toLowerCase()}|${homeTeam.toLowerCase()}`;
-  currentCache[key1] = analysis;
-  currentCache[key2] = analysis;
-  saveAnalysisCache(currentCache);
-  
-  return analysis;
-}
-
-function triggerBackgroundScraping() {
-  if (backgroundScrapingInProgress) {
-    console.log('[Background] Scraping already in progress, skipping');
-    return;
-  }
-  
-  backgroundScrapingInProgress = true;
-  console.log('[Background] Starting background analysis scraping...');
-  
-  scrapeMissingAnalysis()
-    .then(() => {
-      console.log('[Background] Completed background analysis scraping');
-    })
-    .catch(err => {
-      console.error('[Background] Error:', err.message);
-    })
-    .finally(() => {
-      backgroundScrapingInProgress = false;
-    });
-}
-
 async function scrapeMissingAnalysis() {
   return withScraperLock(async () => {
     console.log('[Analysis Scraper] Starting to scrape missing analysis data...');
@@ -1380,9 +1343,7 @@ async function scrapeMissingAnalysis() {
         
         const currentCache = loadAnalysisCache();
         const key1 = `${homeTeam.toLowerCase()}|${awayTeam.toLowerCase()}`;
-        const key2 = `${awayTeam.toLowerCase()}|${homeTeam.toLowerCase()}`;
         currentCache[key1] = analysis;
-        currentCache[key2] = analysis;
         saveAnalysisCache(currentCache);
         
         console.log(`[Analysis Scraper] Saved analysis for ${homeTeam} vs ${awayTeam}`);
@@ -1657,9 +1618,7 @@ async function getTeamAnalysis(homeTeam, awayTeam) {
     
     const analysisCache = loadAnalysisCache();
     const key1 = `${homeTeam.toLowerCase()}|${awayTeam.toLowerCase()}`;
-    const key2 = `${awayTeam.toLowerCase()}|${homeTeam.toLowerCase()}`;
     analysisCache[key1] = result;
-    analysisCache[key2] = result;
     saveAnalysisCache(analysisCache);
     
   } catch (err) {
@@ -1937,16 +1896,16 @@ function generateMatchSummary(analysis) {
   
   let formDescription = '';
   if (homeWins > awayWins + 1) {
-    formDescription = `${homeClean} comes into this match in excellent form with ${homeWins} wins from their last 5 matches, including home performances yielding an average of ${homeAvgScored} goals scored.`;
+    formDescription = `${homeClean} comes into this match in excellent form with ${homeWins} wins from their last 5 matches, recently averaging ${homeAvgScored} goals scored per game.`;
   } else if (awayWins > homeWins + 1) {
-    formDescription = `${awayClean} enters this fixture in superior condition, winning ${awayWins} of their last 5 games and averaging ${awayAvgScored} goals per match on the road.`;
-  } else if (homeWins === awayWins) {
+    formDescription = `${awayClean} enters this fixture in superior condition, winning ${awayWins} of their last 5 games and averaging ${awayAvgScored} goals scored per game.`;
+  } else if (homeWins === awayWins && homeWins > 0) {
     formDescription = `Both teams arrive with identical recent records, each winning ${homeWins} of their last 5 matches, setting up what promises to be a closely contested encounter.`;
   } else {
     formDescription = `Both teams show similar recent form with ${homeWins} wins for ${homeClean} and ${awayWins} for ${awayClean}, making this a difficult match to predict confidently.`;
   }
   
-  let statsDescription = `Defensively, ${homeClean} has conceded an average of ${homeAvgConceded} goals per home game while ${awayClean} has shipped ${awayAvgConceded} away, suggesting potential for goals in either direction.`;
+  let statsDescription = `Defensively, ${homeClean} has conceded an average of ${homeAvgConceded} goals per game while ${awayClean} has shipped ${awayAvgConceded}, keeping things competitive at both ends.`;
   
   let h2hDescription = '';
   if (h2h && h2h.length > 0) {
@@ -2079,8 +2038,6 @@ module.exports = {
   saveAnalysisCache,
   pruneResultsCache,
   scrapeMissingAnalysis,
-  scrapeSingleAnalysis,
-  triggerBackgroundScraping,
   getResultsCache,
   scrapeYesterdayResults
 };

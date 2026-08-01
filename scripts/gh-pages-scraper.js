@@ -403,6 +403,27 @@ function updateSitemapCore() {
     })
     .join('\n');
 
+  // Prerendered match-analysis pages (only indexable ones are listed).
+  const analysisDir = path.join(process.cwd(), 'public', 'analysis');
+  const analysisEntries = [];
+  if (fs.existsSync(analysisDir)) {
+    fs.readdirSync(analysisDir)
+      .filter(d => /^[\w-]+$/.test(d) && fs.statSync(path.join(analysisDir, d)).isDirectory())
+      .forEach(d => {
+        const page = path.join(analysisDir, d, 'index.html');
+        if (!fs.existsSync(page)) return;
+        const robots = (fs.readFileSync(page, 'utf8').match(/<meta name="robots"[^>]*>/i) || [''])[0];
+        if (/noindex/i.test(robots)) return;
+        analysisEntries.push(`  <url>
+    <loc>https://winfulltime.com/analysis/${d}/</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>`);
+      });
+  }
+  const analysisXml = analysisEntries.join('\n');
+
   const coreXml = coreUrls.map(u => `  <url>
     <loc>${u.loc}</loc>
     <lastmod>${today}</lastmod>
@@ -413,6 +434,7 @@ function updateSitemapCore() {
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${coreXml}
+${analysisXml}
 ${blogEntries}
 </urlset>
 `;
