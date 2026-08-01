@@ -230,38 +230,49 @@ function generateSummary(analysis) {
   const awayAvgScored = a10.avgScored != null ? a10.avgScored : 0;
   const awayAvgConceded = a10.avgConceded != null ? a10.avgConceded : 0;
 
-  let formDescription = '';
-  if (homeWins > awayWins + 1) {
-    formDescription = homeClean + ' comes into this match in excellent form with ' + homeWins + ' wins from their last 5 matches, recently averaging ' + homeAvgScored + ' goals scored per game.';
-  } else if (awayWins > homeWins + 1) {
-    formDescription = awayClean + ' enters this fixture in superior condition, winning ' + awayWins + ' of their last 5 games and averaging ' + awayAvgScored + ' goals scored per game.';
-  } else if (homeWins === awayWins && homeWins > 0) {
-    formDescription = 'Both teams arrive with identical recent records, each winning ' + homeWins + ' of their last 5 matches, setting up what promises to be a closely contested encounter.';
-  } else {
-    formDescription = 'Both teams show similar recent form with ' + homeWins + ' wins for ' + homeClean + ' and ' + awayWins + ' for ' + awayClean + ', making this a difficult match to predict confidently.';
+  const homeHasForm = sideHasTeamData(hf, h10);
+  const awayHasForm = sideHasTeamData(af, a10);
+
+  let parts = [];
+
+  if (homeHasForm && awayHasForm) {
+    if (homeWins > awayWins + 1) {
+      parts.push(homeClean + ' comes into this match in excellent form with ' + homeWins + ' wins from their last 5 matches, recently averaging ' + homeAvgScored + ' goals scored per game.');
+    } else if (awayWins > homeWins + 1) {
+      parts.push(awayClean + ' enters this fixture in superior condition, winning ' + awayWins + ' of their last 5 games and averaging ' + awayAvgScored + ' goals scored per game.');
+    } else if (homeWins === awayWins && homeWins > 0) {
+      parts.push('Both teams arrive with identical recent records, each winning ' + homeWins + ' of their last 5 matches, setting up what promises to be a closely contested encounter.');
+    } else {
+      parts.push('Both teams show similar recent form with ' + homeWins + ' wins for ' + homeClean + ' and ' + awayWins + ' for ' + awayClean + ', making this a difficult match to predict confidently.');
+    }
+    parts.push('Defensively, ' + homeClean + ' has conceded an average of ' + homeAvgConceded + ' goals per game while ' + awayClean + ' has shipped ' + awayAvgConceded + ', keeping things competitive at both ends.');
+  } else if (homeHasForm) {
+    parts.push(homeClean + ' come into this match with ' + homeWins + ' wins from their last 5 matches, averaging ' + homeAvgScored + ' goals scored per game.');
+  } else if (awayHasForm) {
+    parts.push(awayClean + ' come into this match with ' + awayWins + ' wins from their last 5 games, averaging ' + awayAvgScored + ' goals scored per game.');
   }
 
-  const statsDescription = 'Defensively, ' + homeClean + ' has conceded an average of ' + homeAvgConceded + ' goals per game while ' + awayClean + ' has shipped ' + awayAvgConceded + ', keeping things competitive at both ends.';
-
-  let h2hDescription = '';
   const h2h = analysis.h2h || [];
   if (h2h.length > 0) {
     const homeH2HWins = h2h.filter(h => h.homeGoals > h.awayGoals).length;
     const awayH2HWins = h2h.filter(h => h.awayGoals > h.homeGoals).length;
     const draws = h2h.length - homeH2HWins - awayH2HWins;
-    h2hDescription = ' Their head-to-head history shows ' + homeClean + ' winning ' + homeH2HWins + ', ' + awayClean + ' winning ' + awayH2HWins + ', and ' + draws + ' draws in their last ' + h2h.length + ' meetings.';
+    parts.push('Their head-to-head history shows ' + homeClean + ' winning ' + homeH2HWins + ', ' + awayClean + ' winning ' + awayH2HWins + ', and ' + draws + ' draws in their last ' + h2h.length + ' meetings.');
   }
 
-  let predictionHint = '';
-  if (homeWins > awayWins && homeAvgScored > awayAvgConceded) {
-    predictionHint = homeClean + ' appears better positioned for a positive result.';
-  } else if (awayWins > homeWins && awayAvgScored > homeAvgConceded) {
-    predictionHint = awayClean + ' looks better placed to take something from this match.';
-  } else {
-    predictionHint = 'Expect a competitive match with the potential for a share of the spoils.';
+  if (homeHasForm && awayHasForm) {
+    if (homeWins > awayWins && homeAvgScored > awayAvgConceded) {
+      parts.push(homeClean + ' appears better positioned for a positive result.');
+    } else if (awayWins > homeWins && awayAvgScored > homeAvgConceded) {
+      parts.push(awayClean + ' looks better placed to take something from this match.');
+    } else {
+      parts.push('Expect a competitive match with the potential for a share of the spoils.');
+    }
+  } else if (h2h.length > 0) {
+    parts.push('Historical meetings suggest this fixture could produce a competitive contest.');
   }
 
-  return (formDescription + ' ' + statsDescription + h2hDescription + ' ' + predictionHint).replace(/\s+/g, ' ').trim();
+  return parts.join(' ').replace(/\s+/g, ' ').trim();
 }
 
 function sideHasTeamData(form, last10) {
@@ -271,11 +282,14 @@ function sideHasTeamData(form, last10) {
     Number(s.avgScored || 0) > 0;
 }
 
-// Reject matchups where either team has no form or statistics, otherwise the
-// page renders misleading zeroed-out stats and summaries for that side.
+// Reject matchups with no usable data at all. Matchups with partial data
+// (form, statistics, or head-to-head for either side) are kept so over/under
+// and BTTS fixtures still get a page; the renderer shows only what exists.
 function isEmptyAnalysis(a) {
   if (!a) return true;
-  return !sideHasTeamData(a.homeForm, a.homeLast10) || !sideHasTeamData(a.awayForm, a.awayLast10);
+  return !sideHasTeamData(a.homeForm, a.homeLast10) &&
+         !sideHasTeamData(a.awayForm, a.awayLast10) &&
+         !(a.h2h && a.h2h.length);
 }
 
 function escapeHtml(value) {
@@ -327,24 +341,51 @@ function hasStats(stats) {
   return (s.wins || 0) + (s.draws || 0) + (s.losses || 0) > 0 || Number(s.avgScored || 0) > 0;
 }
 
+function renderNoDataCard(team, note) {
+  return '<div class="analysis-card"><h4>' + escapeHtml(cleanTeamName(team)) + '</h4><p style="margin:0;color:rgba(232,237,245,0.55);font-size:13px;line-height:1.5;">' + note + '</p></div>';
+}
+
 function buildContentHtml(analysis, home, away) {
-  const hasForm = !!(analysis.homeForm && analysis.awayForm);
-  const hasStat = hasStats(analysis.homeLast10) || hasStats(analysis.awayLast10);
+  const homeName = analysis.homeTeam || home;
+  const awayName = analysis.awayTeam || away;
   const h2h = analysis.h2h || [];
   const summary = analysis.summary || '';
   let html = '';
-  if (hasForm) {
-    html += '<div class="analysis-section"><h3>Recent Form</h3><div class="analysis-grid">' +
-      renderForm(analysis.homeTeam || home, analysis.homeForm) +
-      renderForm(analysis.awayTeam || away, analysis.awayForm) +
-      '</div></div>';
+
+  const formCards = [];
+  const homeHasForm = sideHasTeamData(analysis.homeForm, analysis.homeLast10);
+  const awayHasForm = sideHasTeamData(analysis.awayForm, analysis.awayLast10);
+  if (homeHasForm) {
+    formCards.push(renderForm(homeName, analysis.homeForm));
+  } else if (awayHasForm) {
+    formCards.push(renderNoDataCard(homeName, 'No recent form data available for ' + escapeHtml(cleanTeamName(homeName)) + '.'));
   }
-  if (hasStat) {
-    html += '<div class="analysis-section"><h3>Statistics (Last 10 Matches)</h3><div class="analysis-grid">' +
-      renderStats(analysis.homeTeam || home, analysis.homeLast10) +
-      renderStats(analysis.awayTeam || away, analysis.awayLast10) +
-      '</div></div>';
+  if (awayHasForm) {
+    formCards.push(renderForm(awayName, analysis.awayForm));
+  } else if (homeHasForm) {
+    formCards.push(renderNoDataCard(awayName, 'No recent form data available for ' + escapeHtml(cleanTeamName(awayName)) + '.'));
   }
+  if (formCards.length) {
+    html += '<div class="analysis-section"><h3>Recent Form</h3><div class="analysis-grid">' + formCards.join('') + '</div></div>';
+  }
+
+  const statCards = [];
+  const homeHasStats = hasStats(analysis.homeLast10);
+  const awayHasStats = hasStats(analysis.awayLast10);
+  if (homeHasStats) {
+    statCards.push(renderStats(homeName, analysis.homeLast10));
+  } else if (awayHasStats) {
+    statCards.push(renderNoDataCard(homeName, 'No recent statistics available for ' + escapeHtml(cleanTeamName(homeName)) + '.'));
+  }
+  if (awayHasStats) {
+    statCards.push(renderStats(awayName, analysis.awayLast10));
+  } else if (homeHasStats) {
+    statCards.push(renderNoDataCard(awayName, 'No recent statistics available for ' + escapeHtml(cleanTeamName(awayName)) + '.'));
+  }
+  if (statCards.length) {
+    html += '<div class="analysis-section"><h3>Statistics (Last 10 Matches)</h3><div class="analysis-grid">' + statCards.join('') + '</div></div>';
+  }
+
   if (h2h.length > 0) {
     html += '<div class="analysis-section"><h3>Head to Head</h3><div class="h2h-list">' +
       h2h.slice(0, 5).map(function (h) {
@@ -574,7 +615,7 @@ async function main() {
   }
 
   const matchups = collectMatchups(predictions);
-  const maxMatchups = parseInt(process.env.ANALYSIS_MAX_MATCHUPS, 10) || 200;
+  const maxMatchups = parseInt(process.env.ANALYSIS_MAX_MATCHUPS, 10) || 500;
   const limited = matchups.slice(0, maxMatchups);
   console.log('[analysis] Matchups found:', matchups.length, '| processing up to', limited.length);
 
