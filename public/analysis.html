@@ -412,45 +412,165 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
 
 
- if (homeTeam && awayTeam) {
+ function escapeHtml(value) {
 
- document.getElementById('staticContent').style.display = 'none';
+  return String(value || '').replace(/[&<>"']/g, function (c) {
+   return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
 
- document.getElementById('matchTitle').style.display = 'block';
+ }
 
- document.getElementById('content').style.display = 'block';
+ function getFormClass(char) {
+  if (char === 'W') return 'form-win';
+  if (char === 'D') return 'form-draw';
+  if (char === 'L') return 'form-loss';
+  return '';
+ }
 
- document.getElementById('matchTitle').textContent = decodeURIComponent(homeTeam) + ' vs ' + decodeURIComponent(awayTeam);
+ function renderForm(team, form) {
+  return `
+  <div class="analysis-card">
+   <h4>${escapeHtml(team)}</h4>
+   <div class="form-bar">
+    ${String(form || '').slice(-5).split('').map(f => `<span class="form-result ${getFormClass(f)}">${escapeHtml(f)}</span>`).join('')}
+   </div>
+  </div>`;
+ }
 
- document.title = decodeURIComponent(homeTeam) + ' vs ' + decodeURIComponent(awayTeam) + ' - WinFulltime';
+ function renderStats(team, stats) {
+  const s = stats || {};
+  return `
+  <div class="analysis-card">
+   <h4>${escapeHtml(team)}</h4>
+   <div class="stats-grid">
+    <div class="stat-item"><div class="stat-label">W</div><div class="stat-value">${s.wins || 0}</div></div>
+    <div class="stat-item"><div class="stat-label">D</div><div class="stat-value">${s.draws || 0}</div></div>
+    <div class="stat-item"><div class="stat-label">L</div><div class="stat-value">${s.losses || 0}</div></div>
+    <div class="stat-item"><div class="stat-label">Scored</div><div class="stat-value">${s.avgScored ? Number(s.avgScored).toFixed(1) : 0}</div></div>
+    <div class="stat-item"><div class="stat-label">Conceded</div><div class="stat-value">${s.avgConceded ? Number(s.avgConceded).toFixed(1) : 0}</div></div>
+   </div>
+  </div>`;
+ }
 
+ function hasStats(stats) {
+  const s = stats || {};
+  return (s.wins || 0) + (s.draws || 0) + (s.losses || 0) > 0 || Number(s.avgScored || 0) > 0;
+ }
 
+ function renderUnavailable() {
+  document.getElementById('content').innerHTML = `
+  <div class="analysis-section" style="background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.2);">
+   <h3 style="color: #ef4444;">Analysis Unavailable</h3>
+   <p style="margin-bottom: 12px; line-height: 1.6;">
+    We could not find analysis data for this fixture. It may not be covered by today's predictions yet. View all predictions on the
+    <a href="/" style="color: #ef4444;">home page</a>.
+   </p>
+  </div>
+  <div class="disclaimer">
+   <p><strong>18+ Only</strong></p>
+   <p>Predictions are for informational purposes only. Gambling involves financial risk and may lead to addiction. Please play responsibly.</p>
+  </div>`;
+ }
 
- document.getElementById('content').innerHTML = `
+ function renderAnalysis(analysis) {
+  const hasForm = (analysis.homeForm || '') && (analysis.awayForm || '');
+  const hasStat = hasStats(analysis.homeLast10) || hasStats(analysis.awayLast10);
+  const h2h = analysis.h2h || [];
+  const summary = analysis.summary || '';
 
- <div class="analysis-section" style="background: #fef2f2; border: 1px solid #fecaca;">
+  if (!hasForm && !hasStat && h2h.length === 0 && !summary) {
+   renderUnavailable();
+   return;
+  }
 
- <h3 style="color: #dc2626;">Analysis Unavailable</h3>
+  document.getElementById('content').innerHTML = `
+  ${hasForm ? `
+  <div class="analysis-section">
+   <h3>Recent Form</h3>
+   <div class="analysis-grid">
+    ${renderForm(analysis.homeTeam || homeTeam, analysis.homeForm)}
+    ${renderForm(analysis.awayTeam || awayTeam, analysis.awayForm)}
+   </div>
+  </div>` : ''}
+  ${hasStat ? `
+  <div class="analysis-section">
+   <h3>Statistics (Last 10 Matches)</h3>
+   <div class="analysis-grid">
+    ${renderStats(analysis.homeTeam || homeTeam, analysis.homeLast10)}
+    ${renderStats(analysis.awayTeam || awayTeam, analysis.awayLast10)}
+   </div>
+  </div>` : ''}
+  ${h2h.length > 0 ? `
+  <div class="analysis-section">
+   <h3>Head to Head</h3>
+   <div class="h2h-list">
+    ${h2h.slice(0, 5).map(h => `
+    <div class="h2h-item">
+     <span>${escapeHtml(h.homeTeam)}</span>
+     <span>${Number(h.homeGoals) || 0} - ${Number(h.awayGoals) || 0}</span>
+     <span>${escapeHtml(h.awayTeam)}</span>
+    </div>`).join('')}
+   </div>
+  </div>` : ''}
+  ${summary ? `
+  <div class="summary-section">
+   <h3>Match Summary</h3>
+   <div class="summary-text">
+    <p>${escapeHtml(summary)}</p>
+   </div>
+  </div>` : ''}
+  <div class="disclaimer">
+   <p><strong>18+ Only</strong></p>
+   <p>Predictions are for informational purposes only. Gambling involves financial risk and may lead to addiction. Please play responsibly.</p>
+  </div>`;
+ }
 
- <p style="margin-bottom: 12px; line-height: 1.6;">
+ async function loadAnalysis() {
+  try {
+   const response = await fetch('/data/analysis.json', { cache: 'no-store' });
+   if (!response.ok) {
+    renderUnavailable();
+    return;
+   }
+   const data = await response.json();
+   const homeClean = decodeURIComponent(homeTeam).trim();
+   const awayClean = decodeURIComponent(awayTeam).trim();
+   let analysis;
+   if (homeClean && awayClean) {
+    const key = homeClean.toLowerCase() + '|' + awayClean.toLowerCase();
+    analysis = data && data.matchups && data.matchups[key];
+   } else if (homeClean) {
+    const match = Object.keys(data && data.matchups || {}).find(k => k.split('|')[0] === homeClean.toLowerCase());
+    analysis = match ? data.matchups[match] : null;
+   }
+   if (analysis) {
+    renderAnalysis(analysis);
+   } else {
+    renderUnavailable();
+   }
+  } catch (error) {
+   console.error('Error loading analysis:', error);
+   renderUnavailable();
+  }
+ }
 
- Match analysis is not available in static mode. View all predictions on the
+ if (homeTeam) {
 
- <a href="/" style="color: #ef4444;">home page</a>.
+  document.getElementById('staticContent').style.display = 'none';
 
-</p>
+  document.getElementById('matchTitle').style.display = 'block';
 
-</div>
+  document.getElementById('content').style.display = 'block';
 
- <div class="disclaimer">
+  const titleHome = decodeURIComponent(homeTeam);
 
- <p><strong>18+ Only</strong></p>
+  const titleAway = awayTeam ? decodeURIComponent(awayTeam) : '';
 
- <p>Predictions are for informational purposes only. Gambling involves financial risk and may lead to addiction. Please play responsibly.</p>
+  document.getElementById('matchTitle').textContent = titleAway ? titleHome + ' vs ' + titleAway : titleHome;
 
-</div>
+  document.title = (titleAway ? titleHome + ' vs ' + titleAway : titleHome) + ' - WinFulltime';
 
- `;
+  loadAnalysis();
 
  }
 

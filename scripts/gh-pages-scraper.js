@@ -2,6 +2,7 @@ const scraper = require('../src/services/scraper');
 const { scrapeUnbeatenStreaks } = require('./scrape-h2h-unbeaten');
 const { scrapeBttsNo } = require('./scrape-btts-no');
 const { generateAllPages } = require('./generate-category-pages');
+const buildAnalysis = require('./build-analysis');
 const fs = require('fs');
 const path = require('path');
 
@@ -330,6 +331,16 @@ async function main() {
   }
 
   enrichPublishedPredictions(dataDir);
+
+  // Match analysis (statarea first, FotMob fallback). Reads the freshly
+  // written predictions.json, so it must run after every market is merged.
+  console.log('Building match analysis...');
+  try {
+    await buildAnalysis.main();
+  } catch (err) {
+    console.error('Analysis build failed:', err.message);
+  }
+
   console.log('All data written to public/data/');
 
   // Generate static category pages

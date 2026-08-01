@@ -1135,11 +1135,31 @@ gtag('config', 'G-HMGZMW9EDP');
 
  
 
- document.querySelectorAll('.match-card').forEach(card => {
+  document.querySelectorAll('.match-card[data-match]').forEach(card => {
 
- card.style.cursor = 'default';
+  card.style.cursor = 'pointer';
 
- });
+  card.addEventListener('click', function () {
+
+  let match;
+
+  try { match = JSON.parse(decodeURIComponent(this.getAttribute('data-match'))); } catch (e) { return; }
+
+  const matchStr = match.match || match.nextMatch || '';
+
+  const teams = matchStr.includes(' - ') ? matchStr.split(' - ') : matchStr.split(' vs ');
+
+  const home = (teams[0] || '').trim();
+
+  const away = (teams[1] || '').trim();
+
+  if (!home || !away) return;
+
+  window.location.href = '/analysis.html?home=' + encodeURIComponent(home) + '&away=' + encodeURIComponent(away);
+
+  });
+
+  });
 
 
 

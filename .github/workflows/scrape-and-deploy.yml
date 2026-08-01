@@ -10,7 +10,8 @@ on:
     paths:
       - 'public/**'
       - 'src/templates/**'
-      - 'scripts/bake-layout.js'
+      - 'src/services/**'
+      - 'scripts/**'
       - '.github/workflows/scrape-and-deploy.yml'
   schedule:
     - cron: '3 0 * * *'
