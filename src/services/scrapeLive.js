@@ -660,11 +660,17 @@ function getCachedLive() {
   return liveCache;
 }
 
+const { forceRestartIfMemoryCritical } = require('./memoryGuard');
+
 function startLiveScrapeLoop() {
   if (scrapeTimer) return;
   console.log('[fotmob-live] Starting scrape loop (every 5 min)');
+  forceRestartIfMemoryCritical();
   scrapeLive();
-  scrapeTimer = setInterval(scrapeLive, SCRAPE_INTERVAL_MS);
+  scrapeTimer = setInterval(function () {
+    forceRestartIfMemoryCritical();
+    scrapeLive();
+  }, SCRAPE_INTERVAL_MS);
 }
 
 module.exports = { scrapeLive, getCachedLive, startLiveScrapeLoop };

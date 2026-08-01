@@ -8,6 +8,22 @@ const axios = require('axios');
 const apiRoutes = require('./src/routes/api');
 const chatRoutes = require('./src/routes/chat');
 const { applyLayout, staticWithLayout } = require('./src/templates/layout');
+const { forceRestartIfMemoryCritical } = require('./src/services/memoryGuard');
+
+// On small Render instances Node's heap limit is auto-tuned close to the
+// container ceiling; crossing it aborts the process (SIGABRT → exit 134),
+// which Render reports as a server-failure alert. forceRestartIfMemoryCritical()
+// logs the reason and exits cleanly (exit 0) before the OOM abort triggers.
+
+// Surface the real crash cause in Render logs (an uncaught exception inside a
+// timer previously killed the process with no trace, looking like exit 134).
+process.on('uncaughtException', (err) => {
+  console.error('[uncaughtException] FATAL:', err && err.stack ? err.stack : err);
+  process.exit(1);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('[unhandledRejection]', reason && reason.stack ? reason.stack : reason);
+});
 
 const YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@winfulltime/videos';
 
@@ -480,6 +496,7 @@ startLiveScrapeLoop();
   }
 })();
 setInterval(async function() {
+  forceRestartIfMemoryCritical();
   try {
     const memMB = Math.round(process.memoryUsage().heapUsed / 1024 / 1024);
     if (memMB > 380) {
@@ -506,6 +523,7 @@ setInterval(async function() {
   }
 })();
 setInterval(async function() {
+  forceRestartIfMemoryCritical();
   try {
     console.log('[cron] Refreshing Author Picks pool...');
     const result = await buildGiantPool();
