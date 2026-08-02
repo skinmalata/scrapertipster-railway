@@ -106,6 +106,17 @@ nav a:hover{color:var(--accent)}
 .stats-table th{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
 .stats-table td{font-weight:500}
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--border-light);color:var(--text-muted);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+.toc{background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h3{margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted)}
+.toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:24px}
+.toc li{margin-bottom:6px;font-size:14px}
+.toc li a{color:var(--text-primary)}
+.toc li a:hover{color:var(--accent)}
+.faq{margin:32px 0}
+.faq h2{margin:0 0 8px}
+.faq-item{border:1px solid var(--border-light);border-radius:12px;padding:18px 22px;margin:14px 0}
+.faq-item h3{margin:0 0 8px;font-size:17px}
+.faq-item p{margin:0;color:var(--text-muted)}
 .cta{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;padding:28px 32px;text-align:center;margin:38px 0}
 .cta h3{font-size:20px;font-weight:700;margin-bottom:10px}
 .social-share{display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -251,6 +262,15 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   ]
 }
 </script>
+<!-- FAQPage schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"What is goal trading in football?","acceptedAnswer":{"@type":"Answer","text":"Goal trading is buying a position before an expected goal and selling it after the market re-prices. Every goal swings the price of the match result and the over/under markets, and the market overreacts to each event. The trader prices the reaction faster than the board and banks the gap between the pre-goal and post-goal prices."}},{"@type":"Question","name":"What are the two basic goal trades?","acceptedAnswer":{"@type":"Answer","text":"The first is backing a result before a goal you expect and laying it once the market moves in your favour. The second is trading the over/under market: backing over before goals arrive and laying it, or taking an under position after a quick goal inflates the over price. Both depend on reading the match dynamics, not just following the score."}},{"@type":"Question","name":"When are goals tradeable?","acceptedAnswer":{"@type":"Answer","text":"Goals are tradeable when the market's price movement is predictable: a dominant side creating clear chances against a tiring defence, a team chasing a result late, or an open game where the over price is likely to shrink. The skill is identifying the repricing before it happens and having a disciplined exit point if the goal does not come."}},{"@type":"Question","name":"What is the psychology of a successful trade?","acceptedAnswer":{"@type":"Answer","text":"The psychology is ruthless: enter with a defined risk, exit at a defined price, and never let a single match change the plan. The hardest moment is holding through the minutes when nothing happens, and the most dangerous is overtrading after a win. A goal trader thinks in price, not in results, and treats every trade as one repetition of a process."}}]
+}
+</script>
+
 </head>
 <body>
 <header>
@@ -260,16 +280,17 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav id="nav">
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/best-picks.html">Best Picks</a>
- <a href="/author-picks.html">Author Picks</a>
- <a href="/predictions/in-play">In-Play</a>
- <a href="/blog/" class="active">Blog</a>
- <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-  <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
-  <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
- </span></nav>
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/author-picks.html">Author Picks</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/blog/" class="active">Blog</a>
+   <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
+    <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
+   </span>
+  </nav>
  </div>
 </header>
 
@@ -282,14 +303,49 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <p class="lead">Every goal is a repricing event. The market overreacts to each one — and the trader who prices the reaction faster than the board banks the gap.</p>
 
-  <figure class="figure">
-   <img src="/blog/thumbnails/goal-trading-live-football.webp" alt="Goal Trading: Backing and Laying Live Matches | WinFulltime" width="1200" height="630" loading="eager">
-   <figcaption>Backing and laying around the market swing of a goal</figcaption>
-  </figure>
+   <figure class="figure">
+    <img src="/blog/thumbnails/goal-trading-live-football.webp" alt="Goal Trading: Backing and Laying Live Matches | WinFulltime" width="1200" height="630" loading="eager">
+    <figcaption>Backing and laying around the market swing of a goal</figcaption>
+   </figure>
 
-  <p>Watch any live football market and you will see the same pattern repeat: a goal lands, the odds snap violently, and then the market slowly corrects. That snap-and-correct is the entire business of goal trading. You do not predict goals — you trade the emotional overreaction they cause.</p><h2>What a Goal Does to a Price</h2><p>When a team scores, the market reprices the match in milliseconds. The scoring side shortens dramatically; the conceding side drifts. But the reaction is usually <em>too big</em>, because liquidity is thin, algorithms extrapolate from one event, and recreational money piles into the momentum.</p><p>The correction comes minutes later, as the market reassesses the true state. A 0-0 draw with one team dominant produces a small correction; a lucky goal from a passive team produces a large one. The gap between the overreaction and the correction is the goal trader's income.</p><h2>The Two Basic Trades</h2><p><strong>Trade 1: Back the momentum before the goal.</strong> A team camped in the opposition box, generating chance after chance, is about to score. Its price is still drifting from the last event. Back it before the next repricing, then collect as the goal arrives.</p><p><strong>Trade 2: Lay the overreaction after the goal.</strong> A team scores a fortuitous opener; its price now overstates its real chance. Lay it at the inflated price, then back it back when the market calms — banking the difference regardless of the final score.</p><div class="highlight"><strong>Example:</strong> Home side dominating 0-0 at 1.70. You back them. They score: price snaps to 1.25. The market overcorrected — you lay them back at 1.25. If they win, your back/lay pair still profits on the swing; if they concede, the lay pays out.</div><h2>When Goals Are Tradeable</h2><p>Not every match is tradeable. The richest goal-trading environments share three traits:</p><ul><li><strong>High shot volume</strong> — a game with regular chances produces frequent swings.</li><li><strong>Mismatched quality</strong> — a clearly stronger side generates repeated, tradable momentum.</li><li><strong>Thin but active liquidity</strong> — enough volume to trade, few enough participants that the prices overreact.</li></ul><p>Matches between evenly-matched defensive sides produce almost nothing to trade. Recognising a dead market and staying out is as important as any entry.</p><h2>The Psychology of the Trade</h2><p>Goal trading punishes indecision harder than any other form of betting. The window after a goal is measured in seconds; the correction completes within minutes. Traders who hesitate watch the price recover without them, and traders who freeze when a position runs against them convert a small loss into a disaster.</p><p>The antidote is pre-decided exits. Before every trade, set the price at which you take profit and the price at which you accept the loss. Execution becomes mechanical, and mechanical execution is the whole game.</p><h2>Building the Trading Habit</h2><p>Goal trading is a craft learned in small stakes. Start with a single league you know intimately, trade only matches you are watching live, and keep a trade log with entry price, exit price, and the reason for each. After a hundred trades you will know whether the swing-reading skill is yours. Most beginners discover they are not faster than the market — and that discovery, made cheaply, is worth the tuition.</p><h2>Final Thoughts</h2><p>Goal trading is not betting on who wins — it is trading how the market <em>feels</em> about each goal. The football is just the fuel for the swing. Master the reaction, respect the exits, and log every trade, and you can turn the sport's most volatile moments into a repeatable process rather than a series of anxious gambles.</p><h2>Managing the Downside</h2><p>Goal trading looks effortless on a highlights reel and is brutally unforgiving in practice. The same market swings that create profit also create the fastest losses in betting: a position taken before a goal pays beautifully when the goal arrives, but the identical position collapses when the scoring chance is wasted and the price snaps back the other way. The asymmetry is the job description.</p><p>Three rules contain the damage. First, the stake is fixed before entry, like any other bet — a trade that runs against you is a real loss, not a rounding error. Second, the stop price is set at entry: if the price moves against you by a defined amount, the position is closed without hesitation, because hesitation after a missed chance is exactly when the market accelerates away. Third, the total exposure is capped: a bettor with five open live positions has five simultaneous chances to be wrong, and the emotional load compounds.</p><p>The honest assessment comes from the trade log. After every session, record the entries, exits and the reason for each. The log will show whether your goal reads come before the market's or after it. Most beginners discover they are reading the same momentum the price has already absorbed — a finding worth far more than the small stakes spent learning it. Goal trading is a craft of fast, pre-planned decisions; the bettor who treats it as an improvisation is simply gambling at speed.</p>
+  <nav class="toc" aria-label="Table of contents">
+   <h3>Contents</h3>
+   <ul>
+    <li><a href="#what-a-goal-does-to-a-price">What a Goal Does to a Price</a></li>
+    <li><a href="#the-two-basic-trades">The Two Basic Trades</a></li>
+    <li><a href="#when-goals-are-tradeable">When Goals Are Tradeable</a></li>
+    <li><a href="#the-psychology-of-the-trade">The Psychology of the Trade</a></li>
+    <li><a href="#building-the-trading-habit">Building the Trading Habit</a></li>
+    <li><a href="#final-thoughts">Final Thoughts</a></li>
+    <li><a href="#managing-the-downside">Managing the Downside</a></li>
+   </ul>
+  </nav>
 
-  <div class="cta">
+
+   <p>Watch any live football market and you will see the same pattern repeat: a goal lands, the odds snap violently, and then the market slowly corrects. That snap-and-correct is the entire business of goal trading. You do not predict goals — you trade the emotional overreaction they cause.</p><h2 id="what-a-goal-does-to-a-price">What a Goal Does to a Price</h2><p>When a team scores, the market reprices the match in milliseconds. The scoring side shortens dramatically; the conceding side drifts. But the reaction is usually <em>too big</em>, because liquidity is thin, algorithms extrapolate from one event, and recreational money piles into the momentum.</p><p>The correction comes minutes later, as the market reassesses the true state. A 0-0 draw with one team dominant produces a small correction; a lucky goal from a passive team produces a large one. The gap between the overreaction and the correction is the goal trader's income.</p><h2 id="the-two-basic-trades">The Two Basic Trades</h2><p><strong>Trade 1: Back the momentum before the goal.</strong> A team camped in the opposition box, generating chance after chance, is about to score. Its price is still drifting from the last event. Back it before the next repricing, then collect as the goal arrives.</p><p><strong>Trade 2: Lay the overreaction after the goal.</strong> A team scores a fortuitous opener; its price now overstates its real chance. Lay it at the inflated price, then back it back when the market calms — banking the difference regardless of the final score.</p><div class="highlight"><strong>Example:</strong> Home side dominating 0-0 at 1.70. You back them. They score: price snaps to 1.25. The market overcorrected — you lay them back at 1.25. If they win, your back/lay pair still profits on the swing; if they concede, the lay pays out.</div><h2 id="when-goals-are-tradeable">When Goals Are Tradeable</h2><p>Not every match is tradeable. The richest goal-trading environments share three traits:</p><ul><li><strong>High shot volume</strong> — a game with regular chances produces frequent swings.</li><li><strong>Mismatched quality</strong> — a clearly stronger side generates repeated, tradable momentum.</li><li><strong>Thin but active liquidity</strong> — enough volume to trade, few enough participants that the prices overreact.</li></ul><p>Matches between evenly-matched defensive sides produce almost nothing to trade. Recognising a dead market and staying out is as important as any entry.</p><h2 id="the-psychology-of-the-trade">The Psychology of the Trade</h2><p>Goal trading punishes indecision harder than any other form of betting. The window after a goal is measured in seconds; the correction completes within minutes. Traders who hesitate watch the price recover without them, and traders who freeze when a position runs against them convert a small loss into a disaster.</p><p>The antidote is pre-decided exits. Before every trade, set the price at which you take profit and the price at which you accept the loss. Execution becomes mechanical, and mechanical execution is the whole game.</p><h2 id="building-the-trading-habit">Building the Trading Habit</h2><p>Goal trading is a craft learned in small stakes. Start with a single league you know intimately, trade only matches you are watching live, and keep a trade log with entry price, exit price, and the reason for each. After a hundred trades you will know whether the swing-reading skill is yours. Most beginners discover they are not faster than the market — and that discovery, made cheaply, is worth the tuition.</p><h2 id="final-thoughts">Final Thoughts</h2><p>Goal trading is not betting on who wins — it is trading how the market <em>feels</em> about each goal. The football is just the fuel for the swing. Master the reaction, respect the exits, and log every trade, and you can turn the sport's most volatile moments into a repeatable process rather than a series of anxious gambles.</p><h2 id="managing-the-downside">Managing the Downside</h2><p>Goal trading looks effortless on a highlights reel and is brutally unforgiving in practice. The same market swings that create profit also create the fastest losses in betting: a position taken before a goal pays beautifully when the goal arrives, but the identical position collapses when the scoring chance is wasted and the price snaps back the other way. The asymmetry is the job description.</p><p>Three rules contain the damage. First, the stake is fixed before entry, like any other bet — a trade that runs against you is a real loss, not a rounding error. Second, the stop price is set at entry: if the price moves against you by a defined amount, the position is closed without hesitation, because hesitation after a missed chance is exactly when the market accelerates away. Third, the total exposure is capped: a bettor with five open live positions has five simultaneous chances to be wrong, and the emotional load compounds.</p><p>The honest assessment comes from the trade log. After every session, record the entries, exits and the reason for each. The log will show whether your goal reads come before the market's or after it. Most beginners discover they are reading the same momentum the price has already absorbed — a finding worth far more than the small stakes spent learning it. Goal trading is a craft of fast, pre-planned decisions; the bettor who treats it as an improvisation is simply gambling at speed.</p>
+
+  <section class="faq">
+   <h2 id="faq">Frequently Asked Questions</h2>
+   <div class="faq-item">
+    <h3>What is goal trading in football?</h3>
+    <p>Goal trading is buying a position before an expected goal and selling it after the market re-prices. Every goal swings the price of the match result and the over/under markets, and the market overreacts to each event. The trader prices the reaction faster than the board and banks the gap between the pre-goal and post-goal prices.</p>
+   </div>
+   <div class="faq-item">
+    <h3>What are the two basic goal trades?</h3>
+    <p>The first is backing a result before a goal you expect and laying it once the market moves in your favour. The second is trading the over/under market: backing over before goals arrive and laying it, or taking an under position after a quick goal inflates the over price. Both depend on reading the match dynamics, not just following the score.</p>
+   </div>
+   <div class="faq-item">
+    <h3>When are goals tradeable?</h3>
+    <p>Goals are tradeable when the market's price movement is predictable: a dominant side creating clear chances against a tiring defence, a team chasing a result late, or an open game where the over price is likely to shrink. The skill is identifying the repricing before it happens and having a disciplined exit point if the goal does not come.</p>
+   </div>
+   <div class="faq-item">
+    <h3>What is the psychology of a successful trade?</h3>
+    <p>The psychology is ruthless: enter with a defined risk, exit at a defined price, and never let a single match change the plan. The hardest moment is holding through the minutes when nothing happens, and the most dangerous is overtrading after a win. A goal trader thinks in price, not in results, and treats every trade as one repetition of a process.</p>
+   </div>
+  </section>
+
+
+   <div class="cta">
    <h3>Put These Principles Into Practice Today</h3>
    <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
    <p style="margin:16px 0"><a href="/predictions/1x2" class="btn">1X2 Predictions</a> <a href="/predictions/in-play" class="btn">Live In-Play Tips</a></p>
@@ -326,9 +382,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </div>
 
 <footer>
- <div class="footer-content">
+ <div class="footer-content container">
   <div style="text-align:center;margin-bottom:24px;">
-   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p><a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">In-Play Tips</a>
+   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p>
+   <a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;font-weight:600;font-size:14px;">In-Play Tips</a>
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
@@ -350,7 +407,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <a href="/contact.html">Contact</a>
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
-   <a href="/policy.html">Editorial Policy</a>
   </div>
   <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
  </div>

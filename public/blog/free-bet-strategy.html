@@ -106,6 +106,17 @@ nav a:hover{color:var(--accent)}
 .stats-table th{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
 .stats-table td{font-weight:500}
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--border-light);color:var(--text-muted);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+.toc{background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h3{margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted)}
+.toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:24px}
+.toc li{margin-bottom:6px;font-size:14px}
+.toc li a{color:var(--text-primary)}
+.toc li a:hover{color:var(--accent)}
+.faq{margin:32px 0}
+.faq h2{margin:0 0 8px}
+.faq-item{border:1px solid var(--border-light);border-radius:12px;padding:18px 22px;margin:14px 0}
+.faq-item h3{margin:0 0 8px;font-size:17px}
+.faq-item p{margin:0;color:var(--text-muted)}
 .cta{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;padding:28px 32px;text-align:center;margin:38px 0}
 .cta h3{font-size:20px;font-weight:700;margin-bottom:10px}
 .social-share{display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -251,6 +262,15 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   ]
 }
 </script>
+<!-- FAQPage schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"Why is a free bet not worth its face value?","acceptedAnswer":{"@type":"Answer","text":"Because when you win a free bet, the bookmaker deducts the free-stake from your payout — you receive only the profit, not the stake as well. A £20 free bet on a 2.00 price therefore returns about £20 in profit, but a £20 cash bet would return £40 including the stake. The free bet is effectively worth the profit portion only, which is why its true value is below face value."}},{"@type":"Question","name":"How do I convert a free bet into maximum guaranteed value?","acceptedAnswer":{"@type":"Answer","text":"Use the free bet on the highest-priced selection that still has fair value, because you keep only the profit. On an exchange or matched approach, you back the free-bet selection and lay the same selection, locking in the difference as guaranteed value. Higher-priced, value selections convert a larger share of the free stake into profit."}},{"@type":"Question","name":"What is the difference between bet-and-get and bet-and-build offers?","acceptedAnswer":{"@type":"Answer","text":"Bet-and-get offers give you a free bet after you place a qualifying cash bet, and the free bet can be converted with a matched approach. Bet-and-build offers reward you for the total staked, effectively a small rebate on turnover. Each has different conversion maths and fine print, so read the terms before deciding which is worth chasing."}},{"@type":"Question","name":"What fine print decides a free bet's real value?","acceptedAnswer":{"@type":"Answer","text":"Look for the minimum odds that qualify, whether the free stake is returned with winnings, the expiry window, excluded markets, and any maximum win cap. A free bet on low odds converts poorly because the profit portion is small; a short expiry forces rushed bets. The terms, not the headline number, decide the value."}}]
+}
+</script>
+
 </head>
 <body>
 <header>
@@ -260,16 +280,17 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav id="nav">
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/best-picks.html">Best Picks</a>
- <a href="/author-picks.html">Author Picks</a>
- <a href="/predictions/in-play">In-Play</a>
- <a href="/blog/" class="active">Blog</a>
- <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-  <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
-  <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
- </span></nav>
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/author-picks.html">Author Picks</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/blog/" class="active">Blog</a>
+   <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
+    <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
+   </span>
+  </nav>
  </div>
 </header>
 
@@ -282,14 +303,49 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <p class="lead">A £20 free bet is not worth £20. Learn how the maths works, and how to convert promotional offers into the highest guaranteed value possible.</p>
 
-  <figure class="figure">
-   <img src="/blog/thumbnails/free-bet-strategy.webp" alt="Free Bet Strategy: How to Extract Maximum Value | WinFulltime" width="1200" height="630" loading="eager">
-   <figcaption>How to extract maximum value from free bets</figcaption>
-  </figure>
+   <figure class="figure">
+    <img src="/blog/thumbnails/free-bet-strategy.webp" alt="Free Bet Strategy: How to Extract Maximum Value | WinFulltime" width="1200" height="630" loading="eager">
+    <figcaption>How to extract maximum value from free bets</figcaption>
+   </figure>
 
-  <p>Every bookmaker offers free bets — for signing up, for depositing, for losing a tight game by one goal. They look like free money. They are not. A free bet converts to cash only when it wins, and the way bookmakers structure them guarantees that the average conversion is a fraction of the headline number.</p><h2>Why a Free Bet Is Not Worth Its Face Value</h2><p>When you place a free bet, you receive the <em>winnings only</em> — the stake is not returned. Back a 5.00 selection with a £20 free bet and a win returns £80 (4 x £20). Compare that with a real £20 stake, which returns £100. The missing £20 is the stake you never get back, and that gap is the tax on every free bet.</p><p>The conversion rate is roughly the inverse of the odds. The higher the price you use the free bet on, the higher the percentage of the face value you can capture — up to a point. At even money (2.00), you recover half of the value. At 5.00, you recover 80%. At 10.00, 90% — but the variance becomes wild.</p><div class="highlight"><strong>Conversion rule:</strong> A free bet on a 2.00 selection converts, on average, to ~50% of its face value. On a 3.00 selection, ~67%. The best risk-adjusted conversions sit around 70-80%.</div><h2>The Guaranteed Conversion (Matched Approach)</h2><p>The professional way to convert a free bet is to make it risk-free by covering the opposite outcome elsewhere. Use the free bet on one side of a market and a real stake on the other side of an exchange or a second bookmaker. Whatever happens, one side pays, and the net result is a guaranteed capture of most of the free bet's value.</p><ol><li>Place the free bet on a selection at a price of roughly 3.00 or higher.</li><li>Place a real stake on the same selection <em>losing</em> at the exchange (lay the same team).</li><li>Calculate the lay stake so that both outcomes yield the same profit.</li><li>Collect the fixed amount regardless of the result.</li></ol><p>This is the core of matched betting, and it converts welcome offers into near-guaranteed profit in a single pass.</p><h2>Bet-and-Get vs Bet-and-Build Offers</h2><p>Not all offers behave the same. <strong>Bet-and-get</strong> rewards deposit and staking activity, usually after qualifying wagering. <strong>Bet-and-build</strong> (also called stake-back) returns your stake as a free bet if your bet loses — a much richer structure because the downside is removed entirely. When choosing offers, prefer stake-back mechanics and refund offers over credit-based ones.</p><h2>The Fine Print That Decides Value</h2><table class="stats-table"><thead><tr><th>Condition</th><th>Effect on value</th></tr></thead><tbody><tr><td>Min odds to qualify</td><td>Pushes you to higher-risk bets</td></tr><tr><td>Wagering requirement</td><td>Must re-stake winnings before withdrawal</td></tr><tr><td>Time limit</td><td>Forces rushed, worse-priced bets</td></tr><tr><td>Max stake</td><td>Caps how much you can convert</td></tr><tr><td>Excluded markets</td><td>Blocks the best conversion prices</td></tr></tbody></table><p>Read every term before placing. A "no deposit free bet" with a 40x wagering requirement is worth almost nothing, no matter how large the headline number.</p><h2>Maximising Without Matched Betting</h2><p>If you do not want to run a matching process, the smart casual play is: use free bets on higher-priced selections (3.00 to 6.00) where you have genuine value, accept the variance, and treat the offer as a one-off — never let a free bet persuade you to bet on matches you have not researched.</p><h2>Final Thoughts</h2><p>Free bets are marketing spend, and the bookmaker's whole design is to make you treat them like winnings. The disciplined bettor treats them like what they are: a coupon worth 50-80% of face value, convertible at best through a matched approach or a well-chosen value price. Take every offer that genuinely converts, skip every one that requires you to gamble for the privilege, and let the fine print decide — not the banner.</p><h2>Converting at Different Prices</h2><p>The conversion maths is worth making concrete. A £20 free bet at 2.00 returns £20 of winnings when it lands — half the face value. At 3.00 it returns £40, or 67% of face value. At 5.00 it returns £80, or 80%. The pattern tempts bettors toward longer prices, but variance punishes it: a 5.00 free bet lands only one time in five, and the guaranteed-conversion approaches quoted above still work best in the 2.50-4.00 band where the lay side is priced sensibly.</p><p>The matching calculation for a 3.00 free bet with a £20 face value is straightforward. Lay the same selection at the exchange at 3.10. A backer matches the lay, so the exchange requires you to cover their stake. If the selection wins, the free bet pays £40 and the lay pays out your liability; if it loses, the lay keeps the backer's stake minus commission. Sized correctly, both branches return roughly £26-27 — a 70% conversion with no outcome risk. The exact figure depends on the commission and the lay price, which is why a conversion calculator is a free-bet bettor's most used tool. Anything converting above 70% is a good offer; anything below 55% is probably a trap dressed in fine print.</p>
+  <nav class="toc" aria-label="Table of contents">
+   <h3>Contents</h3>
+   <ul>
+    <li><a href="#why-a-free-bet-is-not-worth-its-face-value">Why a Free Bet Is Not Worth Its Face Value</a></li>
+    <li><a href="#the-guaranteed-conversion-matched-approach">The Guaranteed Conversion (Matched Approach)</a></li>
+    <li><a href="#bet-and-get-vs-bet-and-build-offers">Bet-and-Get vs Bet-and-Build Offers</a></li>
+    <li><a href="#the-fine-print-that-decides-value">The Fine Print That Decides Value</a></li>
+    <li><a href="#maximising-without-matched-betting">Maximising Without Matched Betting</a></li>
+    <li><a href="#final-thoughts">Final Thoughts</a></li>
+    <li><a href="#converting-at-different-prices">Converting at Different Prices</a></li>
+   </ul>
+  </nav>
 
-  <div class="cta">
+
+   <p>Every bookmaker offers free bets — for signing up, for depositing, for losing a tight game by one goal. They look like free money. They are not. A free bet converts to cash only when it wins, and the way bookmakers structure them guarantees that the average conversion is a fraction of the headline number.</p><h2 id="why-a-free-bet-is-not-worth-its-face-value">Why a Free Bet Is Not Worth Its Face Value</h2><p>When you place a free bet, you receive the <em>winnings only</em> — the stake is not returned. Back a 5.00 selection with a £20 free bet and a win returns £80 (4 x £20). Compare that with a real £20 stake, which returns £100. The missing £20 is the stake you never get back, and that gap is the tax on every free bet.</p><p>The conversion rate is roughly the inverse of the odds. The higher the price you use the free bet on, the higher the percentage of the face value you can capture — up to a point. At even money (2.00), you recover half of the value. At 5.00, you recover 80%. At 10.00, 90% — but the variance becomes wild.</p><div class="highlight"><strong>Conversion rule:</strong> A free bet on a 2.00 selection converts, on average, to ~50% of its face value. On a 3.00 selection, ~67%. The best risk-adjusted conversions sit around 70-80%.</div><h2 id="the-guaranteed-conversion-matched-approach">The Guaranteed Conversion (Matched Approach)</h2><p>The professional way to convert a free bet is to make it risk-free by covering the opposite outcome elsewhere. Use the free bet on one side of a market and a real stake on the other side of an exchange or a second bookmaker. Whatever happens, one side pays, and the net result is a guaranteed capture of most of the free bet's value.</p><ol><li>Place the free bet on a selection at a price of roughly 3.00 or higher.</li><li>Place a real stake on the same selection <em>losing</em> at the exchange (lay the same team).</li><li>Calculate the lay stake so that both outcomes yield the same profit.</li><li>Collect the fixed amount regardless of the result.</li></ol><p>This is the core of matched betting, and it converts welcome offers into near-guaranteed profit in a single pass.</p><h2 id="bet-and-get-vs-bet-and-build-offers">Bet-and-Get vs Bet-and-Build Offers</h2><p>Not all offers behave the same. <strong>Bet-and-get</strong> rewards deposit and staking activity, usually after qualifying wagering. <strong>Bet-and-build</strong> (also called stake-back) returns your stake as a free bet if your bet loses — a much richer structure because the downside is removed entirely. When choosing offers, prefer stake-back mechanics and refund offers over credit-based ones.</p><h2 id="the-fine-print-that-decides-value">The Fine Print That Decides Value</h2><table class="stats-table"><thead><tr><th>Condition</th><th>Effect on value</th></tr></thead><tbody><tr><td>Min odds to qualify</td><td>Pushes you to higher-risk bets</td></tr><tr><td>Wagering requirement</td><td>Must re-stake winnings before withdrawal</td></tr><tr><td>Time limit</td><td>Forces rushed, worse-priced bets</td></tr><tr><td>Max stake</td><td>Caps how much you can convert</td></tr><tr><td>Excluded markets</td><td>Blocks the best conversion prices</td></tr></tbody></table><p>Read every term before placing. A "no deposit free bet" with a 40x wagering requirement is worth almost nothing, no matter how large the headline number.</p><h2 id="maximising-without-matched-betting">Maximising Without Matched Betting</h2><p>If you do not want to run a matching process, the smart casual play is: use free bets on higher-priced selections (3.00 to 6.00) where you have genuine value, accept the variance, and treat the offer as a one-off — never let a free bet persuade you to bet on matches you have not researched.</p><h2 id="final-thoughts">Final Thoughts</h2><p>Free bets are marketing spend, and the bookmaker's whole design is to make you treat them like winnings. The disciplined bettor treats them like what they are: a coupon worth 50-80% of face value, convertible at best through a matched approach or a well-chosen value price. Take every offer that genuinely converts, skip every one that requires you to gamble for the privilege, and let the fine print decide — not the banner.</p><h2 id="converting-at-different-prices">Converting at Different Prices</h2><p>The conversion maths is worth making concrete. A £20 free bet at 2.00 returns £20 of winnings when it lands — half the face value. At 3.00 it returns £40, or 67% of face value. At 5.00 it returns £80, or 80%. The pattern tempts bettors toward longer prices, but variance punishes it: a 5.00 free bet lands only one time in five, and the guaranteed-conversion approaches quoted above still work best in the 2.50-4.00 band where the lay side is priced sensibly.</p><p>The matching calculation for a 3.00 free bet with a £20 face value is straightforward. Lay the same selection at the exchange at 3.10. A backer matches the lay, so the exchange requires you to cover their stake. If the selection wins, the free bet pays £40 and the lay pays out your liability; if it loses, the lay keeps the backer's stake minus commission. Sized correctly, both branches return roughly £26-27 — a 70% conversion with no outcome risk. The exact figure depends on the commission and the lay price, which is why a conversion calculator is a free-bet bettor's most used tool. Anything converting above 70% is a good offer; anything below 55% is probably a trap dressed in fine print.</p>
+
+  <section class="faq">
+   <h2 id="faq">Frequently Asked Questions</h2>
+   <div class="faq-item">
+    <h3>Why is a free bet not worth its face value?</h3>
+    <p>Because when you win a free bet, the bookmaker deducts the free-stake from your payout — you receive only the profit, not the stake as well. A £20 free bet on a 2.00 price therefore returns about £20 in profit, but a £20 cash bet would return £40 including the stake. The free bet is effectively worth the profit portion only, which is why its true value is below face value.</p>
+   </div>
+   <div class="faq-item">
+    <h3>How do I convert a free bet into maximum guaranteed value?</h3>
+    <p>Use the free bet on the highest-priced selection that still has fair value, because you keep only the profit. On an exchange or matched approach, you back the free-bet selection and lay the same selection, locking in the difference as guaranteed value. Higher-priced, value selections convert a larger share of the free stake into profit.</p>
+   </div>
+   <div class="faq-item">
+    <h3>What is the difference between bet-and-get and bet-and-build offers?</h3>
+    <p>Bet-and-get offers give you a free bet after you place a qualifying cash bet, and the free bet can be converted with a matched approach. Bet-and-build offers reward you for the total staked, effectively a small rebate on turnover. Each has different conversion maths and fine print, so read the terms before deciding which is worth chasing.</p>
+   </div>
+   <div class="faq-item">
+    <h3>What fine print decides a free bet's real value?</h3>
+    <p>Look for the minimum odds that qualify, whether the free stake is returned with winnings, the expiry window, excluded markets, and any maximum win cap. A free bet on low odds converts poorly because the profit portion is small; a short expiry forces rushed bets. The terms, not the headline number, decide the value.</p>
+   </div>
+  </section>
+
+
+   <div class="cta">
    <h3>Put These Principles Into Practice Today</h3>
    <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
    <p style="margin:16px 0"><a href="/predictions/1x2" class="btn">1X2 Predictions</a> <a href="/predictions/in-play" class="btn">Live In-Play Tips</a></p>
@@ -326,9 +382,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </div>
 
 <footer>
- <div class="footer-content">
+ <div class="footer-content container">
   <div style="text-align:center;margin-bottom:24px;">
-   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p><a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">In-Play Tips</a>
+   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p>
+   <a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;font-weight:600;font-size:14px;">In-Play Tips</a>
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
@@ -350,7 +407,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <a href="/contact.html">Contact</a>
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
-   <a href="/policy.html">Editorial Policy</a>
   </div>
   <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
  </div>

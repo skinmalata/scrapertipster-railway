@@ -106,6 +106,17 @@ nav a:hover{color:var(--accent)}
 .stats-table th{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
 .stats-table td{font-weight:500}
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--border-light);color:var(--text-muted);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+.toc{background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h3{margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted)}
+.toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:24px}
+.toc li{margin-bottom:6px;font-size:14px}
+.toc li a{color:var(--text-primary)}
+.toc li a:hover{color:var(--accent)}
+.faq{margin:32px 0}
+.faq h2{margin:0 0 8px}
+.faq-item{border:1px solid var(--border-light);border-radius:12px;padding:18px 22px;margin:14px 0}
+.faq-item h3{margin:0 0 8px;font-size:17px}
+.faq-item p{margin:0;color:var(--text-muted)}
 .cta{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;padding:28px 32px;text-align:center;margin:38px 0}
 .cta h3{font-size:20px;font-weight:700;margin-bottom:10px}
 .social-share{display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -251,6 +262,15 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   ]
 }
 </script>
+<!-- FAQPage schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"What is the professional weekly betting workflow?","acceptedAnswer":{"@type":"Answer","text":"The workflow has five stages: build the fixture map for the weekend, price each game yourself using a model or systematic method, filter by the gap between your price and the market's, shop the best available lines and stake according to your bankroll rules, then review everything against the closing line. Repeating this every week is what turns value-finding from luck into a machine."}},{"@type":"Question","name":"How do professionals price games themselves?","acceptedAnswer":{"@type":"Answer","text":"They use a pricing model built on a consistent method — expected goals, form, injuries, home advantage and market history — to produce a fair price for each match. The model is then compared against the market's price. The professional does not need to be right about results, only right about which prices are too high or too low relative to the model."}},{"@type":"Question","name":"What is the value gap filter?","acceptedAnswer":{"@type":"Answer","text":"The value gap is the difference between your fair price and the market price. Professionals only act when the gap exceeds a meaningful threshold, because every bet carries variance and the margin must be large enough to be real after costs. A small gap is noise; a large gap on a well-priced match is the actual opportunity."}},{"@type":"Question","name":"What tools do professionals use?","acceptedAnswer":{"@type":"Answer","text":"A pricing model or a spreadsheet, a data source for fixtures and statistics, an odds comparison tool, and several bookmaker or exchange accounts so the best available line is always taken. The review stage uses closing line value to tell them whether their pricing is genuinely beating the market. The tools matter less than the discipline of running the whole machine weekly."}}]
+}
+</script>
+
 </head>
 <body>
 <header>
@@ -260,16 +280,17 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav id="nav">
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/best-picks.html">Best Picks</a>
- <a href="/author-picks.html">Author Picks</a>
- <a href="/predictions/in-play">In-Play</a>
- <a href="/blog/" class="active">Blog</a>
- <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-  <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
-  <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
- </span></nav>
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/author-picks.html">Author Picks</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/blog/" class="active">Blog</a>
+   <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
+    <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
+   </span>
+  </nav>
  </div>
 </header>
 
@@ -282,14 +303,51 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <p class="lead">Professionals do not find value by luck or feeling. They run a weekly machine: price, filter, compare, bet, review. Here is how that machine works.</p>
 
-  <figure class="figure">
-   <img src="/blog/thumbnails/how-pros-find-value-weekend.webp" alt="How Professional Bettors Find Value Every Weekend | WinFulltime" width="1200" height="630" loading="eager">
-   <figcaption>The professional bettor's weekly value workflow</figcaption>
-  </figure>
+   <figure class="figure">
+    <img src="/blog/thumbnails/how-pros-find-value-weekend.webp" alt="How Professional Bettors Find Value Every Weekend | WinFulltime" width="1200" height="630" loading="eager">
+    <figcaption>The professional bettor's weekly value workflow</figcaption>
+   </figure>
 
-  <p>Weekend after weekend, the same small group of bettors beats the market while everyone else loses. It is not intuition, insider access, or luck. It is process. Professional bettors run a weekly machine with five stages, and every stage is learnable. This is how the machine works.</p><h2>Stage 1: Build the Fixture Map</h2><p>The weekend starts days early, with the calendar. Professionals map every fixture against its context: previous results, upcoming commitments, travel, congestion, motivation. A side three days after a European away trip is flagged; a side with a cup final in five days is flagged; a dead-rubber fixture is flagged. The map is the raw material every other stage depends on.</p><h2>Stage 2: Price the Games Yourself</h2><p>Before looking at any bookmaker price, professionals estimate their own probabilities. The most practical method is an expected-goals approach:</p><ol><li>Estimate each team's attacking and defensive strength from recent data.</li><li>Adjust for home advantage, injuries and the fixture map.</li><li>Convert the resulting expected goals into probabilities and fair prices.</li></ol><p>The output is a list of "my prices". It does not need to be perfect — it needs to be independent. Independence is the entire point: if your number is just the book's number repeated, you have no edge to find.</p><h2>Stage 3: Filter by Gap</h2><p>Now the comparison. Each game on your list is checked against the offered prices. The professional rule is ruthless: bet only where your fair price beats the market's price by a meaningful margin — typically several percent of implied probability. Everything else is skipped. A typical weekend might yield dozens of candidate games and a handful of actual bets. The skill is the skipping.</p><div class="highlight"><strong>The professional filter:</strong> If my fair price is 2.10 and the book offers 2.00, there is no bet. If the book offers 2.25, there is a bet. The gap — not the match, not the league, not the feeling — is the only justification for staking.</div><h2>Stage 4: Shop the Lines and Stake</h2><p>The selected bets are placed at the best available price across every book. Line shopping is not a luxury — it is a source of edge as real as any model, because the same match carries meaningfully different prices across books. Then the stake is sized by the plan: flat units for consistency, or Kelly-derived fractions for edge-weighted sizing. The stake is decided before the bet, never after the excitement.</p><h2>Stage 5: Review Everything</h2><p>Sunday's matches produce Monday's data. Each bet is recorded with its price, the closing price, the reasoning, and the result. Monthly, the record is reviewed: which markets made money, which leaked, where the closing line value sat, and which behavioural patterns crept in. The review is where the machine improves — without it, every weekend is a fresh guess.</p><h2>What You Can Do With a Weeknight</h2><p>You do not need to be a full-time professional to run this machine. A condensed version takes two focused hours:</p><ul><li><strong>One hour:</strong> fixture map + your own pricing for the matches you know best.</li><li><strong>Thirty minutes:</strong> compare your prices to the best available odds and filter.</li><li><strong>Thirty minutes:</strong> place the filtered bets and log them.</li></ul><p>That is it. The same structure, scaled to a hobbyist's time budget, produces the same discipline — and discipline, not hours, is what separates the machine from the crowd.</p><h2>The Reality Check</h2><p>Even a well-run machine loses weeks. The difference is the process survives them. A professional with a losing weekend still knows their edge, still holds their plan, and still executes next week. The casual bettor with a losing weekend changes strategy in panic. That difference — process over emotion — is the real edge, and it is built, not born.</p><h2>Final Thoughts</h2><p>The professional weekend is not a mystery. It is a map, a model, a filter, a shop, and a review — repeated weekly, improved constantly. Start with one league, run the machine honestly for three months, and let your own record tell you whether the edge is real. If it is, scale it. If it is not, the record will show you that too — which is exactly what a professional wants.</p><h2>The Tools That Run the Machine</h2><p>The professional weekend runs on tools that any bettor can assemble. The fixture map comes from a season calendar and a cup draw list. The pricing stage needs a simple expected-goals spreadsheet — attack and defence ratings per team, adjusted for home advantage and injuries — which takes an hour to build and improves with every week of data. The filter is the comparison between your fair prices and the market's best available price, which an odds-comparison site provides in seconds.</p><p>The stake is set by a plan: either a flat unit that never varies, or a Kelly-derived fraction that grows with evidence of edge. The record is a spreadsheet with the five fields that matter most — price taken, closing price, stake, reason, result. The whole stack is free or nearly so; the professional's advantage is not the tools but the fact that they are used every week, without exception, in the same order.</p><p>The final piece is the review. Monthly, the record is filtered by market and by day, and the losing segments are interrogated: is this variance or is this a leak? The machine is only as good as its feedback loop. A bettor who runs the same five stages weekly and reviews the data monthly is doing everything a professional does — at hobby scale. The scale is the only difference, and scale is the easy part to change when the evidence supports it.</p>
+  <nav class="toc" aria-label="Table of contents">
+   <h3>Contents</h3>
+   <ul>
+    <li><a href="#stage-1-build-the-fixture-map">Stage 1: Build the Fixture Map</a></li>
+    <li><a href="#stage-2-price-the-games-yourself">Stage 2: Price the Games Yourself</a></li>
+    <li><a href="#stage-3-filter-by-gap">Stage 3: Filter by Gap</a></li>
+    <li><a href="#stage-4-shop-the-lines-and-stake">Stage 4: Shop the Lines and Stake</a></li>
+    <li><a href="#stage-5-review-everything">Stage 5: Review Everything</a></li>
+    <li><a href="#what-you-can-do-with-a-weeknight">What You Can Do With a Weeknight</a></li>
+    <li><a href="#the-reality-check">The Reality Check</a></li>
+    <li><a href="#final-thoughts">Final Thoughts</a></li>
+    <li><a href="#the-tools-that-run-the-machine">The Tools That Run the Machine</a></li>
+   </ul>
+  </nav>
 
-  <div class="cta">
+
+   <p>Weekend after weekend, the same small group of bettors beats the market while everyone else loses. It is not intuition, insider access, or luck. It is process. Professional bettors run a weekly machine with five stages, and every stage is learnable. This is how the machine works.</p><h2 id="stage-1-build-the-fixture-map">Stage 1: Build the Fixture Map</h2><p>The weekend starts days early, with the calendar. Professionals map every fixture against its context: previous results, upcoming commitments, travel, congestion, motivation. A side three days after a European away trip is flagged; a side with a cup final in five days is flagged; a dead-rubber fixture is flagged. The map is the raw material every other stage depends on.</p><h2 id="stage-2-price-the-games-yourself">Stage 2: Price the Games Yourself</h2><p>Before looking at any bookmaker price, professionals estimate their own probabilities. The most practical method is an expected-goals approach:</p><ol><li>Estimate each team's attacking and defensive strength from recent data.</li><li>Adjust for home advantage, injuries and the fixture map.</li><li>Convert the resulting expected goals into probabilities and fair prices.</li></ol><p>The output is a list of "my prices". It does not need to be perfect — it needs to be independent. Independence is the entire point: if your number is just the book's number repeated, you have no edge to find.</p><h2 id="stage-3-filter-by-gap">Stage 3: Filter by Gap</h2><p>Now the comparison. Each game on your list is checked against the offered prices. The professional rule is ruthless: bet only where your fair price beats the market's price by a meaningful margin — typically several percent of implied probability. Everything else is skipped. A typical weekend might yield dozens of candidate games and a handful of actual bets. The skill is the skipping.</p><div class="highlight"><strong>The professional filter:</strong> If my fair price is 2.10 and the book offers 2.00, there is no bet. If the book offers 2.25, there is a bet. The gap — not the match, not the league, not the feeling — is the only justification for staking.</div><h2 id="stage-4-shop-the-lines-and-stake">Stage 4: Shop the Lines and Stake</h2><p>The selected bets are placed at the best available price across every book. Line shopping is not a luxury — it is a source of edge as real as any model, because the same match carries meaningfully different prices across books. Then the stake is sized by the plan: flat units for consistency, or Kelly-derived fractions for edge-weighted sizing. The stake is decided before the bet, never after the excitement.</p><h2 id="stage-5-review-everything">Stage 5: Review Everything</h2><p>Sunday's matches produce Monday's data. Each bet is recorded with its price, the closing price, the reasoning, and the result. Monthly, the record is reviewed: which markets made money, which leaked, where the closing line value sat, and which behavioural patterns crept in. The review is where the machine improves — without it, every weekend is a fresh guess.</p><h2 id="what-you-can-do-with-a-weeknight">What You Can Do With a Weeknight</h2><p>You do not need to be a full-time professional to run this machine. A condensed version takes two focused hours:</p><ul><li><strong>One hour:</strong> fixture map + your own pricing for the matches you know best.</li><li><strong>Thirty minutes:</strong> compare your prices to the best available odds and filter.</li><li><strong>Thirty minutes:</strong> place the filtered bets and log them.</li></ul><p>That is it. The same structure, scaled to a hobbyist's time budget, produces the same discipline — and discipline, not hours, is what separates the machine from the crowd.</p><h2 id="the-reality-check">The Reality Check</h2><p>Even a well-run machine loses weeks. The difference is the process survives them. A professional with a losing weekend still knows their edge, still holds their plan, and still executes next week. The casual bettor with a losing weekend changes strategy in panic. That difference — process over emotion — is the real edge, and it is built, not born.</p><h2 id="final-thoughts">Final Thoughts</h2><p>The professional weekend is not a mystery. It is a map, a model, a filter, a shop, and a review — repeated weekly, improved constantly. Start with one league, run the machine honestly for three months, and let your own record tell you whether the edge is real. If it is, scale it. If it is not, the record will show you that too — which is exactly what a professional wants.</p><h2 id="the-tools-that-run-the-machine">The Tools That Run the Machine</h2><p>The professional weekend runs on tools that any bettor can assemble. The fixture map comes from a season calendar and a cup draw list. The pricing stage needs a simple expected-goals spreadsheet — attack and defence ratings per team, adjusted for home advantage and injuries — which takes an hour to build and improves with every week of data. The filter is the comparison between your fair prices and the market's best available price, which an odds-comparison site provides in seconds.</p><p>The stake is set by a plan: either a flat unit that never varies, or a Kelly-derived fraction that grows with evidence of edge. The record is a spreadsheet with the five fields that matter most — price taken, closing price, stake, reason, result. The whole stack is free or nearly so; the professional's advantage is not the tools but the fact that they are used every week, without exception, in the same order.</p><p>The final piece is the review. Monthly, the record is filtered by market and by day, and the losing segments are interrogated: is this variance or is this a leak? The machine is only as good as its feedback loop. A bettor who runs the same five stages weekly and reviews the data monthly is doing everything a professional does — at hobby scale. The scale is the only difference, and scale is the easy part to change when the evidence supports it.</p>
+
+  <section class="faq">
+   <h2 id="faq">Frequently Asked Questions</h2>
+   <div class="faq-item">
+    <h3>What is the professional weekly betting workflow?</h3>
+    <p>The workflow has five stages: build the fixture map for the weekend, price each game yourself using a model or systematic method, filter by the gap between your price and the market's, shop the best available lines and stake according to your bankroll rules, then review everything against the closing line. Repeating this every week is what turns value-finding from luck into a machine.</p>
+   </div>
+   <div class="faq-item">
+    <h3>How do professionals price games themselves?</h3>
+    <p>They use a pricing model built on a consistent method — expected goals, form, injuries, home advantage and market history — to produce a fair price for each match. The model is then compared against the market's price. The professional does not need to be right about results, only right about which prices are too high or too low relative to the model.</p>
+   </div>
+   <div class="faq-item">
+    <h3>What is the value gap filter?</h3>
+    <p>The value gap is the difference between your fair price and the market price. Professionals only act when the gap exceeds a meaningful threshold, because every bet carries variance and the margin must be large enough to be real after costs. A small gap is noise; a large gap on a well-priced match is the actual opportunity.</p>
+   </div>
+   <div class="faq-item">
+    <h3>What tools do professionals use?</h3>
+    <p>A pricing model or a spreadsheet, a data source for fixtures and statistics, an odds comparison tool, and several bookmaker or exchange accounts so the best available line is always taken. The review stage uses closing line value to tell them whether their pricing is genuinely beating the market. The tools matter less than the discipline of running the whole machine weekly.</p>
+   </div>
+  </section>
+
+
+   <div class="cta">
    <h3>Put These Principles Into Practice Today</h3>
    <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
    <p style="margin:16px 0"><a href="/predictions/1x2" class="btn">1X2 Predictions</a> <a href="/predictions/in-play" class="btn">Live In-Play Tips</a></p>
@@ -326,9 +384,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </div>
 
 <footer>
- <div class="footer-content">
+ <div class="footer-content container">
   <div style="text-align:center;margin-bottom:24px;">
-   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p><a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">In-Play Tips</a>
+   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p>
+   <a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;font-weight:600;font-size:14px;">In-Play Tips</a>
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
@@ -350,7 +409,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <a href="/contact.html">Contact</a>
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
-   <a href="/policy.html">Editorial Policy</a>
   </div>
   <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
  </div>

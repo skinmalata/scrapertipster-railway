@@ -15,12 +15,88 @@ const path = require('path');
 
 const BLOG_DIR = path.join(__dirname, '..', 'public', 'blog');
 const ADDENDA_FILE = path.join(__dirname, '..', 'blog-data', 'addenda.json');
+const FAQS_FILE = path.join(__dirname, '..', 'blog-data', 'faqs.json');
 const DOMAIN = 'https://winfulltime.com';
 
 function esc(v) {
   return String(v || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 function enc(v) { return encodeURIComponent(String(v || '')); }
+
+function slugifyHeading(text) {
+  const base = String(text || '').toLowerCase()
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, 'and')
+    .replace(/&[a-z]+;/g, ' ')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+  return base || 'section';
+}
+
+// Give every H2/H3 an id (when missing) and return the content + a TOC list.
+function addHeadingIds(content) {
+  let seen = {};
+  const processed = String(content || '').replace(/<h([23])([^>]*)>(.*?)<\/h\1>/g, function(m, level, attrs, inner) {
+    const hasId = /id\s*=\s*["']/.test(attrs);
+    if (hasId) return m;
+    const raw = inner.replace(/<[^>]+>/g, '').trim();
+    let id = slugifyHeading(raw);
+    if (seen[id]) {
+      seen[id]++;
+      id = id + '-' + seen[id];
+    } else {
+      seen[id] = 1;
+    }
+    return '<h' + level + ' id="' + id + '">' + inner + '</h' + level + '>';
+  });
+  const toc = [];
+  const re = /<h2[^>]*id="([^"]+)"[^>]*>(.*?)<\/h2>/g;
+  let m;
+  while ((m = re.exec(processed)) !== null) {
+    toc.push({ id: m[1], label: m[2].replace(/<[^>]+>/g, '').trim() });
+  }
+  return { content: processed, toc };
+}
+
+function tocHtml(toc) {
+  if (!toc || toc.length < 3) return '';
+  const items = toc.map(t => `    <li><a href="#${esc(t.id)}">${esc(t.label)}</a></li>`).join('\n');
+  return `  <nav class="toc" aria-label="Table of contents">
+   <h3>Contents</h3>
+   <ul>
+${items}
+   </ul>
+  </nav>
+`;
+}
+
+function faqSchema(faqs, url) {
+  if (!faqs || !faqs.length) return '';
+  const list = faqs.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } }));
+  return `<!-- FAQPage schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": ${JSON.stringify(list)}
+}
+</script>
+`;
+}
+
+function faqHtml(faqs) {
+  if (!faqs || !faqs.length) return '';
+  const items = faqs.map(f => `   <div class="faq-item">
+    <h3>${esc(f.q)}</h3>
+    <p>${f.a}</p>
+   </div>`).join('\n');
+  return `  <section class="faq">
+   <h2 id="faq">Frequently Asked Questions</h2>
+${items}
+  </section>
+`;
+}
 
 function relatedHtml(related) {
   return (related || []).map(r => `    <li><a href="${r.href}">${r.label}</a></li>`).join('\n');
@@ -30,6 +106,8 @@ function articleHtml(a) {
   const url = `${DOMAIN}/blog/${a.slug}.html`;
   const image = `${DOMAIN}/blog/thumbnails/${a.slug}.webp`;
   const breadcrumb = a.title.replace(/\s*[\|—]\s*WinFulltime.*$/, '').trim();
+  const faqs = Array.isArray(a.faqs) ? a.faqs : [];
+  const { content: bodyContent, toc } = addHeadingIds(a.content);
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -138,6 +216,17 @@ nav a:hover{color:var(--accent)}
 .stats-table th{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
 .stats-table td{font-weight:500}
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--border-light);color:var(--text-muted);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+.toc{background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h3{margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted)}
+.toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:24px}
+.toc li{margin-bottom:6px;font-size:14px}
+.toc li a{color:var(--text-primary)}
+.toc li a:hover{color:var(--accent)}
+.faq{margin:32px 0}
+.faq h2{margin:0 0 8px}
+.faq-item{border:1px solid var(--border-light);border-radius:12px;padding:18px 22px;margin:14px 0}
+.faq-item h3{margin:0 0 8px;font-size:17px}
+.faq-item p{margin:0;color:var(--text-muted)}
 .cta{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;padding:28px 32px;text-align:center;margin:38px 0}
 .cta h3{font-size:20px;font-weight:700;margin-bottom:10px}
 .social-share{display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -283,6 +372,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   ]
 }
 </script>
+${faqSchema(faqs, url)}
 </head>
 <body>
 <header>
@@ -315,14 +405,18 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <p class="lead">${esc(a.lead)}</p>
 
-  <figure class="figure">
-   <img src="/blog/thumbnails/${a.slug}.webp" alt="${esc(a.title)}" width="1200" height="630" loading="eager">
-   <figcaption>${esc(a.thumbCaption || a.title)}</figcaption>
-  </figure>
+   <figure class="figure">
+    <img src="/blog/thumbnails/${a.slug}.webp" alt="${esc(a.title)}" width="1200" height="630" loading="eager">
+    <figcaption>${esc(a.thumbCaption || a.title)}</figcaption>
+   </figure>
 
-  ${a.content}
+${tocHtml(toc)}
 
-  <div class="cta">
+   ${bodyContent}
+
+${faqHtml(faqs)}
+
+   <div class="cta">
    <h3>Put These Principles Into Practice Today</h3>
    <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
    <p style="margin:16px 0"><a href="/predictions/1x2" class="btn">1X2 Predictions</a> <a href="/predictions/in-play" class="btn">Live In-Play Tips</a></p>
@@ -448,10 +542,18 @@ function main() {
       for (const a of list) addenda[a.slug] = a.addendum;
     } catch (e) { console.error('Could not load addenda.json:', e.message); }
   }
+  let faqsBySlug = {};
+  if (fs.existsSync(FAQS_FILE)) {
+    try {
+      const list = JSON.parse(fs.readFileSync(FAQS_FILE, 'utf8'));
+      for (const f of list) faqsBySlug[f.slug] = f.faqs;
+    } catch (e) { console.error('Could not load faqs.json:', e.message); }
+  }
   let count = 0;
   for (const a of items) {
     if (!a.slug) { console.error('Missing slug for an item'); continue; }
     if (addenda[a.slug]) a.content += addenda[a.slug];
+    if (faqsBySlug[a.slug]) a.faqs = faqsBySlug[a.slug];
     const html = articleHtml(a);
     fs.writeFileSync(path.join(BLOG_DIR, `${a.slug}.html`), html);
     console.log(`Wrote ${a.slug}.html`);

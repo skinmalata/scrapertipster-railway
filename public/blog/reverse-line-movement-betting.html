@@ -106,6 +106,17 @@ nav a:hover{color:var(--accent)}
 .stats-table th{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
 .stats-table td{font-weight:500}
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--border-light);color:var(--text-muted);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+.toc{background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h3{margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted)}
+.toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:24px}
+.toc li{margin-bottom:6px;font-size:14px}
+.toc li a{color:var(--text-primary)}
+.toc li a:hover{color:var(--accent)}
+.faq{margin:32px 0}
+.faq h2{margin:0 0 8px}
+.faq-item{border:1px solid var(--border-light);border-radius:12px;padding:18px 22px;margin:14px 0}
+.faq-item h3{margin:0 0 8px;font-size:17px}
+.faq-item p{margin:0;color:var(--text-muted)}
 .cta{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;padding:28px 32px;text-align:center;margin:38px 0}
 .cta h3{font-size:20px;font-weight:700;margin-bottom:10px}
 .social-share{display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -251,6 +262,15 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   ]
 }
 </script>
+<!-- FAQPage schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"What is reverse line movement (RLM)?","acceptedAnswer":{"@type":"Answer","text":"Reverse line movement happens when the public's money lands heavily on one side but the odds move against it — the opposite of what the betting flow implies. That contradiction usually means sharp or professional money is taking the other side, and the market is moving to protect the book against it. RLM is a signal that smart money disagrees with the public."}},{"@type":"Question","name":"Why does RLM matter in football?","acceptedAnswer":{"@type":"Answer","text":"Because football markets carry large amounts of public, sentiment-driven money that books must balance. When a price moves against a flood of public bets, it indicates the market believes the other side is the true value. Following RLM safely means aligning with the direction of the move and the smart money it represents."}},{"@type":"Question","name":"How do I measure reverse line movement?","acceptedAnswer":{"@type":"Answer","text":"Compare the percentage of money on each side (public betting percentages) against the actual price movement from opening to the time you bet. When the majority of money is on one side but the price moves the other way, that gap is the RLM signal. The larger the money-versus-price disagreement, the stronger the signal."}},{"@type":"Question","name":"When does RLM fail?","acceptedAnswer":{"@type":"Answer","text":"RLM fails when the price movement has a non-smart cause, such as an injury announcement, a late line change by the book, or a staking pattern that is large but not informed. It also weakens in markets with low volume where small stakes move prices. RLM is a useful filter alongside your own pricing, not a standalone system."}}]
+}
+</script>
+
 </head>
 <body>
 <header>
@@ -260,16 +280,17 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav id="nav">
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/best-picks.html">Best Picks</a>
- <a href="/author-picks.html">Author Picks</a>
- <a href="/predictions/in-play">In-Play</a>
- <a href="/blog/" class="active">Blog</a>
- <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-  <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
-  <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
- </span></nav>
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/author-picks.html">Author Picks</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/blog/" class="active">Blog</a>
+   <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
+    <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
+   </span>
+  </nav>
  </div>
 </header>
 
@@ -282,14 +303,49 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <p class="lead">When most of the money lands on one side and the odds still move against it, something smarter than the public is at work.</p>
 
-  <figure class="figure">
-   <img src="/blog/thumbnails/reverse-line-movement-betting.webp" alt="Reverse Line Movement: Follow the Smart Money | WinFulltime" width="1200" height="630" loading="eager">
-   <figcaption>What reverse line movement tells you about sharp money</figcaption>
-  </figure>
+   <figure class="figure">
+    <img src="/blog/thumbnails/reverse-line-movement-betting.webp" alt="Reverse Line Movement: Follow the Smart Money | WinFulltime" width="1200" height="630" loading="eager">
+    <figcaption>What reverse line movement tells you about sharp money</figcaption>
+   </figure>
 
-  <p>The classic odds puzzle goes like this: 70% of the money is on Manchester City, yet their price is drifting out from 1.80 to 1.95. Every ordinary logic says a flood of backing should shorten the odds. When the price instead moves <em>against</em> the majority of money, you are looking at <strong>reverse line movement</strong> (RLM).</p><h2>The Mechanics Behind the Contradiction</h2><p>Bookmakers do not set prices purely by the weight of money. They set prices to balance risk against their own exposure. When a flood of recreational money lands on one side, the book is happy to keep taking it — at a <em>worse</em> price. Meanwhile, a smaller number of sharp bettors quietly takes the other side in large amounts. When the sharp money is large enough, the book protects itself by moving the price <em>towards</em> the sharp side and <em>away</em> from the public side.</p><p>The result looks backwards to casual bettors: heavy public money on a favourite, yet the favourite's odds lengthen. That lengthening is the bookmaker's way of making the sharp side more expensive, because that is the side the book is afraid of.</p><div class="highlight"><strong>The signal:</strong> RLM is not "the bookmaker is wrong." It is "the market is telling you that the informed money disagrees with the majority."</div><h2>Why It Matters in Football</h2><p>Football is the ultimate public sport, and the biggest matches attract the heaviest recreational money. That makes RLM especially meaningful on popular sides of the market:</p><ul><li><strong>Big favourites in marquee games</strong> — the public loves the glamour team, and sharp bettors routinely oppose inflated prices.</li><li><strong>Accumulator anchors</strong> — popular selections added to thousands of accas create one-directional money that RLM can contradict.</li><li><strong>Draws</strong> — recreational bettors almost never back the draw, so a draw market moving against low money is a strong tell.</li></ul><h2>How to Measure It</h2><p>You need two data points: the distribution of money (which side the public is on) and the price movement (which way the odds actually go). Betting exchanges publish matched volume by side, and many odds-comparison sites show both stake percentages and odds history. When those two lines point in opposite directions, RLM is present.</p><table class="stats-table"><thead><tr><th>Public money</th><th>Odds movement</th><th>Verdict</th></tr></thead><tbody><tr><td>70% on Home</td><td>Home shortens 2.10 → 1.90</td><td>Confirmed move (public + sharp aligned)</td></tr><tr><td>70% on Home</td><td>Home drifts 2.10 → 2.30</td><td><strong>Reverse line movement</strong></td></tr><tr><td>70% on Home</td><td>Home holds steady</td><td>Book protecting itself; neutral</td></tr></tbody></table><h2>Following RLM Safely</h2><p>RLM is a directional hint, not a guaranteed win. Treat it with the same discipline as any other signal:</p><ul><li><strong>Require magnitude.</strong> A one-tick drift is noise. Look for a clear move of at least one full price increment against the money flow.</li><li><strong>Check the timing.</strong> RLM that forms late — in the final hours before kickoff — is the strongest version, because it reflects the newest information.</li><li><strong>Never ignore the fundamentals.</strong> If your own research says the public is right, RLM alone should not overturn it. Combine the signal with your own model.</li><li><strong>Bet the price, not the story.</strong> You are not "backing the sharp side." You are backing a price that, in your judgment, now carries value.</li></ul><h2>When RLM Fails</h2><p>Not all reverse movement is sharp money. A star player's late withdrawal, a manager's rotation announcement, or heavy local money on a minnow can all move a price against the public flow for entirely ordinary reasons. The strongest RLM signals come with <em>volume</em> — big stakes, late timing, and consistency across multiple books. Weak RLM, seen on a single bookmaker's board, is frequently just noise.</p><h2>Final Thoughts</h2><p>Reverse line movement gives you a rare, visible trace of informed opinion in a market that hides it everywhere else. Used alongside value estimation and staking discipline, it improves the quality of your selections. Used alone, it becomes another gambling superstition. The market's smart money leaves footprints — RLM is how you learn to read them.</p><h2>RLM in Practice: A Concrete Example</h2><p>Take a Sunday derby. By midday, the exchange shows 68% of stakes on the home side at 2.05, yet the price has drifted to 2.20. Two hours later it reaches 2.30, and the away side has shortened from 3.60 to 3.10. That is textbook reverse line movement: the money is one way and the price is moving the other. The disciplined read is that the small number of large stakes on the away side — placed late, in size, across multiple books — outweighs the volume of small public stakes on the home side.</p><p>The follow-through matters too. The home side eventually shortens back toward 2.10 in the final hour — a partial reversal that suggests the book balanced its books and the anomaly has been priced out. For the RLM bettor, the lesson is timing: the entry was during the initial drift, and the partial recovery would have been a sensible exit if they wanted to lock in the price movement rather than hold through kickoff. RLM is a signal about the market's fear, not about the final score — acting on it early and taking the price movement when it appears is the safer expression of the same insight.</p>
+  <nav class="toc" aria-label="Table of contents">
+   <h3>Contents</h3>
+   <ul>
+    <li><a href="#the-mechanics-behind-the-contradiction">The Mechanics Behind the Contradiction</a></li>
+    <li><a href="#why-it-matters-in-football">Why It Matters in Football</a></li>
+    <li><a href="#how-to-measure-it">How to Measure It</a></li>
+    <li><a href="#following-rlm-safely">Following RLM Safely</a></li>
+    <li><a href="#when-rlm-fails">When RLM Fails</a></li>
+    <li><a href="#final-thoughts">Final Thoughts</a></li>
+    <li><a href="#rlm-in-practice-a-concrete-example">RLM in Practice: A Concrete Example</a></li>
+   </ul>
+  </nav>
 
-  <div class="cta">
+
+   <p>The classic odds puzzle goes like this: 70% of the money is on Manchester City, yet their price is drifting out from 1.80 to 1.95. Every ordinary logic says a flood of backing should shorten the odds. When the price instead moves <em>against</em> the majority of money, you are looking at <strong>reverse line movement</strong> (RLM).</p><h2 id="the-mechanics-behind-the-contradiction">The Mechanics Behind the Contradiction</h2><p>Bookmakers do not set prices purely by the weight of money. They set prices to balance risk against their own exposure. When a flood of recreational money lands on one side, the book is happy to keep taking it — at a <em>worse</em> price. Meanwhile, a smaller number of sharp bettors quietly takes the other side in large amounts. When the sharp money is large enough, the book protects itself by moving the price <em>towards</em> the sharp side and <em>away</em> from the public side.</p><p>The result looks backwards to casual bettors: heavy public money on a favourite, yet the favourite's odds lengthen. That lengthening is the bookmaker's way of making the sharp side more expensive, because that is the side the book is afraid of.</p><div class="highlight"><strong>The signal:</strong> RLM is not "the bookmaker is wrong." It is "the market is telling you that the informed money disagrees with the majority."</div><h2 id="why-it-matters-in-football">Why It Matters in Football</h2><p>Football is the ultimate public sport, and the biggest matches attract the heaviest recreational money. That makes RLM especially meaningful on popular sides of the market:</p><ul><li><strong>Big favourites in marquee games</strong> — the public loves the glamour team, and sharp bettors routinely oppose inflated prices.</li><li><strong>Accumulator anchors</strong> — popular selections added to thousands of accas create one-directional money that RLM can contradict.</li><li><strong>Draws</strong> — recreational bettors almost never back the draw, so a draw market moving against low money is a strong tell.</li></ul><h2 id="how-to-measure-it">How to Measure It</h2><p>You need two data points: the distribution of money (which side the public is on) and the price movement (which way the odds actually go). Betting exchanges publish matched volume by side, and many odds-comparison sites show both stake percentages and odds history. When those two lines point in opposite directions, RLM is present.</p><table class="stats-table"><thead><tr><th>Public money</th><th>Odds movement</th><th>Verdict</th></tr></thead><tbody><tr><td>70% on Home</td><td>Home shortens 2.10 → 1.90</td><td>Confirmed move (public + sharp aligned)</td></tr><tr><td>70% on Home</td><td>Home drifts 2.10 → 2.30</td><td><strong>Reverse line movement</strong></td></tr><tr><td>70% on Home</td><td>Home holds steady</td><td>Book protecting itself; neutral</td></tr></tbody></table><h2 id="following-rlm-safely">Following RLM Safely</h2><p>RLM is a directional hint, not a guaranteed win. Treat it with the same discipline as any other signal:</p><ul><li><strong>Require magnitude.</strong> A one-tick drift is noise. Look for a clear move of at least one full price increment against the money flow.</li><li><strong>Check the timing.</strong> RLM that forms late — in the final hours before kickoff — is the strongest version, because it reflects the newest information.</li><li><strong>Never ignore the fundamentals.</strong> If your own research says the public is right, RLM alone should not overturn it. Combine the signal with your own model.</li><li><strong>Bet the price, not the story.</strong> You are not "backing the sharp side." You are backing a price that, in your judgment, now carries value.</li></ul><h2 id="when-rlm-fails">When RLM Fails</h2><p>Not all reverse movement is sharp money. A star player's late withdrawal, a manager's rotation announcement, or heavy local money on a minnow can all move a price against the public flow for entirely ordinary reasons. The strongest RLM signals come with <em>volume</em> — big stakes, late timing, and consistency across multiple books. Weak RLM, seen on a single bookmaker's board, is frequently just noise.</p><h2 id="final-thoughts">Final Thoughts</h2><p>Reverse line movement gives you a rare, visible trace of informed opinion in a market that hides it everywhere else. Used alongside value estimation and staking discipline, it improves the quality of your selections. Used alone, it becomes another gambling superstition. The market's smart money leaves footprints — RLM is how you learn to read them.</p><h2 id="rlm-in-practice-a-concrete-example">RLM in Practice: A Concrete Example</h2><p>Take a Sunday derby. By midday, the exchange shows 68% of stakes on the home side at 2.05, yet the price has drifted to 2.20. Two hours later it reaches 2.30, and the away side has shortened from 3.60 to 3.10. That is textbook reverse line movement: the money is one way and the price is moving the other. The disciplined read is that the small number of large stakes on the away side — placed late, in size, across multiple books — outweighs the volume of small public stakes on the home side.</p><p>The follow-through matters too. The home side eventually shortens back toward 2.10 in the final hour — a partial reversal that suggests the book balanced its books and the anomaly has been priced out. For the RLM bettor, the lesson is timing: the entry was during the initial drift, and the partial recovery would have been a sensible exit if they wanted to lock in the price movement rather than hold through kickoff. RLM is a signal about the market's fear, not about the final score — acting on it early and taking the price movement when it appears is the safer expression of the same insight.</p>
+
+  <section class="faq">
+   <h2 id="faq">Frequently Asked Questions</h2>
+   <div class="faq-item">
+    <h3>What is reverse line movement (RLM)?</h3>
+    <p>Reverse line movement happens when the public's money lands heavily on one side but the odds move against it — the opposite of what the betting flow implies. That contradiction usually means sharp or professional money is taking the other side, and the market is moving to protect the book against it. RLM is a signal that smart money disagrees with the public.</p>
+   </div>
+   <div class="faq-item">
+    <h3>Why does RLM matter in football?</h3>
+    <p>Because football markets carry large amounts of public, sentiment-driven money that books must balance. When a price moves against a flood of public bets, it indicates the market believes the other side is the true value. Following RLM safely means aligning with the direction of the move and the smart money it represents.</p>
+   </div>
+   <div class="faq-item">
+    <h3>How do I measure reverse line movement?</h3>
+    <p>Compare the percentage of money on each side (public betting percentages) against the actual price movement from opening to the time you bet. When the majority of money is on one side but the price moves the other way, that gap is the RLM signal. The larger the money-versus-price disagreement, the stronger the signal.</p>
+   </div>
+   <div class="faq-item">
+    <h3>When does RLM fail?</h3>
+    <p>RLM fails when the price movement has a non-smart cause, such as an injury announcement, a late line change by the book, or a staking pattern that is large but not informed. It also weakens in markets with low volume where small stakes move prices. RLM is a useful filter alongside your own pricing, not a standalone system.</p>
+   </div>
+  </section>
+
+
+   <div class="cta">
    <h3>Put These Principles Into Practice Today</h3>
    <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
    <p style="margin:16px 0"><a href="/predictions/1x2" class="btn">1X2 Predictions</a> <a href="/predictions/in-play" class="btn">Live In-Play Tips</a></p>
@@ -326,9 +382,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </div>
 
 <footer>
- <div class="footer-content">
+ <div class="footer-content container">
   <div style="text-align:center;margin-bottom:24px;">
-   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p><a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">In-Play Tips</a>
+   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p>
+   <a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;font-weight:600;font-size:14px;">In-Play Tips</a>
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
@@ -350,7 +407,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <a href="/contact.html">Contact</a>
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
-   <a href="/policy.html">Editorial Policy</a>
   </div>
   <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
  </div>

@@ -106,6 +106,17 @@ nav a:hover{color:var(--accent)}
 .stats-table th{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
 .stats-table td{font-weight:500}
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--border-light);color:var(--text-muted);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+.toc{background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h3{margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted)}
+.toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:24px}
+.toc li{margin-bottom:6px;font-size:14px}
+.toc li a{color:var(--text-primary)}
+.toc li a:hover{color:var(--accent)}
+.faq{margin:32px 0}
+.faq h2{margin:0 0 8px}
+.faq-item{border:1px solid var(--border-light);border-radius:12px;padding:18px 22px;margin:14px 0}
+.faq-item h3{margin:0 0 8px;font-size:17px}
+.faq-item p{margin:0;color:var(--text-muted)}
 .cta{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;padding:28px 32px;text-align:center;margin:38px 0}
 .cta h3{font-size:20px;font-weight:700;margin-bottom:10px}
 .social-share{display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -251,6 +262,15 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   ]
 }
 </script>
+<!-- FAQPage schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"Is it better to bet on favourites or underdogs?","acceptedAnswer":{"@type":"Answer","text":"Neither side is inherently better — the edge lives in whichever is mispriced. Favourites win often but pay little, so a favourite only makes money if its price is still too high. Underdogs lose often but pay big, so they only make money when their true probability is better than the price implies. Value, not team strength, decides which to back."}},{"@type":"Question","name":"Why do favourites sometimes offer poor value?","acceptedAnswer":{"@type":"Answer","text":"The public over-bets famous favourites, which pushes their prices below fair value. The margin on a short price is proportionally larger, and a 1.30 favourite must land roughly 77% of the time just to break even. When a favourite is over-priced by the market, backing it guarantees a losing long-term position even though it wins most matches."}},{"@type":"Question","name":"Where are underdogs systematically mispriced?","acceptedAnswer":{"@type":"Answer","text":"Underdogs are often underpriced in markets the public ignores — defensive teams at home, strong away sides in low-scoring leagues, or underdogs with good underlying data in an away game. The draw is also a forgotten favourite: draws are systematically mispriced by the public's preference for decisive outcomes. These are the spots where underdog value lives."}},{"@type":"Question","name":"What is the balanced approach to favourites and underdogs?","acceptedAnswer":{"@type":"Answer","text":"Bet whichever side your model prices as better than the market, regardless of whether that is the favourite or the underdog. Track your closing line value to confirm the edge. The balanced bettor follows the value wherever it appears rather than committing to a favourite-only or underdog-only style."}}]
+}
+</script>
+
 </head>
 <body>
 <header>
@@ -260,16 +280,17 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav id="nav">
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/best-picks.html">Best Picks</a>
- <a href="/author-picks.html">Author Picks</a>
- <a href="/predictions/in-play">In-Play</a>
- <a href="/blog/" class="active">Blog</a>
- <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-  <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
-  <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
- </span></nav>
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/author-picks.html">Author Picks</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/blog/" class="active">Blog</a>
+   <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
+    <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
+   </span>
+  </nav>
  </div>
 </header>
 
@@ -282,14 +303,50 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <p class="lead">Favourites give you frequent wins at low prices. Underdogs give you rare wins at big prices. The truth is hidden in which side is mispriced.</p>
 
-  <figure class="figure">
-   <img src="/blog/thumbnails/favourites-vs-underdogs-betting.webp" alt="Backing Favourites vs Underdogs | WinFulltime" width="1200" height="630" loading="eager">
-   <figcaption>The maths of favourites versus underdogs</figcaption>
-  </figure>
+   <figure class="figure">
+    <img src="/blog/thumbnails/favourites-vs-underdogs-betting.webp" alt="Backing Favourites vs Underdogs | WinFulltime" width="1200" height="630" loading="eager">
+    <figcaption>The maths of favourites versus underdogs</figcaption>
+   </figure>
 
-  <p>Walk into any casual betting conversation and you will hear both sides of a running argument. The favourite backer swears by steady, frequent wins. The underdog backer points at the odds board and asks why anyone would risk a fortune to win nothing. Both are describing the same market from opposite ends — and both can be losing. The question is not which side wins more, but which side is priced wrong.</p><h2>The Favourite's Case</h2><p>Back a 1.50 favourite and you win roughly two-thirds of the time. The appeal is psychological as much as financial: winning feels good, and winning often feels sustainable. The bankroll grows slowly and steadily, and short streaks of losses are survivable.</p><p>The hidden cost is the price. A 1.50 price carries a margin-heavy number — the bookmaker's lowest-margin markets are usually the favourites, but the absolute risk you carry on a "safe" bet is still your full stake. A heavy favourite that draws or loses costs you exactly the same as an underdog that was always unlikely.</p><h2>The Underdog's Case</h2><p>Back a 5.00 underdog and you win one time in five. The occasional win lands big, which makes it memorable — and that memorability is exactly why underdog betting feels more profitable than it is. The bookmaker prices underdogs with wider margins precisely because recreational bettors love the longshot. The "value" in a big price is often just the bookmaker's margin wearing a costume.</p><h2>The Actual Math</h2><p>Profitability has nothing to do with which side wins more. It is decided by the gap between the price and true probability. A favourite can be poor value; an underdog can be rich. The test is always the same: <em>is the price bigger than my estimate of the chance?</em></p><table class="stats-table"><thead><tr><th>Side</th><th>Fair odds</th><th>Book price</th><th>Verdict</th></tr></thead><tbody><tr><td>Favourite</td><td>1.60</td><td>1.50</td><td>Poor value — overpriced</td></tr><tr><td>Favourite</td><td>1.60</td><td>1.70</td><td>Good value — underpriced</td></tr><tr><td>Underdog</td><td>4.50</td><td>5.00</td><td>Good value — underpriced</td></tr><tr><td>Underdog</td><td>6.00</td><td>5.00</td><td>Poor value — overpriced</td></tr></tbody></table><h2>Where Each Side Is Systematically Mispriced</h2><p>Research into bookmaker pricing reveals consistent patterns that a bettor can exploit:</p><ul><li><strong>Heavy favourites are often underpriced in specific spots.</strong> A genuinely elite team facing a defensively broken opponent carries a price that trails its true probability — but only when the opponent is really that weak.</li><li><strong>Underdogs are chronically overpriced in casual markets.</strong> The public backs glamour teams and romantic longshots, inflating prices on both ends of the board.</li><li><strong>Mid-price underdogs (3.00-4.00) offer the cleanest value.</strong> They are too big to be trendy and too small to be protected — the market prices them closest to fair, which is where your own estimate can find an edge.</li></ul><h2>The Draw: The Forgotten Favourite</h2><p>The most systematic mispricing in football is neither favourite nor underdog — it is the draw. Recreational bettors almost never back it, so it carries the highest margins in the market. A patient bettor pricing draws honestly can find value that no casual player is even looking for.</p><h2>A Balanced Approach</h2><p>The professional answer is to stop choosing a side and start choosing prices. Keep a favourite strategy for your highest-conviction games, but demand a real gap between price and estimate. Keep an underdog strategy for situations with genuine upside — a defensive away side with a track record of grinding draws, a cup tie where motivation replaces quality. And keep the draw in your calculations, because the best value in football is often the market everyone ignores.</p><h2>Final Thoughts</h2><p>The favourite-versus-underdog debate is a distraction. Both sides pay winners; the market decides which side is generous. Price every candidate against your own estimate, favour the gaps wherever they appear, and let the bookmaker's own numbers — not your tribal preference — tell you where the value lives.</p><h2>Real Markets, Real Patterns</h2><p>The patterns become concrete in specific leagues. In top European leagues, heavy home favourites are among the most efficiently priced products in betting — the market prices the name and the venue so carefully that a 1.50 home favourite rarely carries exploitable value. The same fixtures in smaller leagues behave differently: a mid-table home side at 2.10 against a relegation-threatened traveller is often priced with looser margins, because the books devote less attention to the market.</p><p>Underdogs show the reverse geography. A glamour-club away side priced at 5.00 against a mid-table opponent attracts recreational money because of the name on the shirt, inflating the price the book can offer — and inflating the value for anyone willing to back the unglamorous favourite. Meanwhile, the genuine minnow in a cup tie is routinely overpriced on romance: the public backs the giant-killing story, and the book happily takes the money.</p><p>The lesson is not that one side is better. It is that mispricing follows attention, not logic. The value sits where the crowd is looking elsewhere: efficient in the marquee games, sloppy in the obscure ones, and permanently generous on the draw. A bettor who prices each fixture against the book's number — and stays out of the glamour markets altogether — will beat both the favourite backer and the underdog dreamer, because neither is reading the market; they are reading their own taste.</p>
+  <nav class="toc" aria-label="Table of contents">
+   <h3>Contents</h3>
+   <ul>
+    <li><a href="#the-favourites-case">The Favourite's Case</a></li>
+    <li><a href="#the-underdogs-case">The Underdog's Case</a></li>
+    <li><a href="#the-actual-math">The Actual Math</a></li>
+    <li><a href="#where-each-side-is-systematically-mispriced">Where Each Side Is Systematically Mispriced</a></li>
+    <li><a href="#the-draw-the-forgotten-favourite">The Draw: The Forgotten Favourite</a></li>
+    <li><a href="#a-balanced-approach">A Balanced Approach</a></li>
+    <li><a href="#final-thoughts">Final Thoughts</a></li>
+    <li><a href="#real-markets-real-patterns">Real Markets, Real Patterns</a></li>
+   </ul>
+  </nav>
 
-  <div class="cta">
+
+   <p>Walk into any casual betting conversation and you will hear both sides of a running argument. The favourite backer swears by steady, frequent wins. The underdog backer points at the odds board and asks why anyone would risk a fortune to win nothing. Both are describing the same market from opposite ends — and both can be losing. The question is not which side wins more, but which side is priced wrong.</p><h2 id="the-favourites-case">The Favourite's Case</h2><p>Back a 1.50 favourite and you win roughly two-thirds of the time. The appeal is psychological as much as financial: winning feels good, and winning often feels sustainable. The bankroll grows slowly and steadily, and short streaks of losses are survivable.</p><p>The hidden cost is the price. A 1.50 price carries a margin-heavy number — the bookmaker's lowest-margin markets are usually the favourites, but the absolute risk you carry on a "safe" bet is still your full stake. A heavy favourite that draws or loses costs you exactly the same as an underdog that was always unlikely.</p><h2 id="the-underdogs-case">The Underdog's Case</h2><p>Back a 5.00 underdog and you win one time in five. The occasional win lands big, which makes it memorable — and that memorability is exactly why underdog betting feels more profitable than it is. The bookmaker prices underdogs with wider margins precisely because recreational bettors love the longshot. The "value" in a big price is often just the bookmaker's margin wearing a costume.</p><h2 id="the-actual-math">The Actual Math</h2><p>Profitability has nothing to do with which side wins more. It is decided by the gap between the price and true probability. A favourite can be poor value; an underdog can be rich. The test is always the same: <em>is the price bigger than my estimate of the chance?</em></p><table class="stats-table"><thead><tr><th>Side</th><th>Fair odds</th><th>Book price</th><th>Verdict</th></tr></thead><tbody><tr><td>Favourite</td><td>1.60</td><td>1.50</td><td>Poor value — overpriced</td></tr><tr><td>Favourite</td><td>1.60</td><td>1.70</td><td>Good value — underpriced</td></tr><tr><td>Underdog</td><td>4.50</td><td>5.00</td><td>Good value — underpriced</td></tr><tr><td>Underdog</td><td>6.00</td><td>5.00</td><td>Poor value — overpriced</td></tr></tbody></table><h2 id="where-each-side-is-systematically-mispriced">Where Each Side Is Systematically Mispriced</h2><p>Research into bookmaker pricing reveals consistent patterns that a bettor can exploit:</p><ul><li><strong>Heavy favourites are often underpriced in specific spots.</strong> A genuinely elite team facing a defensively broken opponent carries a price that trails its true probability — but only when the opponent is really that weak.</li><li><strong>Underdogs are chronically overpriced in casual markets.</strong> The public backs glamour teams and romantic longshots, inflating prices on both ends of the board.</li><li><strong>Mid-price underdogs (3.00-4.00) offer the cleanest value.</strong> They are too big to be trendy and too small to be protected — the market prices them closest to fair, which is where your own estimate can find an edge.</li></ul><h2 id="the-draw-the-forgotten-favourite">The Draw: The Forgotten Favourite</h2><p>The most systematic mispricing in football is neither favourite nor underdog — it is the draw. Recreational bettors almost never back it, so it carries the highest margins in the market. A patient bettor pricing draws honestly can find value that no casual player is even looking for.</p><h2 id="a-balanced-approach">A Balanced Approach</h2><p>The professional answer is to stop choosing a side and start choosing prices. Keep a favourite strategy for your highest-conviction games, but demand a real gap between price and estimate. Keep an underdog strategy for situations with genuine upside — a defensive away side with a track record of grinding draws, a cup tie where motivation replaces quality. And keep the draw in your calculations, because the best value in football is often the market everyone ignores.</p><h2 id="final-thoughts">Final Thoughts</h2><p>The favourite-versus-underdog debate is a distraction. Both sides pay winners; the market decides which side is generous. Price every candidate against your own estimate, favour the gaps wherever they appear, and let the bookmaker's own numbers — not your tribal preference — tell you where the value lives.</p><h2 id="real-markets-real-patterns">Real Markets, Real Patterns</h2><p>The patterns become concrete in specific leagues. In top European leagues, heavy home favourites are among the most efficiently priced products in betting — the market prices the name and the venue so carefully that a 1.50 home favourite rarely carries exploitable value. The same fixtures in smaller leagues behave differently: a mid-table home side at 2.10 against a relegation-threatened traveller is often priced with looser margins, because the books devote less attention to the market.</p><p>Underdogs show the reverse geography. A glamour-club away side priced at 5.00 against a mid-table opponent attracts recreational money because of the name on the shirt, inflating the price the book can offer — and inflating the value for anyone willing to back the unglamorous favourite. Meanwhile, the genuine minnow in a cup tie is routinely overpriced on romance: the public backs the giant-killing story, and the book happily takes the money.</p><p>The lesson is not that one side is better. It is that mispricing follows attention, not logic. The value sits where the crowd is looking elsewhere: efficient in the marquee games, sloppy in the obscure ones, and permanently generous on the draw. A bettor who prices each fixture against the book's number — and stays out of the glamour markets altogether — will beat both the favourite backer and the underdog dreamer, because neither is reading the market; they are reading their own taste.</p>
+
+  <section class="faq">
+   <h2 id="faq">Frequently Asked Questions</h2>
+   <div class="faq-item">
+    <h3>Is it better to bet on favourites or underdogs?</h3>
+    <p>Neither side is inherently better — the edge lives in whichever is mispriced. Favourites win often but pay little, so a favourite only makes money if its price is still too high. Underdogs lose often but pay big, so they only make money when their true probability is better than the price implies. Value, not team strength, decides which to back.</p>
+   </div>
+   <div class="faq-item">
+    <h3>Why do favourites sometimes offer poor value?</h3>
+    <p>The public over-bets famous favourites, which pushes their prices below fair value. The margin on a short price is proportionally larger, and a 1.30 favourite must land roughly 77% of the time just to break even. When a favourite is over-priced by the market, backing it guarantees a losing long-term position even though it wins most matches.</p>
+   </div>
+   <div class="faq-item">
+    <h3>Where are underdogs systematically mispriced?</h3>
+    <p>Underdogs are often underpriced in markets the public ignores — defensive teams at home, strong away sides in low-scoring leagues, or underdogs with good underlying data in an away game. The draw is also a forgotten favourite: draws are systematically mispriced by the public's preference for decisive outcomes. These are the spots where underdog value lives.</p>
+   </div>
+   <div class="faq-item">
+    <h3>What is the balanced approach to favourites and underdogs?</h3>
+    <p>Bet whichever side your model prices as better than the market, regardless of whether that is the favourite or the underdog. Track your closing line value to confirm the edge. The balanced bettor follows the value wherever it appears rather than committing to a favourite-only or underdog-only style.</p>
+   </div>
+  </section>
+
+
+   <div class="cta">
    <h3>Put These Principles Into Practice Today</h3>
    <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
    <p style="margin:16px 0"><a href="/predictions/1x2" class="btn">1X2 Predictions</a> <a href="/predictions/in-play" class="btn">Live In-Play Tips</a></p>
@@ -326,9 +383,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </div>
 
 <footer>
- <div class="footer-content">
+ <div class="footer-content container">
   <div style="text-align:center;margin-bottom:24px;">
-   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p><a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">In-Play Tips</a>
+   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p>
+   <a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;font-weight:600;font-size:14px;">In-Play Tips</a>
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
@@ -350,7 +408,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <a href="/contact.html">Contact</a>
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
-   <a href="/policy.html">Editorial Policy</a>
   </div>
   <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
  </div>

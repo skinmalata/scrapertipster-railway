@@ -106,6 +106,17 @@ nav a:hover{color:var(--accent)}
 .stats-table th{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
 .stats-table td{font-weight:500}
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--border-light);color:var(--text-muted);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+.toc{background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h3{margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted)}
+.toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:24px}
+.toc li{margin-bottom:6px;font-size:14px}
+.toc li a{color:var(--text-primary)}
+.toc li a:hover{color:var(--accent)}
+.faq{margin:32px 0}
+.faq h2{margin:0 0 8px}
+.faq-item{border:1px solid var(--border-light);border-radius:12px;padding:18px 22px;margin:14px 0}
+.faq-item h3{margin:0 0 8px;font-size:17px}
+.faq-item p{margin:0;color:var(--text-muted)}
 .cta{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;padding:28px 32px;text-align:center;margin:38px 0}
 .cta h3{font-size:20px;font-weight:700;margin-bottom:10px}
 .social-share{display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -251,6 +262,15 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   ]
 }
 </script>
+<!-- FAQPage schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"Why are bet builders risky for the bettor?","acceptedAnswer":{"@type":"Answer","text":"Every leg in a builder carries the bookmaker's margin, and the builder price is the product of all those margins. Because the book adjusts the combined price, a typical 4-6% margin per market compounds into a much bigger edge for the house the more legs you add. The builder feels like one bet but is really a bundle of individually margined bets."}},{"@type":"Question","name":"What makes a bet builder profitable?","acceptedAnswer":{"@type":"Answer","text":"Profitability comes from correlation: choosing legs that are positively related, so the whole bundle is more likely to land than its individual parts suggest. Markets like team shots, corners and cards can be naturally correlated with the match winner. A builder of independent or negatively correlated legs simply multiplies the book's margin."}},{"@type":"Question","name":"How do builders compare to traditional accumulators?","acceptedAnswer":{"@type":"Answer","text":"Builders combine markets from a single match, while traditional accumulators combine selections from different matches. Builders often look safer because the correlation is visible, but the bookmaker prices that correlation in. Traditional accas across matches let you find independent value, whereas builders only pay if you find genuinely underpriced correlated legs."}}]
+}
+</script>
+
 </head>
 <body>
 <header>
@@ -260,16 +280,17 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav id="nav">
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/best-picks.html">Best Picks</a>
- <a href="/author-picks.html">Author Picks</a>
- <a href="/predictions/in-play">In-Play</a>
- <a href="/blog/" class="active">Blog</a>
- <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-  <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
-  <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
- </span></nav>
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/author-picks.html">Author Picks</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/blog/" class="active">Blog</a>
+   <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
+    <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
+   </span>
+  </nav>
  </div>
 </header>
 
@@ -282,14 +303,46 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <p class="lead">A bet builder bundles many markets from one match into a single ticket — and its biggest selling point is also its biggest trap.</p>
 
-  <figure class="figure">
-   <img src="/blog/thumbnails/bet-builder-strategy.webp" alt="Bet Builder Strategy: Creating Accumulator Value | WinFulltime" width="1200" height="630" loading="eager">
-   <figcaption>How to build profitable bet builder tickets</figcaption>
-  </figure>
+   <figure class="figure">
+    <img src="/blog/thumbnails/bet-builder-strategy.webp" alt="Bet Builder Strategy: Creating Accumulator Value | WinFulltime" width="1200" height="630" loading="eager">
+    <figcaption>How to build profitable bet builder tickets</figcaption>
+   </figure>
 
-  <p>The bet builder — also called a same-game multi or bet pack — is the modern bookmaker's favourite product. Pick over 2.5 goals, both teams to score, over 9 corners, and a home win, all from the same match, and watch the combined price balloon. It feels like genius value. That feeling is exactly what the bookmaker is selling.</p><h2>How the Builder Combines Its Price</h2><p>Combine three markets and the odds multiply. At 2.00, 1.80 and 1.50, the builder prices at 5.40 (2.00 x 1.80 x 1.50). To pay you 5.40, the bookmaker has to be confident the true combined probability is below that number. Here is the catch: a bookmaker builds the combined price from the <em>same</em> underlying match dynamics, and the markets are not independent. That creates correlation the bookmaker is pricing for — and you can use, or fall victim to.</p><div class="highlight"><strong>The hidden tax:</strong> Every individual leg in a builder carries the bookmaker's margin. Multiply several margins together and the combined margin is severe. A builder of five 5%-margin legs carries an effective tax near 23% on every ticket.</div><h2>Correlation Is the Real Skill</h2><p>Markets inside one match are connected. If a team is chasing a game, over 2.5 goals and over 9 corners and the comeback team to win are all <em>more likely together</em> than the multiplied prices suggest. When the bookmaker prices each leg independently, these correlated combinations become under-priced.</p><p>This is where a bet builder actually wins. The profitable builder is not a random collection of favourite outcomes — it is a story: <em>"The away team will fall behind, push forward, and the match will open up."</em> Every leg should reinforce that story.</p><h2>Positive vs Negative Correlation</h2><table class="stats-table"><thead><tr><th>Combination</th><th>Correlation</th><th>Verdict</th></tr></thead><tbody><tr><td>Over 2.5 goals + BTTS yes</td><td>Positive</td><td>Both likely in an open game — fair value</td></tr><tr><td>Team A win + Team A to score 2+</td><td>Positive</td><td>Win usually requires goals — value</td></tr><tr><td>Under 2.5 + over 9 corners</td><td>Negative</td><td>Both can happen but pull against each other</td></tr><tr><td>0-0 correct score + over 10 shots on target</td><td>Negative</td><td>Nearly impossible — bookmaker tax</td></tr></tbody></table><h2>Profitable Builder Rules</h2><ul><li><strong>Pick a story.</strong> Build from a clear match narrative: an aggressive press, a leaky defence, a team that must chase the game.</li><li><strong>Prefer correlated legs.</strong> Legs that reinforce each other in the same direction add value; legs that pull against each other add tax.</li><li><strong>Cap the number of legs.</strong> Four to six is the sweet spot. Beyond that, the multiplied margin overwhelms any edge.</li><li><strong>Avoid popular throw-in legs.</strong> Corners and player cards builders are the most heavily priced products in the industry — the margins are brutal.</li><li><strong>Compare the same combination as singles.</strong> If the singles at the best prices combine to less than the builder price, the builder is carrying extra margin — take the singles instead.</li></ul><h2>The Bookmaker's Edge on Builders</h2><p>Bookmakers price builders with generous marketing but sharp mathematics. Studies of same-game multi pricing repeatedly find combined margins far above what the individual markets carry. The product exists to attract casual, fun-driven stakes on popular matches — the exact profile of a losing bettor.</p><p>That does not mean builders are unplayable. It means they are only playable where you have identified correlation the price does not reflect, and only with stakes sized for the entertainment they provide.</p><h2>Builders vs Traditional Accumulators</h2><p>Across-match accumulators combine independent events, so each leg's margin is genuinely additive — there is no correlation to exploit. Builders, by contrast, offer the bettor a correlation edge that books routinely misprice. For a disciplined bettor, a well-chosen correlated builder is the stronger play; for everyone else, both products are the same tax, packaged differently.</p><h2>Final Thoughts</h2><p>Bet builders are not a trick for guaranteed wins. They are a market where correlation turns the bookmaker's margin back in your favour — if you build with a narrative, keep the legs tight, and never mistake a big combined price for a good one. Build your ticket like an argument, not a wish list.</p><h2>Building a Builder: A Worked Example</h2><p>An aggressive home side averaging 2.1 goals at home faces a promoted away side conceding 1.9 per game. The narrative is obvious: an open, one-sided game. The builder is built from that story alone. Home win at 1.85, home over 1.5 goals at 1.70, and over 9 corners at 1.90. Multiplied, the ticket prices near 5.95. The book prices each leg independently, but the story binds them: a dominant home side chasing goals generates corners and shots and wins — the three legs move together.</p><p>The trade-off is the margin. Each leg carries a slice of the book's margin, and three legs multiply the tax toward 15-20%. The builder is only worth its price if the correlation genuinely raises the combined probability above what 5.95 implies — and for a mismatch of this kind it often does. The same three selections at 1.85, 1.70 and 1.90 would also stand as a standalone wager; the discipline is to check whether the builder's combined price beats taking the three as singles. When it does not, the singles win. When it does, the builder is the smarter ticket.</p>
+  <nav class="toc" aria-label="Table of contents">
+   <h3>Contents</h3>
+   <ul>
+    <li><a href="#how-the-builder-combines-its-price">How the Builder Combines Its Price</a></li>
+    <li><a href="#correlation-is-the-real-skill">Correlation Is the Real Skill</a></li>
+    <li><a href="#positive-vs-negative-correlation">Positive vs Negative Correlation</a></li>
+    <li><a href="#profitable-builder-rules">Profitable Builder Rules</a></li>
+    <li><a href="#the-bookmakers-edge-on-builders">The Bookmaker's Edge on Builders</a></li>
+    <li><a href="#builders-vs-traditional-accumulators">Builders vs Traditional Accumulators</a></li>
+    <li><a href="#final-thoughts">Final Thoughts</a></li>
+    <li><a href="#building-a-builder-a-worked-example">Building a Builder: A Worked Example</a></li>
+   </ul>
+  </nav>
 
-  <div class="cta">
+
+   <p>The bet builder — also called a same-game multi or bet pack — is the modern bookmaker's favourite product. Pick over 2.5 goals, both teams to score, over 9 corners, and a home win, all from the same match, and watch the combined price balloon. It feels like genius value. That feeling is exactly what the bookmaker is selling.</p><h2 id="how-the-builder-combines-its-price">How the Builder Combines Its Price</h2><p>Combine three markets and the odds multiply. At 2.00, 1.80 and 1.50, the builder prices at 5.40 (2.00 x 1.80 x 1.50). To pay you 5.40, the bookmaker has to be confident the true combined probability is below that number. Here is the catch: a bookmaker builds the combined price from the <em>same</em> underlying match dynamics, and the markets are not independent. That creates correlation the bookmaker is pricing for — and you can use, or fall victim to.</p><div class="highlight"><strong>The hidden tax:</strong> Every individual leg in a builder carries the bookmaker's margin. Multiply several margins together and the combined margin is severe. A builder of five 5%-margin legs carries an effective tax near 23% on every ticket.</div><h2 id="correlation-is-the-real-skill">Correlation Is the Real Skill</h2><p>Markets inside one match are connected. If a team is chasing a game, over 2.5 goals and over 9 corners and the comeback team to win are all <em>more likely together</em> than the multiplied prices suggest. When the bookmaker prices each leg independently, these correlated combinations become under-priced.</p><p>This is where a bet builder actually wins. The profitable builder is not a random collection of favourite outcomes — it is a story: <em>"The away team will fall behind, push forward, and the match will open up."</em> Every leg should reinforce that story.</p><h2 id="positive-vs-negative-correlation">Positive vs Negative Correlation</h2><table class="stats-table"><thead><tr><th>Combination</th><th>Correlation</th><th>Verdict</th></tr></thead><tbody><tr><td>Over 2.5 goals + BTTS yes</td><td>Positive</td><td>Both likely in an open game — fair value</td></tr><tr><td>Team A win + Team A to score 2+</td><td>Positive</td><td>Win usually requires goals — value</td></tr><tr><td>Under 2.5 + over 9 corners</td><td>Negative</td><td>Both can happen but pull against each other</td></tr><tr><td>0-0 correct score + over 10 shots on target</td><td>Negative</td><td>Nearly impossible — bookmaker tax</td></tr></tbody></table><h2 id="profitable-builder-rules">Profitable Builder Rules</h2><ul><li><strong>Pick a story.</strong> Build from a clear match narrative: an aggressive press, a leaky defence, a team that must chase the game.</li><li><strong>Prefer correlated legs.</strong> Legs that reinforce each other in the same direction add value; legs that pull against each other add tax.</li><li><strong>Cap the number of legs.</strong> Four to six is the sweet spot. Beyond that, the multiplied margin overwhelms any edge.</li><li><strong>Avoid popular throw-in legs.</strong> Corners and player cards builders are the most heavily priced products in the industry — the margins are brutal.</li><li><strong>Compare the same combination as singles.</strong> If the singles at the best prices combine to less than the builder price, the builder is carrying extra margin — take the singles instead.</li></ul><h2 id="the-bookmakers-edge-on-builders">The Bookmaker's Edge on Builders</h2><p>Bookmakers price builders with generous marketing but sharp mathematics. Studies of same-game multi pricing repeatedly find combined margins far above what the individual markets carry. The product exists to attract casual, fun-driven stakes on popular matches — the exact profile of a losing bettor.</p><p>That does not mean builders are unplayable. It means they are only playable where you have identified correlation the price does not reflect, and only with stakes sized for the entertainment they provide.</p><h2 id="builders-vs-traditional-accumulators">Builders vs Traditional Accumulators</h2><p>Across-match accumulators combine independent events, so each leg's margin is genuinely additive — there is no correlation to exploit. Builders, by contrast, offer the bettor a correlation edge that books routinely misprice. For a disciplined bettor, a well-chosen correlated builder is the stronger play; for everyone else, both products are the same tax, packaged differently.</p><h2 id="final-thoughts">Final Thoughts</h2><p>Bet builders are not a trick for guaranteed wins. They are a market where correlation turns the bookmaker's margin back in your favour — if you build with a narrative, keep the legs tight, and never mistake a big combined price for a good one. Build your ticket like an argument, not a wish list.</p><h2 id="building-a-builder-a-worked-example">Building a Builder: A Worked Example</h2><p>An aggressive home side averaging 2.1 goals at home faces a promoted away side conceding 1.9 per game. The narrative is obvious: an open, one-sided game. The builder is built from that story alone. Home win at 1.85, home over 1.5 goals at 1.70, and over 9 corners at 1.90. Multiplied, the ticket prices near 5.95. The book prices each leg independently, but the story binds them: a dominant home side chasing goals generates corners and shots and wins — the three legs move together.</p><p>The trade-off is the margin. Each leg carries a slice of the book's margin, and three legs multiply the tax toward 15-20%. The builder is only worth its price if the correlation genuinely raises the combined probability above what 5.95 implies — and for a mismatch of this kind it often does. The same three selections at 1.85, 1.70 and 1.90 would also stand as a standalone wager; the discipline is to check whether the builder's combined price beats taking the three as singles. When it does not, the singles win. When it does, the builder is the smarter ticket.</p>
+
+  <section class="faq">
+   <h2 id="faq">Frequently Asked Questions</h2>
+   <div class="faq-item">
+    <h3>Why are bet builders risky for the bettor?</h3>
+    <p>Every leg in a builder carries the bookmaker's margin, and the builder price is the product of all those margins. Because the book adjusts the combined price, a typical 4-6% margin per market compounds into a much bigger edge for the house the more legs you add. The builder feels like one bet but is really a bundle of individually margined bets.</p>
+   </div>
+   <div class="faq-item">
+    <h3>What makes a bet builder profitable?</h3>
+    <p>Profitability comes from correlation: choosing legs that are positively related, so the whole bundle is more likely to land than its individual parts suggest. Markets like team shots, corners and cards can be naturally correlated with the match winner. A builder of independent or negatively correlated legs simply multiplies the book's margin.</p>
+   </div>
+   <div class="faq-item">
+    <h3>How do builders compare to traditional accumulators?</h3>
+    <p>Builders combine markets from a single match, while traditional accumulators combine selections from different matches. Builders often look safer because the correlation is visible, but the bookmaker prices that correlation in. Traditional accas across matches let you find independent value, whereas builders only pay if you find genuinely underpriced correlated legs.</p>
+   </div>
+  </section>
+
+
+   <div class="cta">
    <h3>Put These Principles Into Practice Today</h3>
    <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
    <p style="margin:16px 0"><a href="/predictions/1x2" class="btn">1X2 Predictions</a> <a href="/predictions/in-play" class="btn">Live In-Play Tips</a></p>
@@ -326,9 +379,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </div>
 
 <footer>
- <div class="footer-content">
+ <div class="footer-content container">
   <div style="text-align:center;margin-bottom:24px;">
-   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p><a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">In-Play Tips</a>
+   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p>
+   <a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;font-weight:600;font-size:14px;">In-Play Tips</a>
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
@@ -350,7 +404,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <a href="/contact.html">Contact</a>
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
-   <a href="/policy.html">Editorial Policy</a>
   </div>
   <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
  </div>

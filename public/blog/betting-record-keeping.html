@@ -106,6 +106,17 @@ nav a:hover{color:var(--accent)}
 .stats-table th{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
 .stats-table td{font-weight:500}
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--border-light);color:var(--text-muted);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+.toc{background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h3{margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted)}
+.toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:24px}
+.toc li{margin-bottom:6px;font-size:14px}
+.toc li a{color:var(--text-primary)}
+.toc li a:hover{color:var(--accent)}
+.faq{margin:32px 0}
+.faq h2{margin:0 0 8px}
+.faq-item{border:1px solid var(--border-light);border-radius:12px;padding:18px 22px;margin:14px 0}
+.faq-item h3{margin:0 0 8px;font-size:17px}
+.faq-item p{margin:0;color:var(--text-muted)}
 .cta{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;padding:28px 32px;text-align:center;margin:38px 0}
 .cta h3{font-size:20px;font-weight:700;margin-bottom:10px}
 .social-share{display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -251,6 +262,15 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   ]
 }
 </script>
+<!-- FAQPage schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"What should I record for every bet?","acceptedAnswer":{"@type":"Answer","text":"At minimum: the match, market, selection, stake, odds, date, bookmaker and result. The most important field is the average price you got versus the closing line, because that reveals whether you have an edge independent of luck. Recording your reasoning before the bet is the step that makes the record useful for changing behaviour."}},{"@type":"Question","name":"Why is memory not enough for tracking betting performance?","acceptedAnswer":{"@type":"Answer","text":"Human memory is heavily biased — bettors remember winners, forget losers, and misremember the prices they took. A written record produced at the moment of each bet gives the honest dataset needed to measure edge, spot tilt, and adjust stakes. Without the record, every evaluation is guesswork."}},{"@type":"Question","name":"What metrics does a betting record reveal?","acceptedAnswer":{"@type":"Answer","text":"It reveals your average odds, strike rate, units won or lost, and — critically — closing line value, which separates good process from lucky results. It also exposes patterns such as betting under emotion, chasing losses, or over-staking on certain days or markets, which are invisible without a ledger."}}]
+}
+</script>
+
 </head>
 <body>
 <header>
@@ -260,16 +280,17 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav id="nav">
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/best-picks.html">Best Picks</a>
- <a href="/author-picks.html">Author Picks</a>
- <a href="/predictions/in-play">In-Play</a>
- <a href="/blog/" class="active">Blog</a>
- <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-  <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
-  <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
- </span></nav>
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/author-picks.html">Author Picks</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/blog/" class="active">Blog</a>
+   <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
+    <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
+   </span>
+  </nav>
  </div>
 </header>
 
@@ -282,14 +303,46 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <p class="lead">Bettors who cannot say what their average price was last month are not gamblers losing to odds — they are gamblers losing to ignorance.</p>
 
-  <figure class="figure">
-   <img src="/blog/thumbnails/betting-record-keeping.webp" alt="Record Keeping: Boost Long-Term Betting Profit | WinFulltime" width="1200" height="630" loading="eager">
-   <figcaption>What to track in a betting journal</figcaption>
-  </figure>
+   <figure class="figure">
+    <img src="/blog/thumbnails/betting-record-keeping.webp" alt="Record Keeping: Boost Long-Term Betting Profit | WinFulltime" width="1200" height="630" loading="eager">
+    <figcaption>What to track in a betting journal</figcaption>
+   </figure>
 
-  <p>Ask a casual bettor how they are doing and you get a feeling. Ask a professional and you get a spreadsheet. The difference between the two is not luck or knowledge — it is data. Bettors who track every bet know what works, what does not, and what to change. Bettors who do not track are guessing about their own process, and guessing loses.</p><h2>Why Memory Is Not Enough</h2><p>The human brain is an unreliable bookkeeper. It remembers the 9-leg accumulator that landed in March and forgets the forty singles that failed. It counts the big win and discounts the commission, the fee, the boosted-price bait. A betting record replaces that biased memory with arithmetic — and the arithmetic is where the truth lives.</p><h2>What to Record on Every Bet</h2><p>A useful record captures not just results but <em>process</em>, so you can separate luck from skill:</p><ul><li><strong>Date and market</strong> — match, league, bet type, and market.</li><li><strong>Selection and price</strong> — what you backed and at what odds.</li><li><strong>Closing price</strong> — the reference price at kickoff, to compute closing line value.</li><li><strong>Stake</strong> — in units or currency, whichever you track.</li><li><strong>Reason</strong> — the edge or signal that justified the bet.</li><li><strong>Result and return</strong> — won, lost, and the profit or loss in units.</li><li><strong>State of mind</strong> — calm, rushed, chasing, confident. This flags your tilt patterns.</li></ul><h2>The Metrics Your Record Reveals</h2><table class="stats-table"><thead><tr><th>Metric</th><th>What it tells you</th></tr></thead><tbody><tr><td>Win rate</td><td>How often selections land</td></tr><tr><td>Average odds</td><td>Your typical price level</td></tr><tr><td>ROI</td><td>Return on every unit staked</td></tr><tr><td>Closing line value</td><td>Whether your prices beat the market</td></tr><tr><td>Profit by market</td><td>Which markets carry your real edge</td></tr><tr><td>Profit by day/state</td><td>When and how you bet best</td></tr><tr><td>Losing streak depth</td><td>Whether variance or process is failing</td></tr></tbody></table><div class="highlight"><strong>The diagnostic power:</strong> If your win rate is 55% but your average odds are 1.60, you are losing money on value. If your ROI is positive but your closing line value is negative, your success is luck that will revert. The record tells you which is true.</div><h2>Simple vs Detailed Records</h2><p>You do not need a professional database. A simple spreadsheet with the fields above is enough to answer every important question. The key is <em>consistency</em> — record every bet, including the ones you would rather forget. Selective record-keeping is self-deception wearing a spreadsheet.</p><p>For a middle ground, track three summary rows per month: total staked, total returned, and average closing line value. Those three numbers tell you more than a month of emotional recollection.</p><h2>Using the Record to Change Behaviour</h2><p>A record is only useful if it changes what you do next. Schedule a monthly review with five questions:</p><ol><li>Which markets made or lost money — and should I adjust my mix?</li><li>Did I take better prices than closing, on average?</li><li>Did I ever bet while tilted or chasing?</li><li>Did I follow my staking plan, or drift?</li><li>What one change would improve next month?</li></ol><h2>The Discipline of Honest Data</h2><p>The hardest part of record keeping is not the spreadsheet — it is honesty. Recording a losing bet hurts. Recording that your favourite market is actually your worst is humiliating. That is precisely why the record is valuable: it defeats the stories you tell yourself. The bettor who can look at a negative month, trace it to a specific behavioural pattern, and fix it, has a genuine edge. The bettor who "feels" like they are winning has none.</p><h2>Final Thoughts</h2><p>Professional betting is professional record keeping. The tool is free, the discipline is cheap, and the information is priceless. Start today — even if it is a single sheet of paper — and give yourself ninety days of honest data. What you learn about your own betting will be worth more than any tipster, system, or promotion ever sold.</p><h2>What a Proper Record Row Looks Like</h2><p>A useful record does not need elegance; it needs completeness. A single row captures the decision: <strong>2026-08-01 | EPL | Arsenal v Everton | Over 2.5 | price 1.92 | closing 1.85 | stake 2u | reason: xG gap + fixture congestion | result W | return 3.84u | state: calm</strong>. That one line answers every question that matters months later — what was priced, whether it beat the market, why it was bet, and whether the bettor was in the right state of mind when it was placed.</p><p>The reason field is the most valuable and the most commonly skipped. Without it, a winning bet teaches nothing and a losing bet explains nothing. With it, patterns emerge that no results table can show: maybe every bet placed while tired loses, or every bet in the Monday-night market leaks, or every bet taken after 11pm carries a worse price. The state-of-mind field turns the record into a behaviour monitor as well as a financial ledger.</p><p>The monthly review turns raw data into decisions. Compute the ROI, compare your average taken price with the average closing price, and separate your bets by market, day and state. The bettor who answers "which of these three categories is losing my money?" every month is doing professional-grade evaluation with a free spreadsheet. The bettor who keeps no record is running a business without accounts — profitable only by accident, and incapable of fixing what is broken.</p>
+  <nav class="toc" aria-label="Table of contents">
+   <h3>Contents</h3>
+   <ul>
+    <li><a href="#why-memory-is-not-enough">Why Memory Is Not Enough</a></li>
+    <li><a href="#what-to-record-on-every-bet">What to Record on Every Bet</a></li>
+    <li><a href="#the-metrics-your-record-reveals">The Metrics Your Record Reveals</a></li>
+    <li><a href="#simple-vs-detailed-records">Simple vs Detailed Records</a></li>
+    <li><a href="#using-the-record-to-change-behaviour">Using the Record to Change Behaviour</a></li>
+    <li><a href="#the-discipline-of-honest-data">The Discipline of Honest Data</a></li>
+    <li><a href="#final-thoughts">Final Thoughts</a></li>
+    <li><a href="#what-a-proper-record-row-looks-like">What a Proper Record Row Looks Like</a></li>
+   </ul>
+  </nav>
 
-  <div class="cta">
+
+   <p>Ask a casual bettor how they are doing and you get a feeling. Ask a professional and you get a spreadsheet. The difference between the two is not luck or knowledge — it is data. Bettors who track every bet know what works, what does not, and what to change. Bettors who do not track are guessing about their own process, and guessing loses.</p><h2 id="why-memory-is-not-enough">Why Memory Is Not Enough</h2><p>The human brain is an unreliable bookkeeper. It remembers the 9-leg accumulator that landed in March and forgets the forty singles that failed. It counts the big win and discounts the commission, the fee, the boosted-price bait. A betting record replaces that biased memory with arithmetic — and the arithmetic is where the truth lives.</p><h2 id="what-to-record-on-every-bet">What to Record on Every Bet</h2><p>A useful record captures not just results but <em>process</em>, so you can separate luck from skill:</p><ul><li><strong>Date and market</strong> — match, league, bet type, and market.</li><li><strong>Selection and price</strong> — what you backed and at what odds.</li><li><strong>Closing price</strong> — the reference price at kickoff, to compute closing line value.</li><li><strong>Stake</strong> — in units or currency, whichever you track.</li><li><strong>Reason</strong> — the edge or signal that justified the bet.</li><li><strong>Result and return</strong> — won, lost, and the profit or loss in units.</li><li><strong>State of mind</strong> — calm, rushed, chasing, confident. This flags your tilt patterns.</li></ul><h2 id="the-metrics-your-record-reveals">The Metrics Your Record Reveals</h2><table class="stats-table"><thead><tr><th>Metric</th><th>What it tells you</th></tr></thead><tbody><tr><td>Win rate</td><td>How often selections land</td></tr><tr><td>Average odds</td><td>Your typical price level</td></tr><tr><td>ROI</td><td>Return on every unit staked</td></tr><tr><td>Closing line value</td><td>Whether your prices beat the market</td></tr><tr><td>Profit by market</td><td>Which markets carry your real edge</td></tr><tr><td>Profit by day/state</td><td>When and how you bet best</td></tr><tr><td>Losing streak depth</td><td>Whether variance or process is failing</td></tr></tbody></table><div class="highlight"><strong>The diagnostic power:</strong> If your win rate is 55% but your average odds are 1.60, you are losing money on value. If your ROI is positive but your closing line value is negative, your success is luck that will revert. The record tells you which is true.</div><h2 id="simple-vs-detailed-records">Simple vs Detailed Records</h2><p>You do not need a professional database. A simple spreadsheet with the fields above is enough to answer every important question. The key is <em>consistency</em> — record every bet, including the ones you would rather forget. Selective record-keeping is self-deception wearing a spreadsheet.</p><p>For a middle ground, track three summary rows per month: total staked, total returned, and average closing line value. Those three numbers tell you more than a month of emotional recollection.</p><h2 id="using-the-record-to-change-behaviour">Using the Record to Change Behaviour</h2><p>A record is only useful if it changes what you do next. Schedule a monthly review with five questions:</p><ol><li>Which markets made or lost money — and should I adjust my mix?</li><li>Did I take better prices than closing, on average?</li><li>Did I ever bet while tilted or chasing?</li><li>Did I follow my staking plan, or drift?</li><li>What one change would improve next month?</li></ol><h2 id="the-discipline-of-honest-data">The Discipline of Honest Data</h2><p>The hardest part of record keeping is not the spreadsheet — it is honesty. Recording a losing bet hurts. Recording that your favourite market is actually your worst is humiliating. That is precisely why the record is valuable: it defeats the stories you tell yourself. The bettor who can look at a negative month, trace it to a specific behavioural pattern, and fix it, has a genuine edge. The bettor who "feels" like they are winning has none.</p><h2 id="final-thoughts">Final Thoughts</h2><p>Professional betting is professional record keeping. The tool is free, the discipline is cheap, and the information is priceless. Start today — even if it is a single sheet of paper — and give yourself ninety days of honest data. What you learn about your own betting will be worth more than any tipster, system, or promotion ever sold.</p><h2 id="what-a-proper-record-row-looks-like">What a Proper Record Row Looks Like</h2><p>A useful record does not need elegance; it needs completeness. A single row captures the decision: <strong>2026-08-01 | EPL | Arsenal v Everton | Over 2.5 | price 1.92 | closing 1.85 | stake 2u | reason: xG gap + fixture congestion | result W | return 3.84u | state: calm</strong>. That one line answers every question that matters months later — what was priced, whether it beat the market, why it was bet, and whether the bettor was in the right state of mind when it was placed.</p><p>The reason field is the most valuable and the most commonly skipped. Without it, a winning bet teaches nothing and a losing bet explains nothing. With it, patterns emerge that no results table can show: maybe every bet placed while tired loses, or every bet in the Monday-night market leaks, or every bet taken after 11pm carries a worse price. The state-of-mind field turns the record into a behaviour monitor as well as a financial ledger.</p><p>The monthly review turns raw data into decisions. Compute the ROI, compare your average taken price with the average closing price, and separate your bets by market, day and state. The bettor who answers "which of these three categories is losing my money?" every month is doing professional-grade evaluation with a free spreadsheet. The bettor who keeps no record is running a business without accounts — profitable only by accident, and incapable of fixing what is broken.</p>
+
+  <section class="faq">
+   <h2 id="faq">Frequently Asked Questions</h2>
+   <div class="faq-item">
+    <h3>What should I record for every bet?</h3>
+    <p>At minimum: the match, market, selection, stake, odds, date, bookmaker and result. The most important field is the average price you got versus the closing line, because that reveals whether you have an edge independent of luck. Recording your reasoning before the bet is the step that makes the record useful for changing behaviour.</p>
+   </div>
+   <div class="faq-item">
+    <h3>Why is memory not enough for tracking betting performance?</h3>
+    <p>Human memory is heavily biased — bettors remember winners, forget losers, and misremember the prices they took. A written record produced at the moment of each bet gives the honest dataset needed to measure edge, spot tilt, and adjust stakes. Without the record, every evaluation is guesswork.</p>
+   </div>
+   <div class="faq-item">
+    <h3>What metrics does a betting record reveal?</h3>
+    <p>It reveals your average odds, strike rate, units won or lost, and — critically — closing line value, which separates good process from lucky results. It also exposes patterns such as betting under emotion, chasing losses, or over-staking on certain days or markets, which are invisible without a ledger.</p>
+   </div>
+  </section>
+
+
+   <div class="cta">
    <h3>Put These Principles Into Practice Today</h3>
    <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
    <p style="margin:16px 0"><a href="/predictions/1x2" class="btn">1X2 Predictions</a> <a href="/predictions/in-play" class="btn">Live In-Play Tips</a></p>
@@ -326,9 +379,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </div>
 
 <footer>
- <div class="footer-content">
+ <div class="footer-content container">
   <div style="text-align:center;margin-bottom:24px;">
-   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p><a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">In-Play Tips</a>
+   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p>
+   <a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;font-weight:600;font-size:14px;">In-Play Tips</a>
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
@@ -350,7 +404,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <a href="/contact.html">Contact</a>
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
-   <a href="/policy.html">Editorial Policy</a>
   </div>
   <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
  </div>

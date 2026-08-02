@@ -106,6 +106,17 @@ nav a:hover{color:var(--accent)}
 .stats-table th{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
 .stats-table td{font-weight:500}
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--border-light);color:var(--text-muted);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+.toc{background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h3{margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted)}
+.toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:24px}
+.toc li{margin-bottom:6px;font-size:14px}
+.toc li a{color:var(--text-primary)}
+.toc li a:hover{color:var(--accent)}
+.faq{margin:32px 0}
+.faq h2{margin:0 0 8px}
+.faq-item{border:1px solid var(--border-light);border-radius:12px;padding:18px 22px;margin:14px 0}
+.faq-item h3{margin:0 0 8px;font-size:17px}
+.faq-item p{margin:0;color:var(--text-muted)}
 .cta{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;padding:28px 32px;text-align:center;margin:38px 0}
 .cta h3{font-size:20px;font-weight:700;margin-bottom:10px}
 .social-share{display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -251,6 +262,15 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   ]
 }
 </script>
+<!-- FAQPage schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"What is a market anomaly in football betting?","acceptedAnswer":{"@type":"Answer","text":"A market anomaly is a price that is clearly wrong compared to the true probability of the outcome — a team priced as if it were far stronger or weaker than it actually is. Anomalies appear when bookmakers copy each other's lines, when sharp money has not yet corrected a price, or when a change (a manager, an injury, a fixture quirk) is not yet priced in."}},{"@type":"Question","name":"What are the two kinds of betting anomaly?","acceptedAnswer":{"@type":"Answer","text":"Fixated odds are stale prices that persist because bookmakers automatically copy each other's lines without adjusting for new information. True anomalies are prices that are wrong at the moment the market opens or moves — usually because the setters made an error or the public has pushed a price away from fair value. Both are the same opportunity: a price better than reality."}},{"@type":"Question","name":"How do I find market anomalies?","acceptedAnswer":{"@type":"Answer","text":"Build or consult a pricing model for the match, compare your fair price against the market's, and flag gaps above a meaningful threshold. Focus on smaller leagues and midweek fixtures where markets get less sharp attention, and act early because the lifecycle of an anomaly is short — sharp money corrects it quickly."}},{"@type":"Question","name":"Why do anomalies persist in football betting?","acceptedAnswer":{"@type":"Answer","text":"Because the majority of betting money is driven by loyalty, narratives and public teams rather than fair pricing, and because bookmakers copy lines mechanically. A price can stay wrong for hours when no sharp money notices the league, the market, or the mismatch. The professional discipline is to strike quickly and not to expect the anomaly to last."}}]
+}
+</script>
+
 </head>
 <body>
 <header>
@@ -260,16 +280,17 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav id="nav">
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/best-picks.html">Best Picks</a>
- <a href="/author-picks.html">Author Picks</a>
- <a href="/predictions/in-play">In-Play</a>
- <a href="/blog/" class="active">Blog</a>
- <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-  <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
-  <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
- </span></nav>
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/author-picks.html">Author Picks</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/blog/" class="active">Blog</a>
+   <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
+    <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
+   </span>
+  </nav>
  </div>
 </header>
 
@@ -282,14 +303,50 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <p class="lead">Every week a bookmaker prices a market wrong. Most bettors never notice. Finding the anomaly is the entire profession.</p>
 
-  <figure class="figure">
-   <img src="/blog/thumbnails/fixated-odds-market-anomalies.webp" alt="How to Identify Fixated Odds and Market Anomalies | WinFulltime" width="1200" height="630" loading="eager">
-   <figcaption>Spotting fixated odds and stale prices</figcaption>
-  </figure>
+   <figure class="figure">
+    <img src="/blog/thumbnails/fixated-odds-market-anomalies.webp" alt="How to Identify Fixated Odds and Market Anomalies | WinFulltime" width="1200" height="630" loading="eager">
+    <figcaption>Spotting fixated odds and stale prices</figcaption>
+   </figure>
 
-  <p>A "fixated" price is one that has frozen in time while the world moved on. It is the odds left unchanged after a key injury, a manager change, or a scheduling shock — the number the trader forgot to update, or decided not to touch. To the average bettor it is just a price. To the sharp eye, it is an anomaly with money attached.</p><h2>What a Market Anomaly Looks Like</h2><p>Markets are efficient most of the time — the bookmaker's pricing models are good and their traders are quick. Anomalies appear when the efficiency breaks, and they break in patterns you can learn to see:</p><ul><li><strong>Stale prices after news.</strong> A star striker is ruled out, and the favourite's price barely moves. The market has not fully absorbed the news.</li><li><strong>Cross-market contradictions.</strong> The match odds say the home side is a clear favourite, but the over/under line and the corners market are priced for a completely different game. One of them is wrong.</li><li><strong>Book-to-book divergence.</strong> Two bookmakers diverge by more than the usual few cents on a specific market. The outlier is usually the error.</li><li><strong>Illiquid early lines.</strong> A market that opened hours ago and was never traded carries prices set by a single trader's guess, untouched by money.</li></ul><h2>The Two Kinds of Anomaly</h2><p><strong>Pricing errors</strong> are simple mistakes — a flipped handicap, a forgotten team news update, a decimal slip. They are rare and usually corrected within minutes, which makes them low-frequency but high-value when caught.</p><p><strong>Structural mispricings</strong> are the more interesting kind: prices that stay wrong because nobody is betting enough to force a correction. Obscure markets, small leagues, and early lines are all structurally mispriced because the volume of money is too small to make the book care. These are not mistakes — they are neglect, and neglect is persistent.</p><div class="highlight"><strong>The key difference:</strong> A pricing error corrects itself in minutes and only a fast bot catches it. A structural mispricing can survive for days — and it is the sustainable hunting ground for a patient bettor.</div><h2>How to Hunt for Anomalies</h2><p>You do not need a bot to find mispriced markets, but you do need a systematic approach:</p><ol><li><strong>Maintain a news radar.</strong> Team news, injuries, manager changes and weather hit prices at different speeds. Trade where the news is freshest and the pricing is slowest.</li><li><strong>Price markets yourself.</strong> Build a simple expected-goals estimate for the matches you follow and compare it to the offered price. The gap between your estimate and the market is where anomalies live.</li><li><strong>Compare books on every stake.</strong> A persistent book-to-book gap on the same market is a repeatable anomaly, not a coincidence.</li><li><strong>Focus on the neglected markets.</strong> The main 1X2 market is efficiently priced. The handicap, the team total, the small-league special — those are where the book's attention runs thin.</li></ul><h2>The Lifecycle of an Anomaly</h2><p>Every mispricing follows a path: it appears, it persists while unnoticed, and it dies when either money or a trader corrects it. The profit comes from betting while it persists. The discipline comes from knowing it will die — anomalies do not survive the market's attention, and your entry must be sized like any other bet, because the correction can happen while you are still in position.</p><h2>Why Anomalies Persist in Football</h2><p>Football's calendar guarantees a stream of anomalies. Every international break, cup round and midweek window resets lineups, motivation and fatigue faster than the models can track. The market prices the league table; the anomaly lives in the fixture list, the fitness report and the rotation plan. The bettor who reads the news, prices the game independently, and compares the books is doing what the models cannot.</p><h2>The Professional Discipline</h2><p>Anomaly hunting rewards patience and punishes volume. Most of what you check will be priced correctly; the value is concentrated in the handful of mismatches you identified in advance. Keep an anomaly log: what you found, what price you took, and what the closing price said. Positive closing-line value on your anomaly bets is the proof that you are not just seeing patterns — you are seeing real mispricings.</p><h2>Final Thoughts</h2><p>Fixated odds and stale lines are not secrets handed to lucky bettors — they are the visible residue of an imperfect market. Read the news, do your own pricing, compare the books, and be patient enough to act only where the gap is real. The market corrects itself every day. Your job is to be there before it does.</p><h2>An Anomaly in the Wild</h2><p>Picture a Tuesday night Championship fixture. The home side's star midfielder — its set-piece taker and creative core — is ruled out at the evening press conference. By the time the market opens for the next round, the price should reflect the weakened side. Instead, the book's opening number barely moves, because the trader modelled the squads from a database that has not been updated and no volume has forced a correction. That price, unchanged for hours, is a fixated market.</p><p>The anomaly is visible in three places at once: the price is stale against the news, the exchange's early volume disagrees with it, and the same selection is priced differently across books. The bettor who reads the team news, prices the weakened side honestly, and checks the board will find a number that overstates the home side's chances. The correction arrives within hours — usually the moment the first substantial stake lands — and the bettor who entered early has captured the gap.</p><p>The takeaway is the discipline of the hunt. Anomalies are found by routine, not luck: read the news before the market does, price the game independently, and compare the books. Most markets are fair; the profit is in the handful that are not. The bettor who checks every market the same way eventually spots the one that forgot to move — and that one pays for the entire habit.</p>
+  <nav class="toc" aria-label="Table of contents">
+   <h3>Contents</h3>
+   <ul>
+    <li><a href="#what-a-market-anomaly-looks-like">What a Market Anomaly Looks Like</a></li>
+    <li><a href="#the-two-kinds-of-anomaly">The Two Kinds of Anomaly</a></li>
+    <li><a href="#how-to-hunt-for-anomalies">How to Hunt for Anomalies</a></li>
+    <li><a href="#the-lifecycle-of-an-anomaly">The Lifecycle of an Anomaly</a></li>
+    <li><a href="#why-anomalies-persist-in-football">Why Anomalies Persist in Football</a></li>
+    <li><a href="#the-professional-discipline">The Professional Discipline</a></li>
+    <li><a href="#final-thoughts">Final Thoughts</a></li>
+    <li><a href="#an-anomaly-in-the-wild">An Anomaly in the Wild</a></li>
+   </ul>
+  </nav>
 
-  <div class="cta">
+
+   <p>A "fixated" price is one that has frozen in time while the world moved on. It is the odds left unchanged after a key injury, a manager change, or a scheduling shock — the number the trader forgot to update, or decided not to touch. To the average bettor it is just a price. To the sharp eye, it is an anomaly with money attached.</p><h2 id="what-a-market-anomaly-looks-like">What a Market Anomaly Looks Like</h2><p>Markets are efficient most of the time — the bookmaker's pricing models are good and their traders are quick. Anomalies appear when the efficiency breaks, and they break in patterns you can learn to see:</p><ul><li><strong>Stale prices after news.</strong> A star striker is ruled out, and the favourite's price barely moves. The market has not fully absorbed the news.</li><li><strong>Cross-market contradictions.</strong> The match odds say the home side is a clear favourite, but the over/under line and the corners market are priced for a completely different game. One of them is wrong.</li><li><strong>Book-to-book divergence.</strong> Two bookmakers diverge by more than the usual few cents on a specific market. The outlier is usually the error.</li><li><strong>Illiquid early lines.</strong> A market that opened hours ago and was never traded carries prices set by a single trader's guess, untouched by money.</li></ul><h2 id="the-two-kinds-of-anomaly">The Two Kinds of Anomaly</h2><p><strong>Pricing errors</strong> are simple mistakes — a flipped handicap, a forgotten team news update, a decimal slip. They are rare and usually corrected within minutes, which makes them low-frequency but high-value when caught.</p><p><strong>Structural mispricings</strong> are the more interesting kind: prices that stay wrong because nobody is betting enough to force a correction. Obscure markets, small leagues, and early lines are all structurally mispriced because the volume of money is too small to make the book care. These are not mistakes — they are neglect, and neglect is persistent.</p><div class="highlight"><strong>The key difference:</strong> A pricing error corrects itself in minutes and only a fast bot catches it. A structural mispricing can survive for days — and it is the sustainable hunting ground for a patient bettor.</div><h2 id="how-to-hunt-for-anomalies">How to Hunt for Anomalies</h2><p>You do not need a bot to find mispriced markets, but you do need a systematic approach:</p><ol><li><strong>Maintain a news radar.</strong> Team news, injuries, manager changes and weather hit prices at different speeds. Trade where the news is freshest and the pricing is slowest.</li><li><strong>Price markets yourself.</strong> Build a simple expected-goals estimate for the matches you follow and compare it to the offered price. The gap between your estimate and the market is where anomalies live.</li><li><strong>Compare books on every stake.</strong> A persistent book-to-book gap on the same market is a repeatable anomaly, not a coincidence.</li><li><strong>Focus on the neglected markets.</strong> The main 1X2 market is efficiently priced. The handicap, the team total, the small-league special — those are where the book's attention runs thin.</li></ul><h2 id="the-lifecycle-of-an-anomaly">The Lifecycle of an Anomaly</h2><p>Every mispricing follows a path: it appears, it persists while unnoticed, and it dies when either money or a trader corrects it. The profit comes from betting while it persists. The discipline comes from knowing it will die — anomalies do not survive the market's attention, and your entry must be sized like any other bet, because the correction can happen while you are still in position.</p><h2 id="why-anomalies-persist-in-football">Why Anomalies Persist in Football</h2><p>Football's calendar guarantees a stream of anomalies. Every international break, cup round and midweek window resets lineups, motivation and fatigue faster than the models can track. The market prices the league table; the anomaly lives in the fixture list, the fitness report and the rotation plan. The bettor who reads the news, prices the game independently, and compares the books is doing what the models cannot.</p><h2 id="the-professional-discipline">The Professional Discipline</h2><p>Anomaly hunting rewards patience and punishes volume. Most of what you check will be priced correctly; the value is concentrated in the handful of mismatches you identified in advance. Keep an anomaly log: what you found, what price you took, and what the closing price said. Positive closing-line value on your anomaly bets is the proof that you are not just seeing patterns — you are seeing real mispricings.</p><h2 id="final-thoughts">Final Thoughts</h2><p>Fixated odds and stale lines are not secrets handed to lucky bettors — they are the visible residue of an imperfect market. Read the news, do your own pricing, compare the books, and be patient enough to act only where the gap is real. The market corrects itself every day. Your job is to be there before it does.</p><h2 id="an-anomaly-in-the-wild">An Anomaly in the Wild</h2><p>Picture a Tuesday night Championship fixture. The home side's star midfielder — its set-piece taker and creative core — is ruled out at the evening press conference. By the time the market opens for the next round, the price should reflect the weakened side. Instead, the book's opening number barely moves, because the trader modelled the squads from a database that has not been updated and no volume has forced a correction. That price, unchanged for hours, is a fixated market.</p><p>The anomaly is visible in three places at once: the price is stale against the news, the exchange's early volume disagrees with it, and the same selection is priced differently across books. The bettor who reads the team news, prices the weakened side honestly, and checks the board will find a number that overstates the home side's chances. The correction arrives within hours — usually the moment the first substantial stake lands — and the bettor who entered early has captured the gap.</p><p>The takeaway is the discipline of the hunt. Anomalies are found by routine, not luck: read the news before the market does, price the game independently, and compare the books. Most markets are fair; the profit is in the handful that are not. The bettor who checks every market the same way eventually spots the one that forgot to move — and that one pays for the entire habit.</p>
+
+  <section class="faq">
+   <h2 id="faq">Frequently Asked Questions</h2>
+   <div class="faq-item">
+    <h3>What is a market anomaly in football betting?</h3>
+    <p>A market anomaly is a price that is clearly wrong compared to the true probability of the outcome — a team priced as if it were far stronger or weaker than it actually is. Anomalies appear when bookmakers copy each other's lines, when sharp money has not yet corrected a price, or when a change (a manager, an injury, a fixture quirk) is not yet priced in.</p>
+   </div>
+   <div class="faq-item">
+    <h3>What are the two kinds of betting anomaly?</h3>
+    <p>Fixated odds are stale prices that persist because bookmakers automatically copy each other's lines without adjusting for new information. True anomalies are prices that are wrong at the moment the market opens or moves — usually because the setters made an error or the public has pushed a price away from fair value. Both are the same opportunity: a price better than reality.</p>
+   </div>
+   <div class="faq-item">
+    <h3>How do I find market anomalies?</h3>
+    <p>Build or consult a pricing model for the match, compare your fair price against the market's, and flag gaps above a meaningful threshold. Focus on smaller leagues and midweek fixtures where markets get less sharp attention, and act early because the lifecycle of an anomaly is short — sharp money corrects it quickly.</p>
+   </div>
+   <div class="faq-item">
+    <h3>Why do anomalies persist in football betting?</h3>
+    <p>Because the majority of betting money is driven by loyalty, narratives and public teams rather than fair pricing, and because bookmakers copy lines mechanically. A price can stay wrong for hours when no sharp money notices the league, the market, or the mismatch. The professional discipline is to strike quickly and not to expect the anomaly to last.</p>
+   </div>
+  </section>
+
+
+   <div class="cta">
    <h3>Put These Principles Into Practice Today</h3>
    <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
    <p style="margin:16px 0"><a href="/predictions/1x2" class="btn">1X2 Predictions</a> <a href="/predictions/in-play" class="btn">Live In-Play Tips</a></p>
@@ -326,9 +383,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </div>
 
 <footer>
- <div class="footer-content">
+ <div class="footer-content container">
   <div style="text-align:center;margin-bottom:24px;">
-   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p><a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">In-Play Tips</a>
+   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p>
+   <a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;font-weight:600;font-size:14px;">In-Play Tips</a>
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
@@ -350,7 +408,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <a href="/contact.html">Contact</a>
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
-   <a href="/policy.html">Editorial Policy</a>
   </div>
   <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
  </div>

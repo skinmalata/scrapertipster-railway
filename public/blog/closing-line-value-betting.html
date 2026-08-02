@@ -106,6 +106,17 @@ nav a:hover{color:var(--accent)}
 .stats-table th{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
 .stats-table td{font-weight:500}
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--border-light);color:var(--text-muted);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+.toc{background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h3{margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted)}
+.toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:24px}
+.toc li{margin-bottom:6px;font-size:14px}
+.toc li a{color:var(--text-primary)}
+.toc li a:hover{color:var(--accent)}
+.faq{margin:32px 0}
+.faq h2{margin:0 0 8px}
+.faq-item{border:1px solid var(--border-light);border-radius:12px;padding:18px 22px;margin:14px 0}
+.faq-item h3{margin:0 0 8px;font-size:17px}
+.faq-item p{margin:0;color:var(--text-muted)}
 .cta{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;padding:28px 32px;text-align:center;margin:38px 0}
 .cta h3{font-size:20px;font-weight:700;margin-bottom:10px}
 .social-share{display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -251,6 +262,15 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   ]
 }
 </script>
+<!-- FAQPage schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"What is closing line value (CLV)?","acceptedAnswer":{"@type":"Answer","text":"CLV measures whether the price you took for a bet is better than the price the market finally closed at. If you consistently get better odds than the closing line, you are beating the market even when individual results go against you. Professionals treat CLV as the strongest signal that a bettor has a real edge."}},{"@type":"Question","name":"Why do professionals value CLV above win rate?","acceptedAnswer":{"@type":"Answer","text":"Because a single result is mostly luck, but consistently beating the closing line is the fingerprint of skill. Two bettors can have identical strike rates while one is winning and the other losing long-term — the difference shows up in average price versus the closing line, not in results."}},{"@type":"Question","name":"How can I improve my closing line value?","acceptedAnswer":{"@type":"Answer","text":"Take prices early when opening lines are softest, shop across multiple bookmakers, and bet only when your model's price is better than the market's. Tracking your CLV after each bet tells you whether your selections and timing are genuinely beating the market or merely matching it."}},{"@type":"Question","name":"Why do CLV and win rate disagree?","acceptedAnswer":{"@type":"Answer","text":"A bettor taking value at long odds loses most bets but profits from the ones that land because the price was too high; a bettor betting short favourites wins often but may still lose money. CLV captures the price advantage while win rate does not, which is why the two can point in opposite directions."}}]
+}
+</script>
+
 </head>
 <body>
 <header>
@@ -260,16 +280,17 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav id="nav">
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/best-picks.html">Best Picks</a>
- <a href="/author-picks.html">Author Picks</a>
- <a href="/predictions/in-play">In-Play</a>
- <a href="/blog/" class="active">Blog</a>
- <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-  <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
-  <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
- </span></nav>
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/author-picks.html">Author Picks</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/blog/" class="active">Blog</a>
+   <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
+    <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
+   </span>
+  </nav>
  </div>
 </header>
 
@@ -282,14 +303,49 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <p class="lead">The result of a single bet tells you almost nothing. Closing line value tells you whether you are actually winning — long before the results do.</p>
 
-  <figure class="figure">
-   <img src="/blog/thumbnails/closing-line-value-betting.webp" alt="Closing Line Value: The Key Betting Metric | WinFulltime" width="1200" height="630" loading="eager">
-   <figcaption>Why closing line value matters more than results</figcaption>
-  </figure>
+   <figure class="figure">
+    <img src="/blog/thumbnails/closing-line-value-betting.webp" alt="Closing Line Value: The Key Betting Metric | WinFulltime" width="1200" height="630" loading="eager">
+    <figcaption>Why closing line value matters more than results</figcaption>
+   </figure>
 
-  <p>Every bettor has a system for judging success. Amateurs count wins. Semi-professionals count money. Professionals track <strong>closing line value</strong> — and they would often rather be 40% on the season with strong CLV than 60% with weak CLV.</p><h2>What the Closing Line Is</h2><p>The closing line is the final price offered in a market before it is suspended — the point at which all public and private information has been priced in. For football, that is the price a market consensus of bookmakers and exchange traders believe is closest to fair value at kickoff.</p><p>Closing line value is the difference between the price <em>you</em> took and the price at <em>closing</em>. If you backed a team at 2.10 and the market closed at 1.95, you gained 0.15 of value on the market. If you backed at 2.10 and it closed at 2.30, the market believes you overpaid.</p><div class="highlight"><strong>The core idea:</strong> Beating the closing line — taking better prices than the market's final consensus — is the closest thing betting has to a measurable edge. The market is the sum of every sharp account trading it. Consistently beating its final price means you are, on average, smarter than the combined field.</div><h2>Why Results Lie</h2><p>A single football match has huge variance. A 60% hit rate can be a losing season if your prices are consistently worse than closing. A 35% hit rate on correctly-priced underdogs can be profitable. Short-term results are dominated by noise; CLV, measured over hundreds of bets, isolates signal from noise.</p><p>This is why professional staking plans like the Kelly Criterion require an estimate of edge — and why the most reliable estimate of edge is your long-run CLV, not your win rate.</p><h2>How to Measure Your CLV</h2><p>Tracking CLV requires records, and that is a feature, not a bug:</p><ul><li>Record the price you took on every bet.</li><li>Record the closing price from a reference source (the exchange's final matched price is the cleanest).</li><li>Calculate the difference per bet, then average it across your sample.</li></ul><table class="stats-table"><thead><tr><th>Bet</th><th>Your price</th><th>Closing price</th><th>CLV</th></tr></thead><tbody><tr><td>#1</td><td>2.10</td><td>2.00</td><td>+0.10</td></tr><tr><td>#2</td><td>1.80</td><td>1.85</td><td>−0.05</td></tr><tr><td>#3</td><td>3.40</td><td>3.20</td><td>+0.20</td></tr><tr><td><strong>Average</strong></td><td></td><td></td><td><strong>+0.083</strong></td></tr></tbody></table><p>A sustained positive average CLV is the single best predictor that your betting is profitable in the long run, independent of what your last ten results looked like.</p><h2>How to Improve Your CLV</h2><p>If your CLV is consistently negative, your edge is a fiction. To fix it:</p><ul><li><strong>Shop lines.</strong> The same match priced at 2.05, 2.10 and 2.15 across three books is one market with three outcomes — take the best.</li><li><strong>Bet early on sharp moves.</strong> When you genuinely identify value, you are usually early. Entering at the start of a move captures more CLV than entering at the end.</li><li><strong>Stop chasing.</strong> Late bets taken because the price "looks good now" are, by definition, close to the closing line — and close to fair value. They carry almost no CLV.</li><li><strong>Specialise.</strong> The more you understand one league or market, the more often you will beat consensus.</li></ul><h2>CLV and Bookmaker Limits</h2><p>There is a reason professional bettors guard their CLV statistics: bookmakers do too. A bettor who consistently beats the closing line is, by definition, costing the book money, and books respond with lower limits or account restrictions. If you find yourself winning on CLV, expect your prices to be cut. That is the clearest market confirmation that your edge is real.</p><h2>Final Thoughts</h2><p>Results are the scoreboard, but CLV is the batting average — it tells you whether your process is sound long before luck decides any individual game. If you are not measuring it, you are betting in the dark. Start a record today, compare every price you take with the closing price, and let the metric decide whether your strategy deserves more money or less.</p><h2>Why CLV and Win Rate Can Disagree</h2><p>Consider two bettors after one hundred bets. Bettor A wins 60% at an average price of 1.80. Bettor B wins 42% at an average price of 2.60. Bettor A looks like the better punter, but the maths says otherwise: A's 60% at 1.80 implies a break-even of 55.6%, so their edge is 4.4% per bet; B's 42% at 2.60 implies a break-even of 38.5%, an edge of 3.5% — and if B's closing line value is positive while A's is negative, the smart money is on B. Betting on B is not glamorous: losing 58% of the time takes a calm temperament. But the CLV record shows B's wins are priced better than the market, which is the only thing that predicts the long run.</p><p>This is why professional operations fire bettors who hit 65% at average odds of 1.40 and promote bettors who hit 40% at 2.80. The first is probably paying short prices for certainty that does not exist; the second is buying value the market later agrees with. Your own evaluation should apply the same logic. Stop asking whether you are winning and start asking whether the prices you take beat the market's final opinion — that answer, not the recent run of results, is the forecast of your future.</p>
+  <nav class="toc" aria-label="Table of contents">
+   <h3>Contents</h3>
+   <ul>
+    <li><a href="#what-the-closing-line-is">What the Closing Line Is</a></li>
+    <li><a href="#why-results-lie">Why Results Lie</a></li>
+    <li><a href="#how-to-measure-your-clv">How to Measure Your CLV</a></li>
+    <li><a href="#how-to-improve-your-clv">How to Improve Your CLV</a></li>
+    <li><a href="#clv-and-bookmaker-limits">CLV and Bookmaker Limits</a></li>
+    <li><a href="#final-thoughts">Final Thoughts</a></li>
+    <li><a href="#why-clv-and-win-rate-can-disagree">Why CLV and Win Rate Can Disagree</a></li>
+   </ul>
+  </nav>
 
-  <div class="cta">
+
+   <p>Every bettor has a system for judging success. Amateurs count wins. Semi-professionals count money. Professionals track <strong>closing line value</strong> — and they would often rather be 40% on the season with strong CLV than 60% with weak CLV.</p><h2 id="what-the-closing-line-is">What the Closing Line Is</h2><p>The closing line is the final price offered in a market before it is suspended — the point at which all public and private information has been priced in. For football, that is the price a market consensus of bookmakers and exchange traders believe is closest to fair value at kickoff.</p><p>Closing line value is the difference between the price <em>you</em> took and the price at <em>closing</em>. If you backed a team at 2.10 and the market closed at 1.95, you gained 0.15 of value on the market. If you backed at 2.10 and it closed at 2.30, the market believes you overpaid.</p><div class="highlight"><strong>The core idea:</strong> Beating the closing line — taking better prices than the market's final consensus — is the closest thing betting has to a measurable edge. The market is the sum of every sharp account trading it. Consistently beating its final price means you are, on average, smarter than the combined field.</div><h2 id="why-results-lie">Why Results Lie</h2><p>A single football match has huge variance. A 60% hit rate can be a losing season if your prices are consistently worse than closing. A 35% hit rate on correctly-priced underdogs can be profitable. Short-term results are dominated by noise; CLV, measured over hundreds of bets, isolates signal from noise.</p><p>This is why professional staking plans like the Kelly Criterion require an estimate of edge — and why the most reliable estimate of edge is your long-run CLV, not your win rate.</p><h2 id="how-to-measure-your-clv">How to Measure Your CLV</h2><p>Tracking CLV requires records, and that is a feature, not a bug:</p><ul><li>Record the price you took on every bet.</li><li>Record the closing price from a reference source (the exchange's final matched price is the cleanest).</li><li>Calculate the difference per bet, then average it across your sample.</li></ul><table class="stats-table"><thead><tr><th>Bet</th><th>Your price</th><th>Closing price</th><th>CLV</th></tr></thead><tbody><tr><td>#1</td><td>2.10</td><td>2.00</td><td>+0.10</td></tr><tr><td>#2</td><td>1.80</td><td>1.85</td><td>−0.05</td></tr><tr><td>#3</td><td>3.40</td><td>3.20</td><td>+0.20</td></tr><tr><td><strong>Average</strong></td><td></td><td></td><td><strong>+0.083</strong></td></tr></tbody></table><p>A sustained positive average CLV is the single best predictor that your betting is profitable in the long run, independent of what your last ten results looked like.</p><h2 id="how-to-improve-your-clv">How to Improve Your CLV</h2><p>If your CLV is consistently negative, your edge is a fiction. To fix it:</p><ul><li><strong>Shop lines.</strong> The same match priced at 2.05, 2.10 and 2.15 across three books is one market with three outcomes — take the best.</li><li><strong>Bet early on sharp moves.</strong> When you genuinely identify value, you are usually early. Entering at the start of a move captures more CLV than entering at the end.</li><li><strong>Stop chasing.</strong> Late bets taken because the price "looks good now" are, by definition, close to the closing line — and close to fair value. They carry almost no CLV.</li><li><strong>Specialise.</strong> The more you understand one league or market, the more often you will beat consensus.</li></ul><h2 id="clv-and-bookmaker-limits">CLV and Bookmaker Limits</h2><p>There is a reason professional bettors guard their CLV statistics: bookmakers do too. A bettor who consistently beats the closing line is, by definition, costing the book money, and books respond with lower limits or account restrictions. If you find yourself winning on CLV, expect your prices to be cut. That is the clearest market confirmation that your edge is real.</p><h2 id="final-thoughts">Final Thoughts</h2><p>Results are the scoreboard, but CLV is the batting average — it tells you whether your process is sound long before luck decides any individual game. If you are not measuring it, you are betting in the dark. Start a record today, compare every price you take with the closing price, and let the metric decide whether your strategy deserves more money or less.</p><h2 id="why-clv-and-win-rate-can-disagree">Why CLV and Win Rate Can Disagree</h2><p>Consider two bettors after one hundred bets. Bettor A wins 60% at an average price of 1.80. Bettor B wins 42% at an average price of 2.60. Bettor A looks like the better punter, but the maths says otherwise: A's 60% at 1.80 implies a break-even of 55.6%, so their edge is 4.4% per bet; B's 42% at 2.60 implies a break-even of 38.5%, an edge of 3.5% — and if B's closing line value is positive while A's is negative, the smart money is on B. Betting on B is not glamorous: losing 58% of the time takes a calm temperament. But the CLV record shows B's wins are priced better than the market, which is the only thing that predicts the long run.</p><p>This is why professional operations fire bettors who hit 65% at average odds of 1.40 and promote bettors who hit 40% at 2.80. The first is probably paying short prices for certainty that does not exist; the second is buying value the market later agrees with. Your own evaluation should apply the same logic. Stop asking whether you are winning and start asking whether the prices you take beat the market's final opinion — that answer, not the recent run of results, is the forecast of your future.</p>
+
+  <section class="faq">
+   <h2 id="faq">Frequently Asked Questions</h2>
+   <div class="faq-item">
+    <h3>What is closing line value (CLV)?</h3>
+    <p>CLV measures whether the price you took for a bet is better than the price the market finally closed at. If you consistently get better odds than the closing line, you are beating the market even when individual results go against you. Professionals treat CLV as the strongest signal that a bettor has a real edge.</p>
+   </div>
+   <div class="faq-item">
+    <h3>Why do professionals value CLV above win rate?</h3>
+    <p>Because a single result is mostly luck, but consistently beating the closing line is the fingerprint of skill. Two bettors can have identical strike rates while one is winning and the other losing long-term — the difference shows up in average price versus the closing line, not in results.</p>
+   </div>
+   <div class="faq-item">
+    <h3>How can I improve my closing line value?</h3>
+    <p>Take prices early when opening lines are softest, shop across multiple bookmakers, and bet only when your model's price is better than the market's. Tracking your CLV after each bet tells you whether your selections and timing are genuinely beating the market or merely matching it.</p>
+   </div>
+   <div class="faq-item">
+    <h3>Why do CLV and win rate disagree?</h3>
+    <p>A bettor taking value at long odds loses most bets but profits from the ones that land because the price was too high; a bettor betting short favourites wins often but may still lose money. CLV captures the price advantage while win rate does not, which is why the two can point in opposite directions.</p>
+   </div>
+  </section>
+
+
+   <div class="cta">
    <h3>Put These Principles Into Practice Today</h3>
    <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
    <p style="margin:16px 0"><a href="/predictions/1x2" class="btn">1X2 Predictions</a> <a href="/predictions/in-play" class="btn">Live In-Play Tips</a></p>
@@ -326,9 +382,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </div>
 
 <footer>
- <div class="footer-content">
+ <div class="footer-content container">
   <div style="text-align:center;margin-bottom:24px;">
-   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p><a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">In-Play Tips</a>
+   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p>
+   <a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;font-weight:600;font-size:14px;">In-Play Tips</a>
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
@@ -350,7 +407,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <a href="/contact.html">Contact</a>
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
-   <a href="/policy.html">Editorial Policy</a>
   </div>
   <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
  </div>

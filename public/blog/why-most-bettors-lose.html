@@ -106,6 +106,17 @@ nav a:hover{color:var(--accent)}
 .stats-table th{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
 .stats-table td{font-weight:500}
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--border-light);color:var(--text-muted);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+.toc{background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h3{margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted)}
+.toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:24px}
+.toc li{margin-bottom:6px;font-size:14px}
+.toc li a{color:var(--text-primary)}
+.toc li a:hover{color:var(--accent)}
+.faq{margin:32px 0}
+.faq h2{margin:0 0 8px}
+.faq-item{border:1px solid var(--border-light);border-radius:12px;padding:18px 22px;margin:14px 0}
+.faq-item h3{margin:0 0 8px;font-size:17px}
+.faq-item p{margin:0;color:var(--text-muted)}
 .cta{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;padding:28px 32px;text-align:center;margin:38px 0}
 .cta h3{font-size:20px;font-weight:700;margin-bottom:10px}
 .social-share{display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -251,6 +262,15 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   ]
 }
 </script>
+<!-- FAQPage schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"What are the most common reasons bettors lose?","acceptedAnswer":{"@type":"Answer","text":"Most bankrolls are drained by seven repeatable habits rather than bad luck: betting without a price, chasing losses, betting too many selections, ignoring the best price, betting under emotion, having no bankroll plan, and not recording bets. Each one quietly pays the full bookmaker margin with no compensating edge."}},{"@type":"Question","name":"How does betting too many selections hurt you?","acceptedAnswer":{"@type":"Answer","text":"Volume betting multiplies the margin problem: every extra bet on a match without genuine value is another payment of the house edge. Betting too many selections also spreads bankroll too thin and makes it harder to size each bet correctly. The number of bets matters less than the number of value bets."}},{"@type":"Question","name":"What does winning actually look like?","acceptedAnswer":{"@type":"Answer","text":"Winning is a slow, boring process of small edges compounding over hundreds of bets: positive closing line value, consistent stakes, honest records, and occasional flat months that are just variance. It does not look like a run of wins. If your betting feels exciting, you are probably buying the excitement the book sells at a heavy price."}},{"@type":"Question","name":"How does the bookmaker's design feed these habits?","acceptedAnswer":{"@type":"Answer","text":"The bookmaker's product is engineered for action: in-play betting, quick deposits, cash-out, bonuses, and the 'one goal away' near-miss of an accumulator all reward frequent betting and emotional decisions. Every feature that feels helpful is designed to keep you betting faster and thinking slower. Recognising the design is the first defence against it."}}]
+}
+</script>
+
 </head>
 <body>
 <header>
@@ -260,16 +280,17 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav id="nav">
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/best-picks.html">Best Picks</a>
- <a href="/author-picks.html">Author Picks</a>
- <a href="/predictions/in-play">In-Play</a>
- <a href="/blog/" class="active">Blog</a>
- <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-  <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
-  <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
- </span></nav>
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/author-picks.html">Author Picks</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/blog/" class="active">Blog</a>
+   <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
+    <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
+   </span>
+  </nav>
  </div>
 </header>
 
@@ -282,14 +303,52 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <p class="lead">It is not the odds. It is not the referee. It is a small set of repeatable, human habits that drain most bankrolls before the odds ever matter.</p>
 
-  <figure class="figure">
-   <img src="/blog/thumbnails/why-most-bettors-lose.webp" alt="Why Most Bettors Lose: Common Mistakes | WinFulltime" width="1200" height="630" loading="eager">
-   <figcaption>The seven habits that drain most bankrolls</figcaption>
-  </figure>
+   <figure class="figure">
+    <img src="/blog/thumbnails/why-most-bettors-lose.webp" alt="Why Most Bettors Lose: Common Mistakes | WinFulltime" width="1200" height="630" loading="eager">
+    <figcaption>The seven habits that drain most bankrolls</figcaption>
+   </figure>
 
-  <p>Statistically, the bookmaker's margin explains a slow bleed of a few percent per bet. Most losing bettors lose far faster than any margin can explain. The difference between the mathematical bleed and the actual collapse is behaviour — a short list of habits so common that the bookmaker's whole business model quietly depends on them.</p><h2>Habit 1: Betting Without a Price</h2><p>The most expensive habit is betting on matches without knowing whether the price is good. Most bettors ask "who will win?" when the only profitable question is "is this price better than the fair price?" Without an estimate of your own, every bet is a guess wearing the label of a decision.</p><p><strong>The fix:</strong> price the game yourself — even roughly — and only bet where your number beats the market's by a real margin.</p><h2>Habit 2: Chasing Losses</h2><p>A bad day produces the instinct to double the stake and recover it tonight. Chasing is the fastest destroyer of bankrolls because it escalates exactly when your judgment is worst. The recovered loss is imaginary; the bigger stake is real.</p><p><strong>The fix:</strong> a pre-set daily loss limit, obeyed without exception, and a full stop after any loss. The market will be there tomorrow.</p><h2>Habit 3: Betting Too Many Selections</h2><p>Big accumulators multiply the margin, not just the odds. The casual bettor's love of the 8-fold is the house's favourite revenue stream — every extra leg multiplies the tax.</p><p><strong>The fix:</strong> understand the margin maths, keep the core of your staking in singles, and treat big multiples as entertainment only.</p><h2>Habit 4: Ignoring the Best Price</h2><p>The same match is priced differently at every book. Betting at 1.85 when 2.00 is available is handing the book a permanent edge with no information value in return. Line shopping is free edge.</p><p><strong>The fix:</strong> compare prices across books before every single bet.</p><h2>Habit 5: Betting Under Emotion</h2><p>Revenge, boredom, excitement and desperation all place bets. The tilt bet after a bad beat is the most expensive wager in betting — its price is wrong by design, because its purpose is not value but feeling.</p><p><strong>The fix:</strong> a cooldown rule after any loss and a rule that no bet is placed while angry, drunk, or euphoric.</p><h2>Habit 6: No Bankroll Plan</h2><p>Bettors without a bankroll plan stake differently on different days — huge on Tuesday, tiny on Saturday — and let one streak dictate the pace. Variance becomes self-reinforcing: the bankroll is never allowed to compound because it is never managed.</p><p><strong>The fix:</strong> a separate betting bankroll, a fixed stake as a percentage of it, and a rule that the stake only changes on a schedule, never in a session.</p><h2>Habit 7: Not Recording Bets</h2><p>The final habit is the silent enabler of all the others. Without a record, there is no evidence of the mistakes — so they repeat forever. The bettor who "feels" even is usually a slow leak; the record reveals it in a month.</p><p><strong>The fix:</strong> log every bet with its price, reasoning, result and mental state. Review monthly.</p><div class="highlight"><strong>The summary:</strong> These seven habits are not seven problems — they are one problem: betting without a process. Fix the process and the habits lose their power together.</div><h2>What Winning Actually Looks Like</h2><p>Winning bettors are not people who never lose. They are people whose losses are smaller than their wins, because the wins come from a price advantage and the losses are capped by a plan. A month of honest records will show you which habits you have. Correcting even two of the seven changes the trajectory of a bankroll more than any tipster ever will.</p><h2>Final Thoughts</h2><p>The bookmaker does not need to beat you — you do it for them with these habits. Name them, write the fixes into rules, and run the process for three months. The people who stay in this game profitably are not the smartest or the luckiest. They are the ones who stopped making the seven mistakes and never went back.</p><h2>How the Bookmaker Design Feeds the Habits</h2><p>The seven habits do not emerge from nowhere — the bookmaker's product design actively feeds them. The near-miss notification, the "cash out available" popup, the boosted price on a popular team, the deposit-bonus prompt after a losing night: every element is engineered to trigger the next bet while the last result still hurts. The design goal is not to win individual bets; it is to keep the recreational flow moving, because the margin does the house's real work over volume.</p><p>Recognising the design is the first defence against it. A bettor who understands that the notification is a marketing tool, not a signal, is immune to its pull. A bettor who understands that the "boost" exists to make the popular team more attractive — not to offer value — stops chasing it. The cash-out prompt is the clearest example: it is offered most aggressively when the position is at its most dangerous for the bettor, which is precisely when a panicked exit costs the most.</p><p>None of this is a conspiracy; it is simply how the industry works, and it works because most players never notice. The disciplined bettor's advantage is awareness. When the habits are named and the triggers are recognised, the marketing machine loses its power over the bankroll — and the bettor is finally betting against the margin alone, rather than against the margin and their own impulses combined.</p>
+  <nav class="toc" aria-label="Table of contents">
+   <h3>Contents</h3>
+   <ul>
+    <li><a href="#habit-1-betting-without-a-price">Habit 1: Betting Without a Price</a></li>
+    <li><a href="#habit-2-chasing-losses">Habit 2: Chasing Losses</a></li>
+    <li><a href="#habit-3-betting-too-many-selections">Habit 3: Betting Too Many Selections</a></li>
+    <li><a href="#habit-4-ignoring-the-best-price">Habit 4: Ignoring the Best Price</a></li>
+    <li><a href="#habit-5-betting-under-emotion">Habit 5: Betting Under Emotion</a></li>
+    <li><a href="#habit-6-no-bankroll-plan">Habit 6: No Bankroll Plan</a></li>
+    <li><a href="#habit-7-not-recording-bets">Habit 7: Not Recording Bets</a></li>
+    <li><a href="#what-winning-actually-looks-like">What Winning Actually Looks Like</a></li>
+    <li><a href="#final-thoughts">Final Thoughts</a></li>
+    <li><a href="#how-the-bookmaker-design-feeds-the-habits">How the Bookmaker Design Feeds the Habits</a></li>
+   </ul>
+  </nav>
 
-  <div class="cta">
+
+   <p>Statistically, the bookmaker's margin explains a slow bleed of a few percent per bet. Most losing bettors lose far faster than any margin can explain. The difference between the mathematical bleed and the actual collapse is behaviour — a short list of habits so common that the bookmaker's whole business model quietly depends on them.</p><h2 id="habit-1-betting-without-a-price">Habit 1: Betting Without a Price</h2><p>The most expensive habit is betting on matches without knowing whether the price is good. Most bettors ask "who will win?" when the only profitable question is "is this price better than the fair price?" Without an estimate of your own, every bet is a guess wearing the label of a decision.</p><p><strong>The fix:</strong> price the game yourself — even roughly — and only bet where your number beats the market's by a real margin.</p><h2 id="habit-2-chasing-losses">Habit 2: Chasing Losses</h2><p>A bad day produces the instinct to double the stake and recover it tonight. Chasing is the fastest destroyer of bankrolls because it escalates exactly when your judgment is worst. The recovered loss is imaginary; the bigger stake is real.</p><p><strong>The fix:</strong> a pre-set daily loss limit, obeyed without exception, and a full stop after any loss. The market will be there tomorrow.</p><h2 id="habit-3-betting-too-many-selections">Habit 3: Betting Too Many Selections</h2><p>Big accumulators multiply the margin, not just the odds. The casual bettor's love of the 8-fold is the house's favourite revenue stream — every extra leg multiplies the tax.</p><p><strong>The fix:</strong> understand the margin maths, keep the core of your staking in singles, and treat big multiples as entertainment only.</p><h2 id="habit-4-ignoring-the-best-price">Habit 4: Ignoring the Best Price</h2><p>The same match is priced differently at every book. Betting at 1.85 when 2.00 is available is handing the book a permanent edge with no information value in return. Line shopping is free edge.</p><p><strong>The fix:</strong> compare prices across books before every single bet.</p><h2 id="habit-5-betting-under-emotion">Habit 5: Betting Under Emotion</h2><p>Revenge, boredom, excitement and desperation all place bets. The tilt bet after a bad beat is the most expensive wager in betting — its price is wrong by design, because its purpose is not value but feeling.</p><p><strong>The fix:</strong> a cooldown rule after any loss and a rule that no bet is placed while angry, drunk, or euphoric.</p><h2 id="habit-6-no-bankroll-plan">Habit 6: No Bankroll Plan</h2><p>Bettors without a bankroll plan stake differently on different days — huge on Tuesday, tiny on Saturday — and let one streak dictate the pace. Variance becomes self-reinforcing: the bankroll is never allowed to compound because it is never managed.</p><p><strong>The fix:</strong> a separate betting bankroll, a fixed stake as a percentage of it, and a rule that the stake only changes on a schedule, never in a session.</p><h2 id="habit-7-not-recording-bets">Habit 7: Not Recording Bets</h2><p>The final habit is the silent enabler of all the others. Without a record, there is no evidence of the mistakes — so they repeat forever. The bettor who "feels" even is usually a slow leak; the record reveals it in a month.</p><p><strong>The fix:</strong> log every bet with its price, reasoning, result and mental state. Review monthly.</p><div class="highlight"><strong>The summary:</strong> These seven habits are not seven problems — they are one problem: betting without a process. Fix the process and the habits lose their power together.</div><h2 id="what-winning-actually-looks-like">What Winning Actually Looks Like</h2><p>Winning bettors are not people who never lose. They are people whose losses are smaller than their wins, because the wins come from a price advantage and the losses are capped by a plan. A month of honest records will show you which habits you have. Correcting even two of the seven changes the trajectory of a bankroll more than any tipster ever will.</p><h2 id="final-thoughts">Final Thoughts</h2><p>The bookmaker does not need to beat you — you do it for them with these habits. Name them, write the fixes into rules, and run the process for three months. The people who stay in this game profitably are not the smartest or the luckiest. They are the ones who stopped making the seven mistakes and never went back.</p><h2 id="how-the-bookmaker-design-feeds-the-habits">How the Bookmaker Design Feeds the Habits</h2><p>The seven habits do not emerge from nowhere — the bookmaker's product design actively feeds them. The near-miss notification, the "cash out available" popup, the boosted price on a popular team, the deposit-bonus prompt after a losing night: every element is engineered to trigger the next bet while the last result still hurts. The design goal is not to win individual bets; it is to keep the recreational flow moving, because the margin does the house's real work over volume.</p><p>Recognising the design is the first defence against it. A bettor who understands that the notification is a marketing tool, not a signal, is immune to its pull. A bettor who understands that the "boost" exists to make the popular team more attractive — not to offer value — stops chasing it. The cash-out prompt is the clearest example: it is offered most aggressively when the position is at its most dangerous for the bettor, which is precisely when a panicked exit costs the most.</p><p>None of this is a conspiracy; it is simply how the industry works, and it works because most players never notice. The disciplined bettor's advantage is awareness. When the habits are named and the triggers are recognised, the marketing machine loses its power over the bankroll — and the bettor is finally betting against the margin alone, rather than against the margin and their own impulses combined.</p>
+
+  <section class="faq">
+   <h2 id="faq">Frequently Asked Questions</h2>
+   <div class="faq-item">
+    <h3>What are the most common reasons bettors lose?</h3>
+    <p>Most bankrolls are drained by seven repeatable habits rather than bad luck: betting without a price, chasing losses, betting too many selections, ignoring the best price, betting under emotion, having no bankroll plan, and not recording bets. Each one quietly pays the full bookmaker margin with no compensating edge.</p>
+   </div>
+   <div class="faq-item">
+    <h3>How does betting too many selections hurt you?</h3>
+    <p>Volume betting multiplies the margin problem: every extra bet on a match without genuine value is another payment of the house edge. Betting too many selections also spreads bankroll too thin and makes it harder to size each bet correctly. The number of bets matters less than the number of value bets.</p>
+   </div>
+   <div class="faq-item">
+    <h3>What does winning actually look like?</h3>
+    <p>Winning is a slow, boring process of small edges compounding over hundreds of bets: positive closing line value, consistent stakes, honest records, and occasional flat months that are just variance. It does not look like a run of wins. If your betting feels exciting, you are probably buying the excitement the book sells at a heavy price.</p>
+   </div>
+   <div class="faq-item">
+    <h3>How does the bookmaker's design feed these habits?</h3>
+    <p>The bookmaker's product is engineered for action: in-play betting, quick deposits, cash-out, bonuses, and the 'one goal away' near-miss of an accumulator all reward frequent betting and emotional decisions. Every feature that feels helpful is designed to keep you betting faster and thinking slower. Recognising the design is the first defence against it.</p>
+   </div>
+  </section>
+
+
+   <div class="cta">
    <h3>Put These Principles Into Practice Today</h3>
    <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
    <p style="margin:16px 0"><a href="/predictions/1x2" class="btn">1X2 Predictions</a> <a href="/predictions/in-play" class="btn">Live In-Play Tips</a></p>
@@ -326,9 +385,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </div>
 
 <footer>
- <div class="footer-content">
+ <div class="footer-content container">
   <div style="text-align:center;margin-bottom:24px;">
-   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p><a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">In-Play Tips</a>
+   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p>
+   <a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;font-weight:600;font-size:14px;">In-Play Tips</a>
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
@@ -350,7 +410,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <a href="/contact.html">Contact</a>
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
-   <a href="/policy.html">Editorial Policy</a>
   </div>
   <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
  </div>

@@ -106,6 +106,17 @@ nav a:hover{color:var(--accent)}
 .stats-table th{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
 .stats-table td{font-weight:500}
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--border-light);color:var(--text-muted);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+.toc{background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h3{margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted)}
+.toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:24px}
+.toc li{margin-bottom:6px;font-size:14px}
+.toc li a{color:var(--text-primary)}
+.toc li a:hover{color:var(--accent)}
+.faq{margin:32px 0}
+.faq h2{margin:0 0 8px}
+.faq-item{border:1px solid var(--border-light);border-radius:12px;padding:18px 22px;margin:14px 0}
+.faq-item h3{margin:0 0 8px;font-size:17px}
+.faq-item p{margin:0;color:var(--text-muted)}
 .cta{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;padding:28px 32px;text-align:center;margin:38px 0}
 .cta h3{font-size:20px;font-weight:700;margin-bottom:10px}
 .social-share{display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -251,6 +262,15 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   ]
 }
 </script>
+<!-- FAQPage schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"What is dutching in football betting?","acceptedAnswer":{"@type":"Answer","text":"Dutching means splitting a single stake across two or more selections in the same event so that if any of them wins, the profit is the same. A common football example is dutching the home win and the draw when you believe the away side has almost no chance — you cover both outcomes that you think contain the value."}},{"@type":"Question","name":"How do I split my stake when dutching?","acceptedAnswer":{"@type":"Answer","text":"You stake each selection in proportion to its odds so the payout is identical whichever selection lands. The formula divides the total stake so that each outcome returns the same amount, leaving the difference between that return and the total stake as the guaranteed profit if any selected outcome wins."}},{"@type":"Question","name":"When does dutching actually create value?","acceptedAnswer":{"@type":"Answer","text":"Dutching creates value when you believe two or more outcomes are collectively under-priced, such as home-win and draw when the draw price is too high. It also reduces variance and risk by covering multiple plausible outcomes. When the selections are genuinely mispriced in your favour, the combined edge beats backing a single outcome."}},{"@type":"Question","name":"What mistakes destroy dutching value?","acceptedAnswer":{"@type":"Answer","text":"The four big mistakes are dutching outcomes that are not actually mispriced, over-covering so the combined stake gets spread too thin, ignoring the bookmaker margin on each leg, and failing to track dutch bets properly in your records. Dutching when there is no collective edge simply multiplies the margin across more legs."}}]
+}
+</script>
+
 </head>
 <body>
 <header>
@@ -260,16 +280,17 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav id="nav">
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/best-picks.html">Best Picks</a>
- <a href="/author-picks.html">Author Picks</a>
- <a href="/predictions/in-play">In-Play</a>
- <a href="/blog/" class="active">Blog</a>
- <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-  <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
-  <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
- </span></nav>
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/author-picks.html">Author Picks</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/blog/" class="active">Blog</a>
+   <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
+    <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
+   </span>
+  </nav>
  </div>
 </header>
 
@@ -282,12 +303,26 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <p class="lead">Dutching is the practice of dividing a single stake across two or more selections in the same event so that any winner pays out the same profit. It is one of the oldest techniques in professional betting — and, done properly, one of the most versatile. Here is exactly how it works, the maths behind it, and the only situations where dutching actually creates value.</p>
 
-  <figure class="figure">
-   <img src="/blog/thumbnails/dutching-explained.webp" alt="Dutching Explained: Spread Risk Across Selections | WinFulltime" width="1200" height="630" loading="eager">
-   <figcaption>Dutching splits your stake so every selected outcome pays the same profit.</figcaption>
-  </figure>
+   <figure class="figure">
+    <img src="/blog/thumbnails/dutching-explained.webp" alt="Dutching Explained: Spread Risk Across Selections | WinFulltime" width="1200" height="630" loading="eager">
+    <figcaption>Dutching splits your stake so every selected outcome pays the same profit.</figcaption>
+   </figure>
 
-  <p><span class="q">D</span>utching gets its name from Arthur Flegenheimer — better known as Dutch Schultz — the notorious Prohibition-era bookmaker who ran his racket in New York in the 1920s and 30s. He is credited with popularising the technique of covering several runners in the same race so that his book stayed profitable whichever horse won. The idea is older than football, but its logic is perfect for modern match betting.</p>
+  <nav class="toc" aria-label="Table of contents">
+   <h3>Contents</h3>
+   <ul>
+    <li><a href="#what-is-dutching">What Dutching Actually Is</a></li>
+    <li><a href="#the-maths">The Maths: How to Split Your Stake</a></li>
+    <li><a href="#worked-example">Worked Example: A Real Football Match</a></li>
+    <li><a href="#when-dutching-works">When Dutching Actually Creates Value</a></li>
+    <li><a href="#the-mistakes">The Four Mistakes That Destroy Dutching Value</a></li>
+    <li><a href="#dutching-vs-other-approaches">Dutching vs Other Risk Tools</a></li>
+    <li><a href="#staking-and-tracking">Staking and Tracking Dutch Bets</a></li>
+   </ul>
+  </nav>
+
+
+   <p><span class="q">D</span>utching gets its name from Arthur Flegenheimer — better known as Dutch Schultz — the notorious Prohibition-era bookmaker who ran his racket in New York in the 1920s and 30s. He is credited with popularising the technique of covering several runners in the same race so that his book stayed profitable whichever horse won. The idea is older than football, but its logic is perfect for modern match betting.</p>
 
   <h2 id="what-is-dutching">What Dutching Actually Is</h2>
 
@@ -376,7 +411,28 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <strong>Bottom line:</strong> Dutching is a disciplined way to express "this outcome can't happen" while keeping your win rate high. Use it sparingly, only where your two selections are genuinely under-priced, and never as a substitute for a real betting edge.
   </div>
 
-  <div class="cta">
+  <section class="faq">
+   <h2 id="faq">Frequently Asked Questions</h2>
+   <div class="faq-item">
+    <h3>What is dutching in football betting?</h3>
+    <p>Dutching means splitting a single stake across two or more selections in the same event so that if any of them wins, the profit is the same. A common football example is dutching the home win and the draw when you believe the away side has almost no chance — you cover both outcomes that you think contain the value.</p>
+   </div>
+   <div class="faq-item">
+    <h3>How do I split my stake when dutching?</h3>
+    <p>You stake each selection in proportion to its odds so the payout is identical whichever selection lands. The formula divides the total stake so that each outcome returns the same amount, leaving the difference between that return and the total stake as the guaranteed profit if any selected outcome wins.</p>
+   </div>
+   <div class="faq-item">
+    <h3>When does dutching actually create value?</h3>
+    <p>Dutching creates value when you believe two or more outcomes are collectively under-priced, such as home-win and draw when the draw price is too high. It also reduces variance and risk by covering multiple plausible outcomes. When the selections are genuinely mispriced in your favour, the combined edge beats backing a single outcome.</p>
+   </div>
+   <div class="faq-item">
+    <h3>What mistakes destroy dutching value?</h3>
+    <p>The four big mistakes are dutching outcomes that are not actually mispriced, over-covering so the combined stake gets spread too thin, ignoring the bookmaker margin on each leg, and failing to track dutch bets properly in your records. Dutching when there is no collective edge simply multiplies the margin across more legs.</p>
+   </div>
+  </section>
+
+
+   <div class="cta">
    <h3>Put These Principles Into Practice Today</h3>
    <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
    <p style="margin:16px 0"><a href="/predictions/1x2" class="btn">1X2 Predictions</a> <a href="/predictions/in-play" class="btn">Live In-Play Tips</a></p>
@@ -413,9 +469,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </div>
 
 <footer>
- <div class="footer-content">
+ <div class="footer-content container">
   <div style="text-align:center;margin-bottom:24px;">
-   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p><a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">In-Play Tips</a>
+   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p>
+   <a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;font-weight:600;font-size:14px;">In-Play Tips</a>
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
@@ -437,7 +494,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <a href="/contact.html">Contact</a>
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
-   <a href="/policy.html">Editorial Policy</a>
   </div>
   <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
  </div>

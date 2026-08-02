@@ -106,6 +106,17 @@ nav a:hover{color:var(--accent)}
 .stats-table th{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
 .stats-table td{font-weight:500}
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--border-light);color:var(--text-muted);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+.toc{background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h3{margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted)}
+.toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:24px}
+.toc li{margin-bottom:6px;font-size:14px}
+.toc li a{color:var(--text-primary)}
+.toc li a:hover{color:var(--accent)}
+.faq{margin:32px 0}
+.faq h2{margin:0 0 8px}
+.faq-item{border:1px solid var(--border-light);border-radius:12px;padding:18px 22px;margin:14px 0}
+.faq-item h3{margin:0 0 8px;font-size:17px}
+.faq-item p{margin:0;color:var(--text-muted)}
 .cta{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;padding:28px 32px;text-align:center;margin:38px 0}
 .cta h3{font-size:20px;font-weight:700;margin-bottom:10px}
 .social-share{display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -251,6 +262,15 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   ]
 }
 </script>
+<!-- FAQPage schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"What is a system bet in football betting?","acceptedAnswer":{"@type":"Answer","text":"A system bet splits several selections across multiple combined wagers, so not every selection has to win for the ticket to pay. A Trixie covers three selections in three doubles plus a treble; a Yankee covers four selections in a full combination of doubles, trebles and a four-fold. Systems reduce risk compared to a single accumulator of the same selections."}},{"@type":"Question","name":"What is the system family and how do the names work?","acceptedAnswer":{"@type":"Answer","text":"The names describe how many selections and combinations are covered: a Trixie uses 3 selections and 4 bets (3 doubles + 1 treble); a Patent uses 3 selections and 7 bets (singles + doubles + treble); a Yankee uses 4 selections and 11 bets; a Lucky 15 uses 4 selections and 15 bets (singles included); a Lucky 31 uses 5 selections; a Heinz uses 6 selections in 57 bets. Higher names mean more combinations and more coverage."}},{"@type":"Question","name":"How do system bet payouts work?","acceptedAnswer":{"@type":"Answer","text":"Each individual wager in the system pays independently: if enough selections win, some of the combinations pay even if the whole ticket loses. Returns are the sum of all winning combinations, and every combination also carries its own margin. The more legs, the more combinations — and the more margin is paid — so systems cover risk but not the book's edge."}},{"@type":"Question","name":"When do system bets make sense?","acceptedAnswer":{"@type":"Answer","text":"Systems make sense when you want the insurance of multiple winning combinations — for example covering three solid selections while knowing one might lose. They are most useful for bettors who want the entertainment of a multiple with reduced all-or-nothing risk. The margin maths still applies: each combination is margined, so systems are not a free way to beat the price."}}]
+}
+</script>
+
 </head>
 <body>
 <header>
@@ -260,16 +280,17 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav id="nav">
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/best-picks.html">Best Picks</a>
- <a href="/author-picks.html">Author Picks</a>
- <a href="/predictions/in-play">In-Play</a>
- <a href="/blog/" class="active">Blog</a>
- <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-  <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
-  <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
- </span></nav>
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/author-picks.html">Author Picks</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/blog/" class="active">Blog</a>
+   <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
+    <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
+   </span>
+  </nav>
  </div>
 </header>
 
@@ -282,14 +303,50 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <p class="lead">A system bet splits your selections across multiple wagers so one result does not sink the whole ticket. Understanding how they pay is half the battle.</p>
 
-  <figure class="figure">
-   <img src="/blog/thumbnails/system-bets-explained.webp" alt="System Bets Explained: Trixie, Yankee, Lucky 15 | WinFulltime" width="1200" height="630" loading="eager">
-   <figcaption>How Trixie, Yankee and Lucky 15 system bets work</figcaption>
-  </figure>
+   <figure class="figure">
+    <img src="/blog/thumbnails/system-bets-explained.webp" alt="System Bets Explained: Trixie, Yankee, Lucky 15 | WinFulltime" width="1200" height="630" loading="eager">
+    <figcaption>How Trixie, Yankee and Lucky 15 system bets work</figcaption>
+   </figure>
 
-  <p>An ordinary four-fold accumulator is all-or-nothing: one loser and the ticket is dead. System bets change the equation by spreading your stake across multiple combinations of your selections. Lose one game and a system can still pay. The trade-off is more stakes and more complexity — and a pay table that most bettors never fully understand.</p><h2>What a System Bet Is</h2><p>A system bet lets you choose <em>n</em> selections and a set of combinations of size <em>k</em>. Instead of one four-fold, a "4 from 4" becomes multiple doubles, trebles and the four-fold, each with its own stake. The most famous systems have names, and their names tell you their structure.</p><h2>The System Family</h2><table class="stats-table"><thead><tr><th>System</th><th>Selections</th><th>Wagers</th><th>What it covers</th></tr></thead><tbody><tr><td>Double</td><td>2</td><td>1</td><td>1 double</td></tr><tr><td>Trixie</td><td>3</td><td>4</td><td>3 doubles + 1 treble</td></tr><tr><td>Patent</td><td>3</td><td>7</td><td>3 singles + 3 doubles + 1 treble</td></tr><tr><td>Yankee</td><td>4</td><td>11</td><td>6 doubles + 4 trebles + 1 four-fold</td></tr><tr><td>Lucky 15</td><td>4</td><td>15</td><td>Yankee + 4 singles</td></tr><tr><td>Heinz</td><td>6</td><td>57</td><td>All combinations 2-up</td></tr><tr><td>Super Heinz</td><td>7</td><td>120</td><td>All combinations 2-up</td></tr></tbody></table><p>The "Lucky" systems (Lucky 15, Lucky 31, Lucky 63) add singles to the full-cover structure, and typically include a bonus if only one selection wins, and another if all win.</p><h2>How Payouts Work</h2><p>Every combination is a separate bet with its own stake. A £1 Lucky 15 costs £15 in total because it holds fifteen £1 wagers. Winnings accumulate from every winning combination. If two of your four selections win, the Lucky 15 pays the two singles and one double — plus the one-winner bonus. If all four win, every combination pays.</p><div class="highlight"><strong>Cost warning:</strong> The system's resilience is paid for in stakes. A Heinz carries 57 separate bets. If you fund each with £1, a single winner across six selections leaves you down the other 56 stakes — that is why systems need strong selections, not hopeful ones.</div><h2>When Systems Make Sense</h2><p>System bets reward a specific situation: you have several strong selections but cannot be certain all will land. The classic example is a weekend of favourites where you rate each at 60-65% — individually strong, but a four-fold needing all four is unlikely. A Lucky 15 turns "three of four land" from a total loss into a paying day.</p><ul><li><strong>Use systems</strong> when your edge is on single selections but your confidence in any specific combination is moderate.</li><li><strong>Use singles</strong> when one selection stands far above the rest — a system just spreads the tax.</li><li><strong>Use accumulators</strong> when you are deliberately chasing the tail-risk payout and accept the all-or-nothing trade.</li></ul><h2>The Margin Maths</h2><p>Every component of a system bet carries the bookmaker's margin. A Lucky 15 on five-percent-margin markets embeds that margin fifteen times. The resilience you gain is real, but so is the extra tax. System bets are a risk-management tool, not a value-finding tool — they cannot turn poor prices into good ones, only spread the loss if your read is slightly off.</p><h2>System Bets in Football</h2><p>Football's most natural home for systems is the weekend basket: a set of match favourites or overs you believe in as a group but not as certainties. Double chance and draw-no-bet selections pair naturally with system structures because they raise the individual win rate while lowering the price — a trade that fits the resilience systems are built for.</p><h2>Final Thoughts</h2><p>System bets are one of the few products that reward realistic uncertainty. They admit that football is unpredictable and build a structure that survives it. But they are a cost, not a cure: the same margin rules apply, the stakes multiply, and the pay tables must be understood before the ticket is placed. Use them for basket weekends, keep the selections sharp, and never treat the structure as a reason to bet more than your plan allows.</p><h2>A Lucky 15 Worked Through</h2><p>Four selections, each at 2.00, in a £1 Lucky 15 costs £15. One winner pays the single at £1 profit. Two winners pay two singles (£2) plus one double (2.00 x 2.00 = 4.00), for £6 in winnings against the £15 outlay — still a loss, but a far smaller one than a dead four-fold. Three winners pay three singles, three doubles and one treble: £3 + £12 + £8 = £23, a modest profit. All four winners pay every combination: the four singles (£4), six doubles (£24), four trebles (£32) and the four-fold (£16) — £76 in winnings against £15 staked, plus the all-winners bonus some books add.</p><p>The pattern is the point. A system turns "three of four land" from a full loss into a payday, which is precisely the realistic outcome when you back four teams you individually believe in. The cost is the spread: £15 staked for returns that start small. That is why systems suit basket betting on your own edge, not random hunches — the structure rescues near-misses, but it cannot turn a bad selection into a good one, and the multiplied stake magnifies the cost of being wrong on all four.</p>
+  <nav class="toc" aria-label="Table of contents">
+   <h3>Contents</h3>
+   <ul>
+    <li><a href="#what-a-system-bet-is">What a System Bet Is</a></li>
+    <li><a href="#the-system-family">The System Family</a></li>
+    <li><a href="#how-payouts-work">How Payouts Work</a></li>
+    <li><a href="#when-systems-make-sense">When Systems Make Sense</a></li>
+    <li><a href="#the-margin-maths">The Margin Maths</a></li>
+    <li><a href="#system-bets-in-football">System Bets in Football</a></li>
+    <li><a href="#final-thoughts">Final Thoughts</a></li>
+    <li><a href="#a-lucky-15-worked-through">A Lucky 15 Worked Through</a></li>
+   </ul>
+  </nav>
 
-  <div class="cta">
+
+   <p>An ordinary four-fold accumulator is all-or-nothing: one loser and the ticket is dead. System bets change the equation by spreading your stake across multiple combinations of your selections. Lose one game and a system can still pay. The trade-off is more stakes and more complexity — and a pay table that most bettors never fully understand.</p><h2 id="what-a-system-bet-is">What a System Bet Is</h2><p>A system bet lets you choose <em>n</em> selections and a set of combinations of size <em>k</em>. Instead of one four-fold, a "4 from 4" becomes multiple doubles, trebles and the four-fold, each with its own stake. The most famous systems have names, and their names tell you their structure.</p><h2 id="the-system-family">The System Family</h2><table class="stats-table"><thead><tr><th>System</th><th>Selections</th><th>Wagers</th><th>What it covers</th></tr></thead><tbody><tr><td>Double</td><td>2</td><td>1</td><td>1 double</td></tr><tr><td>Trixie</td><td>3</td><td>4</td><td>3 doubles + 1 treble</td></tr><tr><td>Patent</td><td>3</td><td>7</td><td>3 singles + 3 doubles + 1 treble</td></tr><tr><td>Yankee</td><td>4</td><td>11</td><td>6 doubles + 4 trebles + 1 four-fold</td></tr><tr><td>Lucky 15</td><td>4</td><td>15</td><td>Yankee + 4 singles</td></tr><tr><td>Heinz</td><td>6</td><td>57</td><td>All combinations 2-up</td></tr><tr><td>Super Heinz</td><td>7</td><td>120</td><td>All combinations 2-up</td></tr></tbody></table><p>The "Lucky" systems (Lucky 15, Lucky 31, Lucky 63) add singles to the full-cover structure, and typically include a bonus if only one selection wins, and another if all win.</p><h2 id="how-payouts-work">How Payouts Work</h2><p>Every combination is a separate bet with its own stake. A £1 Lucky 15 costs £15 in total because it holds fifteen £1 wagers. Winnings accumulate from every winning combination. If two of your four selections win, the Lucky 15 pays the two singles and one double — plus the one-winner bonus. If all four win, every combination pays.</p><div class="highlight"><strong>Cost warning:</strong> The system's resilience is paid for in stakes. A Heinz carries 57 separate bets. If you fund each with £1, a single winner across six selections leaves you down the other 56 stakes — that is why systems need strong selections, not hopeful ones.</div><h2 id="when-systems-make-sense">When Systems Make Sense</h2><p>System bets reward a specific situation: you have several strong selections but cannot be certain all will land. The classic example is a weekend of favourites where you rate each at 60-65% — individually strong, but a four-fold needing all four is unlikely. A Lucky 15 turns "three of four land" from a total loss into a paying day.</p><ul><li><strong>Use systems</strong> when your edge is on single selections but your confidence in any specific combination is moderate.</li><li><strong>Use singles</strong> when one selection stands far above the rest — a system just spreads the tax.</li><li><strong>Use accumulators</strong> when you are deliberately chasing the tail-risk payout and accept the all-or-nothing trade.</li></ul><h2 id="the-margin-maths">The Margin Maths</h2><p>Every component of a system bet carries the bookmaker's margin. A Lucky 15 on five-percent-margin markets embeds that margin fifteen times. The resilience you gain is real, but so is the extra tax. System bets are a risk-management tool, not a value-finding tool — they cannot turn poor prices into good ones, only spread the loss if your read is slightly off.</p><h2 id="system-bets-in-football">System Bets in Football</h2><p>Football's most natural home for systems is the weekend basket: a set of match favourites or overs you believe in as a group but not as certainties. Double chance and draw-no-bet selections pair naturally with system structures because they raise the individual win rate while lowering the price — a trade that fits the resilience systems are built for.</p><h2 id="final-thoughts">Final Thoughts</h2><p>System bets are one of the few products that reward realistic uncertainty. They admit that football is unpredictable and build a structure that survives it. But they are a cost, not a cure: the same margin rules apply, the stakes multiply, and the pay tables must be understood before the ticket is placed. Use them for basket weekends, keep the selections sharp, and never treat the structure as a reason to bet more than your plan allows.</p><h2 id="a-lucky-15-worked-through">A Lucky 15 Worked Through</h2><p>Four selections, each at 2.00, in a £1 Lucky 15 costs £15. One winner pays the single at £1 profit. Two winners pay two singles (£2) plus one double (2.00 x 2.00 = 4.00), for £6 in winnings against the £15 outlay — still a loss, but a far smaller one than a dead four-fold. Three winners pay three singles, three doubles and one treble: £3 + £12 + £8 = £23, a modest profit. All four winners pay every combination: the four singles (£4), six doubles (£24), four trebles (£32) and the four-fold (£16) — £76 in winnings against £15 staked, plus the all-winners bonus some books add.</p><p>The pattern is the point. A system turns "three of four land" from a full loss into a payday, which is precisely the realistic outcome when you back four teams you individually believe in. The cost is the spread: £15 staked for returns that start small. That is why systems suit basket betting on your own edge, not random hunches — the structure rescues near-misses, but it cannot turn a bad selection into a good one, and the multiplied stake magnifies the cost of being wrong on all four.</p>
+
+  <section class="faq">
+   <h2 id="faq">Frequently Asked Questions</h2>
+   <div class="faq-item">
+    <h3>What is a system bet in football betting?</h3>
+    <p>A system bet splits several selections across multiple combined wagers, so not every selection has to win for the ticket to pay. A Trixie covers three selections in three doubles plus a treble; a Yankee covers four selections in a full combination of doubles, trebles and a four-fold. Systems reduce risk compared to a single accumulator of the same selections.</p>
+   </div>
+   <div class="faq-item">
+    <h3>What is the system family and how do the names work?</h3>
+    <p>The names describe how many selections and combinations are covered: a Trixie uses 3 selections and 4 bets (3 doubles + 1 treble); a Patent uses 3 selections and 7 bets (singles + doubles + treble); a Yankee uses 4 selections and 11 bets; a Lucky 15 uses 4 selections and 15 bets (singles included); a Lucky 31 uses 5 selections; a Heinz uses 6 selections in 57 bets. Higher names mean more combinations and more coverage.</p>
+   </div>
+   <div class="faq-item">
+    <h3>How do system bet payouts work?</h3>
+    <p>Each individual wager in the system pays independently: if enough selections win, some of the combinations pay even if the whole ticket loses. Returns are the sum of all winning combinations, and every combination also carries its own margin. The more legs, the more combinations — and the more margin is paid — so systems cover risk but not the book's edge.</p>
+   </div>
+   <div class="faq-item">
+    <h3>When do system bets make sense?</h3>
+    <p>Systems make sense when you want the insurance of multiple winning combinations — for example covering three solid selections while knowing one might lose. They are most useful for bettors who want the entertainment of a multiple with reduced all-or-nothing risk. The margin maths still applies: each combination is margined, so systems are not a free way to beat the price.</p>
+   </div>
+  </section>
+
+
+   <div class="cta">
    <h3>Put These Principles Into Practice Today</h3>
    <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
    <p style="margin:16px 0"><a href="/predictions/1x2" class="btn">1X2 Predictions</a> <a href="/predictions/in-play" class="btn">Live In-Play Tips</a></p>
@@ -326,9 +383,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </div>
 
 <footer>
- <div class="footer-content">
+ <div class="footer-content container">
   <div style="text-align:center;margin-bottom:24px;">
-   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p><a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">In-Play Tips</a>
+   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p>
+   <a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;font-weight:600;font-size:14px;">In-Play Tips</a>
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
@@ -350,7 +408,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <a href="/contact.html">Contact</a>
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
-   <a href="/policy.html">Editorial Policy</a>
   </div>
   <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
  </div>

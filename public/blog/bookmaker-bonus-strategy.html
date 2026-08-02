@@ -106,6 +106,17 @@ nav a:hover{color:var(--accent)}
 .stats-table th{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
 .stats-table td{font-weight:500}
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--border-light);color:var(--text-muted);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+.toc{background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h3{margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted)}
+.toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:24px}
+.toc li{margin-bottom:6px;font-size:14px}
+.toc li a{color:var(--text-primary)}
+.toc li a:hover{color:var(--accent)}
+.faq{margin:32px 0}
+.faq h2{margin:0 0 8px}
+.faq-item{border:1px solid var(--border-light);border-radius:12px;padding:18px 22px;margin:14px 0}
+.faq-item h3{margin:0 0 8px;font-size:17px}
+.faq-item p{margin:0;color:var(--text-muted)}
 .cta{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;padding:28px 32px;text-align:center;margin:38px 0}
 .cta h3{font-size:20px;font-weight:700;margin-bottom:10px}
 .social-share{display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -251,6 +262,15 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   ]
 }
 </script>
+<!-- FAQPage schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"Are bookmaker deposit bonuses actually free money?","acceptedAnswer":{"@type":"Answer","text":"No. A deposit match carries a wagering requirement that typically eats most of the bonus's face value, and the requirement is set so the house keeps its edge on average. Treat the bonus as a discount on turnover rather than free money, and read the terms before treating it as value."}},{"@type":"Question","name":"Which bookmaker promotions offer the best value?","acceptedAnswer":{"@type":"Answer","text":"Odds boosts are the one genuine edge if applied to fair or slightly mispriced markets, because they pay true odds on a stake without a heavy wagering requirement. Cash-out offers, refunds and no-risk bets can also be positive if structured carefully. Deposit-match bonuses and reload offers are the weakest because of their rollover terms."}},{"@type":"Question","name":"How do I read the fine print of a bonus offer?","acceptedAnswer":{"@type":"Answer","text":"Look for the wagering requirement (how many times the bonus or deposit must be staked), the time limit, qualifying minimum odds, excluded markets, and maximum bet or win caps. The time limit trap is particularly important — a big bonus with a short window forces rushed, poor bets. If the terms make the expected value negative, the bonus is not value."}},{"@type":"Question","name":"What is bonus abuse and is it allowed?","acceptedAnswer":{"@type":"Answer","text":"Bonus abuse refers to systematically extracting bonuses in ways that violate a bookmaker's terms, such as opening multiple accounts or arbitraging promotions across books. Bookmakers restrict or ban accounts they believe are abusing offers. Playing bonuses honestly under the published terms while calculating their true expected value is legitimate and sustainable."}}]
+}
+</script>
+
 </head>
 <body>
 <header>
@@ -260,16 +280,17 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav id="nav">
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/best-picks.html">Best Picks</a>
- <a href="/author-picks.html">Author Picks</a>
- <a href="/predictions/in-play">In-Play</a>
- <a href="/blog/" class="active">Blog</a>
- <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-  <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
-  <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
- </span></nav>
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/author-picks.html">Author Picks</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/blog/" class="active">Blog</a>
+   <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
+    <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
+   </span>
+  </nav>
  </div>
 </header>
 
@@ -282,14 +303,50 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <p class="lead">Every bonus a bookmaker offers was designed by an actuary. Understanding the design is the only way to make the offer work for you.</p>
 
-  <figure class="figure">
-   <img src="/blog/thumbnails/bookmaker-bonus-strategy.webp" alt="Bonus Abuse: How Bookmaker Promotions Work | WinFulltime" width="1200" height="630" loading="eager">
-   <figcaption>How bookmaker promotions and bonuses are designed</figcaption>
-  </figure>
+   <figure class="figure">
+    <img src="/blog/thumbnails/bookmaker-bonus-strategy.webp" alt="Bonus Abuse: How Bookmaker Promotions Work | WinFulltime" width="1200" height="630" loading="eager">
+    <figcaption>How bookmaker promotions and bonuses are designed</figcaption>
+   </figure>
 
-  <p>Scroll any betting site and you will see the same promises: "100% up to £100", "free bet on your first loss", "price boost Friday". They look like gifts from a generous bookmaker. They are the opposite — they are carefully priced marketing, engineered so the average player deposits more than they ever get back. The most profitable thing a bettor can do is read the design behind the headline.</p><h2>The Three Pillars of Every Bonus</h2><p>Nearly every promotion is built on three levers: <strong>wagering requirements</strong>, <strong>minimum odds</strong>, and <strong>exclusions</strong>. Together they determine whether an offer is worth anything at all.</p><ul><li><strong>Wagering requirement:</strong> the amount you must re-stake before bonus money becomes withdrawable. A "£100 free bet" needing 5x wagering means £500 of bets before you see a penny.</li><li><strong>Minimum odds:</strong> the lowest price at which a qualifying bet counts. Requiring 1.50 or 2.00 odds pushes you toward higher-risk selections.</li><li><strong>Exclusions:</strong> restrictions on which markets, bet types or payment methods count. Withdrawing via certain e-wallets can invalidate an offer entirely.</li></ul><div class="highlight"><strong>The test:</strong> Multiply the wagering requirement by the book's margin. If a £100 bonus needs 5x wagering at a 5% margin, you pay an expected £25 back to the book before you can withdraw — a quarter of the "free" money.</div><h2>Why Deposit Matches Are Not Free Money</h2><p>Match a £100 deposit with a 100% bonus and you have £200 of betting credit. The trap is the sequence: that £200 must be wagered — often many times over — at worse-than-fair prices before withdrawal. Expected value is on the book's side from the first bet. Deposit bonuses are a retention tool: they triple the time you spend at a site that has a structural edge.</p><h2>Odds Boosts: The One Genuine Edge</h2><p>Not every promotion is a trap. <strong>Odds boosts</strong> genuinely increase a price — a 2.10 selection boosted to 2.40 has real value if your fair price is above 2.10. The bookmaker runs boosts as a loss leader, knowing most players will boost their favourite rather than their value bet. The disciplined play is to boost only selections where the boosted price still beats your own estimate.</p><h2>Playable Bonus Types, Ranked</h2><table class="stats-table"><thead><tr><th>Offer type</th><th>Typical value</th><th>Risk</th></tr></thead><tbody><tr><td>Stake-back free bet</td><td>High — downside removed</td><td>Low</td></tr><tr><td>Odds boost</td><td>Moderate — real but limited</td><td>Low</td></tr><tr><td>Welcome deposit match</td><td>Low after wagering</td><td>High</td></tr><tr><td>Cashback on losses</td><td>Moderate — smooths variance</td><td>Medium</td></tr><tr><td>No-deposit free bet</td><td>Rarely withdrawable</td><td>Medium</td></tr></tbody></table><h2>Playing Promotions Smartly</h2><ul><li><strong>Calculate, never admire.</strong> Convert every offer to an expected percentage of stake before deciding. If the maths is murky, the offer is poor.</li><li><strong>Track your offers.</strong> Bookmakers rotate promotions. Keeping a simple log of which offers you used and what they returned reveals which are worth repeat play.</li><li><strong>Never chase a boost you would not take normally.</strong> A boosted 5.00 is still a losing bet if your fair price is 4.50.</li><li><strong>Watch the payment method rules.</strong> The most common way bonuses get voided is breaching the small print, not bad luck.</li><li><strong>Expect account limits.</strong> Players who consistently extract value from promotions get their offers cut. That is the market confirming your edge — use it while it lasts.</li></ul><h2>Bonus Abuse and Fair Play</h2><p>"Bonus abuse" in bookmaker terms is simply taking offers at better than the intended value. Matched bettors and sharp players do this openly within the rules. What earns account restriction is <em>against-the-rules</em> exploitation: multi-accounting, fraud, or collusion. Play within the terms, extract the genuine value, and treat the word "abuse" as the bookmaker's complaint about players who read the fine print.</p><h2>Final Thoughts</h2><p>Bookmaker bonuses are marketing budgets with actuarial backing. Every one of them has a designed value — sometimes positive, mostly negative — and the difference is entirely in the reading. Treat every promotion as a puzzle to be solved with a calculator, take the genuine edge in boosts and stake-backs, and skip the rest. The bookmaker does the same maths on their side. Now you know theirs.</p><h2>The Time Limit Trap</h2><p>The most under-appreciated condition in a bonus offer is the clock. A £50 free bet valid for seven days is a different product from one valid for twenty-four hours. The short window forces a rushed selection on whatever is available at the moment, and rushed selections are precisely how the book recovers its promotional spend. Combine a short validity with a maximum odds condition and the trap is complete: the bettor must place a high-odds bet, quickly, on a market they have not researched.</p><p>The professional response is to treat every bonus like an appointment. When the clock starts, the selection should already be decided — ideally from the value list prepared in advance. If no qualifying bet is genuinely worth taking within the window, the correct move is to let the bonus expire. Forfeiting a £50 offer that would force a bad £50 bet is not wasting money; it is avoiding a guaranteed loss. Books run expiry windows precisely to punish the distracted. The bettor who treats the deadline as a test of discipline, rather than an excuse to gamble, is the one the promotion was never designed to serve.</p>
+  <nav class="toc" aria-label="Table of contents">
+   <h3>Contents</h3>
+   <ul>
+    <li><a href="#the-three-pillars-of-every-bonus">The Three Pillars of Every Bonus</a></li>
+    <li><a href="#why-deposit-matches-are-not-free-money">Why Deposit Matches Are Not Free Money</a></li>
+    <li><a href="#odds-boosts-the-one-genuine-edge">Odds Boosts: The One Genuine Edge</a></li>
+    <li><a href="#playable-bonus-types-ranked">Playable Bonus Types, Ranked</a></li>
+    <li><a href="#playing-promotions-smartly">Playing Promotions Smartly</a></li>
+    <li><a href="#bonus-abuse-and-fair-play">Bonus Abuse and Fair Play</a></li>
+    <li><a href="#final-thoughts">Final Thoughts</a></li>
+    <li><a href="#the-time-limit-trap">The Time Limit Trap</a></li>
+   </ul>
+  </nav>
 
-  <div class="cta">
+
+   <p>Scroll any betting site and you will see the same promises: "100% up to £100", "free bet on your first loss", "price boost Friday". They look like gifts from a generous bookmaker. They are the opposite — they are carefully priced marketing, engineered so the average player deposits more than they ever get back. The most profitable thing a bettor can do is read the design behind the headline.</p><h2 id="the-three-pillars-of-every-bonus">The Three Pillars of Every Bonus</h2><p>Nearly every promotion is built on three levers: <strong>wagering requirements</strong>, <strong>minimum odds</strong>, and <strong>exclusions</strong>. Together they determine whether an offer is worth anything at all.</p><ul><li><strong>Wagering requirement:</strong> the amount you must re-stake before bonus money becomes withdrawable. A "£100 free bet" needing 5x wagering means £500 of bets before you see a penny.</li><li><strong>Minimum odds:</strong> the lowest price at which a qualifying bet counts. Requiring 1.50 or 2.00 odds pushes you toward higher-risk selections.</li><li><strong>Exclusions:</strong> restrictions on which markets, bet types or payment methods count. Withdrawing via certain e-wallets can invalidate an offer entirely.</li></ul><div class="highlight"><strong>The test:</strong> Multiply the wagering requirement by the book's margin. If a £100 bonus needs 5x wagering at a 5% margin, you pay an expected £25 back to the book before you can withdraw — a quarter of the "free" money.</div><h2 id="why-deposit-matches-are-not-free-money">Why Deposit Matches Are Not Free Money</h2><p>Match a £100 deposit with a 100% bonus and you have £200 of betting credit. The trap is the sequence: that £200 must be wagered — often many times over — at worse-than-fair prices before withdrawal. Expected value is on the book's side from the first bet. Deposit bonuses are a retention tool: they triple the time you spend at a site that has a structural edge.</p><h2 id="odds-boosts-the-one-genuine-edge">Odds Boosts: The One Genuine Edge</h2><p>Not every promotion is a trap. <strong>Odds boosts</strong> genuinely increase a price — a 2.10 selection boosted to 2.40 has real value if your fair price is above 2.10. The bookmaker runs boosts as a loss leader, knowing most players will boost their favourite rather than their value bet. The disciplined play is to boost only selections where the boosted price still beats your own estimate.</p><h2 id="playable-bonus-types-ranked">Playable Bonus Types, Ranked</h2><table class="stats-table"><thead><tr><th>Offer type</th><th>Typical value</th><th>Risk</th></tr></thead><tbody><tr><td>Stake-back free bet</td><td>High — downside removed</td><td>Low</td></tr><tr><td>Odds boost</td><td>Moderate — real but limited</td><td>Low</td></tr><tr><td>Welcome deposit match</td><td>Low after wagering</td><td>High</td></tr><tr><td>Cashback on losses</td><td>Moderate — smooths variance</td><td>Medium</td></tr><tr><td>No-deposit free bet</td><td>Rarely withdrawable</td><td>Medium</td></tr></tbody></table><h2 id="playing-promotions-smartly">Playing Promotions Smartly</h2><ul><li><strong>Calculate, never admire.</strong> Convert every offer to an expected percentage of stake before deciding. If the maths is murky, the offer is poor.</li><li><strong>Track your offers.</strong> Bookmakers rotate promotions. Keeping a simple log of which offers you used and what they returned reveals which are worth repeat play.</li><li><strong>Never chase a boost you would not take normally.</strong> A boosted 5.00 is still a losing bet if your fair price is 4.50.</li><li><strong>Watch the payment method rules.</strong> The most common way bonuses get voided is breaching the small print, not bad luck.</li><li><strong>Expect account limits.</strong> Players who consistently extract value from promotions get their offers cut. That is the market confirming your edge — use it while it lasts.</li></ul><h2 id="bonus-abuse-and-fair-play">Bonus Abuse and Fair Play</h2><p>"Bonus abuse" in bookmaker terms is simply taking offers at better than the intended value. Matched bettors and sharp players do this openly within the rules. What earns account restriction is <em>against-the-rules</em> exploitation: multi-accounting, fraud, or collusion. Play within the terms, extract the genuine value, and treat the word "abuse" as the bookmaker's complaint about players who read the fine print.</p><h2 id="final-thoughts">Final Thoughts</h2><p>Bookmaker bonuses are marketing budgets with actuarial backing. Every one of them has a designed value — sometimes positive, mostly negative — and the difference is entirely in the reading. Treat every promotion as a puzzle to be solved with a calculator, take the genuine edge in boosts and stake-backs, and skip the rest. The bookmaker does the same maths on their side. Now you know theirs.</p><h2 id="the-time-limit-trap">The Time Limit Trap</h2><p>The most under-appreciated condition in a bonus offer is the clock. A £50 free bet valid for seven days is a different product from one valid for twenty-four hours. The short window forces a rushed selection on whatever is available at the moment, and rushed selections are precisely how the book recovers its promotional spend. Combine a short validity with a maximum odds condition and the trap is complete: the bettor must place a high-odds bet, quickly, on a market they have not researched.</p><p>The professional response is to treat every bonus like an appointment. When the clock starts, the selection should already be decided — ideally from the value list prepared in advance. If no qualifying bet is genuinely worth taking within the window, the correct move is to let the bonus expire. Forfeiting a £50 offer that would force a bad £50 bet is not wasting money; it is avoiding a guaranteed loss. Books run expiry windows precisely to punish the distracted. The bettor who treats the deadline as a test of discipline, rather than an excuse to gamble, is the one the promotion was never designed to serve.</p>
+
+  <section class="faq">
+   <h2 id="faq">Frequently Asked Questions</h2>
+   <div class="faq-item">
+    <h3>Are bookmaker deposit bonuses actually free money?</h3>
+    <p>No. A deposit match carries a wagering requirement that typically eats most of the bonus's face value, and the requirement is set so the house keeps its edge on average. Treat the bonus as a discount on turnover rather than free money, and read the terms before treating it as value.</p>
+   </div>
+   <div class="faq-item">
+    <h3>Which bookmaker promotions offer the best value?</h3>
+    <p>Odds boosts are the one genuine edge if applied to fair or slightly mispriced markets, because they pay true odds on a stake without a heavy wagering requirement. Cash-out offers, refunds and no-risk bets can also be positive if structured carefully. Deposit-match bonuses and reload offers are the weakest because of their rollover terms.</p>
+   </div>
+   <div class="faq-item">
+    <h3>How do I read the fine print of a bonus offer?</h3>
+    <p>Look for the wagering requirement (how many times the bonus or deposit must be staked), the time limit, qualifying minimum odds, excluded markets, and maximum bet or win caps. The time limit trap is particularly important — a big bonus with a short window forces rushed, poor bets. If the terms make the expected value negative, the bonus is not value.</p>
+   </div>
+   <div class="faq-item">
+    <h3>What is bonus abuse and is it allowed?</h3>
+    <p>Bonus abuse refers to systematically extracting bonuses in ways that violate a bookmaker's terms, such as opening multiple accounts or arbitraging promotions across books. Bookmakers restrict or ban accounts they believe are abusing offers. Playing bonuses honestly under the published terms while calculating their true expected value is legitimate and sustainable.</p>
+   </div>
+  </section>
+
+
+   <div class="cta">
    <h3>Put These Principles Into Practice Today</h3>
    <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
    <p style="margin:16px 0"><a href="/predictions/1x2" class="btn">1X2 Predictions</a> <a href="/predictions/in-play" class="btn">Live In-Play Tips</a></p>
@@ -326,9 +383,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </div>
 
 <footer>
- <div class="footer-content">
+ <div class="footer-content container">
   <div style="text-align:center;margin-bottom:24px;">
-   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p><a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">In-Play Tips</a>
+   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p>
+   <a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;font-weight:600;font-size:14px;">In-Play Tips</a>
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
@@ -350,7 +408,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <a href="/contact.html">Contact</a>
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
-   <a href="/policy.html">Editorial Policy</a>
   </div>
   <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
  </div>

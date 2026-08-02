@@ -106,6 +106,17 @@ nav a:hover{color:var(--accent)}
 .stats-table th{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
 .stats-table td{font-weight:500}
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--border-light);color:var(--text-muted);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+.toc{background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h3{margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted)}
+.toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:24px}
+.toc li{margin-bottom:6px;font-size:14px}
+.toc li a{color:var(--text-primary)}
+.toc li a:hover{color:var(--accent)}
+.faq{margin:32px 0}
+.faq h2{margin:0 0 8px}
+.faq-item{border:1px solid var(--border-light);border-radius:12px;padding:18px 22px;margin:14px 0}
+.faq-item h3{margin:0 0 8px;font-size:17px}
+.faq-item p{margin:0;color:var(--text-muted)}
 .cta{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;padding:28px 32px;text-align:center;margin:38px 0}
 .cta h3{font-size:20px;font-weight:700;margin-bottom:10px}
 .social-share{display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -251,6 +262,15 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   ]
 }
 </script>
+<!-- FAQPage schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"What is lay betting on an exchange?","acceptedAnswer":{"@type":"Answer","text":"Lay betting means betting against a selection — acting as the bookmaker and taking on the stake of a backer. If the selection does not win, you keep the backer's stake as profit; if it wins, you pay out the backer's winnings. On an exchange you can lay any outcome of any match, which opens up a whole class of strategies based on teams losing or not covering."}},{"@type":"Question","name":"How does liability work when laying?","acceptedAnswer":{"@type":"Answer","text":"Liability is the amount you could lose if your lay is wrong, and it is the backer's potential winnings, not the stake. A £10 lay at odds of 4.00 creates £30 of liability — if the selection wins you pay £30. Managing liability by keeping stakes proportionate to odds is the core bankroll rule of lay betting."}},{"@type":"Question","name":"Why do bettors lay favourites?","acceptedAnswer":{"@type":"Answer","text":"Laying a favourite profits from the very common outcome of the favourite not winning, which happens more often than the short price implies is profitable for backers. Because the public over-bets favourites on exchanges and books, the lay price can be soft enough to give the layer a structural edge, particularly against over-hyped or injury-hit teams."}},{"@type":"Question","name":"What are common lay betting mistakes?","acceptedAnswer":{"@type":"Answer","text":"The most common mistakes are over-staking relative to liability, laying selections without a genuine price edge, and treating every favourite as layable just because it looks risky. Layers also forget exchange commission, which reduces the edge and must be priced into every lay. Bankroll rules for layers are stricter because a single winner pays out far more than the stake."}}]
+}
+</script>
+
 </head>
 <body>
 <header>
@@ -260,16 +280,17 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav id="nav">
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/best-picks.html">Best Picks</a>
- <a href="/author-picks.html">Author Picks</a>
- <a href="/predictions/in-play">In-Play</a>
- <a href="/blog/" class="active">Blog</a>
- <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-  <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
-  <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
- </span></nav>
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/author-picks.html">Author Picks</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/blog/" class="active">Blog</a>
+   <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
+    <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
+   </span>
+  </nav>
  </div>
 </header>
 
@@ -282,14 +303,50 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <p class="lead">Most bettors only ever back winners. On a betting exchange you can do the opposite: act as the bookmaker, take on bets that a team will lose, and keep their stake when you are right.</p>
 
-  <figure class="figure">
-   <img src="/blog/thumbnails/lay-betting-strategy.webp" alt="Lay Betting on Exchanges: Profit From Losers | WinFulltime" width="1200" height="630" loading="eager">
-   <figcaption>How lay betting works on betting exchanges</figcaption>
-  </figure>
+   <figure class="figure">
+    <img src="/blog/thumbnails/lay-betting-strategy.webp" alt="Lay Betting on Exchanges: Profit From Losers | WinFulltime" width="1200" height="630" loading="eager">
+    <figcaption>How lay betting works on betting exchanges</figcaption>
+   </figure>
 
-  <p>Every football match has three possible outcomes, but a standard sportsbook only lets you pick one side of each. A betting exchange flips that model: instead of betting <em>for</em> an outcome, you can bet <em>against</em> it. When you lay a team, you are taking on the role of the bookmaker, offering odds to someone who wants to back that team. If the team fails to win, their stake is yours.</p><h2>Back vs Lay: The Exchange Model</h2><p>On an exchange, every market has two sides. <strong>Backing</strong> means you agree with the outcome at a given price. <strong>Laying</strong> means you take the opposite view. The odds shown are what other users are willing to take or give, and the exchange matches the two sides and charges a small commission on net winnings.</p><div class="highlight"><strong>Key distinction:</strong> A back bet wins when the event happens. A lay bet wins when the event does not happen. Lay the favourite and you profit whenever it fails to win — including every draw.</div><h2>How Liability Works</h2><p>When you lay, you do not stake a fixed amount. You commit to <strong>liability</strong>: the amount you pay the backer if the selection wins. For a lay at odds of 3.00 with £10 matched, your liability is £20 (the £10 stake times the odds minus one). Your profit if the lay loses is capped at the backer's £10 stake.</p><p>The liability formula is:</p><p style="text-align:center"><strong>Liability = Stake x (Odds − 1)</strong></p><table class="stats-table"><thead><tr><th>Lay odds</th><th>Backer stake</th><th>Your liability</th><th>Your profit if lay wins</th></tr></thead><tbody><tr><td>1.50</td><td>£20</td><td>£10</td><td>£20</td></tr><tr><td>2.00</td><td>£20</td><td>£20</td><td>£20</td></tr><tr><td>4.00</td><td>£20</td><td>£60</td><td>£20</td></tr><tr><td>10.00</td><td>£20</td><td>£180</td><td>£20</td></tr></tbody></table><p>The lesson is immediate: laying big-priced teams carries outsized downside. Profitable layers concentrate on short-priced selections, where the risk of a win is low and the liability stays manageable.</p><h2>Why Lay the Favourite?</h2><p>A heavy favourite — say 1.40 to win a home match — only needs to fail <em>once</em> for a layer to profit. Even if it wins three times out of four, laying it at 1.40 and being right on the losing match banks the same fixed stake each time. With a disciplined liability and long enough sample, the maths rewards consistent selection over occasional big wins.</p><h2>Common Lay Strategies</h2><h3>1. Lay to a Stop-Win</h3><p>Lay a team at low odds, then <em>back the same team</em> at even lower in-play odds after it takes the lead. You lock in a guaranteed profit across both positions regardless of the final result.</p><h3>2. Lay the Draw</h3><p>In high-scoring leagues, draws are frequent. Laying the draw across several matches in a Saturday accumulator-style basket can produce steady returns, though runs of scoreless matches will test your bankroll.</p><h3>3. Lay After Early Goals</h3><p>When a favourite concedes early, its odds drift. Laying it <em>after</em> the goal — once the odds have moved out — reduces liability and improves your entry price.</p><h2>Bankroll Rules for Layers</h2><p>Because liability is the real risk, professional layers size positions on liability, not on the fixed stake. A common rule is to keep total open liability under 2% of your bankroll per position, and to walk away from a match where your liability exceeds your comfort zone no matter how "safe" the lay looks.</p><p>Exchange commission, typically 2% to 5% on net winnings, quietly erodes profits. It must be priced into your break-even odds or your edge disappears.</p><div class="highlight"><strong>Rule of thumb:</strong> If you would not back the selection yourself at the lay price, you should not be laying it either. Laying is not the opposite of smart backing — it is the same discipline, viewed from the other side of the trade.</div><h2>Exchanges vs Bookmakers</h2><p>Bookmakers offer immediate, fixed odds but you can only bet one way. Exchanges offer better prices, the ability to lay, and in-play liquidity that bookmakers cannot match. For layers, the exchange is the only real venue, because a sportsbook will never let you take a bet that a team will lose.</p><p>If you are new to exchanges, start by laying matches you understand well in a single league, keep liability small, and record every lay. Six months of tracked data tells you whether the approach is working far more honestly than a month of instinct.</p><h2>Final Thoughts</h2><p>Lay betting is not a shortcut to free money. It is bookmaking with all the same risks — and the same rewards — as the firms you usually bet against. Handle liability with the respect it deserves and you gain a genuinely different tool: a way to profit from losers instead of only from winners.</p><h2>Common Lay Betting Mistakes</h2><p>The most frequent error newcomers make is treating lay odds like back odds. A backer compares prices the same way on every bet; a layer must always convert the odds to liability first. Laying a 6.00 underdog because "it cannot win" commits a liability five times the stake — one surprise win wipes out weeks of small profits. The second common mistake is ignoring exchange commission when calculating break-even. At a 5% commission rate, a lay at 2.00 needs to win more often than the price alone suggests; the layer who forgets the fee is slowly donating.</p><p>Finally, lay bettors often quit at the worst time. A run of lay losses feels identical to a run of bad luck, but in a lay strategy it usually means the market has repriced the favourite correctly — the edge has moved on. A disciplined layer reviews their closing line value exactly like a backer does, and steps down the stakes when the edge fades rather than doubling them to recover. The exchange is a market like any other; it rewards those who track it honestly and punishes those who assume the lay side is easy money.</p>
+  <nav class="toc" aria-label="Table of contents">
+   <h3>Contents</h3>
+   <ul>
+    <li><a href="#back-vs-lay-the-exchange-model">Back vs Lay: The Exchange Model</a></li>
+    <li><a href="#how-liability-works">How Liability Works</a></li>
+    <li><a href="#why-lay-the-favourite">Why Lay the Favourite?</a></li>
+    <li><a href="#common-lay-strategies">Common Lay Strategies</a></li>
+    <li><a href="#bankroll-rules-for-layers">Bankroll Rules for Layers</a></li>
+    <li><a href="#exchanges-vs-bookmakers">Exchanges vs Bookmakers</a></li>
+    <li><a href="#final-thoughts">Final Thoughts</a></li>
+    <li><a href="#common-lay-betting-mistakes">Common Lay Betting Mistakes</a></li>
+   </ul>
+  </nav>
 
-  <div class="cta">
+
+   <p>Every football match has three possible outcomes, but a standard sportsbook only lets you pick one side of each. A betting exchange flips that model: instead of betting <em>for</em> an outcome, you can bet <em>against</em> it. When you lay a team, you are taking on the role of the bookmaker, offering odds to someone who wants to back that team. If the team fails to win, their stake is yours.</p><h2 id="back-vs-lay-the-exchange-model">Back vs Lay: The Exchange Model</h2><p>On an exchange, every market has two sides. <strong>Backing</strong> means you agree with the outcome at a given price. <strong>Laying</strong> means you take the opposite view. The odds shown are what other users are willing to take or give, and the exchange matches the two sides and charges a small commission on net winnings.</p><div class="highlight"><strong>Key distinction:</strong> A back bet wins when the event happens. A lay bet wins when the event does not happen. Lay the favourite and you profit whenever it fails to win — including every draw.</div><h2 id="how-liability-works">How Liability Works</h2><p>When you lay, you do not stake a fixed amount. You commit to <strong>liability</strong>: the amount you pay the backer if the selection wins. For a lay at odds of 3.00 with £10 matched, your liability is £20 (the £10 stake times the odds minus one). Your profit if the lay loses is capped at the backer's £10 stake.</p><p>The liability formula is:</p><p style="text-align:center"><strong>Liability = Stake x (Odds − 1)</strong></p><table class="stats-table"><thead><tr><th>Lay odds</th><th>Backer stake</th><th>Your liability</th><th>Your profit if lay wins</th></tr></thead><tbody><tr><td>1.50</td><td>£20</td><td>£10</td><td>£20</td></tr><tr><td>2.00</td><td>£20</td><td>£20</td><td>£20</td></tr><tr><td>4.00</td><td>£20</td><td>£60</td><td>£20</td></tr><tr><td>10.00</td><td>£20</td><td>£180</td><td>£20</td></tr></tbody></table><p>The lesson is immediate: laying big-priced teams carries outsized downside. Profitable layers concentrate on short-priced selections, where the risk of a win is low and the liability stays manageable.</p><h2 id="why-lay-the-favourite">Why Lay the Favourite?</h2><p>A heavy favourite — say 1.40 to win a home match — only needs to fail <em>once</em> for a layer to profit. Even if it wins three times out of four, laying it at 1.40 and being right on the losing match banks the same fixed stake each time. With a disciplined liability and long enough sample, the maths rewards consistent selection over occasional big wins.</p><h2 id="common-lay-strategies">Common Lay Strategies</h2><h3 id="1-lay-to-a-stop-win">1. Lay to a Stop-Win</h3><p>Lay a team at low odds, then <em>back the same team</em> at even lower in-play odds after it takes the lead. You lock in a guaranteed profit across both positions regardless of the final result.</p><h3 id="2-lay-the-draw">2. Lay the Draw</h3><p>In high-scoring leagues, draws are frequent. Laying the draw across several matches in a Saturday accumulator-style basket can produce steady returns, though runs of scoreless matches will test your bankroll.</p><h3 id="3-lay-after-early-goals">3. Lay After Early Goals</h3><p>When a favourite concedes early, its odds drift. Laying it <em>after</em> the goal — once the odds have moved out — reduces liability and improves your entry price.</p><h2 id="bankroll-rules-for-layers">Bankroll Rules for Layers</h2><p>Because liability is the real risk, professional layers size positions on liability, not on the fixed stake. A common rule is to keep total open liability under 2% of your bankroll per position, and to walk away from a match where your liability exceeds your comfort zone no matter how "safe" the lay looks.</p><p>Exchange commission, typically 2% to 5% on net winnings, quietly erodes profits. It must be priced into your break-even odds or your edge disappears.</p><div class="highlight"><strong>Rule of thumb:</strong> If you would not back the selection yourself at the lay price, you should not be laying it either. Laying is not the opposite of smart backing — it is the same discipline, viewed from the other side of the trade.</div><h2 id="exchanges-vs-bookmakers">Exchanges vs Bookmakers</h2><p>Bookmakers offer immediate, fixed odds but you can only bet one way. Exchanges offer better prices, the ability to lay, and in-play liquidity that bookmakers cannot match. For layers, the exchange is the only real venue, because a sportsbook will never let you take a bet that a team will lose.</p><p>If you are new to exchanges, start by laying matches you understand well in a single league, keep liability small, and record every lay. Six months of tracked data tells you whether the approach is working far more honestly than a month of instinct.</p><h2 id="final-thoughts">Final Thoughts</h2><p>Lay betting is not a shortcut to free money. It is bookmaking with all the same risks — and the same rewards — as the firms you usually bet against. Handle liability with the respect it deserves and you gain a genuinely different tool: a way to profit from losers instead of only from winners.</p><h2 id="common-lay-betting-mistakes">Common Lay Betting Mistakes</h2><p>The most frequent error newcomers make is treating lay odds like back odds. A backer compares prices the same way on every bet; a layer must always convert the odds to liability first. Laying a 6.00 underdog because "it cannot win" commits a liability five times the stake — one surprise win wipes out weeks of small profits. The second common mistake is ignoring exchange commission when calculating break-even. At a 5% commission rate, a lay at 2.00 needs to win more often than the price alone suggests; the layer who forgets the fee is slowly donating.</p><p>Finally, lay bettors often quit at the worst time. A run of lay losses feels identical to a run of bad luck, but in a lay strategy it usually means the market has repriced the favourite correctly — the edge has moved on. A disciplined layer reviews their closing line value exactly like a backer does, and steps down the stakes when the edge fades rather than doubling them to recover. The exchange is a market like any other; it rewards those who track it honestly and punishes those who assume the lay side is easy money.</p>
+
+  <section class="faq">
+   <h2 id="faq">Frequently Asked Questions</h2>
+   <div class="faq-item">
+    <h3>What is lay betting on an exchange?</h3>
+    <p>Lay betting means betting against a selection — acting as the bookmaker and taking on the stake of a backer. If the selection does not win, you keep the backer's stake as profit; if it wins, you pay out the backer's winnings. On an exchange you can lay any outcome of any match, which opens up a whole class of strategies based on teams losing or not covering.</p>
+   </div>
+   <div class="faq-item">
+    <h3>How does liability work when laying?</h3>
+    <p>Liability is the amount you could lose if your lay is wrong, and it is the backer's potential winnings, not the stake. A £10 lay at odds of 4.00 creates £30 of liability — if the selection wins you pay £30. Managing liability by keeping stakes proportionate to odds is the core bankroll rule of lay betting.</p>
+   </div>
+   <div class="faq-item">
+    <h3>Why do bettors lay favourites?</h3>
+    <p>Laying a favourite profits from the very common outcome of the favourite not winning, which happens more often than the short price implies is profitable for backers. Because the public over-bets favourites on exchanges and books, the lay price can be soft enough to give the layer a structural edge, particularly against over-hyped or injury-hit teams.</p>
+   </div>
+   <div class="faq-item">
+    <h3>What are common lay betting mistakes?</h3>
+    <p>The most common mistakes are over-staking relative to liability, laying selections without a genuine price edge, and treating every favourite as layable just because it looks risky. Layers also forget exchange commission, which reduces the edge and must be priced into every lay. Bankroll rules for layers are stricter because a single winner pays out far more than the stake.</p>
+   </div>
+  </section>
+
+
+   <div class="cta">
    <h3>Put These Principles Into Practice Today</h3>
    <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
    <p style="margin:16px 0"><a href="/predictions/1x2" class="btn">1X2 Predictions</a> <a href="/predictions/in-play" class="btn">Live In-Play Tips</a></p>
@@ -326,9 +383,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </div>
 
 <footer>
- <div class="footer-content">
+ <div class="footer-content container">
   <div style="text-align:center;margin-bottom:24px;">
-   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p><a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">In-Play Tips</a>
+   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p>
+   <a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;font-weight:600;font-size:14px;">In-Play Tips</a>
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
@@ -350,7 +408,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <a href="/contact.html">Contact</a>
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
-   <a href="/policy.html">Editorial Policy</a>
   </div>
   <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
  </div>

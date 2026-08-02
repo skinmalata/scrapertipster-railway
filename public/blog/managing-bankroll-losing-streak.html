@@ -106,6 +106,17 @@ nav a:hover{color:var(--accent)}
 .stats-table th{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
 .stats-table td{font-weight:500}
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--border-light);color:var(--text-muted);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+.toc{background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h3{margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted)}
+.toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:24px}
+.toc li{margin-bottom:6px;font-size:14px}
+.toc li a{color:var(--text-primary)}
+.toc li a:hover{color:var(--accent)}
+.faq{margin:32px 0}
+.faq h2{margin:0 0 8px}
+.faq-item{border:1px solid var(--border-light);border-radius:12px;padding:18px 22px;margin:14px 0}
+.faq-item h3{margin:0 0 8px;font-size:17px}
+.faq-item p{margin:0;color:var(--text-muted)}
 .cta{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;padding:28px 32px;text-align:center;margin:38px 0}
 .cta h3{font-size:20px;font-weight:700;margin-bottom:10px}
 .social-share{display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -251,6 +262,15 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   ]
 }
 </script>
+<!-- FAQPage schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"How should I handle a losing streak?","acceptedAnswer":{"@type":"Answer","text":"First, recognise that losing streaks are a normal part of variance even for profitable bettors, and do not change your staking in response to them. Keep betting the same small percentage of bankroll, review whether the bets themselves still have value, and never chase. The survival rules are flat: shrink stakes as bankroll shrinks, and never increase them to recover."}},{"@type":"Question","name":"What are the survival rules during a losing streak?","acceptedAnswer":{"@type":"Answer","text":"Keep stakes as a fixed small percentage of the current bankroll so losses are self-limiting. Stop immediately if you are betting to recover rather than because of value. Maintain your records honestly, because the record will show whether the streak is variance or a broken process. And keep the biggest rule: never chase a loss with a bigger bet."}},{"@type":"Question","name":"How do I measure my way out of a losing streak?","acceptedAnswer":{"@type":"Answer","text":"Use the record to separate variance from a real problem: if your closing line value is still positive and your bets still follow your rules, the streak is variance and the edge will reassert itself. If your CLV has turned negative or your rules are being broken, that is a process problem to fix before betting more. The metrics, not the scoreboard, tell you which one you are in."}},{"@type":"Question","name":"What is the psychology of a losing streak?","acceptedAnswer":{"@type":"Answer","text":"The psychology is a storm of doubt: the urge to 'get it back' rises exactly when the edge is most at risk of being abandoned. The antidote is pre-commitment — written rules that you obey mechanically, knowing the streak is temporary. Bettors who survive streaks treat them as a scheduled part of the process rather than an emergency."}}]
+}
+</script>
+
 </head>
 <body>
 <header>
@@ -260,16 +280,17 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav id="nav">
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/best-picks.html">Best Picks</a>
- <a href="/author-picks.html">Author Picks</a>
- <a href="/predictions/in-play">In-Play</a>
- <a href="/blog/" class="active">Blog</a>
- <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-  <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
-  <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
- </span></nav>
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/author-picks.html">Author Picks</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/blog/" class="active">Blog</a>
+   <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
+    <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
+   </span>
+  </nav>
  </div>
 </header>
 
@@ -282,14 +303,49 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <p class="lead">Every profitable bettor has survived a losing streak. The ones who survive are not luckier — they run a plan built for the storm.</p>
 
-  <figure class="figure">
-   <img src="/blog/thumbnails/managing-bankroll-losing-streak.webp" alt="How to Manage a Bankroll During a Losing Streak | WinFulltime" width="1200" height="630" loading="eager">
-   <figcaption>The bankroll survival plan for losing streaks</figcaption>
-  </figure>
+   <figure class="figure">
+    <img src="/blog/thumbnails/managing-bankroll-losing-streak.webp" alt="How to Manage a Bankroll During a Losing Streak | WinFulltime" width="1200" height="630" loading="eager">
+    <figcaption>The bankroll survival plan for losing streaks</figcaption>
+   </figure>
 
-  <p>Losing streaks are not a sign that betting is broken. They are the normal weather of a sport where the best bettor in the world wins barely over half the time. A streak of eight or ten losses will hit every serious bettor, including the ones who end the year in profit. The difference between them and everyone else is not avoidance — it is survival. The bankroll that survives the streak is the bankroll that compounds after it.</p><h2>First, Understand What Is Happening</h2><p>Two different things produce losing runs, and they need different responses:</p><ul><li><strong>Variance.</strong> Even a genuine edge produces streaks. With a 55% hit rate at 2.00 odds, a run of six losses in ten bets happens routinely — that is statistics, not failure.</li><li><strong>A broken process.</strong> The edge may be gone: the market tightened, the league changed, your discipline slipped. This is not variance; this is information.</li></ul><p>The first test is your closing line value. If your prices still beat the market during the streak, the process is intact and the streak is variance. If your prices have gone negative, the process needs fixing — no amount of staking discipline fixes a vanished edge.</p><h2>The Survival Rules</h2><div class="highlight"><strong>The golden rule of streaks:</strong> the stake is fixed by your plan and never changed mid-streak. A plan that shrinks stakes during a bad run, and grows them during a good one, is a plan built to survive.</div><p>Four rules govern the storm:</p><ul><li><strong>Never increase stakes to recover.</strong> Recovery staking is how a losing streak becomes a bankroll emergency. The stake stays exactly where the plan put it.</li><li><strong>Flat staking is your friend.</strong> If you use percentage staking, keep it flat during the streak. The bankroll is already shrinking; the stakes must shrink with it — proportionally, never desperately.</li><li><strong>Consider a temporary reduction.</strong> A disciplined response to a long streak is to drop the stake fraction (for example from 2% to 1%) until the streak ends. You lose less while the storm passes, and you are still in the game.</li><li><strong>Set a review trigger.</strong> Decide in advance: "If I lose X units, I stop betting and review for a week." The review protects you from mistaking a broken process for bad luck.</li></ul><h2>What to Do When the Streak Hits</h2><ol><li><strong>Stop escalating.</strong> Whatever your instinct says, the next stake is exactly your planned stake — or smaller.</li><li><strong>Reduce the stake tier.</strong> Drop to your minimum stake and stay there until your record shows the process is working again.</li><li><strong>Check the fundamentals.</strong> Re-run your pricing on the last few bets. If your prices were genuinely good and losing anyway, hold the course.</li><li><strong>Keep betting, or stop deliberately.</strong> Variance-streaks are endured with full size; process-breaks are paused for repair. Knowing which you are in is the whole decision.</li></ol><h2>The Psychology of the Storm</h2><p>The streak's real weapon is not the money — it is the mind. Every loss makes the next bet feel more urgent and more certain. This is exactly when the streak does its damage, because urgency replaces process. The professional response is mechanical: the stake stays fixed, the filter stays strict, and the record stays honest. No bet during a streak is ever "special".</p><p>It also helps to step away. A scheduled break — a weekend without betting, a week off — costs nothing in a long-run game and resets the emotional state that the streak is feeding on.</p><h2>Measuring Your Way Out</h2><p>Streaks end. The bettor who survives measures the return: after the run, review the last thirty bets. What was the closing line value? Did the process hold? Was the stake ever increased in panic? The answers tell you whether you endured variance or ignored a broken process — and that distinction decides whether the next streak will be survivable too.</p><h2>Final Thoughts</h2><p>Losing streaks are the entry fee to profitable betting. They are paid by every long-term winner, and they separate the ones who will be there in five years from the ones who quit in a bad October. Stake by the plan, shrink by the plan, review by the plan, and let the arithmetic of the edge do its slow work. The streak is weather. The plan is the house.</p><h2>Putting the Plan to the Test</h2><p>Watch the survival plan in action. A bettor with a 200-unit bankroll stakes a flat 2 units per bet and has an honest edge priced around 4%. Ten straight losses — a sequence that will happen every couple of seasons at that edge — drop the bankroll to 180 units. The bettor holds the stake at 2 units because the plan says so, reviews the closing line value to confirm the prices were still beating the market, and continues. Eleven of the next twenty bets land, and because the prices were genuinely good, the bankroll climbs back above 190 units. The streak cost ten units, not the bankroll.</p><p>Contrast the recovery bettor. The same ten losses produce the same 180-unit balance, but the frustration doubles the next stake to 4 units "to get it back". The next two losses cost 8 units instead of 4, the balance drops to 172, and now the desperation has a foothold. Every subsequent decision is distorted by the growing hole, and the plan that was built to survive the storm has been abandoned at the exact moment it mattered most.</p><p>The numbers tell the whole story: the same variance, two different outcomes, and the only variable is whether the stake stayed on the plan. Losing streaks are the price of admission to a profitable career, and they are survivable precisely because they are forecast. The bettor who has already decided what the streak will cost — and has written the response — does not make a decision during the storm. They simply implement the one they already made.</p>
+  <nav class="toc" aria-label="Table of contents">
+   <h3>Contents</h3>
+   <ul>
+    <li><a href="#first-understand-what-is-happening">First, Understand What Is Happening</a></li>
+    <li><a href="#the-survival-rules">The Survival Rules</a></li>
+    <li><a href="#what-to-do-when-the-streak-hits">What to Do When the Streak Hits</a></li>
+    <li><a href="#the-psychology-of-the-storm">The Psychology of the Storm</a></li>
+    <li><a href="#measuring-your-way-out">Measuring Your Way Out</a></li>
+    <li><a href="#final-thoughts">Final Thoughts</a></li>
+    <li><a href="#putting-the-plan-to-the-test">Putting the Plan to the Test</a></li>
+   </ul>
+  </nav>
 
-  <div class="cta">
+
+   <p>Losing streaks are not a sign that betting is broken. They are the normal weather of a sport where the best bettor in the world wins barely over half the time. A streak of eight or ten losses will hit every serious bettor, including the ones who end the year in profit. The difference between them and everyone else is not avoidance — it is survival. The bankroll that survives the streak is the bankroll that compounds after it.</p><h2 id="first-understand-what-is-happening">First, Understand What Is Happening</h2><p>Two different things produce losing runs, and they need different responses:</p><ul><li><strong>Variance.</strong> Even a genuine edge produces streaks. With a 55% hit rate at 2.00 odds, a run of six losses in ten bets happens routinely — that is statistics, not failure.</li><li><strong>A broken process.</strong> The edge may be gone: the market tightened, the league changed, your discipline slipped. This is not variance; this is information.</li></ul><p>The first test is your closing line value. If your prices still beat the market during the streak, the process is intact and the streak is variance. If your prices have gone negative, the process needs fixing — no amount of staking discipline fixes a vanished edge.</p><h2 id="the-survival-rules">The Survival Rules</h2><div class="highlight"><strong>The golden rule of streaks:</strong> the stake is fixed by your plan and never changed mid-streak. A plan that shrinks stakes during a bad run, and grows them during a good one, is a plan built to survive.</div><p>Four rules govern the storm:</p><ul><li><strong>Never increase stakes to recover.</strong> Recovery staking is how a losing streak becomes a bankroll emergency. The stake stays exactly where the plan put it.</li><li><strong>Flat staking is your friend.</strong> If you use percentage staking, keep it flat during the streak. The bankroll is already shrinking; the stakes must shrink with it — proportionally, never desperately.</li><li><strong>Consider a temporary reduction.</strong> A disciplined response to a long streak is to drop the stake fraction (for example from 2% to 1%) until the streak ends. You lose less while the storm passes, and you are still in the game.</li><li><strong>Set a review trigger.</strong> Decide in advance: "If I lose X units, I stop betting and review for a week." The review protects you from mistaking a broken process for bad luck.</li></ul><h2 id="what-to-do-when-the-streak-hits">What to Do When the Streak Hits</h2><ol><li><strong>Stop escalating.</strong> Whatever your instinct says, the next stake is exactly your planned stake — or smaller.</li><li><strong>Reduce the stake tier.</strong> Drop to your minimum stake and stay there until your record shows the process is working again.</li><li><strong>Check the fundamentals.</strong> Re-run your pricing on the last few bets. If your prices were genuinely good and losing anyway, hold the course.</li><li><strong>Keep betting, or stop deliberately.</strong> Variance-streaks are endured with full size; process-breaks are paused for repair. Knowing which you are in is the whole decision.</li></ol><h2 id="the-psychology-of-the-storm">The Psychology of the Storm</h2><p>The streak's real weapon is not the money — it is the mind. Every loss makes the next bet feel more urgent and more certain. This is exactly when the streak does its damage, because urgency replaces process. The professional response is mechanical: the stake stays fixed, the filter stays strict, and the record stays honest. No bet during a streak is ever "special".</p><p>It also helps to step away. A scheduled break — a weekend without betting, a week off — costs nothing in a long-run game and resets the emotional state that the streak is feeding on.</p><h2 id="measuring-your-way-out">Measuring Your Way Out</h2><p>Streaks end. The bettor who survives measures the return: after the run, review the last thirty bets. What was the closing line value? Did the process hold? Was the stake ever increased in panic? The answers tell you whether you endured variance or ignored a broken process — and that distinction decides whether the next streak will be survivable too.</p><h2 id="final-thoughts">Final Thoughts</h2><p>Losing streaks are the entry fee to profitable betting. They are paid by every long-term winner, and they separate the ones who will be there in five years from the ones who quit in a bad October. Stake by the plan, shrink by the plan, review by the plan, and let the arithmetic of the edge do its slow work. The streak is weather. The plan is the house.</p><h2 id="putting-the-plan-to-the-test">Putting the Plan to the Test</h2><p>Watch the survival plan in action. A bettor with a 200-unit bankroll stakes a flat 2 units per bet and has an honest edge priced around 4%. Ten straight losses — a sequence that will happen every couple of seasons at that edge — drop the bankroll to 180 units. The bettor holds the stake at 2 units because the plan says so, reviews the closing line value to confirm the prices were still beating the market, and continues. Eleven of the next twenty bets land, and because the prices were genuinely good, the bankroll climbs back above 190 units. The streak cost ten units, not the bankroll.</p><p>Contrast the recovery bettor. The same ten losses produce the same 180-unit balance, but the frustration doubles the next stake to 4 units "to get it back". The next two losses cost 8 units instead of 4, the balance drops to 172, and now the desperation has a foothold. Every subsequent decision is distorted by the growing hole, and the plan that was built to survive the storm has been abandoned at the exact moment it mattered most.</p><p>The numbers tell the whole story: the same variance, two different outcomes, and the only variable is whether the stake stayed on the plan. Losing streaks are the price of admission to a profitable career, and they are survivable precisely because they are forecast. The bettor who has already decided what the streak will cost — and has written the response — does not make a decision during the storm. They simply implement the one they already made.</p>
+
+  <section class="faq">
+   <h2 id="faq">Frequently Asked Questions</h2>
+   <div class="faq-item">
+    <h3>How should I handle a losing streak?</h3>
+    <p>First, recognise that losing streaks are a normal part of variance even for profitable bettors, and do not change your staking in response to them. Keep betting the same small percentage of bankroll, review whether the bets themselves still have value, and never chase. The survival rules are flat: shrink stakes as bankroll shrinks, and never increase them to recover.</p>
+   </div>
+   <div class="faq-item">
+    <h3>What are the survival rules during a losing streak?</h3>
+    <p>Keep stakes as a fixed small percentage of the current bankroll so losses are self-limiting. Stop immediately if you are betting to recover rather than because of value. Maintain your records honestly, because the record will show whether the streak is variance or a broken process. And keep the biggest rule: never chase a loss with a bigger bet.</p>
+   </div>
+   <div class="faq-item">
+    <h3>How do I measure my way out of a losing streak?</h3>
+    <p>Use the record to separate variance from a real problem: if your closing line value is still positive and your bets still follow your rules, the streak is variance and the edge will reassert itself. If your CLV has turned negative or your rules are being broken, that is a process problem to fix before betting more. The metrics, not the scoreboard, tell you which one you are in.</p>
+   </div>
+   <div class="faq-item">
+    <h3>What is the psychology of a losing streak?</h3>
+    <p>The psychology is a storm of doubt: the urge to 'get it back' rises exactly when the edge is most at risk of being abandoned. The antidote is pre-commitment — written rules that you obey mechanically, knowing the streak is temporary. Bettors who survive streaks treat them as a scheduled part of the process rather than an emergency.</p>
+   </div>
+  </section>
+
+
+   <div class="cta">
    <h3>Put These Principles Into Practice Today</h3>
    <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
    <p style="margin:16px 0"><a href="/predictions/1x2" class="btn">1X2 Predictions</a> <a href="/predictions/in-play" class="btn">Live In-Play Tips</a></p>
@@ -326,9 +382,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </div>
 
 <footer>
- <div class="footer-content">
+ <div class="footer-content container">
   <div style="text-align:center;margin-bottom:24px;">
-   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p><a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">In-Play Tips</a>
+   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p>
+   <a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;font-weight:600;font-size:14px;">In-Play Tips</a>
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
@@ -350,7 +407,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <a href="/contact.html">Contact</a>
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
-   <a href="/policy.html">Editorial Policy</a>
   </div>
   <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
  </div>

@@ -106,6 +106,17 @@ nav a:hover{color:var(--accent)}
 .stats-table th{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
 .stats-table td{font-weight:500}
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--border-light);color:var(--text-muted);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+.toc{background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h3{margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted)}
+.toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:24px}
+.toc li{margin-bottom:6px;font-size:14px}
+.toc li a{color:var(--text-primary)}
+.toc li a:hover{color:var(--accent)}
+.faq{margin:32px 0}
+.faq h2{margin:0 0 8px}
+.faq-item{border:1px solid var(--border-light);border-radius:12px;padding:18px 22px;margin:14px 0}
+.faq-item h3{margin:0 0 8px;font-size:17px}
+.faq-item p{margin:0;color:var(--text-muted)}
 .cta{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;padding:28px 32px;text-align:center;margin:38px 0}
 .cta h3{font-size:20px;font-weight:700;margin-bottom:10px}
 .social-share{display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -251,6 +262,15 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   ]
 }
 </script>
+<!-- FAQPage schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"Why are multiples worse for the bettor?","acceptedAnswer":{"@type":"Answer","text":"Every leg of an accumulator carries the bookmaker's margin, and the margins multiply together. A single faces the margin once; a four-fold faces it four times compounded. With a typical 4-6% margin per market, the expected loss on a four-fold is roughly triple that of a single. The product the house loves is priced accordingly."}},{"@type":"Question","name":"Do singles ever lose their appeal to edge bettors?","acceptedAnswer":{"@type":"Answer","text":"For a bettor with a genuine edge, singles are how the edge converts into profit: the advantage per bet is applied directly and compounds over hundreds of bets. Multiples turn a positive edge into a multiplied position where the compounding works against you. Even a large accumulator is mathematically a worse version of the same selections as singles."}},{"@type":"Question","name":"When do multiples have a legitimate role?","acceptedAnswer":{"@type":"Answer","text":"Multiples have two legitimate uses: as a fixed, separate entertainment budget (not the edge money), and in rare cases of correlated legs where the combined probability genuinely beats the book's multiplied price. Outside those two, an accumulator is a higher-margin product that you are paying the book to sell you."}},{"@type":"Question","name":"What is the psychological trap of accumulators?","acceptedAnswer":{"@type":"Answer","text":"The trap is that a near-miss accumulator feels like you were 'one goal away', which the brain reads as skill rather than the multiplied margin you paid. The excitement is the product the book is selling. Understanding the arithmetic — that each leg multiplies the house edge — removes the romance and protects your bankroll."}}]
+}
+</script>
+
 </head>
 <body>
 <header>
@@ -260,16 +280,17 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav id="nav">
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/best-picks.html">Best Picks</a>
- <a href="/author-picks.html">Author Picks</a>
- <a href="/predictions/in-play">In-Play</a>
- <a href="/blog/" class="active">Blog</a>
- <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-  <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
-  <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
- </span></nav>
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/author-picks.html">Author Picks</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/blog/" class="active">Blog</a>
+   <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
+    <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
+   </span>
+  </nav>
  </div>
 </header>
 
@@ -282,14 +303,49 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <p class="lead">The bookmaker's favourite conversation is the one where you defend your accumulator. The maths is not on your side — and understanding why is a competitive advantage.</p>
 
-  <figure class="figure">
-   <img src="/blog/thumbnails/single-bets-vs-multiples.webp" alt="Single Bets vs Multiples: The Real Math | WinFulltime" width="1200" height="630" loading="eager">
-   <figcaption>The mathematics of singles versus accumulators</figcaption>
-  </figure>
+   <figure class="figure">
+    <img src="/blog/thumbnails/single-bets-vs-multiples.webp" alt="Single Bets vs Multiples: The Real Math | WinFulltime" width="1200" height="630" loading="eager">
+    <figcaption>The mathematics of singles versus accumulators</figcaption>
+   </figure>
 
-  <p>Every betting site makes its money partly from accumulators. That single fact should make you suspicious. A product the house loves is rarely a product that serves you — and the reason the house loves multiples is written in plain arithmetic.</p><h2>How the Margin Multiplies</h2><p>Every market a bookmaker offers carries a margin — the small edge the house keeps in each price. In a typical football 1X2 market that margin is 4-6%. Place a single and you face that margin once. Place a four-fold and the margins multiply together.</p><p>Here is the brutal version. With a 5% margin per market:</p><ul><li><strong>Single:</strong> expected loss per £100 staked — about £5.</li><li><strong>Double:</strong> the margin compounds — about £10.</li><li><strong>Four-fold:</strong> compounding pushes the expected loss toward £18-20.</li><li><strong>Eight-fold:</strong> toward £34-40.</li></ul><div class="highlight"><strong>The arithmetic:</strong> Your chances of winning an accumulator are the probabilities multiplied together, and so are the book's margins. Every leg you add makes the ticket more exciting and your expected return worse — at the same time.</div><h2>Why Singles Win for the Edge Bettor</h2><p>For a bettor with a genuine edge — say, an average price gap of +5% over fair value — a single converts that edge directly into profit. Stakes compound over hundreds of bets. The Kelly Criterion exists precisely because an edge bettor's optimal staking is a simple function of single-bet value. Multiples break that model entirely: they turn a +5% edge per bet into a multiplied position where the compounding works against you.</p><p>The professional truth is unglamorous: singles, sized consistently, with a real edge, are how bankrolls grow. The excitement is the product the book is selling — and it is priced accordingly.</p><h2>When Multiples Have a Role</h2><p>Multiples are not mathematically worthless — they have two legitimate uses:</p><ul><li><strong>Entertainment budget.</strong> A small accumulator stake on a weekend of games is a ticket to watching with interest. Treated as the cost of fun — like a cinema ticket — it is fine. Treated as investing, it is self-destruction.</li><li><strong>Correlated value.</strong> As covered in our correlated accumulator guide, when legs reinforce each other, the multiplied price under-prices the true combined probability. This is the one situation where a multiple can carry genuine value.</li></ul><p>Everything else — random four-folds, "guaranteed" 10-leg bankers, boosts that grow with legs added — is margin being multiplied in the book's favour.</p><h2>The Psychological Trap</h2><p>The accumulator's real weapon is psychology. A big combined price feels like value; a single at 1.80 feels small and uninteresting. Bettors describe the same expected loss as "not worth it" on singles and "exciting" on multiples. The bookmaker knows exactly what they are pricing: not the event, but the feeling of the event. Name the feeling, and you have named the tax.</p><h2>Finding Your Balance</h2><p>There is no rule that you must choose one exclusively, but the proportions matter:</p><ul><li><strong>Core bankroll:</strong> singles on your highest-conviction value bets, sized by your staking plan.</li><li><strong>Entertainment:</strong> a capped, fixed amount each week for accumulator fun — never funded by your real edge.</li><li><strong>Rare value:</strong> correlated multiples only where you have identified the reinforcement.</li></ul><h2>Final Thoughts</h2><p>The house built its margins into every price, and accumulators multiply those margins. Singles are the honest instrument of an edge; multiples are the price of excitement. Knowing the difference — and being able to name the arithmetic — is the single cheapest edge available in football betting. Use it.</p><h2>The Margin, Worked Through</h2><p>The theory is worth seeing in pounds. Take three selections, each fairly priced at 2.00 but offered by the book at 1.90. The book's margin on each is about 5%. Place them as three singles with a £10 stake each and your expected return per £30 staked is roughly £28.50 — the margin is applied once per bet. Place the same three as a £30 treble and the odds multiply: 1.90 x 1.90 x 1.90 = 6.86. Fair value at 2.00 each is 8.00, so the treble price carries the book's margin compounded, and your expected return falls to roughly £25.70 per £30 staked. The treble has quietly cost you nearly five pounds more of expected value than the three singles.</p><p>Now imagine repeating that difference over fifty weekend baskets a year. The single bettor keeps a material share of their stake in the game; the accumulator bettor has donated it in compound interest to the margin. The excitement of the multiplied price is real, but it is the only thing the accumulator pays for — and it is priced accordingly. When the stakes are the same and the selections are the same, the singles are simply the better mathematical instrument. The bookmaker knows it; the margin table proves it; and the bettor who acts on it has taken back one of the few permanent edges the house cannot remove.</p>
+  <nav class="toc" aria-label="Table of contents">
+   <h3>Contents</h3>
+   <ul>
+    <li><a href="#how-the-margin-multiplies">How the Margin Multiplies</a></li>
+    <li><a href="#why-singles-win-for-the-edge-bettor">Why Singles Win for the Edge Bettor</a></li>
+    <li><a href="#when-multiples-have-a-role">When Multiples Have a Role</a></li>
+    <li><a href="#the-psychological-trap">The Psychological Trap</a></li>
+    <li><a href="#finding-your-balance">Finding Your Balance</a></li>
+    <li><a href="#final-thoughts">Final Thoughts</a></li>
+    <li><a href="#the-margin-worked-through">The Margin, Worked Through</a></li>
+   </ul>
+  </nav>
 
-  <div class="cta">
+
+   <p>Every betting site makes its money partly from accumulators. That single fact should make you suspicious. A product the house loves is rarely a product that serves you — and the reason the house loves multiples is written in plain arithmetic.</p><h2 id="how-the-margin-multiplies">How the Margin Multiplies</h2><p>Every market a bookmaker offers carries a margin — the small edge the house keeps in each price. In a typical football 1X2 market that margin is 4-6%. Place a single and you face that margin once. Place a four-fold and the margins multiply together.</p><p>Here is the brutal version. With a 5% margin per market:</p><ul><li><strong>Single:</strong> expected loss per £100 staked — about £5.</li><li><strong>Double:</strong> the margin compounds — about £10.</li><li><strong>Four-fold:</strong> compounding pushes the expected loss toward £18-20.</li><li><strong>Eight-fold:</strong> toward £34-40.</li></ul><div class="highlight"><strong>The arithmetic:</strong> Your chances of winning an accumulator are the probabilities multiplied together, and so are the book's margins. Every leg you add makes the ticket more exciting and your expected return worse — at the same time.</div><h2 id="why-singles-win-for-the-edge-bettor">Why Singles Win for the Edge Bettor</h2><p>For a bettor with a genuine edge — say, an average price gap of +5% over fair value — a single converts that edge directly into profit. Stakes compound over hundreds of bets. The Kelly Criterion exists precisely because an edge bettor's optimal staking is a simple function of single-bet value. Multiples break that model entirely: they turn a +5% edge per bet into a multiplied position where the compounding works against you.</p><p>The professional truth is unglamorous: singles, sized consistently, with a real edge, are how bankrolls grow. The excitement is the product the book is selling — and it is priced accordingly.</p><h2 id="when-multiples-have-a-role">When Multiples Have a Role</h2><p>Multiples are not mathematically worthless — they have two legitimate uses:</p><ul><li><strong>Entertainment budget.</strong> A small accumulator stake on a weekend of games is a ticket to watching with interest. Treated as the cost of fun — like a cinema ticket — it is fine. Treated as investing, it is self-destruction.</li><li><strong>Correlated value.</strong> As covered in our correlated accumulator guide, when legs reinforce each other, the multiplied price under-prices the true combined probability. This is the one situation where a multiple can carry genuine value.</li></ul><p>Everything else — random four-folds, "guaranteed" 10-leg bankers, boosts that grow with legs added — is margin being multiplied in the book's favour.</p><h2 id="the-psychological-trap">The Psychological Trap</h2><p>The accumulator's real weapon is psychology. A big combined price feels like value; a single at 1.80 feels small and uninteresting. Bettors describe the same expected loss as "not worth it" on singles and "exciting" on multiples. The bookmaker knows exactly what they are pricing: not the event, but the feeling of the event. Name the feeling, and you have named the tax.</p><h2 id="finding-your-balance">Finding Your Balance</h2><p>There is no rule that you must choose one exclusively, but the proportions matter:</p><ul><li><strong>Core bankroll:</strong> singles on your highest-conviction value bets, sized by your staking plan.</li><li><strong>Entertainment:</strong> a capped, fixed amount each week for accumulator fun — never funded by your real edge.</li><li><strong>Rare value:</strong> correlated multiples only where you have identified the reinforcement.</li></ul><h2 id="final-thoughts">Final Thoughts</h2><p>The house built its margins into every price, and accumulators multiply those margins. Singles are the honest instrument of an edge; multiples are the price of excitement. Knowing the difference — and being able to name the arithmetic — is the single cheapest edge available in football betting. Use it.</p><h2 id="the-margin-worked-through">The Margin, Worked Through</h2><p>The theory is worth seeing in pounds. Take three selections, each fairly priced at 2.00 but offered by the book at 1.90. The book's margin on each is about 5%. Place them as three singles with a £10 stake each and your expected return per £30 staked is roughly £28.50 — the margin is applied once per bet. Place the same three as a £30 treble and the odds multiply: 1.90 x 1.90 x 1.90 = 6.86. Fair value at 2.00 each is 8.00, so the treble price carries the book's margin compounded, and your expected return falls to roughly £25.70 per £30 staked. The treble has quietly cost you nearly five pounds more of expected value than the three singles.</p><p>Now imagine repeating that difference over fifty weekend baskets a year. The single bettor keeps a material share of their stake in the game; the accumulator bettor has donated it in compound interest to the margin. The excitement of the multiplied price is real, but it is the only thing the accumulator pays for — and it is priced accordingly. When the stakes are the same and the selections are the same, the singles are simply the better mathematical instrument. The bookmaker knows it; the margin table proves it; and the bettor who acts on it has taken back one of the few permanent edges the house cannot remove.</p>
+
+  <section class="faq">
+   <h2 id="faq">Frequently Asked Questions</h2>
+   <div class="faq-item">
+    <h3>Why are multiples worse for the bettor?</h3>
+    <p>Every leg of an accumulator carries the bookmaker's margin, and the margins multiply together. A single faces the margin once; a four-fold faces it four times compounded. With a typical 4-6% margin per market, the expected loss on a four-fold is roughly triple that of a single. The product the house loves is priced accordingly.</p>
+   </div>
+   <div class="faq-item">
+    <h3>Do singles ever lose their appeal to edge bettors?</h3>
+    <p>For a bettor with a genuine edge, singles are how the edge converts into profit: the advantage per bet is applied directly and compounds over hundreds of bets. Multiples turn a positive edge into a multiplied position where the compounding works against you. Even a large accumulator is mathematically a worse version of the same selections as singles.</p>
+   </div>
+   <div class="faq-item">
+    <h3>When do multiples have a legitimate role?</h3>
+    <p>Multiples have two legitimate uses: as a fixed, separate entertainment budget (not the edge money), and in rare cases of correlated legs where the combined probability genuinely beats the book's multiplied price. Outside those two, an accumulator is a higher-margin product that you are paying the book to sell you.</p>
+   </div>
+   <div class="faq-item">
+    <h3>What is the psychological trap of accumulators?</h3>
+    <p>The trap is that a near-miss accumulator feels like you were 'one goal away', which the brain reads as skill rather than the multiplied margin you paid. The excitement is the product the book is selling. Understanding the arithmetic — that each leg multiplies the house edge — removes the romance and protects your bankroll.</p>
+   </div>
+  </section>
+
+
+   <div class="cta">
    <h3>Put These Principles Into Practice Today</h3>
    <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
    <p style="margin:16px 0"><a href="/predictions/1x2" class="btn">1X2 Predictions</a> <a href="/predictions/in-play" class="btn">Live In-Play Tips</a></p>
@@ -326,9 +382,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </div>
 
 <footer>
- <div class="footer-content">
+ <div class="footer-content container">
   <div style="text-align:center;margin-bottom:24px;">
-   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p><a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">In-Play Tips</a>
+   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p>
+   <a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;font-weight:600;font-size:14px;">In-Play Tips</a>
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
@@ -350,7 +407,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <a href="/contact.html">Contact</a>
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
-   <a href="/policy.html">Editorial Policy</a>
   </div>
   <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
  </div>

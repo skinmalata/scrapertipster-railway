@@ -106,6 +106,17 @@ nav a:hover{color:var(--accent)}
 .stats-table th{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
 .stats-table td{font-weight:500}
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--border-light);color:var(--text-muted);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+.toc{background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h3{margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted)}
+.toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:24px}
+.toc li{margin-bottom:6px;font-size:14px}
+.toc li a{color:var(--text-primary)}
+.toc li a:hover{color:var(--accent)}
+.faq{margin:32px 0}
+.faq h2{margin:0 0 8px}
+.faq-item{border:1px solid var(--border-light);border-radius:12px;padding:18px 22px;margin:14px 0}
+.faq-item h3{margin:0 0 8px;font-size:17px}
+.faq-item p{margin:0;color:var(--text-muted)}
 .cta{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;padding:28px 32px;text-align:center;margin:38px 0}
 .cta h3{font-size:20px;font-weight:700;margin-bottom:10px}
 .social-share{display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -251,6 +262,15 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   ]
 }
 </script>
+<!-- FAQPage schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"Why are handicaps ideal for trading?","acceptedAnswer":{"@type":"Answer","text":"Handicaps have defined, predictable price movements and two clear sides, which makes them clean instruments for buying and selling positions. Because the handicap level and price shift continuously with match dynamics, a trader can buy a mispriced position early and sell it back when the market agrees — without needing a goal to land."}},{"@type":"Question","name":"What is the core handicap trade?","acceptedAnswer":{"@type":"Answer","text":"The core trade is buying a position when you believe the market is wrong, then selling it when the price moves to fair value. A typical pattern is backing a strong home team on a negative handicap early, then laying or closing the position once the price tightens as the match confirms the team's dominance. The profit is the price gap, not the result."}},{"@type":"Question","name":"How do I trade the early goal pattern?","acceptedAnswer":{"@type":"Answer","text":"When a strong favourite concedes an early goal, the handicap market overcorrects in favour of the underdog. The trader backs the favourite on its now-soft handicap and closes the position when the market corrects back — often before the match even ends. Timing and a defined exit are everything; the pattern works because the market overreacts to the early shock."}},{"@type":"Question","name":"How do I manage risk in handicap trading?","acceptedAnswer":{"@type":"Answer","text":"Define your maximum loss before entering, use a stop or a price at which you close regardless of emotion, and size positions so a single bad read cannot hurt the bankroll. Read match dynamics continuously — shots, territory, pressing — rather than just the scoreboard, and exit when the market reaches your target. Risk management, not prediction, is the trader's real edge."}}]
+}
+</script>
+
 </head>
 <body>
 <header>
@@ -260,16 +280,17 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav id="nav">
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/best-picks.html">Best Picks</a>
- <a href="/author-picks.html">Author Picks</a>
- <a href="/predictions/in-play">In-Play</a>
- <a href="/blog/" class="active">Blog</a>
- <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-  <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
-  <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
- </span></nav>
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/author-picks.html">Author Picks</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/blog/" class="active">Blog</a>
+   <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
+    <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
+   </span>
+  </nav>
  </div>
 </header>
 
@@ -282,14 +303,50 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <p class="lead">Handicaps are the cleanest trading instrument in football: buy a position you think is mispriced, then sell it back when the market agrees.</p>
 
-  <figure class="figure">
-   <img src="/blog/thumbnails/handicap-trading-football.webp" alt="Handicap Trading: Profiting From Match Dynamics | WinFulltime" width="1200" height="630" loading="eager">
-   <figcaption>Buying and selling handicap positions in-play</figcaption>
-  </figure>
+   <figure class="figure">
+    <img src="/blog/thumbnails/handicap-trading-football.webp" alt="Handicap Trading: Profiting From Match Dynamics | WinFulltime" width="1200" height="630" loading="eager">
+    <figcaption>Buying and selling handicap positions in-play</figcaption>
+   </figure>
 
-  <p>Every football match is a series of repricings. The market's view of a game shifts with every attack, card and goal — and each shift is a chance to trade. Handicap markets are the cleanest way to do it, because a handicap position carries a price that moves smoothly with the game state. Trade it well and you do not need to be right about the result — only about the moment.</p><h2>Why Handicaps Are Ideal for Trading</h2><p>An Asian handicap — say, Manchester City −1.5 goals — is a single number with a single price. As the match unfolds, that price breathes. A City goal moves it; an equaliser moves it back; a red card sends it spiking. Because a handicap is a continuous scale rather than a yes/no outcome, its price responds to every event and gives a trader continuous entry and exit points.</p><h2>The Core Trade: Buy Value, Sell When Fair</h2><p>Handicap trading follows a simple loop:</p><ol><li><strong>Entry:</strong> Buy a handicap position when its price is below fair value in your judgment.</li><li><strong>Hold:</strong> Wait for the market to agree — usually driven by goals, dominance, or cards.</li><li><strong>Exit:</strong> Sell the position back at a better price, banking the difference.</li></ol><p>The beauty is that you do not need the final result. A position bought at 2.10 and sold at 1.80 banks a profit regardless of how the match ends. You are trading the market's opinion, not the football.</p><h2>The Pattern: Trading the Early Goal</h2><p>The highest-frequency handicap trade is the early-goal fade on a favourite. A heavy favourite behind 1-0 inside ten minutes still usually wins — the market, though, prices the shock and the favourite's handicap drifts dramatically. The trader who <em>buys</em> the favourite's handicap at the panic price and sells it back as the favourite regains control captures the swing.</p><div class="highlight"><strong>Trade profile:</strong> Favourite −1.5 at 1.90 before kickoff → concedes in the 8th minute → handicap price drifts to 3.20 → buy at 3.20 → favourite scores, pressure builds → price tightens to 2.20 → sell. Profit banked on a game that may still end drawn.</div><h2>Reading the Match Dynamics</h2><p>Trading requires you to distinguish real momentum from noise. Three signals matter most:</p><ul><li><strong>Pressure without reward:</strong> a team dominating shots and territory but yet to score — their handicap is cheap and about to correct.</li><li><strong>Red cards:</strong> the first red card is the strongest repricing event in football — it shifts the whole handicap scale in one move.</li><li><strong>Late-game state:</strong> a team needing one goal to cover, attacking with five minutes left, is a live target — but the window closes fast.</li></ul><h2>Managing the Risk</h2><p>Trading is not risk-free. Positions held too long can be ambushed by an equaliser; buy the wrong swing and you must cut the loss. Three rules keep the downside controlled:</p><ul><li><strong>Define the exit before entry.</strong> Know both your profit target and your stop price before you buy.</li><li><strong>Size for the worst case.</strong> A handicap trade that runs against you is a real loss — size it like a normal bet, not a happy accident.</li><li><strong>Never average a losing position.</strong> Buying more as the price runs against you converts a trade into a gamble. Cut, then re-enter fresh.</li></ul><h2>The Tools You Need</h2><p>Handicap trading lives or dies on liquidity. Exchanges provide the depth to buy and sell at real prices; a bookmaker's in-play handicap cannot be traded back. You also need a live stream or fast data feed — the trade window after a goal is measured in seconds, and a lagging screen turns profit into noise.</p><h2>Final Thoughts</h2><p>Handicap trading transforms football betting from a result business into a trading business. The skill is not predicting outcomes — it is reading the game state, recognising when the market has mispriced the momentum, and executing entries and exits with discipline. Do that consistently and the result of any single match stops mattering. What matters is the swing.</p><h2>A Worked Handicap Trade</h2><p>Put the pattern in numbers. A strong home favourite is priced −1.5 at 1.95 before kickoff, implying a comfortable two-goal win is the base case. The match opens scrappy and the away side scores against the run of play in the 12th minute. The market panics: the −1.5 price snaps to 3.40. The trader who believes the favourite is still the better side — the goal was against the run of play — buys the −1.5 at 3.40.</p><p>Twenty minutes later the favourite has equalised and is creating chances. The −1.5 price corrects to 2.40. The trader sells: a buy at 3.40 and a sell at 2.40 in handicap terms means the position now banks a profit equal to the difference, regardless of the final scoreline. If the favourite wins by two or more, the buy position cashes; if not, the sell position covers it. The trade made money the moment the market agreed with the original read.</p><p>The discipline detail is the exit. The profit was locked in at 2.40, but a trader who set a target of 2.20 would still be holding when the away side scored a second. That is why every entry must carry its exit price in advance: the market will not wait while you decide, and the difference between a professional trade and a regretted one is usually the size of the window between the target and the stop.</p>
+  <nav class="toc" aria-label="Table of contents">
+   <h3>Contents</h3>
+   <ul>
+    <li><a href="#why-handicaps-are-ideal-for-trading">Why Handicaps Are Ideal for Trading</a></li>
+    <li><a href="#the-core-trade-buy-value-sell-when-fair">The Core Trade: Buy Value, Sell When Fair</a></li>
+    <li><a href="#the-pattern-trading-the-early-goal">The Pattern: Trading the Early Goal</a></li>
+    <li><a href="#reading-the-match-dynamics">Reading the Match Dynamics</a></li>
+    <li><a href="#managing-the-risk">Managing the Risk</a></li>
+    <li><a href="#the-tools-you-need">The Tools You Need</a></li>
+    <li><a href="#final-thoughts">Final Thoughts</a></li>
+    <li><a href="#a-worked-handicap-trade">A Worked Handicap Trade</a></li>
+   </ul>
+  </nav>
 
-  <div class="cta">
+
+   <p>Every football match is a series of repricings. The market's view of a game shifts with every attack, card and goal — and each shift is a chance to trade. Handicap markets are the cleanest way to do it, because a handicap position carries a price that moves smoothly with the game state. Trade it well and you do not need to be right about the result — only about the moment.</p><h2 id="why-handicaps-are-ideal-for-trading">Why Handicaps Are Ideal for Trading</h2><p>An Asian handicap — say, Manchester City −1.5 goals — is a single number with a single price. As the match unfolds, that price breathes. A City goal moves it; an equaliser moves it back; a red card sends it spiking. Because a handicap is a continuous scale rather than a yes/no outcome, its price responds to every event and gives a trader continuous entry and exit points.</p><h2 id="the-core-trade-buy-value-sell-when-fair">The Core Trade: Buy Value, Sell When Fair</h2><p>Handicap trading follows a simple loop:</p><ol><li><strong>Entry:</strong> Buy a handicap position when its price is below fair value in your judgment.</li><li><strong>Hold:</strong> Wait for the market to agree — usually driven by goals, dominance, or cards.</li><li><strong>Exit:</strong> Sell the position back at a better price, banking the difference.</li></ol><p>The beauty is that you do not need the final result. A position bought at 2.10 and sold at 1.80 banks a profit regardless of how the match ends. You are trading the market's opinion, not the football.</p><h2 id="the-pattern-trading-the-early-goal">The Pattern: Trading the Early Goal</h2><p>The highest-frequency handicap trade is the early-goal fade on a favourite. A heavy favourite behind 1-0 inside ten minutes still usually wins — the market, though, prices the shock and the favourite's handicap drifts dramatically. The trader who <em>buys</em> the favourite's handicap at the panic price and sells it back as the favourite regains control captures the swing.</p><div class="highlight"><strong>Trade profile:</strong> Favourite −1.5 at 1.90 before kickoff → concedes in the 8th minute → handicap price drifts to 3.20 → buy at 3.20 → favourite scores, pressure builds → price tightens to 2.20 → sell. Profit banked on a game that may still end drawn.</div><h2 id="reading-the-match-dynamics">Reading the Match Dynamics</h2><p>Trading requires you to distinguish real momentum from noise. Three signals matter most:</p><ul><li><strong>Pressure without reward:</strong> a team dominating shots and territory but yet to score — their handicap is cheap and about to correct.</li><li><strong>Red cards:</strong> the first red card is the strongest repricing event in football — it shifts the whole handicap scale in one move.</li><li><strong>Late-game state:</strong> a team needing one goal to cover, attacking with five minutes left, is a live target — but the window closes fast.</li></ul><h2 id="managing-the-risk">Managing the Risk</h2><p>Trading is not risk-free. Positions held too long can be ambushed by an equaliser; buy the wrong swing and you must cut the loss. Three rules keep the downside controlled:</p><ul><li><strong>Define the exit before entry.</strong> Know both your profit target and your stop price before you buy.</li><li><strong>Size for the worst case.</strong> A handicap trade that runs against you is a real loss — size it like a normal bet, not a happy accident.</li><li><strong>Never average a losing position.</strong> Buying more as the price runs against you converts a trade into a gamble. Cut, then re-enter fresh.</li></ul><h2 id="the-tools-you-need">The Tools You Need</h2><p>Handicap trading lives or dies on liquidity. Exchanges provide the depth to buy and sell at real prices; a bookmaker's in-play handicap cannot be traded back. You also need a live stream or fast data feed — the trade window after a goal is measured in seconds, and a lagging screen turns profit into noise.</p><h2 id="final-thoughts">Final Thoughts</h2><p>Handicap trading transforms football betting from a result business into a trading business. The skill is not predicting outcomes — it is reading the game state, recognising when the market has mispriced the momentum, and executing entries and exits with discipline. Do that consistently and the result of any single match stops mattering. What matters is the swing.</p><h2 id="a-worked-handicap-trade">A Worked Handicap Trade</h2><p>Put the pattern in numbers. A strong home favourite is priced −1.5 at 1.95 before kickoff, implying a comfortable two-goal win is the base case. The match opens scrappy and the away side scores against the run of play in the 12th minute. The market panics: the −1.5 price snaps to 3.40. The trader who believes the favourite is still the better side — the goal was against the run of play — buys the −1.5 at 3.40.</p><p>Twenty minutes later the favourite has equalised and is creating chances. The −1.5 price corrects to 2.40. The trader sells: a buy at 3.40 and a sell at 2.40 in handicap terms means the position now banks a profit equal to the difference, regardless of the final scoreline. If the favourite wins by two or more, the buy position cashes; if not, the sell position covers it. The trade made money the moment the market agreed with the original read.</p><p>The discipline detail is the exit. The profit was locked in at 2.40, but a trader who set a target of 2.20 would still be holding when the away side scored a second. That is why every entry must carry its exit price in advance: the market will not wait while you decide, and the difference between a professional trade and a regretted one is usually the size of the window between the target and the stop.</p>
+
+  <section class="faq">
+   <h2 id="faq">Frequently Asked Questions</h2>
+   <div class="faq-item">
+    <h3>Why are handicaps ideal for trading?</h3>
+    <p>Handicaps have defined, predictable price movements and two clear sides, which makes them clean instruments for buying and selling positions. Because the handicap level and price shift continuously with match dynamics, a trader can buy a mispriced position early and sell it back when the market agrees — without needing a goal to land.</p>
+   </div>
+   <div class="faq-item">
+    <h3>What is the core handicap trade?</h3>
+    <p>The core trade is buying a position when you believe the market is wrong, then selling it when the price moves to fair value. A typical pattern is backing a strong home team on a negative handicap early, then laying or closing the position once the price tightens as the match confirms the team's dominance. The profit is the price gap, not the result.</p>
+   </div>
+   <div class="faq-item">
+    <h3>How do I trade the early goal pattern?</h3>
+    <p>When a strong favourite concedes an early goal, the handicap market overcorrects in favour of the underdog. The trader backs the favourite on its now-soft handicap and closes the position when the market corrects back — often before the match even ends. Timing and a defined exit are everything; the pattern works because the market overreacts to the early shock.</p>
+   </div>
+   <div class="faq-item">
+    <h3>How do I manage risk in handicap trading?</h3>
+    <p>Define your maximum loss before entering, use a stop or a price at which you close regardless of emotion, and size positions so a single bad read cannot hurt the bankroll. Read match dynamics continuously — shots, territory, pressing — rather than just the scoreboard, and exit when the market reaches your target. Risk management, not prediction, is the trader's real edge.</p>
+   </div>
+  </section>
+
+
+   <div class="cta">
    <h3>Put These Principles Into Practice Today</h3>
    <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
    <p style="margin:16px 0"><a href="/predictions/1x2" class="btn">1X2 Predictions</a> <a href="/predictions/in-play" class="btn">Live In-Play Tips</a></p>
@@ -326,9 +383,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </div>
 
 <footer>
- <div class="footer-content">
+ <div class="footer-content container">
   <div style="text-align:center;margin-bottom:24px;">
-   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p><a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">In-Play Tips</a>
+   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p>
+   <a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;font-weight:600;font-size:14px;">In-Play Tips</a>
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
@@ -350,7 +408,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <a href="/contact.html">Contact</a>
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
-   <a href="/policy.html">Editorial Policy</a>
   </div>
   <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
  </div>
