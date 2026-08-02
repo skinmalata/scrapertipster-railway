@@ -9,7 +9,7 @@ var SITE={
   name:'WinFulltime',
   url:'https://winfulltime.com',
   tagline:'Free AI Football Predictions',
-  email:'mesigotochukwu@gmail.com',
+  email:'officialwinfulltime@gmail.com',
   desc:'WinFulltime is a free football prediction website providing AI-driven betting tips across 50+ global leagues. No registration required.',
   pages:{
     home:{url:'/',title:'Home - Daily Predictions'},

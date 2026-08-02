@@ -4,7 +4,7 @@ const knowledge = {
     tagline: 'AI Football Predictions',
     description: 'WinFulltime provides AI-driven betting tips across 50+ global leagues including Premier League, La Liga, Serie A, Bundesliga, Ligue 1, and Champions League. Membership requires a paid plan — accounts are created only after payment is confirmed. Covers 750+ teams worldwide.',
     founded: '2026',
-    email: 'mesigotochukwu@gmail.com',
+    email: 'officialwinfulltime@gmail.com',
     website: 'https://winfulltime.com',
     youtube: '@winfulltime',
     youtubeUrl: 'https://www.youtube.com/@winfulltime/videos'
@@ -107,7 +107,7 @@ async function getChatResponse(message) {
 SITE OVERVIEW:
 - Name: WinFulltime (https://winfulltime.com)
 - Free AI-powered football predictions, no registration needed
-- Contact: mesigotochukwu@gmail.com
+  - Contact: officialwinfulltime@gmail.com
 - YouTube: @winfulltime
 
 PREDICTION MARKETS:
