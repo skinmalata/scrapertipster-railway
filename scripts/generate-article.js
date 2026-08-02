@@ -1,0 +1,464 @@
+// Builds complete SEO blog article HTML files from structured content data.
+// Usage: node scripts/generate-article.js <data-file.json>
+// Each item in the data file:
+// {
+//   "slug": "...", "title": "...", "description": "...", "keywords": "...",
+//   "category": "Strategy", "section": "Core Betting Strategies",
+//   "h1": "...", "lead": "...",
+//   "content": "<p>...full body HTML...</p>",
+//   "related": [{ "href": "/blog/x.html", "label": "X" }],
+//   "share": "Short share text",
+//   "date": "2026-08-02T09:00:00+01:00"
+// }
+const fs = require('fs');
+const path = require('path');
+
+const BLOG_DIR = path.join(__dirname, '..', 'public', 'blog');
+const ADDENDA_FILE = path.join(__dirname, '..', 'blog-data', 'addenda.json');
+const DOMAIN = 'https://winfulltime.com';
+
+function esc(v) {
+  return String(v || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function enc(v) { return encodeURIComponent(String(v || '')); }
+
+function relatedHtml(related) {
+  return (related || []).map(r => `    <li><a href="${r.href}">${r.label}</a></li>`).join('\n');
+}
+
+function articleHtml(a) {
+  const url = `${DOMAIN}/blog/${a.slug}.html`;
+  const image = `${DOMAIN}/blog/thumbnails/${a.slug}.webp`;
+  const breadcrumb = a.title.replace(/\s*[\|—]\s*WinFulltime.*$/, '').trim();
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Preload hero font -->
+<link rel="preload" href="/assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${esc(a.title)}</title>
+<meta name="description" content="${esc(a.description)}">
+<meta name="keywords" content="${esc(a.keywords)}">
+<link rel="canonical" href="${url}">
+<meta name="author" content="Tochukwu Mesigo">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0d1117">
+<!-- Open Graph -->
+<meta property="og:title" content="${esc(a.title)}">
+<meta property="og:description" content="${esc(a.description)}">
+<meta property="og:type" content="article">
+<meta property="og:url" content="${url}">
+<meta property="og:image" content="${image}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="WinFulltime">
+<meta property="article:published_time" content="${a.date}">
+<meta property="article:modified_time" content="${a.date}">
+<meta property="article:section" content="${esc(a.section)}">
+<meta property="article:author" content="https://winfulltime.com/author-bio.html">
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${esc(a.title)}">
+<meta name="twitter:description" content="${esc(a.description)}">
+<meta name="twitter:image" content="${image}">
+<link rel="alternate" type="application/rss+xml" href="https://winfulltime.com/feed.xml" title="WinFulltime — Latest Posts">
+<link rel="alternate" type="application/rss+xml" href="https://winfulltime.com/predictions-feed.xml" title="WinFulltime — Match Predictions">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="icon" type="image/png" href="/icons/favicon-32x32.png">
+<script>
+ window.startedAt = window.performance && performance.now();
+</script>
+<!-- Global site stylesheet -->
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg-primary:#0d1117;
+  --bg-card:#151a2c;
+  --border:#212737;
+  --border-light:#2d3444;
+  --text-primary:#e6e6e6;
+  --text-muted:#9aa3b8;
+  --accent:#ff2448;
+  --accent-dark:#d41a38;
+}
+@media (prefers-color-scheme: light){
+  :root{
+    --bg-primary:#f4f6fb;
+    --bg-card:#ffffff;
+    --border:#e1e4ea;
+    --border-light:#eef1f5;
+    --text-primary:#1a1a1a;
+    --text-muted:#5a6274;
+  }
+}
+[data-theme="light"]{
+  --bg-primary:#f4f6fb;
+  --bg-card:#ffffff;
+  --border:#e1e4ea;
+  --border-light:#eef1f5;
+  --text-primary:#1a1a1a;
+  --text-muted:#5a6274;
+}
+html{font-size:16px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;scroll-behavior:smooth}
+body{margin:0;background:var(--bg-primary);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:auto;-moz-osx-font-smoothing:grayscale}
+a{color:var(--accent);text-decoration:none}
+a:hover{color:var(--accent-dark)}
+img{max-width:100%;display:block}
+.container{max-width:1180px;margin:0 auto;padding:0 16px}
+header{border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg-card);z-index:100}
+.logo{font-weight:700;font-size:20px;color:var(--accent);letter-spacing:1px}
+.header-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 0}
+nav ul{display:flex;list-style:none;gap:20px}
+nav a{font-size:14px;font-weight:500;color:var(--text-primary)}
+nav a:hover{color:var(--accent)}
+.hero{padding:56px 0 32px;text-align:center}
+.hero h1{font-size:40px;font-weight:700;line-height:1.15;margin-bottom:12px}
+.hero p.lead{font-size:18px;color:var(--text-muted);max-width:720px;margin:0 auto}
+.meta{color:var(--text-muted);font-size:13px;font-weight:500;text-transform:uppercase;letter-spacing:.03em}
+.by{color:var(--text-muted);font-size:13px}
+.post{padding:40px 0}
+.post .meta-bar{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted);margin-bottom:18px}
+.post .meta-bar .dot{width:4px;height:4px;border-radius:50%;background:var(--border-light)}
+.post h2{font-size:26px;font-weight:600;margin:32px 0 14px;line-height:1.2}
+.post h3{font-size:19px;font-weight:600;margin:24px 0 12px}
+.post p{margin:0 0 16px}
+.post ul{margin:0 0 16px;padding-left:24px}
+.post li{margin-bottom:6px}
+.post blockquote{margin:20px 0;padding:18px 22px;border-left:3px solid var(--accent);background:var(--bg-primary);border-radius:0 6px 6px 0;font-style:italic;color:var(--text-muted)}
+.post figcaption{text-align:center;color:var(--text-muted);font-size:13px;margin-top:6px}
+.figure{text-align:center;margin:28px 0}
+.figure img{border-radius:12px;border:1px solid var(--border-light)}
+.highlight{background:linear-gradient(120deg,rgba(255,36,72,.08),rgba(255,36,72,.04));border:1px solid var(--border-light);border-radius:12px;padding:20px 22px;margin:28px 0;font-size:15px;line-height:1.7}
+.highlight strong{color:var(--accent)}
+.stats-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14px}
+.stats-table th,.stats-table td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--border-light)}
+.stats-table th{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+.stats-table td{font-weight:500}
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--border-light);color:var(--text-muted);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+.cta{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;padding:28px 32px;text-align:center;margin:38px 0}
+.cta h3{font-size:20px;font-weight:700;margin-bottom:10px}
+.social-share{display:flex;gap:10px;justify-content:center;margin:40px 0 20px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.social-share span{color:var(--text-muted);font-size:14px;font-weight:600;align-self:center;margin-right:8px}
+.q{color:#0d1117}
+footer{border-top:1px solid var(--border);padding:32px 0 18px}
+.footer-content .footer-links{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;font-size:13px;margin:18px 0}
+.footer-content .footer-links a{color:var(--text-muted)}
+.footer-copyright{text-align:center;color:var(--text-muted);font-size:12px;margin-top:18px}
+.btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:10px 24px;border-radius:10px;font-weight:600;font-size:13px;border:0;cursor:pointer}
+.theme-toggle{background:var(--border-light);color:var(--text-primary);border:0;border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer}
+</style>
+<!-- wf-layout-styles -->
+<style>
+html{font-size:16px}
+@media(max-width:700px){
+  .hero h1{font-size:28px}
+  .container{padding:0 12px}
+}
+body > header, header {
+  background: rgba(24,30,48,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border, rgba(255,255,255,0.06));
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+body > header .header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+body > header .logo {
+  display: flex;
+  align-items: center;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  text-align: left;
+  margin: 0;
+}
+body > header .logo a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
+  text-decoration: none;
+}
+body > header .logo-icon {
+  height: 28px;
+  width: auto;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+body > header .logo span { color: #ff7e7e; }
+body > header .hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 1001;
+}
+body > header .hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--text-primary, #e8edf5);
+  margin: 5px 0;
+  transition: all 0.3s;
+  border-radius: 2px;
+}
+body > header .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+body > header .hamburger.active span:nth-child(2) { opacity: 0; }
+body > header .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+body > header nav { display: flex; gap: 24px; }
+body > header nav a {
+  color: var(--text-muted, #94a3b8);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  transition: color 0.2s;
+  padding: 4px 0;
+  position: relative;
+}
+body > header nav a:hover,
+body > header nav a.active { color: var(--text-primary, #e8edf5); }
+body > header nav .wft-auth-login,
+body > header nav .wft-auth-account { display: inline-block; }
+body > header nav .wft-auth-login:hover,
+body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
+@media (max-width: 640px) {
+  body > header .hamburger { display: block; }
+  body > header nav {
+    display: none !important;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-primary, #181e30);
+    border-bottom: 1px solid var(--border, rgba(255,255,255,0.06));
+    flex-direction: column;
+    padding: 16px;
+    gap: 12px;
+    z-index: 1000;
+  }
+  body > header nav.open { display: flex !important; }
+}
+</style>
+<!-- Schema.org JSON-LD structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "${url}"
+  },
+  "headline": "${esc(breadcrumb)}",
+  "description": "${esc(a.description)}",
+  "image": "${image}",
+  "author": { "@type": "Person", "name": "Tochukwu Mesigo", "url": "https://winfulltime.com/author-bio.html" },
+  "publisher": { "@type": "Organization", "name": "WinFulltime", "logo": { "@type": "ImageObject", "url": "https://winfulltime.com/icons/icon-192.png" } },
+  "datePublished": "${a.date}",
+  "dateModified": "${a.date}",
+  "articleSection": "${esc(a.section)}",
+  "keywords": "${esc(a.keywords)}"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://winfulltime.com/"},
+    {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://winfulltime.com/blog/"},
+    {"@type": "ListItem", "position": 3, "name": "${esc(breadcrumb)}", "item": "${url}"}
+  ]
+}
+</script>
+</head>
+<body>
+<header>
+ <div class="header-content">
+  <div class="logo">
+   <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <nav id="nav">
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/author-picks.html">Author Picks</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/blog/" class="active">Blog</a>
+   <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
+    <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
+   </span>
+  </nav>
+ </div>
+</header>
+
+<article class="post">
+ <div class="container">
+
+  <p class="meta-bar"><span class="meta">${esc(a.section)}</span><span class="dot"></span><span class="by">By <a href="/author-bio.html">Tochukwu Mesigo</a></span></p>
+
+  <h1>${esc(a.h1)}</h1>
+
+  <p class="lead">${esc(a.lead)}</p>
+
+  <figure class="figure">
+   <img src="/blog/thumbnails/${a.slug}.webp" alt="${esc(a.title)}" width="1200" height="630" loading="eager">
+   <figcaption>${esc(a.thumbCaption || a.title)}</figcaption>
+  </figure>
+
+  ${a.content}
+
+  <div class="cta">
+   <h3>Put These Principles Into Practice Today</h3>
+   <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
+   <p style="margin:16px 0"><a href="/predictions/1x2" class="btn">1X2 Predictions</a> <a href="/predictions/in-play" class="btn">Live In-Play Tips</a></p>
+  </div>
+
+  <p class="by">Last updated: August 2026 | By <a href="/author-bio.html">Tochukwu Mesigo</a> | <span class="meta">Category: ${esc(a.section)}</span></p>
+
+  <div class="related-posts">
+   <h3>Keep Reading</h3>
+   <ul>
+${relatedHtml(a.related)}
+   </ul>
+  </div>
+
+  <div style="margin: 0 auto 32px; max-width: 560px; background: linear-gradient(135deg, #151a2c, #20273b); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 28px 32px; text-align: center;">
+   <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,36,72,0.6); margin-bottom: 8px;">Featured Tool</div>
+   <h3 style="margin: 0 0 10px; font-size: 20px; font-weight: 700; color: #e8edf5;">Build Winning Accumulator Tickets</h3>
+   <p style="margin: 0 auto 16px; font-size: 14px; line-height: 1.6; max-width: 440px; color: rgba(232,237,245,0.55);">Generate optimized accumulator combinations from today's AI-powered predictions. Set your target odds and get instant ticket suggestions.</p>
+   <a href="/ticket-builder.html" style="display: inline-block; background: linear-gradient(135deg, #ff2448, #d41a38); color: #fff; padding: 12px 32px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 15px;">Free Ticket Builder &rarr;</a>
+  </div>
+
+ </div>
+</article>
+
+<div class="social-share">
+ <span>Share:</span>
+ <a href="https://www.facebook.com/sharer/sharer.php?u=${url}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#1877f2;color:#fff;border-radius:8px;font-size:13px;font-weight:600" aria-label="Share on Facebook">Facebook</a>
+ <a href="https://twitter.com/intent/tweet?text=${enc(a.share)}&url=${url}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#000;color:#fff;border-radius:8px;font-size:13px;font-weight:600" aria-label="Share on X">X (Twitter)</a>
+ <a href="https://wa.me/?text=${enc(a.share)}%20${url}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#25d366;color:#fff;border-radius:8px;font-size:13px;font-weight:600" aria-label="Share on WhatsApp">WhatsApp</a>
+</div>
+
+<footer>
+ <div class="footer-content container">
+  <div style="text-align:center;margin-bottom:24px;">
+   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p>
+   <a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;font-weight:600;font-size:14px;">In-Play Tips</a>
+  </div>
+  <div class="footer-links">
+   <a href="/">Home</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/2-odds-of-the-day.html">2 Odds</a>
+   <a href="/best-picks.html">Best Picks</a>
+   <a href="/author-picks.html">Author Picks</a>
+   <a href="/blog/">Blog</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/predictions/1x2">1X2</a>
+   <a href="/predictions/over-1-5">Over 1.5</a>
+   <a href="/predictions/over-2-5">Over 2.5</a>
+   <a href="/predictions/btts">BTTS Yes</a>
+   <a href="/predictions/btts-no">BTTS No</a>
+   <a href="/predictions/unbeaten">Unbeaten</a>
+   <a href="/predictions/corners">Corners</a>
+   <a href="/predictions/cards">Cards</a>
+   <a href="/advertise.html">Advertise</a>
+   <a href="/contact.html">Contact</a>
+   <a href="/terms.html">Terms</a>
+   <a href="/privacy.html">Privacy</a>
+  </div>
+  <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
+ </div>
+ <div style="text-align:center;padding:12px 0;"><button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">Light</button></div>
+</footer>
+
+ <script>
+ document.getElementById('hamburger')?.addEventListener('click', function() {
+   this.classList.toggle('active');
+   document.getElementById('nav')?.classList.toggle('open');
+ });
+ </script>
+ <script>
+ (function() {
+   const saved = localStorage.getItem("wf-theme");
+   const theme = saved || "dark";
+   document.documentElement.setAttribute("data-theme", theme === "dark" ? "" : "light");
+   const btn = document.getElementById("themeToggle");
+   if (btn) btn.textContent = theme === "dark" ? "Light" : "Dark";
+ })();
+ document.addEventListener("DOMContentLoaded", function() {
+   const btn = document.getElementById("themeToggle");
+   if (!btn) return;
+   btn.addEventListener("click", function() {
+     const html = document.documentElement;
+     const isLight = html.getAttribute("data-theme") === "light";
+     if (isLight) {
+       html.removeAttribute("data-theme");
+       btn.textContent = "Light";
+       localStorage.setItem("wf-theme", "dark");
+     } else {
+       html.setAttribute("data-theme", "light");
+       btn.textContent = "Dark";
+       localStorage.setItem("wf-theme", "light");
+     }
+   });
+ });
+ </script>
+ <!-- Google Analytics 4 -->
+ <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>
+ <script>
+ window.dataLayer = window.dataLayer || [];
+ function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date());
+ gtag('config', 'G-HMGZMW9EDP');
+ </script>
+ <script>window.__initialFcp = window.performance ? performance.getEntriesByName('first-contentful-paint')[0]?.startTime : 0;</script>
+ <script src="/config.js"></script>
+ <script src="/supabase-client.js"></script>
+ <script src="/auth.js?v=20260801"></script>
+<script src="/chat-widget.js" async></script>
+<script src="/responsible-gambling.js"></script>
+</body>
+</html>
+`;
+}
+
+function main() {
+  const dataFile = process.argv[2];
+  if (!dataFile) { console.error('Usage: node scripts/generate-article.js <data-file.json>'); process.exit(1); }
+  const items = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
+  let addenda = {};
+  if (fs.existsSync(ADDENDA_FILE)) {
+    try {
+      const list = JSON.parse(fs.readFileSync(ADDENDA_FILE, 'utf8'));
+      for (const a of list) addenda[a.slug] = a.addendum;
+    } catch (e) { console.error('Could not load addenda.json:', e.message); }
+  }
+  let count = 0;
+  for (const a of items) {
+    if (!a.slug) { console.error('Missing slug for an item'); continue; }
+    if (addenda[a.slug]) a.content += addenda[a.slug];
+    const html = articleHtml(a);
+    fs.writeFileSync(path.join(BLOG_DIR, `${a.slug}.html`), html);
+    console.log(`Wrote ${a.slug}.html`);
+    count++;
+  }
+  console.log(`Done: ${count} article(s).`);
+}
+
+if (require.main === module) main();
+module.exports = { articleHtml, esc };
