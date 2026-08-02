@@ -8,12 +8,19 @@ function getChangedUrls() {
   const before = process.env.INDEXNOW_BEFORE_SHA;
   const after = process.env.INDEXNOW_AFTER_SHA || 'HEAD';
   if (!before || /^0+$/.test(before)) {
-    throw new Error('A previous commit SHA is required to determine changed URLs.');
+    console.log('IndexNow: no previous commit SHA (first push) — skipping URL submission.');
+    return [];
   }
 
-  const changedFiles = execFileSync('git', ['diff', '--name-only', before, after, '--', 'public'], { encoding: 'utf8' })
-    .split(/\r?\n/)
-    .filter(Boolean);
+  let changedFiles;
+  try {
+    changedFiles = execFileSync('git', ['diff', '--name-only', before, after, '--', 'public'], { encoding: 'utf8' })
+      .split(/\r?\n/)
+      .filter(Boolean);
+  } catch (err) {
+    console.warn(`IndexNow: could not diff ${before}..${after} (${err.message}). Skipping URL submission.`);
+    return [];
+  }
 
   const urls = changedFiles
     .filter((file) => file.endsWith('.html'))

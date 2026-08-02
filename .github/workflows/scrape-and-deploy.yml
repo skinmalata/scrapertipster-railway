@@ -85,7 +85,11 @@ jobs:
 
       - name: Submit changed URLs to IndexNow
         if: github.event_name == 'push'
-        run: node scripts/submit-indexnow.js
+        run: |
+          if [[ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]]; then
+            git fetch --quiet --depth 1 origin "${{ github.event.before }}" || true
+          fi
+          node scripts/submit-indexnow.js
         env:
           INDEXNOW_BEFORE_SHA: ${{ github.event.before }}
           INDEXNOW_AFTER_SHA: ${{ github.sha }}
