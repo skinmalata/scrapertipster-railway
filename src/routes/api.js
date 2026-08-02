@@ -1731,8 +1731,9 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
     }
 
     // History — build from the server's own local prediction + result caches
-    // first (reliable from Render, no external fetch). Fall back to the
-    // CI-enriched CDN predictions, then to author-picks files.
+    // first (reliable from Render, no external fetch). Merge in any results
+    // embedded in the CI-enriched CDN predictions to fill score gaps. Fall
+    // back to the CDN predictions entirely, then to author-picks files.
     var history = [];
     try {
       var HISTORY_KEYS = [
@@ -1744,7 +1745,42 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
         { key: 'cornersMatches', label: 'Corners', type: 'corners' },
         { key: 'cardsMatches', label: 'Cards', type: 'cards' }
       ];
+
+      // Try to enrich scores with CI-published CDN results (reachable via
+      // github.io). Each match has an embedded `result` for past dates.
+      var cdnPred = null;
+      var PRED_ORIGINS = [
+        'https://winfulltime.com/data/predictions.json',
+        'https://skinmalata.github.io/scrapertipster-railway/data/predictions.json'
+      ];
+      for (var predOriginIdx = 0; predOriginIdx < PRED_ORIGINS.length; predOriginIdx++) {
+        try {
+          var cdnRes = await fetch(PRED_ORIGINS[predOriginIdx], { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }, signal: AbortSignal.timeout(10000) });
+          var candidate = await cdnRes.json();
+          if (candidate && Array.isArray(candidate.matches) && candidate.matches.length > 0) { cdnPred = candidate; break; }
+        } catch (e) {}
+      }
+
+      // Per-date result maps: local cache first, then CDN-embedded results.
+      var resultsByDate = {};
       var localResults = (getScraperService().getResultsCache && getScraperService().getResultsCache()) || {};
+      Object.keys(localResults).forEach(function(d) {
+        if (/^\d{4}-\d{2}-\d{2}$/.test(d)) resultsByDate[d] = Object.assign({}, localResults[d]);
+      });
+      if (cdnPred) {
+        HISTORY_KEYS.forEach(function(mk) {
+          var arr = Array.isArray(cdnPred[mk.key]) ? cdnPred[mk.key] : [];
+          arr.forEach(function(m) {
+            var d = String(m.date || '').slice(0, 10);
+            if (!d || !(m.result && typeof m.result.home === 'number')) return;
+            var key = m.match || m.nextMatch || '';
+            if (!key) return;
+            if (!resultsByDate[d]) resultsByDate[d] = {};
+            resultsByDate[d][key] = m.result;
+          });
+        });
+      }
+
       var localByDate = {};
       HISTORY_KEYS.forEach(function(mk) {
         var arr = Array.isArray(preds[mk.key]) ? preds[mk.key] : [];
@@ -1762,7 +1798,7 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
       });
       Object.keys(localByDate).sort().slice(-3).forEach(function(d) {
         var dayPicks = [];
-        var dayResults = localResults[d] || {};
+        var dayResults = resultsByDate[d] || {};
         CATEGORY_DEFS.forEach(function(def) {
           var entry = localByDate[d][def.type];
           if (!entry) return;
