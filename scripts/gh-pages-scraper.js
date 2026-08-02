@@ -367,6 +367,7 @@ function updateSitemapCore() {
     { loc: 'https://winfulltime.com/analysis.html', changefreq: 'daily', priority: '0.8' },
     { loc: 'https://winfulltime.com/about.html', changefreq: 'monthly', priority: '0.7' },
     { loc: 'https://winfulltime.com/contact.html', changefreq: 'monthly', priority: '0.5' },
+    { loc: 'https://winfulltime.com/policy.html', changefreq: 'monthly', priority: '0.4' },
     { loc: 'https://winfulltime.com/privacy.html', changefreq: 'monthly', priority: '0.4' },
     { loc: 'https://winfulltime.com/terms.html', changefreq: 'monthly', priority: '0.4' },
     { loc: 'https://winfulltime.com/advertise.html', changefreq: 'monthly', priority: '0.6' },
