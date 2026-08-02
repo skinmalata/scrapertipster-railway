@@ -478,64 +478,74 @@ const { buildGoldenTips } = require('./src/services/goldenOpportunities');
 const { buildGiantPool } = require('./src/services/authorPicks');
 const { startTelegramBot } = require('./src/services/telegramBot');
 const { startMastodonBot } = require('./src/services/mastodonBot');
-startLiveScrapeLoop();
 
-// Refresh pre-match predictions on startup if stale or missing, then every 12h.
-(async function refreshPredictionsOnBoot() {
+// The pre-match scrape (fetchPredictions), the Author Picks build
+// (buildGiantPool) and the FotMob live scrape all buffer large responses in
+// the same V8 heap. Running them concurrently at boot repeatedly blew past the
+// 384MB heap cap and aborted the process (exit 134 / SIGABRT). Serialize them
+// through one promise chain so heavy jobs always run one at a time.
+let heavyJobChain = Promise.resolve();
+function runHeavyExclusive(job) {
+  const run = heavyJobChain.then(job, job);
+  heavyJobChain = run.catch(function () {});
+  return run;
+}
+
+function heapMB() {
   try {
-    const memMB = Math.round(process.memoryUsage().heapUsed / 1024 / 1024);
-    if (memMB > 350) {
-      console.warn('[startup] Skipping pre-match refresh — memory too high (' + memMB + 'MB)');
-      return;
-    }
+    return Math.round(process.memoryUsage().heapUsed / 1024 / 1024);
+  } catch (e) {
+    return 0;
+  }
+}
+
+async function refreshPreMatchPredictions() {
+  forceRestartIfMemoryCritical();
+  if (heapMB() > 350) {
+    console.warn('[prematch] Skipping refresh — memory too high (' + heapMB() + 'MB)');
+    return;
+  }
+  try {
     const cached = getScraperService().loadCachedPredictions();
     if (!cached || cached.isStale || !cached.matches || !cached.matches.length) {
-      console.log('[startup] Pre-match cache missing or stale, refreshing...');
+      console.log('[prematch] Cache missing or stale, refreshing...');
       await getScraperService().fetchPredictions();
-      console.log('[startup] Pre-match predictions refreshed');
+      console.log('[prematch] Predictions refreshed');
     } else {
-      console.log('[startup] Pre-match cache OK, matches:', cached.matches.length);
+      console.log('[prematch] Cache OK, matches:', cached.matches.length);
     }
   } catch (e) {
-    console.error('[startup] Pre-match refresh failed:', e.message);
+    console.error('[prematch] Refresh failed:', e.message);
   }
-})();
-setInterval(async function() {
+}
+
+async function refreshAuthorPicks() {
   forceRestartIfMemoryCritical();
   try {
-    const memMB = Math.round(process.memoryUsage().heapUsed / 1024 / 1024);
-    if (memMB > 380) {
-      console.warn('[cron] Skipping pre-match refresh — memory too high (' + memMB + 'MB)');
-      return;
-    }
-    console.log('[cron] Refreshing pre-match predictions...');
-    await getScraperService().fetchPredictions();
-    console.log('[cron] Pre-match predictions refreshed');
+    console.log('[author-picks] Building Author Picks pool...');
+    const result = await buildGiantPool();
+    console.log('[author-picks] Ready:', result.analyzedFixtures, 'analyzed of', result.totalFixtures, 'fixtures');
   } catch (e) {
-    console.error('[cron] Pre-match refresh failed:', e.message);
+    console.error('[author-picks] Build failed:', e.message);
   }
+}
+
+// Boot: refresh pre-match predictions first, then build Author Picks, then
+// start the live scrape loop — never overlapping, so the combined memory of
+// the heavy jobs never sits in the heap at the same time.
+runHeavyExclusive(refreshPreMatchPredictions)
+  .then(function () { return runHeavyExclusive(refreshAuthorPicks); })
+  .then(function () { startLiveScrapeLoop(); })
+  .catch(function (e) { console.error('[boot] Heavy job chain failed:', e.message); });
+
+// Refresh pre-match predictions every 12h (serialized against other heavy jobs).
+setInterval(function () {
+  runHeavyExclusive(refreshPreMatchPredictions);
 }, 12 * 60 * 60 * 1000);
 
-// Pre-build Author Picks on startup, then refresh every 6h, so visitors never
-// wait for the heavy multi-minute build (it has its own once-per-day cache).
-(async function buildAuthorPicksOnBoot() {
-  try {
-    console.log('[startup] Building Author Picks pool...');
-    const result = await buildGiantPool();
-    console.log('[startup] Author Picks ready:', result.analyzedFixtures, 'analyzed of', result.totalFixtures, 'fixtures');
-  } catch (e) {
-    console.error('[startup] Author Picks build failed:', e.message);
-  }
-})();
-setInterval(async function() {
-  forceRestartIfMemoryCritical();
-  try {
-    console.log('[cron] Refreshing Author Picks pool...');
-    const result = await buildGiantPool();
-    console.log('[cron] Author Picks refreshed:', result.analyzedFixtures, 'analyzed of', result.totalFixtures, 'fixtures');
-  } catch (e) {
-    console.error('[cron] Author Picks refresh failed:', e.message);
-  }
+// Refresh Author Picks every 6h (serialized against other heavy jobs).
+setInterval(function () {
+  runHeavyExclusive(refreshAuthorPicks);
 }, 6 * 60 * 60 * 1000);
 
 function getLiveTipsFromCache() {
