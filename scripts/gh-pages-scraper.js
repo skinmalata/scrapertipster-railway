@@ -436,6 +436,42 @@ function updateSitemapCore() {
   }
   const analysisXml = analysisEntries.join('\n');
 
+  // Prerendered League Hub Pages (/predictions/league/slug/).
+  const leagueDir = path.join(process.cwd(), 'public', 'predictions', 'league');
+  const leagueEntries = [];
+  if (fs.existsSync(leagueDir)) {
+    fs.readdirSync(leagueDir).forEach(slug => {
+      if (!/^[\w-]+$/.test(slug)) return;
+      const page = path.join(leagueDir, slug, 'index.html');
+      if (!fs.existsSync(page)) return;
+      leagueEntries.push(`  <url>
+    <loc>https://winfulltime.com/predictions/league/${slug}/</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>`);
+    });
+  }
+  const leagueXml = leagueEntries.join('\n');
+
+  // Prerendered Evergreen H2H Pages (/h2h/slug/).
+  const h2hDir = path.join(process.cwd(), 'public', 'h2h');
+  const h2hEntries = [];
+  if (fs.existsSync(h2hDir)) {
+    fs.readdirSync(h2hDir).forEach(slug => {
+      if (!/^[\w-]+$/.test(slug)) return;
+      const page = path.join(h2hDir, slug, 'index.html');
+      if (!fs.existsSync(page)) return;
+      h2hEntries.push(`  <url>
+    <loc>https://winfulltime.com/h2h/${slug}/</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>`);
+    });
+  }
+  const h2hXml = h2hEntries.join('\n');
+
   const coreXml = coreUrls.map(u => `  <url>
     <loc>${u.loc}</loc>
     <lastmod>${today}</lastmod>
@@ -447,12 +483,14 @@ function updateSitemapCore() {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${coreXml}
 ${analysisXml}
+${leagueXml}
+${h2hXml}
 ${blogEntries}
 </urlset>
 `;
 
   fs.writeFileSync(sitemapPath, sitemap);
-  console.log('Sitemap updated with all live prediction categories');
+  console.log('Sitemap updated with all live prediction categories, league hubs, and H2H pages');
 }
 
 function rebuildStatic() {
