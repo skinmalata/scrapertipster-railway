@@ -1,0 +1,183 @@
+'use strict';
+
+const { decodeSportybet, decodeMsport, createSportybetCode, createMsportCode } = require('./sportradar');
+const { decodeBet9ja, createBet9jaCode } = require('./bet9ja');
+const { BOOKMAKERS, requireResolvable } = require('./matcher');
+
+const MAX_LEGS = 30;
+
+// Short in-memory cache so the same code is not re-sent to the bookmaker on
+// every click. 5 minutes TTL keeps returned odds current enough for a preview.
+const CACHE_TTL_MS = 5 * 60 * 1000;
+const CACHE_MAX = 200;
+const resultCache = new Map();
+
+function cacheGet(key) {
+  const entry = resultCache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.at > CACHE_TTL_MS) {
+    resultCache.delete(key);
+    return null;
+  }
+  return entry.value;
+}
+
+function cacheSet(key, value) {
+  if (resultCache.size >= CACHE_MAX) {
+    const oldestKey = resultCache.keys().next().value;
+    if (oldestKey) resultCache.delete(oldestKey);
+  }
+  resultCache.set(key, { at: Date.now(), value: value });
+}
+
+// Passive provider health: remembers the last upstream failure per bookmaker so
+// /api/converter/status can report when a provider is unreachable.
+const providerHealth = {};
+function recordProviderFailure(bookmaker, err) {
+  if (!bookmaker || !err) return;
+  const isUpstream = err.code === 'NETWORK_ERROR' || err.code === 'NO_CODE' || err.code === 'UPSTREAM_ERROR';
+  if (isUpstream) providerHealth[bookmaker] = Date.now();
+}
+function providerStatus() {
+  const now = Date.now();
+  return BOOKMAKERS.map(function (b) {
+    const last = providerHealth[b];
+    return {
+      bookmaker: b,
+      bookmakerName: LABELS[b],
+      healthy: !last || (now - last) > 60 * 1000,
+      lastFailureAt: last ? new Date(last).toISOString() : null
+    };
+  });
+}
+
+const DECODERS = {
+  sportybet: decodeSportybet,
+  msport: decodeMsport,
+  bet9ja: decodeBet9ja
+};
+
+const LABELS = {
+  sportybet: 'SportyBet',
+  msport: 'MSport',
+  bet9ja: 'Bet9ja'
+};
+
+function badRequest(message) {
+  const err = new Error(message);
+  err.code = 'BAD_REQUEST';
+  return err;
+}
+
+function normalizeCode(raw) {
+  return String(raw || '').trim().toUpperCase();
+}
+
+function assertBookmaker(bookmaker) {
+  if (!BOOKMAKERS.includes(bookmaker)) {
+    throw badRequest('Unknown bookmaker "' + bookmaker + '". Choose sportybet, msport or bet9ja.');
+  }
+}
+
+function totalOdds(legs) {
+  let product = 1;
+  let hasOdds = false;
+  for (const leg of legs) {
+    const odd = Number(leg.odds);
+    if (Number.isFinite(odd) && odd > 0) {
+      product *= odd;
+      hasOdds = true;
+    }
+  }
+  return hasOdds ? Number(product.toFixed(2)) : null;
+}
+
+async function decodeCode(input) {
+  const code = normalizeCode(input && input.code);
+  const bookmaker = input && input.bookmaker;
+  if (!code) throw badRequest('Please enter a booking code.');
+  assertBookmaker(bookmaker);
+
+  const cacheKey = 'd:' + bookmaker + ':' + code;
+  const cached = cacheGet(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const legs = await DECODERS[bookmaker](code);
+    if (legs.length > MAX_LEGS) {
+      const err = new Error('Booking codes with more than ' + MAX_LEGS + ' selections are not supported.');
+      err.code = 'TOO_MANY_LEGS';
+      throw err;
+    }
+
+    const result = {
+      code: code,
+      bookmaker: bookmaker,
+      bookmakerName: LABELS[bookmaker],
+      legs: legs,
+      legCount: legs.length,
+      totalOdds: totalOdds(legs)
+    };
+    cacheSet(cacheKey, result);
+    return result;
+  } catch (err) {
+    recordProviderFailure(bookmaker, err);
+    throw err;
+  }
+}
+
+function keepLegsFilter(legs, keepLegs) {
+  if (!Array.isArray(keepLegs) || !keepLegs.length) return legs;
+  const indices = keepLegs.map(Number).filter(function (n) { return Number.isFinite(n); });
+  const kept = legs.filter(function (leg, index) { return indices.includes(index); });
+  if (!kept.length) throw badRequest('None of the selected legs are part of this code.');
+  return kept;
+}
+
+async function createCode(bookmaker, legs) {
+  if (bookmaker === 'bet9ja') return createBet9jaCode(legs);
+  if (bookmaker === 'msport') return createMsportCode(legs);
+  return createSportybetCode(legs);
+}
+
+async function convertCode(input) {
+  const code = normalizeCode(input && input.code);
+  const from = input && input.from;
+  const to = input && input.to;
+  if (!code) throw badRequest('Please enter a booking code.');
+  assertBookmaker(from);
+  assertBookmaker(to);
+
+  const keepLegs = (input && input.keepLegs) || [];
+  const cacheKey = 'c:' + from + ':' + to + ':' + code + ':' + keepLegs.join(',');
+  const cached = cacheGet(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const source = await decodeCode({ code: code, bookmaker: from });
+    let legs = source.legs;
+    legs = keepLegsFilter(legs, keepLegs);
+
+    if (from !== to) requireResolvable(from, to);
+
+    const newCode = await createCode(to, legs);
+
+    const result = {
+      code: newCode,
+      from: from,
+      fromName: LABELS[from],
+      to: to,
+      toName: LABELS[to],
+      legCount: legs.length,
+      totalOdds: totalOdds(legs)
+    };
+    cacheSet(cacheKey, result);
+    return result;
+  } catch (err) {
+    recordProviderFailure(from, err);
+    recordProviderFailure(to, err);
+    throw err;
+  }
+}
+
+module.exports = { decodeCode, convertCode, providerStatus, BOOKMAKERS, LABELS, MAX_LEGS };

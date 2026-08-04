@@ -7,6 +7,7 @@ const path = require('path');
 const axios = require('axios');
 const apiRoutes = require('./src/routes/api');
 const chatRoutes = require('./src/routes/chat');
+const bookingCodeRoutes = require('./src/routes/bookingCodes');
 const { applyLayout, staticWithLayout } = require('./src/templates/layout');
 const { forceRestartIfMemoryCritical, startMemoryWatchdog } = require('./src/services/memoryGuard');
 
@@ -220,6 +221,18 @@ const apiLimiter = rateLimit({
 app.use('/api/golden-tips', apiLimiter);
 app.use('/api/live-tips', apiLimiter);
 
+// Booking code converter calls live bookmaker APIs per request, so it gets a
+// tighter limit than the internal endpoints to avoid the site being throttled
+// by SportyBet/MSport/Bet9ja on behalf of its visitors.
+const converterLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please slow down.' }
+});
+app.use('/api/converter', converterLimiter);
+
 
 
 // Redirect old ?category= query params to clean URLs
@@ -284,6 +297,7 @@ app.use(express.static('public', {
 // API Routes (optional local/dev API — production site is GitHub Pages)
 app.use('/api', apiRoutes);
 app.use('/api', chatRoutes);
+app.use('/api', bookingCodeRoutes);
 
 // RSS Feed
 const RSS_FEED_ARTICLES_FILE = path.join(__dirname, 'articles-manifest.json');

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+ <meta charset="UTF-8">
+
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+ <title>Free Booking Code Converter | SportyBet, MSport &amp; Bet9ja - WinFulltime</title>
+
+ <meta name="description" content="Convert SportyBet, MSport and Bet9ja booking codes into playable codes for another bookmaker, free. Decode any code and preview every selection, market and odds before you share it.">
+ <meta name="keywords" content="booking code converter, sportybet code converter, msport code converter, bet9ja code converter, convert betting code, free booking code, decode booking code, betting code generator">
+
+ <meta property="og:title" content="Free Booking Code Converter - WinFulltime">
+ <meta property="og:url" content="https://winfulltime.com/converter.html">
+ <meta property="og:description" content="Decode and convert SportyBet, MSport and Bet9ja booking codes for free. Preview every selection, market and odds, then generate a fresh code in the bookmaker you use.">
+ <meta property="og:image" content="https://winfulltime.com/winfulltimelogo.png">
+ <meta property="og:type" content="website">
+
+ <meta name="twitter:card" content="summary_large_image">
+ <meta name="twitter:title" content="Free Booking Code Converter - WinFulltime">
+ <meta name="twitter:description" content="Decode and convert SportyBet, MSport and Bet9ja booking codes for free.">
+ <meta name="twitter:image" content="https://winfulltime.com/winfulltimelogo.png">
+
+ <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+ <link rel="canonical" href="https://winfulltime.com/converter.html">
+
+ <link rel="icon" href="/icons/icon-192.png" type="image/png">
+ <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+ <link rel="manifest" href="/manifest.json">
+ <meta name="theme-color" content="#ff2448">
+ <meta name="apple-mobile-web-app-capable" content="yes">
+ <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+ <meta name="apple-mobile-web-app-title" content="WinFulltime">
+ <link rel="stylesheet" href="/styles.css">
+ <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Free Booking Code Converter",
+    "url": "https://winfulltime.com/converter.html",
+    "description": "Free booking code converter for SportyBet, MSport and Bet9ja. Decode any code, preview every selection, market and odds, and convert it into a fresh code for another bookmaker.",
+    "applicationCategory": "SportsApplication",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "publisher": {
+      "@type": "Organization",
+      "name": "WinFulltime",
+      "url": "https://winfulltime.com",
+      "logo": { "@type": "ImageObject", "url": "https://winfulltime.com/winfulltimelogo.png", "width": 128, "height": 128 }
+    }
+  }
+ </script>
+ <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How does the booking code converter work?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Enter a SportyBet, MSport or Bet9ja booking code and choose the bookmaker you want a new code for. The converter decodes the code into its individual selections, then builds a fresh booking code from those selections for the target bookmaker. Codes are re-read and validated by the target bookmaker before they are returned." }
+      },
+      {
+        "@type": "Question",
+        "name": "Which bookmakers does the converter support?",
+        "acceptedAnswer": { "@type": "Answer", "text": "SportyBet, MSport and Bet9ja. SportyBet and MSport use the same betting platform IDs, so codes convert between them directly. Bet9ja codes can be decoded and recreated in Bet9ja; cross-conversion between Bet9ja and SportyBet/MSport is being rolled out." }
+      },
+      {
+        "@type": "Question",
+        "name": "Are there any limits on booking codes?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Booking codes support up to 30 selections and are valid until the first match in the code starts. Only pre-match selections can be converted." }
+      },
+      {
+        "@type": "Question",
+        "name": "Is the converter free?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. The booking code converter is completely free and requires no account or sign-in." }
+      }
+    ]
+  }
+ </script>
+ <style>
+  .converter-wrap { max-width: 860px; margin: 0 auto; padding: 8px 0 48px; }
+  .cv-card {
+    background: var(--card-bg, #1d2438);
+    border: 1px solid var(--border, rgba(255,255,255,0.08));
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 18px;
+  }
+  .cv-field { margin-bottom: 14px; }
+  .cv-field label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted, #94a3b8); margin-bottom: 6px; }
+  .cv-field select, .cv-field input[type="text"] {
+    width: 100%;
+    background: var(--bg-primary, #181e30);
+    border: 1px solid var(--border, rgba(255,255,255,0.12));
+    border-radius: 10px;
+    color: var(--text-primary, #e8edf5);
+    font-size: 15px;
+    padding: 12px 14px;
+    box-sizing: border-box;
+  }
+  .cv-field select:focus, .cv-field input[type="text"]:focus { outline: none; border-color: #ff2448; }
+  .cv-arrow { text-align: center; font-size: 20px; color: var(--text-muted, #94a3b8); padding: 4px 0; }
+  .cv-actions { display: flex; gap: 10px; margin-top: 6px; flex-wrap: wrap; }
+  .cv-btn {
+    flex: 1;
+    min-width: 200px;
+    border: none;
+    border-radius: 10px;
+    padding: 13px 18px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    color: #fff;
+    background: linear-gradient(135deg, #ff2448, #d41a38);
+    transition: opacity 0.2s;
+  }
+  .cv-btn:disabled { opacity: 0.5; cursor: wait; }
+  .cv-btn.secondary { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+  .cv-status { display: none; margin-top: 14px; padding: 13px 16px; border-radius: 10px; font-size: 14px; line-height: 1.5; }
+  .cv-status.show { display: block; }
+  .cv-status.error { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.4); color: #fca5a5; }
+  .cv-status.info { background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.4); color: #93c5fd; }
+  .cv-legs { list-style: none; margin: 0; padding: 0; }
+  .cv-leg { display: flex; align-items: center; gap: 12px; padding: 12px 4px; border-bottom: 1px solid var(--border, rgba(255,255,255,0.07)); }
+  .cv-leg:last-child { border-bottom: none; }
+  .cv-leg-index { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: rgba(255,36,72,0.15); color: #ff7e7e; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .cv-leg-info { flex: 1; min-width: 0; }
+  .cv-leg-event { font-size: 14px; font-weight: 600; color: var(--text-primary, #e8edf5); }
+  .cv-leg-market { font-size: 12.5px; color: var(--text-muted, #94a3b8); margin-top: 2px; }
+  .cv-leg-odds { flex-shrink: 0; font-size: 15px; font-weight: 700; color: #4ade80; }
+  .cv-summary { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 6px; padding-top: 16px; }
+  .cv-summary strong { color: #ff7e7e; }
+  .cv-code-result { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .cv-code-value { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 18px; font-weight: 700; letter-spacing: 1px; color: #4ade80; word-break: break-all; }
+  .cv-copy {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--border, rgba(255,255,255,0.15));
+    border-radius: 8px;
+    color: var(--text-primary, #e8edf5);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  .cv-note { font-size: 12.5px; color: var(--text-muted, #94a3b8); line-height: 1.6; margin-top: 6px; }
+  .cv-loading { display: none; text-align: center; padding: 18px 0; color: var(--text-muted, #94a3b8); font-size: 14px; }
+  @media (max-width: 600px) {
+    .cv-btn { min-width: 100%; }
+  }
+ </style>
+</head>
+
+<body>
+
+ <nav class="breadcrumbs" aria-label="Breadcrumb">
+  <ol>
+   <li><a href="/">Home</a></li>
+   <li aria-current="page">Code Converter</li>
+  </ol>
+ </nav>
+
+ <main class="container">
+
+  <div class="hero">
+   <h1>Free Booking Code Converter</h1>
+   <p class="hero-subtext">Decode any SportyBet, MSport or Bet9ja booking code, preview every selection, and generate a fresh code for the bookmaker you use.</p>
+  </div>
+
+  <div class="converter-wrap">
+
+   <div class="cv-card">
+    <div class="cv-field">
+     <label for="cvCode">Booking Code</label>
+     <input type="text" id="cvCode" placeholder="Paste your booking code, e.g. 8C4K2X..." autocomplete="off" spellcheck="false">
+    </div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;">
+     <div class="cv-field" style="flex:1;min-width:180px;">
+      <label for="cvFrom">From Bookmaker</label>
+      <select id="cvFrom">
+       <option value="sportybet">SportyBet</option>
+       <option value="msport">MSport</option>
+       <option value="bet9ja">Bet9ja</option>
+      </select>
+     </div>
+     <div class="cv-field" style="flex:1;min-width:180px;">
+      <label for="cvTo">Convert To</label>
+      <select id="cvTo">
+       <option value="sportybet">SportyBet</option>
+       <option value="bet9ja">Bet9ja</option>
+       <option value="msport">MSport</option>
+      </select>
+     </div>
+    </div>
+    <div class="cv-actions">
+     <button class="cv-btn" id="cvDecodeBtn">Decode &amp; Preview</button>
+     <button class="cv-btn secondary" id="cvConvertBtn">Convert Code</button>
+    </div>
+    <div class="cv-status" id="cvStatus"></div>
+    <div class="cv-loading" id="cvLoading">Working with the bookmaker&#8230;</div>
+   </div>
+
+   <div class="cv-card" id="cvPreviewCard" style="display:none;">
+    <h2 style="margin:0 0 4px;font-size:18px;">Code Preview</h2>
+    <div class="cv-note" id="cvPreviewMeta"></div>
+    <ul class="cv-legs" id="cvLegs"></ul>
+    <div class="cv-summary">
+     <div>Total Odds: <strong id="cvTotalOdds">&ndash;</strong></div>
+     <div>Selections: <strong id="cvLegCount">&ndash;</strong></div>
+    </div>
+   </div>
+
+   <div class="cv-card" id="cvResultCard" style="display:none;">
+    <h2 style="margin:0 0 4px;font-size:18px;">Your New Code</h2>
+    <div class="cv-note" id="cvResultMeta"></div>
+    <div class="cv-code-result">
+     <span class="cv-code-value" id="cvNewCode">--</span>
+     <button class="cv-copy" id="cvCopyBtn">Copy</button>
+    </div>
+   </div>
+
+   <div class="cv-card">
+    <h2 style="margin:0 0 10px;font-size:16px;">How it works &amp; limits</h2>
+     <div class="cv-note">
+      <strong>SportyBet &harr; MSport</strong> convert directly because both run on the same betting platform. Bet9ja codes can be decoded and recreated in Bet9ja; converting between Bet9ja and SportyBet/MSport is being rolled out and will be enabled here as soon as the matching feed is ready. Bet9ja code creation currently supports 1X2 selections only.<br>
+      Codes support up to <strong>30 selections</strong> and expire once the first match in the code kicks off. Only pre-match selections can be converted, and codes are region-locked to Nigeria (NG).
+     </div>
+   </div>
+
+  </div>
+
+ </main>
+
+ <script>
+ (function () {
+   var statusEl = document.getElementById('cvStatus');
+   var loadingEl = document.getElementById('cvLoading');
+   var previewCard = document.getElementById('cvPreviewCard');
+   var resultCard = document.getElementById('cvResultCard');
+   var legsEl = document.getElementById('cvLegs');
+   var fromSel = document.getElementById('cvFrom');
+   var toSel = document.getElementById('cvTo');
+
+   var BOOKMAKER_NAMES = { sportybet: 'SportyBet', msport: 'MSport', bet9ja: 'Bet9ja' };
+   var API_BASE = window.WFT_API || 'https://winfulltime-api.onrender.com';
+
+   // Cross-family conversion (Bet9ja <-> SportyBet/MSport) is not available
+   // yet, so those To options are disabled when they cannot work.
+   function refreshToOptions() {
+     var from = fromSel.value;
+     var opts = toSel.options;
+     var firstEnabled = null;
+     for (var i = 0; i < opts.length; i++) {
+       var disabled = (from === 'bet9ja') !== (opts[i].value === 'bet9ja');
+       opts[i].disabled = disabled;
+       if (!disabled && firstEnabled === null) firstEnabled = i;
+     }
+     if (toSel.selectedIndex === -1 || opts[toSel.selectedIndex].disabled) {
+       toSel.selectedIndex = firstEnabled !== null ? firstEnabled : 0;
+     }
+   }
+
+   fromSel.addEventListener('change', refreshToOptions);
+   refreshToOptions();
+
+   function showStatus(msg, type) {
+     statusEl.textContent = msg;
+     statusEl.className = 'cv-status show' + (type ? ' ' + type : '');
+     loadingEl.style.display = 'none';
+   }
+
+   function clearStatus() {
+     statusEl.textContent = '';
+     statusEl.className = 'cv-status';
+   }
+
+   function setLoading(on) {
+     loadingEl.style.display = on ? 'block' : 'none';
+     document.getElementById('cvDecodeBtn').disabled = on;
+     document.getElementById('cvConvertBtn').disabled = on;
+   }
+
+    async function api(path, body) {
+      var res = await fetch(API_BASE + path, {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify(body)
+     });
+     var data = await res.json().catch(function () { return {}; });
+     if (!res.ok || !data.success) {
+       var err = new Error(data.error || 'Something went wrong. Please try again.');
+       err.code = data.code;
+       throw err;
+     }
+     return data;
+   }
+
+   function renderLegs(legs) {
+     legsEl.innerHTML = '';
+     legs.forEach(function (leg, i) {
+       var li = document.createElement('li');
+       li.className = 'cv-leg';
+
+       var index = document.createElement('span');
+       index.className = 'cv-leg-index';
+       index.textContent = String(i + 1);
+
+       var info = document.createElement('div');
+       info.className = 'cv-leg-info';
+       var event = document.createElement('div');
+       event.className = 'cv-leg-event';
+       event.textContent = leg.eventName || leg.eventId || ('Selection ' + (i + 1));
+       var market = document.createElement('div');
+       market.className = 'cv-leg-market';
+       market.textContent = [leg.competition, leg.marketName, leg.outcomeName].filter(Boolean).join(' \u00b7 ') || leg.marketId;
+       info.appendChild(event);
+       info.appendChild(market);
+
+       var odds = document.createElement('span');
+       odds.className = 'cv-leg-odds';
+       odds.textContent = leg.odds ? '@ ' + leg.odds : '';
+
+       li.appendChild(index);
+       li.appendChild(info);
+       li.appendChild(odds);
+       legsEl.appendChild(li);
+     });
+   }
+
+   function formatOdds(v) {
+     if (v === null || v === undefined) return '\u2013';
+     return Number(v).toFixed(2);
+   }
+
+   async function doDecode() {
+     var code = document.getElementById('cvCode').value.trim();
+     if (!code) { showStatus('Please enter a booking code.', 'error'); return; }
+     resultCard.style.display = 'none';
+     previewCard.style.display = 'none';
+     clearStatus();
+     setLoading(true);
+     try {
+       var data = await api('/api/converter/decode', { code: code, bookmaker: fromSel.value });
+       document.getElementById('cvPreviewMeta').textContent = BOOKMAKER_NAMES[data.bookmaker] + ' code \u00b7 ' + data.legCount + ' selection' + (data.legCount === 1 ? '' : 's');
+       document.getElementById('cvTotalOdds').textContent = formatOdds(data.totalOdds);
+       document.getElementById('cvLegCount').textContent = data.legCount;
+       renderLegs(data.legs);
+       previewCard.style.display = 'block';
+       showStatus('Code decoded successfully.', 'info');
+       previewCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+     } catch (err) {
+       showStatus(err.message, 'error');
+     } finally {
+       setLoading(false);
+     }
+   }
+
+   async function doConvert() {
+     var code = document.getElementById('cvCode').value.trim();
+     if (!code) { showStatus('Please enter a booking code.', 'error'); return; }
+     resultCard.style.display = 'none';
+     clearStatus();
+     setLoading(true);
+     try {
+       var data = await api('/api/converter/convert', { code: code, from: fromSel.value, to: toSel.value });
+       document.getElementById('cvResultMeta').textContent = data.fromName + ' \u2192 ' + data.toName + ' \u00b7 ' + data.legCount + ' selection' + (data.legCount === 1 ? '' : 's') + (data.totalOdds ? ' \u00b7 total odds ' + Number(data.totalOdds).toFixed(2) : '');
+       document.getElementById('cvNewCode').textContent = data.code;
+       resultCard.style.display = 'block';
+       showStatus('New code generated successfully. It is valid until the first match kicks off.', 'info');
+       resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+     } catch (err) {
+       showStatus(err.message, 'error');
+     } finally {
+       setLoading(false);
+     }
+   }
+
+   document.getElementById('cvDecodeBtn').addEventListener('click', doDecode);
+   document.getElementById('cvConvertBtn').addEventListener('click', doConvert);
+   document.getElementById('cvCopyBtn').addEventListener('click', function () {
+     var code = document.getElementById('cvNewCode').textContent;
+     if (!code || code === '--') return;
+     navigator.clipboard.writeText(code).then(function () {
+       var btn = document.getElementById('cvCopyBtn');
+       btn.textContent = 'Copied!';
+       setTimeout(function () { btn.textContent = 'Copy'; }, 1600);
+     });
+   });
+
+   document.getElementById('cvCode').addEventListener('keydown', function (e) {
+     if (e.key === 'Enter') doDecode();
+   });
+ })();
+ </script>
+
+</body>
+
+</html>

@@ -1,0 +1,86 @@
+'use strict';
+
+const axios = require('axios');
+
+const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+
+function sportradarHeaders(origin) {
+  return {
+    'User-Agent': BROWSER_UA,
+    Accept: 'application/json, text/javascript, */*; q=0.01',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Current-Country': 'NG',
+    Origin: origin,
+    Referer: origin + '/ng/sport/soccer'
+  };
+}
+
+function bet9jaHeaders() {
+  return {
+    'User-Agent': BROWSER_UA,
+    Accept: 'application/json, text/javascript, */*; q=0.01',
+    'Accept-Language': 'en-US,en;q=0.9',
+    Referer: 'https://coupon.bet9ja.com/',
+    Origin: 'https://coupon.bet9ja.com'
+  };
+}
+
+function wrapUpstreamError(err, label) {
+  const status = err && err.response ? err.response.status : null;
+  const reason = status
+    ? (label + ' returned an error (HTTP ' + status + ').')
+    : 'Could not reach ' + label + '.';
+  const wrapped = new Error(reason + ' Please try again shortly.');
+  wrapped.code = 'NETWORK_ERROR';
+  return wrapped;
+}
+
+async function getJson(url, headers, timeout) {
+  try {
+    const res = await axios.get(url, { headers, timeout: timeout || 15000, validateStatus: function () { return true; } });
+    if (res.status >= 500) {
+      const wrapped = new Error('The bookmaker service is temporarily unavailable (HTTP ' + res.status + ').');
+      wrapped.code = 'NETWORK_ERROR';
+      throw wrapped;
+    }
+    return res.data;
+  } catch (err) {
+    if (err.code === 'NETWORK_ERROR') throw err;
+    throw wrapUpstreamError(err, 'the bookmaker service');
+  }
+}
+
+async function postJson(url, body, headers, timeout) {
+  try {
+    const res = await axios.post(url, body, { headers, timeout: timeout || 15000, validateStatus: function () { return true; } });
+    if (res.status >= 500) {
+      const wrapped = new Error('The bookmaker service is temporarily unavailable (HTTP ' + res.status + ').');
+      wrapped.code = 'NETWORK_ERROR';
+      throw wrapped;
+    }
+    return res.data;
+  } catch (err) {
+    if (err.code === 'NETWORK_ERROR') throw err;
+    throw wrapUpstreamError(err, 'the bookmaker service');
+  }
+}
+
+async function postForm(url, formBody, headers, timeout) {
+  const params = new URLSearchParams();
+  for (const key of Object.keys(formBody)) params.append(key, formBody[key]);
+  const fullHeaders = Object.assign({ 'Content-Type': 'application/x-www-form-urlencoded' }, headers);
+  try {
+    const res = await axios.post(url, params.toString(), { headers: fullHeaders, timeout: timeout || 15000, validateStatus: function () { return true; } });
+    if (res.status >= 500) {
+      const wrapped = new Error('The bookmaker service is temporarily unavailable (HTTP ' + res.status + ').');
+      wrapped.code = 'NETWORK_ERROR';
+      throw wrapped;
+    }
+    return res.data;
+  } catch (err) {
+    if (err.code === 'NETWORK_ERROR') throw err;
+    throw wrapUpstreamError(err, 'the bookmaker service');
+  }
+}
+
+module.exports = { sportradarHeaders, bet9jaHeaders, getJson, postJson, postForm, BROWSER_UA };
