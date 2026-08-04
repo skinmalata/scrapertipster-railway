@@ -156,11 +156,11 @@ ${generateH2hFaqSchema(home, away)}
 
 <div class="matchup-header">
   <div style="font-size:13px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;font-weight:600;">Head to Head Statistics</div>
-  <div class="team-names">
+  <h1 class="team-names" style="margin:0;">
     <div>${escapeHtml(home)}</div>
     <div class="vs-badge">VS</div>
     <div>${escapeHtml(away)}</div>
-  </div>
+  </h1>
   <p style="color:var(--text-secondary);margin:0;font-size:14px;">${escapeHtml(league || 'Football')} ${country ? `(${escapeHtml(country)})` : ''}</p>
 </div>
 

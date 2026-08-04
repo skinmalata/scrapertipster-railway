@@ -27,14 +27,18 @@ function generateDateArchivePage(dateStr, resultsList) {
   let totalCount = 0;
   let wonCount = 0;
 
-  const resultCardsHtml = (resultsList || []).map(r => {
-    totalCount++;
+  const allMatches = resultsList || [];
+  totalCount = allMatches.length;
+  wonCount = allMatches.filter(r => r.status === 'WON' || r.win === true).length;
+
+  const MAX_CARDS = 200;
+  const cardsToShow = allMatches.slice(0, MAX_CARDS);
+  const resultCardsHtml = cardsToShow.map(r => {
     const home = escapeHtml(r.home || r.homeTeam || 'Home');
     const away = escapeHtml(r.away || r.awayTeam || 'Away');
     const score = escapeHtml(r.score || r.ft || 'FT');
     const tip = escapeHtml(r.tip || r.prediction || '1X2');
     const won = r.status === 'WON' || r.win === true;
-    if (won) wonCount++;
 
     return `
     <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;">
@@ -102,6 +106,7 @@ function generateDateArchivePage(dateStr, resultsList) {
 <h2 style="font-size:20px;font-weight:700;margin-bottom:16px;">Match Results for ${escapeHtml(dateTitle)}</h2>
 <div>
   ${resultCardsHtml || '<p style="color:var(--text-secondary);">No archived match results recorded for this date.</p>'}
+  ${allMatches.length > MAX_CARDS ? `<p style="color:var(--text-secondary);font-size:13px;margin-top:12px;">Showing the first ${MAX_CARDS} of ${allMatches.length} settled matches for ${escapeHtml(dateTitle)}.</p>` : ''}
 </div>
 
 <section class="seo-content">
