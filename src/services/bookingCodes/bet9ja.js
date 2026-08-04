@@ -24,7 +24,11 @@ function toGame(id, game) {
     GID: game.GID || '',
     SGID: game.SGID || '',
     SPORT_ID: Number(game.SPORT_ID || 1),
-    odds_display: Number(game.V || 1)
+    odds_display: Number(game.V || 1),
+    eventName: game.E_NAME || '',
+    marketName: game.M_NAME || '',
+    outcomeName: String(game.SGN || ''),
+    odds: Number(game.V || 1)
   };
 }
 

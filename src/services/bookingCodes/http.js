@@ -35,13 +35,21 @@ function wrapUpstreamError(err, label) {
   return wrapped;
 }
 
+function blockedError(status) {
+  const wrapped = new Error(
+    status === 429
+      ? 'The bookmaker service is rate-limiting requests right now. Please try again shortly.'
+      : 'The bookmaker service blocked the request (HTTP ' + status + '). Please try again shortly.'
+  );
+  wrapped.code = 'NETWORK_ERROR';
+  return wrapped;
+}
+
 async function getJson(url, headers, timeout) {
   try {
     const res = await axios.get(url, { headers, timeout: timeout || 15000, validateStatus: function () { return true; } });
-    if (res.status >= 500) {
-      const wrapped = new Error('The bookmaker service is temporarily unavailable (HTTP ' + res.status + ').');
-      wrapped.code = 'NETWORK_ERROR';
-      throw wrapped;
+    if (res.status >= 500 || res.status === 429 || res.status === 403) {
+      throw blockedError(res.status);
     }
     return res.data;
   } catch (err) {
@@ -53,10 +61,8 @@ async function getJson(url, headers, timeout) {
 async function postJson(url, body, headers, timeout) {
   try {
     const res = await axios.post(url, body, { headers, timeout: timeout || 15000, validateStatus: function () { return true; } });
-    if (res.status >= 500) {
-      const wrapped = new Error('The bookmaker service is temporarily unavailable (HTTP ' + res.status + ').');
-      wrapped.code = 'NETWORK_ERROR';
-      throw wrapped;
+    if (res.status >= 500 || res.status === 429 || res.status === 403) {
+      throw blockedError(res.status);
     }
     return res.data;
   } catch (err) {
@@ -71,10 +77,8 @@ async function postForm(url, formBody, headers, timeout) {
   const fullHeaders = Object.assign({ 'Content-Type': 'application/x-www-form-urlencoded' }, headers);
   try {
     const res = await axios.post(url, params.toString(), { headers: fullHeaders, timeout: timeout || 15000, validateStatus: function () { return true; } });
-    if (res.status >= 500) {
-      const wrapped = new Error('The bookmaker service is temporarily unavailable (HTTP ' + res.status + ').');
-      wrapped.code = 'NETWORK_ERROR';
-      throw wrapped;
+    if (res.status >= 500 || res.status === 429 || res.status === 403) {
+      throw blockedError(res.status);
     }
     return res.data;
   } catch (err) {
