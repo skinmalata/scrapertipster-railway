@@ -101,6 +101,15 @@ h3 { font-size: 18px; margin-bottom: 16px; font-weight: 700; border-bottom: 1px 
 .disclaimer strong { color: #ff2448; }
 p { color: #c8d0db; line-height: 1.7; }
 a { color: #ff2448; }
+.crumbs { font-size: 13px; color: #94a3b8; margin-bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+.crumbs a { color: #94a3b8; text-decoration: none; }
+.crumbs a:hover { color: #e8edf5; }
+.watch-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.watch-list li { position: relative; padding-left: 18px; color: #cbd5e1; font-size: 14px; line-height: 1.6; }
+.watch-list li::before { content: ''; position: absolute; left: 0; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: linear-gradient(135deg, #ff2448, #d41a38); }
+.cta-links { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+.cta-link { display: inline-block; padding: 9px 16px; background: rgba(255,36,72,0.12); border: 1px solid rgba(255,36,72,0.35); color: #ff7e7e; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 13px; transition: background 0.2s; }
+.cta-link:hover { background: rgba(255,36,72,0.2); }
 footer { background: #1e2538; border-top: 1px solid rgba(255,255,255,0.06); padding: 40px 16px 32px; margin-top: 20px; }
 .footer-content { max-width: 960px; margin: 0 auto; text-align: center; }
 .footer-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -161,7 +170,9 @@ footer { background: #1e2538; border-top: 1px solid rgba(255,255,255,0.06); padd
 
  }
 
-</script>
+ </script>
+
+ <script type="application/ld+json" id="seoJsonLd"></script>
 
  <!-- Google tag (gtag.js) -->
 

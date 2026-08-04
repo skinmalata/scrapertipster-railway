@@ -19,6 +19,13 @@ const PRERENDER_DIR = path.join(process.cwd(), 'public', 'analysis');
 const ANALYSIS_TEMPLATE_FILE = path.join(process.cwd(), 'public', 'analysis.html');
 const SITE_URL = 'https://winfulltime.com';
 
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const RETENTION_DAYS = 90;
+
+function validDateStr(s) {
+  return DATE_RE.test(String(s || '')) ? String(s) : '';
+}
+
 const COMMON_WORDS = new Set(['fc', 'sc', 'ac', 'rc', 'us', 'ud', 'utd', 'as', 'ss', 'cf', 'cd', 'de', 'da', 'do', 'el', 'la', 'le', 'il', 'al', 'united', 'city', 'club', 'team', 'sporting', 'athletic', 'association', 'real', 'inter', 'san', 'saint', 'st']);
 
 function httpGet(url) {
@@ -306,9 +313,12 @@ function slugifyTeam(name) {
   return String(name || '')
     .toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .split('(')[0]
     .replace(/['’]/g, '')
     .replace(/&/g, 'and')
+    .replace(/\b(?:fc|afc|cf|sc|ac)\b/g, ' ')
     .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '');
 }
 
@@ -345,12 +355,23 @@ function renderNoDataCard(team, note) {
   return '<div class="analysis-card"><h4>' + escapeHtml(cleanTeamName(team)) + '</h4><p style="margin:0;color:rgba(232,237,245,0.55);font-size:13px;line-height:1.5;">' + note + '</p></div>';
 }
 
-function buildContentHtml(analysis, home, away) {
+function buildContentHtml(analysis, home, away, matchup, dateStr) {
   const homeName = analysis.homeTeam || home;
   const awayName = analysis.awayTeam || away;
   const h2h = analysis.h2h || [];
   const summary = analysis.summary || '';
   let html = '';
+
+  const today = new Date().toISOString().slice(0, 10);
+  const infoBits = [];
+  if (dateStr) infoBits.push(escapeHtml(dateStr));
+  if (matchup && matchup.league) infoBits.push(escapeHtml(matchup.league));
+  if (matchup && matchup.country) infoBits.push(escapeHtml(matchup.country));
+  if (matchup && matchup.time) infoBits.push('KO ' + escapeHtml(matchup.time));
+  if (infoBits.length) {
+    html += '<div class="analysis-section" style="padding:12px 20px;"><p style="margin:0;color:#94a3b8;font-size:13px;line-height:1.6;">' +
+      infoBits.join(' &middot; ') + ' &middot; Updated ' + escapeHtml(today) + '</p></div>';
+  }
 
   const formCards = [];
   const homeHasForm = sideHasTeamData(analysis.homeForm, analysis.homeLast10);
@@ -396,6 +417,39 @@ function buildContentHtml(analysis, home, away) {
   if (summary) {
     html += '<div class="summary-section"><h3>Match Summary</h3><div class="summary-text"><p>' + escapeHtml(summary) + '</p></div></div>';
   }
+
+  const watch = [];
+  const homeWins = (analysis.homeForm || '').match(/W/g) || [];
+  const awayWins = (analysis.awayForm || '').match(/W/g) || [];
+  if (homeHasForm && awayHasForm && homeWins.length !== awayWins.length) {
+    const leader = homeWins.length > awayWins.length ? cleanTeamName(homeName) : cleanTeamName(awayName);
+    watch.push(leader + ' arrive with stronger recent form (' + Math.max(homeWins.length, awayWins.length) + ' wins in their last five against ' + Math.min(homeWins.length, awayWins.length) + ' for the opposition).');
+  }
+  const homeScored = Number((analysis.homeLast10 || {}).avgScored || 0);
+  const awayScored = Number((analysis.awayLast10 || {}).avgScored || 0);
+  if (homeScored + awayScored > 0) {
+    const combined = (homeScored + awayScored).toFixed(1);
+    watch.push('The sides average a combined ' + combined + ' goals scored per game over their last 10 outings, pointing to ' + (combined >= 2.5 ? 'an open contest with goals likely at both ends.' : 'a tighter, lower-scoring affair.'));
+  }
+  const homeH2HWins = h2h.filter(function (h) { return h.homeGoals > h.awayGoals; }).length;
+  const awayH2HWins = h2h.filter(function (h) { return h.awayGoals > h.homeGoals; }).length;
+  if (h2h.length > 0 && (homeH2HWins || awayH2HWins)) {
+    const dominant = homeH2HWins > awayH2HWins ? cleanTeamName(homeName) : cleanTeamName(awayName);
+    watch.push('Head-to-head history favours ' + dominant + ' with ' + Math.max(homeH2HWins, awayH2HWins) + ' wins in the last ' + h2h.length + ' meetings.');
+  }
+  if (watch.length) {
+    html += '<div class="analysis-section"><h3>What to Watch</h3><ul class="watch-list">' +
+      watch.map(function (w) { return '<li>' + escapeHtml(w) + '</li>'; }).join('') +
+      '</ul></div>';
+  }
+
+  html += '<div class="cta-links">' +
+    '<a href="/" class="cta-link">Today\'s Predictions</a>' +
+    '<a href="/predictions/1x2" class="cta-link">1X2</a>' +
+    '<a href="/predictions/over-2-5" class="cta-link">Over 2.5 Goals</a>' +
+    '<a href="/predictions/btts" class="cta-link">BTTS</a>' +
+    '<a href="/ticket-builder.html" class="cta-link">Ticket Builder</a>' +
+    '</div>';
   html += '<div class="disclaimer"><p><strong>18+ Only</strong></p><p>Predictions are for informational purposes only. Gambling involves financial risk and may lead to addiction. Please play responsibly.</p></div>';
   return html;
 }
@@ -408,9 +462,12 @@ function buildUnavailableHtml() {
     '<div class="disclaimer"><p><strong>18+ Only</strong></p><p>Predictions are for informational purposes only. Gambling involves financial risk and may lead to addiction. Please play responsibly.</p></div>';
 }
 
-function buildStaticPage(home, away, slug, analysis, template) {
+function buildStaticPage(matchup, slug, analysis, template, dateStr) {
+  const home = matchup.home;
+  const away = matchup.away;
+  const today = new Date().toISOString().slice(0, 10);
   const cleanTitle = (home + ' vs ' + away).trim();
-  const url = SITE_URL + '/analysis/' + slug + '/';
+  const url = SITE_URL + '/analysis/' + dateStr + '/' + slug + '/';
   const hasContent = !!analysis;
   const desc = hasContent
     ? cleanTitle + ' - detailed football match analysis: recent form, head-to-head results, team statistics and a betting summary.'
@@ -419,10 +476,39 @@ function buildStaticPage(home, away, slug, analysis, template) {
   let page = template;
   page = page.replace('<title>Match Analysis - WinFulltime</title>', '<title>' + escapeHtml(cleanTitle + ' - Analysis - WinFulltime') + '</title>');
   page = page.replace('<meta name="description" content="Detailed football match analysis including recent form, head-to-head statistics, team performance metrics, and predictions.">', '<meta name="description" content="' + escapeHtml(desc) + '">');
-  page = page.replace('<link rel="canonical" href="https://winfulltime.com/analysis.html">', '<link rel="canonical" href="' + url + '">');
+  page = page.replace('<meta name="keywords" content="match analysis, football analysis, team statistics, head to head, h2h">', '<meta name="keywords" content="' + escapeHtml(home + ' vs ' + away + ', ' + (matchup.league || '') + ', ' + (matchup.country || '') + ', match analysis, football analysis, team statistics, head to head, h2h').replace(/\s+/g, ' ').trim() + '">');
+  page = page.replace('<link rel="canonical" href="https://winfulltime.com/analysis.html">', '<link rel="canonical" href="' + url + '">\n <meta property="article:published_time" content="' + escapeHtml(dateStr || today) + '">\n <meta property="article:modified_time" content="' + escapeHtml(today) + '">');
   page = page.replace('<meta property="og:title" content="Match Analysis - WinFulltime">', '<meta property="og:title" content="' + escapeHtml(cleanTitle + ' - Analysis - WinFulltime') + '">');
   page = page.replace('<meta property="og:description" content="Detailed football match analysis with statistics and predictions.">', '<meta property="og:description" content="' + escapeHtml(desc) + '">');
   page = page.replace('<meta name="robots" content="index, follow">', hasContent ? '<meta name="robots" content="index, follow">' : '<meta name="robots" content="noindex, nofollow">');
+
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL + '/' },
+          { '@type': 'ListItem', position: 2, name: 'Match Analysis', item: SITE_URL + '/analysis.html' },
+          { '@type': 'ListItem', position: 3, name: cleanTitle, item: url }
+        ]
+      },
+      {
+        '@type': 'SportsEvent',
+        name: cleanTitle,
+        url: url,
+        description: desc,
+        startDate: (dateStr && matchup.time) ? dateStr + 'T' + matchup.time + ':00' : (dateStr || today),
+        eventStatus: 'https://schema.org/EventScheduled',
+        eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+        location: { '@type': 'Place', name: matchup.country || matchup.league || 'Football match' },
+        homeTeam: { '@type': 'SportsTeam', name: cleanTeamName(home) },
+        awayTeam: { '@type': 'SportsTeam', name: cleanTeamName(away) }
+      }
+    ]
+  };
+  const schemaHtml = '<script type="application/ld+json">' + JSON.stringify(schema).replace(/</g, '\\u003c') + '</script>';
+  page = page.replace('<script type="application/ld+json" id="seoJsonLd"></script>', schemaHtml);
 
   const start = page.indexOf('<div id="staticContent">');
   if (start < 0) throw new Error('Template missing <div id="staticContent">');
@@ -440,14 +526,15 @@ function buildStaticPage(home, away, slug, analysis, template) {
   }
   scriptClose += '</script>'.length;
 
-  const body = hasContent ? buildContentHtml(analysis, home, away) : buildUnavailableHtml();
-  const contentHtml = '<h1 id="matchTitle" style="font-size: 28px; margin-bottom: 20px;">' + escapeHtml(cleanTitle) + '</h1>\n\n<div id="content" style="display: block;">\n' + body + '\n</div>\n';
+  const body = hasContent ? buildContentHtml(analysis, home, away, matchup, dateStr) : buildUnavailableHtml();
+  const contentHtml = '<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><a href="/analysis.html">Match Analysis</a><span>/</span><span aria-current="page">' + escapeHtml(cleanTitle) + '</span></nav>\n' +
+    '<h1 id="matchTitle" style="font-size: 28px; margin-bottom: 20px;">' + escapeHtml(cleanTitle) + '</h1>\n\n<div id="content" style="display: block;">\n' + body + '\n</div>\n';
 
   return page.slice(0, start) + contentHtml + page.slice(scriptClose);
 }
 
 function writePrerenderedPages(matchups, result, links, template) {
-  const usedSlugs = new Set();
+  const used = new Set();
   fs.mkdirSync(PRERENDER_DIR, { recursive: true });
   let written = 0;
   matchups.forEach(function (m, i) {
@@ -456,16 +543,17 @@ function writePrerenderedPages(matchups, result, links, template) {
     if (!analysis || isEmptyAnalysis(analysis)) return;
     let slug = matchupSlug(m.home, m.away);
     if (!slug) slug = 'match-' + (i + 1);
+    const date = validDateStr(m.date) || new Date().toISOString().slice(0, 10);
     let finalSlug = slug;
     let n = 2;
-    while (usedSlugs.has(finalSlug)) {
+    while (used.has(date + '/' + finalSlug)) {
       finalSlug = slug + '-' + (n++);
     }
-    usedSlugs.add(finalSlug);
-    links[key] = '/analysis/' + finalSlug + '/';
+    used.add(date + '/' + finalSlug);
+    links[key] = '/analysis/' + date + '/' + finalSlug + '/';
 
-    const page = buildStaticPage(m.home, m.away, finalSlug, analysis, template);
-    const dir = path.join(PRERENDER_DIR, finalSlug);
+    const page = buildStaticPage(m, finalSlug, analysis, template, date);
+    const dir = path.join(PRERENDER_DIR, date, finalSlug);
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, 'index.html'), page);
     written++;
@@ -473,14 +561,48 @@ function writePrerenderedPages(matchups, result, links, template) {
   fs.mkdirSync(path.dirname(LINKS_FILE), { recursive: true });
   fs.writeFileSync(LINKS_FILE, JSON.stringify(links));
 
-  fs.readdirSync(PRERENDER_DIR).forEach(function (d) {
-    if (usedSlugs.has(d)) return;
-    const dir = path.join(PRERENDER_DIR, d);
-    if (!fs.statSync(dir).isDirectory()) return;
-    fs.rmSync(dir, { recursive: true, force: true });
-  });
+  if (written > 0) pruneAnalysisDirs(used);
 
   console.log('[analysis] Prerendered', written, 'static pages to', PRERENDER_DIR);
+}
+
+// Dated URLs archive fixtures by match date. Never delete recent pages (that
+// would churn indexed URLs into 404s); only remove legacy undated directories
+// from before this migration, prune stale children inside current dated dirs,
+// and drop dated archives older than the retention window.
+function pruneAnalysisDirs(used) {
+  if (!fs.existsSync(PRERENDER_DIR)) return;
+  const today = new Date().toISOString().slice(0, 10);
+  const cutoff = addDays(today, -RETENTION_DAYS);
+  const activeDates = new Set();
+  used.forEach(function (p) { activeDates.add(p.split('/')[0]); });
+  let removed = 0;
+  fs.readdirSync(PRERENDER_DIR).forEach(function (d) {
+    const dir = path.join(PRERENDER_DIR, d);
+    if (!fs.statSync(dir).isDirectory()) return;
+    if (!validDateStr(d)) {
+      fs.rmSync(dir, { recursive: true, force: true });
+      removed++;
+      return;
+    }
+    if (activeDates.has(d)) {
+      fs.readdirSync(dir).forEach(function (child) {
+        if (used.has(d + '/' + child)) return;
+        fs.rmSync(path.join(dir, child), { recursive: true, force: true });
+        removed++;
+      });
+      if (fs.readdirSync(dir).length === 0) {
+        fs.rmSync(dir, { recursive: true, force: true });
+        removed++;
+      }
+      return;
+    }
+    if (d < cutoff) {
+      fs.rmSync(dir, { recursive: true, force: true });
+      removed++;
+    }
+  });
+  if (removed) console.log('[analysis] Pruned', removed, 'stale/legacy analysis directories');
 }
 
 function collectMatchups(predictions) {
@@ -500,10 +622,21 @@ function collectMatchups(predictions) {
       const home = teams[0].trim();
       const away = teams[1].trim();
       if (!home || !away) return;
-      const key = home.toLowerCase() + '|' + away.toLowerCase();
-      if (seen.has(key)) return;
-      seen.add(key);
-      out.push({ home: home, away: away, date: m.date || predictions.date || '' });
+      const canonKey = slugifyTeam(home) + '|' + slugifyTeam(away);
+      if (!canonKey || canonKey === '|') return;
+      // Dedupe on the canonical slug pair so the same fixture listed under
+      // slightly different names (e.g. "Queens Park" vs "Queens Park FC")
+      // produces a single dated page instead of near-duplicate URLs.
+      if (seen.has(canonKey)) return;
+      seen.add(canonKey);
+      out.push({
+        home: home,
+        away: away,
+        date: m.date || predictions.date || '',
+        league: m.league || '',
+        country: m.country || '',
+        time: m.time || ''
+      });
     });
   });
   return out;

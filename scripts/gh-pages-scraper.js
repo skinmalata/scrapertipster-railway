@@ -404,24 +404,35 @@ function updateSitemapCore() {
     })
     .join('\n');
 
-  // Prerendered match-analysis pages (only indexable ones are listed).
+  // Prerendered match-analysis pages. Pages live under dated directories
+  // (/analysis/YYYY-MM-DD/slug/) so archives persist; only recent, indexable
+  // ones are listed. Legacy undated directories are excluded.
   const analysisDir = path.join(process.cwd(), 'public', 'analysis');
   const analysisEntries = [];
+  const ANALYSIS_SITEMAP_DAYS = 60;
   if (fs.existsSync(analysisDir)) {
-    fs.readdirSync(analysisDir)
-      .filter(d => /^[\w-]+$/.test(d) && fs.statSync(path.join(analysisDir, d)).isDirectory())
-      .forEach(d => {
-        const page = path.join(analysisDir, d, 'index.html');
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - ANALYSIS_SITEMAP_DAYS);
+    const cutoffISO = cutoff.toISOString().split('T')[0];
+    fs.readdirSync(analysisDir).forEach(d => {
+      const dateDir = path.join(analysisDir, d);
+      if (!fs.statSync(dateDir).isDirectory()) return;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
+      if (d < cutoffISO) return;
+      fs.readdirSync(dateDir).forEach(slug => {
+        if (!/^[\w-]+$/.test(slug)) return;
+        const page = path.join(dateDir, slug, 'index.html');
         if (!fs.existsSync(page)) return;
         const robots = (fs.readFileSync(page, 'utf8').match(/<meta name="robots"[^>]*>/i) || [''])[0];
         if (/noindex/i.test(robots)) return;
         analysisEntries.push(`  <url>
-    <loc>https://winfulltime.com/analysis/${d}/</loc>
+    <loc>https://winfulltime.com/analysis/${d}/${slug}/</loc>
     <lastmod>${today}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>`);
       });
+    });
   }
   const analysisXml = analysisEntries.join('\n');
 
