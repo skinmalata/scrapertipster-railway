@@ -472,6 +472,42 @@ function updateSitemapCore() {
   }
   const h2hXml = h2hEntries.join('\n');
 
+  // Prerendered Team Profile Pages (/teams/slug/).
+  const teamDir = path.join(process.cwd(), 'public', 'teams');
+  const teamEntries = [];
+  if (fs.existsSync(teamDir)) {
+    fs.readdirSync(teamDir).forEach(slug => {
+      if (!/^[\w-]+$/.test(slug)) return;
+      const page = path.join(teamDir, slug, 'index.html');
+      if (!fs.existsSync(page)) return;
+      teamEntries.push(`  <url>
+    <loc>https://winfulltime.com/teams/${slug}/</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>`);
+    });
+  }
+  const teamXml = teamEntries.join('\n');
+
+  // Prerendered Date Archive Pages (/predictions/date/YYYY-MM-DD/).
+  const dateDir = path.join(process.cwd(), 'public', 'predictions', 'date');
+  const dateEntries = [];
+  if (fs.existsSync(dateDir)) {
+    fs.readdirSync(dateDir).forEach(d => {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
+      const page = path.join(dateDir, d, 'index.html');
+      if (!fs.existsSync(page)) return;
+      dateEntries.push(`  <url>
+    <loc>https://winfulltime.com/predictions/date/${d}/</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>never</changefreq>
+    <priority>0.6</priority>
+  </url>`);
+    });
+  }
+  const dateXml = dateEntries.join('\n');
+
   const coreXml = coreUrls.map(u => `  <url>
     <loc>${u.loc}</loc>
     <lastmod>${today}</lastmod>
@@ -485,17 +521,25 @@ ${coreXml}
 ${analysisXml}
 ${leagueXml}
 ${h2hXml}
+${teamXml}
+${dateXml}
 ${blogEntries}
 </urlset>
 `;
 
   fs.writeFileSync(sitemapPath, sitemap);
-  console.log('Sitemap updated with all live prediction categories, league hubs, and H2H pages');
+  console.log('Sitemap updated with all live prediction categories, league hubs, H2H pages, team profiles, and date archives');
 
   try {
     require('./generate-rss').main();
   } catch (e) {
     console.warn('RSS feed generation warning:', e.message);
+  }
+
+  try {
+    require('./submit-google-indexing').main();
+  } catch (e) {
+    console.warn('Google indexing submission note:', e.message);
   }
 }
 
