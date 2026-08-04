@@ -94,23 +94,35 @@ async function main() {
     console.log('[google-indexing] OAuth2 authentication successful!');
 
     let submitted = 0;
-    const sampleUrls = urls.slice(0, 100); // Process batch
+    const BATCH_SIZE = 50;
+    const DELAY_MS = 1000;
 
-    for (const url of sampleUrls) {
-      try {
-        await google.indexing({ version: 'v3', auth }).urlNotifications.publish({
-          requestBody: {
-            url: url,
-            type: 'URL_UPDATED'
-          }
-        });
-        submitted++;
-      } catch (err) {
-        console.warn(`[google-indexing] Failed to publish ${url}:`, err.message);
+    for (let i = 0; i < urls.length; i += BATCH_SIZE) {
+      const batch = urls.slice(i, i + BATCH_SIZE);
+      const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+      const totalBatches = Math.ceil(urls.length / BATCH_SIZE);
+      console.log(`[google-indexing] Processing batch ${batchNum}/${totalBatches} (${batch.length} URLs)...`);
+
+      for (const url of batch) {
+        try {
+          await google.indexing({ version: 'v3', auth }).urlNotifications.publish({
+            requestBody: {
+              url: url,
+              type: 'URL_UPDATED'
+            }
+          });
+          submitted++;
+        } catch (err) {
+          console.warn(`[google-indexing] Failed to publish ${url}:`, err.message);
+        }
+      }
+
+      if (i + BATCH_SIZE < urls.length) {
+        await new Promise(resolve => setTimeout(resolve, DELAY_MS));
       }
     }
 
-    console.log(`[google-indexing] Successfully published ${submitted}/${sampleUrls.length} URLs to Google Indexing API.`);
+    console.log(`[google-indexing] Successfully published ${submitted}/${urls.length} URLs to Google Indexing API.`);
   } catch (e) {
     console.warn('[google-indexing] Indexing API execution note (googleapis package required for live API call):', e.message);
   }

@@ -508,6 +508,29 @@ function updateSitemapCore() {
   }
   const dateXml = dateEntries.join('\n');
 
+  // Prerendered Matrix Pages (/predictions/{league}/{market}/).
+  const matrixDir = path.join(process.cwd(), 'public', 'predictions');
+  const matrixEntries = [];
+  if (fs.existsSync(matrixDir)) {
+    const MARKET_SLUGS = ['1x2', 'over-1-5', 'over-2-5', 'btts', 'btts-no', 'corners', 'cards'];
+    fs.readdirSync(matrixDir).forEach(leagueSlug => {
+      if (!/^[\w-]+$/.test(leagueSlug)) return;
+      const leagueDir = path.join(matrixDir, leagueSlug);
+      if (!fs.existsSync(leagueDir) || !fs.statSync(leagueDir).isDirectory()) return;
+      MARKET_SLUGS.forEach(marketSlug => {
+        const page = path.join(leagueDir, marketSlug, 'index.html');
+        if (!fs.existsSync(page)) return;
+        matrixEntries.push(`  <url>
+    <loc>https://winfulltime.com/predictions/${leagueSlug}/${marketSlug}/</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>`);
+      });
+    });
+  }
+  const matrixXml = matrixEntries.join('\n');
+
   const coreXml = coreUrls.map(u => `  <url>
     <loc>${u.loc}</loc>
     <lastmod>${today}</lastmod>
@@ -521,6 +544,7 @@ ${coreXml}
 ${analysisXml}
 ${leagueXml}
 ${h2hXml}
+${matrixXml}
 ${teamXml}
 ${dateXml}
 ${blogEntries}
@@ -528,7 +552,7 @@ ${blogEntries}
 `;
 
   fs.writeFileSync(sitemapPath, sitemap);
-  console.log('Sitemap updated with all live prediction categories, league hubs, H2H pages, team profiles, and date archives');
+  console.log(`Sitemap updated with all live prediction categories, league hubs, H2H pages, ${matrixEntries.length} matrix pages, team profiles, and date archives`);
 
   try {
     require('./generate-rss').main();

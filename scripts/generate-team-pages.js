@@ -2,166 +2,98 @@
 
 const fs = require('fs');
 const path = require('path');
+const { escapeHtml, slugifyTeam, generateFaqSchema, wrapPage } = require('./lib/layout');
 
 const PREDICTIONS_FILE = path.join(__dirname, '..', 'predictions-cache.json');
 const H2H_CACHE_FILE = path.join(__dirname, '..', 'h2h-unbeaten-cache.json');
 const RESULTS_FILE = path.join(__dirname, '..', 'results-cache.json');
 const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'teams');
 
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function slugifyTeam(name) {
+function slugifyLeague(name) {
   if (!name) return '';
-  return String(name)
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
-function generateTeamFaqSchema(teamName) {
-  const faqs = [
-    {
-      q: `How accurate are WinFulltime ${teamName} predictions?`,
-      a: `Our AI model calculates probabilities for ${teamName} by evaluating recent team form, goal scoring rates, defensive efficiency, head-to-head records, and home/away splits.`
-    },
-    {
-      q: `Where can I find upcoming match predictions for ${teamName}?`,
-      a: `All upcoming ${teamName} fixtures, odds analysis, and 1X2, Over 2.5, BTTS, and corner predictions are updated daily on WinFulltime.`
-    },
-    {
-      q: `Does ${teamName} perform better at home or away?`,
-      a: `Our team hub tracks home vs. away form splits, scoring metrics, and clean sheet rates for ${teamName} across all competitive fixtures.`
-    }
-  ];
-
-  return JSON.stringify({
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faqs.map(f => ({
-      '@type': 'Question',
-      name: f.q,
-      acceptedAnswer: { '@type': 'Answer', text: f.a }
-    }))
-  }, null, 2);
+  let s = String(name).toLowerCase().trim();
+  s = s.replace(/^[\w]+\s*-\s*/i, '');
+  s = s.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  return s || '';
 }
 
 function generateTeamPage(teamName, teamSlug, teamData) {
   const canonicalUrl = `https://winfulltime.com/teams/${teamSlug}/`;
-  const metaTitle = `${teamName} Betting Tips, Stats & Predictions | WinFulltime`;
-  const metaDesc = `Comprehensive betting statistics, recent form, head-to-head records, and upcoming match predictions for ${teamName}. Free data-driven football tips.`;
+  const leagueSlug = slugifyLeague(teamData.league || '');
+  const leagueName = teamData.league || 'Football';
+  const countryLabel = teamData.country ? ` \u2022 ${teamData.country}` : '';
 
-  const upcomingCardsHtml = (teamData.upcoming || []).map(m => `
+  const metaTitle = `${teamName} Betting Tips, Stats & Predictions | WinFulltime`;
+  const upcomingCount = (teamData.upcoming || []).length;
+  const streakCount = (teamData.streaks || []).length;
+  const metaDesc = upcomingCount > 0
+    ? `${teamName} next match prediction, recent form, and ${leagueName} betting statistics. ${upcomingCount} upcoming fixture${upcomingCount !== 1 ? 's' : ''} with AI-powered tips and probability scores.${streakCount > 0 ? ` ${streakCount} active streak${streakCount !== 1 ? 's' : ''} tracked.` : ''}`
+    : `${teamName} form history, head-to-head records, and ${leagueName} statistics. AI-powered prediction model covering 1X2, Over 2.5, BTTS, and corner markets.`;
+
+  const upcomingCardsHtml = (teamData.upcoming || []).map(m => {
+    const homeSlug = slugifyTeam(m.home);
+    const awaySlug = slugifyTeam(m.away);
+    return `
     <div class="match-card" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;">
-      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">⏱ ${escapeHtml(m.time || 'TBD')} | ${escapeHtml(m.league || 'Football')}</div>
-      <div style="font-weight:700;font-size:16px;">${escapeHtml(m.home)} vs ${escapeHtml(m.away)}</div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">\u23f1 ${escapeHtml(m.time || 'TBD')} | ${escapeHtml(m.league || 'Football')}</div>
+      <div style="font-weight:700;font-size:16px;">
+        <a href="/teams/${homeSlug}/" style="color:var(--text-primary);text-decoration:none;">${escapeHtml(m.home)}</a>
+         vs
+        <a href="/teams/${awaySlug}/" style="color:var(--text-primary);text-decoration:none;">${escapeHtml(m.away)}</a>
+      </div>
       <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;">
         <span style="background:rgba(255,36,72,0.15);color:var(--accent);padding:4px 10px;border-radius:6px;font-weight:700;font-size:13px;">Tip: ${escapeHtml(m.tip || '1X2')}</span>
-        <a href="/analysis/${m.date || new Date().toISOString().slice(0,10)}/${slugifyTeam(m.home)}-vs-${slugifyTeam(m.away)}/" style="color:var(--text-secondary);font-size:12px;text-decoration:none;font-weight:600;">View Analysis &rarr;</a>
+        <a href="/analysis/${m.date || new Date().toISOString().slice(0,10)}/${homeSlug}-vs-${awaySlug}/" style="color:var(--accent);font-size:12px;text-decoration:none;font-weight:600;">View Analysis &rarr;</a>
       </div>
-    </div>
-  `).join('\n') || '<p style="color:var(--text-secondary);">No upcoming matches listed today for this team.</p>';
+    </div>`;
+  }).join('\n') || `<p style="color:var(--text-secondary);">No upcoming ${escapeHtml(teamName)} fixtures scheduled today.</p>`;
 
   const streaksHtml = (teamData.streaks || []).map(s => `
     <div style="background:var(--bg-card);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:8px;padding:12px 16px;margin-bottom:10px;">
-      <span style="font-weight:700;color:var(--accent);font-size:14px;">🔥 ${s.count} Match Streak</span>
+      <span style="font-weight:700;color:var(--accent);font-size:14px;">\ud83d\udd25 ${s.count} Match Streak</span>
       <p style="margin:4px 0 0;font-size:13px;color:var(--text-secondary);">${escapeHtml(s.text)}</p>
     </div>
   `).join('\n');
 
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HMGZMW9EDP');</script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${escapeHtml(metaTitle)}</title>
-<meta name="description" content="${escapeHtml(metaDesc)}">
-<meta name="keywords" content="${escapeHtml(teamName)} betting tips, ${escapeHtml(teamName)} stats, ${escapeHtml(teamName)} predictions, ${escapeHtml(teamName)} form">
-<meta property="og:title" content="${escapeHtml(metaTitle)}">
-<meta property="og:url" content="${canonicalUrl}">
-<meta property="og:description" content="${escapeHtml(metaDesc)}">
-<meta property="og:image" content="https://winfulltime.com/winfulltimelogo.png">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="${escapeHtml(metaTitle)}">
-<meta name="twitter:description" content="${escapeHtml(metaDesc)}">
-<meta name="twitter:image" content="https://winfulltime.com/winfulltimelogo.png">
-<link rel="canonical" href="${canonicalUrl}">
-<link rel="icon" href="/icons/icon-192.png" type="image/png">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#ff2448">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css">
-<link rel="stylesheet" href="/app.css">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SportsTeam",
-  "name": "${escapeHtml(teamName)}",
-  "url": "${canonicalUrl}",
-  "memberOf": { "@type": "SportsOrganization", "name": "${escapeHtml(teamData.league || 'Football League')}" }
-}
-</script>
-<script type="application/ld+json">
-${generateTeamFaqSchema(teamName)}
-</script>
-<style>
-.crumbs{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);margin:16px 0 24px}
-.crumbs a{color:var(--text-secondary);text-decoration:none}
-.crumbs a:hover{color:var(--text-primary)}
-.team-hero{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:32px 24px;text-align:center;margin-bottom:32px}
-.seo-content{margin-top:48px;border-top:1px solid var(--border);padding-top:32px}
-.seo-content h2{font-size:22px;font-weight:700;margin-bottom:16px;color:var(--text-primary)}
-.faq-list{display:flex;flex-direction:column;gap:8px}
-.faq-item{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-.faq-item summary{padding:16px 20px;font-weight:600;font-size:15px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center}
-.faq-item summary::after{content:'+';font-size:18px;font-weight:700;color:var(--accent)}
-.faq-item[open] summary::after{content:'\\2212'}
-.faq-item p{padding:0 20px 16px;font-size:14px;line-height:1.6;color:var(--text-secondary);margin:0}
-</style>
-</head>
-<body>
-<div>
-<header>
-<div class="header-content">
-<div class="logo"><a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a></div>
-<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
-<nav id="nav">
-<a href="/">Home</a>
-<a href="/ticket-builder.html">Ticket Builder</a>
-<a href="/best-picks.html">Best Picks</a>
-<a href="/author-picks.html">Author Picks</a>
-<a href="/blog/">Blog</a>
-</nav>
-</div>
-</header>
-<main class="container">
-<nav class="crumbs" aria-label="Breadcrumb">
-  <a href="/">Home</a><span>/</span>
-  <a href="/predictions/1x2">Predictions</a><span>/</span>
-  <span aria-current="page">${escapeHtml(teamName)}</span>
-</nav>
+  const schemaJson = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'SportsTeam',
+    name: teamName,
+    sport: 'Soccer',
+    url: canonicalUrl,
+    memberOf: { '@type': 'SportsOrganization', name: leagueName }
+  }, null, 2);
 
+  const faqJson = generateFaqSchema([
+    {
+      q: `How accurate are WinFulltime ${teamName} predictions?`,
+      a: `Our AI model evaluates ${teamName}'s recent form, goal scoring rates, defensive efficiency, head-to-head records, and home/away splits to generate probability scores across 1X2, Over 2.5, BTTS, and corner markets.`
+    },
+    {
+      q: `When is ${teamName}'s next match?`,
+      a: upcomingCount > 0
+        ? `${teamName}'s next fixture is ${escapeHtml(teamData.upcoming[0].home)} vs ${escapeHtml(teamData.upcoming[0].away)}${teamData.upcoming[0].time ? ` at ${escapeHtml(teamData.upcoming[0].time)}` : ''}. Check this page for the latest prediction and probability score.`
+        : `There are no upcoming ${teamName} fixtures scheduled at this time. This page updates automatically when new matches are added to the schedule.`
+    },
+    {
+      q: `Does ${teamName} perform better at home or away?`,
+      a: `Our prediction model factors in ${teamName}'s home and away form splits, including scoring output, defensive solidity, and clean sheet rates across all competitive fixtures.`
+    }
+  ]);
+
+  const pageCss = `.team-hero{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:32px 24px;text-align:center;margin-bottom:32px}`;
+
+  const leagueLink = leagueSlug
+    ? `<a href="/predictions/league/${leagueSlug}/" style="color:var(--accent);text-decoration:none;font-weight:600;">${escapeHtml(leagueName)}</a>`
+    : escapeHtml(leagueName);
+
+  const body = `
 <div class="team-hero">
 <h1 style="font-size:28px;font-weight:800;margin-bottom:8px;">${escapeHtml(teamName)}</h1>
-<p style="color:var(--text-secondary);margin:0;font-size:14px;">${escapeHtml(teamData.league || 'Football')} ${teamData.country ? `(${escapeHtml(teamData.country)})` : ''}</p>
+<p style="color:var(--text-secondary);margin:0;font-size:14px;">${leagueLink}${countryLabel}</p>
 </div>
 
-${streaksHtml ? `<h2 style="font-size:20px;font-weight:700;margin-bottom:16px;">Team Streaks &amp; Form Badges</h2>${streaksHtml}` : ''}
+${streaksHtml ? `<h2 style="font-size:20px;font-weight:700;margin-bottom:16px;">Active Streaks &amp; Form</h2>${streaksHtml}` : ''}
 
 <h2 style="font-size:20px;font-weight:700;margin:24px 0 16px;">Upcoming Fixtures &amp; Predictions</h2>
 <div>
@@ -171,34 +103,40 @@ ${streaksHtml ? `<h2 style="font-size:20px;font-weight:700;margin-bottom:16px;">
 <section class="seo-content">
 <h2>About ${escapeHtml(teamName)} Predictions</h2>
 <p style="color:var(--text-secondary);line-height:1.7;margin-bottom:20px;">
-WinFulltime evaluates competitive data for ${escapeHtml(teamName)} to generate probability models across 1X2, Over 2.5 goals, Both Teams to Score (BTTS), and corner lines. Our statistical engine tracks form trends, offensive output, defensive solidity, and historical matchup data.
+WinFulltime tracks ${escapeHtml(teamName)} across all competitive fixtures to generate probability models for 1X2, Over 2.5 goals, Both Teams to Score (BTTS), and corner lines. Our statistical engine evaluates form trends, offensive output, defensive solidity, and head-to-head matchup data to produce data-driven betting recommendations.
 </p>
 
 <h2>Frequently Asked Questions</h2>
 <div class="faq-list">
   <details class="faq-item">
     <summary>How accurate are WinFulltime ${escapeHtml(teamName)} predictions?</summary>
-    <p>Our AI model calculates probabilities for ${escapeHtml(teamName)} by evaluating recent team form, goal scoring rates, defensive efficiency, head-to-head records, and home/away splits.</p>
+    <p>Our AI model evaluates ${escapeHtml(teamName)}'s recent form, goal scoring rates, defensive efficiency, head-to-head records, and home/away splits to generate probability scores across 1X2, Over 2.5, BTTS, and corner markets.</p>
   </details>
   <details class="faq-item">
-    <summary>Where can I find upcoming match predictions for ${escapeHtml(teamName)}?</summary>
-    <p>All upcoming ${escapeHtml(teamName)} fixtures, odds analysis, and 1X2, Over 2.5, BTTS, and corner predictions are updated daily on WinFulltime.</p>
+    <summary>When is ${escapeHtml(teamName)}'s next match?</summary>
+    <p>${upcomingCount > 0 ? `${escapeHtml(teamName)}'s next fixture is ${escapeHtml(teamData.upcoming[0].home)} vs ${escapeHtml(teamData.upcoming[0].away)}${teamData.upcoming[0].time ? ` at ${escapeHtml(teamData.upcoming[0].time)}` : ''}. Check this page for the latest prediction and probability score.` : `There are no upcoming ${escapeHtml(teamName)} fixtures scheduled at this time. This page updates automatically when new matches are added to the schedule.`}</p>
   </details>
   <details class="faq-item">
     <summary>Does ${escapeHtml(teamName)} perform better at home or away?</summary>
-    <p>Our team hub tracks home vs. away form splits, scoring metrics, and clean sheet rates for ${escapeHtml(teamName)} across all competitive fixtures.</p>
+    <p>Our prediction model factors in ${escapeHtml(teamName)}'s home and away form splits, including scoring output, defensive solidity, and clean sheet rates across all competitive fixtures.</p>
   </details>
 </div>
-</section>
-</main>
-<footer>
-<div class="footer-content">
-<p style="text-align:center;color:var(--text-secondary);font-size:13px;">&copy; ${new Date().getFullYear()} WinFulltime. All rights reserved.</p>
-</div>
-</footer>
-</div>
-</body>
-</html>`;
+</section>`;
+
+  return wrapPage({
+    title: metaTitle,
+    description: metaDesc,
+    keywords: `${escapeHtml(teamName)} betting tips, ${escapeHtml(teamName)} stats, ${escapeHtml(teamName)} predictions, ${escapeHtml(leagueName)} ${escapeHtml(teamName)}`,
+    canonicalUrl,
+    schemaJson,
+    pageCss,
+    breadcrumbs: [
+      { href: '/', label: 'Home' },
+      ...(leagueSlug ? [{ href: `/predictions/league/${leagueSlug}/`, label: leagueName }] : []),
+      { label: teamName }
+    ],
+    body
+  });
 }
 
 function main() {
@@ -228,20 +166,20 @@ function main() {
       matches.forEach(m => {
         const homeName = (m.home || (m.match ? m.match.split('-')[0] : '')).trim();
         const awayName = (m.away || (m.match ? m.match.split('-')[1] : '')).trim();
-        
+
         if (homeName) {
           const t = getOrCreateTeam(homeName);
           if (t) {
-            if (m.league) t.league = m.league;
-            if (m.country) t.country = m.country;
+            if (m.league && !t.league) t.league = m.league;
+            if (m.country && !t.country) t.country = m.country;
             t.upcoming.push({ home: homeName, away: awayName, time: m.time, tip: m.tip, league: m.league, date: m.date });
           }
         }
         if (awayName) {
           const t = getOrCreateTeam(awayName);
           if (t) {
-            if (m.league) t.league = m.league;
-            if (m.country) t.country = m.country;
+            if (m.league && !t.league) t.league = m.league;
+            if (m.country && !t.country) t.country = m.country;
             t.upcoming.push({ home: homeName, away: awayName, time: m.time, tip: m.tip, league: m.league, date: m.date });
           }
         }

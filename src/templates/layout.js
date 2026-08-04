@@ -15,14 +15,43 @@ const NAV_LINKS = [
   { href: '/blog/', label: 'Blog', match: (p) => p.startsWith('/blog') }
 ];
 
+const TOP_LEAGUES_MENU = [
+  { href: '/predictions/league/premier-league/', label: 'Premier League' },
+  { href: '/predictions/league/la-liga/', label: 'La Liga' },
+  { href: '/predictions/league/uefa-champions-league/', label: 'Champions League' },
+  { href: '/predictions/league/serie-a/', label: 'Serie A' },
+  { href: '/predictions/league/bundesliga/', label: 'Bundesliga' },
+  { href: '/predictions/league/ligue-1/', label: 'Ligue 1' },
+  { href: '/predictions/league/dutch-eredivisie/', label: 'Eredivisie' },
+  { href: '/predictions/leagues/', label: 'All Leagues →' }
+];
+
 const AUTH_BTN_STYLE = 'background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;';
 
 function navLinksHtml(activePath) {
   let html = '';
-  for (const link of NAV_LINKS) {
+  const isLeaguesActive = activePath && activePath.startsWith('/predictions/league');
+
+  // Insert Top Leagues dropdown right after Home
+  html += `\n <a href="/"${(activePath === '/' || activePath === '/index.html') ? ' class="active"' : ''}>Home</a>`;
+
+  html += `\n <div class="nav-dropdown">
+  <a href="/predictions/leagues/" class="nav-dropdown-btn${isLeaguesActive ? ' active' : ''}">Top Leagues <span class="arrow">▼</span></a>
+  <div class="nav-dropdown-content">`;
+  for (const item of TOP_LEAGUES_MENU) {
+    const isSpecial = item.label.includes('All Leagues');
+    const styleAttr = isSpecial ? ' style="border-top:1px solid var(--border,rgba(255,255,255,0.08));font-weight:700;color:var(--accent,#ff2448);"' : '';
+    html += `\n    <a href="${item.href}"${styleAttr}>${item.label}</a>`;
+  }
+  html += `\n  </div>
+ </div>`;
+
+  for (let i = 1; i < NAV_LINKS.length; i++) {
+    const link = NAV_LINKS[i];
     const active = link.match(activePath) ? ' class="active"' : '';
     html += `\n <a href="${link.href}"${active}>${link.label}</a>`;
   }
+
   html += '\n <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">';
   html += `\n  <a href="/login.html" class="wft-auth-login" style="display:inline-block;${AUTH_BTN_STYLE}">Login</a>`;
   html += `\n  <a href="/account.html" class="wft-auth-account" style="display:none;${AUTH_BTN_STYLE}">Account</a>`;
@@ -37,6 +66,12 @@ const FOOTER_HTML = `
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
+   <a href="/predictions/leagues/">Top Leagues</a>
+   <a href="/predictions/league/premier-league/">Premier League</a>
+   <a href="/predictions/league/la-liga/">La Liga</a>
+   <a href="/predictions/league/uefa-champions-league/">Champions League</a>
+   <a href="/predictions/league/serie-a/">Serie A</a>
+   <a href="/predictions/league/bundesliga/">Bundesliga</a>
    <a href="/ticket-builder.html">Ticket Builder</a>
    <a href="/2-odds-of-the-day.html">2 Odds</a>
    <a href="/best-picks.html">Best Picks</a>
@@ -155,6 +190,17 @@ body > header nav .wft-auth-login,
 body > header nav .wft-auth-account { display: inline-block; }
 body > header nav .wft-auth-login:hover,
 body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
+
+.nav-dropdown { position: relative; display: inline-block; }
+.nav-dropdown-btn { display: inline-flex; align-items: center; gap: 4px; color: var(--text-muted, #94a3b8); font-weight: 500; font-size: 14px; text-decoration: none; transition: color 0.2s; padding: 4px 0; cursor: pointer; }
+.nav-dropdown-btn:hover, .nav-dropdown-btn.active { color: var(--text-primary, #e8edf5); }
+.nav-dropdown-btn .arrow { font-size: 9px; transition: transform 0.2s; }
+.nav-dropdown:hover .nav-dropdown-btn .arrow { transform: rotate(180deg); }
+.nav-dropdown-content { display: none; position: absolute; top: 100%; left: -10px; min-width: 200px; background: rgba(24, 30, 48, 0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border, rgba(255,255,255,0.1)); border-radius: 12px; padding: 6px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; }
+.nav-dropdown:hover .nav-dropdown-content { display: block; }
+.nav-dropdown-content a { display: block; padding: 8px 16px; color: var(--text-muted, #94a3b8); font-size: 13px; font-weight: 600; text-decoration: none; transition: background 0.15s, color 0.15s; }
+.nav-dropdown-content a:hover { background: rgba(255, 36, 72, 0.15); color: #fff; }
+
 .theme-toggle {
   background: none;
   border: 1px solid var(--border, rgba(255,255,255,0.06));
