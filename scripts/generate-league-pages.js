@@ -110,7 +110,11 @@ function generateLeaguePage(leagueName, leagueSlug, matches) {
   const metaTitle = `${leagueName} Predictions Today & Betting Tips | WinFulltime`;
   const metaDesc = `Free AI-powered ${leagueName} football predictions for today. Data-driven 1X2, Over 2.5 goals, BTTS, and corner betting tips for ${leagueName}.`;
 
-  const matchCardsHtml = matches.map(renderMatchCard).join('\n');
+  const MAX_CARDS = 200;
+  const matchCardsHtml = matches.slice(0, MAX_CARDS).map(renderMatchCard).join('\n');
+  const truncatedNote = matches.length > MAX_CARDS
+    ? `<p style="color:var(--text-secondary);font-size:13px;margin-top:12px;">Showing the first ${MAX_CARDS} of ${matches.length} ${leagueName} fixtures for today.</p>`
+    : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -223,6 +227,7 @@ ${generateLeagueFaqSchema(leagueName, count)}
 <div class="matches-grid">
   ${matchCardsHtml || '<p style="color:var(--text-secondary);">No active matches scheduled for this league today. Check back during matchday.</p>'}
 </div>
+${truncatedNote}
 
 <section class="seo-content">
 <h2>About ${escapeHtml(leagueName)} Predictions</h2>

@@ -797,6 +797,10 @@ function main() {
     count++;
   }
   console.log(`Done: ${count} article(s).`);
+  if (count > 0) {
+    const { main: regenerateBlogIndex } = require('./generate-blog-index');
+    regenerateBlogIndex();
+  }
 }
 
 if (require.main === module) main();
