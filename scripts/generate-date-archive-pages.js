@@ -152,7 +152,13 @@ function main() {
 
   Object.keys(resultsData).forEach(dateStr => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return;
-    const matchesArr = resultsData[dateStr] || [];
+    const raw = resultsData[dateStr] || {};
+    const matchesArr = Array.isArray(raw)
+      ? raw
+      : Object.entries(raw).map(([fixture, v]) => {
+          const [home, away] = fixture.split(' - ');
+          return { ...v, home, away, score: `${v.home}-${v.away}` };
+        });
     const pageHtml = generateDateArchivePage(dateStr, matchesArr);
     const dirPath = path.join(OUTPUT_DIR, dateStr);
     fs.mkdirSync(dirPath, { recursive: true });
