@@ -1,26 +1,165 @@
 'use strict';
 
-const BOOKMAKERS = ['sportybet', 'msport', 'bet9ja'];
+const { resolveExtid, resolveEidFromExtid } = require('./bet9ja');
+
+const BOOKMAKERS = ['sportybet', 'msport', 'betway', 'bet9ja'];
 
 function isSportradar(bookmaker) {
   return bookmaker === 'sportybet' || bookmaker === 'msport';
+}
+
+function isBetway(bookmaker) {
+  return bookmaker === 'betway';
 }
 
 function isBet9ja(bookmaker) {
   return bookmaker === 'bet9ja';
 }
 
-function requireResolvable(from, to) {
-  if (isSportradar(from) && isBet9ja(to)) {
-    const err = new Error('Converting SportyBet/MSport codes to Bet9ja is not available yet. Cross-bookmaker matching needs a Bet9ja event feed that is still being built. You can still decode any code, convert between SportyBet and MSport, and recreate a code in the same bookmaker.');
-    err.code = 'CROSS_FAMILY_UNAVAILABLE';
-    throw err;
-  }
-  if (isBet9ja(from) && isSportradar(to)) {
-    const err = new Error('Converting Bet9ja codes to SportyBet/MSport is not available yet. Cross-bookmaker matching needs a Bet9ja event feed that is still being built. You can still decode any code, convert between SportyBet and MSport, and recreate a code in the same bookmaker.');
-    err.code = 'CROSS_FAMILY_UNAVAILABLE';
-    throw err;
-  }
+// All four bookmakers resolve a match to the same Sportradar numeric event id
+// (SportyBet/MSport: sr:match:<id>, Betway: sportEvent.eventId, Bet9ja: EXTID,
+// which the coupon decode exposes only as the internal E_ID, so Bet9ja legs are
+// resolved E_ID -> EXTID during canonicalization and EXTID -> E_ID when
+// rebuilding a Bet9ja code).
+// For 1X2 the sign maps to per-bookmaker outcome ids as:
+//   SportyBet/MSport outcomeId: 1 = Home, 2 = Draw, 3 = Away
+//   Betway outcomeId suffix:    1 = Home, 2 = Draw, 3 = Away
+//   Bet9ja SGN:                 1 = Home, X = Draw, 2 = Away
+// The matcher reduces every leg to { eventId, sign } and rebuilds the native
+// ids for the target bookmaker, which keeps cross-family codes exact.
+
+const SIGN = { H: 'H', D: 'D', A: 'A' };
+const SR_OUTCOME = { H: '1', D: '2', A: '3' };
+const BETWAY_INDEX = { H: '1', D: '2', A: '3' };
+const BET9JA_SIGN = { H: '1', D: 'X', A: '2' };
+
+function unresolvedEventError(detail) {
+  const err = new Error(
+    'The match for "' + detail + '" could not be found on the target bookmaker, so the code was not created. The event may have been removed or renamed.'
+  );
+  err.code = 'UNRESOLVED_EVENT';
+  return err;
 }
 
-module.exports = { BOOKMAKERS, isSportradar, isBet9ja, requireResolvable };
+function unsupportedMarketError(leg) {
+  const err = new Error(
+    'Only 1X2 selections can be converted across these bookmakers right now. The "' +
+      (leg.marketName || leg.M_NAME || leg.outcomeName || 'selection') +
+      '" market in this code is not supported for cross-bookmaker conversion, so the code was not created.'
+  );
+  err.code = 'UNSUPPORTED_MARKET';
+  return err;
+}
+
+// --- extraction of the canonical { eventId, sign } from each bookmaker's leg ---
+
+function numericEventId(eventId) {
+  if (typeof eventId === 'number') return String(eventId);
+  const str = String(eventId || '').trim();
+  const m = /^(?:sr:match:)?(\d+)$/.exec(str);
+  return m ? m[1] : null;
+}
+
+function canonicalizeSportradar(leg) {
+  const eventId = numericEventId(leg.eventId);
+  if (!eventId) return null;
+  if (String(leg.marketId) !== '1') return null; // 1X2 only
+  const outcomeId = String(leg.outcomeId);
+  if (!/^[123]$/.test(outcomeId)) return null;
+  const sign = outcomeId === '1' ? SIGN.H : outcomeId === '2' ? SIGN.D : SIGN.A;
+  return { eventId: eventId, sign: sign };
+}
+
+function canonicalizeBetway(leg) {
+  const eventId = numericEventId(leg.eventId);
+  if (!eventId) return null;
+  const marketTypeCName = (leg.market && leg.market.marketTypeCName) || leg.marketTypeCName || '';
+  if (marketTypeCName && marketTypeCName !== 'win-draw-win') return null;
+  const outcomeId = String(leg.outcomeId || '');
+  const idx = outcomeId.slice(-1);
+  if (!/^[123]$/.test(idx)) return null;
+  const sign = idx === '1' ? SIGN.H : idx === '2' ? SIGN.D : SIGN.A;
+  return { eventId: eventId, sign: sign };
+}
+
+// Bet9ja legs carry the internal E_ID, so resolving to the shared EXTID is an
+// async call (cached inside bet9ja.js).
+async function canonicalizeBet9ja(leg) {
+  const sgn = String(leg.SGN || '');
+  let sign = null;
+  if (sgn === '1') sign = SIGN.H;
+  else if (sgn === 'X') sign = SIGN.D;
+  else if (sgn === '2') sign = SIGN.A;
+  if (!sign) return null;
+  const extid = await resolveExtid(leg.E_ID);
+  if (!extid) throw unresolvedEventError(leg.E_NAME || String(leg.E_ID));
+  return { eventId: extid, sign: sign };
+}
+
+async function canonicalize(bookmaker, leg) {
+  if (isSportradar(bookmaker)) return canonicalizeSportradar(leg);
+  if (isBetway(bookmaker)) return canonicalizeBetway(leg);
+  if (isBet9ja(bookmaker)) return canonicalizeBet9ja(leg);
+  return null;
+}
+
+// --- rebuilding native selections for the target bookmaker ---
+
+function toSportradarSelection(canonical) {
+  return {
+    eventId: 'sr:match:' + canonical.eventId,
+    marketId: '1',
+    outcomeId: SR_OUTCOME[canonical.sign],
+    specifier: null
+  };
+}
+
+function toBetwayOutcome(canonical) {
+  const marketId = canonical.eventId + '1';
+  return {
+    outcomeId: marketId + BETWAY_INDEX[canonical.sign],
+    eventId: Number(canonical.eventId),
+    marketId: marketId
+  };
+}
+
+// Bet9ja's BookABetV2 expects the internal E_ID, not the Sportradar EXTID, so
+// each canonical match is resolved back to its Bet9ja event before building.
+async function toBet9jaGame(canonical) {
+  const resolved = await resolveEidFromExtid(canonical.eventId);
+  if (!resolved) throw unresolvedEventError(canonical.eventName || canonical.eventId);
+  const sign = BET9JA_SIGN[canonical.sign];
+  const sid = 'S_1X2_' + sign;
+  return {
+    SGN: sign,
+    M_NAME: '1X2',
+    V: Number(canonical.odds) > 0 ? Number(canonical.odds) : 1,
+    E_ID: Number(resolved.eid),
+    E_NAME: resolved.name || canonical.eventName || '',
+    SPORT_ID: Number(resolved.sportId || 1),
+    id: resolved.eid + '$' + sid
+  };
+}
+
+async function buildLegs(bookmaker, canonicals) {
+  if (isSportradar(bookmaker)) return canonicals.map(toSportradarSelection);
+  if (isBetway(bookmaker)) return canonicals.map(toBetwayOutcome);
+  if (isBet9ja(bookmaker)) {
+    const games = [];
+    for (const canonical of canonicals) {
+      games.push(await toBet9jaGame(canonical));
+    }
+    return games;
+  }
+  throw new Error('Unknown target bookmaker "' + bookmaker + '".');
+}
+
+module.exports = {
+  BOOKMAKERS,
+  isSportradar,
+  isBetway,
+  isBet9ja,
+  canonicalize,
+  buildLegs,
+  unsupportedMarketError
+};

@@ -25,6 +25,29 @@ function bet9jaHeaders() {
   };
 }
 
+function bet9jaSportsHeaders() {
+  return {
+    'User-Agent': BROWSER_UA,
+    Accept: 'application/json, text/javascript, */*; q=0.01',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'X-Requested-With': 'XMLHttpRequest',
+    Referer: 'https://sports.bet9ja.com/',
+    Origin: 'https://sports.bet9ja.com'
+  };
+}
+
+function betwayHeaders() {
+  return {
+    'User-Agent': BROWSER_UA,
+    Accept: 'application/json',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'X-Brand-Id': 'f8a8d16a-d619-4b49-aa8c-f21211403c92',
+    'Current-Country': 'NG',
+    Origin: 'https://www.betway.com.ng',
+    Referer: 'https://www.betway.com.ng/'
+  };
+}
+
 function wrapUpstreamError(err, label) {
   const status = err && err.response ? err.response.status : null;
   const reason = status
@@ -87,4 +110,4 @@ async function postForm(url, formBody, headers, timeout) {
   }
 }
 
-module.exports = { sportradarHeaders, bet9jaHeaders, getJson, postJson, postForm, BROWSER_UA };
+module.exports = { sportradarHeaders, bet9jaHeaders, bet9jaSportsHeaders, betwayHeaders, getJson, postJson, postForm, BROWSER_UA };

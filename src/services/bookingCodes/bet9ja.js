@@ -1,10 +1,93 @@
 'use strict';
 
-const { bet9jaHeaders, getJson, postForm } = require('./http');
+const { bet9jaHeaders, bet9jaSportsHeaders, getJson, postForm } = require('./http');
 
 const BET9JA_GET = 'https://coupon.bet9ja.com/desktop/feapi/CouponAjax/GetBookABetCoupon';
 const BET9JA_CREATE = 'https://apigw.bet9ja.com/sportsbook/placebet/BookABetV2';
+const BET9JA_EVENT = 'https://sports.bet9ja.com/desktop/feapi/PalimpsestAjax/GetEvent';
+const BET9JA_SPORTS = 'https://sports.bet9ja.com/desktop/feapi/PalimpsestAjax/GetSports?DISP=1000';
 const CACHE_VERSION = '1.295.4.219';
+
+// The coupon API returns Bet9ja's internal event id (E_ID). The Sportradar
+// match id that SportyBet/MSport/Betway use is the EXTID field on GetEvent.
+// These resolvers bridge the two, with a short cache so repeated conversions
+// do not re-hit Bet9ja for the same event.
+const EXTID_CACHE_TTL_MS = 10 * 60 * 1000;
+const EXTID_CACHE_MAX = 500;
+const eidToExtidCache = new Map();
+const extidToEidCache = new Map();
+let sportsIndexCache = null;
+let sportsIndexAt = 0;
+
+function cacheCleanup(map) {
+  if (map.size < EXTID_CACHE_MAX) return;
+  const now = Date.now();
+  for (const [key, entry] of map) {
+    if (now - entry.at > EXTID_CACHE_TTL_MS) map.delete(key);
+  }
+  if (map.size >= EXTID_CACHE_MAX) map.clear();
+}
+
+async function resolveExtid(eid) {
+  const key = String(eid || '').trim();
+  if (!key) return null;
+  const cached = eidToExtidCache.get(key);
+  if (cached && Date.now() - cached.at < EXTID_CACHE_TTL_MS) return cached.value;
+  const url = BET9JA_EVENT + '?EVENTID=' + encodeURIComponent(key);
+  const data = await getJson(url, bet9jaSportsHeaders(), 15000);
+  const extid = data && data.D && data.D.EXTID ? String(data.D.EXTID) : null;
+  cacheCleanup(eidToExtidCache);
+  eidToExtidCache.set(key, { at: Date.now(), value: extid });
+  if (extid) {
+    cacheCleanup(extidToEidCache);
+    extidToEidCache.set(extid, { at: Date.now(), value: { eid: key, name: data.D.DS || '', gid: data.D.GID, sgid: data.D.SGID, sportId: data.D.SID || 1, gn: data.D.GN || '' } });
+  }
+  return extid;
+}
+
+// Bet9ja's GetSports feed carries EXTID per event, so an EXTID (Sportradar id)
+// can be resolved back to Bet9ja's internal E_ID. The feed is a curated subset;
+// the index is cached for a few minutes.
+async function getSportsIndex() {
+  if (sportsIndexCache && Date.now() - sportsIndexAt < 10 * 60 * 1000) return sportsIndexCache;
+  const data = await getJson(BET9JA_SPORTS, bet9jaSportsHeaders(), 20000);
+  const pal = data && data.D && data.D.PAL ? data.D.PAL : {};
+  const index = new Map();
+  for (const sport of Object.values(pal)) {
+    for (const sg of Object.values((sport && sport.SG) || {})) {
+      for (const g of Object.values((sg && sg.G) || {})) {
+        for (const [eid, ev] of Object.entries((g && g.E) || {})) {
+          if (ev && ev.EXTID) {
+            index.set(String(ev.EXTID), {
+              eid: eid,
+              name: ev.N || '',
+              gn: g.N || '',
+              sg: sg.N || '',
+              gid: g.GID || eid,
+              sgid: sg.SGID || '',
+              sportId: (sg.SPORT_ID || g.SPORT_ID || 1)
+            });
+          }
+        }
+      }
+    }
+  }
+  sportsIndexCache = index;
+  sportsIndexAt = Date.now();
+  return index;
+}
+
+async function resolveEidFromExtid(extid) {
+  const key = String(extid || '').trim();
+  if (!key) return null;
+  const cached = extidToEidCache.get(key);
+  if (cached && Date.now() - cached.at < EXTID_CACHE_TTL_MS) return cached.value;
+  const index = await getSportsIndex();
+  const found = index.get(key) || null;
+  cacheCleanup(extidToEidCache);
+  extidToEidCache.set(key, { at: Date.now(), value: found });
+  return found;
+}
 
 function invalidError(message) {
   const err = new Error(message || 'The code is invalid or has expired.');
@@ -130,4 +213,4 @@ async function createBet9jaCode(games) {
   return String(code);
 }
 
-module.exports = { decodeBet9ja, createBet9jaCode };
+module.exports = { decodeBet9ja, createBet9jaCode, resolveExtid, resolveEidFromExtid };

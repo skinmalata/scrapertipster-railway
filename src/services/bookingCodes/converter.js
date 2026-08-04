@@ -2,7 +2,8 @@
 
 const { decodeSportybet, decodeMsport, createSportybetCode, createMsportCode } = require('./sportradar');
 const { decodeBet9ja, createBet9jaCode } = require('./bet9ja');
-const { BOOKMAKERS, requireResolvable } = require('./matcher');
+const { decodeBetway, createBetwayCode } = require('./betway');
+const { BOOKMAKERS, isSportradar, canonicalize, buildLegs, unsupportedMarketError } = require('./matcher');
 
 const MAX_LEGS = 30;
 
@@ -54,12 +55,14 @@ function providerStatus() {
 const DECODERS = {
   sportybet: decodeSportybet,
   msport: decodeMsport,
+  betway: decodeBetway,
   bet9ja: decodeBet9ja
 };
 
 const LABELS = {
   sportybet: 'SportyBet',
   msport: 'MSport',
+  betway: 'Betway',
   bet9ja: 'Bet9ja'
 };
 
@@ -75,7 +78,7 @@ function normalizeCode(raw) {
 
 function assertBookmaker(bookmaker) {
   if (!BOOKMAKERS.includes(bookmaker)) {
-    throw badRequest('Unknown bookmaker "' + bookmaker + '". Choose sportybet, msport or bet9ja.');
+    throw badRequest('Unknown bookmaker "' + bookmaker + '". Choose sportybet, msport, betway or bet9ja.');
   }
 }
 
@@ -137,9 +140,18 @@ function keepLegsFilter(legs, keepLegs) {
 async function createCode(bookmaker, legs) {
   if (bookmaker === 'bet9ja') return createBet9jaCode(legs);
   if (bookmaker === 'msport') return createMsportCode(legs);
+  if (bookmaker === 'betway') return createBetwayCode(legs);
   return createSportybetCode(legs);
 }
 
+function sameFamily(from, to) {
+  return from === to || (isSportradar(from) && isSportradar(to));
+}
+
+// Cross-bookmaker conversion reduces every leg to its Sportradar event id and
+// 1X2 sign (all four bookmakers share the numeric id), then rebuilds native
+// ids for the target. Same-family conversions (SportyBet <-> MSport) keep the
+// original platform ids so any market passes through unchanged.
 async function convertCode(input) {
   const code = normalizeCode(input && input.code);
   const from = input && input.from;
@@ -158,9 +170,22 @@ async function convertCode(input) {
     let legs = source.legs;
     legs = keepLegsFilter(legs, keepLegs);
 
-    if (from !== to) requireResolvable(from, to);
-
-    const newCode = await createCode(to, legs);
+    let newCode;
+    if (sameFamily(from, to)) {
+      newCode = await createCode(to, legs);
+    } else {
+      const canonicals = [];
+      for (const leg of legs) {
+        const canonical = await canonicalize(from, leg);
+        if (!canonical) throw unsupportedMarketError(leg);
+        canonical.eventName = leg.eventName || leg.E_NAME || '';
+        canonical.marketName = leg.marketName || leg.M_NAME || '';
+        canonical.outcomeName = leg.outcomeName || leg.SGN || '';
+        canonical.odds = Number(leg.odds || leg.V || 0);
+        canonicals.push(canonical);
+      }
+      newCode = await createCode(to, await buildLegs(to, canonicals));
+    }
 
     const result = {
       code: newCode,
