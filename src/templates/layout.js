@@ -191,7 +191,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </style>`;
 
 // Pages that keep their own custom shell and must never get the shared layout.
-const SKIP_PAGES = new Set(['admin.html', 'app.html', 'offline.html']);
+const SKIP_PAGES = new Set(['admin.html', 'app.html', 'offline.html', 'yandex_7d24d4a4103b655d.html']);
 
 function applyLayout(html, req) {
   return applyLayoutToHtml(html, (req && req.path) || '/');
