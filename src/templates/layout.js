@@ -46,6 +46,7 @@ const FOOTER_HTML = `
    <a href="/predictions/league/serie-a/">Serie A</a>
    <a href="/predictions/league/bundesliga/">Bundesliga</a>
    <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/converter.html">Code Converter</a>
    <a href="/2-odds-of-the-day.html">2 Odds</a>
    <a href="/best-picks.html">Best Picks</a>
    <a href="/author-picks.html">Author Picks</a>
