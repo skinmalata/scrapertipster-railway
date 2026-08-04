@@ -530,10 +530,50 @@ async function refreshAuthorPicks() {
   }
 }
 
-// Boot: refresh pre-match predictions first, then build Author Picks, then
-// start the live scrape loop — never overlapping, so the combined memory of
-// the heavy jobs never sits in the heap at the same time.
+// Corners and Cards are separate scrapes that the pre-match refresh does not
+// touch, so their caches went stale for weeks (best-picks then showed old
+// matches). Refresh them alongside the main predictions so they always hold
+// today's fixtures.
+async function refreshCornersAndCards() {
+  forceRestartIfMemoryCritical();
+  if (heapMB() > 350) {
+    console.warn('[markets] Skipping corners/cards refresh — memory too high (' + heapMB() + 'MB)');
+    return;
+  }
+  var today = new Date().toISOString().split('T')[0];
+
+  var corners = getScraperService().loadCornersCache();
+  if (!corners || corners.date !== today || !corners.matches || !corners.matches.length) {
+    console.log('[markets] Corners cache missing or stale (date: ' + (corners ? corners.date : 'none') + '), refreshing...');
+    try {
+      await getScraperService().scrapeCorners();
+      console.log('[markets] Corners refreshed');
+    } catch (e) {
+      console.error('[markets] Corners refresh failed:', e.message);
+    }
+  } else {
+    console.log('[markets] Corners cache OK, matches:', corners.matches.length);
+  }
+
+  var cards = getScraperService().loadCardsCache();
+  if (!cards || cards.date !== today || !cards.matches || !cards.matches.length) {
+    console.log('[markets] Cards cache missing or stale (date: ' + (cards ? cards.date : 'none') + '), refreshing...');
+    try {
+      await getScraperService().scrapeCards();
+      console.log('[markets] Cards refreshed');
+    } catch (e) {
+      console.error('[markets] Cards refresh failed:', e.message);
+    }
+  } else {
+    console.log('[markets] Cards cache OK, matches:', cards.matches.length);
+  }
+}
+
+// Boot: refresh pre-match predictions first, then corners/cards, then build
+// Author Picks, then start the live scrape loop — never overlapping, so the
+// combined memory of the heavy jobs never sits in the heap at the same time.
 runHeavyExclusive(refreshPreMatchPredictions)
+  .then(function () { return runHeavyExclusive(refreshCornersAndCards); })
   .then(function () { return runHeavyExclusive(refreshAuthorPicks); })
   .then(function () { startLiveScrapeLoop(); })
   .catch(function (e) { console.error('[boot] Heavy job chain failed:', e.message); });
@@ -542,6 +582,11 @@ runHeavyExclusive(refreshPreMatchPredictions)
 setInterval(function () {
   runHeavyExclusive(refreshPreMatchPredictions);
 }, 12 * 60 * 60 * 1000);
+
+// Refresh corners/cards every 6h (serialized against other heavy jobs).
+setInterval(function () {
+  runHeavyExclusive(refreshCornersAndCards);
+}, 6 * 60 * 60 * 1000);
 
 // Refresh Author Picks every 6h (serialized against other heavy jobs).
 setInterval(function () {

@@ -275,6 +275,35 @@ function vipPredictionData() {
   return data;
 }
 
+// Corners and Cards are scraped separately from the main predictions and their
+// caches can sit stale for days, which made best-picks show old fixtures.
+// Refresh either one when its cache is not from today so the daily build uses
+// fresh matches. The load*Cache helpers keep returning stale data by design, so
+// freshness is checked against the cache's own date field.
+async function refreshCornersAndCardsIfStale() {
+  const today = new Date().toISOString().slice(0, 10);
+
+  const corners = getScraperService().loadCornersCache();
+  if (!corners || corners.date !== today || !corners.matches || !corners.matches.length) {
+    try {
+      await getScraperService().scrapeCorners();
+      console.log('[API] Corners refreshed for best-picks (was: ' + (corners ? corners.date : 'none') + ')');
+    } catch (e) {
+      console.error('[API] Corners refresh failed:', e.message);
+    }
+  }
+
+  const cards = getScraperService().loadCardsCache();
+  if (!cards || cards.date !== today || !cards.matches || !cards.matches.length) {
+    try {
+      await getScraperService().scrapeCards();
+      console.log('[API] Cards refreshed for best-picks (was: ' + (cards ? cards.date : 'none') + ')');
+    } catch (e) {
+      console.error('[API] Cards refresh failed:', e.message);
+    }
+  }
+}
+
 function applyLimits(data, isVip) {
   if (isVip) {
     return { ...data, isVip: true, isFreeLimited: false, limit: null, remaining: null };
@@ -596,10 +625,9 @@ router.get('/corners', async (req, res) => {
     
     if (cornersData) {
       const now = Date.now();
-      const timeSinceLastScrape = cornersLastScrape ? now - cornersLastScrape : 0;
-      const isWithinInterval = timeSinceLastScrape < SCRAPE_INTERVAL_MS;
+      const scrapedRecently = cornersLastScrape && (now - cornersLastScrape) < SCRAPE_INTERVAL_MS;
       
-      if (isWithinInterval) {
+      if (scrapedRecently) {
         console.log('[API] Using cached corners data (within 2-hour window)');
         return res.json(cornersData);
       }
@@ -701,10 +729,9 @@ router.get('/cards', async (req, res) => {
     
     if (cardsData) {
       const now = Date.now();
-      const timeSinceLastScrape = cardsLastScrape ? now - cardsLastScrape : 0;
-      const isWithinInterval = timeSinceLastScrape < SCRAPE_INTERVAL_MS;
+      const scrapedRecently = cardsLastScrape && (now - cardsLastScrape) < SCRAPE_INTERVAL_MS;
       
-      if (isWithinInterval) {
+      if (scrapedRecently) {
         console.log('[API] Using cached cards data (within 2-hour window)');
         return res.json(cardsData);
       }
@@ -1502,7 +1529,7 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
     var TODAY_FM = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     var TODAY_SYSTEM = new Date().toISOString().slice(0, 10);
     var CACHE_PATH = path.join(CACHE_DIR, TODAY_FM + '.json');
-    var CACHE_VERSION = 4;
+    var CACHE_VERSION = 5;
 
     // Serve from cache if exists, has picks, and was written by this build.
     try {
@@ -1599,6 +1626,7 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
 
     // Scraper cache — reliable coverage of every category, merged with Author
     // Picks above so nothing is missing when Author Picks only covers 1X2.
+    await refreshCornersAndCardsIfStale();
     var preds = vipPredictionData();
     if (preds && Object.keys(preds).length > 0) {
       [
