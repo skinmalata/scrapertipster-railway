@@ -491,6 +491,12 @@ ${blogEntries}
 
   fs.writeFileSync(sitemapPath, sitemap);
   console.log('Sitemap updated with all live prediction categories, league hubs, and H2H pages');
+
+  try {
+    require('./generate-rss').main();
+  } catch (e) {
+    console.warn('RSS feed generation warning:', e.message);
+  }
 }
 
 function rebuildStatic() {

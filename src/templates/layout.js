@@ -217,6 +217,11 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(/<\/head>/i, HEADER_STYLE_OVERRIDE + '\n</head>');
   }
 
+  // 2b. Inject RSS feed auto-discovery tag into <head>
+  if (!/type="application\/rss\+xml"/i.test(html)) {
+    html = html.replace(/<\/head>/i, '<link rel="alternate" type="application/rss+xml" title="WinFulltime Football Predictions RSS" href="/feed.xml">\n</head>');
+  }
+
   // 3. Footer: replace the existing <footer> or inject one before </body>.
   if (footerRe.test(html)) {
     html = html.replace(footerRe, (m, open, close) => open + FOOTER_HTML + '\n' + close);
