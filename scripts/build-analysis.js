@@ -324,6 +324,19 @@ function cleanTeamName(name) {
   return String(name || '').split('(')[0].trim();
 }
 
+function computeEndDate(dateStr, time, hours) {
+  try {
+    const [hh, mm] = String(time).split(':').map(Number);
+    if (isNaN(hh) || isNaN(mm)) return dateStr + 'T' + time + ':00';
+    const start = new Date(dateStr + 'T' + time + ':00Z');
+    if (isNaN(start.getTime())) return dateStr + 'T' + time + ':00';
+    start.setUTCHours(start.getUTCHours() + hours);
+    return start.toISOString();
+  } catch (e) {
+    return dateStr + 'T' + time + ':00';
+  }
+}
+
 function slugifyTeam(name) {
   return String(name || '')
     .toLowerCase()
@@ -530,9 +543,14 @@ function buildStaticPage(matchup, slug, analysis, template, dateStr, ctx) {
         url: url,
         description: desc,
         startDate: (dateStr && matchup.time) ? dateStr + 'T' + matchup.time + ':00' : (dateStr || today),
+        endDate: (dateStr && matchup.time) ? computeEndDate(dateStr, matchup.time, 2) : (dateStr || today),
         eventStatus: 'https://schema.org/EventScheduled',
         eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
         location: { '@type': 'Place', name: matchup.country || matchup.league || 'Football match' },
+        image: SITE_URL + '/winfulltimelogo.png',
+        organizer: { '@type': 'Organization', name: matchup.league || 'WinFulltime', url: SITE_URL + '/' },
+        performer: { '@type': 'SportsTeam', name: cleanTeamName(home) },
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', url: url, availability: 'https://schema.org/InStock' },
         homeTeam: { '@type': 'SportsTeam', name: cleanTeamName(home) },
         awayTeam: { '@type': 'SportsTeam', name: cleanTeamName(away) }
       }

@@ -161,16 +161,6 @@ function generateH2hPage(home, away, slug, streaks, league, country, links) {
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/app.css">
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SportsEvent",
-  "name": "${escapeHtml(home)} vs ${escapeHtml(away)} Head to Head",
-  "homeTeam": { "@type": "SportsTeam", "name": "${escapeHtml(home)}" },
-  "awayTeam": { "@type": "SportsTeam", "name": "${escapeHtml(away)}" },
-  "location": { "@type": "Place", "name": "${escapeHtml(country || league || 'Football Match')}" }
-}
-</script>
-<script type="application/ld+json">
 ${generateH2hFaqSchema(home, away)}
 </script>
 <style>
