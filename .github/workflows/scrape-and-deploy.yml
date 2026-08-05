@@ -75,14 +75,6 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Post to Mastodon (Flipboard.social)
-        if: env.MASTODON_AUTO_POST == 'true'
-        run: node scripts/post-to-mastodon.js
-        env:
-          MASTODON_INSTANCE_URL: ${{ secrets.MASTODON_INSTANCE_URL }}
-          MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
-          MASTODON_AUTO_POST: ${{ secrets.MASTODON_AUTO_POST }}
-
       - name: Submit changed URLs to IndexNow
         if: github.event_name == 'push'
         run: |
