@@ -341,6 +341,31 @@ async function main() {
     console.error('Analysis build failed:', err.message);
   }
 
+  // Regenerate cross-link pages (teams, h2h, league, matrix, date archives)
+  // AFTER buildAnalysis so they reference the freshly written analysis pages
+  // and analysis-links.json instead of the committed stale snapshot.
+  console.log('Regenerating linker pages...');
+  const regenerators = [
+    require('./generate-team-pages').main,
+    require('./generate-h2h-pages').main,
+    require('./generate-league-pages').main,
+    require('./generate-matrix-pages').main
+  ];
+  for (const regen of regenerators) {
+    try {
+      regen();
+    } catch (e) {
+      console.error('Linker page regeneration failed:', e.message);
+    }
+  }
+  if (fs.existsSync(path.join(process.cwd(), 'results-cache.json'))) {
+    try {
+      require('./generate-date-archive-pages').main();
+    } catch (e) {
+      console.error('Date archive regeneration failed:', e.message);
+    }
+  }
+
   console.log('All data written to public/data/');
 
   // Generate static category pages

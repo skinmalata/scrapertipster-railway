@@ -7,6 +7,24 @@ const { escapeHtml, slugifyTeam, matchupSlug, generateFaqSchema, wrapPage } = re
 const PREDICTIONS_FILE = path.join(__dirname, '..', 'predictions-cache.json');
 const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions');
 const LEAGUE_OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions', 'league');
+const ANALYSIS_OUTPUT_DIR = path.join(__dirname, '..', 'public', 'analysis');
+
+function listAnalysisUrls() {
+  const urls = new Set();
+  try {
+    if (fs.existsSync(ANALYSIS_OUTPUT_DIR)) {
+      fs.readdirSync(ANALYSIS_OUTPUT_DIR).forEach(dateSlug => {
+        const datePath = path.join(ANALYSIS_OUTPUT_DIR, dateSlug);
+        if (!fs.statSync(datePath).isDirectory()) return;
+        fs.readdirSync(datePath).forEach(matchupSlugDir => {
+          const mp = path.join(datePath, matchupSlugDir);
+          if (fs.statSync(mp).isDirectory()) urls.add(`${dateSlug}/${matchupSlugDir}`);
+        });
+      });
+    }
+  } catch (e) {}
+  return urls;
+}
 
 const MARKETS = {
   '1x2': { label: '1X2 Result', dataKey: 'matches', heading: '1X2 Predictions', desc: 'match outcome' },
@@ -39,7 +57,7 @@ function slugifyLeague(name) {
   return s || 'other-league';
 }
 
-function renderMatchCard(m, leagueSlug) {
+function renderMatchCard(m, leagueSlug, analysisUrls) {
   const home = escapeHtml(m.home || (m.match ? m.match.split('-')[0] : 'Home'));
   const away = escapeHtml(m.away || (m.match ? m.match.split('-')[1] : 'Away'));
   const time = escapeHtml(m.time || 'TBD');
@@ -47,10 +65,13 @@ function renderMatchCard(m, leagueSlug) {
   const prob = m.probability || (m.probabilities ? Math.max(...Object.values(m.probabilities)) : null);
   const dateStr = m.date || new Date().toISOString().slice(0, 10);
 
-  const slug = matchupSlug(m.home || '', m.away || '');
-  const analysisUrl = slug ? `/analysis/${dateStr}/${slug}/` : '#';
-  const homeTeamSlug = slugifyTeam(m.home || '');
-  const awayTeamSlug = slugifyTeam(m.away || '');
+  const homeRaw = (m.home || (m.match ? m.match.split('-')[0] : '') || '').trim();
+  const awayRaw = (m.away || (m.match ? m.match.split('-')[1] : '') || '').trim();
+  const slug = homeRaw && awayRaw ? matchupSlug(homeRaw, awayRaw) : '';
+  const analysisKey = slug ? `${dateStr}/${slug}` : '';
+  const analysisUrl = analysisKey && analysisUrls && analysisUrls.has(analysisKey) ? `/analysis/${analysisKey}/` : '';
+  const homeTeamSlug = slugifyTeam(homeRaw);
+  const awayTeamSlug = slugifyTeam(awayRaw);
 
   return `
   <div class="match-card" data-tip="${tip}">
@@ -70,19 +91,19 @@ function renderMatchCard(m, leagueSlug) {
       <div style="display:flex;gap:12px;align-items:center;">
         ${homeTeamSlug ? `<a href="/teams/${homeTeamSlug}/" style="color:var(--text-secondary);font-size:11px;text-decoration:none;">${home}</a>` : ''}
         ${awayTeamSlug ? `<a href="/teams/${awayTeamSlug}/" style="color:var(--text-secondary);font-size:11px;text-decoration:none;">${away}</a>` : ''}
-        ${slug ? `<a href="${analysisUrl}" class="analysis-btn" style="color:var(--accent);font-size:12px;font-weight:600;text-decoration:none;">Analysis &rarr;</a>` : ''}
+        ${analysisUrl ? `<a href="${analysisUrl}" class="analysis-btn" style="color:var(--accent);font-size:12px;font-weight:600;text-decoration:none;">Analysis &rarr;</a>` : ''}
       </div>
     </div>
   </div>`;
 }
 
-function generateMatrixPage(leagueName, leagueSlug, marketSlug, marketConfig, matches, existingMarkets, leagueHubExists) {
+function generateMatrixPage(leagueName, leagueSlug, marketSlug, marketConfig, matches, existingMarkets, leagueHubExists, analysisUrls) {
   const count = matches.length;
   const canonicalUrl = `https://winfulltime.com/predictions/${leagueSlug}/${marketSlug}/`;
   const metaTitle = `${leagueName} ${marketConfig.label} Predictions Today | WinFulltime`;
   const metaDesc = `AI-powered ${leagueName} ${marketConfig.label.toLowerCase()} predictions with probability scores. Free ${marketConfig.desc} tips, form analysis, and match previews updated daily for ${leagueName}.`;
 
-  const matchCardsHtml = matches.map(m => renderMatchCard(m, leagueSlug)).join('\n');
+  const matchCardsHtml = matches.map(m => renderMatchCard(m, leagueSlug, analysisUrls)).join('\n');
 
   const relatedLinks = [];
   if (leagueHubExists) relatedLinks.push(`<a href="/predictions/league/${leagueSlug}/">${escapeHtml(leagueName)} Hub</a>`);
@@ -197,6 +218,7 @@ function main() {
     });
   });
   const leagueHubSlugs = listDirSlugs(LEAGUE_OUTPUT_DIR);
+  const analysisUrls = listAnalysisUrls();
 
   let generated = 0;
 
@@ -237,7 +259,8 @@ function main() {
         marketConfig,
         leagueObj.matches,
         leagueMarkets.get(leagueObj.slug) || new Set(),
-        leagueHubSlugs.has(leagueObj.slug)
+        leagueHubSlugs.has(leagueObj.slug),
+        analysisUrls
       );
       const dirPath = path.join(OUTPUT_DIR, leagueObj.slug, marketSlug);
       fs.mkdirSync(dirPath, { recursive: true });

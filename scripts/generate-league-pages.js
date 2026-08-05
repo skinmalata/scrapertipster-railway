@@ -113,8 +113,10 @@ function renderMatchCard(m, analysisUrls) {
   const tip = escapeHtml(m.tip || '1X2');
   const prob = m.probability || (m.probabilities ? Math.max(...Object.values(m.probabilities)) : null);
   const dateStr = m.date || new Date().toISOString().slice(0, 10);
-  
-  const slug = matchupSlug(m.home || '', m.away || '');
+
+  const homeRaw = (m.home || (m.match ? m.match.split('-')[0] : '') || '').trim();
+  const awayRaw = (m.away || (m.match ? m.match.split('-')[1] : '') || '').trim();
+  const slug = homeRaw && awayRaw ? matchupSlug(homeRaw, awayRaw) : '';
   const analysisKey = slug ? `${dateStr}/${slug}` : '';
   const analysisUrl = analysisKey && analysisUrls && analysisUrls.has(analysisKey) ? `/analysis/${analysisKey}/` : '';
 
