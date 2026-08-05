@@ -35,6 +35,39 @@ function slugifyTeam(name) {
     .replace(/^-+|-+$/g, '');
 }
 
+function listDirSlugs(dir) {
+  if (!fs.existsSync(dir)) return new Set();
+  return new Set(
+    fs.readdirSync(dir).filter(entry => {
+      try {
+        return fs.statSync(path.join(dir, entry)).isDirectory();
+      } catch (e) {
+        return false;
+      }
+    })
+  );
+}
+
+const MARKET_LABELS = {
+  '1x2': '1X2',
+  'over-1-5': 'Over 1.5',
+  'over-2-5': 'Over 2.5',
+  'btts': 'BTTS Yes',
+  'btts-no': 'BTTS No',
+  'corners': 'Corners',
+  'cards': 'Cards'
+};
+
+const MARKET_DATA_KEYS = {
+  '1x2': 'matches',
+  'over-1-5': 'over15Matches',
+  'over-2-5': 'over25Matches',
+  'btts': 'bttsMatches',
+  'btts-no': 'bttsNoMatches',
+  'corners': 'cornersMatches',
+  'cards': 'cardsMatches'
+};
+
 function matchupSlug(home, away) {
   const h = slugifyTeam(home);
   const a = slugifyTeam(away);
@@ -73,7 +106,7 @@ function generateLeagueFaqSchema(leagueName, matchCount) {
   }, null, 2);
 }
 
-function renderMatchCard(m) {
+function renderMatchCard(m, analysisUrls) {
   const home = escapeHtml(m.home || (m.match ? m.match.split('-')[0] : 'Home'));
   const away = escapeHtml(m.away || (m.match ? m.match.split('-')[1] : 'Away'));
   const time = escapeHtml(m.time || 'TBD');
@@ -82,7 +115,8 @@ function renderMatchCard(m) {
   const dateStr = m.date || new Date().toISOString().slice(0, 10);
   
   const slug = matchupSlug(m.home || '', m.away || '');
-  const analysisUrl = slug ? `/analysis/${dateStr}/${slug}/` : '#';
+  const analysisKey = slug ? `${dateStr}/${slug}` : '';
+  const analysisUrl = analysisKey && analysisUrls && analysisUrls.has(analysisKey) ? `/analysis/${analysisKey}/` : '';
 
   return `
   <div class="match-card" data-tip="${tip}">
@@ -99,21 +133,44 @@ function renderMatchCard(m) {
       <div class="tip-badge" style="background:rgba(255,36,72,0.15);color:var(--accent);padding:4px 10px;border-radius:6px;font-weight:700;font-size:13px;">
         ${tip} ${prob ? `<span style="opacity:0.8;font-size:11px;">(${prob}%)</span>` : ''}
       </div>
-      ${slug ? `<a href="${analysisUrl}" class="analysis-btn" style="color:var(--text-secondary);font-size:12px;font-weight:600;text-decoration:none;">View Analysis &rarr;</a>` : ''}
+      ${analysisUrl ? `<a href="${analysisUrl}" class="analysis-btn" style="color:var(--text-secondary);font-size:12px;font-weight:600;text-decoration:none;">View Analysis &rarr;</a>` : ''}
     </div>
   </div>`;
 }
 
-function generateLeaguePage(leagueName, leagueSlug, matches) {
+function generateLeaguePage(leagueName, leagueSlug, matches, ctx) {
   const count = matches.length;
   const canonicalUrl = `https://winfulltime.com/predictions/league/${leagueSlug}/`;
   const metaTitle = `${leagueName} Predictions Today & Betting Tips | WinFulltime`;
   const metaDesc = `Free AI-powered ${leagueName} football predictions for today. Data-driven 1X2, Over 2.5 goals, BTTS, and corner betting tips for ${leagueName}.`;
 
   const MAX_CARDS = 200;
-  const matchCardsHtml = matches.slice(0, MAX_CARDS).map(renderMatchCard).join('\n');
+  const matchCardsHtml = matches.slice(0, MAX_CARDS).map(m => renderMatchCard(m, ctx && ctx.analysisUrls)).join('\n');
   const truncatedNote = matches.length > MAX_CARDS
     ? `<p style="color:var(--text-secondary);font-size:13px;margin-top:12px;">Showing the first ${MAX_CARDS} of ${matches.length} ${leagueName} fixtures for today.</p>`
+    : '';
+
+  const marketLinks = (ctx && ctx.markets && ctx.markets.length)
+    ? ctx.markets.map(mSlug => {
+        const label = MARKET_LABELS[mSlug] || mSlug;
+        return `<a href="/predictions/${leagueSlug}/${mSlug}/" class="chip-link">${escapeHtml(leagueName)} ${escapeHtml(label)}</a>`;
+      }).join('\n        ')
+    : '';
+  const categoryLinks = (ctx && ctx.markets && ctx.markets.length)
+    ? ctx.markets.map(mSlug => {
+        const label = MARKET_LABELS[mSlug] || mSlug;
+        return `<a href="/predictions/${mSlug}" class="chip-link">${escapeHtml(label)} Predictions</a>`;
+      }).join('\n        ')
+    : '';
+  const relatedMarketsHtml = marketLinks
+    ? `<section class="seo-content">
+<h2>Explore ${escapeHtml(leagueName)} Markets</h2>
+<p style="color:var(--text-secondary);line-height:1.7;margin-bottom:16px;">Browse today's ${escapeHtml(leagueName)} predictions across every market, or jump to the main market pages for a full breakdown.</p>
+<div class="chips">
+  ${marketLinks}
+  ${categoryLinks}
+</div>
+</section>`
     : '';
 
   return `<!DOCTYPE html>
@@ -179,6 +236,9 @@ ${generateLeagueFaqSchema(leagueName, count)}
 .faq-item summary::after{content:'+';font-size:18px;font-weight:700;color:var(--accent)}
 .faq-item[open] summary::after{content:'\\2212'}
 .faq-item p{padding:0 20px 16px;font-size:14px;line-height:1.6;color:var(--text-secondary);margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip-link{display:inline-block;padding:9px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:999px;color:var(--text-primary);text-decoration:none;font-size:13px;font-weight:600;transition:all 0.2s}
+.chip-link:hover{border-color:var(--accent);color:var(--accent)}
 </style>
 </head>
 <body>
@@ -228,6 +288,8 @@ ${generateLeagueFaqSchema(leagueName, count)}
   ${matchCardsHtml || '<p style="color:var(--text-secondary);">No active matches scheduled for this league today. Check back during matchday.</p>'}
 </div>
 ${truncatedNote}
+
+${relatedMarketsHtml}
 
 <section class="seo-content">
 <h2>About ${escapeHtml(leagueName)} Predictions</h2>
@@ -312,14 +374,51 @@ function main() {
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
   let generated = 0;
 
+  const analysisUrls = new Set();
+  const analysisRoot = path.join(__dirname, '..', 'public', 'analysis');
+  if (fs.existsSync(analysisRoot)) {
+    fs.readdirSync(analysisRoot).forEach(dateSlug => {
+      const datePath = path.join(analysisRoot, dateSlug);
+      if (!fs.statSync(datePath).isDirectory()) return;
+      fs.readdirSync(datePath).forEach(matchupSlugDir => {
+        const mp = path.join(datePath, matchupSlugDir);
+        if (fs.statSync(mp).isDirectory()) analysisUrls.add(`${dateSlug}/${matchupSlugDir}`);
+      });
+    });
+  }
+
+  const leagueMarkets = new Map();
+  Object.keys(MARKET_DATA_KEYS).forEach(marketSlug => {
+    const matchesList = data[MARKET_DATA_KEYS[marketSlug]] || [];
+    matchesList.forEach(m => {
+      const leagueSlug = slugifyLeague((m.league || 'Other Leagues').trim());
+      if (!leagueSlug) return;
+      if (!leagueMarkets.has(leagueSlug)) leagueMarkets.set(leagueSlug, []);
+      if (!leagueMarkets.get(leagueSlug).includes(marketSlug)) leagueMarkets.get(leagueSlug).push(marketSlug);
+    });
+  });
+
   leaguesMap.forEach(league => {
     if (league.matches.length === 0) return;
-    const pageHtml = generateLeaguePage(league.name, league.slug, league.matches);
+    const pageHtml = generateLeaguePage(league.name, league.slug, league.matches, {
+      analysisUrls,
+      markets: leagueMarkets.get(league.slug) || []
+    });
     const dir = path.join(OUTPUT_DIR, league.slug);
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, 'index.html'), pageHtml);
     generated++;
   });
+
+  let pruned = 0;
+  fs.readdirSync(OUTPUT_DIR).forEach(slug => {
+    const dirPath = path.join(OUTPUT_DIR, slug);
+    if (!fs.statSync(dirPath).isDirectory()) return;
+    if (leaguesMap.has(slug)) return;
+    fs.rmSync(dirPath, { recursive: true, force: true });
+    pruned++;
+  });
+  if (pruned) console.log(`[league-pages] Pruned ${pruned} stale league hub directories`);
 
   console.log(`[league-pages] Prerendered ${generated} League Hub Pages under ${OUTPUT_DIR}`);
 }

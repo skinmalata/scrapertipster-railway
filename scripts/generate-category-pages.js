@@ -169,7 +169,7 @@ function escapeHtml(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
-function generateCategoryPage(slug, catConfig) {
+function generateCategoryPage(slug, catConfig, ctx) {
   const allSlugs = Object.keys(CATEGORIES);
   const categoryTabs = allSlugs.map(s => {
     const c = CATEGORIES[s];
@@ -179,6 +179,32 @@ function generateCategoryPage(slug, catConfig) {
 
   const isStreak = slug === 'draws-streak';
   const isUnbeaten = slug === 'unbeaten';
+
+  const leagueLinks = (ctx && ctx.leagueSlugs && ctx.leagueSlugs.length)
+    ? ctx.leagueSlugs.map(ls => `<a href="/predictions/league/${ls}/" class="chip-link">${escapeHtml(ls.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '))}</a>`).join('\n          ')
+    : '';
+  const leagueLinksHtml = leagueLinks
+    ? `<section class="seo-content">
+<h2>Browse Leagues</h2>
+<p style="color:var(--text-secondary);line-height:1.7;margin-bottom:16px;">Jump straight to today's predictions for any league, or scroll through every market on this page.</p>
+<div class="chips">
+  ${leagueLinks}
+</div>
+</section>`
+    : '';
+
+  const dateLinks = (ctx && ctx.dateSlugs && ctx.dateSlugs.length)
+    ? ctx.dateSlugs.map(ds => `<a href="/predictions/date/${ds}/" class="chip-link">${escapeHtml(ds)}</a>`).join('\n          ')
+    : '';
+  const dateLinksHtml = dateLinks
+    ? `<section class="seo-content">
+<h2>Track Record Archive</h2>
+<p style="color:var(--text-secondary);line-height:1.7;margin-bottom:16px;">Browse verified prediction outcomes and hit rates from previous matchdays.</p>
+<div class="chips">
+  ${dateLinks}
+</div>
+</section>`
+    : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -247,6 +273,9 @@ ${generateFaqSchema(slug)}
 .faq-item p{padding:0 20px 16px;font-size:14px;line-height:1.7;color:var(--text-secondary);margin:0}
 @media(max-width:640px){.seo-content h2{font-size:18px}.faq-item summary{padding:14px 16px;font-size:14px}.faq-item p{padding:0 16px 14px;font-size:13px}.date-tab{padding:8px 14px;font-size:13px;min-width:80px}.match-reason{font-size:12px;max-width:100%;word-break:break-word;margin-top:6px}}
 .match-reason{font-size:13px;color:#fff;margin-top:8px;line-height:1.5;text-align:center;max-width:100%;opacity:0.85}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip-link{display:inline-block;padding:9px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:999px;color:var(--text-primary);text-decoration:none;font-size:13px;font-weight:600;transition:all 0.2s}
+.chip-link:hover{border-color:var(--accent);color:var(--accent)}
 </style>
 </head>
 <body>
@@ -301,6 +330,10 @@ ${generateFaqSchema(slug)}
 <p>Generate optimized accumulator combinations from today's AI-powered predictions. Set your target odds and get instant ticket suggestions.</p>
 <a href="/ticket-builder.html">Pro Ticket Builder &rarr;</a>
 </div>
+
+${leagueLinksHtml}
+
+${dateLinksHtml}
 
 ${generateFaqHtml(slug)}
 
@@ -540,13 +573,28 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 </html>`;
 }
 
+function listDirSlugs(dir) {
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir).filter(entry => {
+    try {
+      return fs.statSync(path.join(dir, entry)).isDirectory();
+    } catch (e) {
+      return false;
+    }
+  }).sort();
+}
+
 function generateAllPages(outputDir) {
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
+  const leagueSlugs = listDirSlugs(path.join(outputDir, 'league'));
+  const dateSlugs = listDirSlugs(path.join(outputDir, 'date'));
+  const ctx = { leagueSlugs, dateSlugs };
+
   for (const [slug, config] of Object.entries(CATEGORIES)) {
-    const html = generateCategoryPage(slug, config);
+    const html = generateCategoryPage(slug, config, ctx);
     fs.writeFileSync(path.join(outputDir, slug + '.html'), html);
     console.log('Generated: predictions/' + slug + '.html');
   }

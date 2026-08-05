@@ -16,6 +16,8 @@ const OUTPUT_FILE = path.join(process.cwd(), 'public', 'data', 'analysis.json');
 const ANALYSIS_CACHE_FILE = path.join(process.cwd(), 'analysis-cache.json');
 const LINKS_FILE = path.join(process.cwd(), 'public', 'data', 'analysis-links.json');
 const PRERENDER_DIR = path.join(process.cwd(), 'public', 'analysis');
+const TEAMS_OUTPUT_DIR = path.join(process.cwd(), 'public', 'teams');
+const H2H_OUTPUT_DIR = path.join(process.cwd(), 'public', 'h2h');
 const ANALYSIS_TEMPLATE_FILE = path.join(process.cwd(), 'public', 'analysis.html');
 const SITE_URL = 'https://winfulltime.com';
 
@@ -305,6 +307,19 @@ function escapeHtml(value) {
   });
 }
 
+function listDirSlugs(dir) {
+  const set = new Set();
+  try {
+    if (fs.existsSync(dir)) {
+      fs.readdirSync(dir).forEach(function (entry) {
+        const full = path.join(dir, entry);
+        if (fs.statSync(full).isDirectory()) set.add(entry);
+      });
+    }
+  } catch (e) {}
+  return set;
+}
+
 function cleanTeamName(name) {
   return String(name || '').split('(')[0].trim();
 }
@@ -355,7 +370,8 @@ function renderNoDataCard(team, note) {
   return '<div class="analysis-card"><h4>' + escapeHtml(cleanTeamName(team)) + '</h4><p style="margin:0;color:rgba(232,237,245,0.55);font-size:13px;line-height:1.5;">' + note + '</p></div>';
 }
 
-function buildContentHtml(analysis, home, away, matchup, dateStr) {
+function buildContentHtml(analysis, home, away, matchup, dateStr, ctx) {
+  ctx = ctx || {};
   const homeName = analysis.homeTeam || home;
   const awayName = analysis.awayTeam || away;
   const h2h = analysis.h2h || [];
@@ -443,6 +459,21 @@ function buildContentHtml(analysis, home, away, matchup, dateStr) {
       '</ul></div>';
   }
 
+  if (ctx.teamExists) {
+    const related = [];
+    const homeTeamSlug = slugifyTeam(home);
+    const awayTeamSlug = slugifyTeam(away);
+    if (homeTeamSlug && ctx.teamExists(homeTeamSlug)) related.push('<a href="/teams/' + homeTeamSlug + '/" class="cta-link">' + escapeHtml(cleanTeamName(homeName)) + ' Team Stats</a>');
+    if (awayTeamSlug && ctx.teamExists(awayTeamSlug)) related.push('<a href="/teams/' + awayTeamSlug + '/" class="cta-link">' + escapeHtml(cleanTeamName(awayName)) + ' Team Stats</a>');
+    if (ctx.h2hExists) {
+      const h2hSlug = matchupSlug(home, away);
+      if (h2hSlug && ctx.h2hExists(h2hSlug)) related.push('<a href="/h2h/' + h2hSlug + '/" class="cta-link">Head to Head</a>');
+    }
+    if (related.length) {
+      html += '<div class="analysis-section"><h3>Related Pages</h3><div class="cta-links">' + related.join('') + '</div></div>';
+    }
+  }
+
   html += '<div class="cta-links">' +
     '<a href="/" class="cta-link">Today\'s Predictions</a>' +
     '<a href="/predictions/1x2" class="cta-link">1X2</a>' +
@@ -462,7 +493,7 @@ function buildUnavailableHtml() {
     '<div class="disclaimer"><p><strong>18+ Only</strong></p><p>Predictions are for informational purposes only. Gambling involves financial risk and may lead to addiction. Please play responsibly.</p></div>';
 }
 
-function buildStaticPage(matchup, slug, analysis, template, dateStr) {
+function buildStaticPage(matchup, slug, analysis, template, dateStr, ctx) {
   const home = matchup.home;
   const away = matchup.away;
   const today = new Date().toISOString().slice(0, 10);
@@ -526,14 +557,14 @@ function buildStaticPage(matchup, slug, analysis, template, dateStr) {
   }
   scriptClose += '</script>'.length;
 
-  const body = hasContent ? buildContentHtml(analysis, home, away, matchup, dateStr) : buildUnavailableHtml();
+  const body = hasContent ? buildContentHtml(analysis, home, away, matchup, dateStr, ctx) : buildUnavailableHtml();
   const contentHtml = '<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><a href="/analysis.html">Match Analysis</a><span>/</span><span aria-current="page">' + escapeHtml(cleanTitle) + '</span></nav>\n' +
     '<h1 id="matchTitle" style="font-size: 28px; margin-bottom: 20px;">' + escapeHtml(cleanTitle) + '</h1>\n\n<div id="content" style="display: block;">\n' + body + '\n</div>\n';
 
   return page.slice(0, start) + contentHtml + page.slice(scriptClose);
 }
 
-function writePrerenderedPages(matchups, result, links, template) {
+function writePrerenderedPages(matchups, result, links, template, ctx) {
   const used = new Set();
   fs.mkdirSync(PRERENDER_DIR, { recursive: true });
   let written = 0;
@@ -552,7 +583,7 @@ function writePrerenderedPages(matchups, result, links, template) {
     used.add(date + '/' + finalSlug);
     links[key] = '/analysis/' + date + '/' + finalSlug + '/';
 
-    const page = buildStaticPage(m, finalSlug, analysis, template, date);
+    const page = buildStaticPage(m, finalSlug, analysis, template, date, ctx);
     const dir = path.join(PRERENDER_DIR, date, finalSlug);
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, 'index.html'), page);
@@ -800,10 +831,16 @@ async function main() {
   fs.writeFileSync(OUTPUT_FILE, JSON.stringify(out));
   console.log('[analysis] Saved', OUTPUT_FILE, 'with', Object.keys(result).length, 'matchups');
 
+  const teamSlugs = listDirSlugs(TEAMS_OUTPUT_DIR);
+  const h2hSlugs = listDirSlugs(H2H_OUTPUT_DIR);
   if (fs.existsSync(ANALYSIS_TEMPLATE_FILE)) {
     const template = fs.readFileSync(ANALYSIS_TEMPLATE_FILE, 'utf8');
     const links = {};
-    writePrerenderedPages(matchups, result, links, template);
+    const ctx = {
+      teamExists: function (slug) { return !!slug && teamSlugs.has(slug); },
+      h2hExists: function (slug) { return !!slug && h2hSlugs.has(slug); }
+    };
+    writePrerenderedPages(matchups, result, links, template, ctx);
   } else {
     console.warn('[analysis] No public/analysis.html template — skipping prerender');
   }

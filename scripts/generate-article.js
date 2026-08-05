@@ -23,6 +23,97 @@ function esc(v) {
 }
 function enc(v) { return encodeURIComponent(String(v || '')); }
 
+function slugifyTeam(name) {
+  return String(name || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function loadTeamEntries() {
+  const teamsDir = path.join(__dirname, '..', 'public', 'teams');
+  const entries = [];
+  if (!fs.existsSync(teamsDir)) return entries;
+  fs.readdirSync(teamsDir).forEach(slug => {
+    const p = path.join(teamsDir, slug);
+    if (!fs.statSync(p).isDirectory()) return;
+    const f = path.join(p, 'index.html');
+    if (!fs.existsSync(f)) return;
+    const html = fs.readFileSync(f, 'utf8');
+    const m = html.match(/<h1[^>]*>([^<]+)<\/h1>/);
+    const name = (m ? m[1] : slug).replace(/&amp;/g, '&').trim();
+    if (!name) return;
+    entries.push({ name, slug });
+  });
+  return entries;
+}
+
+function loadH2hSlugs() {
+  const h2hDir = path.join(__dirname, '..', 'public', 'h2h');
+  const slugs = [];
+  if (!fs.existsSync(h2hDir)) return slugs;
+  fs.readdirSync(h2hDir).forEach(slug => {
+    const p = path.join(h2hDir, slug);
+    if (fs.statSync(p).isDirectory()) slugs.push(slug);
+  });
+  return slugs;
+}
+
+const GENERIC_TEAM_WORDS = new Set(['start', 'city', 'united', 'inter', 'derby', 'union', 'real', 'club', 'team', 'elite']);
+
+function matchTeamsInText(entries, text) {
+  if (!entries || !entries.length || !text) return [];
+  const hay = ' ' + text.replace(/\s+/g, ' ').trim() + ' ';
+  const sorted = entries.slice().sort((a, b) => b.name.length - a.name.length);
+  const matched = [];
+  const used = new Set();
+  for (const e of sorted) {
+    const name = e.name;
+    if (name.length < 4) continue;
+    if (GENERIC_TEAM_WORDS.has(name.toLowerCase())) continue;
+    const needleLower = name.toLowerCase();
+    if ([...used].some(u => needleLower.includes(u))) continue;
+    const re = new RegExp('\\b' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b');
+    if (re.test(hay)) {
+      matched.push(e);
+      used.add(needleLower);
+    }
+    if (matched.length >= 8) break;
+  }
+  return matched;
+}
+
+function relatedStatsHtml(teamEntries, h2hSlugs, text) {
+  const matched = matchTeamsInText(teamEntries, text);
+  if (!matched.length) return '';
+  const h2hSet = new Set(h2hSlugs);
+  const teamLinks = matched.map(e => `    <li><a href="/teams/${e.slug}/">${esc(e.name)}</a></li>`).join('\n');
+  const h2hLinks = [];
+  for (let i = 0; i < matched.length && h2hLinks.length < 4; i++) {
+    for (let j = i + 1; j < matched.length && h2hLinks.length < 4; j++) {
+      const a = slugifyTeam(matched[i].name);
+      const b = slugifyTeam(matched[j].name);
+      const s1 = a + '-vs-' + b;
+      const s2 = b + '-vs-' + a;
+      const slug = h2hSet.has(s1) ? s1 : h2hSet.has(s2) ? s2 : '';
+      if (slug) h2hLinks.push(`    <li><a href="/h2h/${slug}/">${esc(matched[i].name)} vs ${esc(matched[j].name)} Head to Head</a></li>`);
+    }
+  }
+  const h2hBlock = h2hLinks.length
+    ? `<li style="margin-top:6px;padding-top:10px;border-top:1px solid var(--border);font-weight:600;">H2H Matchups</li>\n${h2hLinks.join('\n')}`
+    : '';
+  return `  <div class="related-posts" data-related-teams="wf">
+   <h3>Related Teams &amp; H2H</h3>
+   <ul>
+${teamLinks}
+${h2hBlock}
+   </ul>
+  </div>
+`;
+}
+
 function slugifyHeading(text) {
   const base = String(text || '').toLowerCase()
     .replace(/<[^>]+>/g, '')
@@ -102,7 +193,7 @@ function relatedHtml(related) {
   return (related || []).map(r => `    <li><a href="${r.href}">${r.label}</a></li>`).join('\n');
 }
 
-function articleHtml(a) {
+function articleHtml(a, relatedBox) {
   const url = `${DOMAIN}/blog/${a.slug}.html`;
   const image = `${DOMAIN}/blog/thumbnails/${a.slug}.webp`;
   const breadcrumb = a.title.replace(/\s*[\|—]\s*WinFulltime.*$/, '').trim();
@@ -653,6 +744,8 @@ ${tocHtml(toc)}
 
 ${faqHtml(faqs)}
 
+${relatedBox || ''}
+
    <div class="cta">
    <h3>Put These Principles Into Practice Today</h3>
    <p>Every strategy on this page is only as good as the markets you apply it to. Check the latest predictions, odds, and in-play opportunities below.</p>
@@ -787,11 +880,15 @@ function main() {
     } catch (e) { console.error('Could not load faqs.json:', e.message); }
   }
   let count = 0;
+  const teamEntries = loadTeamEntries();
+  const h2hSlugs = loadH2hSlugs();
   for (const a of items) {
     if (!a.slug) { console.error('Missing slug for an item'); continue; }
     if (addenda[a.slug]) a.content += addenda[a.slug];
     if (faqsBySlug[a.slug]) a.faqs = faqsBySlug[a.slug];
-    const html = articleHtml(a);
+    const searchText = `${a.title} ${a.h1 || ''} ${a.lead || ''} ${a.content || ''}`;
+    const relatedBox = relatedStatsHtml(teamEntries, h2hSlugs, searchText);
+    const html = articleHtml(a, relatedBox);
     fs.writeFileSync(path.join(BLOG_DIR, `${a.slug}.html`), html);
     console.log(`Wrote ${a.slug}.html`);
     count++;
@@ -804,4 +901,4 @@ function main() {
 }
 
 if (require.main === module) main();
-module.exports = { articleHtml, esc };
+module.exports = { articleHtml, esc, slugifyTeam, loadTeamEntries, loadH2hSlugs, matchTeamsInText, relatedStatsHtml };

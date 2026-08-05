@@ -2,12 +2,71 @@
 
 const fs = require('fs');
 const path = require('path');
-const { escapeHtml, slugifyTeam, generateFaqSchema, wrapPage } = require('./lib/layout');
+const { escapeHtml, slugifyTeam, matchupSlug, generateFaqSchema, wrapPage } = require('./lib/layout');
 
 const PREDICTIONS_FILE = path.join(__dirname, '..', 'predictions-cache.json');
 const H2H_CACHE_FILE = path.join(__dirname, '..', 'h2h-unbeaten-cache.json');
 const RESULTS_FILE = path.join(__dirname, '..', 'results-cache.json');
 const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'teams');
+const H2H_OUTPUT_DIR = path.join(__dirname, '..', 'public', 'h2h');
+const ANALYSIS_LINKS_FILE = path.join(__dirname, '..', 'public', 'data', 'analysis-links.json');
+
+function analysisSlugifyTeam(name) {
+  return String(name || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .split('(')[0]
+    .replace(/['’]/g, '')
+    .replace(/&/g, 'and')
+    .replace(/\b(?:fc|afc|cf|sc|ac)\b/g, ' ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function loadAnalysisLinksMap() {
+  const rawMap = new Map();
+  const normMap = new Map();
+  try {
+    if (fs.existsSync(ANALYSIS_LINKS_FILE)) {
+      const links = JSON.parse(fs.readFileSync(ANALYSIS_LINKS_FILE, 'utf8'));
+      Object.keys(links).forEach(key => {
+        const parts = key.split('|');
+        if (parts.length !== 2) return;
+        rawMap.set(key, links[key]);
+        normMap.set(analysisSlugifyTeam(parts[0]) + '|' + analysisSlugifyTeam(parts[1]), links[key]);
+      });
+    }
+  } catch (e) {
+    console.warn('[team-pages] Failed to read analysis links:', e.message);
+  }
+  return { rawMap, normMap };
+}
+
+function findAnalysisLink(home, away, analysisLinks) {
+  const h = home.trim().toLowerCase();
+  const a = away.trim().toLowerCase();
+  const direct = analysisLinks.rawMap.get(h + '|' + a);
+  if (direct) return direct;
+  const reverse = analysisLinks.rawMap.get(a + '|' + h);
+  if (reverse) return reverse;
+  const normDirect = analysisLinks.normMap.get(analysisSlugifyTeam(home) + '|' + analysisSlugifyTeam(away));
+  if (normDirect) return normDirect;
+  return analysisLinks.normMap.get(analysisSlugifyTeam(away) + '|' + analysisSlugifyTeam(home)) || '';
+}
+
+function listDirSlugs(dir) {
+  const set = new Set();
+  try {
+    if (fs.existsSync(dir)) {
+      fs.readdirSync(dir).forEach(entry => {
+        const full = path.join(dir, entry);
+        if (fs.statSync(full).isDirectory()) set.add(entry);
+      });
+    }
+  } catch (e) {}
+  return set;
+}
 
 function slugifyLeague(name) {
   if (!name) return '';
@@ -17,7 +76,8 @@ function slugifyLeague(name) {
   return s || '';
 }
 
-function generateTeamPage(teamName, teamSlug, teamData) {
+function generateTeamPage(teamName, teamSlug, teamData, ctx) {
+  ctx = ctx || {};
   const canonicalUrl = `https://winfulltime.com/teams/${teamSlug}/`;
   const leagueSlug = slugifyLeague(teamData.league || '');
   const leagueName = teamData.league || 'Football';
@@ -33,20 +93,33 @@ function generateTeamPage(teamName, teamSlug, teamData) {
   const upcomingCardsHtml = (teamData.upcoming || []).map(m => {
     const homeSlug = slugifyTeam(m.home);
     const awaySlug = slugifyTeam(m.away);
+    const homeTeamLink = ctx.teamExists && ctx.teamExists(homeSlug)
+      ? `<a href="/teams/${homeSlug}/" style="color:var(--text-primary);text-decoration:none;">${escapeHtml(m.home)}</a>`
+      : escapeHtml(m.home);
+    const awayTeamLink = ctx.teamExists && ctx.teamExists(awaySlug)
+      ? `<a href="/teams/${awaySlug}/" style="color:var(--text-primary);text-decoration:none;">${escapeHtml(m.away)}</a>`
+      : escapeHtml(m.away);
+    const analysisUrl = ctx.analysisUrl ? ctx.analysisUrl(m.home, m.away) : '';
     return `
     <div class="match-card" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;">
       <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">\u23f1 ${escapeHtml(m.time || 'TBD')} | ${escapeHtml(m.league || 'Football')}</div>
       <div style="font-weight:700;font-size:16px;">
-        <a href="/teams/${homeSlug}/" style="color:var(--text-primary);text-decoration:none;">${escapeHtml(m.home)}</a>
+        ${homeTeamLink}
          vs
-        <a href="/teams/${awaySlug}/" style="color:var(--text-primary);text-decoration:none;">${escapeHtml(m.away)}</a>
+        ${awayTeamLink}
       </div>
       <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;">
         <span style="background:rgba(255,36,72,0.15);color:var(--accent);padding:4px 10px;border-radius:6px;font-weight:700;font-size:13px;">Tip: ${escapeHtml(m.tip || '1X2')}</span>
-        <a href="/analysis/${m.date || new Date().toISOString().slice(0,10)}/${homeSlug}-vs-${awaySlug}/" style="color:var(--accent);font-size:12px;text-decoration:none;font-weight:600;">View Analysis &rarr;</a>
+        ${analysisUrl ? `<a href="${analysisUrl}" style="color:var(--accent);font-size:12px;text-decoration:none;font-weight:600;">View Analysis &rarr;</a>` : ''}
       </div>
     </div>`;
   }).join('\n') || `<p style="color:var(--text-secondary);">No upcoming ${escapeHtml(teamName)} fixtures scheduled today.</p>`;
+
+  const h2hRecordsHtml = (teamData.h2hRecords || []).map(r => `
+    <div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;">
+      <span style="font-weight:600;font-size:15px;color:var(--text-primary);">${escapeHtml(r.opponent)}</span>
+      <a href="${r.href}" style="color:var(--accent);font-size:13px;font-weight:600;text-decoration:none;">H2H Stats &rarr;</a>
+    </div>`).join('\n');
 
   const streaksHtml = (teamData.streaks || []).map(s => `
     <div style="background:var(--bg-card);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:8px;padding:12px 16px;margin-bottom:10px;">
@@ -100,6 +173,8 @@ ${streaksHtml ? `<h2 style="font-size:20px;font-weight:700;margin-bottom:16px;">
   ${upcomingCardsHtml}
 </div>
 
+${h2hRecordsHtml ? `<h2 style="font-size:20px;font-weight:700;margin:24px 0 16px;">Head-to-Head Records</h2>\n<div>\n  ${h2hRecordsHtml}\n</div>` : ''}
+
 <section class="seo-content">
 <h2>About ${escapeHtml(teamName)} Predictions</h2>
 <p style="color:var(--text-secondary);line-height:1.7;margin-bottom:20px;">
@@ -141,6 +216,7 @@ WinFulltime tracks ${escapeHtml(teamName)} across all competitive fixtures to ge
 
 function main() {
   const teamsMap = new Map();
+  const h2hSlugs = listDirSlugs(H2H_OUTPUT_DIR);
 
   function getOrCreateTeam(name) {
     const slug = slugifyTeam(name);
@@ -152,10 +228,24 @@ function main() {
         league: '',
         country: '',
         upcoming: [],
-        streaks: []
+        streaks: [],
+        h2hRecords: []
       });
     }
     return teamsMap.get(slug);
+  }
+
+  function addH2hRecord(teamName, opponent) {
+    const t = getOrCreateTeam(teamName);
+    if (!t) return;
+    const s1 = matchupSlug(teamName, opponent);
+    const s2 = matchupSlug(opponent, teamName);
+    const href = s1 && h2hSlugs.has(s1) ? `/h2h/${s1}/` : s2 && h2hSlugs.has(s2) ? `/h2h/${s2}/` : '';
+    if (!href) return;
+    const key = String(opponent).toLowerCase();
+    if (!t.h2hRecords.some(r => r.opponent.toLowerCase() === key)) {
+      t.h2hRecords.push({ opponent, href });
+    }
   }
 
   // Load predictions cache
@@ -174,6 +264,7 @@ function main() {
             if (m.country && !t.country) t.country = m.country;
             t.upcoming.push({ home: homeName, away: awayName, time: m.time, tip: m.tip, league: m.league, date: m.date });
           }
+          addH2hRecord(homeName, awayName);
         }
         if (awayName) {
           const t = getOrCreateTeam(awayName);
@@ -182,6 +273,7 @@ function main() {
             if (m.country && !t.country) t.country = m.country;
             t.upcoming.push({ home: homeName, away: awayName, time: m.time, tip: m.tip, league: m.league, date: m.date });
           }
+          addH2hRecord(awayName, homeName);
         }
       });
     } catch (e) {
@@ -189,13 +281,19 @@ function main() {
     }
   }
 
-  // Load H2H cache for streaks
+  // Load H2H cache for streaks and matchup records
   if (fs.existsSync(H2H_CACHE_FILE)) {
     try {
       const h2hData = JSON.parse(fs.readFileSync(H2H_CACHE_FILE, 'utf8'));
       const datesObj = h2hData.dates || {};
       Object.keys(datesObj).forEach(d => {
         (datesObj[d] || []).forEach(m => {
+          const homeName = (m.home || '').trim();
+          const awayName = (m.away || '').trim();
+          if (homeName && awayName) {
+            addH2hRecord(homeName, awayName);
+            addH2hRecord(awayName, homeName);
+          }
           (m.streaks || []).forEach(s => {
             if (s.team) {
               const t = getOrCreateTeam(s.team);
@@ -212,15 +310,29 @@ function main() {
   }
 
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+  const analysisLinks = loadAnalysisLinksMap();
+  const existingTeamSlugs = listDirSlugs(OUTPUT_DIR);
+  const ctx = {
+    teamExists: slug => !!slug && existingTeamSlugs.has(slug),
+    analysisUrl: (home, away) => findAnalysisLink(home, away, analysisLinks)
+  };
   let generated = 0;
 
   teamsMap.forEach(tData => {
-    const html = generateTeamPage(tData.name, tData.slug, tData);
+    const html = generateTeamPage(tData.name, tData.slug, tData, ctx);
     const dirPath = path.join(OUTPUT_DIR, tData.slug);
     fs.mkdirSync(dirPath, { recursive: true });
     fs.writeFileSync(path.join(dirPath, 'index.html'), html);
     generated++;
   });
+
+  let pruned = 0;
+  listDirSlugs(OUTPUT_DIR).forEach(slug => {
+    if (teamsMap.has(slug)) return;
+    fs.rmSync(path.join(OUTPUT_DIR, slug), { recursive: true, force: true });
+    pruned++;
+  });
+  if (pruned) console.log(`[team-pages] Pruned ${pruned} stale team directories`);
 
   console.log(`[team-pages] Prerendered ${generated} Team Statistics Pages under ${OUTPUT_DIR}`);
 }

@@ -7,6 +7,29 @@ const { escapeHtml, generateFaqSchema, wrapPage } = require('./lib/layout');
 const RESULTS_FILE = path.join(__dirname, '..', 'results-cache.json');
 const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions', 'date');
 
+const MARKET_LINKS = [
+  { slug: '1x2', label: '1X2' },
+  { slug: 'over-1-5', label: 'Over 1.5' },
+  { slug: 'over-2-5', label: 'Over 2.5' },
+  { slug: 'btts', label: 'BTTS Yes' },
+  { slug: 'btts-no', label: 'BTTS No' },
+  { slug: 'corners', label: 'Corners' },
+  { slug: 'cards', label: 'Cards' },
+  { slug: 'unbeaten', label: 'Unbeaten' },
+  { slug: 'in-play', label: 'In Play' }
+];
+
+function listDirSlugs(dir) {
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir).filter(entry => {
+    try {
+      return fs.statSync(path.join(dir, entry)).isDirectory();
+    } catch (e) {
+      return false;
+    }
+  }).sort();
+}
+
 function formatDateTitle(dateStr) {
   try {
     const parts = dateStr.split('-');
@@ -18,7 +41,7 @@ function formatDateTitle(dateStr) {
   }
 }
 
-function generateDateArchivePage(dateStr, resultsList) {
+function generateDateArchivePage(dateStr, resultsList, ctx) {
   const dateTitle = formatDateTitle(dateStr);
   const canonicalUrl = `https://winfulltime.com/predictions/date/${dateStr}/`;
   const metaTitle = `Football Predictions & Results for ${dateTitle} | WinFulltime Track Record`;
@@ -80,7 +103,29 @@ function generateDateArchivePage(dateStr, resultsList) {
   const pageCss = `.stats-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:24px 0 32px}
 .stat-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
 .stat-num{font-size:24px;font-weight:800;color:var(--accent)}
-.stat-txt{font-size:12px;color:var(--text-secondary);margin-top:4px}`;
+.stat-txt{font-size:12px;color:var(--text-secondary);margin-top:4px}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip-link{display:inline-block;padding:9px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:999px;color:var(--text-primary);text-decoration:none;font-size:13px;font-weight:600;transition:all 0.2s}
+.chip-link:hover{border-color:var(--accent);color:var(--accent)}`;
+
+  const marketChips = MARKET_LINKS.map(l => `<a href="/predictions/${l.slug}" class="chip-link">${escapeHtml(l.label)} Predictions</a>`).join('\n        ');
+  const leagueChips = (ctx && ctx.leagueSlugs && ctx.leagueSlugs.length)
+    ? ctx.leagueSlugs.map(ls => `<a href="/predictions/league/${ls}/" class="chip-link">${escapeHtml(ls.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '))}</a>`).join('\n        ')
+    : '';
+  const relatedLinksHtml = `
+<section class="seo-content">
+<h2>Explore Markets</h2>
+<p style="color:var(--text-secondary);line-height:1.7;margin-bottom:16px;">Browse today's live predictions across every market WinFulltime covers.</p>
+<div class="chips">
+  ${marketChips}
+</div>
+${leagueChips ? `
+<h2 style="margin-top:32px;">Browse Leagues</h2>
+<p style="color:var(--text-secondary);line-height:1.7;margin-bottom:16px;">Jump to today's fixtures for any league.</p>
+<div class="chips">
+  ${leagueChips}
+</div>` : ''}
+</section>`;
 
   const body = `
 <div class="hero">
@@ -108,6 +153,8 @@ function generateDateArchivePage(dateStr, resultsList) {
   ${resultCardsHtml || '<p style="color:var(--text-secondary);">No archived match results recorded for this date.</p>'}
   ${allMatches.length > MAX_CARDS ? `<p style="color:var(--text-secondary);font-size:13px;margin-top:12px;">Showing the first ${MAX_CARDS} of ${allMatches.length} settled matches for ${escapeHtml(dateTitle)}.</p>` : ''}
 </div>
+
+${relatedLinksHtml}
 
 <section class="seo-content">
 <h2>About ${escapeHtml(dateTitle)} Prediction Track Record</h2>
@@ -155,6 +202,9 @@ function main() {
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
   let generated = 0;
 
+  const leagueSlugs = listDirSlugs(path.join(__dirname, '..', 'public', 'predictions', 'league'));
+  const ctx = { leagueSlugs };
+
   Object.keys(resultsData).forEach(dateStr => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return;
     const raw = resultsData[dateStr] || {};
@@ -164,12 +214,21 @@ function main() {
           const [home, away] = fixture.split(' - ');
           return { ...v, home, away, score: `${v.home}-${v.away}` };
         });
-    const pageHtml = generateDateArchivePage(dateStr, matchesArr);
+    const pageHtml = generateDateArchivePage(dateStr, matchesArr, ctx);
     const dirPath = path.join(OUTPUT_DIR, dateStr);
     fs.mkdirSync(dirPath, { recursive: true });
     fs.writeFileSync(path.join(dirPath, 'index.html'), pageHtml);
     generated++;
   });
+
+  let pruned = 0;
+  fs.readdirSync(OUTPUT_DIR).forEach(slug => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(slug)) return;
+    if (resultsData[slug]) return;
+    fs.rmSync(path.join(OUTPUT_DIR, slug), { recursive: true, force: true });
+    pruned++;
+  });
+  if (pruned) console.log(`[date-archive-pages] Pruned ${pruned} stale date archive directories`);
 
   console.log(`[date-archive-pages] Prerendered ${generated} Date Archive Pages under ${OUTPUT_DIR}`);
 }

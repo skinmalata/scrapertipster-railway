@@ -6,6 +6,32 @@ const path = require('path');
 const H2H_CACHE_FILE = path.join(__dirname, '..', 'h2h-unbeaten-cache.json');
 const PREDICTIONS_FILE = path.join(__dirname, '..', 'predictions-cache.json');
 const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'h2h');
+const TEAMS_OUTPUT_DIR = path.join(__dirname, '..', 'public', 'teams');
+const LEAGUE_OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions', 'league');
+const PREDICTIONS_OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions');
+const ANALYSIS_LINKS_FILE = path.join(__dirname, '..', 'public', 'data', 'analysis-links.json');
+
+const CATEGORY_KEYS = ['matches', 'over15Matches', 'over25Matches', 'bttsMatches', 'bttsNoMatches', 'cornersMatches', 'cardsMatches'];
+
+const DATA_KEY_TO_MARKET = {
+  matches: '1x2',
+  over15Matches: 'over-1-5',
+  over25Matches: 'over-2-5',
+  bttsMatches: 'btts',
+  bttsNoMatches: 'btts-no',
+  cornersMatches: 'corners',
+  cardsMatches: 'cards'
+};
+
+const MARKET_LABELS = {
+  '1x2': '1X2',
+  'over-1-5': 'Over 1.5 Goals',
+  'over-2-5': 'Over 2.5 Goals',
+  'btts': 'BTTS Yes',
+  'btts-no': 'BTTS No',
+  'corners': 'Corners',
+  'cards': 'Cards & Bookings'
+};
 
 function escapeHtml(str) {
   if (!str) return '';
@@ -25,6 +51,27 @@ function slugifyTeam(name) {
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+}
+
+function analysisSlugifyTeam(name) {
+  return String(name || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .split('(')[0]
+    .replace(/['’]/g, '')
+    .replace(/&/g, 'and')
+    .replace(/\b(?:fc|afc|cf|sc|ac)\b/g, ' ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function slugifyLeague(name) {
+  if (!name) return '';
+  let s = String(name).toLowerCase().trim();
+  s = s.replace(/^(england|spain|italy|germany|france|netherlands|portugal|brazil|argentina|turkey)\s*-\s*/i, '');
+  s = s.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  return s || '';
 }
 
 function matchupSlug(home, away) {
@@ -61,7 +108,8 @@ function generateH2hFaqSchema(home, away) {
   }, null, 2);
 }
 
-function generateH2hPage(home, away, slug, streaks, league, country) {
+function generateH2hPage(home, away, slug, streaks, league, country, links) {
+  links = links || {};
   const canonicalUrl = `https://winfulltime.com/h2h/${slug}/`;
   const metaTitle = `${home} vs ${away} Head to Head Stats & History | WinFulltime`;
   const metaDesc = `Head-to-head statistics, unbeaten streaks, win records, and match predictions for ${home} vs ${away}. Data-driven football analysis.`;
@@ -72,6 +120,16 @@ function generateH2hPage(home, away, slug, streaks, league, country) {
       <p style="margin:4px 0 0;font-size:14px;color:var(--text-secondary);">${escapeHtml(s.text || 'Unbeaten streak recorded in competitive matches.')}</p>
     </div>
   `).join('\n') || '<p style="color:var(--text-secondary);">No active long streaks recorded for this specific matchup.</p>';
+
+  const relatedItems = [];
+  if (links.homeTeam) relatedItems.push(`<a href="${links.homeTeam}">${escapeHtml(home)} Team Stats</a>`);
+  if (links.awayTeam) relatedItems.push(`<a href="${links.awayTeam}">${escapeHtml(away)} Team Stats</a>`);
+  if (links.league) relatedItems.push(`<a href="${links.league}">${escapeHtml(league || 'League')} Predictions</a>`);
+  if (links.analysis) relatedItems.push(`<a href="${links.analysis}">Match Analysis</a>`);
+  (links.categories || []).forEach(c => relatedItems.push(`<a href="${c.href}">${escapeHtml(c.label)}</a>`));
+  const relatedHtml = relatedItems.length
+    ? `<h2>Related Pages</h2>\n<div class="related-links">\n  ${relatedItems.join('\n  ')}\n</div>`
+    : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -122,6 +180,9 @@ ${generateH2hFaqSchema(home, away)}
 .matchup-header{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:32px 24px;text-align:center;margin-bottom:32px}
 .team-names{display:flex;justify-content:center;align-items:center;gap:24px;font-size:24px;font-weight:800;margin:16px 0}
 .vs-badge{background:var(--accent);color:#fff;font-size:14px;padding:4px 12px;border-radius:20px}
+.related-links{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.related-links a{display:inline-block;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--text-secondary);text-decoration:none;transition:background 0.15s,color 0.15s}
+.related-links a:hover{background:rgba(255,36,72,0.15);color:#fff}
 .seo-content{margin-top:48px;border-top:1px solid var(--border);padding-top:32px}
 .seo-content h2{font-size:22px;font-weight:700;margin-bottom:16px;color:var(--text-primary)}
 .faq-list{display:flex;flex-direction:column;gap:8px}
@@ -157,11 +218,12 @@ ${generateH2hFaqSchema(home, away)}
 <div class="matchup-header">
   <div style="font-size:13px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;font-weight:600;">Head to Head Statistics</div>
   <h1 class="team-names" style="margin:0;">
-    <div>${escapeHtml(home)}</div>
+    <div>${links.homeTeam ? `<a href="${links.homeTeam}" style="color:var(--text-primary);text-decoration:none;">${escapeHtml(home)}</a>` : escapeHtml(home)}</div>
     <div class="vs-badge">VS</div>
-    <div>${escapeHtml(away)}</div>
+    <div>${links.awayTeam ? `<a href="${links.awayTeam}" style="color:var(--text-primary);text-decoration:none;">${escapeHtml(away)}</a>` : escapeHtml(away)}</div>
   </h1>
-  <p style="color:var(--text-secondary);margin:0;font-size:14px;">${escapeHtml(league || 'Football')} ${country ? `(${escapeHtml(country)})` : ''}</p>
+  <p style="color:var(--text-secondary);margin:0;font-size:14px;">${links.league ? `<a href="${links.league}" style="color:var(--accent);text-decoration:none;">${escapeHtml(league || 'Football')}</a>` : escapeHtml(league || 'Football')} ${country ? `(${escapeHtml(country)})` : ''}</p>
+  ${links.analysis ? `<a href="${links.analysis}" style="display:inline-block;margin-top:16px;background:var(--accent);color:#fff;padding:10px 24px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;">View Full Match Analysis &rarr;</a>` : ''}
 </div>
 
 <h2 style="font-size:20px;font-weight:700;margin-bottom:16px;">Active Streaks &amp; H2H Performance</h2>
@@ -174,6 +236,8 @@ ${generateH2hFaqSchema(home, away)}
 <p style="color:var(--text-secondary);line-height:1.7;margin-bottom:20px;">
 This head-to-head page tracks historic statistics, unbeaten streaks, and competitive performance trends between ${escapeHtml(home)} and ${escapeHtml(away)}. Our statistical model processes team records to identify value betting opportunities across match outcome (1X2), goal lines, and team form indicators.
 </p>
+
+${relatedHtml}
 
 <h2>Frequently Asked Questions</h2>
 <div class="faq-list">
@@ -200,6 +264,78 @@ This head-to-head page tracks historic statistics, unbeaten streaks, and competi
 </div>
 </body>
 </html>`;
+}
+
+function loadAnalysisLinksMap() {
+  const rawMap = new Map();
+  const normMap = new Map();
+  try {
+    if (fs.existsSync(ANALYSIS_LINKS_FILE)) {
+      const links = JSON.parse(fs.readFileSync(ANALYSIS_LINKS_FILE, 'utf8'));
+      Object.keys(links).forEach(key => {
+        const parts = key.split('|');
+        if (parts.length !== 2) return;
+        rawMap.set(key, links[key]);
+        normMap.set(analysisSlugifyTeam(parts[0]) + '|' + analysisSlugifyTeam(parts[1]), links[key]);
+      });
+    }
+  } catch (e) {
+    console.warn('[h2h-pages] Failed to read analysis links:', e.message);
+  }
+  return { rawMap, normMap };
+}
+
+function listDirSlugs(dir) {
+  const set = new Set();
+  try {
+    if (fs.existsSync(dir)) {
+      fs.readdirSync(dir).forEach(entry => {
+        const full = path.join(dir, entry);
+        if (fs.statSync(full).isDirectory()) set.add(entry);
+      });
+    }
+  } catch (e) {}
+  return set;
+}
+
+function findAnalysisLink(home, away, analysisLinks) {
+  const h = home.trim().toLowerCase();
+  const a = away.trim().toLowerCase();
+  const direct = analysisLinks.rawMap.get(h + '|' + a);
+  if (direct) return direct;
+  const reverse = analysisLinks.rawMap.get(a + '|' + h);
+  if (reverse) return reverse;
+  const normDirect = analysisLinks.normMap.get(analysisSlugifyTeam(home) + '|' + analysisSlugifyTeam(away));
+  if (normDirect) return normDirect;
+  return analysisLinks.normMap.get(analysisSlugifyTeam(away) + '|' + analysisSlugifyTeam(home)) || '';
+}
+
+function scanMatrixMarkets() {
+  const map = new Map();
+  try {
+    if (fs.existsSync(PREDICTIONS_OUTPUT_DIR)) {
+      fs.readdirSync(PREDICTIONS_OUTPUT_DIR).forEach(leagueDir => {
+        if (leagueDir === 'league') return;
+        const leaguePath = path.join(PREDICTIONS_OUTPUT_DIR, leagueDir);
+        if (!fs.statSync(leaguePath).isDirectory()) return;
+        const markets = new Set();
+        fs.readdirSync(leaguePath).forEach(m => {
+          if (fs.statSync(path.join(leaguePath, m)).isDirectory()) markets.add(m);
+        });
+        if (markets.size) map.set(leagueDir, markets);
+      });
+    }
+  } catch (e) {}
+  return map;
+}
+
+function buildCategoryLinks(leagueSlug, matrixMarkets) {
+  const markets = matrixMarkets.get(leagueSlug);
+  if (!markets) return [];
+  return CATEGORY_KEYS
+    .map(k => DATA_KEY_TO_MARKET[k])
+    .filter(m => markets.has(m))
+    .map(m => ({ href: `/predictions/${leagueSlug}/${m}/`, label: MARKET_LABELS[m] }));
 }
 
 function main() {
@@ -267,15 +403,38 @@ function main() {
   }
 
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+
+  const analysisLinks = loadAnalysisLinksMap();
+  const teamSlugs = listDirSlugs(TEAMS_OUTPUT_DIR);
+  const leagueHubSlugs = listDirSlugs(LEAGUE_OUTPUT_DIR);
+  const matrixMarkets = scanMatrixMarkets();
   let generated = 0;
 
   matchupsMap.forEach(item => {
-    const pageHtml = generateH2hPage(item.home, item.away, item.slug, item.streaks, item.league, item.country);
+    const teamHomeSlug = slugifyTeam(item.home);
+    const teamAwaySlug = slugifyTeam(item.away);
+    const leagueSlug = slugifyLeague(item.league);
+    const links = {
+      homeTeam: teamHomeSlug && teamSlugs.has(teamHomeSlug) ? `/teams/${teamHomeSlug}/` : '',
+      awayTeam: teamAwaySlug && teamSlugs.has(teamAwaySlug) ? `/teams/${teamAwaySlug}/` : '',
+      analysis: findAnalysisLink(item.home, item.away, analysisLinks),
+      league: leagueSlug && leagueHubSlugs.has(leagueSlug) ? `/predictions/league/${leagueSlug}/` : '',
+      categories: buildCategoryLinks(leagueSlug, matrixMarkets)
+    };
+    const pageHtml = generateH2hPage(item.home, item.away, item.slug, item.streaks, item.league, item.country, links);
     const dir = path.join(OUTPUT_DIR, item.slug);
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, 'index.html'), pageHtml);
     generated++;
   });
+
+  let pruned = 0;
+  listDirSlugs(OUTPUT_DIR).forEach(slug => {
+    if (matchupsMap.has(slug)) return;
+    fs.rmSync(path.join(OUTPUT_DIR, slug), { recursive: true, force: true });
+    pruned++;
+  });
+  if (pruned) console.log(`[h2h-pages] Pruned ${pruned} stale H2H directories`);
 
   console.log(`[h2h-pages] Prerendered ${generated} Evergreen H2H Pages under ${OUTPUT_DIR}`);
 }

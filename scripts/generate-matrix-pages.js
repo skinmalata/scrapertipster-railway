@@ -6,6 +6,7 @@ const { escapeHtml, slugifyTeam, matchupSlug, generateFaqSchema, wrapPage } = re
 
 const PREDICTIONS_FILE = path.join(__dirname, '..', 'predictions-cache.json');
 const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions');
+const LEAGUE_OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions', 'league');
 
 const MARKETS = {
   '1x2': { label: '1X2 Result', dataKey: 'matches', heading: '1X2 Predictions', desc: 'match outcome' },
@@ -17,7 +18,18 @@ const MARKETS = {
   'cards': { label: 'Cards & Bookings', dataKey: 'cardsMatches', heading: 'Cards & Bookings Predictions', desc: 'yellow and red card bookings' }
 };
 
-const SIBLING_MARKETS = Object.keys(MARKETS).filter(k => k !== '1x2');
+function listDirSlugs(dir) {
+  const set = new Set();
+  try {
+    if (fs.existsSync(dir)) {
+      fs.readdirSync(dir).forEach(entry => {
+        const full = path.join(dir, entry);
+        if (fs.statSync(full).isDirectory()) set.add(entry);
+      });
+    }
+  } catch (e) {}
+  return set;
+}
 
 function slugifyLeague(name) {
   if (!name) return 'other-league';
@@ -64,7 +76,7 @@ function renderMatchCard(m, leagueSlug) {
   </div>`;
 }
 
-function generateMatrixPage(leagueName, leagueSlug, marketSlug, marketConfig, matches) {
+function generateMatrixPage(leagueName, leagueSlug, marketSlug, marketConfig, matches, existingMarkets, leagueHubExists) {
   const count = matches.length;
   const canonicalUrl = `https://winfulltime.com/predictions/${leagueSlug}/${marketSlug}/`;
   const metaTitle = `${leagueName} ${marketConfig.label} Predictions Today | WinFulltime`;
@@ -72,10 +84,11 @@ function generateMatrixPage(leagueName, leagueSlug, marketSlug, marketConfig, ma
 
   const matchCardsHtml = matches.map(m => renderMatchCard(m, leagueSlug)).join('\n');
 
-  const siblingLinks = SIBLING_MARKETS
-    .filter(s => s !== marketSlug)
-    .map(s => `<a href="/predictions/${leagueSlug}/${s}/">${MARKETS[s].label}</a>`)
-    .join('\n    ');
+  const relatedLinks = [];
+  if (leagueHubExists) relatedLinks.push(`<a href="/predictions/league/${leagueSlug}/">${escapeHtml(leagueName)} Hub</a>`);
+  Object.keys(MARKETS)
+    .filter(s => s !== marketSlug && existingMarkets && existingMarkets.has(s))
+    .forEach(s => relatedLinks.push(`<a href="/predictions/${leagueSlug}/${s}/">${MARKETS[s].label}</a>`));
 
   const schemaJson = JSON.stringify({
     '@context': 'https://schema.org',
@@ -119,8 +132,8 @@ function generateMatrixPage(leagueName, leagueSlug, marketSlug, marketConfig, ma
 </div>
 
 <div class="related-links">
-  <span style="font-size:13px;font-weight:600;color:var(--text-secondary);align-self:center;">More ${escapeHtml(leagueName)} markets:</span>
-  ${siblingLinks}
+  <span style="font-size:13px;font-weight:600;color:var(--text-secondary);align-self:center;">More ${escapeHtml(leagueName)} pages:</span>
+  ${relatedLinks.join('\n    ')}
 </div>
 
 <section class="seo-content">
@@ -155,7 +168,7 @@ Our prediction engine processes ${escapeHtml(leagueName)} fixture data specifica
     pageCss,
     breadcrumbs: [
       { href: '/', label: 'Home' },
-      { href: `/predictions/league/${leagueSlug}/`, label: leagueName },
+      ...(leagueHubExists ? [{ href: `/predictions/league/${leagueSlug}/`, label: leagueName }] : []),
       { label: marketConfig.label }
     ],
     body
@@ -170,6 +183,20 @@ function main() {
 
   const raw = fs.readFileSync(PREDICTIONS_FILE, 'utf8');
   const data = JSON.parse(raw);
+
+  const leagueMarkets = new Map();
+  Object.keys(MARKETS).forEach(marketSlug => {
+    const marketConfig = MARKETS[marketSlug];
+    const matchesList = data[marketConfig.dataKey] || [];
+    matchesList.forEach(m => {
+      const rawLeague = (m.league || 'Other Leagues').trim();
+      const leagueSlug = slugifyLeague(rawLeague);
+      if (!leagueSlug) return;
+      if (!leagueMarkets.has(leagueSlug)) leagueMarkets.set(leagueSlug, new Set());
+      leagueMarkets.get(leagueSlug).add(marketSlug);
+    });
+  });
+  const leagueHubSlugs = listDirSlugs(LEAGUE_OUTPUT_DIR);
 
   let generated = 0;
 
@@ -203,13 +230,49 @@ function main() {
 
     leagueMap.forEach(leagueObj => {
       if (leagueObj.matches.length === 0) return;
-      const html = generateMatrixPage(leagueObj.name, leagueObj.slug, marketSlug, marketConfig, leagueObj.matches);
+      const html = generateMatrixPage(
+        leagueObj.name,
+        leagueObj.slug,
+        marketSlug,
+        marketConfig,
+        leagueObj.matches,
+        leagueMarkets.get(leagueObj.slug) || new Set(),
+        leagueHubSlugs.has(leagueObj.slug)
+      );
       const dirPath = path.join(OUTPUT_DIR, leagueObj.slug, marketSlug);
       fs.mkdirSync(dirPath, { recursive: true });
       fs.writeFileSync(path.join(dirPath, 'index.html'), html);
       generated++;
     });
   });
+
+  let pruned = 0;
+  if (fs.existsSync(OUTPUT_DIR)) {
+    fs.readdirSync(OUTPUT_DIR).forEach(leagueSlug => {
+      if (leagueSlug === 'league' || leagueSlug === 'date') return;
+      const leaguePath = path.join(OUTPUT_DIR, leagueSlug);
+      if (!fs.statSync(leaguePath).isDirectory()) return;
+      if (!leagueMarkets.has(leagueSlug)) {
+        fs.rmSync(leaguePath, { recursive: true, force: true });
+        pruned++;
+        return;
+      }
+      const liveMarkets = leagueMarkets.get(leagueSlug);
+      fs.readdirSync(leaguePath).forEach(marketSlug => {
+        if (liveMarkets.has(marketSlug)) return;
+        const marketPath = path.join(leaguePath, marketSlug);
+        if (fs.statSync(marketPath).isDirectory()) {
+          fs.rmSync(marketPath, { recursive: true, force: true });
+          pruned++;
+        }
+      });
+      if (fs.readdirSync(leaguePath).length === 0) {
+        fs.rmSync(leaguePath, { recursive: true, force: true });
+        pruned++;
+      }
+    });
+  }
+  if (pruned) console.log(`[matrix-pages] Pruned ${pruned} stale matrix directories`);
 
   console.log(`[matrix-pages] Prerendered ${generated} Market x League Matrix Pages under ${OUTPUT_DIR}`);
 }
