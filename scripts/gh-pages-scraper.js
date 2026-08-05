@@ -154,6 +154,64 @@ function enrichPublishedPredictions(dataDir) {
   return true;
 }
 
+function isSameFixture(a, b) {
+  if ((a.date || '') !== (b.date || '')) return false;
+  const ta = splitMatch(a.match);
+  const tb = splitMatch(b.match);
+  if (ta.length !== 2 || tb.length !== 2) return a.match === b.match;
+  const s1 = (teamSimilarity(ta[0], tb[0]) + teamSimilarity(ta[1], tb[1])) / 2;
+  const s2 = (teamSimilarity(ta[0], tb[1]) + teamSimilarity(ta[1], tb[0])) / 2;
+  return Math.max(s1, s2) >= 0.7;
+}
+
+// If the upstream sources drop fixtures that were present in the last
+// committed snapshot (fixture churn / flaky source), recover them so
+// previously generated pages don't silently lose content on redeploy. Only
+// fixtures inside the current scrape window are recovered, so genuinely
+// cancelled or expired matches are not kept alive forever. Mirrors the
+// findMissedMatches/mergeMissedMatches recovery the runtime server performs
+// via fetchPredictions, which the static build bypasses.
+function recoverMissedFixtures(freshData, committed) {
+  if (!committed || !Array.isArray(committed.matches) || committed.matches.length === 0) {
+    return freshData;
+  }
+
+  const freshMatches = freshData.matches || [];
+  const hasWindow = Array.isArray(freshData.dates) && freshData.dates.length > 0;
+  const window = hasWindow ? new Set(freshData.dates) : null;
+  const missed = (committed.matches || []).filter(m => {
+    if (!m || !m.match) return false;
+    if (window && !window.has(m.date)) return false;
+    return !freshMatches.some(f => f && f.match && isSameFixture(m, f));
+  });
+
+  if (missed.length === 0) return freshData;
+
+  const merged = { ...freshData };
+  merged.matches = [...missed, ...(freshData.matches || [])].sort((a, b) => {
+    if (a.date === b.date) return 0;
+    return new Date(a.date) - new Date(b.date);
+  });
+  merged.totalMatches = merged.matches.length;
+  merged.recoveredMatches = missed.length;
+
+  const missedOver25 = missed.filter(m => m.over25 || (m.tip && m.tip.includes('Over 2.5')));
+  const missedOver15 = missed.filter(m => m.over15 || (m.tip && m.tip.includes('Over 1.5')));
+  const missedBtts = missed.filter(m => m.btts || (m.tip && m.tip.includes('BTTS')));
+  merged.over25Matches = [...missedOver25, ...(freshData.over25Matches || [])];
+  merged.over15Matches = [...missedOver15, ...(freshData.over15Matches || [])];
+  merged.bttsMatches = [...missedBtts, ...(freshData.bttsMatches || [])];
+  merged.totalOver25 = merged.over25Matches.length;
+  merged.totalOver15 = merged.over15Matches.length;
+  merged.totalBtts = merged.bttsMatches.length;
+
+  console.log(`Recovered ${missed.length} fixture(s) missing from fresh scrape:`);
+  missed.forEach(m => console.log(`  - ${m.match} (${m.date})`));
+
+  fs.writeFileSync(path.join(process.cwd(), 'predictions-cache.json'), JSON.stringify(merged));
+  return merged;
+}
+
 async function main() {
   console.log('=== GitHub Pages Scraper ===');
 
@@ -162,12 +220,22 @@ async function main() {
     fs.mkdirSync(dataDir, { recursive: true });
   }
 
+  const cacheFile = path.join(process.cwd(), 'predictions-cache.json');
+  let committedCache = null;
+  try {
+    if (fs.existsSync(cacheFile)) {
+      committedCache = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
+    }
+  } catch (e) {
+    console.warn('Could not read committed predictions cache for recovery:', e.message);
+  }
+
   console.log('Fetching predictions...');
   try {
     const data = await scraper.fetchAndCachePredictions();
     console.log(`Got ${data.totalMatches} matches`);
+    recoverMissedFixtures(data, committedCache);
 
-    const cacheFile = path.join(process.cwd(), 'predictions-cache.json');
     if (fs.existsSync(cacheFile)) {
       const predictions = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
       predictions.generatedAt = new Date().toISOString();
@@ -201,7 +269,6 @@ async function main() {
     }
   } catch (err) {
     console.error('Predictions fetch failed:', err.message);
-    const cacheFile = path.join(process.cwd(), 'predictions-cache.json');
     if (fs.existsSync(cacheFile)) {
       const predictions = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
       predictions.generatedAt = new Date().toISOString();
@@ -349,7 +416,8 @@ async function main() {
     require('./generate-team-pages').main,
     require('./generate-h2h-pages').main,
     require('./generate-league-pages').main,
-    require('./generate-matrix-pages').main
+    require('./generate-matrix-pages').main,
+    require('./generate-converter-pages').main
   ];
   for (const regen of regenerators) {
     try {
@@ -489,5 +557,5 @@ if (require.main === module) {
     process.exit(1);
   });
 } else {
-  module.exports = { enrichWithResults, enrichPublishedPredictions, rebuildStatic, updateSitemapCore, main };
+  module.exports = { enrichWithResults, enrichPublishedPredictions, rebuildStatic, updateSitemapCore, recoverMissedFixtures, main };
 }

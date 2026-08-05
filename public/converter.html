@@ -549,6 +549,23 @@
    </div>
   </div>
 
+<!-- bet9ja-status-notice:start -->
+<div class="disclaimer">
+   <p>Taking a while? Bet9ja code conversion is experiencing issues at present, and our technical team is working on it.</p>
+   <p>SportyBet, MSport and Betway conversions are unaffected.</p>
+  </div>
+<!-- bet9ja-status-notice:end -->
+<!-- popular-conversions:start -->
+  <div class="cv-limit-chips" style="justify-content:center;margin:16px 0 0;">
+    <a class="cv-chip" style="text-decoration:none;" href="/convert/sportybet-to-msport/">SportyBet &rarr; MSport</a>
+    <a class="cv-chip" style="text-decoration:none;" href="/convert/msport-to-sportybet/">MSport &rarr; SportyBet</a>
+    <a class="cv-chip" style="text-decoration:none;" href="/convert/sportybet-to-bet9ja/">SportyBet &rarr; Bet9ja</a>
+    <a class="cv-chip" style="text-decoration:none;" href="/convert/bet9ja-to-sportybet/">Bet9ja &rarr; SportyBet</a>
+    <a class="cv-chip" style="text-decoration:none;" href="/convert/sportybet-to-betway/">SportyBet &rarr; Betway</a>
+    <a class="cv-chip" style="text-decoration:none;" href="/convert/betway-to-sportybet/">Betway &rarr; SportyBet</a>
+    <a class="cv-chip" style="text-decoration:none;" href="/convert/">All conversions &rarr;</a>
+  </div>
+<!-- popular-conversions:end -->
   <section class="cv-intro" aria-label="About the booking code converter">
    <p>Booking codes are the short strings Nigerian bookmakers generate so you can share a full betting slip in a single line. This free <strong>booking code converter</strong> reads a code from <strong>SportyBet, MSport, Bet9ja or Betway</strong>, shows you every selection with its odds, and lets you <strong>convert a betting code</strong> into a playable code for another bookmaker you already use.</p>
   </section>
@@ -702,6 +719,20 @@
 
    fromSel.addEventListener('change', refreshToOptions);
    refreshToOptions();
+
+   // Optional from/to bookmakers via URL params (programmatic /convert/*/ pages)
+   function applyUrlParams() {
+     var params = new URLSearchParams(window.location.search);
+     var from = params.get('from');
+     var to = params.get('to');
+     if (from && fromSel.querySelector('option[value="' + from + '"]')) {
+       fromSel.value = from;
+     }
+     if (to && toSel.querySelector('option[value="' + to + '"]')) {
+       toSel.value = to;
+     }
+   }
+   applyUrlParams();
 
    function showStatus(msg, type) {
      statusEl.textContent = msg;

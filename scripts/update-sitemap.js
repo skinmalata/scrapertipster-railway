@@ -125,6 +125,14 @@ function buildSitemap() {
     urlEntry(`https://winfulltime.com/predictions/date/${d}/`, today, 'never', '0.6')
   ).join('\n');
 
+  // Prerendered Booking Code Converter Pages (/convert/ hub + /convert/<from>-to-<to>/).
+  const convertEntries = [
+    urlEntry('https://winfulltime.com/convert/', today, 'weekly', '0.8'),
+    ...listPageSlugs('convert').map(slug =>
+      urlEntry(`https://winfulltime.com/convert/${slug}/`, today, 'weekly', '0.7')
+    )
+  ].join('\n');
+
   // Prerendered Matrix Pages (/predictions/{league}/{market}/).
   const matrixEntries = [];
   if (fs.existsSync(path.join(ROOT, 'predictions'))) {
@@ -150,6 +158,7 @@ ${leagueEntries}
 ${h2hEntries}
 ${matrixXml}
 ${teamEntries}
+${convertEntries}
 ${dateEntries}
 ${blogEntries}
 </urlset>
