@@ -231,6 +231,8 @@ function main() {
   if (pruned) console.log(`[date-archive-pages] Pruned ${pruned} stale date archive directories`);
 
   console.log(`[date-archive-pages] Prerendered ${generated} Date Archive Pages under ${OUTPUT_DIR}`);
+
+  try { require('./update-sitemap').main(); } catch (e) { console.error('[date-archive-pages] Sitemap refresh failed:', e.message); }
 }
 
 if (require.main === module) main();

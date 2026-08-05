@@ -1,7 +1,7 @@
-const CACHE_NAME = 'winfulltime-v5';
-const STATIC_CACHE = 'winfulltime-static-v5';
-const DYNAMIC_CACHE = 'winfulltime-dynamic-v5';
-const IMAGE_CACHE = 'winfulltime-images-v5';
+const CACHE_NAME = 'winfulltime-v6';
+const STATIC_CACHE = 'winfulltime-static-v6';
+const DYNAMIC_CACHE = 'winfulltime-dynamic-v6';
+const IMAGE_CACHE = 'winfulltime-images-v6';
 
 const STATIC_ASSETS = [
   '/',
@@ -27,15 +27,18 @@ const STATIC_ASSETS = [
   '/icons/icon-192.png',
   '/icons/icon-512.png',
   '/manifest.json',
-  '/predictions/1x2.html',
-  '/predictions/over-2-5.html',
-  '/predictions/over-1-5.html',
-  '/predictions/btts.html',
-  '/predictions/btts-no.html',
-  '/predictions/corners.html',
-  '/predictions/cards.html',
-  '/predictions/unbeaten.html'
-  ,'/predictions/in-play.html'
+  '/predictions/1x2',
+  '/predictions/over-2-5',
+  '/predictions/over-1-5',
+  '/predictions/btts',
+  '/predictions/btts-no',
+  '/predictions/corners',
+  '/predictions/cards',
+  '/predictions/unbeaten',
+  '/predictions/winning-streak',
+  '/predictions/losing-streak',
+  '/predictions/draws-streak'
+  ,'/predictions/in-play'
 ];
 
 self.addEventListener('install', event => {

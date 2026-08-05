@@ -200,6 +200,7 @@ ${keywords ? `<meta name="keywords" content="${escapeHtml(keywords)}">` : ''}
 <meta property="og:site_name" content="WinFulltime">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="${canonicalUrl}">
 <meta name="twitter:title" content="${escapeHtml(title)}">
 <meta name="twitter:description" content="${escapeHtml(description)}">
 <meta name="twitter:image" content="https://winfulltime.com/winfulltimelogo.png">

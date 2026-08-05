@@ -248,6 +248,8 @@ function main() {
 
   fs.writeFileSync(INDEX_FILE, newPage);
   console.log(`[blog-index] Updated staticContent: ${parsed.sections.reduce((n, s) => n + s.cards.length, 0)} existing + ${newSlugs.length} new cards`);
+
+  try { require('./update-sitemap').main(); } catch (e) { console.error('[blog-index] Sitemap refresh failed:', e.message); }
 }
 
 if (require.main === module) main();

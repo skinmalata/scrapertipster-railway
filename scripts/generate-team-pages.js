@@ -335,6 +335,8 @@ function main() {
   if (pruned) console.log(`[team-pages] Pruned ${pruned} stale team directories`);
 
   console.log(`[team-pages] Prerendered ${generated} Team Statistics Pages under ${OUTPUT_DIR}`);
+
+  try { require('./update-sitemap').main(); } catch (e) { console.error('[team-pages] Sitemap refresh failed:', e.message); }
 }
 
 if (require.main === module) main();

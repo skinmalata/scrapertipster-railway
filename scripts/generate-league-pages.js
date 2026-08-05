@@ -35,6 +35,29 @@ function slugifyTeam(name) {
     .replace(/^-+|-+$/g, '');
 }
 
+// Matches the slug flavour used by the analysis page generator (build-analysis.js),
+// which strips fc/ac/cf prefixes ("AC Milan" => "milan"). Only used to resolve
+// analysis-page links so they match the directories that actually exist.
+function analysisSlugifyTeam(name) {
+  return String(name || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .split('(')[0]
+    .replace(/['’]/g, '')
+    .replace(/&/g, 'and')
+    .replace(/\b(?:fc|afc|cf|sc|ac)\b/g, ' ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function analysisMatchupSlug(home, away) {
+  const h = analysisSlugifyTeam(home);
+  const a = analysisSlugifyTeam(away);
+  if (!h || !a) return '';
+  return h + '-vs-' + a;
+}
+
 function listDirSlugs(dir) {
   if (!fs.existsSync(dir)) return new Set();
   return new Set(
@@ -116,7 +139,7 @@ function renderMatchCard(m, analysisUrls) {
 
   const homeRaw = (m.home || (m.match ? m.match.split('-')[0] : '') || '').trim();
   const awayRaw = (m.away || (m.match ? m.match.split('-')[1] : '') || '').trim();
-  const slug = homeRaw && awayRaw ? matchupSlug(homeRaw, awayRaw) : '';
+  const slug = homeRaw && awayRaw ? analysisMatchupSlug(homeRaw, awayRaw) : '';
   const analysisKey = slug ? `${dateStr}/${slug}` : '';
   const analysisUrl = analysisKey && analysisUrls && analysisUrls.has(analysisKey) ? `/analysis/${analysisKey}/` : '';
 
@@ -191,6 +214,7 @@ function generateLeaguePage(leagueName, leagueSlug, matches, ctx) {
 <meta property="og:image" content="https://winfulltime.com/winfulltimelogo.png">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="${canonicalUrl}">
 <meta name="twitter:title" content="${escapeHtml(metaTitle)}">
 <meta name="twitter:description" content="${escapeHtml(metaDesc)}">
 <meta name="twitter:image" content="https://winfulltime.com/winfulltimelogo.png">
@@ -423,6 +447,8 @@ function main() {
   if (pruned) console.log(`[league-pages] Pruned ${pruned} stale league hub directories`);
 
   console.log(`[league-pages] Prerendered ${generated} League Hub Pages under ${OUTPUT_DIR}`);
+
+  try { require('./update-sitemap').main(); } catch (e) { console.error('[league-pages] Sitemap refresh failed:', e.message); }
 }
 
 if (require.main === module) main();

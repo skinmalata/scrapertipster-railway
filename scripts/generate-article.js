@@ -231,6 +231,7 @@ function articleHtml(a, relatedBox) {
 <meta property="article:author" content="https://winfulltime.com/author-bio.html">
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="${url}">
 <meta name="twitter:title" content="${esc(a.title)}">
 <meta name="twitter:description" content="${esc(a.description)}">
 <meta name="twitter:image" content="${image}">
@@ -898,6 +899,8 @@ function main() {
     const { main: regenerateBlogIndex } = require('./generate-blog-index');
     regenerateBlogIndex();
   }
+
+  try { require('./update-sitemap').main(); } catch (e) { console.error('[article] Sitemap refresh failed:', e.message); }
 }
 
 if (require.main === module) main();

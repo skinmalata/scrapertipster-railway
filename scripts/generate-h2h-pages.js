@@ -147,6 +147,7 @@ function generateH2hPage(home, away, slug, streaks, league, country, links) {
 <meta property="og:image" content="https://winfulltime.com/winfulltimelogo.png">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="${canonicalUrl}">
 <meta name="twitter:title" content="${escapeHtml(metaTitle)}">
 <meta name="twitter:description" content="${escapeHtml(metaDesc)}">
 <meta name="twitter:image" content="https://winfulltime.com/winfulltimelogo.png">
@@ -427,6 +428,8 @@ function main() {
   if (pruned) console.log(`[h2h-pages] Pruned ${pruned} stale H2H directories`);
 
   console.log(`[h2h-pages] Prerendered ${generated} Evergreen H2H Pages under ${OUTPUT_DIR}`);
+
+  try { require('./update-sitemap').main(); } catch (e) { console.error('[h2h-pages] Sitemap refresh failed:', e.message); }
 }
 
 if (require.main === module) main();

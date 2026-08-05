@@ -11,7 +11,8 @@
     "generate-pins": "node scripts/generate-daily-pins.js",
     "post-pins": "node scripts/post-to-pinterest.js",
     "generate:thumbnail": "node scripts/generate-thumbnail.js",
-    "generate:blog-index": "node scripts/generate-blog-index.js"
+    "generate:blog-index": "node scripts/generate-blog-index.js",
+    "update:sitemap": "node scripts/update-sitemap.js"
   },
   "dependencies": {
     "@lemonsqueezy/lemonsqueezy.js": "^4.0.0",

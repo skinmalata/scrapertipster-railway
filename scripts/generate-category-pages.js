@@ -65,6 +65,24 @@ const FAQ_SCHEMA = {
     { q: 'Which factors influence card predictions?', a: 'Key factors include a team average cards per game, derby or rivalry intensity, referee strictness, league discipline norms, and tactical style. Teams that press aggressively or play physically tend to accumulate more bookings.' },
     { q: 'Can I combine cards picks with other markets?', a: 'Yes. Cards picks pair well with 1X2 and Under 2.5 goals in accumulators. Physical, low-scoring matches often produce both fewer goals and more cards, making them natural combination candidates.' },
     { q: 'When are cards predictions updated?', a: 'Cards predictions update daily alongside all other markets. The primary refresh runs at 1:00 AM WAT with a secondary update at 6:00 AM WAT to capture late-appearing fixtures with strong booking trends.' }
+  ],
+  'winning-streak': [
+    { q: 'What is a winning streak in football betting?', a: 'A winning streak is a sequence of consecutive matches in which a team has won every game without a draw or defeat. WinFulltime tracks streaks of 5 or more consecutive victories and pairs them with each team\'s next fixture.' },
+    { q: 'How do winning streak predictions help me bet?', a: 'Teams on long winning runs combine confidence, momentum, and proven form, which bookmakers often underprice. Our streak pages surface those teams and their next match so you can judge whether the streak is likely to continue.' },
+    { q: 'What does "Back To Back Wins" mean?', a: 'It is the number of consecutive matches a team has won in a row. A badge reading "Back To Back Wins: 11" means the team has won 11 straight matches entering the highlighted fixture.' },
+    { q: 'When is winning streak data updated?', a: 'Streak data updates daily. The primary refresh runs at 1:00 AM WAT and a secondary update at 6:00 AM WAT captures the latest results and newly scheduled fixtures across dozens of leagues.' }
+  ],
+  'losing-streak': [
+    { q: 'What is a losing streak?', a: 'A losing streak is a sequence of consecutive matches in which a team has lost every game. We highlight teams on long losing runs along with their next fixture, which is useful for identifying vulnerable sides.' },
+    { q: 'Why track losing streaks for betting?', a: 'Teams in poor form often present both a liability and an opportunity. Backing against a team on a long losing run — or fading their win price — is a common strategy, and our data makes those fixtures easy to find.' },
+    { q: 'What does "Back To Back Losses" mean?', a: 'It is the number of consecutive defeats a team has suffered. A badge reading "Back To Back Losses: 22" means the team has lost 22 straight matches entering the highlighted fixture.' },
+    { q: 'When is losing streak data updated?', a: 'Streak data updates daily. The primary refresh runs at 1:00 AM WAT and a secondary update at 6:00 AM WAT ensures the latest results are reflected across all covered leagues.' }
+  ],
+  'draws-streak': [
+    { q: 'What is a draws streak?', a: 'A draws streak is a sequence of consecutive matches in which a team has drawn every game. WinFulltime tracks teams stuck in long draw runs and pairs them with their next fixture.' },
+    { q: 'Why do draw streaks matter for betting?', a: 'Teams repeatedly sharing points are prime candidates for the draw market and double-chance X picks. Identifying a side that keeps drawing helps you target the X outcome in fixtures bookmakers may price too optimistically.' },
+    { q: 'What does "Back To Back Draws" mean?', a: 'It is the number of consecutive drawn matches a team has recorded. A badge reading "Back To Back Draws: 5" means the team has drawn 5 straight matches entering the highlighted fixture.' },
+    { q: 'When is draws streak data updated?', a: 'Streak data updates daily. The primary refresh runs at 1:00 AM WAT and a secondary update at 6:00 AM WAT keeps the draw-streak pages current with the latest results.' }
   ]
 };
 
@@ -161,6 +179,30 @@ const CATEGORIES = {
     keywords: 'cards predictions, yellow cards tips, bookings predictions, football card betting, over cards tips',
     heading: 'Cards Predictions',
     label: 'Cards'
+  },
+  'winning-streak': {
+    dataKey: 'winstreakMatches',
+    title: 'Winning Streak Predictions Today',
+    description: 'Teams on long winning runs and their next fixture. Free winning streak football predictions updated daily across 50+ leagues.',
+    keywords: 'winning streak predictions, teams on winning streak, football winning runs, back to back wins tips',
+    heading: 'Winning Streaks',
+    label: 'Win Streak'
+  },
+  'losing-streak': {
+    dataKey: 'losestreakMatches',
+    title: 'Losing Streak Predictions Today',
+    description: 'Teams on long losing runs and their next fixture. Free losing streak football predictions to identify vulnerable sides, updated daily.',
+    keywords: 'losing streak predictions, teams on losing streak, football losing runs, back to back losses tips',
+    heading: 'Losing Streaks',
+    label: 'Loss Streak'
+  },
+  'draws-streak': {
+    dataKey: 'drawstreakMatches',
+    title: 'Draws Streak Predictions Today',
+    description: 'Teams stuck in long draw runs and their next fixture. Free draws streak football predictions for the draw market, updated daily.',
+    keywords: 'draws streak predictions, football draw runs, back to back draws tips, draw market predictions',
+    heading: 'Draw Streaks',
+    label: 'Draw Streak'
   }
 };
 
@@ -177,7 +219,7 @@ function generateCategoryPage(slug, catConfig, ctx) {
     return `<a href="/predictions/${s}" id="tab-${s}" class="tab-btn${active}">${escapeHtml(c.label)}</a>`;
   }).join('\n            ');
 
-  const isStreak = slug === 'draws-streak';
+  const isStreak = slug === 'winning-streak' || slug === 'losing-streak' || slug === 'draws-streak';
   const isUnbeaten = slug === 'unbeaten';
 
   const leagueLinks = (ctx && ctx.leagueSlugs && ctx.leagueSlugs.length)
@@ -600,6 +642,8 @@ function generateAllPages(outputDir) {
   }
 
   console.log('All category pages generated in ' + outputDir);
+
+  try { require('./update-sitemap').main(); } catch (e) { console.error('[category-pages] Sitemap refresh failed:', e.message); }
 }
 
 module.exports = { CATEGORIES, generateCategoryPage, generateAllPages };

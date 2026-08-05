@@ -2,12 +2,13 @@
 
 const fs = require('fs');
 const path = require('path');
-const { escapeHtml, slugifyTeam, matchupSlug, generateFaqSchema, wrapPage } = require('./lib/layout');
+const { escapeHtml, slugifyTeam, generateFaqSchema, wrapPage } = require('./lib/layout');
 
 const PREDICTIONS_FILE = path.join(__dirname, '..', 'predictions-cache.json');
 const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions');
 const LEAGUE_OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions', 'league');
 const ANALYSIS_OUTPUT_DIR = path.join(__dirname, '..', 'public', 'analysis');
+const TEAMS_OUTPUT_DIR = path.join(__dirname, '..', 'public', 'teams');
 
 function listAnalysisUrls() {
   const urls = new Set();
@@ -57,7 +58,30 @@ function slugifyLeague(name) {
   return s || 'other-league';
 }
 
-function renderMatchCard(m, leagueSlug, analysisUrls) {
+// Matches the slug flavour used by the analysis page generator (build-analysis.js),
+// which strips fc/ac/cf prefixes ("AC Milan" => "milan"). Only used to resolve
+// analysis-page links so they match the directories that actually exist.
+function analysisSlugifyTeam(name) {
+  return String(name || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .split('(')[0]
+    .replace(/['’]/g, '')
+    .replace(/&/g, 'and')
+    .replace(/\b(?:fc|afc|cf|sc|ac)\b/g, ' ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function analysisMatchupSlug(home, away) {
+  const h = analysisSlugifyTeam(home);
+  const a = analysisSlugifyTeam(away);
+  if (!h || !a) return '';
+  return h + '-vs-' + a;
+}
+
+function renderMatchCard(m, leagueSlug, analysisUrls, teamSlugs) {
   const home = escapeHtml(m.home || (m.match ? m.match.split('-')[0] : 'Home'));
   const away = escapeHtml(m.away || (m.match ? m.match.split('-')[1] : 'Away'));
   const time = escapeHtml(m.time || 'TBD');
@@ -67,7 +91,7 @@ function renderMatchCard(m, leagueSlug, analysisUrls) {
 
   const homeRaw = (m.home || (m.match ? m.match.split('-')[0] : '') || '').trim();
   const awayRaw = (m.away || (m.match ? m.match.split('-')[1] : '') || '').trim();
-  const slug = homeRaw && awayRaw ? matchupSlug(homeRaw, awayRaw) : '';
+  const slug = homeRaw && awayRaw ? analysisMatchupSlug(homeRaw, awayRaw) : '';
   const analysisKey = slug ? `${dateStr}/${slug}` : '';
   const analysisUrl = analysisKey && analysisUrls && analysisUrls.has(analysisKey) ? `/analysis/${analysisKey}/` : '';
   const homeTeamSlug = slugifyTeam(homeRaw);
@@ -89,21 +113,21 @@ function renderMatchCard(m, leagueSlug, analysisUrls) {
         ${tip} ${prob ? `<span style="opacity:0.8;font-size:11px;">(${prob}%)</span>` : ''}
       </div>
       <div style="display:flex;gap:12px;align-items:center;">
-        ${homeTeamSlug ? `<a href="/teams/${homeTeamSlug}/" style="color:var(--text-secondary);font-size:11px;text-decoration:none;">${home}</a>` : ''}
-        ${awayTeamSlug ? `<a href="/teams/${awayTeamSlug}/" style="color:var(--text-secondary);font-size:11px;text-decoration:none;">${away}</a>` : ''}
+        ${homeTeamSlug && teamSlugs && teamSlugs.has(homeTeamSlug) ? `<a href="/teams/${homeTeamSlug}/" style="color:var(--text-secondary);font-size:11px;text-decoration:none;">${home}</a>` : ''}
+        ${awayTeamSlug && teamSlugs && teamSlugs.has(awayTeamSlug) ? `<a href="/teams/${awayTeamSlug}/" style="color:var(--text-secondary);font-size:11px;text-decoration:none;">${away}</a>` : ''}
         ${analysisUrl ? `<a href="${analysisUrl}" class="analysis-btn" style="color:var(--accent);font-size:12px;font-weight:600;text-decoration:none;">Analysis &rarr;</a>` : ''}
       </div>
     </div>
   </div>`;
 }
 
-function generateMatrixPage(leagueName, leagueSlug, marketSlug, marketConfig, matches, existingMarkets, leagueHubExists, analysisUrls) {
+function generateMatrixPage(leagueName, leagueSlug, marketSlug, marketConfig, matches, existingMarkets, leagueHubExists, analysisUrls, teamSlugs) {
   const count = matches.length;
   const canonicalUrl = `https://winfulltime.com/predictions/${leagueSlug}/${marketSlug}/`;
   const metaTitle = `${leagueName} ${marketConfig.label} Predictions Today | WinFulltime`;
   const metaDesc = `AI-powered ${leagueName} ${marketConfig.label.toLowerCase()} predictions with probability scores. Free ${marketConfig.desc} tips, form analysis, and match previews updated daily for ${leagueName}.`;
 
-  const matchCardsHtml = matches.map(m => renderMatchCard(m, leagueSlug, analysisUrls)).join('\n');
+  const matchCardsHtml = matches.map(m => renderMatchCard(m, leagueSlug, analysisUrls, teamSlugs)).join('\n');
 
   const relatedLinks = [];
   if (leagueHubExists) relatedLinks.push(`<a href="/predictions/league/${leagueSlug}/">${escapeHtml(leagueName)} Hub</a>`);
@@ -219,6 +243,7 @@ function main() {
   });
   const leagueHubSlugs = listDirSlugs(LEAGUE_OUTPUT_DIR);
   const analysisUrls = listAnalysisUrls();
+  const teamSlugs = listDirSlugs(TEAMS_OUTPUT_DIR);
 
   let generated = 0;
 
@@ -260,7 +285,8 @@ function main() {
         leagueObj.matches,
         leagueMarkets.get(leagueObj.slug) || new Set(),
         leagueHubSlugs.has(leagueObj.slug),
-        analysisUrls
+        analysisUrls,
+        teamSlugs
       );
       const dirPath = path.join(OUTPUT_DIR, leagueObj.slug, marketSlug);
       fs.mkdirSync(dirPath, { recursive: true });
@@ -298,6 +324,8 @@ function main() {
   if (pruned) console.log(`[matrix-pages] Pruned ${pruned} stale matrix directories`);
 
   console.log(`[matrix-pages] Prerendered ${generated} Market x League Matrix Pages under ${OUTPUT_DIR}`);
+
+  try { require('./update-sitemap').main(); } catch (e) { console.error('[matrix-pages] Sitemap refresh failed:', e.message); }
 }
 
 if (require.main === module) main();

@@ -350,9 +350,29 @@ function slugifyTeam(name) {
     .replace(/^-+|-+$/g, '');
 }
 
+// Slug flavour used by the team/h2h page generators (prefixes kept: "AC Milan"
+// => "ac-milan"). Used only for cross-linking to /teams/ and /h2h/ so the
+// analysis page links match the pages that actually exist.
+function linkSlugifyTeam(name) {
+  if (!name) return '';
+  return String(name)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 function matchupSlug(home, away) {
   const slug = slugifyTeam(home) + '-vs-' + slugifyTeam(away);
   return slug === '-vs-' ? '' : slug;
+}
+
+function linkMatchupSlug(home, away) {
+  const h = linkSlugifyTeam(home);
+  const a = linkSlugifyTeam(away);
+  if (!h || !a) return '';
+  return h + '-vs-' + a;
 }
 
 function renderForm(team, form) {
@@ -474,12 +494,12 @@ function buildContentHtml(analysis, home, away, matchup, dateStr, ctx) {
 
   if (ctx.teamExists) {
     const related = [];
-    const homeTeamSlug = slugifyTeam(home);
-    const awayTeamSlug = slugifyTeam(away);
+    const homeTeamSlug = linkSlugifyTeam(home);
+    const awayTeamSlug = linkSlugifyTeam(away);
     if (homeTeamSlug && ctx.teamExists(homeTeamSlug)) related.push('<a href="/teams/' + homeTeamSlug + '/" class="cta-link">' + escapeHtml(cleanTeamName(homeName)) + ' Team Stats</a>');
     if (awayTeamSlug && ctx.teamExists(awayTeamSlug)) related.push('<a href="/teams/' + awayTeamSlug + '/" class="cta-link">' + escapeHtml(cleanTeamName(awayName)) + ' Team Stats</a>');
     if (ctx.h2hExists) {
-      const h2hSlug = matchupSlug(home, away);
+      const h2hSlug = linkMatchupSlug(home, away);
       if (h2hSlug && ctx.h2hExists(h2hSlug)) related.push('<a href="/h2h/' + h2hSlug + '/" class="cta-link">Head to Head</a>');
     }
     if (related.length) {
@@ -522,6 +542,8 @@ function buildStaticPage(matchup, slug, analysis, template, dateStr, ctx) {
   page = page.replace('<meta name="description" content="Detailed football match analysis including recent form, head-to-head statistics, team performance metrics, and predictions.">', '<meta name="description" content="' + escapeHtml(desc) + '">');
   page = page.replace('<meta name="keywords" content="match analysis, football analysis, team statistics, head to head, h2h">', '<meta name="keywords" content="' + escapeHtml(home + ' vs ' + away + ', ' + (matchup.league || '') + ', ' + (matchup.country || '') + ', match analysis, football analysis, team statistics, head to head, h2h').replace(/\s+/g, ' ').trim() + '">');
   page = page.replace('<link rel="canonical" href="https://winfulltime.com/analysis.html">', '<link rel="canonical" href="' + url + '">\n <meta property="article:published_time" content="' + escapeHtml(dateStr || today) + '">\n <meta property="article:modified_time" content="' + escapeHtml(today) + '">');
+  page = page.replace('<meta property="og:url" content="https://winfulltime.com/analysis.html">', '<meta property="og:url" content="' + url + '">');
+  page = page.replace('<meta name="twitter:url" content="https://winfulltime.com/analysis.html">', '<meta name="twitter:url" content="' + url + '">');
   page = page.replace('<meta property="og:title" content="Match Analysis - WinFulltime">', '<meta property="og:title" content="' + escapeHtml(cleanTitle + ' - Analysis - WinFulltime') + '">');
   page = page.replace('<meta property="og:description" content="Detailed football match analysis with statistics and predictions.">', '<meta property="og:description" content="' + escapeHtml(desc) + '">');
   page = page.replace('<meta name="robots" content="index, follow">', hasContent ? '<meta name="robots" content="index, follow">' : '<meta name="robots" content="noindex, nofollow">');
@@ -862,6 +884,8 @@ async function main() {
   } else {
     console.warn('[analysis] No public/analysis.html template — skipping prerender');
   }
+
+  try { require('./update-sitemap').main(); } catch (e) { console.error('[analysis] Sitemap refresh failed:', e.message); }
 }
 
 if (require.main === module) {
