@@ -72,6 +72,8 @@ h3 { font-size: 18px; margin-bottom: 16px; font-weight: 700; border-bottom: 1px 
 .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .analysis-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 16px; }
 .analysis-card h4 { font-size: 16px; margin-bottom: 10px; font-weight: 700; background: linear-gradient(135deg, #ff2448, #d41a38); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.analysis-card h4 a { color: #ff2448; -webkit-text-fill-color: #ff2448; text-decoration: none; }
+.analysis-card h4 a:hover { text-decoration: underline; }
 .analysis-card p { color: #94a3b8; font-size: 14px; line-height: 1.6; margin: 0; }
 .form-bar { display: flex; gap: 4px; }
 .form-result { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; }
@@ -459,10 +461,20 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   return String(name || '').split('(')[0].trim();
  }
 
+ function slugifyTeam(name) {
+  return String(name || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+ }
+
+ function teamHeading(team) {
+  const name = escapeHtml(cleanTeamName(team));
+  const slug = slugifyTeam(team);
+  return slug ? `<a href="/teams/${slug}/">${name}</a>` : name;
+ }
+
  function renderForm(team, form) {
   return `
   <div class="analysis-card">
-   <h4>${escapeHtml(cleanTeamName(team))}</h4>
+   <h4>${teamHeading(team)}</h4>
    <div class="form-bar">
     ${String(form || '').slice(-5).split('').map(f => `<span class="form-result ${getFormClass(f)}">${escapeHtml(f)}</span>`).join('')}
    </div>
@@ -473,7 +485,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   const s = stats || {};
   return `
   <div class="analysis-card">
-   <h4>${escapeHtml(cleanTeamName(team))}</h4>
+   <h4>${teamHeading(team)}</h4>
    <div class="stats-grid">
     <div class="stat-item"><div class="stat-label">W</div><div class="stat-value">${s.wins || 0}</div></div>
     <div class="stat-item"><div class="stat-label">D</div><div class="stat-value">${s.draws || 0}</div></div>

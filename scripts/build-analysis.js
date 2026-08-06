@@ -375,17 +375,46 @@ function linkMatchupSlug(home, away) {
   return h + '-vs-' + a;
 }
 
-function renderForm(team, form) {
-  return '<div class="analysis-card"><h4>' + escapeHtml(cleanTeamName(team)) + '</h4><div class="form-bar">' +
+function teamStatsHref(ctx, team) {
+  if (!ctx || !ctx.teamExists) return '';
+  const slug = linkSlugifyTeam(team);
+  return slug && ctx.teamExists(slug) ? '/teams/' + slug + '/' : '';
+}
+
+// generate-team-pages / generate-h2h-pages run AFTER buildAnalysis in the
+// same CI pipeline (gh-pages-scraper.js) and create a page for every team and
+// matchup listed in predictions-cache.json, so seed the expected slugs from
+// today's predictions too. Otherwise teams new to today's fixtures have no
+// on-disk page yet when analysis builds and never get linked.
+function seedSlugsFromPredictions(predictions, teamSlugs, h2hSlugs) {
+  ((predictions && predictions.matches) || []).forEach(function (m) {
+    const home = String(m.home || (m.match ? m.match.split('-')[0] : '')).trim();
+    const away = String(m.away || (m.match ? m.match.split('-')[1] : '')).trim();
+    const hs = linkSlugifyTeam(home);
+    const as = linkSlugifyTeam(away);
+    if (hs) teamSlugs.add(hs);
+    if (as) teamSlugs.add(as);
+    const ms = linkMatchupSlug(home, away);
+    if (ms) h2hSlugs.add(ms);
+  });
+}
+
+function teamHeading(team, href) {
+  const name = escapeHtml(cleanTeamName(team));
+  return href ? '<a href="' + href + '">' + name + '</a>' : name;
+}
+
+function renderForm(team, form, href) {
+  return '<div class="analysis-card"><h4>' + teamHeading(team, href) + '</h4><div class="form-bar">' +
     String(form || '').slice(-5).split('').map(function (f) {
       return '<span class="form-result ' + (f === 'W' ? 'form-win' : f === 'D' ? 'form-draw' : f === 'L' ? 'form-loss' : '') + '">' + escapeHtml(f) + '</span>';
     }).join('') +
     '</div></div>';
 }
 
-function renderStats(team, stats) {
+function renderStats(team, stats, href) {
   const s = stats || {};
-  return '<div class="analysis-card"><h4>' + escapeHtml(cleanTeamName(team)) + '</h4><div class="stats-grid">' +
+  return '<div class="analysis-card"><h4>' + teamHeading(team, href) + '</h4><div class="stats-grid">' +
     '<div class="stat-item"><div class="stat-label">W</div><div class="stat-value">' + (s.wins || 0) + '</div></div>' +
     '<div class="stat-item"><div class="stat-label">D</div><div class="stat-value">' + (s.draws || 0) + '</div></div>' +
     '<div class="stat-item"><div class="stat-label">L</div><div class="stat-value">' + (s.losses || 0) + '</div></div>' +
@@ -399,8 +428,8 @@ function hasStats(stats) {
   return (s.wins || 0) + (s.draws || 0) + (s.losses || 0) > 0 || Number(s.avgScored || 0) > 0;
 }
 
-function renderNoDataCard(team, note) {
-  return '<div class="analysis-card"><h4>' + escapeHtml(cleanTeamName(team)) + '</h4><p style="margin:0;color:rgba(232,237,245,0.55);font-size:13px;line-height:1.5;">' + note + '</p></div>';
+function renderNoDataCard(team, note, href) {
+  return '<div class="analysis-card"><h4>' + teamHeading(team, href) + '</h4><p style="margin:0;color:rgba(232,237,245,0.55);font-size:13px;line-height:1.5;">' + note + '</p></div>';
 }
 
 function buildContentHtml(analysis, home, away, matchup, dateStr, ctx) {
@@ -422,18 +451,21 @@ function buildContentHtml(analysis, home, away, matchup, dateStr, ctx) {
       infoBits.join(' &middot; ') + ' &middot; Updated ' + escapeHtml(today) + '</p></div>';
   }
 
+  const homeHref = teamStatsHref(ctx, home);
+  const awayHref = teamStatsHref(ctx, away);
+
   const formCards = [];
   const homeHasForm = sideHasTeamData(analysis.homeForm, analysis.homeLast10);
   const awayHasForm = sideHasTeamData(analysis.awayForm, analysis.awayLast10);
   if (homeHasForm) {
-    formCards.push(renderForm(homeName, analysis.homeForm));
+    formCards.push(renderForm(homeName, analysis.homeForm, homeHref));
   } else if (awayHasForm) {
-    formCards.push(renderNoDataCard(homeName, 'No recent form data available for ' + escapeHtml(cleanTeamName(homeName)) + '.'));
+    formCards.push(renderNoDataCard(homeName, 'No recent form data available for ' + escapeHtml(cleanTeamName(homeName)) + '.', homeHref));
   }
   if (awayHasForm) {
-    formCards.push(renderForm(awayName, analysis.awayForm));
+    formCards.push(renderForm(awayName, analysis.awayForm, awayHref));
   } else if (homeHasForm) {
-    formCards.push(renderNoDataCard(awayName, 'No recent form data available for ' + escapeHtml(cleanTeamName(awayName)) + '.'));
+    formCards.push(renderNoDataCard(awayName, 'No recent form data available for ' + escapeHtml(cleanTeamName(awayName)) + '.', awayHref));
   }
   if (formCards.length) {
     html += '<div class="analysis-section"><h3>Recent Form</h3><div class="analysis-grid">' + formCards.join('') + '</div></div>';
@@ -443,14 +475,14 @@ function buildContentHtml(analysis, home, away, matchup, dateStr, ctx) {
   const homeHasStats = hasStats(analysis.homeLast10);
   const awayHasStats = hasStats(analysis.awayLast10);
   if (homeHasStats) {
-    statCards.push(renderStats(homeName, analysis.homeLast10));
+    statCards.push(renderStats(homeName, analysis.homeLast10, homeHref));
   } else if (awayHasStats) {
-    statCards.push(renderNoDataCard(homeName, 'No recent statistics available for ' + escapeHtml(cleanTeamName(homeName)) + '.'));
+    statCards.push(renderNoDataCard(homeName, 'No recent statistics available for ' + escapeHtml(cleanTeamName(homeName)) + '.', homeHref));
   }
   if (awayHasStats) {
-    statCards.push(renderStats(awayName, analysis.awayLast10));
+    statCards.push(renderStats(awayName, analysis.awayLast10, awayHref));
   } else if (homeHasStats) {
-    statCards.push(renderNoDataCard(awayName, 'No recent statistics available for ' + escapeHtml(cleanTeamName(awayName)) + '.'));
+    statCards.push(renderNoDataCard(awayName, 'No recent statistics available for ' + escapeHtml(cleanTeamName(awayName)) + '.', awayHref));
   }
   if (statCards.length) {
     html += '<div class="analysis-section"><h3>Statistics (Last 10 Matches)</h3><div class="analysis-grid">' + statCards.join('') + '</div></div>';
@@ -873,6 +905,7 @@ async function main() {
 
   const teamSlugs = listDirSlugs(TEAMS_OUTPUT_DIR);
   const h2hSlugs = listDirSlugs(H2H_OUTPUT_DIR);
+  seedSlugsFromPredictions(predictions, teamSlugs, h2hSlugs);
   if (fs.existsSync(ANALYSIS_TEMPLATE_FILE)) {
     const template = fs.readFileSync(ANALYSIS_TEMPLATE_FILE, 'utf8');
     const links = {};
