@@ -44,6 +44,15 @@ function esc(v) {
     .replace(/"/g, '&quot;');
 }
 
+function unesc(v) {
+  return String(v == null ? '' : v)
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&#0?39;/g, "'");
+}
+
 function formatMonthYear(dateStr) {
   if (!dateStr) return '';
   const m = String(dateStr).match(/^(\d{4})-(\d{2})/);
@@ -150,7 +159,7 @@ function extractArticleMeta(slug) {
   const datePublished = (html.match(/["']datePublished["']\s*:\s*["']([^"']+)["']/i) || ['', ''])[1]
     || (html.match(/<meta\s+property=["']article:published_time["']\s+content=["']([^"']+)["']/i) || ['', ''])[1];
 
-  const sectionMeta = (html.match(/<meta\s+property=["']article:section["']\s+content=["']([^"']*)["']/i) || ['', ''])[1].trim();
+  const sectionMeta = unesc((html.match(/<meta\s+property=["']article:section["']\s+content=["']([^"']*)["']/i) || ['', ''])[1]).trim();
 
   return {
     slug,
