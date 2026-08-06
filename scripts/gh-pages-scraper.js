@@ -408,6 +408,16 @@ async function main() {
     console.error('Analysis build failed:', err.message);
   }
 
+  // Team statistics (standings position, form, recent results) from FotMob.
+  // Runs before the linker regenerators so /teams/<slug>/ pages render live
+  // stats instead of the committed snapshot. Refreshes each nightly CI run.
+  console.log('Scraping team statistics...');
+  try {
+    await require('./scrape-team-stats').main();
+  } catch (err) {
+    console.error('Team stats scrape failed:', err.message);
+  }
+
   // Regenerate cross-link pages (teams, h2h, league, matrix, date archives)
   // AFTER buildAnalysis so they reference the freshly written analysis pages
   // and analysis-links.json instead of the committed stale snapshot.

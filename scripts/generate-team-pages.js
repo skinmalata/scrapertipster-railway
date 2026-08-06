@@ -10,6 +10,7 @@ const RESULTS_FILE = path.join(__dirname, '..', 'results-cache.json');
 const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'teams');
 const H2H_OUTPUT_DIR = path.join(__dirname, '..', 'public', 'h2h');
 const ANALYSIS_LINKS_FILE = path.join(__dirname, '..', 'public', 'data', 'analysis-links.json');
+const TEAM_STATS_FILE = path.join(__dirname, '..', 'team-stats-cache.json');
 
 function analysisSlugifyTeam(name) {
   return String(name || '')
@@ -55,6 +56,20 @@ function findAnalysisLink(home, away, analysisLinks) {
   return analysisLinks.normMap.get(analysisSlugifyTeam(away) + '|' + analysisSlugifyTeam(home)) || '';
 }
 
+function loadTeamStatsMap() {
+  const map = new Map();
+  try {
+    if (fs.existsSync(TEAM_STATS_FILE)) {
+      const data = JSON.parse(fs.readFileSync(TEAM_STATS_FILE, 'utf8'));
+      const teams = (data && data.teams) || {};
+      Object.keys(teams).forEach(slug => map.set(slug, teams[slug]));
+    }
+  } catch (e) {
+    console.warn('[team-pages] Failed to read team stats cache:', e.message);
+  }
+  return map;
+}
+
 function listDirSlugs(dir) {
   const set = new Set();
   try {
@@ -76,6 +91,55 @@ function slugifyLeague(name) {
   return s || '';
 }
 
+function teamStatsHtml(stats, ctx) {
+  if (!stats) return '';
+  const formBadges = String(stats.form || '').split('').map(l => {
+    const color = l === 'W' ? '#2AD572' : l === 'L' ? '#FF4646' : '#FFD908';
+    return `<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:${color};color:#111;font-weight:800;font-size:13px;margin-right:6px;">${l}</span>`;
+  }).join('');
+
+  const table = stats.table || {};
+  const record = stats.record || {};
+  const rows = [];
+  if (table.position) {
+    rows.push({ label: 'League Position', value: `${table.position}${table.position === 1 ? 'st' : table.position === 2 ? 'nd' : table.position === 3 ? 'rd' : 'th'} ${table.league ? `in ${table.league}` : ''}` });
+  }
+  if (typeof table.played === 'number') rows.push({ label: 'Matches Played', value: String(table.played) });
+  if (typeof table.points === 'number') rows.push({ label: 'Points', value: String(table.points) });
+  if (typeof record.wins === 'number') rows.push({ label: 'Last 10 Record', value: `${record.wins}W-${record.draws}D-${record.losses}L` });
+  if (typeof record.avgScored === 'number') rows.push({ label: 'Goals Scored (avg)', value: String(record.avgScored) });
+  if (typeof record.avgConceded === 'number') rows.push({ label: 'Goals Conceded (avg)', value: String(record.avgConceded) });
+
+  const recentRows = (stats.recent || []).slice(0, 6).map(r => {
+    const oppSlug = slugifyTeam(r.opponent);
+    const oppLink = ctx.teamExists && ctx.teamExists(oppSlug)
+      ? `<a href="/teams/${oppSlug}/" style="color:var(--text-primary);text-decoration:none;">${escapeHtml(r.opponent)}</a>`
+      : escapeHtml(r.opponent);
+    const badgeColor = r.result === 'W' ? '#2AD572' : r.result === 'L' ? '#FF4646' : '#FFD908';
+    return `
+      <div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:6px;font-size:13px;">
+        <span style="color:var(--text-secondary);min-width:74px;">${escapeHtml(r.date || '')}</span>
+        <span style="flex:1;font-weight:600;color:var(--text-primary);">${oppLink}</span>
+        <span style="font-weight:800;color:var(--text-primary);margin:0 12px;">${escapeHtml(r.score || '')}</span>
+        <span style="color:${badgeColor};font-weight:800;width:16px;text-align:center;">${r.result}</span>
+      </div>`;
+  }).join('\n');
+
+  return `
+<h2 style="font-size:20px;font-weight:700;margin:24px 0 16px;">Team Statistics &amp; Recent Form</h2>
+<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:20px;">
+  ${formBadges ? `<div style="margin-bottom:16px;">${formBadges}</div>` : ''}
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;">
+    ${rows.map(r => `
+      <div>
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);margin-bottom:2px;">${escapeHtml(r.label)}</div>
+        <div style="font-size:15px;font-weight:700;color:var(--text-primary);">${escapeHtml(r.value)}</div>
+      </div>`).join('\n')}
+  </div>
+</div>
+${recentRows ? `<div>${recentRows}</div>` : ''}`;
+}
+
 function generateTeamPage(teamName, teamSlug, teamData, ctx) {
   ctx = ctx || {};
   const canonicalUrl = `https://winfulltime.com/teams/${teamSlug}/`;
@@ -86,8 +150,9 @@ function generateTeamPage(teamName, teamSlug, teamData, ctx) {
   const metaTitle = `${teamName} Betting Tips, Stats & Predictions | WinFulltime`;
   const upcomingCount = (teamData.upcoming || []).length;
   const streakCount = (teamData.streaks || []).length;
+  const hasStats = !!(teamData.stats && (teamData.stats.table || teamData.stats.recent || teamData.stats.form));
   const metaDesc = upcomingCount > 0
-    ? `${teamName} next match prediction, recent form, and ${leagueName} betting statistics. ${upcomingCount} upcoming fixture${upcomingCount !== 1 ? 's' : ''} with AI-powered tips and probability scores.${streakCount > 0 ? ` ${streakCount} active streak${streakCount !== 1 ? 's' : ''} tracked.` : ''}`
+    ? `${teamName} next match prediction, recent form, and ${leagueName} betting statistics.${hasStats ? ` ${teamData.stats.table && teamData.stats.table.position ? `Currently ${teamData.stats.table.position}${teamData.stats.table.position === 1 ? 'st' : teamData.stats.table.position === 2 ? 'nd' : teamData.stats.table.position === 3 ? 'rd' : 'th'} in ${leagueName}.` : ''} ${teamData.stats.form ? `Recent form: ${teamData.stats.form}.` : ''}` : ''} ${upcomingCount} upcoming fixture${upcomingCount !== 1 ? 's' : ''} with AI-powered tips and probability scores.${streakCount > 0 ? ` ${streakCount} active streak${streakCount !== 1 ? 's' : ''} tracked.` : ''}`
     : `${teamName} form history, head-to-head records, and ${leagueName} statistics. AI-powered prediction model covering 1X2, Over 2.5, BTTS, and corner markets.`;
 
   const upcomingCardsHtml = (teamData.upcoming || []).map(m => {
@@ -167,6 +232,8 @@ function generateTeamPage(teamName, teamSlug, teamData, ctx) {
 </div>
 
 ${streaksHtml ? `<h2 style="font-size:20px;font-weight:700;margin-bottom:16px;">Active Streaks &amp; Form</h2>${streaksHtml}` : ''}
+
+${teamStatsHtml(teamData.stats, ctx)}
 
 <h2 style="font-size:20px;font-weight:700;margin:24px 0 16px;">Upcoming Fixtures &amp; Predictions</h2>
 <div>
@@ -311,14 +378,21 @@ function main() {
 
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
   const analysisLinks = loadAnalysisLinksMap();
+  const teamStats = loadTeamStatsMap();
   const existingTeamSlugs = listDirSlugs(OUTPUT_DIR);
+  // teamExists must include every slug in teamsMap because all of them get a
+  // page written this run, even if the on-disk snapshot (from the last commit
+  // in CI) doesn't have them yet. Otherwise brand-new teams render their
+  // opponent names as plain text instead of links.
   const ctx = {
-    teamExists: slug => !!slug && existingTeamSlugs.has(slug),
+    teamExists: slug => !!slug && (teamsMap.has(slug) || existingTeamSlugs.has(slug)),
     analysisUrl: (home, away) => findAnalysisLink(home, away, analysisLinks)
   };
   let generated = 0;
 
   teamsMap.forEach(tData => {
+    const stats = teamStats.get(tData.slug) || null;
+    tData.stats = stats;
     const html = generateTeamPage(tData.name, tData.slug, tData, ctx);
     const dirPath = path.join(OUTPUT_DIR, tData.slug);
     fs.mkdirSync(dirPath, { recursive: true });
