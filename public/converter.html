@@ -473,6 +473,18 @@
   .cv-guides a { color: var(--accent-soft); text-decoration: none; transition: color 0.2s; }
   .cv-guides a:hover { color: var(--accent); text-decoration: underline; }
 
+  /* Converted-today social proof feed */
+  .cv-today { margin: 18px 0 0; padding: 18px 20px; border: 1px solid var(--border); border-radius: 14px; background: var(--bg-card); }
+  .cv-today-title { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800; margin: 0 0 4px; color: var(--text); }
+  .cv-today-count { font-size: 11px; font-weight: 800; color: var(--accent); background: rgba(255, 36, 72, 0.1); padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .cv-today-sub { font-size: 12.5px; color: var(--text-muted); margin: 0 0 10px; }
+  .cv-today-list { list-style: none; margin: 0; padding: 0; }
+  .cv-today-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .cv-today-list li:last-child { border-bottom: 0; }
+  .cv-today-pair { font-weight: 700; color: var(--text); }
+  .cv-today-meta { color: var(--text-muted); font-size: 12px; text-align: right; }
+  .cv-today-empty { justify-content: center; color: var(--text-muted); font-style: italic; }
+
   .cv-faq { margin-top: 6px; }
   .faq-item {
     background: var(--bg);
@@ -609,6 +621,14 @@
    <div class="cv-loading" id="cvLoading">Working with the bookmaker&#8230;</div>
   </div>
 
+  <section class="cv-today" aria-label="Codes converted today">
+   <h2 class="cv-today-title">Converted today <span class="cv-today-count" id="cvTodayCount">&#8230;</span></h2>
+   <p class="cv-today-sub">Real bookings converted on WinFulltime today. Only the bookmakers, selection count and odds are shown &#8212; no codes are exposed.</p>
+   <ul class="cv-today-list" id="cvTodayList">
+    <li class="cv-today-empty">Loading recent conversions&#8230;</li>
+   </ul>
+  </section>
+
   <div class="cv-card" id="cvPreviewCard" style="display:none;">
    <h2 class="cv-card-title"><span class="step" style="background:linear-gradient(135deg,#3b82f6,#2563eb);box-shadow:0 10px 40px rgba(59,130,246,0.25);">i</span> Code Preview</h2>
    <p class="cv-card-sub" id="cvPreviewMeta"></p>
@@ -734,6 +754,62 @@
    }
    applyUrlParams();
 
+   // Converted-today social proof feed (server-logged, anonymous, no codes)
+   var todayCountEl = document.getElementById('cvTodayCount');
+   var todayListEl = document.getElementById('cvTodayList');
+
+   function timeAgo(iso) {
+     var then = new Date(iso).getTime();
+     var diff = Date.now() - then;
+     if (!Number.isFinite(diff) || diff < 0) return 'just now';
+     var min = Math.floor(diff / 60000);
+     if (min < 1) return 'just now';
+     if (min < 60) return min + ' min ago';
+     var hours = Math.floor(min / 60);
+     if (hours < 24) return hours + 'h ago';
+     return Math.floor(hours / 24) + 'd ago';
+   }
+
+   function renderToday(data) {
+     var entries = (data && data.entries) || [];
+     todayCountEl.textContent = data && data.count ? data.count + ' today' : '0 today';
+     todayListEl.innerHTML = '';
+     if (!entries.length) {
+       var empty = document.createElement('li');
+       empty.className = 'cv-today-empty';
+       empty.textContent = 'No codes converted yet today \u2014 be the first.';
+       todayListEl.appendChild(empty);
+       return;
+     }
+     entries.forEach(function (entry) {
+       var li = document.createElement('li');
+       var pair = document.createElement('span');
+       pair.className = 'cv-today-pair';
+       pair.textContent = (entry.fromName || entry.from || '?') + ' \u2192 ' + (entry.toName || entry.to || '?');
+       var meta = document.createElement('span');
+       meta.className = 'cv-today-meta';
+       var parts = [];
+       if (entry.legCount) parts.push(entry.legCount + ' selection' + (entry.legCount === 1 ? '' : 's'));
+       if (entry.totalOdds !== null && entry.totalOdds !== undefined) parts.push('@ ' + Number(entry.totalOdds).toFixed(2));
+       parts.push(timeAgo(entry.createdAt));
+       meta.textContent = parts.join(' \u00b7 ');
+       li.appendChild(pair);
+       li.appendChild(meta);
+       todayListEl.appendChild(li);
+     });
+   }
+
+   function loadToday() {
+     fetch(API_BASE + '/api/converter/recent')
+       .then(function (res) { return res.json().catch(function () { return {}; }); })
+       .then(function (data) {
+         if (data && data.success) renderToday(data);
+         else renderToday(null);
+       })
+       .catch(function () { renderToday(null); });
+   }
+   loadToday();
+
    function showStatus(msg, type) {
      statusEl.textContent = msg;
      statusEl.className = 'cv-status show' + (type ? ' ' + type : '');
@@ -835,11 +911,12 @@
      try {
        var data = await api('/api/converter/convert', { code: code, from: fromSel.value, to: toSel.value });
        document.getElementById('cvResultMeta').textContent = data.fromName + ' \u2192 ' + data.toName + ' \u00b7 ' + data.legCount + ' selection' + (data.legCount === 1 ? '' : 's') + (data.totalOdds ? ' \u00b7 total odds ' + Number(data.totalOdds).toFixed(2) : '');
-       document.getElementById('cvNewCode').textContent = data.code;
-       resultCard.style.display = 'block';
-       showStatus('New code generated successfully. It is valid until the first match kicks off.', 'info');
-       resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-     } catch (err) {
+        document.getElementById('cvNewCode').textContent = data.code;
+        resultCard.style.display = 'block';
+        showStatus('New code generated successfully. It is valid until the first match kicks off.', 'info');
+        resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        loadToday();
+      } catch (err) {
        showStatus(err.message, 'error');
      } finally {
        setLoading(false);

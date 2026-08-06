@@ -3,6 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const { decodeCode, convertCode, providerStatus, BOOKMAKERS, MAX_LEGS } = require('../services/bookingCodes/converter');
+const { recordConversion, getRecent } = require('../services/bookingCodes/recentConversions');
 
 const STATUS_BY_CODE = {
   BAD_REQUEST: 400,
@@ -43,6 +44,7 @@ router.post('/converter/convert', async function (req, res) {
   try {
     const body = req.body || {};
     const result = await convertCode({ code: body.code, from: body.from, to: body.to, keepLegs: body.keepLegs });
+    recordConversion(result);
     res.json({
       success: true,
       from: result.from,
@@ -73,6 +75,11 @@ router.get('/converter', function (req, res) {
 
 router.get('/converter/status', function (req, res) {
   res.json({ success: true, providers: providerStatus() });
+});
+
+router.get('/converter/recent', function (req, res) {
+  const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 25));
+  res.json({ success: true, ...getRecent(limit) });
 });
 
 module.exports = router;
