@@ -324,17 +324,21 @@ function cleanTeamName(name) {
   return String(name || '').split('(')[0].trim();
 }
 
-function computeEndDate(dateStr, time, hours) {
-  try {
-    const [hh, mm] = String(time).split(':').map(Number);
-    if (isNaN(hh) || isNaN(mm)) return dateStr + 'T' + time + ':00';
-    const start = new Date(dateStr + 'T' + time + ':00Z');
-    if (isNaN(start.getTime())) return dateStr + 'T' + time + ':00';
-    start.setUTCHours(start.getUTCHours() + hours);
-    return start.toISOString();
-  } catch (e) {
-    return dateStr + 'T' + time + ':00';
-  }
+// Google's Events rich result requires ISO-8601 datetimes with a timezone
+// offset (e.g. "2026-08-05T19:30:00Z"). The scraper only knows the kick-off
+// time, not the venue timezone, so it is emitted as UTC.
+function eventStartDate(dateStr, time) {
+  const day = validDateStr(dateStr) ? dateStr : new Date().toISOString().slice(0, 10);
+  if (!time) return day + 'T00:00:00Z';
+  const iso = day + 'T' + String(time) + ':00Z';
+  return isNaN(new Date(iso).getTime()) ? day + 'T00:00:00Z' : iso;
+}
+
+function eventEndDate(dateStr, time) {
+  const start = eventStartDate(dateStr, time);
+  const d = new Date(start);
+  d.setUTCHours(d.getUTCHours() + 2);
+  return d.toISOString().replace(/\.000Z$/, 'Z');
 }
 
 function slugifyTeam(name) {
@@ -596,11 +600,18 @@ function buildStaticPage(matchup, slug, analysis, template, dateStr, ctx) {
         name: cleanTitle,
         url: url,
         description: desc,
-        startDate: (dateStr && matchup.time) ? dateStr + 'T' + matchup.time + ':00' : (dateStr || today),
-        endDate: (dateStr && matchup.time) ? computeEndDate(dateStr, matchup.time, 2) : (dateStr || today),
+        startDate: eventStartDate(dateStr, matchup.time),
+        endDate: eventEndDate(dateStr, matchup.time),
         eventStatus: 'https://schema.org/EventScheduled',
         eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-        location: { '@type': 'Place', name: matchup.country || matchup.league || 'Football match' },
+        location: {
+          '@type': 'Place',
+          name: matchup.country || matchup.league || 'Football match',
+          address: {
+            '@type': 'PostalAddress',
+            addressCountry: matchup.country || ''
+          }
+        },
         image: SITE_URL + '/winfulltimelogo.png',
         organizer: { '@type': 'Organization', name: matchup.league || 'WinFulltime', url: SITE_URL + '/' },
         performer: { '@type': 'SportsTeam', name: cleanTeamName(home) },
