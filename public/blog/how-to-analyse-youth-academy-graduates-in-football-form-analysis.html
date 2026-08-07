@@ -235,6 +235,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 <nav id="nav">
  <a href="/">Home</a>
  <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/converter.html">Code Converter</a>
  <a href="/best-picks.html">Best Picks</a>
  <a href="/author-picks.html">Author Picks</a>
  <a href="/predictions/in-play">In-Play</a>
@@ -377,35 +378,77 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </div>
 
 <footer>
- <div class="footer-content">
-  <div style="text-align:center;margin-bottom:24px;">
-   <p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Catch live matches as they happen. Get golden tips and in-play alerts.</p><a href="/predictions/in-play" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">In-Play Tips</a>
+ <div class="footer-grid">
+  <div class="footer-brand">
+   <a href="/" class="footer-brand-link">
+    <img src="/winfulltimelogo.png" alt="WinFulltime" class="footer-logo" width="34" height="34">
+    <span class="footer-brand-name">Win<span>Fulltime</span></span>
+   </a>
+   <p class="footer-about">Data-driven football predictions, in-play alerts and expert analysis — built for smart bettors who want an edge, every single day.</p>
+   <div class="footer-social">
+    <a href="https://facebook.com" aria-label="Facebook" target="_blank" rel="noopener"><svg viewBox="0 0 320 512"><path fill="currentColor" d="M279 14H40a40 40 0 0 0-40 40v404a40 40 0 0 0 40 40h239a40 40 0 0 0 40-40V54a40 40 0 0 0-40-40zM189 512h-58V330h-63v-86h63v-39c0-87 41-140 129-140h86v86h-54c-40 0-47 18-47 51v42h100l-13 86h-87z"/></svg></a>
+    <a href="https://x.com" aria-label="X / Twitter" target="_blank" rel="noopener"><svg viewBox="0 0 512 512"><path fill="currentColor" d="M389 32h70L304 224 415 480H340L257 316 161 480H91l155-178L58 32h75l124 165 132-165z"/></svg></a>
+    <a href="https://telegram.org" aria-label="Telegram" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></a>
+    <a href="https://youtube.com" aria-label="YouTube" target="_blank" rel="noopener"><svg viewBox="0 0 576 512"><path fill="currentColor" d="M549 156c-6-23-24-40-47-46-41-11-166-11-166-11s-125 0-166 11c-23 6-41 23-47 46-11 41-11 127-11 127s0 86 11 127c6 23 24 40 47 46 41 11 166 11 166 11s125 0 166-11c23-6 41-23 47-46 11-41 11-127 11-127s0-86-11-127zM235 326V202l112 62-112 62z"/></svg></a>
+   </div>
   </div>
-  <div class="footer-links">
-   <a href="/">Home</a>
-   <a href="/ticket-builder.html">Ticket Builder</a>
-   <a href="/2-odds-of-the-day.html">2 Odds</a>
-   <a href="/best-picks.html">Best Picks</a>
-   <a href="/author-picks.html">Author Picks</a>
-   <a href="/blog/">Blog</a>
-   <a href="/predictions/in-play">In-Play</a>
-   <a href="/predictions/1x2">1X2</a>
-   <a href="/predictions/over-1-5">Over 1.5</a>
-   <a href="/predictions/over-2-5">Over 2.5</a>
-   <a href="/predictions/btts">BTTS Yes</a>
-   <a href="/predictions/btts-no">BTTS No</a>
-   <a href="/predictions/unbeaten">Unbeaten</a>
-   <a href="/predictions/corners">Corners</a>
-   <a href="/predictions/cards">Cards</a>
-   <a href="/advertise.html">Advertise</a>
-   <a href="/contact.html">Contact</a>
+
+  <div class="footer-col">
+   <h5>Predictions</h5>
+   <ul>
+    <li><a href="/best-picks.html">Best Picks</a></li>
+    <li><a href="/predictions/1x2.html">1X2</a></li>
+    <li><a href="/predictions/over-2-5.html">Over 2.5</a></li>
+    <li><a href="/predictions/over-1-5.html">Over 1.5</a></li>
+    <li><a href="/predictions/btts.html">BTTS Yes</a></li>
+    <li><a href="/predictions/btts-no.html">BTTS No</a></li>
+    <li><a href="/predictions/unbeaten.html">Unbeaten</a></li>
+    <li><a href="/predictions/in-play.html">In-Play</a></li>
+   </ul>
+  </div>
+
+  <div class="footer-col">
+   <h5>Top Leagues</h5>
+   <ul>
+    <li><a href="/predictions/league/premier-league/">Premier League</a></li>
+    <li><a href="/predictions/league/la-liga/">La Liga</a></li>
+    <li><a href="/predictions/league/serie-a/">Serie A</a></li>
+    <li><a href="/predictions/league/ligue-1/">Ligue 1</a></li>
+    <li><a href="/predictions/league/uefa-champions-league/">Champions League</a></li>
+    <li><a href="/predictions/1x2.html">All Predictions</a></li>
+   </ul>
+  </div>
+
+  <div class="footer-col">
+   <h5>Tools</h5>
+   <ul>
+    <li><a href="/ticket-builder.html">Ticket Builder</a></li>
+    <li><a href="/converter.html">Code Converter</a></li>
+    <li><a href="/2-odds-of-the-day.html">2 Odds</a></li>
+    <li><a href="/author-picks.html">Author Picks</a></li>
+    <li><a href="/blog/">Blog</a></li>
+   </ul>
+  </div>
+
+  <div class="footer-col">
+   <h5>Company</h5>
+   <ul>
+    <li><a href="/about.html">About</a></li>
+    <li><a href="/advertise.html">Advertise</a></li>
+    <li><a href="/contact.html">Contact</a></li>
+   </ul>
+  </div>
+ </div>
+
+ <div class="footer-bottom">
+  <span>&copy; <span class="js-year">2026</span> <a href="/">WinFulltime</a>. All rights reserved.</span>
+  <span class="footer-bottom-links">
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
    <a href="/policy.html">Editorial Policy</a>
-  </div>
-  <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
+  </span>
+  <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">Light</button>
  </div>
- <div style="text-align:center;padding:12px 0;"><button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">Light</button></div>
 </footer>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>

@@ -1,25 +1,32 @@
-const CACHE_NAME = 'winfulltime-v6';
-const STATIC_CACHE = 'winfulltime-static-v6';
-const DYNAMIC_CACHE = 'winfulltime-dynamic-v6';
-const IMAGE_CACHE = 'winfulltime-images-v6';
+const CACHE_NAME = 'winfulltime-v7';
+const STATIC_CACHE = 'winfulltime-static-v7';
+const DYNAMIC_CACHE = 'winfulltime-dynamic-v7';
+const IMAGE_CACHE = 'winfulltime-images-v7';
 
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/app.html',
   '/ticket-builder.html',
+  '/converter.html',
   '/best-picks.html',
   '/author-picks.html',
   '/2-odds-of-the-day.html',
   '/analysis.html',
   '/about.html',
+  '/advertise.html',
+  '/contact.html',
+  '/terms.html',
+  '/privacy.html',
+  '/policy.html',
   '/options.html',
   '/offline.html',
+  '/blog/',
   '/styles.css',
   '/app.css',
   '/auth.js',
   '/config.js',
-   '/pwa.js',
+  '/pwa.js',
   '/supabase-client.js',
   '/responsible-gambling.js',
   '/match-analysis-links.js',
@@ -27,18 +34,23 @@ const STATIC_ASSETS = [
   '/icons/icon-192.png',
   '/icons/icon-512.png',
   '/manifest.json',
-  '/predictions/1x2',
-  '/predictions/over-2-5',
-  '/predictions/over-1-5',
-  '/predictions/btts',
-  '/predictions/btts-no',
-  '/predictions/corners',
-  '/predictions/cards',
-  '/predictions/unbeaten',
-  '/predictions/winning-streak',
-  '/predictions/losing-streak',
-  '/predictions/draws-streak'
-  ,'/predictions/in-play'
+  '/predictions/1x2.html',
+  '/predictions/over-2-5.html',
+  '/predictions/over-1-5.html',
+  '/predictions/btts.html',
+  '/predictions/btts-no.html',
+  '/predictions/corners.html',
+  '/predictions/cards.html',
+  '/predictions/unbeaten.html',
+  '/predictions/winning-streak.html',
+  '/predictions/losing-streak.html',
+  '/predictions/draws-streak.html',
+  '/predictions/in-play.html',
+  '/predictions/league/premier-league/',
+  '/predictions/league/la-liga/',
+  '/predictions/league/serie-a/',
+  '/predictions/league/ligue-1/',
+  '/predictions/league/uefa-champions-league/'
 ];
 
 self.addEventListener('install', event => {
