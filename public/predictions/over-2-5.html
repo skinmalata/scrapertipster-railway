@@ -328,7 +328,8 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     if (dateDisplay) dateDisplay.textContent = formatDateLong(dateStr);
 
     var dayLabel = currentDate === 'today' ? 'Today' : currentDate === 'yesterday' ? 'Yesterday' : 'Tomorrow';
-    document.getElementById('pageHeading').innerHTML = CATEGORY_HEADING + '<br>Predictions For ' + dayLabel;
+    var subtitle = IS_STREAK ? 'Teams &amp; Their Next Fixtures' : ('Predictions For ' + dayLabel);
+    document.getElementById('pageHeading').innerHTML = CATEGORY_HEADING + '<br>' + subtitle;
 
     var tabs = document.querySelectorAll('.date-tab');
     tabs.forEach(function(tab) {

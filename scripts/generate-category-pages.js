@@ -341,7 +341,7 @@ ${generateFaqSchema(slug)}
 </header>
 <main class="container">
 <div class="hero">
-<h1 id="pageHeading">${escapeHtml(catConfig.heading)}<br>Predictions For Today</h1>
+<h1 id="pageHeading">${escapeHtml(catConfig.heading)}<br>${isStreak ? 'Teams &amp; Their Next Fixtures' : 'Predictions For Today'}</h1>
 <p class="hero-date" id="currentDate"></p>
 </div>
 
@@ -471,7 +471,8 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     if (dateDisplay) dateDisplay.textContent = formatDateLong(dateStr);
 
     var dayLabel = currentDate === 'today' ? 'Today' : currentDate === 'yesterday' ? 'Yesterday' : 'Tomorrow';
-    document.getElementById('pageHeading').innerHTML = CATEGORY_HEADING + '<br>Predictions For ' + dayLabel;
+    var subtitle = IS_STREAK ? 'Teams &amp; Their Next Fixtures' : ('Predictions For ' + dayLabel);
+    document.getElementById('pageHeading').innerHTML = CATEGORY_HEADING + '<br>' + subtitle;
 
     var tabs = document.querySelectorAll('.date-tab');
     tabs.forEach(function(tab) {
