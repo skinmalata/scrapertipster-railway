@@ -15,6 +15,7 @@ const { getCachedLive } = require('../services/scrapeLive');
 const { getSettledTodayTips, getSettledTipsForDate } = require('../services/liveTipHistory');
 const { buildTwoOddsOfDay, watDate } = require('../services/twoOddsOfDay');
 const { buildTicket } = require('../services/ticketBuilder');
+const { getAvailableMatches } = require('../services/bookingCodes/resolver');
 const { buildGiantPool, getGiantPoolHistory } = require('../services/authorPicks');
 const { fetchTodayStreaks } = require('../services/h2hWinningStreaks');
 const { findMatchingResult } = require('../utils/helpers');
@@ -1482,6 +1483,15 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
     var oddsResponse = await fetchPreMatchOdds(date);
     var h2hMatches = await fetchTodayStreaks();
 
+    var availableMatches = null;
+    if (body.bookingCode === true) {
+      try {
+        availableMatches = await getAvailableMatches();
+      } catch (e) {
+        availableMatches = null;
+      }
+    }
+
     var buildOpts = {
       date: date,
       oddsResponse: oddsResponse,
@@ -1493,7 +1503,9 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
       minOddsPerLeg: parseFloat(body.minOddsPerLeg) || 1.20,
       maxOddsPerLeg: parseFloat(body.maxOddsPerLeg) || 100,
       targetOdds: parseFloat(body.targetOdds) || 20,
-      shuffle: body.shuffle === true
+      shuffle: body.shuffle === true,
+      bookingCodeMode: body.bookingCode === true,
+      availableMatches: availableMatches
     };
 
     var payload = buildTicket(predictions, buildOpts);

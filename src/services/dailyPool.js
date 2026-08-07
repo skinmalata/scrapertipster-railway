@@ -15,6 +15,34 @@ function splitMatchName(match) {
   return parts.length === 2 && parts[0] && parts[1] ? parts : [];
 }
 
+function lagosNowString() {
+  var parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Africa/Lagos', hour12: false,
+    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+  }).formatToParts(new Date());
+  function get(type) {
+    var f = parts.find(function (p) { return p.type === type; });
+    return f ? f.value : '00';
+  }
+  var hour = get('hour') === '24' ? '00' : get('hour');
+  return get('year') + '-' + get('month') + '-' + get('day') + ' ' + hour + ':' + get('minute');
+}
+
+function hasKickedOff(dateStr, timeStr) {
+  if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
+  var t = String(timeStr || '').trim();
+  if (!/^\d{1,2}:\d{2}$/.test(t)) return false;
+  var bits = t.split(':');
+  var kickoff = dateStr + ' ' + (bits[0].length === 1 ? '0' + bits[0] : bits[0]) + ':' + bits[1];
+  return kickoff < lagosNowString();
+}
+
+function teamKey(match) {
+  var parts = splitMatchName(match);
+  if (parts.length !== 2) return null;
+  return normaliseTeam(parts[0]) + '|' + normaliseTeam(parts[1]);
+}
+
 function buildPool(predictions, options) {
   options = options || {};
   var date = options.date || watDate();
@@ -27,6 +55,17 @@ function buildPool(predictions, options) {
   var maxOdds = options.maxOddsPerLeg || 100;
   var markets = options.markets;
   var maxEntries = options.maxEntries;
+  var bookingCodeMode = options.bookingCodeMode || false;
+  var availableMatches = options.availableMatches;
+
+  var availableKeys = null;
+  if (bookingCodeMode && Array.isArray(availableMatches)) {
+    availableKeys = new Set();
+    availableMatches.forEach(function (m) {
+      var key = normaliseTeam(m.home) + '|' + normaliseTeam(m.away);
+      availableKeys.add(key);
+    });
+  }
 
   if (!predictions || !Array.isArray(predictions.matches)) {
     return { pool: [], date: date, total: 0 };
@@ -51,6 +90,13 @@ function buildPool(predictions, options) {
     matches.forEach(function(source) {
       var matchName = source.nextMatch || source.match;
       if (!matchName) return;
+
+      if (source.result || source.score) return;
+      if (bookingCodeMode && hasKickedOff(source.date, source.time)) return;
+      if (availableKeys) {
+        var key = teamKey(matchName);
+        if (!key || !availableKeys.has(key)) return;
+      }
 
       var tip = typeof tipMap === 'function' ? tipMap(source) : (source.tip || '');
       if (!tip) return;

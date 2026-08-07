@@ -42,6 +42,34 @@
     return splitMatch(match);
   }
 
+  function lagosNowString() {
+    var parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Africa/Lagos', hour12: false,
+      year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+    }).formatToParts(new Date());
+    function get(type) {
+      var f = parts.find(function (p) { return p.type === type; });
+      return f ? f.value : '00';
+    }
+    var hour = get('hour') === '24' ? '00' : get('hour');
+    return get('year') + '-' + get('month') + '-' + get('day') + ' ' + hour + ':' + get('minute');
+  }
+
+  function hasKickedOff(dateStr, timeStr) {
+    if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
+    var t = String(timeStr || '').trim();
+    if (!/^\d{1,2}:\d{2}$/.test(t)) return false;
+    var bits = t.split(':');
+    var kickoff = dateStr + ' ' + (bits[0].length === 1 ? '0' + bits[0] : bits[0]) + ':' + bits[1];
+    return kickoff < lagosNowString();
+  }
+
+  function teamKey(match) {
+    var parts = splitMatch(match);
+    if (parts.length !== 2) return null;
+    return normaliseTeam(parts[0]) + '|' + normaliseTeam(parts[1]);
+  }
+
   function fixtureKey(match) {
     var teams = splitMatch(match).map(normalise);
     return teams.length === 2 ? teams.sort().join('|') : normalise(match);
@@ -64,6 +92,16 @@
     var maxOdds = options.maxOddsPerLeg || 100;
     var markets = options.markets;
     var maxEntries = options.maxEntries;
+    var bookingCodeMode = options.bookingCodeMode || false;
+    var availableMatches = options.availableMatches;
+
+    var availableKeys = null;
+    if (bookingCodeMode && Array.isArray(availableMatches)) {
+      availableKeys = new Set();
+      availableMatches.forEach(function (m) {
+        availableKeys.add(normaliseTeam(m.home) + '|' + normaliseTeam(m.away));
+      });
+    }
 
     if (!predictions || !Array.isArray(predictions.matches)) {
       return { pool: [], date: date, total: 0 };
@@ -88,6 +126,13 @@
       matches.forEach(function (source) {
         var matchName = source.nextMatch || source.match;
         if (!matchName) return;
+
+        if (source.result || source.score) return;
+        if (bookingCodeMode && hasKickedOff(source.date, source.time)) return;
+        if (availableKeys) {
+          var akey = teamKey(matchName);
+          if (!akey || !availableKeys.has(akey)) return;
+        }
 
         var tip = typeof tipMap === 'function' ? tipMap(source) : (source.tip || '');
         if (!tip) return;
@@ -279,6 +324,17 @@
     return teams.length === 2 ? teams.sort().join('|') : normaliseTeam(match);
   }
 
+  var BOOKING_CODE_TIPS = {
+    '1x2': ['1', 'X', '2', '1X', 'X2', '12'],
+    'over15': ['Over 1.5'],
+    'over25': ['Over 2.5']
+  };
+  function bookingCodeEligible(category, tip) {
+    var allowed = BOOKING_CODE_TIPS[String(category || '').toLowerCase()];
+    if (!allowed) return false;
+    return allowed.indexOf(String(tip || '').trim()) !== -1;
+  }
+
   function buildTicket(predictions, options) {
     options = options || {};
     var requestedDate = options.date;
@@ -317,7 +373,9 @@
       minOddsPerLeg: minOddsPerLeg,
       maxOddsPerLeg: maxOddsPerLeg,
       markets: markets,
-      maxEntries: 200
+      maxEntries: 200,
+      bookingCodeMode: options.bookingCodeMode === true,
+      availableMatches: options.availableMatches
     });
 
     var pool = poolResult.pool;
@@ -328,13 +386,19 @@
       });
     }
 
+    if (options.bookingCodeMode) {
+      pool = pool.filter(function (p) { return bookingCodeEligible(p.category, p.tip); });
+    }
+
     applyLiveOdds(pool, oddsResponse);
 
     var filtered = pool.filter(function (p) { return p.odds >= minOddsPerLeg && p.odds <= maxOddsPerLeg; });
     if (filtered.length < 2) {
       return {
         available: false, date: date, generatedAt: generatedAt,
-        reason: 'Not enough selections match the criteria. Try adjusting market filters or odds range.',
+        reason: options.bookingCodeMode === true
+          ? 'Not enough upcoming matches for a booking code. Matches that have already kicked off or are not offered by the bookmaker were excluded. Try again when the next fixtures are available, or adjust your target odds.'
+          : 'Not enough selections match the criteria. Try adjusting market filters or odds range.',
         ticket: null, tickets: [], pool: poolResult
       };
     }

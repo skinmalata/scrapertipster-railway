@@ -4,6 +4,7 @@ const { decodeSportybet, decodeMsport, createSportybetCode, createMsportCode } =
 const { decodeBet9ja, createBet9jaCode } = require('./bet9ja');
 const { decodeBetway, createBetwayCode } = require('./betway');
 const { BOOKMAKERS, isSportradar, canonicalize, buildLegs, unsupportedMarketError } = require('./matcher');
+const { resolveLeg, getAvailableMatches } = require('./resolver');
 
 const MAX_LEGS = 30;
 
@@ -144,6 +145,41 @@ async function createCode(bookmaker, legs) {
   return createSportybetCode(legs);
 }
 
+// Build a booking code from plain ticket selections ({ match, tip, category }).
+// Used by the ticket builder: legs are resolved to the bookmaker's native ids
+// (SportyBet: 1X2 + Double Chance + Over 1.5/2.5, Betway: 1X2 only) and then
+// minted through the same public share API as the converter.
+async function createCodeFromLegs(input) {
+  const bookmaker = input && input.bookmaker;
+  const legs = input && Array.isArray(input.legs) ? input.legs : [];
+  if (!bookmaker || !legs.length) throw badRequest('Please provide a bookmaker and at least one selection.');
+  assertBookmaker(bookmaker);
+  if (bookmaker !== 'sportybet' && bookmaker !== 'betway') {
+    throw badRequest('Booking code creation is supported for sportybet and betway only.');
+  }
+  if (legs.length > MAX_LEGS) {
+    const err = new Error('Booking codes with more than ' + MAX_LEGS + ' selections are not supported.');
+    err.code = 'TOO_MANY_LEGS';
+    throw err;
+  }
+
+  const resolved = [];
+  for (const leg of legs) {
+    resolved.push(await resolveLeg(leg, bookmaker));
+  }
+
+  const code = bookmaker === 'betway'
+    ? await createBetwayCode(resolved)
+    : await createSportybetCode(resolved);
+
+  return {
+    code: code,
+    bookmaker: bookmaker,
+    bookmakerName: LABELS[bookmaker],
+    legCount: resolved.length
+  };
+}
+
 function sameFamily(from, to) {
   return from === to || (isSportradar(from) && isSportradar(to));
 }
@@ -205,4 +241,4 @@ async function convertCode(input) {
   }
 }
 
-module.exports = { decodeCode, convertCode, providerStatus, BOOKMAKERS, LABELS, MAX_LEGS };
+module.exports = { decodeCode, convertCode, createCodeFromLegs, providerStatus, getAvailableMatches, BOOKMAKERS, LABELS, MAX_LEGS };

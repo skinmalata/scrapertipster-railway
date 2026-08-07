@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { decodeCode, convertCode, providerStatus, BOOKMAKERS, MAX_LEGS } = require('../services/bookingCodes/converter');
+const { decodeCode, convertCode, createCodeFromLegs, providerStatus, getAvailableMatches, BOOKMAKERS, MAX_LEGS } = require('../services/bookingCodes/converter');
 const { recordConversion, getRecent } = require('../services/bookingCodes/recentConversions');
 
 const STATUS_BY_CODE = {
@@ -60,6 +60,23 @@ router.post('/converter/convert', async function (req, res) {
   }
 });
 
+// Create a booking code from plain ticket selections (ticket builder feature).
+router.post('/converter/create', async function (req, res) {
+  try {
+    const body = req.body || {};
+    const result = await createCodeFromLegs({ bookmaker: body.bookmaker, legs: body.legs });
+    res.json({
+      success: true,
+      bookmaker: result.bookmaker,
+      bookmakerName: result.bookmakerName,
+      code: result.code,
+      legCount: result.legCount
+    });
+  } catch (err) {
+    sendError(res, err);
+  }
+});
+
 router.get('/converter', function (req, res) {
   res.json({
     success: true,
@@ -75,6 +92,18 @@ router.get('/converter', function (req, res) {
 
 router.get('/converter/status', function (req, res) {
   res.json({ success: true, providers: providerStatus() });
+});
+
+// Matches currently available for booking code creation (from the live
+// SportyBet schedule). Used by the ticket builder to exclude matches that have
+// already started or are not offered by the bookmaker.
+router.get('/converter/available-matches', async function (req, res) {
+  try {
+    const matches = await getAvailableMatches();
+    res.json({ success: true, generatedAt: new Date().toISOString(), matches: matches });
+  } catch (err) {
+    sendError(res, err);
+  }
 });
 
 router.get('/converter/recent', function (req, res) {

@@ -334,6 +334,11 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <label for="safeTips">Safe Tips Only (&ge;70% confidence)</label>
   </div>
 
+  <div class="toggle-row" id="bookingCodeRow">
+   <input type="checkbox" id="bookingCode">
+   <label for="bookingCode">Generate Booking Code <span class="booking-code-note">(1X2, Double Chance &amp; Over 1.5/2.5 only)</span></label>
+  </div>
+
   <div class="legs-row">
 <label for="numLegs">Number of Matches</label>
     <div class="legs-input-wrap">
@@ -1440,13 +1445,72 @@ nav.open { display: flex !important; }
 
 
 
- .bet-btn:hover {
+  .bet-btn:hover {
 
  transform: translateY(-1px);
 
  box-shadow: 0 4px 16px rgba(74, 222, 128, 0.3);
 
  }
+
+ .booking-code-note {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0.2px;
+  color: rgba(232,237,245,0.55);
+  margin-top: 2px;
+ }
+
+ .code-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.3s;
+  text-decoration: none;
+  border: none;
+  letter-spacing: 0.2px;
+  color: #fff;
+ }
+ .code-btn.sportybet { background: linear-gradient(135deg, #facc15, #eab308); color: #0a0e17; }
+ .code-btn.betway { background: linear-gradient(135deg, #fb923c, #ea580c); }
+ .code-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(255,255,255,0.2);
+ }
+ .code-btn:disabled { opacity: 0.5; cursor: wait; transform: none; }
+ .code-display {
+  display: none;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(74, 222, 128, 0.12);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  font-size: 15px;
+  color: #4ade80;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 1px;
+  word-break: break-all;
+ }
+ .code-display.error {
+  background: rgba(255, 36, 72, 0.12);
+  border-color: rgba(255, 36, 72, 0.3);
+  color: #ff5a7d;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+ }
+ .code-display .cd-label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; margin-bottom: 4px; font-weight: 600; }
+
 
 
 
@@ -1942,6 +2006,8 @@ nav.open { display: flex !important; }
 
   var lastTarget = 20;
   var lastMinOdds = 1.20;
+  var lastBookingCode = false;
+  var lastTickets = [];
 
   var MAX_LEGS = 30;
   var MAX_ODDS = 500;
@@ -1988,6 +2054,9 @@ nav.open { display: flex !important; }
     var target = lastTarget;
     var tickets = res.tickets || [];
     var AFFILIATE_URL = '';
+    var bookingCodeMode = lastBookingCode;
+
+    lastTickets = tickets;
 
     if (!tickets.length) {
       results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(res.reason || 'No tickets generated.') + '</p></div>';
@@ -2031,8 +2100,13 @@ nav.open { display: flex !important; }
         '<a class="share-option" href="https://t.me/share/url?url=' + encodeURIComponent('https://winfulltime.com/ticket-builder.html') + '&text=' + encodeURIComponent('Football Accumulator @ ' + ticket.totalOdds + ' odds - ' + ticket.selections.length + ' legs') + '" target="_blank" rel="noopener">Telegram</a>' +
         '<a class="share-option share-copy" data-copy=\'' + copyData + '\'>Copy Link</a>' +
         '</div></div>' +
+        (bookingCodeMode ?
+          '<button class="code-btn sportybet" data-code="sportybet" data-ticket="' + tidx + '">&#127881; SportyBet Code</button>' +
+          '<button class="code-btn betway" data-code="betway" data-ticket="' + tidx + '">&#127881; Betway Code</button>' : '') +
         (AFFILIATE_URL ? '<a href="' + AFFILIATE_URL + '" target="_blank" rel="noopener" class="bet-btn"> Bet Now</a>' : '') +
-        '</div></div></div>';
+        '</div></div>' +
+        (bookingCodeMode ? '<div class="code-display" id="code-display-' + tidx + '"></div>' : '') +
+        '</div>';
     }).join('');
 
     results.innerHTML = '<div class="matches-grid">' + html + '</div>';
@@ -2051,11 +2125,13 @@ nav.open { display: flex !important; }
     var todayOnly = document.getElementById('ticketTodayOnly').checked;
     var numLegs = parseInt(document.getElementById('numLegs').value, 10) || 3;
     var safeTips = document.getElementById('safeTips').checked;
+    var bookingCodeMode = document.getElementById('bookingCode').checked;
     var selectedMarkets = getSelectedMarkets();
     var results = document.getElementById('ticketResults');
 
     lastTarget = target;
     lastMinOdds = minOdds;
+    lastBookingCode = bookingCodeMode;
 
     if (!Number.isFinite(target) || !Number.isFinite(minOdds) || !Number.isFinite(maxOdds) || target <= 1 || minOdds <= 1 || maxOdds < minOdds) {
       results.innerHTML = '<div class="no-matches"><p>Enter a target odds above 1.00.</p></div>';
@@ -2105,11 +2181,25 @@ nav.open { display: flex !important; }
         oddsResponse = oddsResult[0].value.response;
       }
 
+      var availableMatches = null;
+      if (bookingCodeMode) {
+        try {
+          var amResult = await fetchJson((window.WFT_API || 'https://winfulltime-api.onrender.com') + '/api/converter/available-matches', 8000);
+          if (amResult && amResult.success && Array.isArray(amResult.matches)) {
+            availableMatches = amResult.matches;
+          }
+        } catch (e) {
+          availableMatches = null;
+        }
+      }
+
       var res = core.build(pred, {
         date: date,
         oddsResponse: oddsResponse,
         markets: selectedMarkets,
         safeOnly: safeTips,
+        bookingCodeMode: bookingCodeMode,
+        availableMatches: availableMatches,
         numLegs: numLegs,
         maxOdds: maxOdds,
         minOddsPerLeg: minOdds,
@@ -2168,6 +2258,51 @@ nav.open { display: flex !important; }
 
   document.getElementById('genBtn').addEventListener('click', function() { generateTickets(); });
   document.getElementById('shuffleBtn').addEventListener('click', function() { shuffleTickets(); });
+
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-code]');
+    if (!btn) return;
+    var ticket = lastTickets[parseInt(btn.dataset.ticket, 10)];
+    if (!ticket) return;
+    var bookmaker = btn.dataset.code;
+    var display = document.getElementById('code-display-' + btn.dataset.ticket);
+    if (!display) return;
+
+    var legs = ticket.selections.map(function(s) {
+      return { match: s.match, tip: s.tip, category: s.category };
+    });
+
+    display.className = 'code-display';
+    display.style.display = 'block';
+    display.innerHTML = '<span class="cd-label">Generating ' + (bookmaker === 'betway' ? 'Betway' : 'SportyBet') + ' code...</span>';
+    btn.disabled = true;
+
+    var api = (window.WFT_API || 'https://winfulltime-api.onrender.com') + '/api/converter/create';
+
+    fetch(api, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookmaker: bookmaker, legs: legs })
+    }).then(function(r) {
+      return r.json().then(function(body) { return { ok: r.ok, body: body }; });
+    }).then(function(res) {
+      btn.disabled = false;
+      if (res.ok && res.body && res.body.success) {
+        display.className = 'code-display';
+        display.innerHTML = '<span class="cd-label">' + escapeHtml(res.body.bookmakerName || bookmaker) + ' Booking Code</span>' +
+          escapeHtml(res.body.code) +
+          '<span class="cd-label" style="margin-top:6px;">' + res.body.legCount + ' legs</span>';
+      } else {
+        var msg = (res.body && res.body.error) ? res.body.error : 'Unable to create the code. Please try again.';
+        display.className = 'code-display error';
+        display.innerHTML = '<span class="cd-label">Booking code could not be created</span>' + escapeHtml(msg);
+      }
+    }).catch(function() {
+      btn.disabled = false;
+      display.className = 'code-display error';
+      display.innerHTML = '<span class="cd-label">Booking code could not be created</span>Network error. Please try again.';
+    });
+  });
 
   document.getElementById('ticketTarget').addEventListener('input', function() {
     var target = parseFloat(this.value);

@@ -52,6 +52,19 @@ function splitMatchName(match) {
   return parts.length === 2 && parts[0] && parts[1] ? parts : [];
 }
 
+// Selections that can be turned into a real booking code (SportyBet: 1X2,
+// Double Chance 1X/X2/12 and Over 1.5/2.5; Betway: plain 1X2).
+var BOOKING_CODE_TIPS = {
+  '1x2': ['1', 'X', '2', '1X', 'X2', '12'],
+  'over15': ['Over 1.5'],
+  'over25': ['Over 2.5']
+};
+function bookingCodeEligible(category, tip) {
+  var allowed = BOOKING_CODE_TIPS[category];
+  if (!allowed) return false;
+  return allowed.indexOf(String(tip || '').trim()) !== -1;
+}
+
 function buildTicket(predictions, options) {
   options = options || {};
   var requestedDate = options.date;
@@ -91,7 +104,9 @@ function buildTicket(predictions, options) {
     minOddsPerLeg: minOddsPerLeg,
     maxOddsPerLeg: maxOddsPerLeg,
     markets: markets,
-    maxEntries: 200
+    maxEntries: 200,
+    bookingCodeMode: options.bookingCodeMode === true,
+    availableMatches: options.availableMatches
   });
 
   var pool = poolResult.pool;
@@ -100,13 +115,19 @@ function buildTicket(predictions, options) {
     pool = pool.filter(function(p) { return markets.includes(p.category); });
   }
 
+  if (options.bookingCodeMode) {
+    pool = pool.filter(function(p) { return bookingCodeEligible(p.category, p.tip); });
+  }
+
   applyLiveOdds(pool, oddsResponse);
 
   var filtered = pool.filter(function(p) { return p.odds >= minOddsPerLeg && p.odds <= maxOddsPerLeg; });
   if (filtered.length < 2) {
     return {
       available: false, date: date, generatedAt: generatedAt,
-      reason: 'Not enough selections match the criteria. Try adjusting market filters or odds range.',
+      reason: options.bookingCodeMode === true
+        ? 'Not enough upcoming matches for a booking code. Matches that have already kicked off or are not offered by the bookmaker were excluded. Try again when the next fixtures are available, or adjust your target odds.'
+        : 'Not enough selections match the criteria. Try adjusting market filters or odds range.',
       ticket: null, tickets: [], pool: poolResult
     };
   }
