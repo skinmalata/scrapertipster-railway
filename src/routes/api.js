@@ -1982,24 +1982,18 @@ async function resolveIsPro(req) {
 }
 
 // GET /api/author-picks — all today's fixtures with best tip per match.
-// Free users get a preview of only 4 tips; Pro members see all picks.
+// Available to all users.
 router.get('/author-picks', optionalAuth, async function (req, res) {
   try {
     var data = await buildGiantPool();
-    var isPro = await resolveIsPro(req);
     var matches = data.matches || [];
-    var payload = {
+    res.json({
       matches: matches,
       totalFixtures: data.totalFixtures,
       analyzedFixtures: data.analyzedFixtures,
       generatedAt: data.generatedAt,
-      isPro: isPro
-    };
-    if (!isPro) {
-      payload.totalTips = matches.length;
-      payload.matches = matches.slice(0, 4);
-    }
-    res.json(payload);
+      isPro: true
+    });
   } catch (e) {
     console.error('[author-picks] Error:', e.message);
     res.status(500).json({ error: 'Failed to build author picks' });
@@ -2007,26 +2001,12 @@ router.get('/author-picks', optionalAuth, async function (req, res) {
 });
 
 // GET /api/author-picks/history — past performance.
-// Free users get a preview of only 4 tips per day.
+// Available to all users.
 router.get('/author-picks/history', optionalAuth, async function (req, res) {
   try {
     var days = Math.min(5, Math.max(1, parseInt(req.query.days, 10) || 3));
     var data = await getGiantPoolHistory(days);
-    var isPro = await resolveIsPro(req);
-    if (!isPro) {
-      data = (data || []).map(function (day) {
-        var matches = (day.matches || []).slice(0, 4);
-        var won = 0, lost = 0, push = 0, pending = 0;
-        matches.forEach(function (m) {
-          if (m.outcome === 'won') won++;
-          else if (m.outcome === 'lost') lost++;
-          else if (m.outcome === 'push') push++;
-          else pending++;
-        });
-        return Object.assign({}, day, { matches: matches, won: won, lost: lost, push: push, pending: pending });
-      });
-    }
-    res.json({ days: data, isPro: isPro });
+    res.json({ days: data, isPro: true });
   } catch (e) {
     console.error('[author-picks/history] Error:', e.message);
     res.status(500).json({ error: 'Failed to load history' });

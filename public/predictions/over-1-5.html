@@ -279,10 +279,12 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
   var DATA_KEY = 'over15Matches';
   var IS_STREAK = false;
   var IS_UNBEATEN = false;
+  var LINK_ANALYSIS = true;
   var CATEGORY_HEADING = 'Over 1.5 Goals';
 
   var allData = null;
   var h2hData = null;
+  var analysisLinks = {};
   var currentDate = 'today';
 
   function getServerDate() {
@@ -414,9 +416,19 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
           reasonHtml + '</div></div>';
       }
 
-      return '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms">' +
+      var cardHtml = '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms">' +
         '<div class="match-header"><span></span><span>' + (match.time || '') + '</span></div>' +
         cardContent + '</div>';
+
+      if (LINK_ANALYSIS && home && away) {
+        var analysisKey = (home + '|' + away).toLowerCase();
+        var analysisHref = analysisLinks[analysisKey];
+        if (analysisHref) {
+          return '<a href="' + analysisHref + '" class="match-card-link" style="display:block;text-decoration:none;color:inherit;">' + cardHtml + '</a>';
+        }
+      }
+
+      return cardHtml;
     }).join('');
 
     content.innerHTML = '<div class="matches-grid">' + html + '</div>';
@@ -453,6 +465,13 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       var res = await fetch('/data/predictions.json');
       if (!res.ok) throw new Error('HTTP ' + res.status);
       allData = await res.json();
+
+      if (LINK_ANALYSIS) {
+        try {
+          var linksRes = await fetch('/data/analysis-links.json');
+          if (linksRes.ok) analysisLinks = await linksRes.json() || {};
+        } catch (e) {}
+      }
 
       if (IS_UNBEATEN) {
         var h2hRes = await fetch('/data/h2h-unbeaten.json');

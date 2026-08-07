@@ -122,7 +122,8 @@ const CATEGORIES = {
     description: 'Free AI-powered 1X2 football predictions for today. Expert home, draw, and away win tips across 50+ leagues worldwide.',
     keywords: '1X2 predictions, football predictions today, home win tips, draw predictions, away win tips, soccer betting tips',
     heading: '1X2 Predictions',
-    label: '1X2'
+    label: '1X2',
+    linkAnalysis: true
   },
   'over-1-5': {
     dataKey: 'over15Matches',
@@ -130,7 +131,8 @@ const CATEGORIES = {
     description: 'Free Over 1.5 goals football predictions for today. Data-driven tips for matches likely to produce 2 or more goals.',
     keywords: 'over 1.5 predictions, over 1.5 goals tips, football goals betting, soccer over under tips',
     heading: 'Over 1.5 Goals',
-    label: 'Over 1.5'
+    label: 'Over 1.5',
+    linkAnalysis: true
   },
   'over-2-5': {
     dataKey: 'over25Matches',
@@ -138,7 +140,8 @@ const CATEGORIES = {
     description: 'Free Over 2.5 goals football predictions for today. Expert tips for high-scoring matches across major leagues.',
     keywords: 'over 2.5 predictions, over 2.5 goals tips, high scoring football tips, soccer goals betting',
     heading: 'Over 2.5 Goals',
-    label: 'Over 2.5'
+    label: 'Over 2.5',
+    linkAnalysis: true
   },
   'btts': {
     dataKey: 'bttsMatches',
@@ -146,7 +149,8 @@ const CATEGORIES = {
     description: 'Free Both Teams to Score (BTTS) predictions for today. Tips for matches where both teams are expected to score.',
     keywords: 'BTTS predictions, both teams to score tips, BTTS yes predictions, soccer both teams to score',
     heading: 'BTTS Yes',
-    label: 'BTTS Yes'
+    label: 'BTTS Yes',
+    linkAnalysis: true
   },
   'btts-no': {
     dataKey: 'bttsNoMatches',
@@ -154,7 +158,8 @@ const CATEGORIES = {
     description: 'Free Both Teams to Score No predictions for today. Tips for matches where at least one team will fail to score.',
     keywords: 'BTTS no predictions, both teams to score no, clean sheet tips, soccer shutout predictions',
     heading: 'BTTS No',
-    label: 'BTTS No'
+    label: 'BTTS No',
+    linkAnalysis: true
   },
   'unbeaten': {
     dataKey: null,
@@ -417,10 +422,12 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
   var DATA_KEY = ${catConfig.dataKey ? "'" + catConfig.dataKey + "'" : 'null'};
   var IS_STREAK = ${isStreak ? 'true' : 'false'};
   var IS_UNBEATEN = ${isUnbeaten ? 'true' : 'false'};
+  var LINK_ANALYSIS = ${catConfig.linkAnalysis ? 'true' : 'false'};
   var CATEGORY_HEADING = '${escapeHtml(catConfig.heading)}';
 
   var allData = null;
   var h2hData = null;
+  var analysisLinks = {};
   var currentDate = 'today';
 
   function getServerDate() {
@@ -552,9 +559,19 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
           reasonHtml + '</div></div>';
       }
 
-      return '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms">' +
+      var cardHtml = '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms">' +
         '<div class="match-header"><span></span><span>' + (match.time || '') + '</span></div>' +
         cardContent + '</div>';
+
+      if (LINK_ANALYSIS && home && away) {
+        var analysisKey = (home + '|' + away).toLowerCase();
+        var analysisHref = analysisLinks[analysisKey];
+        if (analysisHref) {
+          return '<a href="' + analysisHref + '" class="match-card-link" style="display:block;text-decoration:none;color:inherit;">' + cardHtml + '</a>';
+        }
+      }
+
+      return cardHtml;
     }).join('');
 
     content.innerHTML = '<div class="matches-grid">' + html + '</div>';
@@ -591,6 +608,13 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       var res = await fetch('/data/predictions.json');
       if (!res.ok) throw new Error('HTTP ' + res.status);
       allData = await res.json();
+
+      if (LINK_ANALYSIS) {
+        try {
+          var linksRes = await fetch('/data/analysis-links.json');
+          if (linksRes.ok) analysisLinks = await linksRes.json() || {};
+        } catch (e) {}
+      }
 
       if (IS_UNBEATEN) {
         var h2hRes = await fetch('/data/h2h-unbeaten.json');
