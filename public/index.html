@@ -1645,10 +1645,11 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
   function buildTicket(picks,target,shuffle){
     if(shuffle)picks=shuffleArray(picks.slice());
     else picks=picks.slice();
+    picks.forEach(function(p){p._fitJitter=shuffle?Math.random()*0.15:0});
     picks.sort(function(a,b){
       var aFit=Infinity,bFit=Infinity;
       for(var lc=2;lc<=8;lc++){aFit=Math.min(aFit,Math.abs(Math.log(a.odds)-Math.log(target)/lc));bFit=Math.min(bFit,Math.abs(Math.log(b.odds)-Math.log(target)/lc))}
-      return aFit-bFit||b.prob-a.prob});
+      return (aFit+(a._fitJitter||0))-(bFit+(b._fitJitter||0))||b.prob-a.prob});
     var best=[];var used=new Set();
     var minOdds=target*0.8,maxOdds=target*1.2;
     for(var i=0;i<picks.length&&best.length<3;i++){
