@@ -387,7 +387,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
     document.getElementById('totalMatches').textContent = filtered.length;
     var html = filtered.map(function(match, i) {
-      var matchStr = match.match || match.nextMatch || '';
+      var matchStr = (IS_STREAK ? (match.nextMatch || match.match) : (match.match || match.nextMatch)) || '';
       var teams = matchStr.indexOf(' - ') !== -1 ? matchStr.split(' - ') : matchStr.split(' vs ');
       var home = (teams[0] || '').trim();
       var away = (teams[1] || '').trim();
@@ -402,7 +402,9 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
       var cardContent;
       if (IS_STREAK) {
-        cardContent = '<div class="match-teams" style="justify-content:center;"><span class="team team-home" style="text-align:center;width:100%;">' + home + '</span></div>' +
+        cardContent = '<div class="match-teams"><span class="team team-home">' + home + '</span>' +
+          '<span class="vs-score">vs</span>' +
+          '<span class="team team-away">' + away + '</span></div>' +
           '<div class="match-footer"><div style="text-align:center;display:flex;flex-direction:column;align-items:center;">' +
           '<span class="tip-badge">' + streakLabel + '</span>' +
           '<div class="probability">' + match.probability + '%</div></div></div>';
