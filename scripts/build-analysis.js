@@ -15,6 +15,7 @@ const MIN_SIMILARITY = 0.7;
 const OUTPUT_FILE = path.join(process.cwd(), 'public', 'data', 'analysis.json');
 const ANALYSIS_CACHE_FILE = path.join(process.cwd(), 'analysis-cache.json');
 const LINKS_FILE = path.join(process.cwd(), 'public', 'data', 'analysis-links.json');
+const ARCHIVE_FILE = path.join(process.cwd(), 'data', 'analysis-archive.json');
 const PRERENDER_DIR = path.join(process.cwd(), 'public', 'analysis');
 const TEAMS_OUTPUT_DIR = path.join(process.cwd(), 'public', 'teams');
 const H2H_OUTPUT_DIR = path.join(process.cwd(), 'public', 'h2h');
@@ -647,7 +648,7 @@ function buildStaticPage(matchup, slug, analysis, template, dateStr, ctx) {
   return page.slice(0, start) + contentHtml + page.slice(scriptClose);
 }
 
-function writePrerenderedPages(matchups, result, links, template, ctx) {
+function writePrerenderedPages(matchups, result, links, template, ctx, archive) {
   const used = new Set();
   fs.mkdirSync(PRERENDER_DIR, { recursive: true });
   let written = 0;
@@ -672,12 +673,107 @@ function writePrerenderedPages(matchups, result, links, template, ctx) {
     fs.writeFileSync(path.join(dir, 'index.html'), page);
     written++;
   });
+  const archived = emitArchivedPages(archive, used, links, template, ctx);
   fs.mkdirSync(path.dirname(LINKS_FILE), { recursive: true });
   fs.writeFileSync(LINKS_FILE, JSON.stringify(links));
 
   if (written > 0) pruneAnalysisDirs(used);
 
   console.log('[analysis] Prerendered', written, 'static pages to', PRERENDER_DIR);
+  return { used: used, written: written, archived: archived };
+}
+
+// Re-emit prerendered pages for fixtures that already left the rolling
+// prediction window but are still within the retention window. Their URLs were
+// previously indexed, so dropping the pages would 404 those URLs. Data comes
+// from the committed archive (data/analysis-archive.json) rather than the
+// volatile analysis cache, so the pages survive across CI runs.
+function emitArchivedPages(archive, used, links, template, ctx) {
+  const rows = (archive && archive.matchups) || [];
+  if (!rows.length) return 0;
+  const today = new Date().toISOString().slice(0, 10);
+  const cutoff = addDays(today, -RETENTION_DAYS);
+  let emitted = 0;
+  rows.forEach(function (row) {
+    if (!row || !row.date || !row.slug) return;
+    if (row.date < cutoff || row.date > today) return;
+    if (used.has(row.date + '/' + row.slug)) return;
+    if (!row.analysis || isEmptyAnalysis(row.analysis)) return;
+    const key = row.key || String(row.home || '').toLowerCase() + '|' + String(row.away || '').toLowerCase();
+    const matchup = {
+      home: row.home || '',
+      away: row.away || '',
+      date: row.date,
+      league: row.league || '',
+      country: row.country || '',
+      time: row.time || ''
+    };
+    if (!matchup.home || !matchup.away) return;
+    used.add(row.date + '/' + row.slug);
+    if (!links[key]) links[key] = '/analysis/' + row.date + '/' + row.slug + '/';
+    try {
+      const page = buildStaticPage(matchup, row.slug, row.analysis, template, row.date, ctx);
+      const dir = path.join(PRERENDER_DIR, row.date, row.slug);
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, 'index.html'), page);
+      emitted++;
+    } catch (e) {
+      console.warn('[analysis] archived emit failed ' + row.date + '/' + row.slug + ':', e.message);
+    }
+  });
+  if (emitted) console.log('[analysis] Re-emitted', emitted, 'archived analysis pages');
+  return emitted;
+}
+
+function loadAnalysisArchive() {
+  try {
+    if (fs.existsSync(ARCHIVE_FILE)) {
+      const parsed = JSON.parse(fs.readFileSync(ARCHIVE_FILE, 'utf8'));
+      return Array.isArray(parsed) ? { matchups: parsed } : parsed;
+    }
+  } catch (e) {
+    console.warn('[analysis] Failed to read analysis archive:', e.message);
+  }
+  return { matchups: [] };
+}
+
+// Merge freshly analyzed fixtures into the committed archive so their pages
+// keep being re-emitted after they leave the prediction window. Keyed by
+// date + slug so stable URLs are preserved; rows older than the retention
+// window are dropped so the archive stays bounded.
+function updateAnalysisArchive(archive, matchups, result) {
+  archive = archive || { matchups: [] };
+  const today = new Date().toISOString().slice(0, 10);
+  const cutoff = addDays(today, -RETENTION_DAYS);
+  const seen = new Set(archive.matchups.map(function (r) {
+    return r && r.date && r.slug ? r.date + '/' + r.slug : '';
+  }));
+  matchups.forEach(function (m) {
+    const key = m.home.toLowerCase() + '|' + m.away.toLowerCase();
+    const analysis = result[key];
+    if (!analysis || isEmptyAnalysis(analysis)) return;
+    const date = validDateStr(m.date) || today;
+    const slug = matchupSlug(m.home, m.away);
+    if (!slug) return;
+    const id = date + '/' + slug;
+    if (seen.has(id)) return;
+    seen.add(id);
+    archive.matchups.push({
+      key: key,
+      date: date,
+      slug: slug,
+      home: analysis.homeTeam || m.home,
+      away: analysis.awayTeam || m.away,
+      league: m.league || '',
+      country: m.country || '',
+      time: m.time || '',
+      analysis: analysis
+    });
+  });
+  archive.matchups = archive.matchups.filter(function (r) {
+    return r && r.date && r.date >= cutoff && r.slug;
+  });
+  return archive;
 }
 
 // Dated URLs archive fixtures by match date. Never delete recent pages (that
@@ -911,7 +1007,16 @@ async function main() {
       teamExists: function (slug) { return !!slug && teamSlugs.has(slug); },
       h2hExists: function (slug) { return !!slug && h2hSlugs.has(slug); }
     };
-    writePrerenderedPages(matchups, result, links, template, ctx);
+    let archive = loadAnalysisArchive();
+    writePrerenderedPages(matchups, result, links, template, ctx, archive);
+    archive = updateAnalysisArchive(archive, matchups, result);
+    try {
+      fs.mkdirSync(path.dirname(ARCHIVE_FILE), { recursive: true });
+      fs.writeFileSync(ARCHIVE_FILE, JSON.stringify(archive.matchups, null, 2));
+      console.log('[analysis] Updated analysis archive (' + archive.matchups.length + ' entries)');
+    } catch (e) {
+      console.warn('[analysis] Failed to write analysis archive:', e.message);
+    }
   } else {
     console.warn('[analysis] No public/analysis.html template — skipping prerender');
   }
