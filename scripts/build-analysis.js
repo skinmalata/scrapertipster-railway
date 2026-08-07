@@ -682,14 +682,13 @@ function writePrerenderedPages(matchups, result, links, template, ctx) {
 
 // Dated URLs archive fixtures by match date. Never delete recent pages (that
 // would churn indexed URLs into 404s); only remove legacy undated directories
-// from before this migration, prune stale children inside current dated dirs,
-// and drop dated archives older than the retention window.
+// from before this migration, and drop dated archives older than the retention
+// window. Children inside active dated dirs are kept even when the fixture has
+// left the rolling prediction window, so already-indexed URLs stay live.
 function pruneAnalysisDirs(used) {
   if (!fs.existsSync(PRERENDER_DIR)) return;
   const today = new Date().toISOString().slice(0, 10);
   const cutoff = addDays(today, -RETENTION_DAYS);
-  const activeDates = new Set();
-  used.forEach(function (p) { activeDates.add(p.split('/')[0]); });
   let removed = 0;
   fs.readdirSync(PRERENDER_DIR).forEach(function (d) {
     const dir = path.join(PRERENDER_DIR, d);
@@ -699,24 +698,12 @@ function pruneAnalysisDirs(used) {
       removed++;
       return;
     }
-    if (activeDates.has(d)) {
-      fs.readdirSync(dir).forEach(function (child) {
-        if (used.has(d + '/' + child)) return;
-        fs.rmSync(path.join(dir, child), { recursive: true, force: true });
-        removed++;
-      });
-      if (fs.readdirSync(dir).length === 0) {
-        fs.rmSync(dir, { recursive: true, force: true });
-        removed++;
-      }
-      return;
-    }
     if (d < cutoff) {
       fs.rmSync(dir, { recursive: true, force: true });
       removed++;
     }
   });
-  if (removed) console.log('[analysis] Pruned', removed, 'stale/legacy analysis directories');
+  if (removed) console.log('[analysis] Pruned', removed, 'legacy/expired analysis directories');
 }
 
 function collectMatchups(predictions) {
