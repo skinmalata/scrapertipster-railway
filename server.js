@@ -283,6 +283,19 @@ function serveBlogPost(req, res, next) {
 // Serve article pages through one reusable conversion panel, including direct .html URLs.
 app.get('/blog/:slug.html', serveBlogPost);
 
+// Canonical blog URLs are /blog/<slug>.html (matches the canonical tags in the
+// HTML, the sitemap and every internal link). The extensionless form is served
+// with 200 by the static fallback below, which makes Google crawl two URLs per
+// post and drop the extensionless one as an "alternate page with proper
+// canonical". 301 it to the .html form so all signals consolidate on one URL.
+app.get('/blog/:slug', (req, res, next) => {
+  const slug = req.params.slug;
+  if (!slug || slug === 'index' || slug === 'blog-template' || slug.endsWith('.html')) return next();
+  const filePath = path.join(__dirname, 'public', 'blog', slug + '.html');
+  if (!fs.existsSync(filePath)) return next();
+  res.redirect(301, '/blog/' + slug + '.html');
+});
+
 // Serve every other HTML page through the shared nav/footer template. Non-HTML
 // assets (css/js/images) fall through to express.static below.
 app.use((req, res, next) => staticWithLayout(req, res, next, path.join(__dirname, 'public')));
@@ -312,7 +325,7 @@ app.get('/feed.xml', (req, res) => {
     let items = '';
     for (const article of published) {
       const pubDate = new Date(article.publishDate).toUTCString();
-      const url = `https://winfulltime.com/blog/${article.slug}`;
+      const url = `https://winfulltime.com/blog/${article.slug}.html`;
       items += `    <item>
       <title><![CDATA[${article.title}]]></title>
       <link>${url}</link>
