@@ -810,13 +810,13 @@ nav a.active::after {
 
  }
 
- .footer-social { display: flex; gap: 12px; margin-top: 22px; }
+ .footer-social { display: flex; gap: 10px; margin-top: 22px; }
 
- .footer-social a {
+.footer-social a {
 
- width: 40px;
+ width: 32px;
 
- height: 40px;
+ height: 32px;
 
  border-radius: 50%;
 
@@ -836,7 +836,7 @@ nav a.active::after {
 
  .footer-social a:hover { background: var(--accent, #ff2448); border-color: var(--accent, #ff2448); color: #fff; }
 
- .footer-social svg { width: 16px; height: 16px; }
+ .footer-social svg { width: 14px; height: 14px; }
 
  .footer-col h5 { color: var(--text-primary, #fff); font-size: 16px; margin-bottom: 20px; font-weight: 700; }
 
