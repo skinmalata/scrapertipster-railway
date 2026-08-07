@@ -453,6 +453,12 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     });
   }
 
+  function formatDateShort(dateStr) {
+    return new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', {
+      weekday: 'short', month: 'short', day: 'numeric'
+    });
+  }
+
   function getSelectedDateStr() {
     var today = getServerDate();
     if (currentDate === 'yesterday') {
@@ -545,9 +551,25 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
       var cardContent;
       if (IS_STREAK) {
-        cardContent = '<div class="match-teams"><span class="team team-home">' + home + '</span>' +
+        var streakTeam = (match.match || '').trim();
+        var homeLower = home.toLowerCase();
+        var awayLower = away.toLowerCase();
+        var teamLower = streakTeam.toLowerCase();
+        var isStreakHome;
+        if (homeLower === teamLower || awayLower === teamLower) {
+          isStreakHome = homeLower === teamLower;
+        } else {
+          var firstWord = teamLower.split(' ')[0];
+          isStreakHome = homeLower.indexOf(firstWord) !== -1 && awayLower.indexOf(firstWord) === -1;
+        }
+        var streakCount = match.streak || '';
+        var streakWord = CATEGORY_SLUG === 'winning-streak' ? 'Wins' : CATEGORY_SLUG === 'losing-streak' ? 'Losses' : 'Draws';
+        var streakTag = '<span style="display:block;font-size:10px;color:#facc15;letter-spacing:0.4px;text-transform:uppercase;margin-top:4px;">' + streakCount + ' ' + streakWord + '</span>';
+        cardContent = '<div class="match-teams">' +
+          '<span class="team team-home">' + home + (isStreakHome ? streakTag : '') + '</span>' +
           '<span class="vs-score">vs</span>' +
-          '<span class="team team-away">' + away + '</span></div>' +
+          '<span class="team team-away">' + away + (!isStreakHome ? streakTag : '') + '</span>' +
+          '</div>' +
           '<div class="match-footer"><div style="text-align:center;display:flex;flex-direction:column;align-items:center;">' +
           '<span class="tip-badge">' + streakLabel + '</span>' +
           '<div class="probability">' + match.probability + '%</div></div></div>';
@@ -563,7 +585,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       }
 
       var cardHtml = '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms">' +
-        '<div class="match-header"><span></span><span>' + (match.time || '') + '</span></div>' +
+        '<div class="match-header"><span>' + (match.league || '') + '</span><span>' + (IS_STREAK ? (match.nextMatchDate ? formatDateShort(match.nextMatchDate) : (match.time || '')) : (match.time || '')) + '</span></div>' +
         cardContent + '</div>';
 
       if (LINK_ANALYSIS && home && away) {
