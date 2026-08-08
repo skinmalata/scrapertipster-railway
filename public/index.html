@@ -1535,6 +1535,7 @@ renderDayTabs();
 <script src="/config.js"></script>
 <script src="/supabase-client.js"></script>
 <script src="/auth.js?v=20260801"></script>
+<script src="/ticket-builder-core.js?v=20260801"></script>
 <script src="/chat-widget.js" async></script>
 
 <script>
@@ -1691,6 +1692,34 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       if(!todayOnly&&data.date&&data.date!==today){staleNote='Showing predictions from '+data.date+'. Today\'s data is not yet available.'}
       var dataDate=data.date||'';
       try{var oRes=await fetch(API_BASE+'/api/football-odds?date='+encodeURIComponent(dataDate||today),{cache:'no-store'});lastOddsData=oRes.ok?await oRes.json():null}catch(e){lastOddsData=null}
+      if(bookingCodeMode){
+        var bcCore=window.WFTTicketBuilder;
+        if(!bcCore){res.innerHTML='<div class="htb-empty">Booking code engine is still loading. Please refresh the page.</div>';shuffleBtn.disabled=true;return}
+        var bcRes=bcCore.build(data,{
+          date:bcCore.watDate(),
+          oddsResponse:lastOddsData&&Array.isArray(lastOddsData.response)?lastOddsData.response:null,
+          markets:null,
+          safeOnly:false,
+          bookingCodeMode:true,
+          availableMatches:feed&&Array.isArray(feed.matches)?feed.matches:null,
+          numLegs:3,
+          maxOdds:100,
+          minOddsPerLeg:minO,
+          maxOddsPerLeg:maxO,
+          targetOdds:target,
+          shuffle:shuffle,
+          unbeatenData:null
+        });
+        if(!bcRes.available||!bcRes.ticket||!bcRes.ticket.selections||bcRes.ticket.selections.length<2){
+          res.innerHTML='<div class="htb-empty">'+esc(bcRes.reason||'No qualifying picks for a booking code.')+' <a href="/ticket-builder.html" class="htb-full">Try the Pro Ticket Builder</a></div>';
+          shuffleBtn.disabled=true;
+          return;
+        }
+        res.innerHTML=renderTicket(bcRes.ticket.selections,bcRes.ticket.totalOdds,staleNote,true);
+        lastPicks=bcRes.ticket.selections;
+        shuffleBtn.disabled=false;
+        return;
+      }
       var cats=[['matches','1X2'],['over15Matches','Over 1.5'],['over25Matches','Over 2.5'],['bttsMatches','BTTS YES'],['bttsNoMatches','BTTS NO'],['cornersMatches','Corners'],['cardsMatches','Cards'],['teamToScore2PlusMatches','To Score 2+'],['winstreakMatches','Win Streak'],['losestreakMatches','Loss Streak'],['drawstreakMatches','Draw Streak']];
       var seen=new Set();
       var picks=[];
