@@ -1577,6 +1577,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 <script>
 (function(){
   var lastPicks=null,lastOddsData=null,lastTarget=5,lastMinOdds=1.20,lastTicket=null;
+  var API_BASE=window.WFT_API||'https://winfulltime-api.onrender.com';
 
   function esc(v){return String(v||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 
@@ -1682,14 +1683,14 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       var data=await r.json();
       var feedKeys=null;
       if(bookingCodeMode){
-        try{var fm=await fetch('/api/converter/available-matches',{cache:'no-store'});if(fm.ok){var feed=await fm.json();feedKeys=new Set((feed.matches||[]).map(function(x){return normaliseTeam(x.home)+'|'+normaliseTeam(x.away)}))}}catch(e){}
+        try{var fm=await fetch(API_BASE+'/api/converter/available-matches',{cache:'no-store'});if(fm.ok){var feed=await fm.json();feedKeys=new Set((feed.matches||[]).map(function(x){return normaliseTeam(x.home)+'|'+normaliseTeam(x.away)}))}}catch(e){}
         if(!feedKeys){res.innerHTML='<div class="htb-empty">Could not load eligible matches. <a href="/ticket-builder.html" class="htb-full">Try the Pro Ticket Builder</a></div>';return}
       }
       var today=new Date().toISOString().split('T')[0];
       var staleNote=null;
       if(!todayOnly&&data.date&&data.date!==today){staleNote='Showing predictions from '+data.date+'. Today\'s data is not yet available.'}
       var dataDate=data.date||'';
-      try{var oRes=await fetch('/api/football-odds?date='+encodeURIComponent(dataDate||today),{cache:'no-store'});lastOddsData=oRes.ok?await oRes.json():null}catch(e){lastOddsData=null}
+      try{var oRes=await fetch(API_BASE+'/api/football-odds?date='+encodeURIComponent(dataDate||today),{cache:'no-store'});lastOddsData=oRes.ok?await oRes.json():null}catch(e){lastOddsData=null}
       var cats=[['matches','1X2'],['over15Matches','Over 1.5'],['over25Matches','Over 2.5'],['bttsMatches','BTTS YES'],['bttsNoMatches','BTTS NO'],['cornersMatches','Corners'],['cardsMatches','Cards'],['teamToScore2PlusMatches','To Score 2+'],['winstreakMatches','Win Streak'],['losestreakMatches','Loss Streak'],['drawstreakMatches','Draw Streak']];
       var seen=new Set();
       var picks=[];
@@ -1756,7 +1757,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     btn.textContent=bookmaker==='sportybet'?'Creating SportyBet code...':'Creating Betway code...';
     display.style.display='none';
     var legs=(lastTicket||[]).map(function(s){return{match:s.match,tip:s.tip,category:mapCat(s.category)}});
-    fetch('/api/converter/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookmaker:bookmaker,legs:legs})})
+    fetch(API_BASE+'/api/converter/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookmaker:bookmaker,legs:legs})})
       .then(function(res){return res.json().then(function(body){return{ok:res.ok,body:body}})})
       .then(function(result){
         if(result.ok&&result.body.code){display.className='code-display';display.innerHTML='<span class="cd-label">'+bookmaker+' Booking Code</span>'+esc(result.body.code)}
