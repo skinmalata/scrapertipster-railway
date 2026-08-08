@@ -6,10 +6,14 @@
 //
 // SportyBet and Betway are both Sportradar platform bookmakers. The ticket builder
 // only knows team names, so we resolve the match against SportyBet's server-rendered
-// pre-match feed (https://www.sportybet.com/ng/lite/preMatch) which lists every
-// today's football event with its sr:match:<id> and team names. The numeric part of
-// that id is the same Sportradar event id Betway uses, so the same match lookup
-// feeds both bookmakers.
+// pre-match feed, which lists every football event with its sr:match:<id> and team
+// names. The numeric part of that id is the same Sportradar event id Betway uses,
+// so the same match lookup feeds both bookmakers.
+//
+// The aggregate /ng/lite/preMatch page only surfaces a small featured subset of
+// leagues, so the index is instead built from every per-league /ng/lite/events page
+// (the league list comes from /ng/lite/condition/league). Each per-league page uses
+// the same markup as the aggregate page, so one parser serves both.
 //
 // Supported markets:
 //   1X2           -> marketId "1", outcomeId 1 = Home, 2 = Draw, 3 = Away
@@ -23,14 +27,26 @@
 const cheerio = require('cheerio');
 const { sportradarHeaders, getJson } = require('./http');
 
-const SPORTY_LITE = 'https://www.sportybet.com/ng/lite/preMatch?sportId=sr:sport:1&productId=3&timeId=1';
+const SPORTY_LEAGUE_LIST = 'https://www.sportybet.com/ng/lite/condition/league?timeId=1&sportId=sr:sport:1';
+const SPORTY_LEAGUE_EVENTS = 'https://www.sportybet.com/ng/lite/events?sportId=sr:sport:1&timeId=1&marketId=1&tournamentId=';
 const SPORTY_DETAIL = 'https://www.sportybet.com/ng/lite/preMatch/detail?sportId=sr:sport:1&productId=3&marketGroupsName=Main&eventId=';
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const CACHE_MAX = 400;
 
+// The league list changes rarely, so cache it for a day. The event index itself
+// is rebuilt every LEAGUE_REFRESH_MS from all per-league pages, with a
+// stale-while-revalidate pattern so the API never blocks on a slow cold build.
+const LEAGUE_LIST_TTL_MS = 24 * 60 * 60 * 1000;
+const LEAGUE_REFRESH_MS = 20 * 60 * 1000;
+const LEAGUE_CONCURRENCY = 8;
+const NEAR_DAYS = 3;
+
 let eventIndexCache = null;
 let eventIndexAt = 0;
+let leagueListCache = null;
+let leagueListAt = 0;
+let indexBuildPromise = null;
 const detailCache = new Map();
 const resolutionCache = new Map();
 
@@ -163,11 +179,96 @@ function parseEventIndex(html) {
 }
 
 async function getEventIndex() {
-  if (eventIndexCache && Date.now() - eventIndexAt < CACHE_TTL_MS) return eventIndexCache;
-  const html = await getJson(SPORTY_LITE, sportradarHeaders('https://www.sportybet.com'), 20000);
-  eventIndexCache = parseEventIndex(html);
+  if (eventIndexCache && Date.now() - eventIndexAt < LEAGUE_REFRESH_MS) return eventIndexCache;
+  if (indexBuildPromise) {
+    return eventIndexCache || indexBuildPromise;
+  }
+  indexBuildPromise = buildEventIndex();
+  if (eventIndexCache) {
+    // Stale-while-revalidate: serve the previous index right away and let the
+    // refresh finish in the background, so an expired cache never blocks a
+    // request (the frontend times out around 8s, a cold build takes ~14s).
+    indexBuildPromise.catch(function () {}).finally(function () { indexBuildPromise = null; });
+    return eventIndexCache;
+  }
+  try {
+    return await indexBuildPromise;
+  } finally {
+    indexBuildPromise = null;
+  }
+}
+
+async function buildEventIndex() {
+  const leagues = await getLeagueList();
+  const all = [];
+  let done = 0;
+  let failed = 0;
+  const workers = [];
+  for (let w = 0; w < LEAGUE_CONCURRENCY; w++) {
+    workers.push((async function () {
+      for (let i = w; i < leagues.length; i += LEAGUE_CONCURRENCY) {
+        const league = leagues[i];
+        try {
+          const html = await getJson(SPORTY_LEAGUE_EVENTS + encodeURIComponent(league.tid), sportradarHeaders('https://www.sportybet.com'), 20000);
+          const parsed = parseEventIndex(html);
+          for (let k = 0; k < parsed.length; k++) all.push(parsed[k]);
+        } catch (e) {
+          failed++;
+        }
+        done++;
+      }
+    })());
+  }
+  await Promise.all(workers);
+  if (done && failed === done) {
+    const err = new Error('Could not load the bookmaker schedule, so the code was not created.');
+    err.code = 'NETWORK_ERROR';
+    throw err;
+  }
+  eventIndexCache = filterNearTerm(all);
   eventIndexAt = Date.now();
   return eventIndexCache;
+}
+
+async function getLeagueList() {
+  if (leagueListCache && Date.now() - leagueListAt < LEAGUE_LIST_TTL_MS) return leagueListCache;
+  const html = await getJson(SPORTY_LEAGUE_LIST, sportradarHeaders('https://www.sportybet.com'), 20000);
+  const $ = cheerio.load(html);
+  const leagues = [];
+  const seen = new Set();
+  $('a[href]').each(function () {
+    const href = $(this).attr('href') || '';
+    const m = /tournamentId=(sr:tournament:\d+)/.exec(href);
+    if (m && !seen.has(m[1])) {
+      seen.add(m[1]);
+      leagues.push({ tid: m[1], name: $(this).text().trim().replace(/\s+/g, ' ') });
+    }
+  });
+  if (!leagues.length) {
+    const err = new Error('Could not load the bookmaker league list, so the code was not created.');
+    err.code = 'NETWORK_ERROR';
+    throw err;
+  }
+  leagueListCache = leagues;
+  leagueListAt = Date.now();
+  return leagues;
+}
+
+// Per-league pages list the league's whole upcoming round (some leagues play in
+// two weeks), so keep only events inside a short Lagos window: the ticket is for
+// today, and far-future fixtures would never be used by the builder anyway.
+function filterNearTerm(events) {
+  const startNum = Number(lagosTodayDate().replace(/-/g, ''));
+  const maxNum = new Date();
+  maxNum.setDate(maxNum.getDate() + NEAR_DAYS);
+  const endNum = Number(new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Africa/Lagos', year: 'numeric', month: '2-digit', day: '2-digit'
+  }).format(maxNum).replace(/-/g, ''));
+  return events.filter(function (e) {
+    const dateNum = Number(String(e.date || '').replace(/-/g, ''));
+    if (!dateNum) return false;
+    return dateNum >= startNum && dateNum <= endNum;
+  });
 }
 
 function findEvent(events, home, away) {
@@ -330,4 +431,13 @@ async function resolveLeg(leg, bookmaker) {
   return selection;
 }
 
-module.exports = { resolveLeg, getAvailableMatches };
+// Fire the first index build without waiting so the schedule is warm before any
+// request needs it. Called at server boot; safe to call again (getEventIndex
+// deduplicates concurrent builds).
+function warmEventIndex() {
+  getEventIndex().catch(function (e) {
+    console.error('[resolver] warm event index failed:', e.message);
+  });
+}
+
+module.exports = { resolveLeg, getAvailableMatches, warmEventIndex };

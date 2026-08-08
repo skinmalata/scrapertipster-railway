@@ -602,6 +602,12 @@ async function refreshCornersAndCards() {
 runHeavyExclusive(refreshPreMatchPredictions)
   .then(function () { return runHeavyExclusive(refreshCornersAndCards); })
   .then(function () { return runHeavyExclusive(refreshAuthorPicks); })
+  .then(function () {
+    // Warm the booking-code schedule index (287 per-league pages) so the
+    // converter's first request does not have to wait for a cold build.
+    const { warmEventIndex } = require('./src/services/bookingCodes/resolver');
+    warmEventIndex();
+  })
   .then(function () { startLiveScrapeLoop(); })
   .catch(function (e) { console.error('[boot] Heavy job chain failed:', e.message); });
 

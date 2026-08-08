@@ -388,7 +388,7 @@
     var MAX_ITER = 50000;
     var iterations = 0;
 
-    function backtrack(start, current, product, usedMatches) {
+    function backtrack(start, current, product, usedMatches, usedTips) {
       if (iterations >= MAX_ITER) return;
       if (current.length >= 2 && product >= minTicketOdds) {
         iterations++;
@@ -408,17 +408,20 @@
         var p = poolForCombos[j];
         var matchId = matchIdentity(p.match);
         if (usedMatches.has(matchId)) continue;
+        if (usedTips.has(normaliseTeam(p.tip))) continue;
         var newProduct = product * p.odds;
         if (newProduct > maxTicketOdds) break;
         usedMatches.add(matchId);
+        usedTips.add(normaliseTeam(p.tip));
         current.push(p);
-        backtrack(j + 1, current, newProduct, usedMatches);
+        backtrack(j + 1, current, newProduct, usedMatches, usedTips);
         current.pop();
+        usedTips.delete(normaliseTeam(p.tip));
         usedMatches.delete(matchId);
       }
     }
 
-    backtrack(0, [], 1, new Set());
+    backtrack(0, [], 1, new Set(), new Set());
 
     if (tickets.length === 0) {
       return {
