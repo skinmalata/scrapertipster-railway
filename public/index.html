@@ -1639,8 +1639,9 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       return '<div class="htb-leg"><strong>'+(i+1)+'. '+esc(s.match)+'</strong> <span class="htb-tip">'+esc(s.tip)+'</span><br><span style="font-size:11px;color:rgba(232,237,245,.45)">'+esc(s.league)+' | '+esc(s.category)+' | '+s.odds.toFixed(2)+'</span></div>'
     }).join('');
     var staleHtml=staleNote?'<div class="htb-stale">'+esc(staleNote)+'</div>':'';
+    var betwayOk=best.every(function(s){return String(s.category||'').toLowerCase()==='1x2'&&/^[1X2]$/.test(String(s.tip||'').trim())});
     var codeHtml=bookingCodeMode?
-      '<div class="htb-actions"><button class="code-btn sportybet" data-code="sportybet">SportyBet Code</button><button class="code-btn betway" data-code="betway">Betway Code</button></div><div class="code-display" id="htbCodeDisplay"></div>':'';
+      '<div class="htb-actions"><button class="code-btn sportybet" data-code="sportybet">SportyBet Code</button>'+(betwayOk?'<button class="code-btn betway" data-code="betway">Betway Code</button>':'')+'</div><div class="code-display" id="htbCodeDisplay"></div>':'';
     return '<div class="htb-ticket"><div class="htb-ticket-head"><span class="htb-ticket-label">'+best.length+'-Leg Accumulator</span><span class="htb-ticket-odds">'+totalOdds.toFixed(2)+' odds</span></div>'+legs+staleHtml+codeHtml+'<a href="/ticket-builder.html" class="htb-full">Want higher odds? Try the Pro Ticket Builder &rarr;</a></div>';
   }
 

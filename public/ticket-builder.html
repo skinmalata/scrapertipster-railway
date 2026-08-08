@@ -2067,6 +2067,9 @@ nav.open { display: flex !important; }
       var legLines = ticket.selections.map(function(s, i) {
         return (i + 1) + '. ' + s.match + ' - ' + s.tip;
       });
+      var betwayOk = ticket.selections.every(function(s) {
+        return String(s.category || '').toLowerCase() === '1x2' && /^[1X2]$/.test(String(s.tip || '').trim());
+      });
 
       var copyData = encodeURIComponent(JSON.stringify({
         legs: legLines, total: ticket.totalOdds, num: tidx + 1, target: target, aff: AFFILIATE_URL
@@ -2102,7 +2105,7 @@ nav.open { display: flex !important; }
         '</div></div>' +
         (bookingCodeMode ?
           '<button class="code-btn sportybet" data-code="sportybet" data-ticket="' + tidx + '">&#127881; SportyBet Code</button>' +
-          '<button class="code-btn betway" data-code="betway" data-ticket="' + tidx + '">&#127881; Betway Code</button>' : '') +
+          (betwayOk ? '<button class="code-btn betway" data-code="betway" data-ticket="' + tidx + '">&#127881; Betway Code</button>' : '') : '') +
         (AFFILIATE_URL ? '<a href="' + AFFILIATE_URL + '" target="_blank" rel="noopener" class="bet-btn"> Bet Now</a>' : '') +
         '</div></div>' +
         (bookingCodeMode ? '<div class="code-display" id="code-display-' + tidx + '"></div>' : '') +

@@ -49,6 +49,11 @@ const CACHE_MAX = 400;
 // stale-while-revalidate pattern so the API never blocks on a slow cold build.
 const LEAGUE_LIST_TTL_MS = 24 * 60 * 60 * 1000;
 const LEAGUE_REFRESH_MS = 20 * 60 * 1000;
+// Over/Under prices are far more stable than 1X2 and only feed the last-resort
+// schedule fallback, so they refresh every hour instead of every index build.
+// That keeps the doubled upstream traffic (~2 requests per league) down to a
+// sustained load close to the original 1X2-only schedule.
+const OU_REFRESH_MS = 60 * 60 * 1000;
 const LEAGUE_CONCURRENCY = 8;
 const NEAR_DAYS = 3;
 
@@ -56,6 +61,8 @@ let eventIndexCache = null;
 let eventIndexAt = 0;
 let leagueListCache = null;
 let leagueListAt = 0;
+let goalsCache = null;
+let goalsAt = 0;
 let indexBuildPromise = null;
 const detailCache = new Map();
 const resolutionCache = new Map();
@@ -245,6 +252,8 @@ async function getEventIndex() {
 
 async function buildEventIndex() {
   const leagues = await getLeagueList();
+  const needGoals = !goalsCache || Date.now() - goalsAt >= OU_REFRESH_MS;
+  let newGoals = {};
   const all = [];
   let done = 0;
   let failed = 0;
@@ -256,17 +265,16 @@ async function buildEventIndex() {
         try {
           const html = await getJson(SPORTY_LEAGUE_EVENTS_1X2 + encodeURIComponent(league.tid), sportradarHeaders('https://www.sportybet.com'), 20000);
           const parsed = parseEventIndex(html);
-          let goalsMap = null;
-          try {
-            const ouHtml = await getJson(SPORTY_LEAGUE_EVENTS_OU + encodeURIComponent(league.tid), sportradarHeaders('https://www.sportybet.com'), 20000);
-            goalsMap = parseGoalMarkets(ouHtml);
-          } catch (e) {
-            // Missing Over/Under feed just means no Over-goal legs for this league.
+          if (needGoals) {
+            try {
+              const ouHtml = await getJson(SPORTY_LEAGUE_EVENTS_OU + encodeURIComponent(league.tid), sportradarHeaders('https://www.sportybet.com'), 20000);
+              const goalsMap = parseGoalMarkets(ouHtml);
+              for (const k in goalsMap) newGoals[k] = goalsMap[k];
+            } catch (e) {
+              // Missing Over/Under feed just means no Over-goal legs for this league.
+            }
           }
-          for (let k = 0; k < parsed.length; k++) {
-            if (goalsMap && goalsMap[parsed[k].eventId]) parsed[k].goals = goalsMap[parsed[k].eventId];
-            all.push(parsed[k]);
-          }
+          for (let k = 0; k < parsed.length; k++) all.push(parsed[k]);
         } catch (e) {
           failed++;
         }
@@ -279,6 +287,14 @@ async function buildEventIndex() {
     const err = new Error('Could not load the bookmaker schedule, so the code was not created.');
     err.code = 'NETWORK_ERROR';
     throw err;
+  }
+  if (needGoals) {
+    goalsCache = newGoals;
+    goalsAt = Date.now();
+  }
+  for (let k = 0; k < all.length; k++) {
+    const g = goalsCache && goalsCache[all[k].eventId];
+    if (g) all[k].goals = g;
   }
   eventIndexCache = filterNearTerm(all);
   eventIndexAt = Date.now();
