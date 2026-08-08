@@ -82,19 +82,82 @@ function unsupportedMarketError(leg, detail) {
 
 // --- SportyBet pre-match feed (today's football events) ---
 
+// The lite preMatch page lists each league as .m-event-list-item with one or
+// more .m-day-header day titles (e.g. "08/08 Saturday") and then the .m-event
+// rows under them. Each .m-event carries the live 1X2 prices in its outcome
+// links as odds=... alongside marketId/outcomeId, so we can read real odds
+// straight from the schedule. Day and league are carried down to each event.
+
+function lagosTodayDate() {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Africa/Lagos', year: 'numeric', month: '2-digit', day: '2-digit'
+  }).formatToParts(new Date());
+  function get(type) {
+    const f = parts.find(function (p) { return p.type === type; });
+    return f ? f.value : '00';
+  }
+  return get('year') + '-' + get('month') + '-' + get('day');
+}
+
+function parseDayTitle(text) {
+  // SportyBet renders the day as "DD/MM Weekday" (e.g. "09/08 Sunday").
+  const m = /(\d{2})\/(\d{2})/.exec(String(text || '').trim());
+  if (!m) return null;
+  return { day: parseInt(m[1], 10), month: parseInt(m[2], 10) };
+}
+
+function dayToDate(day) {
+  if (!day) return '';
+  const today = lagosTodayDate();
+  const todayNum = Number(today.replace(/-/g, ''));
+  let year = Number(today.slice(0, 4));
+  let base = year * 10000 + day.month * 100 + day.day;
+  if (base < todayNum) {
+    year += 1;
+    base = year * 10000 + day.month * 100 + day.day;
+  }
+  const ymd = String(base);
+  return ymd.slice(0, 4) + '-' + ymd.slice(4, 6) + '-' + ymd.slice(6, 8);
+}
+
+const OUTCOME_SIGN = { '1': '1', '2': 'X', '3': '2' };
+
 function parseEventIndex(html) {
   const $ = cheerio.load(html);
   const events = [];
-  $('.m-event').each(function () {
-    const node = $(this);
-    const time = node.find('.m-event-time').first().text().trim();
-    const home = node.find('.m-home-team .m-team-name').first().text().trim();
-    const away = node.find('.m-away-team .m-team-name').first().text().trim();
-    const href = node.find('.m-event-left').first().attr('href') || '';
-    const m = /eventId=(sr:match:\d+)/.exec(href);
-    if (m && home && away) {
-      events.push({ eventId: m[1], home: home, away: away, time: time });
-    }
+  $('.m-event-list-item').each(function () {
+    const league = $(this).find('.m-item-title').first().text().trim();
+    let currentDay = '';
+    $(this).find('.m-day-title, .m-event').each(function () {
+      if ($(this).hasClass('m-day-title')) {
+        currentDay = dayToDate(parseDayTitle($(this).text()));
+        return;
+      }
+      const node = $(this);
+      const time = node.find('.m-event-time').first().text().trim();
+      const home = node.find('.m-home-team .m-team-name').first().text().trim();
+      const away = node.find('.m-away-team .m-team-name').first().text().trim();
+      const href = node.find('.m-event-left').first().attr('href') || '';
+      const m = /eventId=(sr:match:\d+)/.exec(href);
+      if (!(m && home && away)) return;
+      const odds = {};
+      node.find('.m-outcome').each(function () {
+        const h = $(this).attr('href') || '';
+        const mOut = /outcomeId=(\d+)/.exec(h);
+        const mOdds = /odds=([0-9.]+)/.exec(h);
+        const sign = OUTCOME_SIGN[mOut && mOut[1]];
+        if (sign && mOdds) odds[sign] = Number(mOdds[1]);
+      });
+      events.push({
+        eventId: m[1],
+        home: home,
+        away: away,
+        time: time,
+        date: currentDay,
+        league: league,
+        odds: odds
+      });
+    });
   });
   return events;
 }
@@ -236,11 +299,13 @@ function betwaySelection(event, leg) {
 
 // Currently available (upcoming) football events in the bookmaker's schedule,
 // used by the ticket builder to drop matches that have already started or are
-// not offered at all, so tickets are as likely as possible to resolve.
+// not offered at all, so tickets are as likely as possible to resolve. Also
+// carries the live 1X2 odds and kickoff date/time so the schedule fallback can
+// build a ticket straight from the bookmaker's own prices.
 async function getAvailableMatches() {
   const events = await getEventIndex();
   return events.map(function (e) {
-    return { home: e.home, away: e.away, time: e.time };
+    return { home: e.home, away: e.away, time: e.time, date: e.date || '', league: e.league || '', odds: e.odds || {} };
   });
 }
 

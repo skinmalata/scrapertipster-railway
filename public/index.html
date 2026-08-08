@@ -1711,7 +1711,22 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
           unbeatenData:null
         });
         if(!bcRes.available||!bcRes.ticket||!bcRes.ticket.selections||bcRes.ticket.selections.length<2){
-          res.innerHTML='<div class="htb-empty">'+esc(bcRes.reason||'No qualifying picks for a booking code.')+' <a href="/ticket-builder.html" class="htb-full">Try the Pro Ticket Builder</a></div>';
+          var fbRes=bcCore.buildFromSchedule(feed&&Array.isArray(feed.matches)?feed.matches:null,{
+            date:bcCore.watDate(),
+            targetOdds:target,
+            numLegs:3,
+            minOddsPerLeg:1.05,
+            maxOddsPerLeg:maxO,
+            maxOdds:100,
+            shuffle:shuffle
+          });
+          if(fbRes.available&&fbRes.ticket&&fbRes.ticket.selections&&fbRes.ticket.selections.length>=2){
+            res.innerHTML=renderTicket(fbRes.ticket.selections,fbRes.ticket.totalOdds,staleNote,true);
+            lastPicks=fbRes.ticket.selections;
+            shuffleBtn.disabled=false;
+            return;
+          }
+          res.innerHTML='<div class="htb-empty">'+esc(fbRes.reason||bcRes.reason||'No qualifying picks for a booking code.')+' <a href="/ticket-builder.html" class="htb-full">Try the Pro Ticket Builder</a></div>';
           shuffleBtn.disabled=true;
           return;
         }

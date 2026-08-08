@@ -54,6 +54,8 @@ function splitMatchName(match) {
 
 // Selections that can be turned into a real booking code (SportyBet: 1X2,
 // Double Chance 1X/X2/12 and Over 1.5/2.5; Betway: plain 1X2).
+var BOOKING_CODE_MIN_PROB = 0.55;
+var BOOKING_CODE_MIN_ODDS = 1.05;
 var BOOKING_CODE_TIPS = {
   '1x2': ['1', 'X', '2', '1X', 'X2', '12'],
   'over15': ['Over 1.5'],
@@ -78,6 +80,13 @@ function buildTicket(predictions, options) {
   var maxOddsPerLeg = options.maxOddsPerLeg || 100;
   var targetOdds = options.targetOdds || 20;
   var maxTickets = options.maxTickets || 8;
+  var bookingCodeMode = options.bookingCodeMode === true;
+
+  // Booking-code legs are valid from ~1.05, so high-confidence picks that
+  // estimate below the UI's 1.20 floor are not thrown away.
+  if (bookingCodeMode && minOddsPerLeg > BOOKING_CODE_MIN_ODDS) {
+    minOddsPerLeg = BOOKING_CODE_MIN_ODDS;
+  }
 
   var generatedAt = new Date().toISOString();
   var date = requestedDate || watDate();
@@ -100,7 +109,7 @@ function buildTicket(predictions, options) {
     h2hMatches: h2hMatches,
     unbeatenData: unbeatenForDate,
     safeOnly: safeOnly,
-    minProbability: MIN_PROBABILITY,
+    minProbability: options.bookingCodeMode === true ? BOOKING_CODE_MIN_PROB : MIN_PROBABILITY,
     minOddsPerLeg: minOddsPerLeg,
     maxOddsPerLeg: maxOddsPerLeg,
     markets: markets,

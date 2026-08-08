@@ -2210,6 +2210,23 @@ nav.open { display: flex !important; }
       });
 
       if (!res.available) {
+        if (bookingCodeMode) {
+          var fbRes = core.buildFromSchedule(availableMatches, {
+            date: date,
+            targetOdds: target,
+            numLegs: numLegs,
+            minOddsPerLeg: 1.05,
+            maxOddsPerLeg: maxOdds,
+            maxOdds: maxOdds,
+            shuffle: shuffle === true
+          });
+          if (fbRes.available && fbRes.ticket && fbRes.ticket.selections && fbRes.ticket.selections.length >= 2) {
+            renderTickets({ tickets: fbRes.tickets || [fbRes.ticket], ticket: fbRes.ticket });
+            return;
+          }
+          results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(fbRes.reason || res.reason || 'No tickets could be generated with the current settings. Try adjusting the target odds, number of legs, or odds range.') + '</p></div>';
+          return;
+        }
         results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(res.reason || 'No tickets could be generated with the current settings. Try adjusting the target odds, number of legs, or odds range.') + '</p></div>';
         return;
       }

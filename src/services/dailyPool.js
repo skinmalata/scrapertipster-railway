@@ -2,6 +2,10 @@ const { watDate, fixtureKey, estimatedOdds, MIN_PROBABILITY } = require('./twoOd
 
 var UNBEATEN_MIN_PROB = 0.42;
 var UNBEATEN_MAX_PROB = 0.85;
+// Booking codes only support a handful of markets, so with the 0.70 floor the
+// resulting legs are all ~1.10-1.40 and can never reach a 5x target. Lower the
+// floor for booking-code mode so legs around 0.55-0.70 probability are usable.
+var BOOKING_CODE_MIN_PROB = 0.55;
 
 function normaliseTeam(value) {
   return String(value || '').toLowerCase()
@@ -50,13 +54,13 @@ function buildPool(predictions, options) {
   var h2hMatches = options.h2hMatches;
   var unbeatenData = options.unbeatenData;
   var safeOnly = options.safeOnly || false;
-  var minProbability = options.minProbability || MIN_PROBABILITY;
+  var bookingCodeMode = options.bookingCodeMode || false;
+  var availableMatches = options.availableMatches;
+  var minProbability = options.minProbability || (bookingCodeMode ? BOOKING_CODE_MIN_PROB : MIN_PROBABILITY);
   var minOdds = options.minOddsPerLeg || 1.0;
   var maxOdds = options.maxOddsPerLeg || 100;
   var markets = options.markets;
   var maxEntries = options.maxEntries;
-  var bookingCodeMode = options.bookingCodeMode || false;
-  var availableMatches = options.availableMatches;
 
   var availableKeys = null;
   if (bookingCodeMode && Array.isArray(availableMatches)) {
@@ -106,7 +110,9 @@ function buildPool(predictions, options) {
       if (prob < minProbability) return;
 
       var pickDate = source.date || date;
-      if (pickDate !== date) return;
+      // Booking-code mode allows picks from any upcoming date so matches the
+      // bookmaker actually offers still count.
+      if (!bookingCodeMode && pickDate !== date) return;
 
       var key = pickKey(matchName, tip, pickDate);
       if (seen.has(key)) return;

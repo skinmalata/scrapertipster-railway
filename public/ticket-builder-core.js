@@ -6,6 +6,11 @@
   'use strict';
 
   var MIN_PROBABILITY = 0.7;
+  // Booking codes can only use 1X2 / Double Chance / Over markets, and with a
+  // 0.70 probability floor every leg tops out around 1.37 odds, so three legs
+  // can never reach the default target. Lower the floor for booking-code mode
+  // so legs in the ~0.55-0.70 probability band (odds ~1.4-1.7) can be combined.
+  var BOOKING_CODE_MIN_PROB = 0.55;
   var UNBEATEN_MIN_PROB = 0.42;
   var UNBEATEN_MAX_PROB = 0.85;
 
@@ -94,6 +99,9 @@
     var maxEntries = options.maxEntries;
     var bookingCodeMode = options.bookingCodeMode || false;
     var availableMatches = options.availableMatches;
+    // Booking-code mode relaxes the confidence floor so higher-odds legs are
+    // available (see BOOKING_CODE_MIN_PROB above).
+    var minProbability = options.minProbability || (bookingCodeMode ? BOOKING_CODE_MIN_PROB : MIN_PROBABILITY);
 
     var availableKeys = null;
     if (bookingCodeMode && Array.isArray(availableMatches)) {
@@ -142,7 +150,9 @@
         if (prob < minProbability) return;
 
         var pickDate = source.date || date;
-        if (pickDate !== date) return;
+        // Booking-code mode allows picks from any upcoming date (not only the
+        // selected day) so matches the bookmaker actually offers still count.
+        if (!bookingCodeMode && pickDate !== date) return;
 
         var key = pickKey(matchName, tip, pickDate);
         if (seen.has(key)) return;
@@ -335,73 +345,21 @@
     return allowed.indexOf(String(tip || '').trim()) !== -1;
   }
 
-  function buildTicket(predictions, options) {
+  function matchIdentity(match) {
+    var teams = splitMatchName(match).map(normaliseTeam).filter(Boolean);
+    return teams.length === 2 ? teams.sort().join('|') : normaliseTeam(match);
+  }
+
+  // Shared combination engine: given a pool of picks (each with .match, .tip,
+  // .odds, .fixtureKey, .sourceProbability) find the tickets whose multiplied
+  // odds land closest to the target. Used by both the prediction builder and
+  // the schedule fallback.
+  function combineSelections(pool, options) {
     options = options || {};
-    var requestedDate = options.date;
-    var oddsResponse = options.oddsResponse;
-    var markets = options.markets;
-    var safeOnly = options.safeOnly || false;
     var numLegs = options.numLegs || 3;
-    var maxOdds = options.maxOdds || 500;
-    var minOddsPerLeg = options.minOddsPerLeg || 1.0;
-    var maxOddsPerLeg = options.maxOddsPerLeg || 100;
     var targetOdds = options.targetOdds || 20;
+    var maxOdds = options.maxOdds || 500;
     var maxTickets = options.maxTickets || 8;
-
-    var generatedAt = new Date().toISOString();
-    var date = requestedDate || watDate();
-
-    if (!predictions || !Array.isArray(predictions.matches)) {
-      return { available: false, date: date, generatedAt: generatedAt, reason: 'Pre-match data is not available yet.', ticket: null, tickets: [] };
-    }
-
-    var availableDates = (predictions.dates || []).slice().sort().reverse();
-    if (!availableDates.includes(date) && availableDates.length) {
-      date = availableDates[0];
-    }
-
-    var unbeatenDates = loadUnbeatenDates(options.unbeatenData || options.unbeatenDates);
-    var unbeatenForDate = getUnbeatenForDate(unbeatenDates, date);
-
-    var poolResult = buildPool(predictions, {
-      date: date,
-      oddsResponse: oddsResponse,
-      h2hMatches: options.h2hMatches,
-      unbeatenData: unbeatenForDate,
-      safeOnly: safeOnly,
-      minProbability: MIN_PROBABILITY,
-      minOddsPerLeg: minOddsPerLeg,
-      maxOddsPerLeg: maxOddsPerLeg,
-      markets: markets,
-      maxEntries: 200,
-      bookingCodeMode: options.bookingCodeMode === true,
-      availableMatches: options.availableMatches
-    });
-
-    var pool = poolResult.pool;
-
-    if (Array.isArray(markets) && markets.length > 0) {
-      pool = pool.filter(function (p) {
-        return markets.some(function (m) { return m.toLowerCase() === String(p.category).toLowerCase(); });
-      });
-    }
-
-    if (options.bookingCodeMode) {
-      pool = pool.filter(function (p) { return bookingCodeEligible(p.category, p.tip); });
-    }
-
-    applyLiveOdds(pool, oddsResponse);
-
-    var filtered = pool.filter(function (p) { return p.odds >= minOddsPerLeg && p.odds <= maxOddsPerLeg; });
-    if (filtered.length < 2) {
-      return {
-        available: false, date: date, generatedAt: generatedAt,
-        reason: options.bookingCodeMode === true
-          ? 'Not enough upcoming matches for a booking code. Matches that have already kicked off or are not offered by the bookmaker were excluded. Try again when the next fixtures are available, or adjust your target odds.'
-          : 'Not enough selections match the criteria. Try adjusting market filters or odds range.',
-        ticket: null, tickets: [], pool: poolResult
-      };
-    }
 
     var minTicketOdds = targetOdds * 0.8;
     var maxTicketOdds = targetOdds * 1.2;
@@ -409,7 +367,7 @@
 
     var usedPerFixture = new Map();
     var onePerFixture = [];
-    filtered.forEach(function (p) {
+    pool.forEach(function (p) {
       var key = p.fixtureKey;
       var existing = usedPerFixture.get(key);
       if (!existing || p.sourceProbability > existing.sourceProbability) {
@@ -417,7 +375,7 @@
       }
     });
     onePerFixture = Array.from(usedPerFixture.values());
-    var poolForCombos = onePerFixture.length > 50 ? onePerFixture : filtered;
+    var poolForCombos = onePerFixture.length > 50 ? onePerFixture : pool;
 
     if (options.shuffle) {
       poolForCombos.sort(function () { return Math.random() - 0.5; });
@@ -464,9 +422,9 @@
 
     if (tickets.length === 0) {
       return {
-        available: false, date: date, generatedAt: generatedAt,
+        available: false,
         reason: 'No ticket met the specified criteria. Try adjusting the number of legs, target odds, or odds range.',
-        ticket: null, tickets: [], pool: poolResult
+        ticket: null, tickets: []
       };
     }
 
@@ -503,11 +461,192 @@
 
     return {
       available: top.length > 0,
-      date: date,
-      generatedAt: generatedAt,
       reason: top.length > 0 ? null : 'No ticket met the specified criteria.',
       ticket: top[0] || null,
-      tickets: top,
+      tickets: top
+    };
+  }
+
+  // Fallback that builds a booking-code ticket straight from the bookmaker's
+  // schedule (the /api/converter/available-matches payload now carries the live
+  // 1X2 odds). Used when the prediction feed has no overlap with the schedule,
+  // so a code can still be produced whenever the bookmaker offers fixtures.
+  function buildFromSchedule(availableMatches, options) {
+    options = options || {};
+    var numLegs = options.numLegs || 3;
+    var targetOdds = options.targetOdds || 5;
+    var maxOdds = options.maxOdds || 100;
+    var minOddsPerLeg = options.minOddsPerLeg || 1.05;
+    var maxOddsPerLeg = options.maxOddsPerLeg || 100;
+    var shuffle = options.shuffle === true;
+    var date = options.date || watDate();
+    var generatedAt = new Date().toISOString();
+
+    if (!Array.isArray(availableMatches)) {
+      return { available: false, date: date, generatedAt: generatedAt, reason: 'No matches are available on the bookmaker right now.', ticket: null, tickets: [] };
+    }
+
+    var pool = [];
+    var seen = new Set();
+    var SIGNS = ['1', 'X', '2'];
+    availableMatches.forEach(function (m) {
+      if (!(m.home && m.away)) return;
+      var match = m.home + ' - ' + m.away;
+      if (m.date && hasKickedOff(m.date, m.time)) return;
+      if (!m.date && hasKickedOff(date, m.time)) return;
+      var odds = m.odds || {};
+      SIGNS.forEach(function (sign) {
+        var odd = Number(odds[sign]);
+        if (!(Number.isFinite(odd) && odd >= minOddsPerLeg && odd <= maxOddsPerLeg)) return;
+        var key = match + '|' + sign;
+        if (seen.has(key)) return;
+        seen.add(key);
+        var implied = 1 / odd;
+        pool.push({
+          match: match,
+          tip: sign,
+          odds: Number(odd.toFixed(2)),
+          probability: Math.round(implied * 100),
+          date: m.date || date,
+          time: m.time || '',
+          league: m.league || '',
+          category: '1x2',
+          sourceProbability: implied,
+          fixtureKey: fixtureKey(match),
+          streak: null,
+          oddsSource: 'bookmaker',
+          bookmaker: 'SportyBet',
+          evidence: []
+        });
+      });
+    });
+
+    if (pool.length < 2) {
+      return {
+        available: false, date: date, generatedAt: generatedAt,
+        reason: 'Not enough upcoming matches on the bookmaker to build a booking code. Try again when the next fixtures are available.',
+        ticket: null, tickets: [], pool: { pool: pool, total: pool.length }
+      };
+    }
+
+    var combo = combineSelections(pool, {
+      numLegs: numLegs,
+      targetOdds: targetOdds,
+      maxOdds: maxOdds,
+      shuffle: shuffle,
+      maxTickets: options.maxTickets || 3
+    });
+
+    return {
+      available: combo.available,
+      date: date,
+      generatedAt: generatedAt,
+      reason: combo.available ? null : (combo.reason || 'No ticket met the specified criteria.'),
+      ticket: combo.ticket,
+      tickets: combo.tickets,
+      pool: { pool: pool, total: pool.length },
+      candidateCount: pool.length
+    };
+  }
+
+  function buildTicket(predictions, options) {
+    options = options || {};
+    var requestedDate = options.date;
+    var oddsResponse = options.oddsResponse;
+    var markets = options.markets;
+    var safeOnly = options.safeOnly || false;
+    var numLegs = options.numLegs || 3;
+    var maxOdds = options.maxOdds || 500;
+    var minOddsPerLeg = options.minOddsPerLeg || 1.0;
+    var maxOddsPerLeg = options.maxOddsPerLeg || 100;
+    var targetOdds = options.targetOdds || 20;
+    var maxTickets = options.maxTickets || 8;
+    var bookingCodeMode = options.bookingCodeMode === true;
+
+    // Booking-code legs are valid from ~1.05, so high-confidence picks that
+    // estimate below the UI's 1.20 floor are not thrown away.
+    if (bookingCodeMode && minOddsPerLeg > 1.05) {
+      minOddsPerLeg = 1.05;
+    }
+
+    var generatedAt = new Date().toISOString();
+    var date = requestedDate || watDate();
+
+    if (!predictions || !Array.isArray(predictions.matches)) {
+      return { available: false, date: date, generatedAt: generatedAt, reason: 'Pre-match data is not available yet.', ticket: null, tickets: [] };
+    }
+
+    var availableDates = (predictions.dates || []).slice().sort().reverse();
+    if (!availableDates.includes(date) && availableDates.length) {
+      date = availableDates[0];
+    }
+
+    var unbeatenDates = loadUnbeatenDates(options.unbeatenData || options.unbeatenDates);
+    var unbeatenForDate = getUnbeatenForDate(unbeatenDates, date);
+
+    var poolResult = buildPool(predictions, {
+      date: date,
+      oddsResponse: oddsResponse,
+      h2hMatches: options.h2hMatches,
+      unbeatenData: unbeatenForDate,
+      safeOnly: safeOnly,
+      minProbability: options.minProbability,
+      minOddsPerLeg: minOddsPerLeg,
+      maxOddsPerLeg: maxOddsPerLeg,
+      markets: markets,
+      maxEntries: 200,
+      bookingCodeMode: bookingCodeMode,
+      availableMatches: options.availableMatches
+    });
+
+    var pool = poolResult.pool;
+
+    if (Array.isArray(markets) && markets.length > 0) {
+      pool = pool.filter(function (p) {
+        return markets.some(function (m) { return m.toLowerCase() === String(p.category).toLowerCase(); });
+      });
+    }
+
+    if (bookingCodeMode) {
+      pool = pool.filter(function (p) { return bookingCodeEligible(p.category, p.tip); });
+    }
+
+    applyLiveOdds(pool, oddsResponse);
+
+    var filtered = pool.filter(function (p) { return p.odds >= minOddsPerLeg && p.odds <= maxOddsPerLeg; });
+    if (filtered.length < 2) {
+      return {
+        available: false, date: date, generatedAt: generatedAt,
+        reason: bookingCodeMode
+          ? 'Not enough upcoming matches for a booking code. Matches that have already kicked off or are not offered by the bookmaker were excluded. Try again when the next fixtures are available, or adjust your target odds.'
+          : 'Not enough selections match the criteria. Try adjusting market filters or odds range.',
+        ticket: null, tickets: [], pool: poolResult
+      };
+    }
+
+    var combo = combineSelections(filtered, {
+      numLegs: numLegs,
+      targetOdds: targetOdds,
+      maxOdds: maxOdds,
+      shuffle: options.shuffle,
+      maxTickets: maxTickets
+    });
+
+    if (!combo.available) {
+      return {
+        available: false, date: date, generatedAt: generatedAt,
+        reason: combo.reason || 'No ticket met the specified criteria. Try adjusting the number of legs, target odds, or odds range.',
+        ticket: null, tickets: [], pool: poolResult
+      };
+    }
+
+    return {
+      available: true,
+      date: date,
+      generatedAt: generatedAt,
+      reason: null,
+      ticket: combo.ticket,
+      tickets: combo.tickets,
       pool: poolResult,
       candidateCount: poolResult.total
     };
@@ -515,6 +654,7 @@
 
   root.WFTTicketBuilder = {
     build: buildTicket,
+    buildFromSchedule: buildFromSchedule,
     buildPool: buildPool,
     applyLiveOdds: applyLiveOdds,
     watDate: watDate,
