@@ -15,7 +15,15 @@
 const cheerio = require('cheerio');
 const { getJson, BROWSER_UA } = require('./http');
 
+// Candidate URLs, tried in order. 1xbet's CDN serves datacenter/direct-fetch
+// clients a different (often challenge) page on some hosts, so we attempt more
+// than one entry point and fall back if the first yields no live fixtures.
 const ONE_XBET_LIVE = 'https://1xbet.ng/en/live/football';
+const ONE_XBET_LIVE_CANDIDATES = [
+  'https://1xbet.ng/en/live/football',
+  'https://1xbet.com/en/live/football',
+  'https://1xbetaff.net/en/live/football'
+];
 
 const CACHE_TTL_MS = 60 * 1000;
 
@@ -95,14 +103,49 @@ async function getLiveMatches() {
   const cached = cacheGet(key);
   if (cached) return cached;
 
-  const html = await getJson(ONE_XBET_LIVE, oneXbetHeaders(), 20000);
-  const matches = parseLiveMatches(html);
-  const result = {
-    generatedAt: new Date().toISOString(),
-    matches: matches
-  };
+  const result = await fetchLiveMatches();
   cacheSet(key, result);
   return result;
+}
+
+async function fetchLiveMatches() {
+  const probe = { attempts: [], source: '', total: 0 };
+  for (const url of ONE_XBET_LIVE_CANDIDATES) {
+    const attempt = await fetchAttempt(url);
+    probe.attempts.push({ url: url.replace('https://', ''), note: attempt.note, bytes: attempt.bytes, events: attempt.events, sportsEvents: attempt.sportsEvents });
+    if (attempt.matches.length > 0) {
+      probe.source = url;
+      probe.total = attempt.matches.length;
+      return { generatedAt: new Date().toISOString(), matches: attempt.matches, probe: probe };
+    }
+  }
+  throw new Error('No live fixtures returned by 1xBet (' + probe.attempts.map(function (a) { return a.url + ':' + a.note; }).join('; ') + ').');
+}
+
+function looksBlocked(html) {
+  if (!html) return 'empty-response';
+  if (/Just a moment|Enable JavaScript and cookies to continue|cf-chl|challenge-platform|Pardon Our Interruption/i.test(html)) return 'cloudflare-challenge';
+  if (/Access denied|Your IP has been blocked|restricted in your country|geo-blocked/i.test(html)) return 'blocked';
+  return '';
+}
+
+async function fetchAttempt(url) {
+  let raw;
+  try {
+    raw = await getJson(url, oneXbetHeaders(), 30000);
+  } catch (err) {
+    return { bytes: 0, events: 0, sportsEvents: 0, matches: [], note: 'network-error' };
+  }
+  const html = String(raw || '');
+  const blocked = looksBlocked(html);
+  const matches = parseLiveMatches(html);
+  return {
+    bytes: html.length,
+    events: matches.length,
+    sportsEvents: (html.match(/SportsEvent/g) || []).length,
+    matches: matches,
+    note: blocked || (matches.length ? 'ok' : 'no-jsonld')
+  };
 }
 
 module.exports = { getLiveMatches, parseLiveMatches };

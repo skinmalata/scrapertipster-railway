@@ -113,7 +113,7 @@ router.get('/converter/available-matches', async function (req, res) {
 router.get('/converter/live-matches', async function (req, res) {
   try {
     const data = await getLiveMatches();
-    res.json({ success: true, generatedAt: data.generatedAt, matches: data.matches });
+    res.json({ success: true, generatedAt: data.generatedAt, matches: data.matches, probe: data.probe });
   } catch (err) {
     sendError(res, err);
   }
