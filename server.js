@@ -604,9 +604,12 @@ runHeavyExclusive(refreshPreMatchPredictions)
   .then(function () { return runHeavyExclusive(refreshAuthorPicks); })
   .then(function () {
     // Warm the booking-code schedule index (287 per-league pages) so the
-    // converter's first request does not have to wait for a cold build.
+    // converter's first request does not have to wait for a cold build, and
+    // warm the H2H streak cache so available-matches never blocks on a cold
+    // h2hstats fetch.
     const { warmEventIndex } = require('./src/services/bookingCodes/resolver');
     warmEventIndex();
+    require('./src/services/h2hWinningStreaks').fetchTodayStreaks().catch(function (e) {});
   })
   .then(function () { startLiveScrapeLoop(); })
   .catch(function (e) { console.error('[boot] Heavy job chain failed:', e.message); });

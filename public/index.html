@@ -1718,7 +1718,9 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
             minOddsPerLeg:1.05,
             maxOddsPerLeg:maxO,
             maxOdds:100,
-            shuffle:shuffle
+            shuffle:shuffle,
+            predictions:data,
+            minProbability:0.55
           });
           if(fbRes.available&&fbRes.ticket&&fbRes.ticket.selections&&fbRes.ticket.selections.length>=2){
             res.innerHTML=renderTicket(fbRes.ticket.selections,fbRes.ticket.totalOdds,staleNote,true);

@@ -365,17 +365,51 @@
     var maxTicketOdds = targetOdds * 1.2;
     if (maxOdds && maxTicketOdds > maxOdds) maxTicketOdds = maxOdds;
 
+    // When preferIdealOdds is set (schedule fallback), keep per fixture the
+    // pick whose price is closest to the price a single leg needs to hit the
+    // target. The fallback pool contains many markets per fixture (1X2, Double
+    // Chance, Over goals), and picking the safest (lowest-priced) one would
+    // cap every ticket well below the target; this keeps a spread of prices
+    // the combination engine can actually build a target ticket from.
+    var idealLegOdds = options.preferIdealOdds ? Math.pow(targetOdds, 1 / Math.max(1, numLegs)) : null;
     var usedPerFixture = new Map();
     var onePerFixture = [];
     pool.forEach(function (p) {
       var key = p.fixtureKey;
       var existing = usedPerFixture.get(key);
-      if (!existing || p.sourceProbability > existing.sourceProbability) {
+      if (!existing) {
+        usedPerFixture.set(key, p);
+      } else if (idealLegOdds) {
+        var pDist = Math.abs(p.odds - idealLegOdds);
+        var eDist = Math.abs(existing.odds - idealLegOdds);
+        if (pDist < eDist || (pDist === eDist && p.sourceProbability > existing.sourceProbability)) {
+          usedPerFixture.set(key, p);
+        }
+      } else if (p.sourceProbability > existing.sourceProbability) {
         usedPerFixture.set(key, p);
       }
     });
     onePerFixture = Array.from(usedPerFixture.values());
     var poolForCombos = onePerFixture.length > 50 ? onePerFixture : pool;
+
+    // The schedule feed yields ~1300 fixtures, and the fallback adds several
+    // markets per fixture. An exhaustive 3-leg sweep over that pool stalls the
+    // page, so when the pool is per-fixture it is bounded to the legs priced
+    // closest to the target's ideal single-leg price. The prediction builder's
+    // pool is already capped (~200 entries), so this only trims the fallback.
+    if (options.preferIdealOdds && poolForCombos.length > 350) {
+      poolForCombos = poolForCombos.slice().sort(function (a, b) {
+        var da = Math.abs(a.odds - idealLegOdds);
+        var db = Math.abs(b.odds - idealLegOdds);
+        return (da - db) || ((b.sourceProbability || 0) - (a.sourceProbability || 0));
+      }).slice(0, 350);
+    }
+
+    // Cache the identity keys once so the DFS never re-parses team names.
+    poolForCombos.forEach(function (p) {
+      p._pid = matchIdentity(p.match);
+      p._tipKey = normaliseTeam(p.tip);
+    });
 
     if (options.shuffle) {
       poolForCombos.sort(function () { return Math.random() - 0.5; });
@@ -385,39 +419,47 @@
 
     var tickets = [];
     var seenKeys = new Set();
-    var MAX_ITER = 50000;
+    var MAX_ITER = 30000;
     var iterations = 0;
+    // Hard node budget counts loop iterations (the real cost driver) so the
+    // sweep always terminates in well under a second, even on a large input.
+    var MAX_NODES = 400000;
+    var nodes = 0;
 
     function backtrack(start, current, product, usedMatches, usedTips) {
-      if (iterations >= MAX_ITER) return;
       if (current.length >= 2 && product >= minTicketOdds) {
+        if (iterations >= MAX_ITER) return;
         iterations++;
-        var key = current.map(function (s) { return matchIdentity(s.match) + '|' + normaliseTeam(s.tip); }).sort().join('||');
+        var key = current.map(function (s) { return s._pid + '|' + s._tipKey; }).sort().join('||');
         if (!seenKeys.has(key)) {
           seenKeys.add(key);
+          var avgProb = 0;
+          for (var si = 0; si < current.length; si++) avgProb += current[si].sourceProbability;
+          avgProb = avgProb / current.length;
           tickets.push({
             selections: current.slice(),
             totalOdds: Number(product.toFixed(2)),
-            diff: Math.abs(product - targetOdds)
+            diff: Math.abs(product - targetOdds),
+            avgProb: avgProb
           });
         }
       }
       if (current.length >= numLegs) return;
       for (var j = start; j < poolForCombos.length; j++) {
-        if (iterations >= MAX_ITER) return;
+        if (nodes >= MAX_NODES || iterations >= MAX_ITER) return;
+        nodes++;
         var p = poolForCombos[j];
-        var matchId = matchIdentity(p.match);
-        if (usedMatches.has(matchId)) continue;
-        if (usedTips.has(normaliseTeam(p.tip))) continue;
+        if (usedMatches.has(p._pid)) continue;
+        if (usedTips.has(p._tipKey)) continue;
         var newProduct = product * p.odds;
         if (newProduct > maxTicketOdds) break;
-        usedMatches.add(matchId);
-        usedTips.add(normaliseTeam(p.tip));
+        usedMatches.add(p._pid);
+        usedTips.add(p._tipKey);
         current.push(p);
         backtrack(j + 1, current, newProduct, usedMatches, usedTips);
         current.pop();
-        usedTips.delete(normaliseTeam(p.tip));
-        usedMatches.delete(matchId);
+        usedTips.delete(p._tipKey);
+        usedMatches.delete(p._pid);
       }
     }
 
@@ -431,7 +473,12 @@
       };
     }
 
-    tickets.sort(function (a, b) { return a.diff - b.diff; });
+    // Prefer tickets that land closest to the target odds; when two are equally
+    // close, favor the one with the higher average implied confidence.
+    tickets.sort(function (a, b) {
+      if (a.diff !== b.diff) return a.diff - b.diff;
+      return (b.avgProb || 0) - (a.avgProb || 0);
+    });
 
     var top = [];
     var usedPairs = new Set();
@@ -444,8 +491,8 @@
         var bestScore = -Infinity;
         for (var ti = 0; ti < tickets.length; ti++) {
           if (taken.has(ti)) continue;
-          var pairs = tickets[ti].selections.map(function (s) { return matchIdentity(s.match) + '|' + normaliseTeam(s.tip); });
-          var matchIds = tickets[ti].selections.map(function (s) { return matchIdentity(s.match); });
+          var pairs = tickets[ti].selections.map(function (s) { return s._pid + '|' + s._tipKey; });
+          var matchIds = tickets[ti].selections.map(function (s) { return s._pid; });
           if (pairs.some(function (pair) { return usedPairs.has(pair); })) continue;
           if (pass === 0 && matchIds.some(function (matchId) { return usedMatchIds.has(matchId); })) continue;
           var freshCount = matchIds.filter(function (mId) { return !usedMatchIds.has(mId); }).length;
@@ -457,9 +504,9 @@
       var t = tickets[bestIdx];
       taken.add(bestIdx);
       top.push(t);
-      var tpairs = t.selections.map(function (s) { return matchIdentity(s.match) + '|' + normaliseTeam(s.tip); });
+      var tpairs = t.selections.map(function (s) { return s._pid + '|' + s._tipKey; });
       tpairs.forEach(function (pair) { usedPairs.add(pair); });
-      t.selections.forEach(function (s) { usedMatchIds.add(matchIdentity(s.match)); });
+      t.selections.forEach(function (s) { usedMatchIds.add(s._pid); });
     }
 
     return {
@@ -484,9 +531,67 @@
     var shuffle = options.shuffle === true;
     var date = options.date || watDate();
     var generatedAt = new Date().toISOString();
+    // Confidence floor for fallback picks. Bookmaker odds are margin-inflated,
+    // so 1/odds overstates the true probability; only keep legs where the
+    // market still implies at least this much confidence.
+    var minProbability = Number(options.minProbability);
+    if (!(minProbability > 0 && minProbability < 1)) minProbability = 0.55;
 
     if (!Array.isArray(availableMatches)) {
       return { available: false, date: date, generatedAt: generatedAt, reason: 'No matches are available on the bookmaker right now.', ticket: null, tickets: [] };
+    }
+
+    // When a fixture+tip also appears in the prediction feed, use the model's
+    // own confidence (a real signal) instead of the bookmaker's implied odds,
+    // so overlapping picks rank above blindly-chosen schedule legs.
+    var predMap = {};
+    var predSource = options.predictions;
+    var predList = predSource && Array.isArray(predSource)
+      ? predSource
+      : (predSource && Array.isArray(predSource.matches) ? predSource.matches : []);
+    predList.forEach(function (p) {
+      if (!p || !p.match || !p.tip) return;
+      var raw = Number(p.probability);
+      if (!Number.isFinite(raw) || raw <= 0) return;
+      var prob = raw > 1 ? raw / 100 : raw;
+      var key = fixtureKey(p.match) + '|' + String(p.tip).trim().toLowerCase();
+      if (!predMap[key] || prob > predMap[key]) predMap[key] = prob;
+    });
+
+    // H2H streak check applied to every fallback pick. Strong result streaks
+    // (8+ recent meetings, the same threshold the server paths use) support a
+    // pick and give it a small confidence boost; a strong opposing win streak
+    // directly contradicts the pick, so it is excluded before it reaches the
+    // combination engine. Goals-family streaks support the Over-goal legs.
+    function h2hAdjust(m, tip, confidence) {
+      var h = m.h2h || {};
+      if (!h.homeWin && !h.awayWin && !h.homeUnbeaten && !h.awayUnbeaten && !h.goals) {
+        return { drop: false, boost: 0, confidence: confidence };
+      }
+      if (/^over /i.test(tip)) {
+        var g = h.goals || 0;
+        if (g < 6) return { drop: false, boost: 0, confidence: confidence };
+        var boost = Math.min(0.06, Math.max(0.02, (g - 5) * 0.01));
+        return { drop: false, boost: boost, confidence: Math.min(0.95, confidence + boost) };
+      }
+      var homeStrong = Math.max(h.homeWin || 0, h.homeUnbeaten || 0);
+      var awayStrong = Math.max(h.awayWin || 0, h.awayUnbeaten || 0);
+      var supports = (tip === '1' || tip === '1X') ? homeStrong : ((tip === '2' || tip === 'X2') ? awayStrong : 0);
+      var opposesWin = (tip === '1' || tip === '1X') ? (h.awayWin || 0) : ((tip === '2' || tip === 'X2') ? (h.homeWin || 0) : 0);
+      if (opposesWin >= 8) return { drop: true, boost: 0, confidence: confidence };
+      if (supports < 8) return { drop: false, boost: 0, confidence: confidence };
+      var supportBoost = Math.min(0.06, Math.max(0.02, (supports - 5) * 0.01));
+      return { drop: false, boost: supportBoost, confidence: Math.min(0.95, confidence + supportBoost) };
+    }
+
+    // Fair combined odds of two 1X2 outcomes (Double Chance price from the
+    // single-result prices). The actual code is minted from the bookmaker's
+    // real Double Chance market, so the fair price is only used for selection.
+    function fairPair(oddA, oddB) {
+      if (!(oddA > 1 && oddB > 1)) return null;
+      var p = (1 / oddA) + (1 / oddB);
+      if (!(p > 0)) return null;
+      return 1 / p;
     }
 
     var pool = [];
@@ -501,25 +606,94 @@
       SIGNS.forEach(function (sign) {
         var odd = Number(odds[sign]);
         if (!(Number.isFinite(odd) && odd >= minOddsPerLeg && odd <= maxOddsPerLeg)) return;
+        var modelProb = predMap[fixtureKey(match) + '|' + sign.toLowerCase()];
+        var confidence = modelProb || (1 / odd);
+        var adj = h2hAdjust(m, sign, confidence);
+        if (adj.drop) return;
+        confidence = adj.confidence;
+        if (confidence < minProbability) return;
         var key = match + '|' + sign;
         if (seen.has(key)) return;
         seen.add(key);
-        var implied = 1 / odd;
         pool.push({
           match: match,
           tip: sign,
           odds: Number(odd.toFixed(2)),
-          probability: Math.round(implied * 100),
+          probability: Math.round(confidence * 100),
           date: m.date || date,
           time: m.time || '',
           league: m.league || '',
           category: '1x2',
-          sourceProbability: implied,
+          sourceProbability: confidence,
+          fixtureKey: fixtureKey(match),
+          streak: null,
+          oddsSource: modelProb ? 'prediction' : 'bookmaker',
+          bookmaker: 'SportyBet',
+          evidence: adj.boost > 0 ? ['H2H streak supports this pick'] : []
+        });
+      });
+
+      // Double Chance legs derived from the 1X2 prices.
+      [['1X', odds['1'], odds['X']], ['12', odds['1'], odds['2']], ['X2', odds['X'], odds['2']]].forEach(function (row) {
+        var tip = row[0];
+        var odd = fairPair(row[1], row[2]);
+        if (!odd) return;
+        var confidence = Math.min(0.95, 1 / odd);
+        var adj = h2hAdjust(m, tip, confidence);
+        if (adj.drop) return;
+        confidence = adj.confidence;
+        if (confidence < minProbability) return;
+        var key = match + '|' + tip.toLowerCase();
+        if (seen.has(key)) return;
+        seen.add(key);
+        pool.push({
+          match: match,
+          tip: tip,
+          odds: Number(odd.toFixed(2)),
+          probability: Math.round(confidence * 100),
+          date: m.date || date,
+          time: m.time || '',
+          league: m.league || '',
+          category: '1x2',
+          sourceProbability: confidence,
           fixtureKey: fixtureKey(match),
           streak: null,
           oddsSource: 'bookmaker',
           bookmaker: 'SportyBet',
-          evidence: []
+          evidence: adj.boost > 0 ? ['H2H streak supports this pick'] : []
+        });
+      });
+
+      // Over 1.5 / 2.5 legs from the league's Over/Under page (m.goals).
+      var goals = m.goals || {};
+      [['Over 1.5', goals.over15, 'over15'], ['Over 2.5', goals.over25, 'over25']].forEach(function (row) {
+        var tip = row[0];
+        var odd = Number(row[1]);
+        var category = row[2];
+        if (!(Number.isFinite(odd) && odd >= minOddsPerLeg && odd <= maxOddsPerLeg)) return;
+        var confidence = Math.min(0.95, 1 / odd);
+        var adj = h2hAdjust(m, tip, confidence);
+        if (adj.drop) return;
+        confidence = adj.confidence;
+        if (confidence < minProbability) return;
+        var key = match + '|' + tip.toLowerCase();
+        if (seen.has(key)) return;
+        seen.add(key);
+        pool.push({
+          match: match,
+          tip: tip,
+          odds: Number(odd.toFixed(2)),
+          probability: Math.round(confidence * 100),
+          date: m.date || date,
+          time: m.time || '',
+          league: m.league || '',
+          category: category,
+          sourceProbability: confidence,
+          fixtureKey: fixtureKey(match),
+          streak: null,
+          oddsSource: 'bookmaker',
+          bookmaker: 'SportyBet',
+          evidence: adj.boost > 0 ? ['H2H goals streak supports this pick'] : []
         });
       });
     });
@@ -537,9 +711,9 @@
       targetOdds: targetOdds,
       maxOdds: maxOdds,
       shuffle: shuffle,
+      preferIdealOdds: true,
       maxTickets: options.maxTickets || 3
     });
-
     return {
       available: combo.available,
       date: date,

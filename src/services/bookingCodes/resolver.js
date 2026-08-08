@@ -23,12 +23,22 @@
 // Betway codes only support 1X2 (its outcome-id scheme is only validated for that
 // market family). Double Chance and Over/Under legs are rejected for Betway with a
 // clear error.
+//
+// getAvailableMatches() additionally surfaces the Over/Under prices collected from
+// each league's marketId=18 page (m.goals) and a compact H2H streak summary
+// (m.h2h) derived from the same h2hstats feed the rest of the site uses, so the
+// schedule fallback can check head-to-head form before choosing a pick.
 
 const cheerio = require('cheerio');
 const { sportradarHeaders, getJson } = require('./http');
+const { fetchTodayStreaks, normaliseName } = require('../h2hWinningStreaks');
 
 const SPORTY_LEAGUE_LIST = 'https://www.sportybet.com/ng/lite/condition/league?timeId=1&sportId=sr:sport:1';
-const SPORTY_LEAGUE_EVENTS = 'https://www.sportybet.com/ng/lite/events?sportId=sr:sport:1&timeId=1&marketId=1&tournamentId=';
+// Each league page is fetched twice per refresh: once for the 1X2 market
+// (marketId=1, the outcome prices) and once for Over/Under (marketId=18) so
+// the schedule fallback can build Over 1.5/2.5 legs straight from real odds.
+const SPORTY_LEAGUE_EVENTS_1X2 = 'https://www.sportybet.com/ng/lite/events?sportId=sr:sport:1&timeId=1&marketId=1&tournamentId=';
+const SPORTY_LEAGUE_EVENTS_OU = 'https://www.sportybet.com/ng/lite/events?sportId=sr:sport:1&timeId=1&marketId=18&tournamentId=';
 const SPORTY_DETAIL = 'https://www.sportybet.com/ng/lite/preMatch/detail?sportId=sr:sport:1&productId=3&marketGroupsName=Main&eventId=';
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
@@ -178,6 +188,41 @@ function parseEventIndex(html) {
   return events;
 }
 
+// The Over/Under league page (marketId=18) lists the same .m-event rows as the
+// 1X2 page, but its outcome links carry Over/Under totals. We only keep the Over
+// prices for 1.5 and 2.5 totals, which the schedule fallback uses for its
+// Over-goal legs.
+function parseGoalMarkets(html) {
+  const $ = cheerio.load(html);
+  const goals = {};
+  $('.m-event').each(function () {
+    const node = $(this);
+    const href = node.find('.m-event-left').first().attr('href') || '';
+    const m = /eventId=(sr:match:\d+)/.exec(href);
+    if (!m) return;
+    let over15 = 0;
+    let over25 = 0;
+    node.find('.m-outcome').each(function () {
+      const h = $(this).attr('href') || '';
+      const mMarket = /marketId=(\d+)/.exec(h);
+      const mOut = /outcomeId=(\d+)/.exec(h);
+      const mSpec = /specifier=total%3D([0-9.]+)/.exec(h);
+      const mOdds = /odds=([0-9.]+)/.exec(h);
+      if (!(mMarket && mOut && mSpec && mOdds)) return;
+      if (mMarket[1] !== '18' || mOut[1] !== '12') return; // 12 = Over
+      const total = Number(mSpec[1]);
+      const odd = Number(mOdds[1]);
+      if (total === 1.5 && odd > 1) over15 = odd;
+      else if (total === 2.5 && odd > 1) over25 = odd;
+    });
+    const g = {};
+    if (over15 > 1) g.over15 = over15;
+    if (over25 > 1) g.over25 = over25;
+    if (g.over15 || g.over25) goals[m[1]] = g;
+  });
+  return goals;
+}
+
 async function getEventIndex() {
   if (eventIndexCache && Date.now() - eventIndexAt < LEAGUE_REFRESH_MS) return eventIndexCache;
   if (indexBuildPromise) {
@@ -209,9 +254,19 @@ async function buildEventIndex() {
       for (let i = w; i < leagues.length; i += LEAGUE_CONCURRENCY) {
         const league = leagues[i];
         try {
-          const html = await getJson(SPORTY_LEAGUE_EVENTS + encodeURIComponent(league.tid), sportradarHeaders('https://www.sportybet.com'), 20000);
+          const html = await getJson(SPORTY_LEAGUE_EVENTS_1X2 + encodeURIComponent(league.tid), sportradarHeaders('https://www.sportybet.com'), 20000);
           const parsed = parseEventIndex(html);
-          for (let k = 0; k < parsed.length; k++) all.push(parsed[k]);
+          let goalsMap = null;
+          try {
+            const ouHtml = await getJson(SPORTY_LEAGUE_EVENTS_OU + encodeURIComponent(league.tid), sportradarHeaders('https://www.sportybet.com'), 20000);
+            goalsMap = parseGoalMarkets(ouHtml);
+          } catch (e) {
+            // Missing Over/Under feed just means no Over-goal legs for this league.
+          }
+          for (let k = 0; k < parsed.length; k++) {
+            if (goalsMap && goalsMap[parsed[k].eventId]) parsed[k].goals = goalsMap[parsed[k].eventId];
+            all.push(parsed[k]);
+          }
         } catch (e) {
           failed++;
         }
@@ -398,15 +453,48 @@ function betwaySelection(event, leg) {
 
 // --- public API ---
 
+// Compact H2H signal for the schedule fallback: strongest qualifying streak
+// count per signal (0 when the feed has no streak for the side). The client
+// boosts picks the streaks support and drops picks a strong result streak
+// directly contradicts, matching how the server paths use H2H confidence.
+function h2hSummary(entry) {
+  const s = { homeWin: 0, awayWin: 0, homeUnbeaten: 0, awayUnbeaten: 0, goals: 0 };
+  (entry.streaks.all || []).forEach(function (rec) {
+    const side = rec.normal === entry.homeNormal ? 'home' : (rec.normal === entry.awayNormal ? 'away' : '');
+    if (!side) return;
+    if (rec.type === 'win') s[side + 'Win'] = Math.max(s[side + 'Win'], rec.count);
+    if (rec.type === 'unbeaten') s[side + 'Unbeaten'] = Math.max(s[side + 'Unbeaten'], rec.count);
+    if (rec.family === 'goals' || rec.type === 'ht-over-1.5' || rec.type === 'ht-over-0.5' || rec.type === 'btts-yes') {
+      s.goals = Math.max(s.goals, rec.count);
+    }
+  });
+  return s;
+}
+
 // Currently available (upcoming) football events in the bookmaker's schedule,
 // used by the ticket builder to drop matches that have already started or are
 // not offered at all, so tickets are as likely as possible to resolve. Also
-// carries the live 1X2 odds and kickoff date/time so the schedule fallback can
-// build a ticket straight from the bookmaker's own prices.
+// carries the live 1X2 odds, the Over/Under prices and kickoff date/time so the
+// schedule fallback can build a ticket straight from the bookmaker's own prices,
+// plus the H2H streak summary for the fixtures the h2hstats feed covers.
 async function getAvailableMatches() {
   const events = await getEventIndex();
+  const h2hIndex = {};
+  try {
+    (await fetchTodayStreaks()).forEach(function (m) {
+      const key = normaliseName(m.home) + '|' + normaliseName(m.away);
+      if (!h2hIndex[key]) h2hIndex[key] = m;
+    });
+  } catch (e) {
+    // H2H is a bonus signal; its absence must never break the schedule feed.
+  }
   return events.map(function (e) {
-    return { home: e.home, away: e.away, time: e.time, date: e.date || '', league: e.league || '', odds: e.odds || {} };
+    const entry = h2hIndex[normaliseName(e.home) + '|' + normaliseName(e.away)];
+    return {
+      home: e.home, away: e.away, time: e.time, date: e.date || '', league: e.league || '',
+      odds: e.odds || {}, goals: e.goals || {},
+      h2h: entry ? h2hSummary(entry) : null
+    };
   });
 }
 

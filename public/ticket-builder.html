@@ -2218,7 +2218,9 @@ nav.open { display: flex !important; }
             minOddsPerLeg: 1.05,
             maxOddsPerLeg: maxOdds,
             maxOdds: maxOdds,
-            shuffle: shuffle === true
+            shuffle: shuffle === true,
+            predictions: pred,
+            minProbability: 0.55
           });
           if (fbRes.available && fbRes.ticket && fbRes.ticket.selections && fbRes.ticket.selections.length >= 2) {
             renderTickets({ tickets: fbRes.tickets || [fbRes.ticket], ticket: fbRes.ticket });
