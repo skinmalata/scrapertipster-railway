@@ -104,7 +104,8 @@ const BLOG_REDIRECTS = {
 const TOP_LEVEL_REDIRECTS = {
   'Home': '/',
   'in-play': '/predictions/in-play',
-  'news': '/blog/'
+  'news': '/blog/',
+  'watch-live': '/predictions/in-play'
 };
 
 // Legacy team URLs with no page on this site (team pages are generated only

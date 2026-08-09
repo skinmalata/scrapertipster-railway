@@ -50,7 +50,6 @@ function buildSitemap() {
     { loc: 'https://winfulltime.com/terms.html', changefreq: 'monthly', priority: '0.4' },
     { loc: 'https://winfulltime.com/advertise.html', changefreq: 'monthly', priority: '0.6' },
     { loc: 'https://winfulltime.com/ticket-builder.html', changefreq: 'weekly', priority: '0.8' },
-    { loc: 'https://winfulltime.com/watch-live.html', changefreq: 'hourly', priority: '0.7' },
     { loc: 'https://winfulltime.com/blog/', changefreq: 'weekly', priority: '0.9' },
     { loc: 'https://winfulltime.com/predictions/', changefreq: 'daily', priority: '0.9' },
     { loc: 'https://winfulltime.com/predictions/1x2', changefreq: 'daily', priority: '0.9' },

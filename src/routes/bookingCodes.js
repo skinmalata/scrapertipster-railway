@@ -4,8 +4,6 @@ const express = require('express');
 const router = express.Router();
 const { decodeCode, convertCode, createCodeFromLegs, providerStatus, getAvailableMatches, BOOKMAKERS, MAX_LEGS } = require('../services/bookingCodes/converter');
 const { recordConversion, getRecent } = require('../services/bookingCodes/recentConversions');
-const { getLiveMatches } = require('../services/bookingCodes/resolver');
-
 const STATUS_BY_CODE = {
   BAD_REQUEST: 400,
   INVALID_CODE: 404,
@@ -101,18 +99,6 @@ router.get('/converter/status', function (req, res) {
 router.get('/converter/available-matches', async function (req, res) {
   try {
     const matches = await getAvailableMatches();
-    res.json({ success: true, generatedAt: new Date().toISOString(), matches: matches });
-  } catch (err) {
-    sendError(res, err);
-  }
-});
-
-// Football matches that are in-play right now on SportyBet, with live score and
-// half plus deep links into the match centre. Powers the "Watch Live Football"
-// page, which only ever shows currently-live fixtures.
-router.get('/converter/live-matches', async function (req, res) {
-  try {
-    const matches = await getLiveMatches();
     res.json({ success: true, generatedAt: new Date().toISOString(), matches: matches });
   } catch (err) {
     sendError(res, err);
