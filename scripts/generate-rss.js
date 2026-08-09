@@ -5,6 +5,7 @@ const path = require('path');
 
 const ROOT = path.join(__dirname, '..', 'public');
 const OUTPUT_FILE = path.join(ROOT, 'feed.xml');
+const PREDICTIONS_OUTPUT_FILE = path.join(ROOT, 'predictions-feed.xml');
 const BASE_URL = 'https://winfulltime.com';
 
 function escapeXml(str) {
@@ -110,6 +111,7 @@ ${itemsXml}
 `;
 
   fs.writeFileSync(OUTPUT_FILE, rssXml);
+  fs.writeFileSync(PREDICTIONS_OUTPUT_FILE, rssXml);
   console.log(`[rss-generator] Generated RSS feed with ${items.length} items at ${OUTPUT_FILE}`);
 }
 

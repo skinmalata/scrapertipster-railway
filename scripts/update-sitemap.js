@@ -52,6 +52,7 @@ function buildSitemap() {
     { loc: 'https://winfulltime.com/ticket-builder.html', changefreq: 'weekly', priority: '0.8' },
     { loc: 'https://winfulltime.com/watch-live.html', changefreq: 'hourly', priority: '0.7' },
     { loc: 'https://winfulltime.com/blog/', changefreq: 'weekly', priority: '0.9' },
+    { loc: 'https://winfulltime.com/predictions/', changefreq: 'daily', priority: '0.9' },
     { loc: 'https://winfulltime.com/predictions/1x2', changefreq: 'daily', priority: '0.9' },
     { loc: 'https://winfulltime.com/predictions/over-1-5', changefreq: 'daily', priority: '0.9' },
     { loc: 'https://winfulltime.com/predictions/over-2-5', changefreq: 'daily', priority: '0.9' },
@@ -74,11 +75,13 @@ function buildSitemap() {
     .sort()
     .map(file => {
       const html = fs.readFileSync(path.join(blogDir, file), 'utf8');
+      if (/<meta name="robots"[^>]*noindex/i.test(html)) return null;
       const canonical = (html.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i) || [])[1]
         || `https://winfulltime.com/blog/${file}`;
       const modified = (html.match(/["']dateModified["']\s*:\s*["'](\d{4}-\d{2}-\d{2})/i) || [])[1] || today;
       return urlEntry(canonical, modified, 'monthly', '0.7');
     })
+    .filter(Boolean)
     .join('\n');
 
   // Prerendered match-analysis pages. Pages live under dated directories
@@ -145,6 +148,8 @@ function buildSitemap() {
       MARKET_SLUGS.forEach(marketSlug => {
         const page = path.join(leagueDir, marketSlug, 'index.html');
         if (!fs.existsSync(page)) return;
+        const robots = (fs.readFileSync(page, 'utf8').match(/<meta name="robots"[^>]*>/i) || [''])[0];
+        if (/noindex/i.test(robots)) return;
         matrixEntries.push(urlEntry(`https://winfulltime.com/predictions/${leagueSlug}/${marketSlug}/`, today, 'daily', '0.6'));
       });
     });
