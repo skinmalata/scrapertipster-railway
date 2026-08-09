@@ -115,12 +115,22 @@ const MATRIX_REDIRECTS = [
 function writeStub(relativeFile, target) {
   if (!target) throw new Error(`No target for ${relativeFile}`);
   const abs = path.join(ROOT, relativeFile);
+  const isDirStub = path.basename(abs) === 'index.html';
   if (fs.existsSync(abs)) {
-    console.log(`skip (exists): ${relativeFile}`);
+    const existing = fs.readFileSync(abs, 'utf8');
+    if (isDirStub && /location\.replace/.test(existing)) {
+      fs.writeFileSync(path.join(path.dirname(abs), '.redirect-stub'), '');
+      console.log(`mark:  ${relativeFile}`);
+    } else {
+      console.log(`skip (exists): ${relativeFile}`);
+    }
     return false;
   }
   fs.mkdirSync(path.dirname(abs), { recursive: true });
   fs.writeFileSync(abs, STUB(target));
+  if (isDirStub) {
+    fs.writeFileSync(path.join(path.dirname(abs), '.redirect-stub'), '');
+  }
   console.log(`stub: ${relativeFile} -> ${target}`);
   return true;
 }

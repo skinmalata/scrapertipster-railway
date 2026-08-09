@@ -789,6 +789,7 @@ function pruneAnalysisDirs(used) {
   fs.readdirSync(PRERENDER_DIR).forEach(function (d) {
     const dir = path.join(PRERENDER_DIR, d);
     if (!fs.statSync(dir).isDirectory()) return;
+    if (fs.existsSync(path.join(dir, '.redirect-stub'))) return;
     if (!validDateStr(d)) {
       fs.rmSync(dir, { recursive: true, force: true });
       removed++;

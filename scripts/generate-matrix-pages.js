@@ -310,6 +310,7 @@ function main() {
       fs.readdirSync(leaguePath).forEach(marketSlug => {
         if (liveMarkets.has(marketSlug)) return;
         const marketPath = path.join(leaguePath, marketSlug);
+        if (fs.existsSync(path.join(marketPath, '.redirect-stub'))) return;
         if (fs.statSync(marketPath).isDirectory()) {
           fs.rmSync(marketPath, { recursive: true, force: true });
           pruned++;

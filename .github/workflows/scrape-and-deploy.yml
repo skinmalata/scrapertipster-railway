@@ -76,6 +76,9 @@ jobs:
       - name: Bake shared nav/footer layout into static pages
         run: node scripts/bake-layout.js
 
+      - name: Emit redirect stubs for legacy/missing URLs
+        run: node scripts/generate-redirects.js
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
