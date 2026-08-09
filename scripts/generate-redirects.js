@@ -107,6 +107,12 @@ const TOP_LEVEL_REDIRECTS = {
   'news': '/blog/'
 };
 
+// Legacy team URLs with no page on this site (team pages are generated only
+// for teams in today's matches). Redirect to the match analysis hub.
+const TEAM_REDIRECTS = {
+  'forge': '/analysis.html'
+};
+
 // Matrix page never generated (league has no cards data) -> league hub.
 const MATRIX_REDIRECTS = [
   ['uruguayan-primera-division', 'cards', '/predictions/league/uruguayan-primera-division/']
@@ -162,6 +168,11 @@ function main() {
   // 5. Matrix stubs.
   for (const [league, market, target] of MATRIX_REDIRECTS) {
     if (writeStub(path.join('predictions', league, market, 'index.html'), target)) count++;
+  }
+
+  // 6. Legacy team URL stubs.
+  for (const [slug, target] of Object.entries(TEAM_REDIRECTS)) {
+    if (writeStub(path.join('teams', slug, 'index.html'), target)) count++;
   }
 
   console.log(`\nCreated ${count} redirect stub(s).`);
