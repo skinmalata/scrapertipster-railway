@@ -514,6 +514,41 @@ async function getAvailableMatches() {
   });
 }
 
+// Live-friendly watch list for the "Watch Live Football" page. SportyBet's live
+// widget itself is client-rendered (no server-side names), but the same
+// Sportradar event index that powers booking-code generation is served to any
+// client and includes every football fixture SportyBet currently offers with a
+// working deep link to the match centre. The ticket builder already relies on
+// it in production, so this reuses a proven path instead of scraping a new feed.
+//
+// Matches are returned with the numeric part of their sr:match:<id>, an ISO-ish
+// kickoff (date + time) and a watch URL that drops straight into the SportyBet
+// match centre for the fixture (live score + stream where licensed). Only
+// today's Lagos fixtures are returned: those are the matches on offer right now,
+// and they refresh as the day progresses.
+async function getWatchMatches() {
+  const events = await getEventIndex();
+  const today = lagosTodayDate();
+  return events
+    .filter(function (e) { return e.date === today; })
+    .map(function (e) {
+      const id = String(e.eventId || '').replace(/^sr:match:/, '');
+      return {
+        eventId: id,
+        home: e.home,
+        away: e.away,
+        league: e.league || '',
+        start: e.date + 'T' + (e.time || '00:00'),
+        watchUrl: matchUrl(id)
+      };
+    })
+    .sort(function (a, b) { return (a.start || '').localeCompare(b.start || ''); });
+}
+
+function matchUrl(id) {
+  return 'https://www.sportybet.com/ng/lite/preMatch/detail?sportId=sr:sport:1&productId=3&marketGroupsName=Main&eventId=sr:match:' + String(id).replace(/^sr:match:/, '');
+}
+
 async function resolveLeg(leg, bookmaker) {
   if (!leg || !leg.match) throw unresolvedEventError(leg && leg.match);
   const pair = splitMatchName(leg.match);
@@ -544,4 +579,4 @@ function warmEventIndex() {
   });
 }
 
-module.exports = { resolveLeg, getAvailableMatches, warmEventIndex };
+module.exports = { resolveLeg, getAvailableMatches, getWatchMatches, warmEventIndex };
