@@ -549,6 +549,99 @@ function matchUrl(id) {
   return 'https://www.sportybet.com/ng/lite/preMatch/detail?sportId=sr:sport:1&productId=3&marketGroupsName=Main&eventId=sr:match:' + String(id).replace(/^sr:match:/, '');
 }
 
+// --- SportyBet live-only fixtures (the "Watch Live Football" page) ---
+
+// SportyBet's main live widget is client-rendered, but the same Sportradar
+// platform powers livescore.sportybet.com, whose sport-1 pages are server
+// rendered. The ?status=live filter returns exactly the football events that
+// are in-play right now (team names, league, current score and half), which is
+// the closest thing to a real "live now" list that renders without a browser.
+// Event ids match SportyBet's sr:match:<id>, so the same match-centre deep
+// link that the schedule uses works for these fixtures too. Simulated-reality
+// (virtual) leagues are dropped so the list only shows real matches.
+const SPORTY_LIVE_SCORE = 'https://livescore.sportybet.com/en/sport/1?status=live';
+
+// Live fixtures change minute to minute, so a short 45s cache keeps upstream
+// traffic sane without making the page look stale.
+const LIVE_TTL_MS = 45 * 1000;
+
+let liveCache = null;
+let liveAt = 0;
+
+function cleanLeague(raw) {
+  const text = String(raw || '').replace(/Add to favorites.*$/i, '').trim();
+  const parts = text.split('|');
+  return parts.length === 2
+    ? parts[0].trim() + ' · ' + parts[1].trim()
+    : text;
+}
+
+function isSimulatedLeague(raw) {
+  return /\bSRL\b|simulated reality|virtual/i.test(String(raw || ''));
+}
+
+function parseLiveList(html) {
+  const $ = cheerio.load(html);
+  const out = [];
+  $('[data-testid="matchList-common-match"]').each(function () {
+    const node = $(this);
+    const id = String(node.attr('data-matchid') || '').trim();
+    if (!/^\d+$/.test(id)) return;
+    const home = node.find('.sh-match__teams .truncate').first().text().trim();
+    const away = node.find('.sh-match__teams .truncate').last().text().trim();
+    if (!(home && away)) return;
+
+    // League lives in the h3 header that the match list is grouped under.
+    let league = '';
+    node.parents().each(function () {
+      const h = $(this).children('h3').first();
+      if (h.length && !league) league = h.text();
+    });
+    league = cleanLeague(league);
+    if (isSimulatedLeague(league)) return;
+
+    const status = node.find('.sh-match__status').text()
+      .replace(/Limited coverage|limited coverage/g, '')
+      .replace(/\s+/g, ' ').trim()
+      .replace(/H[12]$/, '');
+    const half = /^1st half|^2nd half|^HT/.test(status) ? status : 'Live';
+    const scoreCells = [];
+    node.find('.rounded-match__score').each(function () {
+      const t = $(this).text().trim();
+      if (t && /^\d+$/.test(t)) scoreCells.push(t);
+    });
+
+    out.push({
+      eventId: id,
+      home: home,
+      away: away,
+      league: league || 'Football',
+      status: half,
+      score: scoreCells.length >= 2 ? { home: Number(scoreCells[0]), away: Number(scoreCells[1]) } : null,
+      watchUrl: matchUrl(id)
+    });
+  });
+  return out;
+}
+
+// Football matches that are in-play right now on SportyBet, each with the live
+// score and half plus a deep link straight into the SportyBet match centre.
+// Falls back to a short-lived cache on upstream trouble so the page keeps
+// serving the last known live list instead of erroring.
+async function getLiveMatches() {
+  if (liveCache && Date.now() - liveAt < LIVE_TTL_MS) return liveCache;
+  try {
+    const html = await getJson(SPORTY_LIVE_SCORE, sportradarHeaders('https://www.sportybet.com'), 20000);
+    const matches = parseLiveList(html);
+    liveCache = matches;
+    liveAt = Date.now();
+    return matches;
+  } catch (e) {
+    if (liveCache) return liveCache;
+    throw e;
+  }
+}
+
 async function resolveLeg(leg, bookmaker) {
   if (!leg || !leg.match) throw unresolvedEventError(leg && leg.match);
   const pair = splitMatchName(leg.match);
@@ -579,4 +672,4 @@ function warmEventIndex() {
   });
 }
 
-module.exports = { resolveLeg, getAvailableMatches, getWatchMatches, warmEventIndex };
+module.exports = { resolveLeg, getAvailableMatches, getWatchMatches, getLiveMatches, warmEventIndex };

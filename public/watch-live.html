@@ -6,19 +6,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Watch Live Football Matches | WinFulltime</title>
-<meta name="description" content="Watch and follow today's football on SportyBet from WinFulltime. Jump straight into the match centre for the fixtures on offer right now.">
+<meta name="description" content="See only the football matches live in-play right now on SportyBet. Jump straight into the match centre for live score, stats and the stream where available.">
 <meta name="keywords" content="watch live football, live football streaming, watch football online, sportybet live, live match streams, football live today">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
 <link rel="canonical" href="https://winfulltime.com/watch-live.html">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Watch Live Football Matches | WinFulltime">
-<meta property="og:description" content="Watch live football matches streaming right now. Jump straight into the broadcast of today's live fixtures.">
+<meta property="og:description" content="Only football matches live in-play right now on SportyBet. Jump straight into the match centre for the score and stream.">
 <meta property="og:url" content="https://winfulltime.com/watch-live.html">
 <meta property="og:site_name" content="WinFulltime">
 <meta property="og:image" content="https://winfulltime.com/winfulltimelogo.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Watch Live Football Matches | WinFulltime">
-<meta name="twitter:description" content="Watch live football matches streaming right now.">
+<meta name="twitter:description" content="Only football matches live in-play right now on SportyBet. Jump straight into the match centre for the score and stream.">
 <meta name="twitter:image" content="https://winfulltime.com/winfulltimelogo.png">
 <link rel="icon" href="/icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
@@ -37,7 +37,7 @@
   "@context": "https://schema.org",
   "@type": "WebPage",
   "name": "Watch Live Football Matches",
-  "description": "Live football matches streaming right now. Jump straight into the broadcast of today's live fixtures.",
+  "description": "Only football matches live in-play right now on SportyBet. Jump straight into the match centre for the score and stream.",
   "url": "https://winfulltime.com/watch-live.html",
   "isPartOf": {
     "@type": "WebSite",
@@ -129,7 +129,7 @@
 <main class="container">
   <div class="hero">
     <h1>Watch Live Football</h1>
-    <div class="hero-subtext">Football on offer right now. Pick a match and jump straight into the SportyBet match centre.</div>
+    <div class="hero-subtext">Only matches that are live right now are listed. Pick one and jump straight into the SportyBet match centre — live score, stats and the stream where available.</div>
     <div class="hero-status"><span class="live-dot"></span><span id="statusText">Loading live matches...</span></div>
   </div>
 
@@ -141,22 +141,20 @@
   <div id="content">
     <div class="loading">
       <div class="spinner"></div>
-      <div class="loading-text">Checking which football matches are available right now...</div>
+      <div class="loading-text">Checking which football matches are live right now...</div>
     </div>
   </div>
 
   <div class="note">
-    <strong>How to use this page:</strong> matches listed are available on <strong>SportyBet</strong>. Clicking a match opens the
-    SportyBet match centre, where you can follow the live score; a stream is shown for matches SportyBet broadcasts to
-    logged-in users. Match times follow Africa/Lagos time.
+    <strong>How to use this page:</strong> every match listed is <strong>in-play right now</strong> on <strong>SportyBet</strong> — the score shown is the current one. Clicking a match opens the SportyBet match centre, where you can follow the live score and stats; a stream is shown for matches SportyBet broadcasts to logged-in users.
   </div>
 
   <section class="faq-section">
     <h2>Frequently Asked Questions</h2>
-    <details class="faq-item"><summary>Which matches can I watch?</summary><p>This page lists the football matches SportyBet is offering right now, pulled from the same bookmaker feed that powers the site's ticket builder — so you always see fixtures that are actually available rather than a stale schedule.</p></details>
+    <details class="faq-item"><summary>Which matches can I watch?</summary><p>This page lists only the football matches SportyBet has live in-play at this moment, pulled from the bookmaker's own live feed. Once a game kicks off it appears here; once it ends it drops off automatically.</p></details>
     <details class="faq-item"><summary>Do I need an account to watch?</summary><p>Yes — watching or betting on SportyBet requires a registered account. Registration is free. Stream availability for an individual match depends on broadcast rights and your region.</p></details>
     <details class="faq-item"><summary>Is watching free?</summary><p>SportyBet provides live streams of many matches to its registered users. You are not charged for the stream itself, but you must be logged in to access it.</p></details>
-    <details class="faq-item"><summary>Why are only some matches listed?</summary><p>WinFulltime mirrors the fixtures SportyBet is currently offering. Matches refresh automatically as fixtures are added, kicked off or removed.</p></details>
+    <details class="faq-item"><summary>Why are only some matches listed?</summary><p>The page auto-refreshes every 60 seconds and always shows what SportyBet has in-play right now. When there is no live football (quiet overnight windows), the list is empty until the next kickoffs start.</p></details>
   </section>
 </main>
 
@@ -233,25 +231,24 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
   function escapeHtml(v) { return String(v ?? '').replace(/[&<>'"]/g, function(c) { return { '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]; }); }
 
-  function kickoffLabel(m) {
-    if (!m.start) return 'Today';
-    var datePart = String(m.start).slice(0, 10);
-    var timePart = String(m.start).slice(11, 16);
-    var day = datePart.slice(8, 10) + '/' + datePart.slice(5, 7);
-    return 'Kickoff ' + day + ' ' + (timePart || '--:--') + ' WAT';
+  function liveLabel(m) {
+    if (m.score && typeof m.score.home === 'number') {
+      return escapeHtml(m.status || 'Live') + ' &middot; ' + m.score.home + ' - ' + m.score.away;
+    }
+    return escapeHtml(m.status || 'Live');
   }
 
   function buildList(matches) {
     if (!matches || matches.length === 0) {
-      return '<div class="no-data">No football matches are currently available.<br>Check back in a few minutes — new fixtures are added all day.</div>';
+      return '<div class="no-data">No football matches are live right now.<br>Games kick off all day — check back in a few minutes.</div>';
     }
     var html = '<div class="matches-grid">' + matches.map(function(m) {
       return '<div class="match-card">' +
         '<div class="match-league">' + escapeHtml(m.league || 'Football') + '</div>' +
         '<div class="match-teams">' + escapeHtml(m.home) + ' <span style="color:var(--text-dim);font-weight:500;">vs</span> ' + escapeHtml(m.away) + '</div>' +
-        '<div class="match-kickoff">' + kickoffLabel(m) + '</div>' +
+        '<div class="match-kickoff">' + liveLabel(m) + '</div>' +
         '<a class="watch-btn" href="' + escapeHtml(m.watchUrl) + '" target="_blank" rel="noopener sponsored">' +
-          '<span class="icon">&#9658;</span> Open on SportyBet</a>' +
+          '<span class="icon">&#9658;</span> Watch Live</a>' +
         '</div>';
     }).join('') + '</div>';
     return html;
@@ -259,7 +256,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
   function render(data) {
     var matches = data && Array.isArray(data.matches) ? data.matches : [];
-    statusText.textContent = matches.length + ' football match' + (matches.length === 1 ? '' : 'es') + ' available on SportyBet';
+    statusText.textContent = matches.length + ' live football match' + (matches.length === 1 ? '' : 'es') + ' right now';
     content.innerHTML = buildList(matches);
     updatedText.textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
   }
