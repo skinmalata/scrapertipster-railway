@@ -19,6 +19,13 @@ const MAX_CORNER_HISTORY_CACHE = 200;
 const MAX_DAILY_RESULTS_CACHE = 500;
 const MAX_FIXTURE_INDEX = 500;
 const MAX_MEMORY_MB = parseInt(process.env.MAX_MEMORY_MB || '400', 10);
+// Escalating backoff when FotMob returns 429/403: 15 -> 30 -> 60 min, so a
+// hard block is not probed again until it has had time to clear.
+const FOTMOB_BLOCK_BASE_MS = 15 * 60 * 1000;
+const FOTMOB_BLOCK_MAX_MS = 60 * 60 * 1000;
+// Small random jitter per cycle so the 5-minute cadence is not a fixed,
+// easily-fingerprinted pattern.
+const SCRAPE_JITTER_MS = 45 * 1000;
 
 let liveCache = null;
 let isScraping = false;
@@ -29,6 +36,8 @@ let dailyMatchResults = new Map();
 let dailyMatchResultsDate = '';
 let fotmobFixtureIndex = new Map();
 let streakCandidateQueue = new Map();
+let fotMobBlockedUntil = 0;
+let fotMobBlockAttempts = 0;
 
 function evictOldest(map, maxSize) {
   if (map.size <= maxSize) return;
@@ -52,6 +61,27 @@ function isMemoryPressure() {
     return true;
   }
   return false;
+}
+
+function isFotMobBlocked() {
+  return Date.now() < fotMobBlockedUntil;
+}
+
+// Escalating cooldown on a 429/403 so a hard block is probed after 15 min,
+// then 30, then 60 (capped) instead of every five-minute cycle.
+function markFotMobBlocked(status) {
+  const attempts = fotMobBlockAttempts + 1;
+  fotMobBlockAttempts = attempts;
+  const cooldownMs = Math.min(FOTMOB_BLOCK_MAX_MS, FOTMOB_BLOCK_BASE_MS * Math.pow(2, attempts - 1));
+  fotMobBlockedUntil = Date.now() + cooldownMs;
+  console.warn('[fotmob-live] Upstream block detected (HTTP ' + status + ') — backing off ' + Math.round(cooldownMs / 60000) + ' min (attempt ' + attempts + ')');
+}
+
+function resetFotMobBlock() {
+  if (fotMobBlockAttempts === 0 && fotMobBlockedUntil === 0) return;
+  fotMobBlockAttempts = 0;
+  fotMobBlockedUntil = 0;
+  console.log('[fotmob-live] Upstream healthy again — block cleared');
 }
 
 function fotMobDateStr(dayOffset) {
@@ -108,6 +138,7 @@ function httpGet(url, timeoutMs) {
       var body = '';
       res.on('data', function (c) { body += c; });
       res.on('end', function () {
+        if (res.statusCode === 429 || res.statusCode === 403) markFotMobBlocked(res.statusCode);
         try { resolve({ status: res.statusCode, data: JSON.parse(body) }); }
         catch (e) { console.warn('[fotmob-live] JSON parse failed for', url, '— status:', res.statusCode, 'body length:', body.length, 'preview:', body.slice(0, 120)); resolve({ status: res.statusCode, data: null }); }
       });
@@ -225,6 +256,7 @@ async function fetchFotMobLive() {
     console.warn('[fotmob-live] No valid FotMob responses — both today and yesterday returned no data');
     return [];
   }
+  resetFotMobBlock();
 
   validResponses.forEach(function(response) { addFotMobResults(response.data); });
   fotmobFixtureIndex = new Map();
@@ -507,6 +539,10 @@ async function enrichLiveMatchDetails(matches) {
 async function scrapeLive() {
   if (isScraping) return liveCache;
   if (isMemoryPressure()) return liveCache;
+  if (isFotMobBlocked()) {
+    console.log('[fotmob-live] Skipping scrape — upstream block cooldown active (' + Math.ceil((fotMobBlockedUntil - Date.now()) / 60000) + ' min left)');
+    return liveCache;
+  }
   isScraping = true;
 
   try {
@@ -634,7 +670,7 @@ async function scrapeLive() {
     console.log('[fotmob-live] Scraped', matches.length, 'live matches (' + withStats + ' stats, ' + withH2h + ' h2h, ' + withForm + ' form, ' + withStreak + ' win-streaks, ' + withMatchStreak + ' match-streaks, ' + queuedCandidates.size + ' queued 8+ streak fixtures, ' + withQueuedStreakCandidate + ' live candidates)');
   } catch (e) {
     console.warn('[fotmob-live] Scrape failed:', e.message);
-    if (!liveCache || !liveCache.matches || !liveCache.matches.length) {
+    if (!isFotMobBlocked() && (!liveCache || !liveCache.matches || !liveCache.matches.length)) {
       console.log('[fotmob-live] Retrying after failure...');
       try {
         var retryMatches = await fetchFotMobLive();
@@ -662,15 +698,24 @@ function getCachedLive() {
 
 const { forceRestartIfMemoryCritical } = require('./memoryGuard');
 
-function startLiveScrapeLoop() {
-  if (scrapeTimer) return;
-  console.log('[fotmob-live] Starting scrape loop (every 5 min)');
-  forceRestartIfMemoryCritical();
-  scrapeLive();
-  scrapeTimer = setInterval(function () {
+function scheduleNextScrape() {
+  // Jittered delay: each cycle waits 5 min plus a random +-45s so the scrape
+  // cadence is not a fixed, easily-fingerprinted pattern.
+  const jitterMs = Math.round((Math.random() * 2 - 1) * SCRAPE_JITTER_MS);
+  const delayMs = Math.max(1000, SCRAPE_INTERVAL_MS + jitterMs);
+  scrapeTimer = setTimeout(function () {
     forceRestartIfMemoryCritical();
     scrapeLive();
-  }, SCRAPE_INTERVAL_MS);
+    scheduleNextScrape();
+  }, delayMs);
+}
+
+function startLiveScrapeLoop() {
+  if (scrapeTimer) return;
+  console.log('[fotmob-live] Starting scrape loop (every 5 min with +/-' + Math.round(SCRAPE_JITTER_MS / 1000) + 's jitter)');
+  forceRestartIfMemoryCritical();
+  scrapeLive();
+  scheduleNextScrape();
 }
 
 module.exports = { scrapeLive, getCachedLive, startLiveScrapeLoop };
