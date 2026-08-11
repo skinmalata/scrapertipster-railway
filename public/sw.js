@@ -95,7 +95,7 @@ self.addEventListener('fetch', event => {
   }
 
   if (url.pathname.startsWith('/data/')) {
-    event.respondWith(networkFirst(request, DYNAMIC_CACHE));
+    event.respondWith(staleWhileRevalidate(request, DYNAMIC_CACHE));
     return;
   }
 

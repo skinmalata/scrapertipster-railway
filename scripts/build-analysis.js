@@ -17,6 +17,8 @@ const ANALYSIS_CACHE_FILE = path.join(process.cwd(), 'analysis-cache.json');
 const LINKS_FILE = path.join(process.cwd(), 'public', 'data', 'analysis-links.json');
 const ARCHIVE_FILE = path.join(process.cwd(), 'data', 'analysis-archive.json');
 const PRERENDER_DIR = path.join(process.cwd(), 'public', 'analysis');
+const TEAMS_OUTPUT_DIR = path.join(process.cwd(), 'public', 'teams');
+const H2H_OUTPUT_DIR = path.join(process.cwd(), 'public', 'h2h');
 const ANALYSIS_TEMPLATE_FILE = path.join(process.cwd(), 'public', 'analysis.html');
 const SITE_URL = 'https://winfulltime.com';
 
@@ -345,6 +347,63 @@ function matchupSlug(home, away) {
   return slug === '-vs-' ? '' : slug;
 }
 
+// Slug flavour used by the team/h2h page generators (prefixes kept: "AC Milan"
+// => "ac-milan"). Used only for cross-linking to /teams/ and /h2h/ so the
+// analysis page links match the pages that actually exist.
+function linkSlugifyTeam(name) {
+  if (!name) return '';
+  return String(name)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function linkMatchupSlug(home, away) {
+  const h = linkSlugifyTeam(home);
+  const a = linkSlugifyTeam(away);
+  if (!h || !a) return '';
+  return h + '-vs-' + a;
+}
+
+function listDirSlugs(dir) {
+  const set = new Set();
+  try {
+    if (fs.existsSync(dir)) {
+      fs.readdirSync(dir).forEach(function (entry) {
+        const full = path.join(dir, entry);
+        if (fs.statSync(full).isDirectory()) set.add(entry);
+      });
+    }
+  } catch (e) {}
+  return set;
+}
+
+function teamStatsHref(ctx, team) {
+  if (!ctx || !ctx.teamExists) return '';
+  const slug = linkSlugifyTeam(team);
+  return slug && ctx.teamExists(slug) ? '/teams/' + slug + '/' : '';
+}
+
+// generate-team-pages / generate-h2h-pages run AFTER buildAnalysis in the
+// same CI pipeline (gh-pages-scraper.js) and create a page for every team and
+// matchup listed in predictions-cache.json, so seed the expected slugs from
+// today's predictions too. Otherwise teams new to today's fixtures have no
+// on-disk page yet when analysis builds and never get linked.
+function seedSlugsFromPredictions(predictions, teamSlugs, h2hSlugs) {
+  ((predictions && predictions.matches) || []).forEach(function (m) {
+    const home = String(m.home || (m.match ? m.match.split('-')[0] : '')).trim();
+    const away = String(m.away || (m.match ? m.match.split('-')[1] : '')).trim();
+    const hs = linkSlugifyTeam(home);
+    const as = linkSlugifyTeam(away);
+    if (hs) teamSlugs.add(hs);
+    if (as) teamSlugs.add(as);
+    const ms = linkMatchupSlug(home, away);
+    if (ms) h2hSlugs.add(ms);
+  });
+}
+
 function teamHeading(team, href) {
   const name = escapeHtml(cleanTeamName(team));
   return href ? '<a href="' + href + '">' + name + '</a>' : name;
@@ -397,8 +456,8 @@ function buildContentHtml(analysis, home, away, matchup, dateStr, ctx) {
       infoBits.join(' &middot; ') + ' &middot; Updated ' + escapeHtml(today) + '</p></div>';
   }
 
-  const homeHref = '';
-  const awayHref = '';
+  const homeHref = teamStatsHref(ctx, home);
+  const awayHref = teamStatsHref(ctx, away);
 
   const formCards = [];
   const homeHasForm = sideHasTeamData(analysis.homeForm, analysis.homeLast10);
@@ -477,6 +536,22 @@ function buildContentHtml(analysis, home, away, matchup, dateStr, ctx) {
     '<a href="/predictions/btts" class="cta-link">BTTS</a>' +
     '<a href="/ticket-builder.html" class="cta-link">Ticket Builder</a>' +
     '</div>';
+
+  if (ctx.teamExists) {
+    const related = [];
+    const homeTeamSlug = linkSlugifyTeam(home);
+    const awayTeamSlug = linkSlugifyTeam(away);
+    if (homeTeamSlug && ctx.teamExists(homeTeamSlug)) related.push('<a href="/teams/' + homeTeamSlug + '/" class="cta-link">' + escapeHtml(cleanTeamName(homeName)) + ' Team Stats</a>');
+    if (awayTeamSlug && ctx.teamExists(awayTeamSlug)) related.push('<a href="/teams/' + awayTeamSlug + '/" class="cta-link">' + escapeHtml(cleanTeamName(awayName)) + ' Team Stats</a>');
+    if (ctx.h2hExists) {
+      const h2hSlug = linkMatchupSlug(home, away);
+      if (h2hSlug && ctx.h2hExists(h2hSlug)) related.push('<a href="/h2h/' + h2hSlug + '/" class="cta-link">Head to Head</a>');
+    }
+    if (related.length) {
+      html += '<div class="analysis-section"><h3>Related Pages</h3><div class="cta-links">' + related.join('') + '</div></div>';
+    }
+  }
+
   html += '<div class="disclaimer"><p><strong>18+ Only</strong></p><p>Predictions are for informational purposes only. Gambling involves financial risk and may lead to addiction. Please play responsibly.</p></div>';
   return html;
 }
@@ -927,7 +1002,13 @@ async function main() {
   if (fs.existsSync(ANALYSIS_TEMPLATE_FILE)) {
     const template = fs.readFileSync(ANALYSIS_TEMPLATE_FILE, 'utf8');
     const links = {};
-    const ctx = {};
+    const teamSlugs = listDirSlugs(TEAMS_OUTPUT_DIR);
+    const h2hSlugs = listDirSlugs(H2H_OUTPUT_DIR);
+    seedSlugsFromPredictions(predictions, teamSlugs, h2hSlugs);
+    const ctx = {
+      teamExists: function (slug) { return !!slug && teamSlugs.has(slug); },
+      h2hExists: function (slug) { return !!slug && h2hSlugs.has(slug); }
+    };
     let archive = loadAnalysisArchive();
     writePrerenderedPages(matchups, result, links, template, ctx, archive);
     archive = updateAnalysisArchive(archive, matchups, result);

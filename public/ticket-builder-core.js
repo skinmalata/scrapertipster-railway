@@ -413,6 +413,16 @@
 
     if (options.shuffle) {
       poolForCombos.sort(function () { return Math.random() - 0.5; });
+    } else if (options.preferIdealOdds) {
+      // The schedule fallback pool is large (1000+ legs, dozens of markets per
+      // fixture). Sorting by proximity to the ideal single-leg price keeps the
+      // DFS exploring legs that can actually reach the target, so it finds
+      // tickets within the node budget instead of burning it on low-odds combos.
+      poolForCombos.sort(function (a, b) {
+        var da = Math.abs(a.odds - idealLegOdds);
+        var db = Math.abs(b.odds - idealLegOdds);
+        return (da - db) || ((b.sourceProbability || 0) - (a.sourceProbability || 0));
+      });
     } else {
       poolForCombos.sort(function (a, b) { return a.odds - b.odds; });
     }

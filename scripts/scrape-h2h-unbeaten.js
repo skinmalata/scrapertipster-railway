@@ -121,7 +121,11 @@ async function scrapeUnbeatenStreaks(dates) {
       cache.dates[date] = matches;
     } catch (err) {
       console.error(`Failed to scrape ${date}: ${err.message}`);
-      if (!cache.dates[date]) cache.dates[date] = [];
+      if (!cache.dates[date] || cache.dates[date].length === 0) {
+        cache.dates[date] = [];
+      } else {
+        console.log(`Keeping existing ${cache.dates[date].length} matches for ${date}`);
+      }
     }
   }
   cache.lastFetch = new Date().toISOString();
