@@ -25,7 +25,7 @@
   header { position: static !important; }
   .bio-wrap { max-width: 720px; margin: 40px auto 48px; padding: 0 16px; }
   .bio-card { background: var(--bg-card, #1a2033); border: 1px solid var(--border, rgba(255,255,255,0.08)); border-radius: var(--radius-lg, 16px); padding: 32px 28px; }
-  .bio-avatar { width: 96px; height: 96px; border-radius: 50%; background: linear-gradient(135deg, #ff2448, #d41a38); display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 800; color: #fff; margin: 0 auto 20px; }
+  .bio-avatar { width: 96px; height: 96px; border-radius: 50%; background: linear-gradient(135deg, #ff2448, #d41a38); display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 800; color: #fff; margin: 0 auto 20px; overflow: hidden; }
   .bio-card h1 { text-align: center; font-size: 28px; font-weight: 800; margin: 0 0 6px; color: var(--text-primary, #e8edf5); }
   .bio-role { text-align: center; font-size: 14px; color: var(--text-muted, #94a3b8); margin-bottom: 24px; }
   .bio-card h2 { font-size: 18px; font-weight: 700; margin: 28px 0 10px; color: var(--text-primary, #e8edf5); }
@@ -71,8 +71,20 @@
   "mainEntity": {
     "@type": "Person",
     "name": "Tochukwu Mesigo",
-    "jobTitle": "Football Analyst & Author",
-    "description": "Tochukwu Mesigo is the analyst and writer behind WinFulltime's football predictions, betting guides, and match analysis.",
+    "url": "https://mesigo.site",
+    "image": "https://winfulltime.com/author-mesigo.png",
+    "jobTitle": "Football Analyst, Author & Web Developer",
+    "description": "Tochukwu Mesigo is the analyst and writer behind WinFulltime's football predictions, betting guides, and match analysis, and a web developer with over 15 years of experience. He works with expected goals (xG), expected threat, pressing data, and head-to-head records to translate raw football statistics into practical betting insight.",
+    "nationality": "Nigerian",
+    "address": { "@type": "PostalAddress", "addressLocality": "Port Harcourt", "addressCountry": "NG" },
+    "sameAs": [
+      "https://mesigo.site",
+      "https://uniport.academia.edu/tochukwumesigo",
+      "https://web.facebook.com/profile.php?id=61583581716476",
+      "https://www.threads.net/@officialwinfulltime",
+      "https://www.youtube.com/@winfulltime"
+    ],
+    "knowsAbout": ["football analytics", "expected goals", "sports betting", "sports statistics", "football predictions", "web development", "technical SEO"],
     "worksFor": { "@type": "Organization", "name": "WinFulltime", "url": "https://winfulltime.com" }
   },
   "isPartOf": {
@@ -86,11 +98,23 @@
 <main>
 <div class="bio-wrap">
 <div class="bio-card">
-<div class="bio-avatar">TM</div>
+<div class="bio-avatar"><img src="/author-mesigo.png" alt="Tochukwu Mesigo" style="width:100%;height:100%;object-fit:cover;"></div>
 <h1>Tochukwu Mesigo</h1>
 <p class="bio-role">Football Analyst &amp; Author at WinFulltime</p>
 
 <p>Tochukwu Mesigo is the analyst and writer behind WinFulltime's football predictions, betting guides, and match analysis. His work focuses on translating raw football statistics &mdash; expected goals, expected threat, pressing data, and head-to-head records &mdash; into practical betting insight anyone can use.</p>
+
+<p>By profession Tochukwu is a web developer and IT professional with over 15 years of experience, specializing in performance optimization, technical SEO, and reliable software builds. That engineering background shapes how the WinFulltime predictions platform is built: structured data pipelines, verifiable numbers, and honest reporting of what the statistics do &mdash; and don't &mdash; tell you.</p>
+
+<p>He writes and publishes across <a href="https://mesigo.site" rel="author" target="_blank">mesigo.site</a>, his personal site covering football analytics and betting strategy, and <a href="/blog/">winfulltime.com/blog</a>. He is based in Port Harcourt, Nigeria.</p>
+
+<h2>Credentials &amp; Methodology</h2>
+<ul>
+ <li><strong>Statistical modeling</strong> &mdash; builds and audits prediction models built on form, xG, head-to-head records, home/away splits, and league context.</li>
+ <li><strong>Data verification</strong> &mdash; every prediction published on WinFulltime is sourced from structured match data and reconciled against results, never from unverified claims.</li>
+ <li><strong>Technical background</strong> &mdash; 15+ years in web development and software engineering; he fixes and maintains production systems, so the tools behind the picks are held to professional engineering standards.</li>
+ <li><strong>Editorial standards</strong> &mdash; all content follows WinFulltime's <a href="/policy.html">Editorial Policy</a>: named authorship, no paid picks, and full transparency on methodology.</li>
+</ul>
 
 <h2>What He Writes About</h2>
 <ul>
@@ -107,6 +131,7 @@
 <p>Explore the <a href="/blog/">WinFulltime blog</a> for the latest strategy guides, analytics deep-dives, and football stories written by Tochukwu Mesigo.</p>
 
 <div class="bio-links">
+<a href="https://mesigo.site" target="_blank" rel="author">mesigo.site</a>
 <a href="/blog/">Read the Blog</a>
 <a class="ghost" href="/about.html">About WinFulltime</a>
 </div>

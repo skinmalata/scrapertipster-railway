@@ -4,7 +4,7 @@ const path = require('path');
 const FAQ_SCHEMA = {
   '1x2': [
     { q: 'What does 1X2 mean in football betting?', a: '1X2 is the standard match result market. 1 means the home team wins, X means the match ends in a draw, and 2 means the away team wins. It covers the three possible outcomes after 90 minutes of regulation time including stoppage time.' },
-    { q: 'How accurate are WinFulltime 1X2 predictions?', a: 'Our AI model analyzes team form, head-to-head records, home/away performance, and league context to assign a probability percentage to each outcome. No system guarantees wins, but probability scores help you assess risk. Higher percentages indicate stronger confidence picks.' },
+    { q: 'How accurate are WinFulltime 1X2 predictions?', a: 'Our statistical model analyzes team form, head-to-head records, home/away performance, and league context to assign a probability percentage to each outcome. No system guarantees wins, but probability scores help you assess risk. Higher percentages indicate stronger confidence picks.' },
     { q: 'Do 1X2 predictions include extra time?', a: 'No. All 1X2 predictions cover only the 90-minute regulation result plus stoppage time. Extra time and penalty shootouts are excluded from this market.' },
     { q: 'How often are 1X2 predictions updated?', a: 'Predictions are refreshed daily. The primary update runs at 1:00 AM WAT and a secondary update at 6:00 AM WAT captures late-appearing fixtures across 50+ leagues worldwide.' },
     { q: 'Can I use 1X2 picks in accumulators?', a: 'Yes. 1X2 picks are the most common accumulator legs. Use our Ticket Builder to automatically combine 1X2 picks with Over 2.5, BTTS, and other markets for optimized tickets.' },
@@ -16,7 +16,7 @@ const FAQ_SCHEMA = {
     { q: 'Is Over 1.5 a good accumulator leg?', a: 'Yes. Over 1.5 is one of the most popular accumulator legs due to its high strike rate. It adds a safety buffer while contributing to overall odds. Use our Ticket Builder to combine Over 1.5 picks with other markets.' },
     { q: 'How do Over 1.5 predictions differ from Over 2.5?', a: 'Over 1.5 requires 2+ goals while Over 2.5 requires 3+. Over 1.5 has a higher hit rate but shorter odds. Many bettors use Over 1.5 as a foundation leg in accumulators because of its reliability.' },
     { q: 'Do Over 1.5 predictions include own goals?', a: 'Yes. Own goals count toward the total in all goal-based markets including Over 1.5. Any goal scored by either team counts.' },
-    { q: 'How are Over 1.5 predictions generated?', a: 'Our AI model evaluates average goals per game, attack vs defense matchups, both teams\' scoring records, historical over 1.5 rates, and home/away scoring patterns. Picks with 80%+ probability are the strongest.' }
+    { q: 'How are Over 1.5 predictions generated?', a: 'Our statistical model evaluates average goals per game, attack vs defense matchups, both teams\' scoring records, historical over 1.5 rates, and home/away scoring patterns. Picks with 80%+ probability are the strongest.' }
   ],
   'over-2-5': [
     { q: 'What does Over 2.5 goals mean?', a: 'Over 2.5 means the total goals scored by both teams must be 3 or more. Scores like 2-1, 3-0, 1-2, 2-2, or higher win. Scores of 0-0, 1-0, 0-1, or 1-1 lose.' },
@@ -100,6 +100,70 @@ ${items}
 </section>`;
 }
 
+function todayStr() {
+  const now = new Date();
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Africa/Lagos', year: 'numeric', month: '2-digit', day: '2-digit'
+  }).formatToParts(now);
+  return new Date(
+    parseInt(parts.find(p => p.type === 'year').value),
+    parseInt(parts.find(p => p.type === 'month').value) - 1,
+    parseInt(parts.find(p => p.type === 'day').value)
+  ).toISOString().slice(0, 10);
+}
+
+function generateNoscriptFallback(slug, catConfig) {
+  const dataFile = path.join(__dirname, '..', 'public', 'data', 'predictions.json');
+  let rows = '';
+  if (fs.existsSync(dataFile)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
+      const key = catConfig.dataKey;
+      const matches = (key && data[key]) ? data[key] : [];
+      const today = todayStr();
+      const todays = matches
+        .filter(m => m.date === today)
+        .slice(0, 25);
+      if (todays.length > 0) {
+        rows = todays.map(m => {
+          const label = m.tip || (m.streaks && m.streaks.length ? m.streaks[0].count + ' unbeaten' : '');
+          return `<tr><td>${escapeHtml(m.league || '')}</td><td>${escapeHtml(m.match || '')}</td><td>${escapeHtml(m.time || '')}</td><td>${escapeHtml(String(label || ''))}</td>${catConfig.dataKey === 'bttsNoMatches' || !m.probability ? '' : `<td>${escapeHtml(String(m.probability || ''))}%</td>`}</tr>`;
+        }).join('');
+      }
+    } catch (e) {
+      console.error('[category-pages] Failed to bake noscript fallback for ' + slug + ':', e.message);
+    }
+  }
+
+  if (!rows) {
+    return `<noscript>
+  <div class="noscript-content" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:24px;margin:20px 0;line-height:1.7;color:rgba(232,237,245,.9);">
+    <h2 style="margin-top:0;font-size:20px;color:#fff;">${escapeHtml(catConfig.label)} Predictions</h2>
+    <p>WinFulltime publishes ${escapeHtml(catConfig.label)} predictions every day. Browse today's picks for this market, explore other <a href="/predictions/1x2">betting markets</a> such as <a href="/predictions/over-1-5">Over 1.5</a>, <a href="/predictions/over-2-5">Over 2.5</a> and <a href="/predictions/btts">BTTS</a>, or jump to a specific <a href="/predictions/league/premier-league/">league</a>.</p>
+    <p>Predictions are derived from statistical analysis of form, head-to-head records and league trends. Football predictions can lose &mdash; bet responsibly.</p>
+  </div>
+</noscript>`;
+  }
+
+  return `<noscript>
+  <div class="noscript-content" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:24px;margin:20px 0;line-height:1.7;color:rgba(232,237,245,.9);">
+    <h2 style="margin-top:0;font-size:20px;color:#fff;">${escapeHtml(catConfig.heading)} Predictions Today</h2>
+    <p>Free ${escapeHtml(catConfig.heading)} picks for today's football matches.</p>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;">
+      <thead><tr style="text-align:left;color:rgba(232,237,245,.55);">
+        <th style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.1);">League</th>
+        <th style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.1);">Match</th>
+        <th style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.1);">Kick-off</th>
+        <th style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.1);">Tip</th>
+        ${catConfig.dataKey === 'bttsNoMatches' ? '' : '<th style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.1);">Confidence</th>'}
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <p style="margin-top:16px;font-size:13px;">Views are updated when JavaScript is enabled. Football predictions can lose &mdash; bet responsibly.</p>
+  </div>
+</noscript>`;
+}
+
 function generateFaqSchema(slug) {
   const faqs = FAQ_SCHEMA[slug];
   if (!faqs || faqs.length === 0) return '';
@@ -119,7 +183,7 @@ const CATEGORIES = {
   '1x2': {
     dataKey: 'matches',
     title: '1X2 Football Predictions Today',
-    description: 'Free AI-powered 1X2 football predictions for today. Expert home, draw, and away win tips across 50+ leagues worldwide.',
+    description: 'Free statistical 1X2 football predictions for today. Expert home, draw, and away win tips across 50+ leagues worldwide.',
     keywords: '1X2 predictions, football predictions today, home win tips, draw predictions, away win tips, soccer betting tips',
     heading: '1X2 Predictions',
     label: '1X2',
@@ -369,12 +433,13 @@ ${generateFaqSchema(slug)}
 </div>
 <span class="loading-text">Loading predictions...</span>
 </div>
+${generateNoscriptFallback(slug, catConfig)}
 </div>
 
 <div class="featured-cta">
 <div class="label">Featured Tool</div>
 <h3>Build Winning Accumulator Tickets</h3>
-<p>Generate optimized accumulator combinations from today's AI-powered predictions. Set your target odds and get instant ticket suggestions.</p>
+<p>Generate optimized accumulator combinations from today's data-driven predictions. Set your target odds and get instant ticket suggestions.</p>
 <a href="/ticket-builder.html">Pro Ticket Builder &rarr;</a>
 </div>
 

@@ -152,8 +152,8 @@ function generateTeamPage(teamName, teamSlug, teamData, ctx) {
   const streakCount = (teamData.streaks || []).length;
   const hasStats = !!(teamData.stats && (teamData.stats.table || teamData.stats.recent || teamData.stats.form));
   const metaDesc = upcomingCount > 0
-    ? `${teamName} next match prediction, recent form, and ${leagueName} betting statistics.${hasStats ? ` ${teamData.stats.table && teamData.stats.table.position ? `Currently ${teamData.stats.table.position}${teamData.stats.table.position === 1 ? 'st' : teamData.stats.table.position === 2 ? 'nd' : teamData.stats.table.position === 3 ? 'rd' : 'th'} in ${leagueName}.` : ''} ${teamData.stats.form ? `Recent form: ${teamData.stats.form}.` : ''}` : ''} ${upcomingCount} upcoming fixture${upcomingCount !== 1 ? 's' : ''} with AI-powered tips and probability scores.${streakCount > 0 ? ` ${streakCount} active streak${streakCount !== 1 ? 's' : ''} tracked.` : ''}`
-    : `${teamName} form history, head-to-head records, and ${leagueName} statistics. AI-powered prediction model covering 1X2, Over 2.5, BTTS, and corner markets.`;
+    ? `${teamName} next match prediction, recent form, and ${leagueName} betting statistics.${hasStats ? ` ${teamData.stats.table && teamData.stats.table.position ? `Currently ${teamData.stats.table.position}${teamData.stats.table.position === 1 ? 'st' : teamData.stats.table.position === 2 ? 'nd' : teamData.stats.table.position === 3 ? 'rd' : 'th'} in ${leagueName}.` : ''} ${teamData.stats.form ? `Recent form: ${teamData.stats.form}.` : ''}` : ''} ${upcomingCount} upcoming fixture${upcomingCount !== 1 ? 's' : ''} with statistical tips and probability scores.${streakCount > 0 ? ` ${streakCount} active streak${streakCount !== 1 ? 's' : ''} tracked.` : ''}`
+    : `${teamName} form history, head-to-head records, and ${leagueName} statistics. Data-driven prediction model covering 1X2, Over 2.5, BTTS, and corner markets.`;
 
   const upcomingCardsHtml = (teamData.upcoming || []).map(m => {
     const homeSlug = slugifyTeam(m.home);
@@ -205,7 +205,7 @@ function generateTeamPage(teamName, teamSlug, teamData, ctx) {
   const faqJson = generateFaqSchema([
     {
       q: `How accurate are WinFulltime ${teamName} predictions?`,
-      a: `Our AI model evaluates ${teamName}'s recent form, goal scoring rates, defensive efficiency, head-to-head records, and home/away splits to generate probability scores across 1X2, Over 2.5, BTTS, and corner markets.`
+      a: `Our statistical model evaluates ${teamName}'s recent form, goal scoring rates, defensive efficiency, head-to-head records, and home/away splits to generate probability scores across 1X2, Over 2.5, BTTS, and corner markets.`
     },
     {
       q: `When is ${teamName}'s next match?`,
@@ -252,7 +252,7 @@ WinFulltime tracks ${escapeHtml(teamName)} across all competitive fixtures to ge
 <div class="faq-list">
   <details class="faq-item">
     <summary>How accurate are WinFulltime ${escapeHtml(teamName)} predictions?</summary>
-    <p>Our AI model evaluates ${escapeHtml(teamName)}'s recent form, goal scoring rates, defensive efficiency, head-to-head records, and home/away splits to generate probability scores across 1X2, Over 2.5, BTTS, and corner markets.</p>
+    <p>Our statistical model evaluates ${escapeHtml(teamName)}'s recent form, goal scoring rates, defensive efficiency, head-to-head records, and home/away splits to generate probability scores across 1X2, Over 2.5, BTTS, and corner markets.</p>
   </details>
   <details class="faq-item">
     <summary>When is ${escapeHtml(teamName)}'s next match?</summary>

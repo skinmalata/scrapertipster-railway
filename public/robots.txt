@@ -3,6 +3,7 @@ Allow: /
 
 Disallow: /api/
 Disallow: /server-
-Disallow: /*.json$
+Disallow: /data/*-cache.json
+Disallow: /*.tmp
 
 Sitemap: https://winfulltime.com/sitemap.xml

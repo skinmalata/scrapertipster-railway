@@ -261,7 +261,7 @@ function getTitleFromHtml(slug) {
 
     <div class="bottom-bar">
       <span class="url">winfulltime.com/blog</span>
-      <span class="tagline">Free AI Football Predictions &amp; Betting Guides</span>
+      <span class="tagline">Free Football Predictions &amp; Betting Guides</span>
     </div>
   </div>
 </body>

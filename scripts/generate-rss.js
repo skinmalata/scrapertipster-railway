@@ -37,7 +37,7 @@ function main() {
       items.push({
         title: `${leagueName} Predictions & Betting Tips Today`,
         link: `${BASE_URL}/predictions/league/${slug}/`,
-        description: `Free AI-powered ${leagueName} football predictions, 1X2 tips, over 2.5 goals, and corner statistics for today.`,
+        description: `Free ${leagueName} football predictions, 1X2 tips, over 2.5 goals, and corner statistics for today.`,
         pubDate: nowUtc,
         guid: `${BASE_URL}/predictions/league/${slug}/`
       });
@@ -101,7 +101,7 @@ function main() {
   <channel>
     <title>WinFulltime Football Predictions &amp; Match Analysis</title>
     <link>${BASE_URL}</link>
-    <description>Daily AI-powered football predictions, 1X2 tips, over 2.5 goals, BTTS, corner statistics, and head to head analysis.</description>
+    <description>Daily data-driven football predictions, 1X2 tips, over 2.5 goals, BTTS, corner statistics, and head to head analysis.</description>
     <language>en-us</language>
     <lastBuildDate>${nowUtc}</lastBuildDate>
     <atom:link href="${BASE_URL}/feed.xml" rel="self" type="application/rss+xml" />

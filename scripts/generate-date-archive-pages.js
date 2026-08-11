@@ -5,6 +5,7 @@ const path = require('path');
 const { escapeHtml, generateFaqSchema, wrapPage } = require('./lib/layout');
 
 const RESULTS_FILE = path.join(__dirname, '..', 'results-cache.json');
+const PREDICTIONS_FILE = path.join(__dirname, '..', 'predictions-cache.json');
 const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions', 'date');
 
 const MARKET_LINKS = [
@@ -41,35 +42,125 @@ function formatDateTitle(dateStr) {
   }
 }
 
-function generateDateArchivePage(dateStr, resultsList, ctx) {
+function normalizeTeam(name) {
+  return String(name || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/^(fc|cd|club|cf|de|ac|as|sc|ss|us|sa|ec|cska|ts|sk|as|atk|atletico|athletic|sv|bv|rb|w)\s+/i, '')
+    .replace(/\s+(fc|cd|club|cf|de|ac|as|sc|ss|us|sa|ec|cska|ts|sk)\s*$/i, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function matchKey(home, away) {
+  return `${normalizeTeam(home)}|${normalizeTeam(away)}`;
+}
+
+/** Build date -> normalized fixture key -> tip from predictions-cache */
+function buildTipLookup() {
+  const lookup = {};
+  if (!fs.existsSync(PREDICTIONS_FILE)) return lookup;
+  try {
+    const preds = JSON.parse(fs.readFileSync(PREDICTIONS_FILE, 'utf8'));
+    const buckets = [
+      preds.matches, preds.over15Matches, preds.over25Matches,
+      preds.bttsMatches, preds.bttsNoMatches, preds.winstreakMatches,
+      preds.losestreakMatches, preds.drawstreakMatches, preds.teamToScoreMatches,
+      preds.teamToScore2PlusMatches, preds.cornersMatches, preds.cardsMatches
+    ];
+    for (const bucket of buckets) {
+      if (!bucket) continue;
+      for (const m of bucket) {
+        if (!m || !m.match || !m.tip || !m.date) continue;
+        const [home, away] = m.match.split(/\s+-\s+/);
+        if (!home || !away) continue;
+        const key = matchKey(home, away);
+        if (!lookup[m.date]) lookup[m.date] = {};
+        lookup[m.date][key] = m.tip;
+      }
+    }
+  } catch (e) {
+    console.error('[date-archive-pages] Failed to load predictions-cache for hit rate:', e.message);
+  }
+  return lookup;
+}
+
+/** Evaluate whether a tip won given final scores. Returns true/false/null (null = not evaluable). */
+function evaluateTip(tip, homeGoals, awayGoals) {
+  const h = Number(homeGoals);
+  const a = Number(awayGoals);
+  if (isNaN(h) || isNaN(a)) return null;
+  const t = String(tip || '').toUpperCase().trim();
+  switch (t) {
+    case '1': return h > a;
+    case '2': return a > h;
+    case 'X': return h === a;
+    case '1X': return h >= a;
+    case 'X2': return a >= h;
+    case '12': return h !== a;
+    case 'OVER 1.5': return (h + a) >= 2;
+    case 'OVER 2.5': return (h + a) >= 3;
+    case 'BTTS YES': return h >= 1 && a >= 1;
+    case 'BTTS NO': return h < 1 || a < 1;
+    default: return null;
+  }
+}
+
+function generateDateArchivePage(dateStr, resultsList, ctx, tipsForDate) {
   const dateTitle = formatDateTitle(dateStr);
   const canonicalUrl = `https://winfulltime.com/predictions/date/${dateStr}/`;
   const metaTitle = `Football Predictions & Results for ${dateTitle} | WinFulltime Track Record`;
   const metaDesc = `Archived football predictions and verified score outcomes for ${dateTitle}. Transparent betting track record across 1X2, over 2.5 goals, and BTTS.`;
 
+  const allMatches = resultsList || [];
+
   let totalCount = 0;
   let wonCount = 0;
+  let settledCount = 0;
+  let evaluatedCount = 0;
 
-  const allMatches = resultsList || [];
+  const evaluatedMatches = allMatches.map(r => {
+    const key = matchKey(r.home || r.homeTeam, r.away || r.awayTeam);
+    const tip = (tipsForDate && tipsForDate[key]) ? tipsForDate[key] : (r.tip || r.prediction || '');
+    const score = r.score || r.ft || '';
+    const scoreMatch = typeof score === 'string' ? score.match(/(\d+)\s*[-:]\s*(\d+)/) : null;
+    const homeGoals = r.homeGoals != null ? r.homeGoals : (scoreMatch ? parseInt(scoreMatch[1], 10) : null);
+    const awayGoals = r.awayGoals != null ? r.awayGoals : (scoreMatch ? parseInt(scoreMatch[2], 10) : null);
+    const settled = homeGoals != null && awayGoals != null;
+    const result = settled ? evaluateTip(tip, homeGoals, awayGoals) : null;
+    if (settled) settledCount++;
+    if (result !== null) {
+      evaluatedCount++;
+      if (result) wonCount++;
+    }
+    return { ...r, tip, homeGoals, awayGoals, won: result };
+  });
+
   totalCount = allMatches.length;
-  wonCount = allMatches.filter(r => r.status === 'WON' || r.win === true).length;
 
   const MAX_CARDS = 200;
-  const cardsToShow = allMatches.slice(0, MAX_CARDS);
+  const cardsToShow = evaluatedMatches.slice(0, MAX_CARDS);
   const resultCardsHtml = cardsToShow.map(r => {
     const home = escapeHtml(r.home || r.homeTeam || 'Home');
     const away = escapeHtml(r.away || r.awayTeam || 'Away');
-    const score = escapeHtml(r.score || r.ft || 'FT');
-    const tip = escapeHtml(r.tip || r.prediction || '1X2');
-    const won = r.status === 'WON' || r.win === true;
+    const score = escapeHtml(r.score || r.ft || (r.homeGoals != null ? `${r.homeGoals} - ${r.awayGoals}` : 'FT'));
+    const tip = escapeHtml(r.tip || '1X2');
+    const won = r.won;
+
+    let statusBadge;
+    if (won === true) {
+      statusBadge = `<span style="background:rgba(34,197,94,0.15);color:#22c55e;padding:3px 10px;border-radius:6px;font-weight:700;font-size:12px;">\u2713 WON</span>`;
+    } else if (won === false) {
+      statusBadge = `<span style="background:rgba(239,68,68,0.15);color:#ef4444;padding:3px 10px;border-radius:6px;font-weight:700;font-size:12px;">\u2718 LOST</span>`;
+    } else {
+      statusBadge = `<span style="background:rgba(148,163,184,0.12);color:#94a3b8;padding:3px 10px;border-radius:6px;font-weight:700;font-size:12px;">SETTLED</span>`;
+    }
 
     return `
     <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
         <span style="font-size:12px;color:var(--text-secondary);">${escapeHtml(r.league || 'Football')}</span>
-        <span style="background:${won ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)'};color:${won ? '#22c55e' : '#ef4444'};padding:3px 10px;border-radius:6px;font-weight:700;font-size:12px;">
-          ${won ? '\u2713 WON' : '\u2718 SETTLED'}
-        </span>
+        ${statusBadge}
       </div>
       <div style="font-weight:700;font-size:16px;display:flex;justify-content:space-between;">
         <span>${home} vs ${away}</span>
@@ -79,7 +170,11 @@ function generateDateArchivePage(dateStr, resultsList, ctx) {
     </div>`;
   }).join('\n');
 
-  const winRate = totalCount > 0 ? Math.round((wonCount / totalCount) * 100) : 0;
+  const winRate = evaluatedCount > 0 ? Math.round((wonCount / evaluatedCount) * 100) : null;
+  const hitRateDisplay = winRate !== null ? `${winRate}%` : 'N/A';
+  const hitRateCopy = winRate !== null
+    ? `The recorded hit rate for this date is ${winRate}% across ${evaluatedCount} evaluated prediction${evaluatedCount !== 1 ? 's' : ''}.`
+    : `This archive lists ${settledCount} settled match result${settledCount !== 1 ? 's' : ''}; predictions published for this date are evaluated against final scores where both a pick and a score are available.`;
 
   const schemaJson = JSON.stringify({
     '@context': 'https://schema.org',
@@ -92,11 +187,11 @@ function generateDateArchivePage(dateStr, resultsList, ctx) {
   const faqJson = generateFaqSchema([
     {
       q: `What was the accuracy hit rate for football predictions on ${dateTitle}?`,
-      a: `WinFulltime publishes verified, transparent track records for all past match predictions. Every match result on ${dateTitle} is settled against official scores. The recorded hit rate for this date is ${winRate}% across ${totalCount} matches.`
+      a: `WinFulltime publishes verified, transparent track records for all past match predictions. Every match result on ${dateTitle} is settled against official scores. ${hitRateCopy}`
     },
     {
       q: 'Are past prediction results verified on WinFulltime?',
-      a: 'Yes. All prediction outcomes are automatically cross-referenced against post-match scores and archived permanently. Each result card shows the final score and whether the prediction won or lost.'
+      a: 'Yes. All prediction outcomes are automatically cross-referenced against post-match scores and archived permanently. Each result card shows the final score and whether the prediction won, lost, or was recorded without an evaluable tip.'
     }
   ]);
 
@@ -139,19 +234,19 @@ ${leagueChips ? `
     <div class="stat-txt">Matches Settled</div>
   </div>
   <div class="stat-box">
-    <div class="stat-num">${winRate}%</div>
+    <div class="stat-num">${hitRateDisplay}</div>
     <div class="stat-txt">Recorded Hit Rate</div>
   </div>
   <div class="stat-box">
-    <div class="stat-num">Verified</div>
-    <div class="stat-txt">Outcome Status</div>
+    <div class="stat-num">${evaluatedCount}</div>
+    <div class="stat-txt">Predictions Evaluated</div>
   </div>
 </div>
 
 <h2 style="font-size:20px;font-weight:700;margin-bottom:16px;">Match Results for ${escapeHtml(dateTitle)}</h2>
 <div>
   ${resultCardsHtml || '<p style="color:var(--text-secondary);">No archived match results recorded for this date.</p>'}
-  ${allMatches.length > MAX_CARDS ? `<p style="color:var(--text-secondary);font-size:13px;margin-top:12px;">Showing the first ${MAX_CARDS} of ${allMatches.length} settled matches for ${escapeHtml(dateTitle)}.</p>` : ''}
+  ${evaluatedMatches.length > MAX_CARDS ? `<p style="color:var(--text-secondary);font-size:13px;margin-top:12px;">Showing the first ${MAX_CARDS} of ${evaluatedMatches.length} settled matches for ${escapeHtml(dateTitle)}.</p>` : ''}
 </div>
 
 ${relatedLinksHtml}
@@ -159,18 +254,18 @@ ${relatedLinksHtml}
 <section class="seo-content">
 <h2>About ${escapeHtml(dateTitle)} Prediction Track Record</h2>
 <p style="color:var(--text-secondary);line-height:1.7;margin-bottom:20px;">
-WinFulltime maintains a transparent, permanent archive of all football prediction outcomes. Predictions published prior to kick-off are automatically settled against final full-time scores to ensure complete accountability and performance tracking. This page provides a complete ${totalCount}-match ledger for ${escapeHtml(dateTitle)}.
+WinFulltime maintains a transparent, permanent archive of all football prediction outcomes. Predictions published prior to kick-off are automatically settled against final full-time scores to ensure complete accountability and performance tracking. This page provides a ${totalCount}-match ledger for ${escapeHtml(dateTitle)} with ${evaluatedCount} prediction${evaluatedCount !== 1 ? 's' : ''} evaluated against official results.
 </p>
 
 <h2>Frequently Asked Questions</h2>
 <div class="faq-list">
   <details class="faq-item">
     <summary>What was the accuracy hit rate for football predictions on ${escapeHtml(dateTitle)}?</summary>
-    <p>WinFulltime publishes verified, transparent track records for all past match predictions. Every match result on ${escapeHtml(dateTitle)} is settled against official scores. The recorded hit rate for this date is ${winRate}% across ${totalCount} matches.</p>
+    <p>WinFulltime publishes verified, transparent track records for all past match predictions. Every match result on ${escapeHtml(dateTitle)} is settled against official scores. ${hitRateCopy}</p>
   </details>
   <details class="faq-item">
     <summary>Are past prediction results verified on WinFulltime?</summary>
-    <p>Yes. All prediction outcomes are automatically cross-referenced against post-match scores and archived permanently. Each result card shows the final score and whether the prediction won or lost.</p>
+    <p>Yes. All prediction outcomes are automatically cross-referenced against post-match scores and archived permanently. Each result card shows the final score and whether the prediction won, lost, or was recorded without an evaluable tip.</p>
   </details>
 </div>
 </section>`;
@@ -204,6 +299,7 @@ function main() {
 
   const leagueSlugs = listDirSlugs(path.join(__dirname, '..', 'public', 'predictions', 'league'));
   const ctx = { leagueSlugs };
+  const tipLookup = buildTipLookup();
 
   Object.keys(resultsData).forEach(dateStr => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return;
@@ -214,7 +310,7 @@ function main() {
           const [home, away] = fixture.split(' - ');
           return { ...v, home, away, score: `${v.home}-${v.away}` };
         });
-    const pageHtml = generateDateArchivePage(dateStr, matchesArr, ctx);
+    const pageHtml = generateDateArchivePage(dateStr, matchesArr, ctx, tipLookup[dateStr] || {});
     const dirPath = path.join(OUTPUT_DIR, dateStr);
     fs.mkdirSync(dirPath, { recursive: true });
     fs.writeFileSync(path.join(dirPath, 'index.html'), pageHtml);

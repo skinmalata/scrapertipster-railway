@@ -102,7 +102,7 @@ function generateLeagueFaqSchema(leagueName, matchCount) {
   const faqs = [
     {
       q: `How accurate are WinFulltime ${leagueName} predictions?`,
-      a: `Our AI model analyzes team form, head-to-head records, home/away performance, and match context for ${leagueName} fixtures. Probability percentages indicate relative confidence levels across 1X2, Over 2.5, BTTS, and corner markets.`
+      a: `Our statistical model analyzes team form, head-to-head records, home/away performance, and match context for ${leagueName} fixtures. Probability percentages indicate relative confidence levels across 1X2, Over 2.5, BTTS, and corner markets.`
     },
     {
       q: `When are ${leagueName} predictions updated?`,
@@ -167,7 +167,7 @@ function generateLeaguePage(leagueName, leagueSlug, matches, ctx) {
   const count = matches.length;
   const canonicalUrl = `https://winfulltime.com/predictions/league/${leagueSlug}/`;
   const metaTitle = `${leagueName} Predictions Today & Betting Tips | WinFulltime`;
-  const metaDesc = `Free AI-powered ${leagueName} football predictions for today. Data-driven 1X2, Over 2.5 goals, BTTS, and corner betting tips for ${leagueName}.`;
+  const metaDesc = `Free ${leagueName} football predictions for today. Data-driven 1X2, Over 2.5 goals, BTTS, and corner betting tips for ${leagueName}.`;
 
   const MAX_CARDS = 200;
   const matchCardsHtml = matches.slice(0, MAX_CARDS).map(m => renderMatchCard(m, ctx && ctx.analysisUrls)).join('\n');
@@ -304,7 +304,7 @@ ${generateLeagueFaqSchema(leagueName, count)}
     <div class="league-stat-lbl">Free Coverage</div>
   </div>
   <div class="league-stat-card">
-    <div class="league-stat-val">AI Powered</div>
+    <div class="league-stat-val">Data Driven</div>
     <div class="league-stat-lbl">Analysis Model</div>
   </div>
 </div>
@@ -320,14 +320,14 @@ ${relatedMarketsHtml}
 <section class="seo-content">
 <h2>About ${escapeHtml(leagueName)} Predictions</h2>
 <p style="color:var(--text-secondary);line-height:1.7;margin-bottom:20px;">
-Our AI algorithm evaluates upcoming ${escapeHtml(leagueName)} matches using comprehensive statistical models. We process team form, offensive and defensive efficiency metrics, head-to-head records, and home/away performance variances to generate probability scores across 1X2, Over 2.5, BTTS, and corner markets.
+Our statistical algorithm evaluates upcoming ${escapeHtml(leagueName)} matches using comprehensive models. We process team form, offensive and defensive efficiency metrics, head-to-head records, and home/away performance variances to generate probability scores across 1X2, Over 2.5, BTTS, and corner markets.
 </p>
 
 <h2>Frequently Asked Questions</h2>
 <div class="faq-list">
   <details class="faq-item">
     <summary>How accurate are WinFulltime ${escapeHtml(leagueName)} predictions?</summary>
-    <p>Our AI model analyzes team form, head-to-head records, home/away performance, and match context for ${escapeHtml(leagueName)} fixtures. Probability percentages indicate relative confidence levels across 1X2, Over 2.5, BTTS, and corner markets.</p>
+    <p>Our statistical model analyzes team form, head-to-head records, home/away performance, and match context for ${escapeHtml(leagueName)} fixtures. Probability percentages indicate relative confidence levels across 1X2, Over 2.5, BTTS, and corner markets.</p>
   </details>
   <details class="faq-item">
     <summary>When are ${escapeHtml(leagueName)} predictions updated?</summary>

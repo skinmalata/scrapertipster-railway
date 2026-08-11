@@ -125,7 +125,7 @@ function generateMatrixPage(leagueName, leagueSlug, marketSlug, marketConfig, ma
   const count = matches.length;
   const canonicalUrl = `https://winfulltime.com/predictions/${leagueSlug}/${marketSlug}/`;
   const metaTitle = `${leagueName} ${marketConfig.label} Predictions Today | WinFulltime`;
-  const metaDesc = `AI-powered ${leagueName} ${marketConfig.label.toLowerCase()} predictions with probability scores. Free ${marketConfig.desc} tips, form analysis, and match previews updated daily for ${leagueName}.`;
+  const metaDesc = `Statistical ${leagueName} ${marketConfig.label.toLowerCase()} predictions with probability scores. Free ${marketConfig.desc} tips, form analysis, and match previews updated daily for ${leagueName}.`;
 
   const matchCardsHtml = matches.map(m => renderMatchCard(m, leagueSlug, analysisUrls, teamSlugs)).join('\n');
 
