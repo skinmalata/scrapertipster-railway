@@ -19,10 +19,10 @@ const MAX_CORNER_HISTORY_CACHE = 200;
 const MAX_DAILY_RESULTS_CACHE = 500;
 const MAX_FIXTURE_INDEX = 500;
 const MAX_MEMORY_MB = parseInt(process.env.MAX_MEMORY_MB || '400', 10);
-// Escalating backoff when FotMob returns 429/403: 15 -> 30 -> 60 min, so a
+// Escalating backoff when FotMob returns 429/403: 5 -> 10 -> 15 min, so a
 // hard block is not probed again until it has had time to clear.
-const FOTMOB_BLOCK_BASE_MS = 15 * 60 * 1000;
-const FOTMOB_BLOCK_MAX_MS = 60 * 60 * 1000;
+const FOTMOB_BLOCK_BASE_MS = 5 * 60 * 1000;
+const FOTMOB_BLOCK_MAX_MS = 15 * 60 * 1000;
 // Small random jitter per cycle so the 5-minute cadence is not a fixed,
 // easily-fingerprinted pattern.
 const SCRAPE_JITTER_MS = 45 * 1000;
@@ -67,8 +67,8 @@ function isFotMobBlocked() {
   return Date.now() < fotMobBlockedUntil;
 }
 
-// Escalating cooldown on a 429/403 so a hard block is probed after 15 min,
-// then 30, then 60 (capped) instead of every five-minute cycle.
+// Escalating cooldown on a 429/403 so a hard block is probed after 5 min,
+// then 10, then 15 (capped) instead of every five-minute cycle.
 function markFotMobBlocked(status) {
   const attempts = fotMobBlockAttempts + 1;
   fotMobBlockAttempts = attempts;

@@ -2,9 +2,9 @@ const axios = require('axios');
 
 const FOREBET_LIVE_URL = 'https://www.forebet.com/en/live-football-tips';
 const SCRAPE_INTERVAL_MS = 5 * 60 * 1000;
-// Escalating backoff when Forebet returns 429/403: 15 -> 30 -> 60 min.
-const FOREBET_BLOCK_BASE_MS = 15 * 60 * 1000;
-const FOREBET_BLOCK_MAX_MS = 60 * 60 * 1000;
+// Escalating backoff when Forebet returns 429/403: 5 -> 10 -> 15 min.
+const FOREBET_BLOCK_BASE_MS = 5 * 60 * 1000;
+const FOREBET_BLOCK_MAX_MS = 15 * 60 * 1000;
 // Small random jitter per cycle so the 5-minute cadence is not a fixed,
 // easily-fingerprinted pattern.
 const SCRAPE_JITTER_MS = 45 * 1000;
