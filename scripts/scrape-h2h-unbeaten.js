@@ -118,6 +118,14 @@ async function scrapeUnbeatenStreaks(dates) {
   for (const date of dates) {
     try {
       const matches = await scrapeDate(date);
+      const existing = cache.dates[date];
+      // The source populates fixtures/streaks gradually through the day. A
+      // partial or empty snapshot (e.g. ran before tomorrow's fixtures were
+      // listed) must never erase data we already captured for the same date.
+      if (matches.length === 0 && Array.isArray(existing) && existing.length > 0) {
+        console.log(`Empty scrape for ${date}, keeping existing ${existing.length} matches`);
+        continue;
+      }
       cache.dates[date] = matches;
     } catch (err) {
       console.error(`Failed to scrape ${date}: ${err.message}`);

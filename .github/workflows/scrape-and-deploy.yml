@@ -14,7 +14,12 @@ on:
       - 'scripts/**'
       - '.github/workflows/scrape-and-deploy.yml'
   schedule:
+    # 00:03 UTC (01:03 WAT) daily
     - cron: '3 0 * * *'
+    # 17:00 UTC (18:00 WAT) daily: re-scrapes today/tomorrow after the source
+    # site has populated fixtures and streak data, so the unbeaten section
+    # never ships an empty snapshot for the day.
+    - cron: '0 17 * * *'
   workflow_dispatch:
 
 permissions:
