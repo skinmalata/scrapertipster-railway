@@ -1538,8 +1538,14 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
 
     var CACHE_DIR = path.join(DATA_ROOT, 'best-picks');
     try { fs.mkdirSync(CACHE_DIR, { recursive: true }); } catch (e) {}
-    var TODAY_FM = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-    var TODAY_SYSTEM = new Date().toISOString().slice(0, 10);
+    function lagosYmd(sep) {
+      var parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Lagos', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
+      var v = {};
+      parts.forEach(function (p) { v[p.type] = p.value; });
+      return v.year + sep + v.month + sep + v.day;
+    }
+    var TODAY_FM = lagosYmd('').replace(/-/g, '');
+    var TODAY_SYSTEM = lagosYmd('-');
     var CACHE_PATH = path.join(CACHE_DIR, TODAY_FM + '.json');
     var CACHE_VERSION = 5;
 

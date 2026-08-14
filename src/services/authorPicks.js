@@ -24,6 +24,16 @@ function fotMobDateStr(dayOffset) {
 
 function todayStr() { return fotMobDateStr(0); }
 
+function lagosDateStr(utcTime) {
+  if (!utcTime) return '';
+  var d = new Date(utcTime);
+  if (isNaN(d.getTime())) return '';
+  var parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Lagos', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(d);
+  var v = {};
+  parts.forEach(function (p) { v[p.type] = p.value; });
+  return v.year + '-' + v.month + '-' + v.day;
+}
+
 function parseScore(status) {
   if (!status || !status.scoreStr) return null;
   var m = String(status.scoreStr).match(/(\d+)\s*-\s*(\d+)/);
@@ -306,7 +316,7 @@ function pickBestTip(tips) {
   return tips[0];
 }
 
-function extractAllFixtures(data) {
+function extractAllFixtures(data, requestedDate) {
   var fixtures = [];
   if (!data || !data.leagues) return fixtures;
   var seen = new Set();
@@ -318,8 +328,12 @@ function extractAllFixtures(data) {
       var id = String(m.id);
       if (seen.has(id)) return;
       seen.add(id);
-      var isLive = m.status && m.status.started && m.status.ongoing && !m.status.finished;
       var kickoff = m.status && m.status.utcTime ? m.status.utcTime : null;
+      // FotMob buckets the date param by venue-local time, which can leak matches
+      // that are "yesterday" (or "tomorrow") by the Lagos clock. Keep only fixtures
+      // whose Lagos-local kickoff date matches the requested YYYYMMDD date.
+      if (requestedDate && lagosDateStr(kickoff).replace(/-/g, '') !== requestedDate) return;
+      var isLive = m.status && m.status.started && m.status.ongoing && !m.status.finished;
       fixtures.push({
         matchId: id,
         home: m.home.name,
@@ -390,12 +404,20 @@ async function buildGiantPool() {
   var date = todayStr();
   var filePath = path.join(DATA_DIR, date + '.json');
 
-  // Serve from today's file if it exists — once per day
+  // Serve from today's file if it exists — once per day, AND every match is
+  // actually for today. The pre-fix build could merge yesterday's fixtures into
+  // today's file, so never serve a contaminated pool — rebuild instead.
   try {
     var saved = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     if (saved && saved.matches && saved.matches.length) {
-      console.log('[author-picks] Serving from saved file for', date);
-      return { matches: saved.matches, totalFixtures: saved.totalFixtures || saved.matches.length, analyzedFixtures: saved.matches.length, generatedAt: saved.generatedAt };
+      var allToday = saved.matches.every(function (m) {
+        return lagosDateStr(m.kickoff).replace(/-/g, '') === date;
+      });
+      if (allToday) {
+        console.log('[author-picks] Serving from saved file for', date);
+        return { matches: saved.matches, totalFixtures: saved.totalFixtures || saved.matches.length, analyzedFixtures: saved.matches.length, generatedAt: saved.generatedAt };
+      }
+      console.warn('[author-picks] Saved file for', date, 'contains non-today matches; rebuilding');
     }
   } catch (e) {}
 
@@ -414,7 +436,7 @@ async function doBuild(date) {
   var res = await httpGet('https://www.fotmob.com/api/data/matches?date=' + date);
   if (!res || res.status !== 200 || !res.data) return { matches: [], generatedAt: new Date().toISOString(), totalFixtures: 0 };
 
-  var allFixtures = extractAllFixtures(res.data);
+  var allFixtures = extractAllFixtures(res.data, date);
   console.log('[author-picks] Total fixtures for', date, ':', allFixtures.length);
 
   var limited = allFixtures.slice(0, MAX_MATCHES);
