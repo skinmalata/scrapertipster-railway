@@ -266,6 +266,26 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(/<\/head>/i, '<link rel="alternate" type="application/rss+xml" title="WinFulltime Football Predictions RSS" href="/feed.xml">\n</head>');
   }
 
+  // 2c. Inject Organization (brand entity) schema unless the page already carries it.
+  if (!/"@type": "Organization"/.test(html)) {
+    const orgSchema = `<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "WinFulltime",
+  "url": "https://winfulltime.com/",
+  "logo": { "@type": "ImageObject", "url": "https://winfulltime.com/winfulltimelogo.png" },
+  "description": "Data-driven football predictions, in-play alerts and expert analysis.",
+  "sameAs": [
+    "https://web.facebook.com/profile.php?id=61583581716476",
+    "https://www.threads.net/@officialwinfulltime",
+    "https://www.youtube.com/@winfulltime"
+  ]
+}
+</script>`;
+    html = html.replace(/<\/head>/i, orgSchema + '\n</head>');
+  }
+
   // 3. Footer: replace the existing <footer> or inject one before </body>.
   if (footerRe.test(html)) {
     html = html.replace(footerRe, (m, open, close) => open + FOOTER_HTML + '\n' + close);
