@@ -29,3 +29,5 @@ services:
         sync: false
       - key: API_FOOTBALL_KEY
         sync: false
+      - key: API_FOOTBALL_ENABLED
+        value: "false"

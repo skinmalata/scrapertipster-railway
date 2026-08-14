@@ -36,6 +36,14 @@ function activePayment() {
 const footballOddsCache = new Map();
 const FOOTBALL_ODDS_CACHE_MS = 10 * 60 * 1000;
 const MAX_FOOTBALL_ODDS_CACHE = 30;
+// When the API-Football subscription is suspended or intentionally disabled,
+// the whole API-Football feature set (odds, live tips, verified prices) is
+// bypassed so the site keeps working on model estimates. Set this env var to
+// "false" to turn it off, or re-enable by setting it to "true" again.
+const API_FOOTBALL_ENABLED = process.env.API_FOOTBALL_ENABLED !== 'false';
+function apiFootballAvailable() {
+  return API_FOOTBALL_ENABLED && Boolean(process.env.API_FOOTBALL_KEY);
+}
 let liveTipsCache = null;
 // API-Football's free plan allows 100 requests/day. Live analysis is capped
 // well below that, leaving a reserve for the rest of the site.
@@ -169,7 +177,7 @@ async function isAuthenticatedVip(req) {
 
 async function fetchPreMatchOdds(date) {
   const apiKey = process.env.API_FOOTBALL_KEY;
-  if (!apiKey) return [];
+  if (!apiFootballAvailable()) return [];
   const cached = footballOddsCache.get(date);
   if (cached && Date.now() - cached.createdAt < FOOTBALL_ODDS_CACHE_MS) return cached.payload.response || [];
   try {
@@ -196,8 +204,7 @@ async function fetchPreMatchOdds(date) {
 }
 
 async function fetchFixtureResults(date) {
-  const apiKey = process.env.API_FOOTBALL_KEY;
-  if (!apiKey) return [];
+  if (!apiFootballAvailable()) return [];
   const cached = fixtureResultsCache.get(date);
   if (cached && Date.now() - cached.createdAt < FIXTURE_RESULTS_CACHE_MS) return cached.data;
   try {
@@ -835,7 +842,7 @@ router.get('/football-odds', async (req, res) => {
 
   const cached = footballOddsCache.get(requestedDate);
   const response = await fetchPreMatchOdds(requestedDate);
-  if (!response.length && !cached) return res.status(502).json({ available: false, source: 'API-Football', message: 'Pre-match odds are temporarily unavailable', response: [] });
+  if (!response.length && !cached) return res.json({ available: false, source: 'API-Football', date: requestedDate, message: 'Pre-match odds are temporarily unavailable. The ticket builder will use model estimates instead.', response: [] });
   const payload = footballOddsCache.get(requestedDate).payload;
   res.json({ ...payload, cached: Boolean(cached) });
 });
@@ -881,23 +888,22 @@ router.get('/two-odds/today', async function(req, res) {
     res.json({ ...payload, isVip: false, freeAccess: true, feature: '2 Odds of the Day' });
   } catch (error) {
     console.error('[two-odds] Build failed:', error.message);
-    res.status(502).json({ available: false, isVip: false, freeAccess: true, feature: '2 Odds of the Day', reason: '2 Odds of the Day is being refreshed. Please check again shortly.', ticket: null });
+    res.json({ available: false, isVip: false, freeAccess: true, feature: '2 Odds of the Day', reason: '2 Odds of the Day is being refreshed. Please check again shortly.', ticket: null });
   }
 });
 
 let liveTipsPending = null;
 
 router.get('/live-tips', async (req, res) => {
-  const apiKey = process.env.API_FOOTBALL_KEY;
-  if (!apiKey) {
-    return res.json({ available: false, opportunities: [], message: 'Live data is not configured yet.' });
+  if (!apiFootballAvailable()) {
+    return res.json({ available: false, opportunities: [], budgetLimited: false, message: 'Live data is not configured yet.' });
   }
 
   if (liveTipsCache && Date.now() - liveTipsCache.createdAt < LIVE_TIPS_CACHE_MS) {
     return res.json({ ...liveTipsCache.payload, cached: true });
   }
 
-  if (liveTipsPending) return liveTipsPending.then(function(payload) { res.json(payload); }).catch(function() { res.status(502).json({ available: false, opportunities: [], message: 'Live data is temporarily unavailable.' }); });
+  if (liveTipsPending) return liveTipsPending.then(function(payload) { res.json(payload); }).catch(function() { res.json({ available: false, opportunities: [], message: 'Live data is temporarily unavailable.' }); });
 
   liveTipsPending = (async function() {
     const API_TIMEOUT_MS = 25000;
@@ -918,7 +924,7 @@ router.get('/live-tips', async (req, res) => {
       liveTipsBudget.used++;
       try {
         const response = await fetch('https://v3.football.api-sports.io/' + endpoint, {
-          headers: { 'x-apisports-key': apiKey, accept: 'application/json' },
+          headers: { 'x-apisports-key': process.env.API_FOOTBALL_KEY, accept: 'application/json' },
           signal: AbortSignal.timeout(API_TIMEOUT_MS)
         });
         const remaining = Number(response.headers.get('x-ratelimit-requests-remaining'));
@@ -1019,7 +1025,7 @@ router.get('/live-tips', async (req, res) => {
       return res.json({ available: false, opportunities: [], budgetLimited: true, refreshSeconds: LIVE_TIPS_CACHE_MS / 1000, message: error.message });
     }
     console.warn('Live tips request error:', error.message);
-    res.status(502).json({ available: false, opportunities: [], message: 'Live data is temporarily unavailable. Please try again shortly.' });
+    res.json({ available: false, opportunities: [], message: 'Live data is temporarily unavailable. Please try again shortly.' });
   } finally {
     liveTipsPending = null;
   }
