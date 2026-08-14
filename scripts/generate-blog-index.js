@@ -212,6 +212,7 @@ function main() {
     .filter(f => f.endsWith('.html') && f !== 'index.html' && f !== 'blog-template.html')
     .map(f => f.replace(/\.html$/, ''))
     .filter(slug => !existingSlugs.has(slug))
+    .filter(slug => !/<meta name="robots"[^>]*noindex/i.test(fs.readFileSync(path.join(BLOG_DIR, `${slug}.html`), 'utf8')))
     .sort();
 
   let additions = newSlugs.map(slug => {

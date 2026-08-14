@@ -100,6 +100,11 @@ const BLOG_REDIRECTS = {
   'POST-SLUG-HERE': '/blog/'
 };
 
+// Merged 1xBet country reviews -> the single comprehensive 1xBet review.
+const BLOG_1XBET_COUNTRY_REDIRECTS = ['bangladesh', 'canada', 'ghana', 'india',
+  'kenya', 'nigeria', 'pakistan', 'south-africa', 'uganda']
+  .map(slug => [slug, '/blog/1xbet-review.html']);
+
 // Top-level dead URLs.
 const TOP_LEVEL_REDIRECTS = {
   'Home': '/',
@@ -159,6 +164,11 @@ function main() {
   // 3. Blog slug mismatch stubs.
   for (const [slug, target] of Object.entries(BLOG_REDIRECTS)) {
     if (writeStub(path.join('blog', `${slug}.html`), target)) count++;
+  }
+
+  // 3b. Merged 1xBet country reviews (files exist as noindex stubs -> skipped).
+  for (const [slug, target] of BLOG_1XBET_COUNTRY_REDIRECTS) {
+    if (writeStub(path.join('blog', `1xbet-${slug}-review.html`), target)) count++;
   }
 
   // 4. Top-level dead URL stubs.
