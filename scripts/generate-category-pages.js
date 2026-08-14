@@ -281,7 +281,6 @@ function escapeHtml(str) {
 }
 
 const EXTRA_TABS = [
-  { id: 'best-picks', href: '/best-picks.html', label: 'Best Picks' },
   { id: 'author-picks', href: '/author-picks.html', label: 'Author Picks' }
 ];
 
