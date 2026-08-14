@@ -29,6 +29,7 @@ const STATIC_ASSETS = [
   '/pwa.js',
   '/supabase-client.js',
   '/responsible-gambling.js',
+  '/free-ticket-builder.js',
   '/match-analysis-links.js',
   '/winfulltimelogo.png',
   '/icons/icon-192.png',

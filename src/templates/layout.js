@@ -10,8 +10,6 @@ const NAV_LINKS = [
   { href: '/', label: 'Home', match: (p) => p === '/' || p === '/index.html' },
   { href: '/ticket-builder.html', label: 'Ticket Builder', match: (p) => p.startsWith('/ticket-builder') },
   { href: '/converter.html', label: 'Code Converter', match: (p) => p.startsWith('/converter') },
-  { href: '/best-picks.html', label: 'Best Picks', match: (p) => p.startsWith('/best-picks') },
-  { href: '/author-picks.html', label: 'Author Picks', match: (p) => p.startsWith('/author-picks') },
   { href: '/predictions/in-play', label: 'In-Play', match: (p) => p.startsWith('/predictions/in-play') },
   { href: '/blog/', label: 'Blog', match: (p) => p.startsWith('/blog') }
 ];

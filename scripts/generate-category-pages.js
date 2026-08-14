@@ -280,13 +280,20 @@ function escapeHtml(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+const EXTRA_TABS = [
+  { id: 'best-picks', href: '/best-picks.html', label: 'Best Picks' },
+  { id: 'author-picks', href: '/author-picks.html', label: 'Author Picks' }
+];
+
 function generateCategoryPage(slug, catConfig, ctx) {
   const allSlugs = Object.keys(CATEGORIES);
   const categoryTabs = allSlugs.map(s => {
     const c = CATEGORIES[s];
     const active = s === slug ? ' active' : '';
     return `<a href="/predictions/${s}" id="tab-${s}" class="tab-btn${active}">${escapeHtml(c.label)}</a>`;
-  }).join('\n            ');
+  }).concat(EXTRA_TABS.map(t =>
+    `<a href="${t.href}" id="tab-${t.id}" class="tab-btn">${escapeHtml(t.label)}</a>`
+  )).join('\n            ');
 
   const isStreak = slug === 'winning-streak' || slug === 'losing-streak' || slug === 'draws-streak';
   const isUnbeaten = slug === 'unbeaten';
