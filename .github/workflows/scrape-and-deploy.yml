@@ -12,6 +12,7 @@ on:
       - 'src/templates/**'
       - 'src/services/**'
       - 'scripts/**'
+      - 'h2h-unbeaten-cache.json'
       - '.github/workflows/scrape-and-deploy.yml'
   schedule:
     # 00:03 UTC (01:03 WAT) daily
