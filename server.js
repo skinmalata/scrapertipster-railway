@@ -506,7 +506,7 @@ const { buildGiantPool } = require('./src/services/authorPicks');
 const { startTelegramBot } = require('./src/services/telegramBot');
 const { startMastodonBot } = require('./src/services/mastodonBot');
 
-// The pre-match scrape (fetchPredictions), the Author Picks build
+// The pre-match scrape (fetchPredictions), the H2H Picks build
 // (buildGiantPool) and the FotMob live scrape all buffer large responses in
 // the same V8 heap. Running them concurrently at boot repeatedly blew past the
 // 384MB heap cap and aborted the process (exit 134 / SIGABRT). Serialize them
@@ -549,7 +549,7 @@ async function refreshPreMatchPredictions() {
 async function refreshAuthorPicks() {
   forceRestartIfMemoryCritical();
   try {
-    console.log('[author-picks] Building Author Picks pool...');
+    console.log('[author-picks] Building H2H Picks pool...');
     const result = await buildGiantPool();
     console.log('[author-picks] Ready:', result.analyzedFixtures, 'analyzed of', result.totalFixtures, 'fixtures');
   } catch (e) {
@@ -597,7 +597,7 @@ async function refreshCornersAndCards() {
 }
 
 // Boot: refresh pre-match predictions first, then corners/cards, then build
-// Author Picks, then start the live scrape loop — never overlapping, so the
+// H2H Picks, then start the live scrape loop — never overlapping, so the
 // combined memory of the heavy jobs never sits in the heap at the same time.
 runHeavyExclusive(refreshPreMatchPredictions)
   .then(function () { return runHeavyExclusive(refreshCornersAndCards); })
@@ -624,7 +624,7 @@ setInterval(function () {
   runHeavyExclusive(refreshCornersAndCards);
 }, 6 * 60 * 60 * 1000);
 
-// Refresh Author Picks every 6h (serialized against other heavy jobs).
+// Refresh H2H Picks every 6h (serialized against other heavy jobs).
 setInterval(function () {
   runHeavyExclusive(refreshAuthorPicks);
 }, 6 * 60 * 60 * 1000);

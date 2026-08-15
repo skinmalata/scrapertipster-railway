@@ -1630,7 +1630,7 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
       { type: 'corners', label: 'Corners' }, { type: 'cards', label: 'Cards' }
     ];
 
-    // Author Picks — the server cron pre-builds today's file; never build here.
+    // H2H Picks — the server cron pre-builds today's file; never build here.
     var authorPicks = [];
     try {
       var raw = JSON.parse(fs.readFileSync(path.join(AUTHOR_DIR, TODAY_FM + '.json'), 'utf8'));
@@ -1649,7 +1649,7 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
     }
 
     // Scraper cache — reliable coverage of every category, merged with Author
-    // Picks above so nothing is missing when Author Picks only covers 1X2.
+    // Picks above so nothing is missing when H2H Picks only covers 1X2.
     await refreshCornersAndCardsIfStale();
     var preds = vipPredictionData();
     if (preds && Object.keys(preds).length > 0) {
@@ -1919,7 +1919,7 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
       } catch (e) {}
     }
 
-    // Fallback: evaluate past Author Picks files (local dev / when present).
+    // Fallback: evaluate past H2H Picks files (local dev / when present).
     if (history.length === 0) {
       var allDates = [];
       try {

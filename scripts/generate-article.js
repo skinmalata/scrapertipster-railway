@@ -714,7 +714,7 @@ ${faqSchema(faqs, url)}
    <a href="/">Home</a>
    <a href="/ticket-builder.html">Ticket Builder</a>
    <a href="/best-picks.html">Best Picks</a>
-   <a href="/author-picks.html">Author Picks</a>
+   <a href="/author-picks.html">H2H Picks</a>
    <a href="/predictions/in-play">In-Play</a>
    <a href="/blog/" class="active">Blog</a>
    <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
@@ -790,7 +790,7 @@ ${relatedHtml(a.related)}
    <a href="/ticket-builder.html">Ticket Builder</a>
    <a href="/2-odds-of-the-day.html">2 Odds</a>
    <a href="/best-picks.html">Best Picks</a>
-   <a href="/author-picks.html">Author Picks</a>
+   <a href="/author-picks.html">H2H Picks</a>
    <a href="/blog/">Blog</a>
    <a href="/predictions/in-play">In-Play</a>
    <a href="/predictions/1x2">1X2</a>

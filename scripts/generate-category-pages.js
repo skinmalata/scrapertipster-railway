@@ -281,7 +281,7 @@ function escapeHtml(str) {
 }
 
 const EXTRA_TABS = [
-  { id: 'author-picks', href: '/author-picks.html', label: 'Author Picks' }
+  { id: 'author-picks', href: '/author-picks.html', label: 'H2H Picks' }
 ];
 
 function generateCategoryPage(slug, catConfig, ctx) {

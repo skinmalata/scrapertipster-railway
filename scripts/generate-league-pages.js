@@ -277,7 +277,7 @@ ${generateLeagueFaqSchema(leagueName, count)}
 <a href="/">Home</a>
 <a href="/ticket-builder.html">Ticket Builder</a>
 <a href="/best-picks.html">Best Picks</a>
-<a href="/author-picks.html">Author Picks</a>
+<a href="/author-picks.html">H2H Picks</a>
 <a href="/blog/">Blog</a>
 </nav>
 </div>

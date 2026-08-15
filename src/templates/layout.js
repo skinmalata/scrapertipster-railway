@@ -77,7 +77,7 @@ const FOOTER_HTML = `
    <ul>
     <li><a href="/best-picks.html">Best Picks</a></li>
     <li><a href="/2-odds-of-the-day.html">2 Odds</a></li>
-    <li><a href="/author-picks.html">Author Picks</a></li>
+    <li><a href="/author-picks.html">H2H Picks</a></li>
     <li><a href="/ticket-builder.html">Ticket Builder</a></li>
     <li><a href="/converter.html">Code Converter</a></li>
    </ul>
