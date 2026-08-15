@@ -20,6 +20,11 @@ on:
     # site has populated fixtures and streak data, so the unbeaten section
     # never ships an empty snapshot for the day.
     - cron: '0 17 * * *'
+    # Every 3 hours UTC: re-scrapes today/tomorrow, but only when the live
+    # h2h-unbeaten.json still shows an empty snapshot for today (the source
+    # populates fixtures/streaks gradually through the day). The preflight job
+    # skips the full scrape+deploy when data is already present.
+    - cron: '15 */3 * * *'
   workflow_dispatch:
 
 permissions:
@@ -32,7 +37,39 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.decide.outputs.run }}
+    # Cheap gate (no checkout, no deps) that decides whether the 3-hourly cron
+    # needs to run the full scrape+deploy. push / workflow_dispatch / the two
+    # principal daily crons (00:03, 17:00) always run; the '15 */3 * * *' runs
+    # run only when the live unbeaten snapshot for today is still empty.
+    steps:
+      - name: Decide whether to run
+        id: decide
+        run: |
+          RUN="true"
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            MINUTE=$(date -u +%M)
+            HOUR=$(date -u +%H)
+            # '15 */3 * * *' fires at minute 15 of hours 0,3,6,9,12,15,18,21 UTC
+            if [ "$MINUTE" = "15" ] && [ $(( HOUR % 3 )) -eq 0 ]; then
+              TODAY=$(date -u +%Y-%m-%d)
+              LIVE=$(curl -fsS --max-time 20 "https://winfulltime.com/data/h2h-unbeaten.json" \
+                | jq -r --arg d "$TODAY" '.dates[$d] | length // 0' 2>/dev/null || echo "0")
+              echo "3-hourly run | today=$TODAY | live unmatched=$LIVE"
+              if [ "$LIVE" -gt 0 ]; then
+                RUN="false"
+                echo "Unbeaten data already present for $TODAY; skipping re-scrape."
+              fi
+            fi
+          fi
+          echo "run=$RUN" >> "$GITHUB_OUTPUT"
+
   scrape:
+    needs: preflight
+    if: needs.preflight.outputs.run == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
