@@ -486,7 +486,7 @@ async function scrapeDate(dateStr, retryCount = 0) {
       });
     }
 
-    if (homeTeam && awayTeam && over25 >= 60) {
+    if (homeTeam && awayTeam && over25 >= 70) {
       over25Matches.push({
         id: over25Id++,
         league: leagueInfo.league,
