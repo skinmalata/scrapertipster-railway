@@ -1,5 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const fs = require('fs');
+const path = require('path');
 
 const API_URL = 'https://www.h2hstats.net/wp-content/themes/h2hstats/lib/call.php';
 const STREAK_CACHE_TTL = 6 * 60 * 60 * 1000;
@@ -122,6 +124,76 @@ function parseAllStreaks(html) {
   return results;
 }
 
+// Fallback source: h2hstats.net 403s datacenter IPs (GitHub Actions and Render
+// alike), so only a residential IP can scrape it live. The committed
+// h2h-unbeaten-cache.json is refreshed daily by the local scheduled task and
+// pushed to the repo, so every deployed copy already has today's unbeaten
+// streaks. Load that cache and convert it to the parseAllStreaks() shape so
+// the usual consumers (findStreakForTeam / findMatchStreak / findAllStreaksForMatch)
+// work unchanged.
+function loadUnbeatenCacheForToday() {
+  var cachePath = path.join(__dirname, '../../h2h-unbeaten-cache.json');
+  var today = todayDateStr();
+  try {
+    if (!fs.existsSync(cachePath)) return [];
+    var data = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
+    var dates = data.dates;
+    if (!dates && data.date && Array.isArray(data.matches)) {
+      dates = {};
+      dates[data.date] = data.matches;
+    }
+    if (!dates) return [];
+
+    var list = dates[today];
+    if (!list) {
+      var sorted = Object.keys(dates).sort().reverse();
+      if (sorted.length) list = dates[sorted[0]];
+    }
+    if (!Array.isArray(list)) return [];
+
+    var results = [];
+    list.forEach(function (m) {
+      if (!m || !m.home || !m.away) return;
+      var entry = {
+        time: m.time || '',
+        league: m.league || '',
+        match: m.match || (m.home + ' - ' + m.away),
+        home: m.home,
+        away: m.away,
+        homeNormal: normaliseName(m.home),
+        awayNormal: normaliseName(m.away),
+        streaks: { all: [], win: [], 'ht-over-1.5': [], 'ht-over-0.5': [], 'ht-draw': [] }
+      };
+      (m.streaks || []).forEach(function (s) {
+        var count = parseInt(s.count, 10);
+        if (isNaN(count)) return;
+        var info = classifyStreak(s.text || '');
+        if (count < minimumForStreak(info)) return;
+        var team = s.team || info.team || '';
+        var record = {
+          count: count,
+          type: info.type,
+          family: info.family,
+          scope: info.scope,
+          team: team,
+          normal: normaliseName(team),
+          text: s.text || ''
+        };
+        entry.streaks.all.push(record);
+        if (entry.streaks[info.type]) entry.streaks[info.type].push(record);
+      });
+      if (entry.streaks.all.length) results.push(entry);
+    });
+    if (results.length) {
+      console.log('[h2h-streaks] Loaded', results.length, 'unbeaten matches from h2h-unbeaten-cache.json (' + today + ')');
+    }
+    return results;
+  } catch (e) {
+    console.warn('[h2h-streaks] Cache fallback failed:', e.message);
+    return [];
+  }
+}
+
 async function fetchTodayStreaks() {
   var today = todayDateStr();
   if (streakCache && streakCacheTime && streakCacheDate === today && (Date.now() - streakCacheTime) < STREAK_CACHE_TTL) return streakCache;
@@ -141,6 +213,13 @@ async function fetchTodayStreaks() {
   } catch (err) {
     console.warn('[h2h-streaks] Fetch failed:', err.message);
     if (streakCache) return streakCache;
+    var fromCache = loadUnbeatenCacheForToday();
+    if (fromCache.length) {
+      streakCache = fromCache;
+      streakCacheTime = Date.now();
+      streakCacheDate = today;
+      return streakCache;
+    }
     return [];
   }
 }
@@ -211,4 +290,4 @@ function getStreakData() {
   return { matches: streakCache || [], cachedAt: streakCacheTime };
 }
 
-module.exports = { fetchTodayStreaks, findStreakForTeam, findMatchStreak, findAllStreaksForMatch, getStreakData, normaliseName, parseAllStreaks, minimumForStreak, RESULT_STREAK_MINIMUM, MARKET_STREAK_MINIMUM };
+module.exports = { fetchTodayStreaks, findStreakForTeam, findMatchStreak, findAllStreaksForMatch, getStreakData, loadUnbeatenCacheForToday, normaliseName, parseAllStreaks, minimumForStreak, RESULT_STREAK_MINIMUM, MARKET_STREAK_MINIMUM };
