@@ -56,13 +56,18 @@ jobs:
             HOUR=$(date -u +%H)
             # '15 */3 * * *' fires at minute 15 of hours 0,3,6,9,12,15,18,21 UTC
             if [ "$MINUTE" = "15" ] && [ $(( HOUR % 3 )) -eq 0 ]; then
-              TODAY=$(date -u +%Y-%m-%d)
+              TODAY=$(TZ=Africa/Lagos date +%Y-%m-%d)
+              YESTERDAY=$(TZ=Africa/Lagos date -d 'yesterday' +%Y-%m-%d)
               LIVE=$(curl -fsS --max-time 20 "https://winfulltime.com/data/h2h-unbeaten.json" \
                 | jq -r --arg d "$TODAY" '.dates[$d] | length // 0' 2>/dev/null || echo "0")
-              echo "3-hourly run | today=$TODAY | live unmatched=$LIVE"
-              if [ "$LIVE" -gt 0 ]; then
+              RESULTS=$(curl -fsS --max-time 20 "https://winfulltime.com/data/results.json" \
+                | jq -r --arg d "$YESTERDAY" '.[$d] | length // 0' 2>/dev/null || echo "0")
+              echo "3-hourly run | today=$TODAY | live unmatched=$LIVE | yesterday=$YESTERDAY results=$RESULTS"
+              if [ "$LIVE" -gt 0 ] && [ "$RESULTS" -gt 0 ]; then
                 RUN="false"
-                echo "Unbeaten data already present for $TODAY; skipping re-scrape."
+                echo "Unbeaten and yesterday's results are present; skipping re-scrape."
+              else
+                echo "A required daily dataset is missing; running recovery scrape."
               fi
             fi
           fi

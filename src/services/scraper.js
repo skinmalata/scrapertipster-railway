@@ -212,20 +212,7 @@ function saveResultsCache(results) {
   }
 }
 
-async function scrapeYesterdayResults() {
-  const formatter = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Africa/Lagos',
-    year: 'numeric', month: '2-digit', day: '2-digit'
-  });
-  const now = new Date();
-  const todayStr = formatter.format(now);
-  const todayDate = new Date(todayStr + 'T12:00:00');
-  todayDate.setDate(todayDate.getDate() - 1);
-  const year = todayDate.getFullYear();
-  const month = String(todayDate.getMonth() + 1).padStart(2, '0');
-  const day = String(todayDate.getDate()).padStart(2, '0');
-  const dateStr = `${year}-${month}-${day}`;
-  
+async function scrapeResultsForDate(dateStr) {
   console.log(`Scraping results for ${dateStr}...`);
   
   const url = `https://www.betexplorer.com/results/soccer/?date=${dateStr}`;
@@ -268,7 +255,6 @@ async function scrapeYesterdayResults() {
   if (!html) return {};
   
   const $ = getCheerio().load(html);
-  const results = {};
   const dateResults = {};
   let currentLeague = '';
   
@@ -312,12 +298,46 @@ async function scrapeYesterdayResults() {
     }
   });
   
-  if (Object.keys(dateResults).length > 0) {
-    results[dateStr] = dateResults;
-    saveResultsCache(results);
-    console.log(`Found ${Object.keys(dateResults).length} results for ${dateStr}`);
-  }
+  console.log(`Found ${Object.keys(dateResults).length} results for ${dateStr}`);
   
+  return dateResults;
+}
+
+function getCompletedResultDates(days = 3) {
+  // Use a midday local date to avoid UTC/Lagos boundary errors around midnight.
+  const today = new Date(getLocalDateStr() + 'T12:00:00');
+  const dates = [];
+  for (let offset = 1; offset <= days; offset++) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - offset);
+    dates.push(date.toISOString().slice(0, 10));
+  }
+  return dates;
+}
+
+async function scrapeRecentResults(days = 3) {
+  const dates = getCompletedResultDates(days);
+  const collected = {};
+
+  // Fetch sequentially so the provider is not hit with parallel requests.
+  for (const dateStr of dates) {
+    const dateResults = await scrapeResultsForDate(dateStr);
+    if (Object.keys(dateResults).length > 0) collected[dateStr] = dateResults;
+  }
+
+  if (Object.keys(collected).length > 0) {
+    saveResultsCache(collected);
+  } else {
+    console.warn(`No completed results were collected for ${dates.join(', ')}`);
+  }
+  return collected;
+}
+
+// Retained for callers that explicitly request only yesterday's results.
+async function scrapeYesterdayResults() {
+  const [dateStr] = getCompletedResultDates(1);
+  const dateResults = await scrapeResultsForDate(dateStr);
+  if (Object.keys(dateResults).length > 0) saveResultsCache({ [dateStr]: dateResults });
   return dateResults;
 }
 
@@ -1035,8 +1055,8 @@ async function fetchAndCachePredictions() {
     const dateRange = getDateRange();
     console.log('Fetching predictions for dates:', dateRange);
     
-    console.log('Scraping yesterday results...');
-    const yesterdayResults = await scrapeYesterdayResults();
+    console.log('Scraping recent completed results (three-day recovery window)...');
+    await scrapeRecentResults();
     
     const allMatches = [];
     const allOver25 = [];
@@ -2039,5 +2059,6 @@ module.exports = {
   pruneResultsCache,
   scrapeMissingAnalysis,
   getResultsCache,
+  scrapeRecentResults,
   scrapeYesterdayResults
 };
