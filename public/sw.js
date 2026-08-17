@@ -1,7 +1,7 @@
-const CACHE_NAME = 'winfulltime-v7';
-const STATIC_CACHE = 'winfulltime-static-v7';
-const DYNAMIC_CACHE = 'winfulltime-dynamic-v7';
-const IMAGE_CACHE = 'winfulltime-images-v7';
+const CACHE_NAME = 'winfulltime-v8';
+const STATIC_CACHE = 'winfulltime-static-v8';
+const DYNAMIC_CACHE = 'winfulltime-dynamic-v8';
+const IMAGE_CACHE = 'winfulltime-images-v8';
 
 const STATIC_ASSETS = [
   '/',
@@ -96,7 +96,9 @@ self.addEventListener('fetch', event => {
   }
 
   if (url.pathname.startsWith('/data/')) {
-    event.respondWith(staleWhileRevalidate(request, DYNAMIC_CACHE));
+    // Results are written to this file after matches finish. Serving a cached
+    // copy first leaves completed markets looking unresolved until a reload.
+    event.respondWith(networkFirst(request, DYNAMIC_CACHE));
     return;
   }
 
