@@ -1,7 +1,7 @@
-const CACHE_NAME = 'winfulltime-v8';
-const STATIC_CACHE = 'winfulltime-static-v8';
-const DYNAMIC_CACHE = 'winfulltime-dynamic-v8';
-const IMAGE_CACHE = 'winfulltime-images-v8';
+const CACHE_NAME = 'winfulltime-v9';
+const STATIC_CACHE = 'winfulltime-static-v9';
+const DYNAMIC_CACHE = 'winfulltime-dynamic-v9';
+const IMAGE_CACHE = 'winfulltime-images-v9';
 
 const STATIC_ASSETS = [
   '/',
@@ -160,9 +160,8 @@ async function staleWhileRevalidate(request, cacheName) {
 
 self.addEventListener('notificationclick', event => {
   event.notification.close();
-  if (event.action === 'open') {
-    event.waitUntil(clients.openWindow('/'));
-  }
+  const url = event.notification.data?.url || '/';
+  event.waitUntil(clients.openWindow(url));
 });
 
 self.addEventListener('push', event => {
@@ -174,8 +173,21 @@ self.addEventListener('push', event => {
       icon: '/icons/icon-192.png',
       badge: '/icons/favicon-32.png',
       vibrate: [200, 100, 200],
-      tag: 'winfulltime-predictions',
+      tag: data.tag || 'winfulltime-predictions',
       data: { url: data.url || '/' }
     })
+  );
+});
+
+self.addEventListener('pushsubscriptionchange', event => {
+  event.waitUntil(
+    self.registration.pushManager.subscribe(event.oldSubscription ? event.oldSubscription.options : { userVisibleOnly: true }).then(sub => {
+      const json = sub.toJSON();
+      return fetch('/api/push/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ endpoint: json.endpoint, keys: json.keys })
+      });
+    }).catch(() => {})
   );
 });

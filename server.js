@@ -8,6 +8,8 @@ const axios = require('axios');
 const apiRoutes = require('./src/routes/api');
 const chatRoutes = require('./src/routes/chat');
 const bookingCodeRoutes = require('./src/routes/bookingCodes');
+const { router: pushRoutes, subscriptions: pushSubscriptions } = require('./src/routes/push');
+const { sendDailyPredictionsNotification } = require('./src/services/pushNotifications');
 const { applyLayout, staticWithLayout } = require('./src/templates/layout');
 const { forceRestartIfMemoryCritical, startMemoryWatchdog } = require('./src/services/memoryGuard');
 
@@ -311,6 +313,7 @@ app.use(express.static('public', {
 app.use('/api', apiRoutes);
 app.use('/api', chatRoutes);
 app.use('/api', bookingCodeRoutes);
+app.use('/api', pushRoutes);
 
 // RSS Feed
 const RSS_FEED_ARTICLES_FILE = path.join(__dirname, 'articles-manifest.json');
@@ -646,6 +649,25 @@ startMastodonBot(
   process.env.MASTODON_INSTANCE_URL || 'https://flipboard.social',
   process.env.MASTODON_ACCESS_TOKEN
 );
+
+// Daily push notification — 12:00 PM WAT (11:00 UTC)
+function scheduleDailyPushNotification() {
+  const now = new Date();
+  const target = new Date(now);
+  target.setUTCHours(11, 0, 0, 0); // 12:00 PM WAT = 11:00 UTC
+  if (target <= now) target.setDate(target.getDate() + 1);
+  const delay = target.getTime() - now.getTime();
+  console.log('[push] Next daily notification in', Math.round(delay / 1000 / 60), 'minutes');
+  setTimeout(function runPush() {
+    sendDailyPredictionsNotification(pushSubscriptions)
+      .catch(function (e) { console.error('[push] Daily notification failed:', e.message); });
+    setInterval(function () {
+      sendDailyPredictionsNotification(pushSubscriptions)
+        .catch(function (e) { console.error('[push] Daily notification failed:', e.message); });
+    }, 24 * 60 * 60 * 1000);
+  }, delay);
+}
+scheduleDailyPushNotification();
 
 const HOST = process.env.HOST || '0.0.0.0';
 

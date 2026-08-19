@@ -638,6 +638,15 @@
       <div class="live-empty"><h3>Loading live matches</h3><p>Fetching current in-play data&hellip;</p></div>
     </div>
 
+    <!-- Daily Push Notifications -->
+    <div class="live-alert-bar" id="dailyNotifyBar">
+      <div class="alert-info">
+        <h3>Daily Prediction Alerts</h3>
+        <p>Get a push notification at 12PM WAT when today's predictions are ready.</p>
+      </div>
+      <button class="alert-toggle" id="dailyNotifyToggle" type="button">Checking...</button>
+    </div>
+
     <div class="pred-grid">
 
      <a href="/predictions/1x2.html" class="pred-card">
@@ -869,6 +878,50 @@
    }
    updateAlertBtn();
    loadLive();
+ })();
+
+ // Daily Push Notification Toggle
+ (function() {
+   var btn = document.getElementById('dailyNotifyToggle');
+   if (!btn) return;
+
+   function updateBtn(subscribed) {
+     if (subscribed) {
+       btn.textContent = 'Alerts On';
+       btn.classList.add('enabled');
+     } else if (!('Notification' in window) || Notification.permission === 'denied') {
+       btn.textContent = 'Blocked';
+       btn.disabled = true;
+     } else {
+       btn.textContent = 'Enable';
+       btn.classList.remove('enabled');
+     }
+   }
+
+   function checkStatus() {
+     if (window.WFTPush && window.WFTPush.isSubscribed) {
+       window.WFTPush.isSubscribed().then(updateBtn);
+     } else {
+       setTimeout(checkStatus, 500);
+     }
+   }
+
+   btn.addEventListener('click', async function() {
+     if (!window.WFTPush) return;
+     btn.disabled = true;
+     btn.textContent = '...';
+     var subscribed = await window.WFTPush.isSubscribed();
+     if (subscribed) {
+       await window.WFTPush.unsubscribe();
+       updateBtn(false);
+     } else {
+       var ok = await window.WFTPush.subscribe();
+       updateBtn(ok);
+     }
+     btn.disabled = false;
+   });
+
+   checkStatus();
  })();
 </script>
 <script src="/pwa.js"></script>
