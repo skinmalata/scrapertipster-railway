@@ -15,17 +15,8 @@ on:
       - 'h2h-unbeaten-cache.json'
       - '.github/workflows/scrape-and-deploy.yml'
   schedule:
-    # 00:03 UTC (01:03 WAT) daily
-    - cron: '3 0 * * *'
-    # 17:00 UTC (18:00 WAT) daily: re-scrapes today/tomorrow after the source
-    # site has populated fixtures and streak data, so the unbeaten section
-    # never ships an empty snapshot for the day.
-    - cron: '0 17 * * *'
-    # Every 3 hours UTC: re-scrapes today/tomorrow, but only when the live
-    # h2h-unbeaten.json still shows an empty snapshot for today (the source
-    # populates fixtures/streaks gradually through the day). The preflight job
-    # skips the full scrape+deploy when data is already present.
-    - cron: '15 */3 * * *'
+    # 09:00 UTC (10:00 WAT) daily, once per day
+    - cron: '0 9 * * *'
   workflow_dispatch:
 
 permissions:
@@ -38,45 +29,10 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  preflight:
-    runs-on: ubuntu-latest
-    outputs:
-      run: ${{ steps.decide.outputs.run }}
-    # Cheap gate (no checkout, no deps) that decides whether the 3-hourly cron
-    # needs to run the full scrape+deploy. push / workflow_dispatch / the two
-    # principal daily crons (00:03, 17:00) always run; the '15 */3 * * *' runs
-    # run only when the live unbeaten snapshot for today is still empty.
-    steps:
-      - name: Decide whether to run
-        id: decide
-        run: |
-          RUN="true"
-          if [ "${{ github.event_name }}" = "schedule" ]; then
-            MINUTE=$(date -u +%M)
-            HOUR=$(date -u +%H)
-            # '15 */3 * * *' fires at minute 15 of hours 0,3,6,9,12,15,18,21 UTC
-            if [ "$MINUTE" = "15" ] && [ $(( HOUR % 3 )) -eq 0 ]; then
-              TODAY=$(TZ=Africa/Lagos date +%Y-%m-%d)
-              YESTERDAY=$(TZ=Africa/Lagos date -d 'yesterday' +%Y-%m-%d)
-              LIVE=$(curl -fsS --max-time 20 "https://winfulltime.com/data/h2h-unbeaten.json" \
-                | jq -r --arg d "$TODAY" '.dates[$d] | length // 0' 2>/dev/null || echo "0")
-              RESULTS=$(curl -fsS --max-time 20 "https://winfulltime.com/data/results.json" \
-                | jq -r --arg d "$YESTERDAY" '.[$d] | length // 0' 2>/dev/null || echo "0")
-              echo "3-hourly run | today=$TODAY | live unmatched=$LIVE | yesterday=$YESTERDAY results=$RESULTS"
-              if [ "$LIVE" -gt 0 ] && [ "$RESULTS" -gt 0 ]; then
-                RUN="false"
-                echo "Unbeaten and yesterday's results are present; skipping re-scrape."
-              else
-                echo "A required daily dataset is missing; running recovery scrape."
-              fi
-            fi
-          fi
-          echo "run=$RUN" >> "$GITHUB_OUTPUT"
-
   prewarm-author-picks:
-    # Build the H2H Picks pool off-peak (00:03 UTC / 01:03 WAT, 17:00 UTC,
-    # and the 3-hourly runs) instead of on a visitor's page load. Once the
-    # daily file exists the endpoint returns instantly.
+    # Build the H2H Picks pool alongside the daily scrape (09:00 UTC /
+    # 10:00 WAT) instead of on a visitor's page load. Once the daily file
+    # exists the endpoint returns instantly.
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
     steps:
@@ -89,8 +45,6 @@ jobs:
             || echo 'prewarm request failed (will retry on next schedule run)'
 
   scrape:
-    needs: preflight
-    if: needs.preflight.outputs.run == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
