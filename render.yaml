@@ -13,6 +13,8 @@ services:
         value: /var/data/live-tip-history.json
       - key: CONVERTER_RECENT_FILE
         value: /var/data/converter-recent.json
+      - key: AUTHOR_PICKS_DATA_DIR
+        value: /var/data/author-picks
       - key: SUPABASE_URL
         value: https://xogkqpjtxfemcxzsuwke.supabase.co
       - key: SUPABASE_SERVICE_KEY

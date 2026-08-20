@@ -2,9 +2,8 @@ var https = require('https');
 var fs = require('fs');
 var path = require('path');
 var HTTP_TIMEOUT_MS = 10000;
-var MAX_MATCHES = 80;
+var MAX_MATCHES = 60;
 var DETAIL_CONCURRENCY = 3;
-var DETAIL_DELAY_MS = 500;
 var MIN_CONFIDENCE = 55;
 var DATA_DIR = process.env.AUTHOR_PICKS_DATA_DIR || path.join(
   process.env.RAILWAY_VOLUME_MOUNT_PATH || process.env.RENDER_DISK_PATH || __dirname,
@@ -258,7 +257,7 @@ async function fetchH2HStats(fixtureIdSets) {
       if (id && !seen.has(id)) { seen.add(id); ids.push(id); }
     });
   });
-  ids = ids.slice(0, 10);
+  ids = ids.slice(0, 5);
   var corners = [], cards = [];
   for (var i = 0; i < ids.length; i += 3) {
     var batch = ids.slice(i, i + 3);
@@ -353,12 +352,15 @@ function extractAllFixtures(data, requestedDate) {
 }
 
 async function enrichFixture(match) {
-  var res = await httpGet('https://www.fotmob.com/api/data/matchDetails?matchId=' + match.matchId).catch(function () { return null; });
+  var detailReq = httpGet('https://www.fotmob.com/api/data/matchDetails?matchId=' + match.matchId).catch(function () { return null; });
+  var formsReq = Promise.all([fetchTeamForm(match.homeId), fetchTeamForm(match.awayId)]);
+  var res = await detailReq;
   if (!res || res.status !== 200 || !res.data) return null;
   var h2h = extractH2H(res.data);
   if (!h2h || h2h.total < 3) return null;
-  var homeForm = await fetchTeamForm(match.homeId);
-  var awayForm = await fetchTeamForm(match.awayId);
+  var forms = await formsReq;
+  var homeForm = forms[0];
+  var awayForm = forms[1];
   if (!homeForm && !awayForm) return null;
 
   var h2hStats = await fetchH2HStats([h2h.fixtures, homeForm && homeForm.fixtureIds, awayForm && awayForm.fixtureIds]);
@@ -446,7 +448,6 @@ async function doBuild(date) {
     var batch = limited.slice(i, i + DETAIL_CONCURRENCY);
     var results = await Promise.all(batch.map(function (m) { return enrichFixture(m).catch(function () { return null; }); }));
     results.forEach(function (r) { if (r) enriched.push(r); });
-    if (i + DETAIL_CONCURRENCY < limited.length) await new Promise(function (r) { setTimeout(r, DETAIL_DELAY_MS); });
   }
 
   enriched.sort(function (a, b) {

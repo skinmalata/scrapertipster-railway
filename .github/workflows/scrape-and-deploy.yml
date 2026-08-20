@@ -73,6 +73,21 @@ jobs:
           fi
           echo "run=$RUN" >> "$GITHUB_OUTPUT"
 
+  prewarm-author-picks:
+    # Build the H2H Picks pool off-peak (00:03 UTC / 01:03 WAT, 17:00 UTC,
+    # and the 3-hourly runs) instead of on a visitor's page load. Once the
+    # daily file exists the endpoint returns instantly.
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Warm H2H Picks pool
+        run: |
+          curl -fsS --max-time 300 -o /dev/null \
+            -H 'User-Agent: winfulltime-prewarm/1.0 (github-actions)' \
+            -w 'author-picks warmed in %{time_total}s\n' \
+            'https://winfulltime-api.onrender.com/api/author-picks' \
+            || echo 'prewarm request failed (will retry on next schedule run)'
+
   scrape:
     needs: preflight
     if: needs.preflight.outputs.run == 'true'
