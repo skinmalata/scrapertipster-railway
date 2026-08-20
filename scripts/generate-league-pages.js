@@ -436,15 +436,14 @@ function main() {
     generated++;
   });
 
-  let pruned = 0;
+  let retained = 0;
   fs.readdirSync(OUTPUT_DIR).forEach(slug => {
     const dirPath = path.join(OUTPUT_DIR, slug);
     if (!fs.statSync(dirPath).isDirectory()) return;
     if (leaguesMap.has(slug)) return;
-    fs.rmSync(dirPath, { recursive: true, force: true });
-    pruned++;
+    if (fs.existsSync(path.join(dirPath, 'index.html'))) retained++;
   });
-  if (pruned) console.log(`[league-pages] Pruned ${pruned} stale league hub directories`);
+  if (retained) console.log(`[league-pages] Retained ${retained} previously published league hub directories`);
 
   console.log(`[league-pages] Prerendered ${generated} League Hub Pages under ${OUTPUT_DIR}`);
 

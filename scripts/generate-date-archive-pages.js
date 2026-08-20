@@ -317,14 +317,13 @@ function main() {
     generated++;
   });
 
-  let pruned = 0;
+  let retained = 0;
   fs.readdirSync(OUTPUT_DIR).forEach(slug => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(slug)) return;
     if (resultsData[slug]) return;
-    fs.rmSync(path.join(OUTPUT_DIR, slug), { recursive: true, force: true });
-    pruned++;
+    if (fs.existsSync(path.join(OUTPUT_DIR, slug, 'index.html'))) retained++;
   });
-  if (pruned) console.log(`[date-archive-pages] Pruned ${pruned} stale date archive directories`);
+  if (retained) console.log(`[date-archive-pages] Retained ${retained} previously published date archive directories`);
 
   console.log(`[date-archive-pages] Prerendered ${generated} Date Archive Pages under ${OUTPUT_DIR}`);
 

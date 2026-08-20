@@ -400,13 +400,12 @@ function main() {
     generated++;
   });
 
-  let pruned = 0;
+  let retained = 0;
   listDirSlugs(OUTPUT_DIR).forEach(slug => {
     if (teamsMap.has(slug)) return;
-    fs.rmSync(path.join(OUTPUT_DIR, slug), { recursive: true, force: true });
-    pruned++;
+    if (fs.existsSync(path.join(OUTPUT_DIR, slug, 'index.html'))) retained++;
   });
-  if (pruned) console.log(`[team-pages] Pruned ${pruned} stale team directories`);
+  if (retained) console.log(`[team-pages] Retained ${retained} previously published team directories`);
 
   console.log(`[team-pages] Prerendered ${generated} Team Statistics Pages under ${OUTPUT_DIR}`);
 

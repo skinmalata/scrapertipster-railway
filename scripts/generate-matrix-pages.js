@@ -295,34 +295,35 @@ function main() {
     });
   });
 
-  let pruned = 0;
+  let retained = 0;
   if (fs.existsSync(OUTPUT_DIR)) {
+    function indexExists(p) {
+      return fs.existsSync(path.join(p, 'index.html'));
+    }
     fs.readdirSync(OUTPUT_DIR).forEach(leagueSlug => {
       if (leagueSlug === 'league' || leagueSlug === 'date') return;
       const leaguePath = path.join(OUTPUT_DIR, leagueSlug);
       if (!fs.statSync(leaguePath).isDirectory()) return;
-      if (!leagueMarkets.has(leagueSlug)) {
-        fs.rmSync(leaguePath, { recursive: true, force: true });
-        pruned++;
-        return;
-      }
-      const liveMarkets = leagueMarkets.get(leagueSlug);
+      let anyRetained = false;
       fs.readdirSync(leaguePath).forEach(marketSlug => {
-        if (liveMarkets.has(marketSlug)) return;
         const marketPath = path.join(leaguePath, marketSlug);
         if (fs.existsSync(path.join(marketPath, '.redirect-stub'))) return;
-        if (fs.statSync(marketPath).isDirectory()) {
-          fs.rmSync(marketPath, { recursive: true, force: true });
-          pruned++;
+        if (!fs.statSync(marketPath).isDirectory()) return;
+        if (indexExists(marketPath)) {
+          retained++;
+          anyRetained = true;
         }
       });
-      if (fs.readdirSync(leaguePath).length === 0) {
-        fs.rmSync(leaguePath, { recursive: true, force: true });
-        pruned++;
+      if (!leagueMarkets.has(leagueSlug) && indexExists(leaguePath)) {
+        retained++;
+        anyRetained = true;
+      }
+      if (anyRetained && indexExists(leaguePath)) {
+        // league level dir has no own index (markets only); keep it as container
       }
     });
   }
-  if (pruned) console.log(`[matrix-pages] Pruned ${pruned} stale matrix directories`);
+  if (retained) console.log(`[matrix-pages] Retained ${retained} previously published matrix directories`);
 
   console.log(`[matrix-pages] Prerendered ${generated} Market x League Matrix Pages under ${OUTPUT_DIR}`);
 

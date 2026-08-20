@@ -419,13 +419,12 @@ function main() {
     generated++;
   });
 
-  let pruned = 0;
+  let retained = 0;
   listDirSlugs(OUTPUT_DIR).forEach(slug => {
     if (matchupsMap.has(slug)) return;
-    fs.rmSync(path.join(OUTPUT_DIR, slug), { recursive: true, force: true });
-    pruned++;
+    if (fs.existsSync(path.join(OUTPUT_DIR, slug, 'index.html'))) retained++;
   });
-  if (pruned) console.log(`[h2h-pages] Pruned ${pruned} stale H2H directories`);
+  if (retained) console.log(`[h2h-pages] Retained ${retained} previously published H2H directories`);
 
   console.log(`[h2h-pages] Prerendered ${generated} Evergreen H2H Pages under ${OUTPUT_DIR}`);
 

@@ -784,8 +784,6 @@ function updateAnalysisArchive(archive, matchups, result) {
 // left the rolling prediction window, so already-indexed URLs stay live.
 function pruneAnalysisDirs(used) {
   if (!fs.existsSync(PRERENDER_DIR)) return;
-  const today = new Date().toISOString().slice(0, 10);
-  const cutoff = addDays(today, -RETENTION_DAYS);
   let removed = 0;
   fs.readdirSync(PRERENDER_DIR).forEach(function (d) {
     const dir = path.join(PRERENDER_DIR, d);
@@ -794,14 +792,9 @@ function pruneAnalysisDirs(used) {
     if (!validDateStr(d)) {
       fs.rmSync(dir, { recursive: true, force: true });
       removed++;
-      return;
-    }
-    if (d < cutoff) {
-      fs.rmSync(dir, { recursive: true, force: true });
-      removed++;
     }
   });
-  if (removed) console.log('[analysis] Pruned', removed, 'legacy/expired analysis directories');
+  if (removed) console.log('[analysis] Pruned', removed, 'legacy undated analysis directories');
 }
 
 function collectMatchups(predictions) {
