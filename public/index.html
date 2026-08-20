@@ -497,6 +497,8 @@ gtag('config', 'G-HMGZMW9EDP');
 
 
 
+ <script src="/analysis-maps.js"></script>
+
  <script>
 
  console.log('Script starting...');
@@ -1167,11 +1169,23 @@ gtag('config', 'G-HMGZMW9EDP');
 
  `;
 
-  if (!home || !away) return cardHtml;
+  let linkHome = home;
 
-  const analysisKey = (home + '|' + away).toLowerCase();
+  let linkAway = away;
 
-  const analysisHref = analysisLinks[analysisKey];
+  if (isStreakTab && !linkAway && match.nextMatch) {
+
+  const nm = String(match.nextMatch).split(/\s+-\s+|\s+vs\s+/i);
+
+  if (nm.length === 2) { linkHome = (nm[0] || '').trim(); linkAway = (nm[1] || '').trim(); }
+
+  }
+
+  if (!linkHome && !linkAway) return cardHtml;
+
+  const analysisHref = (typeof window.resolveAnalysisLink === 'function')
+   ? window.resolveAnalysisLink(linkHome, linkAway, match)
+   : (analysisLinks[(linkHome + '|' + linkAway).toLowerCase()] || '');
 
   if (!analysisHref) return cardHtml;
 
@@ -1255,6 +1269,8 @@ gtag('config', 'G-HMGZMW9EDP');
   analysisLinks = linksData || {};
 
   currentData = await response.json();
+
+  if (typeof window.ensureAnalysisMaps === 'function') { await window.ensureAnalysisMaps(); }
 
  renderDayTabs();
 

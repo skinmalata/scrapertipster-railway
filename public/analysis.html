@@ -581,13 +581,16 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    const data = await response.json();
    const homeClean = (homeTeam || '').trim();
    const awayClean = (awayTeam || '').trim();
+   const mups = (data && data.matchups) || {};
    let analysis;
    if (homeClean && awayClean) {
-    const key = homeClean.toLowerCase() + '|' + awayClean.toLowerCase();
-    analysis = data && data.matchups && data.matchups[key];
+    analysis = mups[homeClean.toLowerCase() + '|' + awayClean.toLowerCase()];
+    if (!analysis && typeof window.resolveAnalysisKey === 'function') {
+      analysis = window.resolveAnalysisKey(homeClean, awayClean, mups);
+    }
    } else if (homeClean) {
-    const match = Object.keys(data && data.matchups || {}).find(k => k.split('|')[0] === homeClean.toLowerCase());
-    analysis = match ? data.matchups[match] : null;
+    const match = Object.keys(mups).find(k => k.split('|')[0] === homeClean.toLowerCase());
+    analysis = match ? mups[match] : null;
    }
    if (analysis) {
     renderAnalysis(analysis);
@@ -614,7 +617,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
     const links = linksRes || {};
     const seen = new Set();
     const items = [];
-    const categories = [preds.matches, preds.over15Matches, preds.over25Matches, preds.bttsMatches, preds.bttsNoMatches];
+    const categories = [preds.matches, preds.over15Matches, preds.over25Matches, preds.bttsMatches, preds.bttsNoMatches, preds.cardsMatches, preds.cornersMatches, preds.winstreakMatches, preds.losestreakMatches, preds.drawstreakMatches];
     categories.forEach(cat => (cat || []).forEach(m => {
      const parts = String(m.match || m.nextMatch || '').split(/\s+-\s+|\s+vs\s+/i);
      if (parts.length !== 2) return;
@@ -624,7 +627,9 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
      const key = (home + '|' + away).toLowerCase();
      if (seen.has(key)) return;
      seen.add(key);
-     const href = links[key];
+     const href = (typeof window.findAnalysisLink === 'function')
+      ? window.findAnalysisLink(home, away)
+      : (links[key] || '');
      if (!href) return;
      items.push('<a class="today-match-link" href="' + href + '"><span class="today-match-team">' + escapeHtml(cleanTeamName(home)) + '</span><span class="today-match-vs">vs</span><span class="today-match-team">' + escapeHtml(cleanTeamName(away)) + '</span></a>');
     }));
@@ -743,6 +748,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </footer>
 
 
+<script src="/analysis-maps.js"></script>
 <script src="/responsible-gambling.js"></script>
 
 <script>

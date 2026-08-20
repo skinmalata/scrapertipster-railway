@@ -1295,11 +1295,10 @@ function getAllMatchupsFromPredictions() {
       if (!matchup && match.nextMatch) {
         matchup = match.nextMatch;
       }
-      if (matchup && matchup.includes(' - ')) {
-        const teams = matchup.split(' - ');
-        if (teams.length === 2) {
-          const [homeTeam, awayTeam] = teams.map(t => t.trim());
-          matchups.add(`${homeTeam}|${awayTeam}`);
+      if (matchup) {
+        const teams = splitMatchup(matchup);
+        if (teams) {
+          matchups.add(`${teams[0]}|${teams[1]}`);
         }
       }
     }
@@ -1340,7 +1339,7 @@ async function scrapeMissingAnalysis() {
     
     console.log(`[Analysis Scraper] Found ${missingMatchups.length} matchups missing analysis data`);
     
-    const MAX_SCRAPES_PER_RUN = parseInt(process.env.MAX_SCRAPES_PER_RUN) || 50;
+    const MAX_SCRAPES_PER_RUN = parseInt(process.env.MAX_SCRAPES_PER_RUN) || 80;
     const matchupsToScrape = missingMatchups.slice(0, MAX_SCRAPES_PER_RUN);
     console.log(`[Analysis Scraper] Will scrape up to ${matchupsToScrape.length} matchups this run`);
     
@@ -1351,7 +1350,7 @@ async function scrapeMissingAnalysis() {
     for (let i = 0; i < matchupsToScrape.length; i++) {
       // Check if we've exceeded the time limit
       if (Date.now() - startTime > TIMEOUT_MS) {
-        console.log(`[Analysis Scraper] Timeout reached (3 minutes). Stopping after ${i} matches.`);
+        console.log(`[Analysis Scraper] Timeout reached (90 seconds). Stopping after ${i} matches.`);
         break;
       }
       const [homeTeam, awayTeam] = matchupsToScrape[i].split('|');
@@ -1391,6 +1390,15 @@ function saveAnalysisCache(data) {
   }
 }
 
+// Splits a matchup label like "Team A - Team B" or "Team A vs Team B" into
+// its two teams, or returns null when it is not a two-team label.
+function splitMatchup(matchup) {
+  if (!matchup) return null;
+  const parts = String(matchup).split(/\s+-\s+|\s+vs\s+/i);
+  if (parts.length !== 2) return null;
+  return parts.map(t => t.trim());
+}
+
 // Function to batch scrape analysis for all matches
 async function batchScrapeAnalysis(matchesData) {
   console.log('Starting batch analysis scraping for all matches...');
@@ -1398,118 +1406,31 @@ async function batchScrapeAnalysis(matchesData) {
   // Extract all unique matchups from different prediction types
   const matchups = new Set();
   
-  // Process 1X2 matches
-  if (matchesData.matches) {
-    matchesData.matches.forEach(match => {
-      const teams = match.match.split(' - ');
-      if (teams.length === 2) {
-        const [homeTeam, awayTeam] = teams.map(t => t.trim());
-        matchups.add(`${homeTeam}|${awayTeam}`);
+  // Categories made up of full "Home - Away" matchups, plus the single-team
+  // categories whose nextMatch field carries the full matchup.
+  const matchupGroups = [
+    { list: matchesData.matches },
+    { list: matchesData.over25Matches },
+    { list: matchesData.over15Matches },
+    { list: matchesData.bttsMatches },
+    { list: matchesData.winstreakMatches, preferNext: true },
+    { list: matchesData.losestreakMatches, preferNext: true },
+    { list: matchesData.drawstreakMatches, preferNext: true },
+    { list: matchesData.teamToScoreMatches },
+    { list: matchesData.teamToScore2PlusMatches }
+  ];
+
+  for (const group of matchupGroups) {
+    if (!group.list) continue;
+    for (const match of group.list) {
+      const label = group.preferNext
+        ? (match.nextMatch || match.match)
+        : (match.match || match.nextMatch);
+      const teams = splitMatchup(label);
+      if (teams) {
+        matchups.add(`${teams[0]}|${teams[1]}`);
       }
-    });
-  }
-  
-  // Process Over/Under 2.5 matches
-  if (matchesData.over25Matches) {
-    matchesData.over25Matches.forEach(match => {
-      const teams = match.match.split(' - ');
-      if (teams.length === 2) {
-        const [homeTeam, awayTeam] = teams.map(t => t.trim());
-        matchups.add(`${homeTeam}|${awayTeam}`);
-      }
-    });
-  }
-  
-  // Process Over/Under 1.5 matches
-  if (matchesData.over15Matches) {
-    matchesData.over15Matches.forEach(match => {
-      const teams = match.match.split(' - ');
-      if (teams.length === 2) {
-        const [homeTeam, awayTeam] = teams.map(t => t.trim());
-        matchups.add(`${homeTeam}|${awayTeam}`);
-      }
-    });
-  }
-  
-  // Process BTTS matches
-  if (matchesData.bttsMatches) {
-    matchesData.bttsMatches.forEach(match => {
-      const teams = match.match.split(' - ');
-      if (teams.length === 2) {
-        const [homeTeam, awayTeam] = teams.map(t => t.trim());
-        matchups.add(`${homeTeam}|${awayTeam}`);
-      }
-    });
-  }
-  
-  // Process Winning Streak matches - use nextMatch field for full matchup
-  if (matchesData.winstreakMatches) {
-    matchesData.winstreakMatches.forEach(match => {
-      const matchup = match.nextMatch || match.match;
-      if (matchup && matchup.includes(' - ')) {
-        const teams = matchup.split(' - ');
-        if (teams.length === 2) {
-          const [homeTeam, awayTeam] = teams.map(t => t.trim());
-          matchups.add(`${homeTeam}|${awayTeam}`);
-        }
-      }
-    });
-  }
-  
-  // Process Losing Streak matches
-  if (matchesData.losestreakMatches) {
-    matchesData.losestreakMatches.forEach(match => {
-      const matchup = match.nextMatch || match.match;
-      if (matchup && matchup.includes(' - ')) {
-        const teams = matchup.split(' - ');
-        if (teams.length === 2) {
-          const [homeTeam, awayTeam] = teams.map(t => t.trim());
-          matchups.add(`${homeTeam}|${awayTeam}`);
-        }
-      }
-    });
-  }
-  
-  // Process Draw Streak matches
-  if (matchesData.drawstreakMatches) {
-    matchesData.drawstreakMatches.forEach(match => {
-      const matchup = match.nextMatch || match.match;
-      if (matchup && matchup.includes(' - ')) {
-        const teams = matchup.split(' - ');
-        if (teams.length === 2) {
-          const [homeTeam, awayTeam] = teams.map(t => t.trim());
-          matchups.add(`${homeTeam}|${awayTeam}`);
-        }
-      }
-    });
-  }
-  
-  // Process Team to Score matches - use match field for full matchup
-  if (matchesData.teamToScoreMatches) {
-    matchesData.teamToScoreMatches.forEach(match => {
-      const matchup = match.match || match.nextMatch;
-      if (matchup && matchup.includes(' - ')) {
-        const teams = matchup.split(' - ');
-        if (teams.length === 2) {
-          const [homeTeam, awayTeam] = teams.map(t => t.trim());
-          matchups.add(`${homeTeam}|${awayTeam}`);
-        }
-      }
-    });
-  }
-  
-  // Process Team to Score 2+ matches
-  if (matchesData.teamToScore2PlusMatches) {
-    matchesData.teamToScore2PlusMatches.forEach(match => {
-      const matchup = match.match || match.nextMatch;
-      if (matchup && matchup.includes(' - ')) {
-        const teams = matchup.split(' - ');
-        if (teams.length === 2) {
-          const [homeTeam, awayTeam] = teams.map(t => t.trim());
-          matchups.add(`${homeTeam}|${awayTeam}`);
-        }
-      }
-    });
+    }
   }
 
   console.log(`Found ${matchups.size} unique matchups to analyze`);
@@ -1525,7 +1446,7 @@ async function batchScrapeAnalysis(matchesData) {
   for (let i = 0; i < matchupsArray.length; i++) {
     // Check if we've exceeded the time limit
     if (Date.now() - startTime > TIMEOUT_MS) {
-      console.log(`Batch scraping timeout reached (3 minutes). Stopping after ${i} matches.`);
+      console.log(`Batch scraping timeout reached (90 seconds). Stopping after ${i} matches.`);
       break;
     }
     const [homeTeam, awayTeam] = matchupsArray[i].split('|');

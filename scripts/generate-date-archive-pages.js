@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { escapeHtml, generateFaqSchema, wrapPage } = require('./lib/layout');
+const { readableLeagueLabel } = require('./league-labels');
 
 const RESULTS_FILE = path.join(__dirname, '..', 'results-cache.json');
 const PREDICTIONS_FILE = path.join(__dirname, '..', 'predictions-cache.json');
@@ -205,7 +206,7 @@ function generateDateArchivePage(dateStr, resultsList, ctx, tipsForDate) {
 
   const marketChips = MARKET_LINKS.map(l => `<a href="/predictions/${l.slug}" class="chip-link">${escapeHtml(l.label)} Predictions</a>`).join('\n        ');
   const leagueChips = (ctx && ctx.leagueSlugs && ctx.leagueSlugs.length)
-    ? ctx.leagueSlugs.map(ls => `<a href="/predictions/league/${ls}/" class="chip-link">${escapeHtml(ls.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '))}</a>`).join('\n        ')
+    ? ctx.leagueSlugs.map(ls => `<a href="/predictions/league/${ls}/" class="chip-link">${escapeHtml(readableLeagueLabel(ls, ctx.leagueLabelBySlug))}</a>`).join('\n        ')
     : '';
   const relatedLinksHtml = `
 <section class="seo-content">
@@ -298,7 +299,7 @@ function main() {
   let generated = 0;
 
   const leagueSlugs = listDirSlugs(path.join(__dirname, '..', 'public', 'predictions', 'league'));
-  const ctx = { leagueSlugs };
+  const ctx = { leagueSlugs, leagueLabelBySlug: require('./league-labels').buildLeagueLabelBySlug() };
   const tipLookup = buildTipLookup();
 
   Object.keys(resultsData).forEach(dateStr => {

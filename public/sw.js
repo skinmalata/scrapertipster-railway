@@ -31,6 +31,7 @@ const STATIC_ASSETS = [
   '/responsible-gambling.js',
   '/free-ticket-builder.js',
   '/match-analysis-links.js',
+  '/analysis-maps.js',
   '/winfulltimelogo.png',
   '/icons/icon-192.png',
   '/icons/icon-512.png',

@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { buildLeagueLabelBySlug, readableLeagueLabel, formatDateChips } = require('./league-labels');
 
 const FAQ_SCHEMA = {
   '1x2': [
@@ -239,7 +240,8 @@ const CATEGORIES = {
     description: 'Free corner kick predictions for today. Over 8.5 and Over 9.5 corners tips with 80%+ hit rates.',
     keywords: 'corner predictions, corner kick betting, over 8.5 corners tips, over 9.5 corners, football corner tips',
     heading: 'Corner Predictions',
-    label: 'Corners'
+    label: 'Corners',
+    linkAnalysis: true
   },
   'cards': {
     dataKey: 'cardsMatches',
@@ -247,7 +249,8 @@ const CATEGORIES = {
     description: 'Free yellow cards and bookings predictions for today. Tips for matches likely to produce high card counts based on team discipline trends.',
     keywords: 'cards predictions, yellow cards tips, bookings predictions, football card betting, over cards tips',
     heading: 'Cards Predictions',
-    label: 'Cards'
+    label: 'Cards',
+    linkAnalysis: true
   },
   'winning-streak': {
     dataKey: 'winstreakMatches',
@@ -255,7 +258,8 @@ const CATEGORIES = {
     description: 'Teams on long winning runs and their next fixture. Free winning streak football predictions updated daily across 50+ leagues.',
     keywords: 'winning streak predictions, teams on winning streak, football winning runs, back to back wins tips',
     heading: 'Winning Streaks',
-    label: 'Win Streak'
+    label: 'Win Streak',
+    linkAnalysis: true
   },
   'losing-streak': {
     dataKey: 'losestreakMatches',
@@ -263,7 +267,8 @@ const CATEGORIES = {
     description: 'Teams on long losing runs and their next fixture. Free losing streak football predictions to identify vulnerable sides, updated daily.',
     keywords: 'losing streak predictions, teams on losing streak, football losing runs, back to back losses tips',
     heading: 'Losing Streaks',
-    label: 'Loss Streak'
+    label: 'Loss Streak',
+    linkAnalysis: true
   },
   'draws-streak': {
     dataKey: 'drawstreakMatches',
@@ -271,7 +276,8 @@ const CATEGORIES = {
     description: 'Teams stuck in long draw runs and their next fixture. Free draws streak football predictions for the draw market, updated daily.',
     keywords: 'draws streak predictions, football draw runs, back to back draws tips, draw market predictions',
     heading: 'Draw Streaks',
-    label: 'Draw Streak'
+    label: 'Draw Streak',
+    linkAnalysis: true
   }
 };
 
@@ -297,8 +303,9 @@ function generateCategoryPage(slug, catConfig, ctx) {
   const isStreak = slug === 'winning-streak' || slug === 'losing-streak' || slug === 'draws-streak';
   const isUnbeaten = slug === 'unbeaten';
 
+  const leagueLabelBySlug = ctx && ctx.leagueLabelBySlug;
   const leagueLinks = (ctx && ctx.leagueSlugs && ctx.leagueSlugs.length)
-    ? ctx.leagueSlugs.map(ls => `<a href="/predictions/league/${ls}/" class="chip-link">${escapeHtml(ls.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '))}</a>`).join('\n          ')
+    ? ctx.leagueSlugs.map(ls => `<a href="/predictions/league/${ls}/" class="chip-link">${escapeHtml(readableLeagueLabel(ls, leagueLabelBySlug))}</a>`).join('\n          ')
     : '';
   const leagueLinksHtml = leagueLinks
     ? `<section class="seo-content">
@@ -311,7 +318,7 @@ function generateCategoryPage(slug, catConfig, ctx) {
     : '';
 
   const dateLinks = (ctx && ctx.dateSlugs && ctx.dateSlugs.length)
-    ? ctx.dateSlugs.map(ds => `<a href="/predictions/date/${ds}/" class="chip-link">${escapeHtml(ds)}</a>`).join('\n          ')
+    ? formatDateChips(ctx.dateSlugs, 14).join('\n          ')
     : '';
   const dateLinksHtml = dateLinks
     ? `<section class="seo-content">
@@ -486,6 +493,7 @@ document.addEventListener("DOMContentLoaded",function(){const b=document.getElem
 document.getElementById('hamburger')?.addEventListener('click', function() { this.classList.toggle('active'); document.getElementById('nav')?.classList.toggle('open'); });
 </script>
 <script src="/responsible-gambling.js"></script>
+<script src="/analysis-maps.js"></script>
 <script>
 (function() {
   var CATEGORY_SLUG = '${slug}';
@@ -660,8 +668,9 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
         cardContent + '</div>';
 
       if (LINK_ANALYSIS && home && away) {
-        var analysisKey = (home + '|' + away).toLowerCase();
-        var analysisHref = analysisLinks[analysisKey];
+        var analysisHref = (typeof window.resolveAnalysisLink === 'function')
+          ? window.resolveAnalysisLink(home, away, match)
+          : (analysisLinks[(home + '|' + away).toLowerCase()] || '');
         if (analysisHref) {
           return '<a href="' + analysisHref + '" class="match-card-link" style="display:block;text-decoration:none;color:inherit;">' + cardHtml + '</a>';
         }
@@ -707,8 +716,13 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
       if (LINK_ANALYSIS) {
         try {
-          var linksRes = await fetch('/data/analysis-links.json');
-          if (linksRes.ok) analysisLinks = await linksRes.json() || {};
+          if (typeof window.ensureAnalysisMaps === 'function') {
+            await window.ensureAnalysisMaps();
+            analysisLinks = (typeof window.getAnalysisRaw === 'function') ? window.getAnalysisRaw() : {};
+          } else {
+            var linksRes = await fetch('/data/analysis-links.json');
+            if (linksRes.ok) analysisLinks = await linksRes.json() || {};
+          }
         } catch (e) {}
       }
 
@@ -753,7 +767,7 @@ function generateAllPages(outputDir) {
 
   const leagueSlugs = listDirSlugs(path.join(outputDir, 'league'));
   const dateSlugs = listDirSlugs(path.join(outputDir, 'date'));
-  const ctx = { leagueSlugs, dateSlugs };
+  const ctx = { leagueSlugs, dateSlugs, leagueLabelBySlug: buildLeagueLabelBySlug() };
 
   for (const [slug, config] of Object.entries(CATEGORIES)) {
     const html = generateCategoryPage(slug, config, ctx);

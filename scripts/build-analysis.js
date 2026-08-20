@@ -15,6 +15,7 @@ const MIN_SIMILARITY = 0.7;
 const OUTPUT_FILE = path.join(process.cwd(), 'public', 'data', 'analysis.json');
 const ANALYSIS_CACHE_FILE = path.join(process.cwd(), 'analysis-cache.json');
 const LINKS_FILE = path.join(process.cwd(), 'public', 'data', 'analysis-links.json');
+const SLUG_LINKS_FILE = path.join(process.cwd(), 'public', 'data', 'analysis-links-by-slug.json');
 const ARCHIVE_FILE = path.join(process.cwd(), 'data', 'analysis-archive.json');
 const PRERENDER_DIR = path.join(process.cwd(), 'public', 'analysis');
 const TEAMS_OUTPUT_DIR = path.join(process.cwd(), 'public', 'teams');
@@ -678,6 +679,20 @@ function writePrerenderedPages(matchups, result, links, template, ctx, archive) 
   fs.mkdirSync(path.dirname(LINKS_FILE), { recursive: true });
   fs.writeFileSync(LINKS_FILE, JSON.stringify(links));
 
+  // Canonical slug-keyed map so client lookups survive name/prefix/order
+  // variants (e.g. "FC Thun" vs "Thun", reversed home/away). First slug pair
+  // wins when several raw keys normalize to the same pair.
+  const linksBySlug = {};
+  Object.keys(links).forEach(function (k) {
+    const parts = String(k).split('|');
+    if (parts.length !== 2) return;
+    const sk = slugifyTeam(parts[0]) + '|' + slugifyTeam(parts[1]);
+    if (!sk || sk === '|') return;
+    if (!linksBySlug[sk]) linksBySlug[sk] = links[k];
+  });
+  fs.mkdirSync(path.dirname(SLUG_LINKS_FILE), { recursive: true });
+  fs.writeFileSync(SLUG_LINKS_FILE, JSON.stringify(linksBySlug));
+
   if (written > 0) pruneAnalysisDirs(used);
 
   console.log('[analysis] Prerendered', written, 'static pages to', PRERENDER_DIR);
@@ -805,11 +820,19 @@ function collectMatchups(predictions) {
     predictions.over15Matches,
     predictions.over25Matches,
     predictions.bttsMatches,
-    predictions.bttsNoMatches
+    predictions.bttsNoMatches,
+    predictions.cardsMatches,
+    predictions.cornersMatches,
+    predictions.winstreakMatches,
+    predictions.losestreakMatches,
+    predictions.drawstreakMatches
   ];
   categories.forEach(cat => {
     (cat || []).forEach(m => {
-      const teams = splitMatch(m.match || m.nextMatch || '');
+      let teams = splitMatch(m.match || '');
+      // Streak entries carry a single team name in `match` (no separator);
+      // pair them via their next fixture so the matchup gets an analysis key.
+      if (teams.length !== 2) teams = splitMatch(m.nextMatch || '');
       if (teams.length !== 2) return;
       const home = teams[0].trim();
       const away = teams[1].trim();
@@ -824,7 +847,7 @@ function collectMatchups(predictions) {
       out.push({
         home: home,
         away: away,
-        date: m.date || predictions.date || '',
+        date: m.nextMatchDate || m.date || predictions.date || '',
         league: m.league || '',
         country: m.country || '',
         time: m.time || ''
@@ -908,6 +931,26 @@ async function buildFotMobAnalysis(home, away, date, fixturesCache) {
   return result;
 }
 
+// Retry the FotMob fallback once on empty/error results. Between attempts the
+// per-date fixture cache is cleared so a transient API failure is retried with
+// fresh data instead of the same cached fixture list.
+async function analyzeWithRetry(m, fixturesCache) {
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const analysis = await buildFotMobAnalysis(m.home, m.away, m.date, fixturesCache);
+      if (analysis && !isEmptyAnalysis(analysis)) return analysis;
+    } catch (e) {
+      if (attempt === 2) console.warn('[analysis] fotmob retry failed ' + m.home + ' vs ' + m.away + ':', e.message);
+    }
+    if (attempt === 1) {
+      const dates = [validDateStr(m.date), addDays(m.date, -1), addDays(m.date, 1)];
+      dates.forEach(function (d) { if (d && fixturesCache.has(d)) fixturesCache.delete(d); });
+      await sleep(DETAIL_DELAY_MS);
+    }
+  }
+  return null;
+}
+
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -940,7 +983,7 @@ async function main() {
   }
 
   const matchups = collectMatchups(predictions);
-  const maxMatchups = parseInt(process.env.ANALYSIS_MAX_MATCHUPS, 10) || 500;
+  const maxMatchups = parseInt(process.env.ANALYSIS_MAX_MATCHUPS, 10) || 800;
   const limited = matchups.slice(0, maxMatchups);
   console.log('[analysis] Matchups found:', matchups.length, '| processing up to', limited.length);
 
@@ -959,18 +1002,13 @@ async function main() {
       console.log('[analysis] statarea: ' + m.home + ' vs ' + m.away);
       return { key: key, value: cached };
     }
-    try {
-      const analysis = await buildFotMobAnalysis(m.home, m.away, m.date, fixturesCache);
-      if (analysis && !isEmptyAnalysis(analysis)) {
-        console.log('[analysis] fotmob: ' + m.home + ' vs ' + m.away);
-        return { key: key, value: analysis };
-      }
-      console.log('[analysis] unavailable: ' + m.home + ' vs ' + m.away);
-      return null;
-    } catch (e) {
-      console.warn('[analysis] fotmob error ' + m.home + ' vs ' + m.away + ':', e.message);
-      return null;
+    const value = await analyzeWithRetry(m, fixturesCache);
+    if (value) {
+      console.log('[analysis] fotmob: ' + m.home + ' vs ' + m.away);
+      return { key: key, value: value };
     }
+    console.log('[analysis] unavailable: ' + m.home + ' vs ' + m.away);
+    return null;
   });
 
   analyzed.forEach(entry => {

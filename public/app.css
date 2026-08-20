@@ -301,7 +301,7 @@ nav a.active::after {
  border-color: rgba(255,255,255,0.1);
  background: var(--bg-card-hover);
  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
- }
+ }.match-card-link { cursor: pointer; display: block; text-decoration: none; color: inherit; border-radius: var(--radius-lg); }.match-card-link:focus-visible { outline: 2px solid rgba(96,165,250,0.75); outline-offset: 3px; }.match-card-link:hover .match-card,.match-card-link:focus-visible .match-card { border-color: var(--border-hover); }
 
  .match-header {
  display: flex;

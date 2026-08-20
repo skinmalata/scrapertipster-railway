@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { readableLeagueLabel, buildLeagueLabelBySlug } = require('./league-labels');
 
 const ROOT = path.join(__dirname, '..', 'public');
 const OUTPUT_FILE = path.join(ROOT, 'feed.xml');
@@ -28,12 +29,13 @@ function main() {
   const nowUtc = new Date().toUTCString();
 
   // 1. Collect League Hub Pages
+  const leagueLabelBySlug = buildLeagueLabelBySlug();
   const leagueDir = path.join(ROOT, 'predictions', 'league');
   if (fs.existsSync(leagueDir)) {
     fs.readdirSync(leagueDir).forEach(slug => {
       const pagePath = path.join(leagueDir, slug, 'index.html');
       if (!fs.existsSync(pagePath)) return;
-      const leagueName = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      const leagueName = readableLeagueLabel(slug, leagueLabelBySlug);
       items.push({
         title: `${leagueName} Predictions & Betting Tips Today`,
         link: `${BASE_URL}/predictions/league/${slug}/`,
