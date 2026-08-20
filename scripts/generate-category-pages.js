@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { buildLeagueLabelBySlug, readableLeagueLabel, formatDateChips } = require('./league-labels');
+const { CHIPS_CSS, chipsSection, faqBlock, renderHead, collectionPageSchema, generateFaqSchema } = require('./lib/seo-blocks');
 
 const FAQ_SCHEMA = {
   '1x2': [
@@ -90,14 +91,8 @@ const FAQ_SCHEMA = {
 function generateFaqHtml(slug) {
   const faqs = FAQ_SCHEMA[slug];
   if (!faqs || faqs.length === 0) return '';
-  const items = faqs.map(f =>
-    `<details class="faq-item"><summary>${f.q}</summary><p>${f.a}</p></details>`
-  ).join('\n');
   return `<section class="seo-content">
-<h2>About These Predictions</h2>
-<div class="faq-list">
-${items}
-</div>
+${faqBlock({ heading: 'About These Predictions', faqs })}
 </section>`;
 }
 
@@ -163,21 +158,6 @@ function generateNoscriptFallback(slug, catConfig) {
     <p style="margin-top:16px;font-size:13px;">Views are updated when JavaScript is enabled. Football predictions can lose &mdash; bet responsibly.</p>
   </div>
 </noscript>`;
-}
-
-function generateFaqSchema(slug) {
-  const faqs = FAQ_SCHEMA[slug];
-  if (!faqs || faqs.length === 0) return '';
-  const entities = faqs.map(f => ({
-    '@type': 'Question',
-    name: f.q,
-    acceptedAnswer: { '@type': 'Answer', text: f.a }
-  }));
-  return JSON.stringify({
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: entities
-  }, null, 2);
 }
 
 const CATEGORIES = {
@@ -307,77 +287,30 @@ function generateCategoryPage(slug, catConfig, ctx) {
   const leagueLinks = (ctx && ctx.leagueSlugs && ctx.leagueSlugs.length)
     ? ctx.leagueSlugs.map(ls => `<a href="/predictions/league/${ls}/" class="chip-link">${escapeHtml(readableLeagueLabel(ls, leagueLabelBySlug))}</a>`).join('\n          ')
     : '';
-  const leagueLinksHtml = leagueLinks
-    ? `<section class="seo-content">
-<h2>Browse Leagues</h2>
-<p style="color:var(--text-secondary);line-height:1.7;margin-bottom:16px;">Jump straight to today's predictions for any league, or scroll through every market on this page.</p>
-<div class="chips">
-  ${leagueLinks}
-</div>
-</section>`
-    : '';
+  const leagueLinksHtml = chipsSection({
+    heading: 'Browse Leagues',
+    intro: 'Jump straight to today\'s predictions for any league, or scroll through every market on this page.',
+    chips: leagueLinks
+  });
 
   const dateLinks = (ctx && ctx.dateSlugs && ctx.dateSlugs.length)
     ? formatDateChips(ctx.dateSlugs, 14).join('\n          ')
     : '';
-  const dateLinksHtml = dateLinks
-    ? `<section class="seo-content">
-<h2>Track Record Archive</h2>
-<p style="color:var(--text-secondary);line-height:1.7;margin-bottom:16px;">Browse verified prediction outcomes and hit rates from previous matchdays.</p>
-<div class="chips">
-  ${dateLinks}
-</div>
-</section>`
-    : '';
+  const dateLinksHtml = chipsSection({
+    heading: 'Track Record Archive',
+    intro: 'Browse verified prediction outcomes and hit rates from previous matchdays.',
+    chips: dateLinks
+  });
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HMGZMW9EDP');</script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${escapeHtml(catConfig.title)} | WinFulltime</title>
-<meta name="description" content="${escapeHtml(catConfig.description)}">
-<meta name="keywords" content="${escapeHtml(catConfig.keywords)}">
-<meta property="og:title" content="${escapeHtml(catConfig.title)} | WinFulltime">
-<meta property="og:url" content="https://winfulltime.com/predictions/${slug}">
-<meta property="og:description" content="${escapeHtml(catConfig.description)}">
-<meta property="og:image" content="https://winfulltime.com/winfulltimelogo.png">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="${escapeHtml(catConfig.title)} | WinFulltime">
-<meta name="twitter:description" content="${escapeHtml(catConfig.description)}">
-<meta name="twitter:image" content="https://winfulltime.com/winfulltimelogo.png">
-<link rel="canonical" href="https://winfulltime.com/predictions/${slug}">
-<link rel="icon" href="/icons/icon-192.png" type="image/png">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#ff2448">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="WinFulltime">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css">
-<link rel="stylesheet" href="/app.css">
+${renderHead({ title: `${escapeHtml(catConfig.title)} | WinFulltime`, description: catConfig.description, keywords: catConfig.keywords, canonicalUrl: `https://winfulltime.com/predictions/${slug}` })}
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "CollectionPage",
-  "name": "${escapeHtml(catConfig.title)}",
-  "description": "${escapeHtml(catConfig.description)}",
-  "url": "https://winfulltime.com/predictions/${slug}",
-  "publisher": {
-    "@type": "Organization",
-    "name": "WinFulltime",
-    "logo": { "@type": "ImageObject", "url": "https://winfulltime.com/winfulltimelogo.png" }
-  }
-}
+${collectionPageSchema({ name: catConfig.title, description: catConfig.description, url: `https://winfulltime.com/predictions/${slug}` })}
 </script>
 <script type="application/ld+json">
-${generateFaqSchema(slug)}
+${generateFaqSchema(FAQ_SCHEMA[slug])}
 </script>
 <style>
 .date-tabs{display:flex;justify-content:center;gap:0;margin-bottom:24px;background:var(--bg-card);border-radius:12px;padding:4px;width:fit-content;max-width:100%;margin-left:auto;margin-right:auto;border:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -397,9 +330,7 @@ ${generateFaqSchema(slug)}
 .faq-item p{padding:0 20px 16px;font-size:14px;line-height:1.7;color:var(--text-secondary);margin:0}
 @media(max-width:640px){.seo-content h2{font-size:18px}.faq-item summary{padding:14px 16px;font-size:14px}.faq-item p{padding:0 16px 14px;font-size:13px}.date-tab{padding:8px 14px;font-size:13px;min-width:80px}.match-reason{font-size:12px;max-width:100%;word-break:break-word;margin-top:6px}}
 .match-reason{font-size:13px;color:#fff;margin-top:8px;line-height:1.5;text-align:center;max-width:100%;opacity:0.85}
-.chips{display:flex;flex-wrap:wrap;gap:10px}
-.chip-link{display:inline-block;padding:9px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:999px;color:var(--text-primary);text-decoration:none;font-size:13px;font-weight:600;transition:all 0.2s}
-.chip-link:hover{border-color:var(--accent);color:var(--accent)}
+${CHIPS_CSS}
 </style>
 </head>
 <body>

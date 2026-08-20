@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { escapeHtml, generateFaqSchema, wrapPage } = require('./lib/layout');
 const { readableLeagueLabel } = require('./league-labels');
+const { CHIPS_CSS, chipsBlock, faqBlock } = require('./lib/seo-blocks');
 
 const RESULTS_FILE = path.join(__dirname, '..', 'results-cache.json');
 const PREDICTIONS_FILE = path.join(__dirname, '..', 'predictions-cache.json');
@@ -200,9 +201,7 @@ function generateDateArchivePage(dateStr, resultsList, ctx, tipsForDate) {
 .stat-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
 .stat-num{font-size:24px;font-weight:800;color:var(--accent)}
 .stat-txt{font-size:12px;color:var(--text-secondary);margin-top:4px}
-.chips{display:flex;flex-wrap:wrap;gap:10px}
-.chip-link{display:inline-block;padding:9px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:999px;color:var(--text-primary);text-decoration:none;font-size:13px;font-weight:600;transition:all 0.2s}
-.chip-link:hover{border-color:var(--accent);color:var(--accent)}`;
+${CHIPS_CSS}`;
 
   const marketChips = MARKET_LINKS.map(l => `<a href="/predictions/${l.slug}" class="chip-link">${escapeHtml(l.label)} Predictions</a>`).join('\n        ');
   const leagueChips = (ctx && ctx.leagueSlugs && ctx.leagueSlugs.length)
@@ -210,17 +209,17 @@ function generateDateArchivePage(dateStr, resultsList, ctx, tipsForDate) {
     : '';
   const relatedLinksHtml = `
 <section class="seo-content">
-<h2>Explore Markets</h2>
-<p style="color:var(--text-secondary);line-height:1.7;margin-bottom:16px;">Browse today's live predictions across every market WinFulltime covers.</p>
-<div class="chips">
-  ${marketChips}
-</div>
-${leagueChips ? `
-<h2 style="margin-top:32px;">Browse Leagues</h2>
-<p style="color:var(--text-secondary);line-height:1.7;margin-bottom:16px;">Jump to today's fixtures for any league.</p>
-<div class="chips">
-  ${leagueChips}
-</div>` : ''}
+${chipsBlock({
+    heading: 'Explore Markets',
+    intro: 'Browse today\'s live predictions across every market WinFulltime covers.',
+    chips: marketChips
+  })}
+${leagueChips ? chipsBlock({
+    heading: 'Browse Leagues',
+    intro: 'Jump to today\'s fixtures for any league.',
+    chips: leagueChips,
+    h2Style: 'margin-top:32px;'
+  }) : ''}
 </section>`;
 
   const body = `
@@ -253,22 +252,18 @@ ${leagueChips ? `
 ${relatedLinksHtml}
 
 <section class="seo-content">
-<h2>About ${escapeHtml(dateTitle)} Prediction Track Record</h2>
-<p style="color:var(--text-secondary);line-height:1.7;margin-bottom:20px;">
-WinFulltime maintains a transparent, permanent archive of all football prediction outcomes. Predictions published prior to kick-off are automatically settled against final full-time scores to ensure complete accountability and performance tracking. This page provides a ${totalCount}-match ledger for ${escapeHtml(dateTitle)} with ${evaluatedCount} prediction${evaluatedCount !== 1 ? 's' : ''} evaluated against official results.
-</p>
-
-<h2>Frequently Asked Questions</h2>
-<div class="faq-list">
-  <details class="faq-item">
-    <summary>What was the accuracy hit rate for football predictions on ${escapeHtml(dateTitle)}?</summary>
-    <p>WinFulltime publishes verified, transparent track records for all past match predictions. Every match result on ${escapeHtml(dateTitle)} is settled against official scores. ${hitRateCopy}</p>
-  </details>
-  <details class="faq-item">
-    <summary>Are past prediction results verified on WinFulltime?</summary>
-    <p>Yes. All prediction outcomes are automatically cross-referenced against post-match scores and archived permanently. Each result card shows the final score and whether the prediction won, lost, or was recorded without an evaluable tip.</p>
-  </details>
-</div>
+${faqBlock({
+    heading: `About ${escapeHtml(dateTitle)} Prediction Track Record`,
+    intro: `WinFulltime maintains a transparent, permanent archive of all football prediction outcomes. Predictions published prior to kick-off are automatically settled against final full-time scores to ensure complete accountability and performance tracking. This page provides a ${totalCount}-match ledger for ${escapeHtml(dateTitle)} with ${evaluatedCount} prediction${evaluatedCount !== 1 ? 's' : ''} evaluated against official results.`,
+    introMarginBottom: 20
+  })}
+${faqBlock({
+    heading: 'Frequently Asked Questions',
+    faqs: [
+      { q: `What was the accuracy hit rate for football predictions on ${escapeHtml(dateTitle)}?`, a: `WinFulltime publishes verified, transparent track records for all past match predictions. Every match result on ${escapeHtml(dateTitle)} is settled against official scores. ${hitRateCopy}` },
+      { q: 'Are past prediction results verified on WinFulltime?', a: 'Yes. All prediction outcomes are automatically cross-referenced against post-match scores and archived permanently. Each result card shows the final score and whether the prediction won, lost, or was recorded without an evaluable tip.' }
+    ]
+  })}
 </section>`;
 
   return wrapPage({

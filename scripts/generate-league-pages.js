@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { CHIPS_CSS, FAQ_CSS, faqsList, chipsSection, renderHead, collectionPageSchema } = require('./lib/seo-blocks');
 
 const PREDICTIONS_FILE = path.join(__dirname, '..', 'predictions-cache.json');
 const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions', 'league');
@@ -98,8 +99,8 @@ function matchupSlug(home, away) {
   return h + '-vs-' + a;
 }
 
-function generateLeagueFaqSchema(leagueName, matchCount) {
-  const faqs = [
+function leagueFaqs(leagueName) {
+  return [
     {
       q: `How accurate are WinFulltime ${leagueName} predictions?`,
       a: `Our statistical model analyzes team form, head-to-head records, home/away performance, and match context for ${leagueName} fixtures. Probability percentages indicate relative confidence levels across 1X2, Over 2.5, BTTS, and corner markets.`
@@ -117,11 +118,13 @@ function generateLeagueFaqSchema(leagueName, matchCount) {
       a: `Yes. ${leagueName} picks with 75%+ probability make strong accumulator legs. Use our Ticket Builder tool to automatically combine market picks into optimized tickets.`
     }
   ];
+}
 
+function generateLeagueFaqSchema(leagueName) {
   return JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: faqs.map(f => ({
+    mainEntity: leagueFaqs(leagueName).map(f => ({
       '@type': 'Question',
       name: f.q,
       acceptedAnswer: { '@type': 'Answer', text: f.a }
@@ -187,63 +190,21 @@ function generateLeaguePage(leagueName, leagueSlug, matches, ctx) {
         return `<a href="/predictions/${mSlug}" class="chip-link">${escapeHtml(label)} Predictions</a>`;
       }).join('\n        ')
     : '';
-  const relatedMarketsHtml = marketLinks
-    ? `<section class="seo-content">
-<h2>Explore ${escapeHtml(leagueName)} Markets</h2>
-<p style="color:var(--text-secondary);line-height:1.7;margin-bottom:16px;">Browse today's ${escapeHtml(leagueName)} predictions across every market, or jump to the main market pages for a full breakdown.</p>
-<div class="chips">
-  ${marketLinks}
-  ${categoryLinks}
-</div>
-</section>`
-    : '';
+  const relatedMarketsHtml = chipsSection({
+    heading: `Explore ${escapeHtml(leagueName)} Markets`,
+    intro: `Browse today's ${escapeHtml(leagueName)} predictions across every market, or jump to the main market pages for a full breakdown.`,
+    chips: [marketLinks, categoryLinks].filter(Boolean).join('\n  ')
+  });
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HMGZMW9EDP');</script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${escapeHtml(metaTitle)}</title>
-<meta name="description" content="${escapeHtml(metaDesc)}">
-<meta name="keywords" content="${escapeHtml(leagueName)} predictions, ${escapeHtml(leagueName)} tips today, ${escapeHtml(leagueName)} betting picks, soccer predictions">
-<meta property="og:title" content="${escapeHtml(metaTitle)}">
-<meta property="og:url" content="${canonicalUrl}">
-<meta property="og:description" content="${escapeHtml(metaDesc)}">
-<meta property="og:image" content="https://winfulltime.com/winfulltimelogo.png">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:url" content="${canonicalUrl}">
-<meta name="twitter:title" content="${escapeHtml(metaTitle)}">
-<meta name="twitter:description" content="${escapeHtml(metaDesc)}">
-<meta name="twitter:image" content="https://winfulltime.com/winfulltimelogo.png">
-<link rel="canonical" href="${canonicalUrl}">
-<link rel="icon" href="/icons/icon-192.png" type="image/png">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#ff2448">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css">
-<link rel="stylesheet" href="/app.css">
+${renderHead({ title: metaTitle, description: metaDesc, keywords: `${leagueName} predictions, ${leagueName} tips today, ${leagueName} betting picks, soccer predictions`, canonicalUrl, twitterUrl: canonicalUrl })}
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "CollectionPage",
-  "name": "${escapeHtml(leagueName)} Football Predictions Today",
-  "description": "${escapeHtml(metaDesc)}",
-  "url": "${canonicalUrl}",
-  "publisher": {
-    "@type": "Organization",
-    "name": "WinFulltime",
-    "logo": { "@type": "ImageObject", "url": "https://winfulltime.com/winfulltimelogo.png" }
-  }
-}
+${collectionPageSchema({ name: `${leagueName} Football Predictions Today`, description: metaDesc, url: canonicalUrl })}
 </script>
 <script type="application/ld+json">
-${generateLeagueFaqSchema(leagueName, count)}
+${generateLeagueFaqSchema(leagueName)}
 </script>
 <style>
 .crumbs{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);margin:16px 0 24px}
@@ -256,15 +217,8 @@ ${generateLeagueFaqSchema(leagueName, count)}
 .matches-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:24px}
 .seo-content{margin-top:48px;border-top:1px solid var(--border);padding-top:32px}
 .seo-content h2{font-size:22px;font-weight:700;margin-bottom:16px;color:var(--text-primary)}
-.faq-list{display:flex;flex-direction:column;gap:8px}
-.faq-item{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-.faq-item summary{padding:16px 20px;font-weight:600;font-size:15px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center}
-.faq-item summary::after{content:'+';font-size:18px;font-weight:700;color:var(--accent)}
-.faq-item[open] summary::after{content:'\\2212'}
-.faq-item p{padding:0 20px 16px;font-size:14px;line-height:1.6;color:var(--text-secondary);margin:0}
-.chips{display:flex;flex-wrap:wrap;gap:10px}
-.chip-link{display:inline-block;padding:9px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:999px;color:var(--text-primary);text-decoration:none;font-size:13px;font-weight:600;transition:all 0.2s}
-.chip-link:hover{border-color:var(--accent);color:var(--accent)}
+${FAQ_CSS}
+${CHIPS_CSS}
 </style>
 </head>
 <body>
@@ -324,24 +278,7 @@ Our statistical algorithm evaluates upcoming ${escapeHtml(leagueName)} matches u
 </p>
 
 <h2>Frequently Asked Questions</h2>
-<div class="faq-list">
-  <details class="faq-item">
-    <summary>How accurate are WinFulltime ${escapeHtml(leagueName)} predictions?</summary>
-    <p>Our statistical model analyzes team form, head-to-head records, home/away performance, and match context for ${escapeHtml(leagueName)} fixtures. Probability percentages indicate relative confidence levels across 1X2, Over 2.5, BTTS, and corner markets.</p>
-  </details>
-  <details class="faq-item">
-    <summary>When are ${escapeHtml(leagueName)} predictions updated?</summary>
-    <p>Predictions are updated daily. Primary updates run at 1:00 AM WAT with a secondary refresh at 6:00 AM WAT to capture late lineup changes and scheduled fixtures.</p>
-  </details>
-  <details class="faq-item">
-    <summary>Which markets are covered for ${escapeHtml(leagueName)}?</summary>
-    <p>We cover 1X2 match result (Home/Draw/Away), Over 1.5 &amp; Over 2.5 Goals, Both Teams to Score (BTTS Yes/No), Corners, and Yellow Cards for all listed ${escapeHtml(leagueName)} matches.</p>
-  </details>
-  <details class="faq-item">
-    <summary>Can I use ${escapeHtml(leagueName)} picks in accumulator bets?</summary>
-    <p>Yes. ${escapeHtml(leagueName)} picks with 75%+ probability make strong accumulator legs. Use our Ticket Builder tool to automatically combine market picks into optimized tickets.</p>
-  </details>
-</div>
+${faqsList(leagueFaqs(leagueName))}
 </section>
 </main>
 <footer>
