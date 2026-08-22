@@ -544,6 +544,14 @@ async function refreshPreMatchPredictions() {
     } else {
       console.log('[prematch] Cache OK, matches:', cached.matches.length);
     }
+    // Always refresh completed results so the history/yesterday view shows
+    // scores even when the prediction cache is still fresh.
+    try {
+      const collected = await getScraperService().scrapeRecentResults();
+      console.log('[prematch] Recent results refreshed (' + Object.keys(collected).length + ' day(s))');
+    } catch (re) {
+      console.error('[prematch] Results refresh failed:', re.message);
+    }
   } catch (e) {
     console.error('[prematch] Refresh failed:', e.message);
   }

@@ -15,7 +15,7 @@ const { debugLog } = require('../utils/logger');
 const STATAREA_URL = 'https://www.statarea.com/predictions';
 const CACHE_FILE = path.join(process.cwd(), 'predictions-cache.json');
 const ANALYSIS_CACHE_FILE = path.join(process.cwd(), 'analysis-cache.json');
-const RESULTS_CACHE_FILE = path.join(process.cwd(), 'results-cache.json');
+const RESULTS_CACHE_FILE = process.env.RESULTS_CACHE_FILE || path.join(process.cwd(), 'results-cache.json');
 
 const CACHE_VERSION = '2';
 
