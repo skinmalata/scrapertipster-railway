@@ -10,6 +10,40 @@ const TEAMS_OUTPUT_DIR = path.join(__dirname, '..', 'public', 'teams');
 const LEAGUE_OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions', 'league');
 const PREDICTIONS_OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions');
 const ANALYSIS_LINKS_FILE = path.join(__dirname, '..', 'public', 'data', 'analysis-links.json');
+const H2H_REGISTRY_FILE = path.join(__dirname, '..', 'data', 'h2h-registry.json');
+
+// Accumulates every H2H matchup ever seen so H2H pages survive a full GitHub
+// Pages redeploy (which replaces the entire site each run). Without this a
+// fixture that drops out of the daily scrape loses its indexed URL -> 404.
+function loadH2hRegistry() {
+  try {
+    if (fs.existsSync(H2H_REGISTRY_FILE)) {
+      const arr = JSON.parse(fs.readFileSync(H2H_REGISTRY_FILE, 'utf8'));
+      return Array.isArray(arr) ? arr : [];
+    }
+  } catch (e) {
+    console.warn('[h2h-pages] Failed to read H2H registry:', e.message);
+  }
+  return [];
+}
+
+function saveH2hRegistry(list) {
+  try {
+    fs.mkdirSync(path.dirname(H2H_REGISTRY_FILE), { recursive: true });
+    const seen = new Set();
+    const out = [];
+    list.forEach(item => {
+      if (!item || !item.home || !item.away) return;
+      const key = String(item.home).toLowerCase() + '|' + String(item.away).toLowerCase();
+      if (seen.has(key)) return;
+      seen.add(key);
+      out.push({ home: item.home, away: item.away });
+    });
+    fs.writeFileSync(H2H_REGISTRY_FILE, JSON.stringify(out, null, 2));
+  } catch (e) {
+    console.warn('[h2h-pages] Failed to write H2H registry:', e.message);
+  }
+}
 
 const CATEGORY_KEYS = ['matches', 'over15Matches', 'over25Matches', 'bttsMatches', 'bttsNoMatches', 'cornersMatches', 'cardsMatches'];
 
@@ -393,6 +427,15 @@ function main() {
     }
   }
 
+  // Restore historically-indexed H2H pages so a full redeploy never orphans a
+  // URL Google already has indexed.
+  loadH2hRegistry().forEach(item => {
+    if (!item || !item.home || !item.away) return;
+    const slug = matchupSlug(item.home, item.away);
+    if (!slug || matchupsMap.has(slug)) return;
+    matchupsMap.set(slug, { home: item.home, away: item.away, slug, streaks: [], league: '', country: '' });
+  });
+
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
   const analysisLinks = loadAnalysisLinksMap();
@@ -427,6 +470,8 @@ function main() {
   if (retained) console.log(`[h2h-pages] Retained ${retained} previously published H2H directories`);
 
   console.log(`[h2h-pages] Prerendered ${generated} Evergreen H2H Pages under ${OUTPUT_DIR}`);
+
+  saveH2hRegistry([...matchupsMap.values()].map(v => ({ home: v.home, away: v.away })));
 
   try { require('./update-sitemap').main(); } catch (e) { console.error('[h2h-pages] Sitemap refresh failed:', e.message); }
 }

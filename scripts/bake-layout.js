@@ -9,7 +9,7 @@ const path = require('path');
 const { applyLayoutToHtml, SKIP_PAGES } = require('../src/templates/layout');
 
 const ROOT = path.join(__dirname, '..', 'public');
-const SKIP_FILES = new Set(['pinterest-ea6fdcfb1731666c03500a5d385f306f.html', 'yandex_7d24d4a4103b655d.html']);
+const SKIP_FILES = new Set(['pinterest-ea6fdcfb1731666c03500a5d385f306f.html', 'yandex_7d24d4a4103b655d.html', '404.html']);
 
 function listHtml(dir) {
   let out = [];

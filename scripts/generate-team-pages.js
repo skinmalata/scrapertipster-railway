@@ -11,6 +11,31 @@ const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'teams');
 const H2H_OUTPUT_DIR = path.join(__dirname, '..', 'public', 'h2h');
 const ANALYSIS_LINKS_FILE = path.join(__dirname, '..', 'public', 'data', 'analysis-links.json');
 const TEAM_STATS_FILE = path.join(__dirname, '..', 'team-stats-cache.json');
+const TEAM_REGISTRY_FILE = path.join(__dirname, '..', 'data', 'team-registry.json');
+
+// Accumulates every team name ever seen so team profile pages survive a full
+// GitHub Pages redeploy (which replaces the entire site each run). Without this
+// a team that drops out of the daily scrape loses its indexed URL -> 404.
+function loadTeamRegistry() {
+  try {
+    if (fs.existsSync(TEAM_REGISTRY_FILE)) {
+      const arr = JSON.parse(fs.readFileSync(TEAM_REGISTRY_FILE, 'utf8'));
+      return Array.isArray(arr) ? arr : [];
+    }
+  } catch (e) {
+    console.warn('[team-pages] Failed to read team registry:', e.message);
+  }
+  return [];
+}
+
+function saveTeamRegistry(names) {
+  try {
+    fs.mkdirSync(path.dirname(TEAM_REGISTRY_FILE), { recursive: true });
+    fs.writeFileSync(TEAM_REGISTRY_FILE, JSON.stringify([...new Set(names)].sort(), null, 2));
+  } catch (e) {
+    console.warn('[team-pages] Failed to write team registry:', e.message);
+  }
+}
 
 function analysisSlugifyTeam(name) {
   return String(name || '')
@@ -376,6 +401,10 @@ function main() {
     }
   }
 
+  // Restore historically-indexed team pages so a full GitHub Pages redeploy
+  // never orphans a URL that Google already has in its index.
+  loadTeamRegistry().forEach(name => { if (name) getOrCreateTeam(name); });
+
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
   const analysisLinks = loadAnalysisLinksMap();
   const teamStats = loadTeamStatsMap();
@@ -408,6 +437,8 @@ function main() {
   if (retained) console.log(`[team-pages] Retained ${retained} previously published team directories`);
 
   console.log(`[team-pages] Prerendered ${generated} Team Statistics Pages under ${OUTPUT_DIR}`);
+
+  saveTeamRegistry([...teamsMap.values()].map(t => t.name));
 
   try { require('./update-sitemap').main(); } catch (e) { console.error('[team-pages] Sitemap refresh failed:', e.message); }
 }
