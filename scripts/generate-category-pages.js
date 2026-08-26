@@ -272,13 +272,17 @@ const EXTRA_TABS = [
 
 function generateCategoryPage(slug, catConfig, ctx) {
   const allSlugs = Object.keys(CATEGORIES);
-  const categoryTabs = allSlugs.map(s => {
+  const baseTabs = allSlugs.map(s => {
     const c = CATEGORIES[s];
     const active = s === slug ? ' active' : '';
     return `<a href="/predictions/${s}" id="tab-${s}" class="tab-btn${active}">${escapeHtml(c.label)}</a>`;
-  }).concat(EXTRA_TABS.map(t =>
+  });
+  const extraTabsHtml = EXTRA_TABS.map(t =>
     `<a href="${t.href}" id="tab-${t.id}" class="tab-btn">${escapeHtml(t.label)}</a>`
-  )).join('\n            ');
+  );
+  const insertIdx = allSlugs.indexOf('over-2-5') + 1;
+  baseTabs.splice(insertIdx, 0, ...extraTabsHtml);
+  const categoryTabs = baseTabs.join('\n            ');
 
   const isStreak = slug === 'winning-streak' || slug === 'losing-streak' || slug === 'draws-streak';
   const isUnbeaten = slug === 'unbeaten';
@@ -312,6 +316,7 @@ ${collectionPageSchema({ name: catConfig.title, description: catConfig.descripti
 <script type="application/ld+json">
 ${generateFaqSchema(FAQ_SCHEMA[slug])}
 </script>
+<script async src="https://news.google.com/swg/js/v1/publisher.js"></script>
 <style>
 .date-tabs{display:flex;justify-content:center;gap:0;margin-bottom:24px;background:var(--bg-card);border-radius:12px;padding:4px;width:fit-content;max-width:100%;margin-left:auto;margin-right:auto;border:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch}
 .date-tab{flex:1;padding:10px 20px;border:none;border-radius:8px;background:transparent;color:var(--text-secondary);font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;min-width:90px;min-height:44px;text-align:center}
@@ -414,6 +419,7 @@ ${generateFaqHtml(slug)}
 <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
 </div>
 <div style="text-align:center;padding:12px 0;"><button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">Light</button></div>
+<div style="text-align:center;padding:0 0 8px;"><div google-add-preferred-source-btn data-theme="dark"></div></div>
 </footer>
 <script src="/chat-widget.js"></script>
 <script>

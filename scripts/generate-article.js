@@ -702,6 +702,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 }
 </script>
 ${faqSchema(faqs, url)}
+<script async src="https://news.google.com/swg/js/v1/publisher.js"></script>
 </head>
 <body>
 <header>
@@ -809,6 +810,7 @@ ${relatedHtml(a.related)}
   <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
  </div>
  <div style="text-align:center;padding:12px 0;"><button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">Light</button></div>
+ <div style="text-align:center;padding:0 0 8px;"><div google-add-preferred-source-btn data-theme="dark"></div></div>
 </footer>
 
  <script>

@@ -66,7 +66,8 @@ const HEAD_BOILERPLATE = `<meta charset="UTF-8">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/app.css">
-<link rel="alternate" type="application/rss+xml" title="WinFulltime Football Predictions RSS" href="/feed.xml">`;
+<link rel="alternate" type="application/rss+xml" title="WinFulltime Football Predictions RSS" href="/feed.xml">
+<script async src="https://news.google.com/swg/js/v1/publisher.js"></script>`;
 
 const HEADER_HTML = `<header>
 <div class="header-content">
@@ -117,6 +118,7 @@ const FOOTER_HTML = `<footer>
   <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
  </div>
  <div style="text-align:center;padding:12px 0;"><button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">Light</button></div>
+ <div style="text-align:center;padding:0 0 8px;"><div google-add-preferred-source-btn data-theme="dark"></div></div>
 </footer>`;
 
 const BODY_SCRIPTS = `<script src="/config.js"></script>

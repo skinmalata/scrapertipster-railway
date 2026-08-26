@@ -217,6 +217,7 @@ ${generateH2hFaqSchema(home, away)}
 .faq-item[open] summary::after{content:'\\2212'}
 .faq-item p{padding:0 20px 16px;font-size:14px;line-height:1.6;color:var(--text-secondary);margin:0}
 </style>
+<script async src="https://news.google.com/swg/js/v1/publisher.js"></script>
 </head>
 <body>
 <div>

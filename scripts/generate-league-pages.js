@@ -220,6 +220,7 @@ ${generateLeagueFaqSchema(leagueName)}
 ${FAQ_CSS}
 ${CHIPS_CSS}
 </style>
+<script async src="https://news.google.com/swg/js/v1/publisher.js"></script>
 </head>
 <body>
 <div>
