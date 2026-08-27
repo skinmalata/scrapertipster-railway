@@ -11,6 +11,7 @@ const LEAGUE_OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions', 'l
 const PREDICTIONS_OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions');
 const ANALYSIS_LINKS_FILE = path.join(__dirname, '..', 'public', 'data', 'analysis-links.json');
 const H2H_REGISTRY_FILE = path.join(__dirname, '..', 'data', 'h2h-registry.json');
+const { canonicalName, canonicalPair, aliasVariantSlugs, deprecatePage } = require('./lib/team-aliases');
 
 // Accumulates every H2H matchup ever seen so H2H pages survive a full GitHub
 // Pages redeploy (which replaces the entire site each run). Without this a
@@ -366,6 +367,8 @@ function buildCategoryLinks(leagueSlug, matrixMarkets) {
 
 function main() {
   const matchupsMap = new Map();
+  const existingH2hSlugs = listDirSlugs(OUTPUT_DIR);
+  const rawPairs = [];
 
   // Load from H2H cache file
   if (fs.existsSync(H2H_CACHE_FILE)) {
@@ -379,13 +382,16 @@ function main() {
         matchesArr.forEach(m => {
           const home = (m.home || '').trim();
           const away = (m.away || '').trim();
-          const slug = matchupSlug(home, away);
+          const ch = canonicalName(home);
+          const ca = canonicalName(away);
+          rawPairs.push([home, away]);
+          const slug = matchupSlug(ch, ca);
           if (!slug) return;
 
           if (!matchupsMap.has(slug)) {
             matchupsMap.set(slug, {
-              home,
-              away,
+              home: ch,
+              away: ca,
               slug,
               streaks: m.streaks || [],
               league: m.league || '',
@@ -409,13 +415,16 @@ function main() {
       matchesArr.forEach(m => {
         const home = (m.home || (m.match ? m.match.split('-')[0] : '')).trim();
         const away = (m.away || (m.match ? m.match.split('-')[1] : '')).trim();
-        const slug = matchupSlug(home, away);
+        const ch = canonicalName(home);
+        const ca = canonicalName(away);
+        rawPairs.push([home, away]);
+        const slug = matchupSlug(ch, ca);
         if (!slug) return;
 
         if (!matchupsMap.has(slug)) {
           matchupsMap.set(slug, {
-            home,
-            away,
+            home: ch,
+            away: ca,
             slug,
             streaks: [],
             league: m.league || '',
@@ -429,12 +438,53 @@ function main() {
   }
 
   // Restore historically-indexed H2H pages so a full redeploy never orphans a
-  // URL Google already has indexed.
+  // URL Google already has indexed. Canonicalized so variant spellings rejoin
+  // their canonical matchup instead of surviving as duplicates.
   loadH2hRegistry().forEach(item => {
     if (!item || !item.home || !item.away) return;
-    const slug = matchupSlug(item.home, item.away);
+    const ch = canonicalName(item.home);
+    const ca = canonicalName(item.away);
+    rawPairs.push([item.home, item.away]);
+    const slug = matchupSlug(ch, ca);
     if (!slug || matchupsMap.has(slug)) return;
-    matchupsMap.set(slug, { home: item.home, away: item.away, slug, streaks: [], league: '', country: '' });
+    matchupsMap.set(slug, { home: ch, away: ca, slug, streaks: [], league: '', country: '' });
+  });
+
+  const finalMatchups = new Map();
+  const keyToTarget = new Map();
+
+  // Group deployed H2H dirs by canonical matchup: variant spellings of the same
+  // two teams (e.g. club-brugge-kv-vs-kortrijk) collapse onto ONE existing URL.
+  // Reversed-orientation matchups are different keys and never merged.
+  const variantMap = aliasVariantSlugs();
+  const deployedByKey = new Map();
+  const exactCanonical = new Map();
+  existingH2hSlugs.forEach(slug => {
+    const parts = slug.split('-vs-');
+    if (parts.length !== 2) return;
+    const key = `${variantMap.get(parts[0]) || parts[0]}-vs-${variantMap.get(parts[1]) || parts[1]}`;
+    if (key === slug) exactCanonical.set(key, slug);
+    if (!deployedByKey.has(key)) deployedByKey.set(key, []);
+    deployedByKey.get(key).push(slug);
+  });
+  // Prefer the canonical URL when it already exists; otherwise reuse the variant
+  // dir the caches/registry mention most often (ties -> alphabetical) so we never
+  // mint a NEW url when a deployed one already covers the same matchup.
+  const rawCount = new Map();
+  rawPairs.forEach(([h, a]) => {
+    if (!h || !a) return;
+    const s = matchupSlug(h, a);
+    if (s && existingH2hSlugs.has(s)) rawCount.set(s, (rawCount.get(s) || 0) + 1);
+  });
+  const targetMap = new Map();
+  deployedByKey.forEach((slugs, key) => {
+    if (exactCanonical.has(key)) { targetMap.set(key, exactCanonical.get(key)); return; }
+    targetMap.set(key, slugs.slice().sort((x, y) => ((rawCount.get(y) || 0) - (rawCount.get(x) || 0)) || x.localeCompare(y))[0]);
+  });
+  matchupsMap.forEach((item, desired) => {
+    const target = targetMap.get(desired) || desired;
+    if (!finalMatchups.has(target)) finalMatchups.set(target, { ...item, slug: target });
+    keyToTarget.set(desired, target);
   });
 
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
@@ -445,7 +495,7 @@ function main() {
   const matrixMarkets = scanMatrixMarkets();
   let generated = 0;
 
-  matchupsMap.forEach(item => {
+  finalMatchups.forEach(item => {
     const teamHomeSlug = slugifyTeam(item.home);
     const teamAwaySlug = slugifyTeam(item.away);
     const leagueSlug = slugifyLeague(item.league);
@@ -465,14 +515,26 @@ function main() {
 
   let retained = 0;
   listDirSlugs(OUTPUT_DIR).forEach(slug => {
-    if (matchupsMap.has(slug)) return;
-    if (fs.existsSync(path.join(OUTPUT_DIR, slug, 'index.html'))) retained++;
+    if (finalMatchups.has(slug)) return;
+    if (!fs.existsSync(path.join(OUTPUT_DIR, slug, 'index.html'))) return;
+    retained++;
+    // Same-orientation variant spelling (e.g. club-brugge-kv-vs-kortrijk): keep
+    // the URL working but consolidate onto its canonical matchup page. A
+    // reversed-orientation matchup is a DIFFERENT, legitimate page - untouched.
+    const parts = slug.split('-vs-');
+    if (parts.length === 2) {
+      const key = `${variantMap.get(parts[0]) || parts[0]}-vs-${variantMap.get(parts[1]) || parts[1]}`;
+      const target = keyToTarget.get(key);
+      if (target && target !== slug) {
+        deprecatePage(path.join(OUTPUT_DIR, slug, 'index.html'), `https://winfulltime.com/h2h/${target}/`);
+      }
+    }
   });
   if (retained) console.log(`[h2h-pages] Retained ${retained} previously published H2H directories`);
 
   console.log(`[h2h-pages] Prerendered ${generated} Evergreen H2H Pages under ${OUTPUT_DIR}`);
 
-  saveH2hRegistry([...matchupsMap.values()].map(v => ({ home: v.home, away: v.away })));
+  saveH2hRegistry([...finalMatchups.values()].map(v => ({ home: v.home, away: v.away })));
 
   try { require('./update-sitemap').main(); } catch (e) { console.error('[h2h-pages] Sitemap refresh failed:', e.message); }
 }

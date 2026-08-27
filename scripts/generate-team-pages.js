@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { escapeHtml, slugifyTeam, matchupSlug, generateFaqSchema, wrapPage } = require('./lib/layout');
+const { canonicalName, aliasVariantSlugs, deprecatePage } = require('./lib/team-aliases');
 
 const PREDICTIONS_FILE = path.join(__dirname, '..', 'predictions-cache.json');
 const H2H_CACHE_FILE = path.join(__dirname, '..', 'h2h-unbeaten-cache.json');
@@ -311,11 +312,12 @@ function main() {
   const h2hSlugs = listDirSlugs(H2H_OUTPUT_DIR);
 
   function getOrCreateTeam(name) {
-    const slug = slugifyTeam(name);
+    const canonical = canonicalName(name);
+    const slug = slugifyTeam(canonical);
     if (!slug) return null;
     if (!teamsMap.has(slug)) {
       teamsMap.set(slug, {
-        name,
+        name: canonical,
         slug,
         league: '',
         country: '',
@@ -330,13 +332,14 @@ function main() {
   function addH2hRecord(teamName, opponent) {
     const t = getOrCreateTeam(teamName);
     if (!t) return;
-    const s1 = matchupSlug(teamName, opponent);
-    const s2 = matchupSlug(opponent, teamName);
+    const opp = canonicalName(opponent);
+    const s1 = matchupSlug(t.name, opp);
+    const s2 = matchupSlug(opp, t.name);
     const href = s1 && h2hSlugs.has(s1) ? `/h2h/${s1}/` : s2 && h2hSlugs.has(s2) ? `/h2h/${s2}/` : '';
     if (!href) return;
-    const key = String(opponent).toLowerCase();
+    const key = opp.toLowerCase();
     if (!t.h2hRecords.some(r => r.opponent.toLowerCase() === key)) {
-      t.h2hRecords.push({ opponent, href });
+      t.h2hRecords.push({ opponent: opp, href });
     }
   }
 
@@ -430,9 +433,18 @@ function main() {
   });
 
   let retained = 0;
+  const variantMap = aliasVariantSlugs();
   listDirSlugs(OUTPUT_DIR).forEach(slug => {
     if (teamsMap.has(slug)) return;
-    if (fs.existsSync(path.join(OUTPUT_DIR, slug, 'index.html'))) retained++;
+    const abs = path.join(OUTPUT_DIR, slug, 'index.html');
+    if (!fs.existsSync(abs)) return;
+    retained++;
+    // Variant spelling of a team whose canonical page is live this run:
+    // keep the URL working but consolidate signals onto the canonical page.
+    const canonicalSlug = variantMap.get(slug);
+    if (canonicalSlug && canonicalSlug !== slug && teamsMap.has(canonicalSlug)) {
+      deprecatePage(abs, `https://winfulltime.com/teams/${canonicalSlug}/`);
+    }
   });
   if (retained) console.log(`[team-pages] Retained ${retained} previously published team directories`);
 

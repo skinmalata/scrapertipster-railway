@@ -113,15 +113,30 @@ function buildSitemap() {
     urlEntry(`https://winfulltime.com/predictions/league/${slug}/`, today, 'daily', '0.8')
   ).join('\n');
 
-  // Prerendered Evergreen H2H Pages (/h2h/slug/).
-  const h2hEntries = listPageSlugs('h2h').map(slug =>
-    urlEntry(`https://winfulltime.com/h2h/${slug}/`, today, 'weekly', '0.7')
-  ).join('\n');
+  // Prerendered Evergreen H2H Pages (/h2h/slug/). Stub + deprecated variant
+  // pages carry robots:noindex and a canonical pointing elsewhere - they are
+  // skipped so only the canonical matchup URL is submitted.
+  const h2hEntries = listPageSlugs('h2h').map(slug => {
+    const page = path.join(ROOT, 'h2h', slug, 'index.html');
+    if (!fs.existsSync(page)) return null;
+    const html = fs.readFileSync(page, 'utf8');
+    if (/<meta name="robots"[^>]*noindex/i.test(html)) return null;
+    const canonical = (html.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i) || [])[1]
+      || `https://winfulltime.com/h2h/${slug}/`;
+    return urlEntry(canonical, today, 'weekly', '0.7');
+  }).filter(Boolean).join('\n');
 
-  // Prerendered Team Profile Pages (/teams/slug/).
-  const teamEntries = listPageSlugs('teams').map(slug =>
-    urlEntry(`https://winfulltime.com/teams/${slug}/`, today, 'weekly', '0.7')
-  ).join('\n');
+  // Prerendered Team Profile Pages (/teams/slug/). Same treatment - stubs and
+  // variant spelling pages are noindexed and canonicalized, not submitted.
+  const teamEntries = listPageSlugs('teams').map(slug => {
+    const page = path.join(ROOT, 'teams', slug, 'index.html');
+    if (!fs.existsSync(page)) return null;
+    const html = fs.readFileSync(page, 'utf8');
+    if (/<meta name="robots"[^>]*noindex/i.test(html)) return null;
+    const canonical = (html.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i) || [])[1]
+      || `https://winfulltime.com/teams/${slug}/`;
+    return urlEntry(canonical, today, 'weekly', '0.7');
+  }).filter(Boolean).join('\n');
 
   // Prerendered Date Archive Pages (/predictions/date/YYYY-MM-DD/).
   const dateEntries = listPageSlugs('predictions/date').filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)).map(d =>
