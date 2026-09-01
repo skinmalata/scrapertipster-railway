@@ -145,6 +145,28 @@ footer { background: #1e2538; border-top: 1px solid rgba(255,255,255,0.06); padd
  .summary-section { padding: 16px; }
  .summary-text { font-size: 14px; }
 }
+.odds-comparison { background: #1e2538; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.odds-comparison h3 { font-size: 18px; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px; }
+.odds-comp-meta { color: #94a3b8; font-size: 13px; margin-bottom: 12px; }
+.odds-table-wrap { overflow-x: auto; }
+.odds-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.odds-table th { color: #94a3b8; font-weight: 600; text-align: left; padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 13px; }
+.odds-table th:nth-child(2), .odds-table th:nth-child(3), .odds-table th:nth-child(4), .odds-table td:nth-child(2), .odds-table td:nth-child(3), .odds-table td:nth-child(4) { text-align: center; }
+.odds-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #e8edf5; }
+.odds-table tr:last-child td { border-bottom: none; }
+.odds-book { white-space: nowrap; }
+.odds-book strong { font-weight: 700; }
+.odds-best { color: #22c55e !important; font-weight: 700; }
+.odds-sponsored { display: inline-block; vertical-align: middle; margin-left: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #fff; background: linear-gradient(135deg, #ff2448, #d41a38); border-radius: 4px; padding: 2px 6px; }
+.odds-bet-link { display: inline-block; padding: 4px 14px; background: rgba(255,36,72,0.12); border: 1px solid rgba(255,36,72,0.35); color: #ff7e7e; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 12px; white-space: nowrap; }
+.odds-bet-link:hover { background: rgba(255,36,72,0.2); }
+.odds-no-link { color: #64748b; }
+.odds-comp-note { color: #64748b; font-size: 12px; margin: 14px 0 0; line-height: 1.6; }
+@media (max-width: 640px) {
+ .odds-comparison { padding: 16px; }
+ .odds-table { font-size: 13px; }
+ .odds-table th, .odds-table td { padding: 8px; }
+}
 
 /* Hamburger menu — mobile */
 .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 1001; }
@@ -780,6 +802,7 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 });
 </script>
-<script src="/1xbet-odds-widget.js" defer></script></body>
+<script src="/1xbet-odds-widget.js" defer></script>
+<script src="/odds-comparison-widget.js" defer></script></body>
 
 </html>

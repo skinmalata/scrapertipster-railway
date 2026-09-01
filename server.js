@@ -222,6 +222,7 @@ const apiLimiter = rateLimit({
 });
 app.use('/api/golden-tips', apiLimiter);
 app.use('/api/live-tips', apiLimiter);
+app.use('/api/odds/comparison', apiLimiter);
 
 // Booking code converter calls live bookmaker APIs per request, so it gets a
 // tighter limit than the internal endpoints to avoid the site being throttled

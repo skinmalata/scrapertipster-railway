@@ -19,6 +19,7 @@ const { getAvailableMatches } = require('../services/bookingCodes/resolver');
 const { buildGiantPool, getGiantPoolHistory } = require('../services/authorPicks');
 const { fetchTodayStreaks } = require('../services/h2hWinningStreaks');
 const { findMatchingResult } = require('../utils/helpers');
+const { getOddsComparison } = require('../services/oddsComparison');
 const { optionalAuth, requireAuth, requirePro: requireProMiddleware, requireAdmin, logAdminAction } = require('../middleware/auth');
 const payment = require('../services/payment');
 const whop = require('../services/whop');
@@ -845,6 +846,25 @@ router.get('/football-odds', async (req, res) => {
   if (!response.length && !cached) return res.json({ available: false, source: 'API-Football', date: requestedDate, message: 'Pre-match odds are temporarily unavailable. The ticket builder will use model estimates instead.', response: [] });
   const payload = footballOddsCache.get(requestedDate).payload;
   res.json({ ...payload, cached: Boolean(cached) });
+});
+
+// Live 1X2 odds comparison for the analysis pages, backed by The Odds API.
+// The browser only ever calls this endpoint; the API key stays server-side.
+// Responses are shaped { available, bookmakers: [...] } and degrade to
+// { available: false, reason: ... } whenever the provider has no data.
+router.get('/odds/comparison', async (req, res) => {
+  try {
+    const result = await getOddsComparison({
+      home: req.query.home,
+      away: req.query.away,
+      date: req.query.date,
+      league: req.query.league
+    });
+    res.json(result);
+  } catch (error) {
+    console.warn('[odds-comparison] Endpoint error:', error.message);
+    res.json({ available: false, reason: 'server-error' });
+  }
 });
 
 // 2 Odds of the Day is temporarily free for everyone. The ticket engine keeps

@@ -35,3 +35,5 @@ services:
         sync: false
       - key: API_FOOTBALL_ENABLED
         value: "false"
+      - key: THE_ODDS_API_KEY
+        sync: false
