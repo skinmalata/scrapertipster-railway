@@ -808,37 +808,9 @@ nav a.active::after {
 
  max-width: 340px;
 
- }
+  }
 
- .footer-social { display: flex; gap: 10px; margin-top: 22px; }
-
-.footer-social a {
-
- width: 32px;
-
- height: 32px;
-
- border-radius: 50%;
-
- border: 1px solid var(--border, rgba(255,255,255,0.18));
-
- color: var(--text-primary, #fff);
-
- display: flex;
-
- align-items: center;
-
- justify-content: center;
-
- transition: all 0.2s;
-
- }
-
- .footer-social a:hover { background: var(--accent, #ff2448); border-color: var(--accent, #ff2448); color: #fff; }
-
- .footer-social svg { width: 14px; height: 14px; }
-
- .footer-col h5 { color: var(--text-primary, #fff); font-size: 16px; margin-bottom: 20px; font-weight: 700; }
+  .footer-col h5 { color: var(--text-primary, #fff); font-size: 16px; margin-bottom: 20px; font-weight: 700; }
 
  .footer-col ul { list-style: none; margin: 0; padding: 0; }
 
