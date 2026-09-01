@@ -57,6 +57,17 @@ function betkingHeaders() {
   };
 }
 
+function bangbetHeaders() {
+  return {
+    'User-Agent': BROWSER_UA,
+    Accept: 'application/json, text/plain, */*',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'X-Requested-With': 'XMLHttpRequest',
+    Origin: 'https://www.bangbet.com',
+    Referer: 'https://www.bangbet.com/'
+  };
+}
+
 function wrapUpstreamError(err, label) {
   const status = err && err.response ? err.response.status : null;
   const reason = status
@@ -177,4 +188,4 @@ async function postForm(url, formBody, headers, timeout) {
   return postFormWithRetry(url, formBody, headers, timeout, 2);
 }
 
-module.exports = { sportradarHeaders, bet9jaHeaders, bet9jaSportsHeaders, betwayHeaders, betkingHeaders, getJson, postJson, postForm, BROWSER_UA };
+module.exports = { sportradarHeaders, bet9jaHeaders, bet9jaSportsHeaders, betwayHeaders, betkingHeaders, bangbetHeaders, getJson, postJson, postForm, BROWSER_UA };

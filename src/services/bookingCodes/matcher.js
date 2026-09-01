@@ -2,7 +2,7 @@
 
 const { resolveExtid, resolveEidFromExtid } = require('./bet9ja');
 
-const BOOKMAKERS = ['sportybet', 'msport', 'betway', 'bet9ja', 'betking'];
+const BOOKMAKERS = ['sportybet', 'msport', 'betway', 'bet9ja', 'betking', 'bangbet'];
 
 function isSportradar(bookmaker) {
   return bookmaker === 'sportybet' || bookmaker === 'msport';
@@ -18,6 +18,10 @@ function isBet9ja(bookmaker) {
 
 function isBetking(bookmaker) {
   return bookmaker === 'betking';
+}
+
+function isBangbet(bookmaker) {
+  return bookmaker === 'bangbet';
 }
 
 // All four bookmakers resolve a match to the same Sportradar numeric event id
@@ -115,11 +119,19 @@ function canonicalizeBetking(leg) {
   return { eventId: eventId, sign: sign };
 }
 
+// Bangbet runs on the same Sportradar platform as SportyBet/MSport, so its
+// legs already carry sr:match:<id> event ids and the same 1X2 market/outcome
+// ids (marketId "1", outcomeId "1"/"2"/"3"). Reuse the Sportradar rule.
+function canonicalizeBangbet(leg) {
+  return canonicalizeSportradar(leg);
+}
+
 async function canonicalize(bookmaker, leg) {
   if (isSportradar(bookmaker)) return canonicalizeSportradar(leg);
   if (isBetway(bookmaker)) return canonicalizeBetway(leg);
   if (isBet9ja(bookmaker)) return canonicalizeBet9ja(leg);
   if (isBetking(bookmaker)) return canonicalizeBetking(leg);
+  if (isBangbet(bookmaker)) return canonicalizeBangbet(leg);
   return null;
 }
 
@@ -174,6 +186,9 @@ async function buildLegs(bookmaker, canonicals) {
   if (isBetking(bookmaker)) {
     throw new Error('BetKing booking code creation is not supported yet.');
   }
+  if (isBangbet(bookmaker)) {
+    throw new Error('Bangbet booking code creation is not supported yet.');
+  }
   throw new Error('Unknown target bookmaker "' + bookmaker + '".');
 }
 
@@ -183,6 +198,7 @@ module.exports = {
   isBetway,
   isBet9ja,
   isBetking,
+  isBangbet,
   canonicalize,
   buildLegs,
   unsupportedMarketError
