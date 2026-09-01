@@ -287,27 +287,57 @@ const BOOKMAKER_HOMEPAGES = {
   betsson: 'https://www.betsson.com',
   nordicbet: 'https://www.nordicbet.com',
   betcris: 'https://www.betcris.com',
-  bodog: 'https://www.bodog.com'
+  bodog: 'https://www.bodog.com',
+  betclic: 'https://www.betclic.com',
+  winamax: 'https://www.winamax.com'
 };
+
+// Keys carry regional/suffix labels (e.g. "unibet_fr", "sport888", "coolbet")
+// that don't match the homepage map directly. Map known base brands so those
+// rows still link to the bookmaker's own site.
+const BOOKMAKER_KEY_BRANDS = [
+  ['unibet', 'unibet'],
+  ['williamhill', 'williamhill'],
+  ['888sport', '888sport'],
+  ['sport888', '888sport'],
+  ['bet365', 'bet365'],
+  ['betfair', 'betfair'],
+  ['betway', 'betway'],
+  ['bwin', 'bwin'],
+  ['pinnacle', 'pinnacle'],
+  ['marathonbet', 'marathonbet'],
+  ['paddypower', 'paddypower'],
+  ['betsson', 'betsson'],
+  ['nordicbet', 'nordicbet'],
+  ['betclic', 'betclic'],
+  ['winamax', 'winamax']
+];
+
+function brandHomepage(bkm) {
+  var key = String(bkm.key || '').toLowerCase();
+  for (var i = 0; i < BOOKMAKER_KEY_BRANDS.length; i++) {
+    if (key.indexOf(BOOKMAKER_KEY_BRANDS[i][0]) !== -1) {
+      var url = BOOKMAKER_HOMEPAGES[BOOKMAKER_KEY_BRANDS[i][1]];
+      if (url) return url;
+    }
+  }
+
+  var title = String(bkm.title || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  var types = ['williamhill', '888sport', 'paddypower', 'marathonbet', 'bet365', 'betfair', 'betway', 'unibet', 'bwin', 'pinnacle', 'betsson', 'nordicbet'];
+  for (var j = 0; j < types.length; j++) {
+    if (title.indexOf(types[j]) !== -1 && BOOKMAKER_HOMEPAGES[types[j]]) {
+      return BOOKMAKER_HOMEPAGES[types[j]];
+    }
+  }
+  return null;
+}
 
 function linkForBookmaker(bkm, event) {
   var links = (event.links || []).filter(function (l) {
     return l && Object.prototype.hasOwnProperty.call(l, 'href');
   });
   if (links.length) return links[0].href;
-
-  var key = String(bkm.key || '').toLowerCase();
-  var home = BOOKMAKER_HOMEPAGES[key];
-  if (home) return home;
-
-  var title = String(bkm.title || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-  var types = ['williamhill', '888sport', 'paddypower', 'marathonbet', 'bet365', 'betfair', 'betway', 'unibet', 'bwin', 'pinnacle'];
-  for (var i = 0; i < types.length; i++) {
-    if (title.indexOf(types[i]) !== -1 && BOOKMAKER_HOMEPAGES[types[i]]) {
-      return BOOKMAKER_HOMEPAGES[types[i]];
-    }
-  }
-  return null;
+  return brandHomepage(bkm);
 }
 
 function outcomePrice(marketOutcomes, label) {
