@@ -4,7 +4,7 @@ const { decodeSportybet, decodeMsport, createSportybetCode, createMsportCode } =
 const { decodeBet9ja, createBet9jaCode } = require('./bet9ja');
 const { decodeBetway, createBetwayCode } = require('./betway');
 const { decodeBetking } = require('./betking');
-const { decodeBangbet } = require('./bangbet');
+const { decodeBangbet, createBangbetCode } = require('./bangbet');
 const { BOOKMAKERS, isSportradar, canonicalize, buildLegs, unsupportedMarketError } = require('./matcher');
 const { resolveLeg, getAvailableMatches } = require('./resolver');
 
@@ -154,9 +154,7 @@ async function createCode(bookmaker, legs) {
     throw err;
   }
   if (bookmaker === 'bangbet') {
-    const err = new Error('Bangbet booking code creation is not supported yet.');
-    err.code = 'INVALID_SELECTIONS';
-    throw err;
+    return createBangbetCode(legs);
   }
   return createSportybetCode(legs);
 }

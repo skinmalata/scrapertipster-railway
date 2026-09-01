@@ -146,6 +146,18 @@ function toSportradarSelection(canonical) {
   };
 }
 
+// Bangbet uses the same Sportradar ids and 1X2 outcome ids as SportyBet/MSport,
+// but its /share API also needs the odds for each selection.
+function toBangbetSelection(canonical) {
+  return {
+    eventId: 'sr:match:' + canonical.eventId,
+    marketId: '1',
+    specifiers: '',
+    outcomeId: SR_OUTCOME[canonical.sign],
+    odds: Number(canonical.odds) > 0 ? Number(canonical.odds) : 1
+  };
+}
+
 function toBetwayOutcome(canonical) {
   const marketId = canonical.eventId + '1';
   return {
@@ -187,7 +199,7 @@ async function buildLegs(bookmaker, canonicals) {
     throw new Error('BetKing booking code creation is not supported yet.');
   }
   if (isBangbet(bookmaker)) {
-    throw new Error('Bangbet booking code creation is not supported yet.');
+    return canonicals.map(toBangbetSelection);
   }
   throw new Error('Unknown target bookmaker "' + bookmaker + '".');
 }
