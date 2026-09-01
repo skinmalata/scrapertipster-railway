@@ -32,62 +32,135 @@ let oddsBudget = { day: '', used: 0, remaining: null };
 const LEAGUE_SPORT_OVERRIDES = {
   'premier league': 'soccer_epl',
   'english premier league': 'soccer_epl',
-  'liga 1 paraguay': 'soccer_paraguay',
-  'paraguay liga 1': 'soccer_paraguay',
-  'liga mx': 'soccer_mexico_ligamx',
-  'mexico liga mx': 'soccer_mexico_ligamx',
-  'argentine liga profesional': 'soccer_argentina_primera',
-  'argentina liga profesional': 'soccer_argentina_primera',
-  'argentine primera nacional': 'soccer_argentina_primera_nacional',
-  'brazil serie a': 'soccer_brazil_campeonato',
-  'brasileiro serie a': 'soccer_brazil_campeonato',
-  'brazilian serie a': 'soccer_brazil_campeonato',
-  'brazil serie b': 'soccer_brazil_serie_b',
+  'championship': 'soccer_efl_champ',
+  'efl championship': 'soccer_efl_champ',
+  'league one': 'soccer_england_league1',
+  'league 1': 'soccer_england_league1',
+  'efl league one': 'soccer_england_league1',
+  'league two': 'soccer_england_league2',
+  'league 2': 'soccer_england_league2',
+  'efl league two': 'soccer_england_league2',
+  'serie a': 'soccer_italy_serie_a',
+  'italian serie a': 'soccer_italy_serie_a',
+  'serie b': 'soccer_italy_serie_b',
+  'italian serie b': 'soccer_italy_serie_b',
+  'la liga': 'soccer_spain_la_liga',
+  'spanish la liga': 'soccer_spain_la_liga',
+  'primera division spain': 'soccer_spain_la_liga',
+  'segunda division': 'soccer_spain_segunda_division',
+  'bundesliga': 'soccer_germany_bundesliga',
+  'german bundesliga': 'soccer_germany_bundesliga',
+  'bundesliga 2': 'soccer_germany_bundesliga2',
+  'bundesliga 3': 'soccer_germany_liga3',
   'ligue 1': 'soccer_france_ligue_one',
   'french ligue 1': 'soccer_france_ligue_one',
-  'soccer epl': 'soccer_epl',
-  'serie a': 'soccer_italy_serie_a',
-  'spanish la liga': 'soccer_spain_la_liga',
-  'la liga': 'soccer_spain_la_liga',
-  'german bundesliga': 'soccer_germany_bundesliga',
-  'turkish super lig': 'soccer_turkey_super_lig',
-  'super lig': 'soccer_turkey_super_lig',
-  'romanian liga 1': 'soccer_romania_liga1',
-  'greek super league': 'soccer_greece_super_league',
-  'greek superleague': 'soccer_greece_super_league',
-  'europa league': 'soccer_uefa_europa_league',
-  'champions league': 'soccer_uefa_champions_league',
-  'copa libertadores': 'soccer_conmebol_copa_libertadores',
-  'copa sudamericana': 'soccer_conmebol_copa_sudamericana',
+  'ligue 2': 'soccer_france_ligue_two',
+  'eredivisie': 'soccer_netherlands_eredivisie',
+  'dutch eredivisie': 'soccer_netherlands_eredivisie',
+  'primeira liga': 'soccer_portugal_primeira_liga',
+  'portuguese liga': 'soccer_portugal_primeira_liga',
+  'turkish super lig': 'soccer_turkey_super_league',
+  'super lig': 'soccer_turkey_super_league',
+  'turkey super league': 'soccer_turkey_super_league',
+  'super league': 'soccer_turkey_super_league',
+  'scottish premiership': 'soccer_spl',
+  'scottish premier league': 'soccer_spl',
+  'premiership scotland': 'soccer_spl',
   'ekstraklasa': 'soccer_poland_ekstraklasa',
   'polish ekstraklasa': 'soccer_poland_ekstraklasa',
   'allsvenskan': 'soccer_sweden_allsvenskan',
   'swedish allsvenskan': 'soccer_sweden_allsvenskan',
-  'eroen divisie': 'soccer_netherlands_eredivisie',
-  'eredivisie': 'soccer_netherlands_eredivisie',
-  'primeira liga': 'soccer_portugal_primeira_liga',
-  'portuguese liga': 'soccer_portugal_primeira_liga',
-  'russian premier league': 'soccer_russia_premier_league',
-  'ukrainian premier league': 'soccer_ukraine_premier_league',
-  'czech first league': 'soccer_czechia_first_league',
+  'superettan': 'soccer_sweden_superettan',
+  'eliteserien': 'soccer_norway_eliteserien',
+  'norwegian eliteserien': 'soccer_norway_eliteserien',
+  'superliga': 'soccer_denmark_superliga',
+  'danish superliga': 'soccer_denmark_superliga',
+  'veikkausliiga': 'soccer_finland_veikkausliiga',
   'austrian bundesliga': 'soccer_austria_bundesliga',
-  'swiss super league': 'soccer_switzerland_super_league',
+  'swiss super league': 'soccer_switzerland_superleague',
+  'swiss superleague': 'soccer_switzerland_superleague',
   'belgian pro league': 'soccer_belgium_first_div',
   'jupiler pro league': 'soccer_belgium_first_div',
-  'scottish premiership': 'soccer_scotland_premiership',
+  'greek super league': 'soccer_greece_super_league',
+  'greek superleague': 'soccer_greece_super_league',
+  'liga mx': 'soccer_mexico_ligamx',
+  'mexico liga mx': 'soccer_mexico_ligamx',
   'mls': 'soccer_usa_mls',
   'major league soccer': 'soccer_usa_mls',
-  'colombian primera a': 'soccer_colombia_primera_a',
-  'chilean primera division': 'soccer_chile_primera',
-  'peruvian primera division': 'soccer_peru_primera',
-  'uruguayan primera division': 'soccer_uruguay_primera',
-  'bolivian primera division': 'soccer_bolivia_primera',
-  'ecuadorian liga pro': 'soccer_ecuador_liga_pro',
-  'venezuelan primera division': 'soccer_venezuela_primera',
-  'japanese j league': 'soccer_japan_j2_league',
-  'k league': 'soccer_korea_k_league',
-  'indian super league': 'soccer_india_super_league'
+  'brazil serie a': 'soccer_brazil_campeonato',
+  'brasileiro serie a': 'soccer_brazil_campeonato',
+  'brazilian serie a': 'soccer_brazil_campeonato',
+  'brazil serie b': 'soccer_brazil_serie_b',
+  'brazil serie b2': 'soccer_brazil_serie_b',
+  'argentine liga profesional': 'soccer_argentina_primera_division',
+  'argentina liga profesional': 'soccer_argentina_primera_division',
+  'primera division argentina': 'soccer_argentina_primera_division',
+  'liga 1 paraguay': 'soccer_argentina_primera_division',
+  'chilean primera division': 'soccer_chile_campeonato',
+  'china super league': 'soccer_china_superleague',
+  'chinese super league': 'soccer_china_superleague',
+  'russian premier league': 'soccer_russia_premier_league',
+  'saudi pro league': 'soccer_saudi_arabia_pro_league',
+  'league of ireland': 'soccer_league_of_ireland',
+  'japanese j league': 'soccer_japan_j_league',
+  'j league': 'soccer_japan_j_league',
+  'k league': 'soccer_korea_kleague1',
+  'k league 1': 'soccer_korea_kleague1',
+  'copa libertadores': 'soccer_conmebol_copa_libertadores',
+  'copa sudamericana': 'soccer_conmebol_copa_sudamericana',
+  'champions league': 'soccer_uefa_champs_league',
+  'europa league': 'soccer_uefa_europa_league',
+  'europa conference league': 'soccer_uefa_europa_conference_league',
+  'fa cup': 'soccer_fa_cup',
+  'efl cup': 'soccer_england_efl_cup',
+  'league cup': 'soccer_england_efl_cup',
+  'world cup': 'soccer_fifa_world_cup',
+  'nations league': 'soccer_uefa_nations_league',
+  'euro 2024': 'soccer_uefa_european_championship',
+  'euro': 'soccer_uefa_european_championship',
+  'africa cup of nations': 'soccer_africa_cup_of_nations'
 };
+
+// Ordered most-likely-first list of soccer sports used as a fallback for
+// team-name matching when the page's league label is empty or wrong (analysis
+// league strings are often unreliable, e.g. a Championship tie labelled
+// "League One"). Each sport's daily odds are cached, so probing several sports
+// on the first match is cheap and later matches reuse the cached results.
+const FALLBACK_PRIORITY_SPORTS = [
+  'soccer_efl_champ',
+  'soccer_england_league1',
+  'soccer_england_league2',
+  'soccer_epl',
+  'soccer_italy_serie_a',
+  'soccer_italy_serie_b',
+  'soccer_spain_la_liga',
+  'soccer_spain_segunda_division',
+  'soccer_germany_bundesliga',
+  'soccer_germany_bundesliga2',
+  'soccer_france_ligue_one',
+  'soccer_france_ligue_two',
+  'soccer_netherlands_eredivisie',
+  'soccer_portugal_primeira_liga',
+  'soccer_turkey_super_league',
+  'soccer_belgium_first_div',
+  'soccer_switzerland_superleague',
+  'soccer_austria_bundesliga',
+  'soccer_denmark_superliga',
+  'soccer_sweden_allsvenskan',
+  'soccer_norway_eliteserien',
+  'soccer_poland_ekstraklasa',
+  'soccer_greece_super_league',
+  'soccer_spl',
+  'soccer_scotland',
+  'soccer_brazil_campeonato',
+  'soccer_brazil_serie_b',
+  'soccer_mexico_ligamx',
+  'soccer_usa_mls',
+  'soccer_argentina_primera_division',
+  'soccer_chile_campeonato'
+];
+
+const MAX_FALLBACK_PROBES = 5;
 
 function apiKey() {
   return process.env.THE_ODDS_API_KEY || '';
@@ -242,26 +315,82 @@ async function fetchOddsForSport(sportKey, fromIso, toIso) {
   return events;
 }
 
+// Common page-name -> canonical API-name aliases. The analysis data uses short
+// or slang names ("Preston", "Sheffield Utd") while The Odds API uses full
+// names ("Preston North End", "Sheffield United"). The alias value is a
+// normalized token the API name is expected to contain.
+const TEAM_ALIASES = {
+  'preston': 'preston north end',
+  'sheffield utd': 'sheffield united',
+  'sheffield wed': 'sheffield wednesday',
+  'bolton': 'bolton wanderers',
+  'bolton wanderers': 'bolton wanderers',
+  'lincoln': 'lincoln city',
+  'blackburn': 'blackburn rovers',
+  'west ham': 'west ham united',
+  'wolves': 'wolverhampton wanderers',
+  'wolverhampton': 'wolverhampton wanderers',
+  'wba': 'west bromwich albion',
+  'west brom': 'west bromwich albion',
+  'palace': 'crystal palace',
+  'brighton': 'brighton hove albion',
+  'man utd': 'manchester united',
+  'manchester utd': 'manchester united',
+  'man city': 'manchester city',
+  'spurs': 'tottenham hotspur',
+  'tottenham': 'tottenham hotspur',
+  'leeds': 'leeds united',
+  'newcastle': 'newcastle united',
+  'united': 'united',
+  'hod': 'hod',
+  'nb': 'nb'
+};
+
+function aliasTokens(name) {
+  var norm = normalizeName(name);
+  var tokens = tokenize(name);
+  if (TEAM_ALIASES[norm]) {
+    return tokenize(TEAM_ALIASES[norm]).length ? tokenize(TEAM_ALIASES[norm]) : tokens;
+  }
+  // multi-word partial aliases (e.g. "Sheffield Utd") — check after normalizing
+  var aliasKey = Object.keys(TEAM_ALIASES).find(function (k) {
+    return norm.indexOf(normalizeName(k)) === 0 && tokens[0] === tokenize(k)[0];
+  });
+  if (aliasKey) {
+    var expanded = tokenize(TEAM_ALIASES[aliasKey]);
+    if (expanded.length) return expanded;
+  }
+  return tokens;
+}
+
+// Team match score on [0,1]. Accepts exact, alias expansion, and the case where
+// one side's significant tokens start the other side (short name -> full name).
+function teamMatchScore(pageName, apiName) {
+  var pageNorm = normalizeName(pageName);
+  var apiNorm = normalizeName(apiName);
+  if (!pageNorm || !apiNorm) return 0;
+  if (pageNorm === apiNorm) return 1;
+  if (apiNorm.indexOf(pageNorm) === 0 || pageNorm.indexOf(apiNorm) === 0) return 0.92;
+
+  var pt = aliasTokens(pageName);
+  var at = tokenize(apiName);
+  if (!pt.length || !at.length) return 0;
+  if (pt[0] === at[0]) return 0.85;
+  return tokenOverlap(pt, at);
+}
+
 function findEvent(events, home, away) {
-  var h = normalizeName(home);
-  var a = normalizeName(away);
   var hTokens = tokenize(home);
   var aTokens = tokenize(away);
-  if (!h || !a || !hTokens.length || !aTokens.length) return null;
-
-  for (var i = 0; i < events.length; i++) {
-    var ev = events[i];
-    if (!ev || !ev.home_team || !ev.away_team) continue;
-    if (normalizeName(ev.home_team) === h && normalizeName(ev.away_team) === a) return ev;
-  }
+  if (!hTokens.length || !aTokens.length) return null;
 
   var best = null;
   var bestScore = 0;
   for (var j = 0; j < events.length; j++) {
     var candidate = events[j];
     if (!candidate || !candidate.home_team || !candidate.away_team) continue;
-    var score = (tokenOverlap(hTokens, tokenize(candidate.home_team)) + tokenOverlap(aTokens, tokenize(candidate.away_team))) / 2;
-    if (score >= 0.7 && score > bestScore) {
+    var score = (teamMatchScore(home, candidate.home_team) + teamMatchScore(away, candidate.away_team)) / 2;
+    if (score >= 0.75 && score > bestScore) {
       bestScore = score;
       best = candidate;
     }
@@ -403,27 +532,67 @@ async function getOddsComparison(opts) {
     return { available: false, reason: 'source-error' };
   }
 
-  var sportKey = resolveSportKey(league, sports);
-  if (!sportKey) return { available: false, reason: 'no-sport-match' };
-
   var fromIso = date + 'T00:00:00Z';
   var toIso = addUtcDays(date, 1) + 'T00:00:00Z';
 
-  var events;
-  try {
-    events = await fetchOddsForSport(sportKey, fromIso, toIso);
-  } catch (e) {
-    console.warn('[odds-comparison] Odds fetch failed (' + sportKey + '):', e.message);
-    if (e.code === 'ODDS_BUDGET_REACHED') {
-      return { available: false, reason: 'budget-limited', message: e.message };
+  // Build the ordered list of sports to try: the league-resolved sport first,
+  // then the priority fallbacks (team names are the ground truth and analysis
+  // league labels are often empty or wrong, e.g. a Championship tie labelled
+  // "League One").
+  var primarySport = resolveSportKey(league, sports);
+  var candidates = [];
+  var seen = {};
+  function pushSport(key) {
+    if (!key || seen[key]) return;
+    var exists = sports.some(function (s) { return s.key === key; });
+    if (!exists) return;
+    seen[key] = true;
+    candidates.push(key);
+  }
+  pushSport(primarySport);
+  FALLBACK_PRIORITY_SPORTS.forEach(pushSport);
+
+  var event = null;
+  var sportKey = null;
+  var triedAny = false;
+  var probes = 0;
+  var failReason = null;
+  for (var ci = 0; ci < candidates.length; ci++) {
+    var key = candidates[ci];
+    var isPrimary = key === primarySport;
+    // Always try the league-resolved sport, then probe at most MAX_FALLBACK_PROBES
+    // additional priority sports. Each sport's events stay cached for the day,
+    // so probing several on the first match is cheap and later matches reuse them.
+    if (!isPrimary && probes >= MAX_FALLBACK_PROBES) break;
+    if (!isPrimary) probes++;
+    var events;
+    try {
+      events = await fetchOddsForSport(key, fromIso, toIso);
+      triedAny = true;
+    } catch (e) {
+      if (e.code === 'ODDS_BUDGET_REACHED') {
+        return { available: false, reason: 'budget-limited', message: e.message };
+      }
+      if (isPrimary) {
+        return { available: false, reason: 'source-error' };
+      }
+      continue;
     }
-    return { available: false, reason: 'source-error' };
+    if (!events.length) {
+      if (isPrimary && !event) failReason = failReason || 'no-events';
+      continue;
+    }
+    event = findEvent(events, home, away);
+    if (event) {
+      sportKey = key;
+      break;
+    }
   }
 
-  if (!events.length) return { available: false, reason: 'no-events' };
-
-  var event = findEvent(events, home, away);
-  if (!event) return { available: false, reason: 'no-event' };
+  if (!event) {
+    if (!triedAny) return { available: false, reason: 'no-sport-match' };
+    return { available: false, reason: failReason || 'no-event' };
+  }
 
   var matchup = { home: event.home_team || home, away: event.away_team || away };
   var bookmakers = mapBookmakers(event, matchup);
