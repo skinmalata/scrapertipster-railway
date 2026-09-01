@@ -46,6 +46,26 @@ const BOOKMAKERS = {
     ],
     redeemHint: 'Open coupon.bet9ja.com or the Bet9ja app, enter the code in the Book-A-Bet coupon and load it.',
     marketNote: 'Bet9ja code creation currently supports 1X2 selections only. SportyBet, MSport and Betway conversions are unaffected.'
+  },
+  bangbet: {
+    name: 'Bangbet',
+    codeType: 'booking code',
+    findSteps: [
+      'Open the Bangbet app and open the booking you want to convert from your saved bookies.',
+      'Tap the share option on the booking and copy the short code it displays.'
+    ],
+    redeemHint: 'Open the Bangbet app or site, paste the code into the code entry field and load the slip.',
+    marketNote: 'Bangbet runs on the same Sportradar platform as SportyBet and MSport, so code creation works from 1X2 selections with their current odds.'
+  },
+  betking: {
+    name: 'BetKing',
+    codeType: 'book bet code',
+    findSteps: [
+      'Open your slip on BetKing and choose to book the bet, which gives the slip a bet code.',
+      'Copy the book bet code BetKing shows for that slip (it opens at the /book-bet/ share link).'
+    ],
+    redeemHint: 'BetKing codes currently decode and convert out only — creating a fresh BetKing code needs a signed-in Code Zone session and is not supported yet.',
+    marketNote: 'BetKing is decode-only: no new BetKing code creation yet, but most BetKing book bet codes convert cleanly to other supported bookmakers.'
   }
 };
 
@@ -282,16 +302,265 @@ const PAIRS = [
       { q: 'How long does a Betway to Bet9ja code last?', a: 'The Bet9ja code is valid until the first match in the slip kicks off.' },
       { q: 'How many legs can I convert from Betway to Bet9ja?', a: 'Up to 30 legs, matching the Bet9ja coupon limit for Betway to Bet9ja conversion.' }
     ]
+  },
+  {
+    from: 'sportybet',
+    to: 'bangbet',
+    blurb: 'Re-issue a SportyBet share code as a fresh Bangbet booking code that loads straight in the Bangbet app.',
+    intro:
+      'Bangbet runs on the same Sportradar betting platform as SportyBet, so moving a slip between the two is very clean. If you built a slip on SportyBet but want to play it on Bangbet — for its mass bundles or local-language deals — paste your SportyBet share code here and get a fresh Bangbet booking code in seconds. The selections carry over at their current odds, with no sign-in and no fee.',
+    howTo: [
+      { title: 'Copy your SportyBet share code', body: 'Open the slip in the SportyBet app, tap Share, and copy the share code it displays.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to SportyBet.' },
+      { title: 'Choose Bangbet and convert', body: 'Set the To bookmaker to Bangbet and tap Convert Code to re-encode the slip.' },
+      { title: 'Load it on Bangbet', body: 'Open the Bangbet app, paste the new Bangbet code into the code field and the slip loads ready to stake.' }
+    ],
+    faq: [
+      { q: 'Will my SportyBet slip convert cleanly to Bangbet?', a: 'Yes in most cases. Because SportyBet and Bangbet share the Sportradar platform, 1X2 selections convert cleanly to a fresh Bangbet code whenever the match is still on the board.' },
+      { q: 'Does Bangbet code creation support all markets?', a: 'A Bangbet code is built from 1X2 selections with their current odds, matching how SportyBet selections are re-encoded on the shared platform.' },
+      { q: 'How many legs can a SportyBet to Bangbet slip have?', a: 'Up to 30 selections are supported for a SportyBet to Bangbet conversion.' },
+      { q: 'How long does the converted Bangbet code stay valid?', a: 'The Bangbet code is valid until the first match on the slip kicks off, so load and stake it before the earliest kick-off.' },
+      { q: 'Is the SportyBet to Bangbet conversion free?', a: 'Yes. Generating the Bangbet booking code is free — you only stake if you place the bet on Bangbet.' }
+    ]
+  },
+  {
+    from: 'msport',
+    to: 'bangbet',
+    blurb: 'Turn an MSport share code into a Bangbet booking code built from the same selection odds.',
+    intro:
+      'MSport and Bangbet both sit on the Sportradar platform, and the conversion between them gives you a fresh Bangbet code with the identical selection odds. If you hold an MSport share code but play on Bangbet — or want to pass a slip to a friend who uses it — paste the code below and get a Bangbet booking code ready to load, without rebuilding the slip leg by leg.',
+    howTo: [
+      { title: 'Copy your MSport share code', body: 'Open the slip in the MSport app, tap Share, and copy the share code it displays.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to MSport.' },
+      { title: 'Choose Bangbet and convert', body: 'Set the To bookmaker to Bangbet and tap Convert Code.' },
+      { title: 'Load it on Bangbet', body: 'Open the Bangbet app, paste the generated code into the code field and the slip loads ready to stake.' }
+    ],
+    faq: [
+      { q: 'Does the converted Bangbet code keep my odds?', a: 'Yes. The MSport selections are re-encoded for Bangbet with their current odds, so the combined total is the same whenever Bangbet prices the market identically.' },
+      { q: 'Which MSport selections can convert to Bangbet?', a: 'MSport 1X2 selections convert cleanly because Bangbet reads the same Sportradar event and outcome ids used by MSport.' },
+      { q: 'How many legs can I move from MSport to Bangbet?', a: 'Up to 30 legs are supported for an MSport to Bangbet conversion.' },
+      { q: 'Is generating the Bangbet code free?', a: 'Yes, creating the Bangbet booking code is free; you only stake when you place the bet on Bangbet.' }
+    ]
+  },
+  {
+    from: 'betway',
+    to: 'bangbet',
+    blurb: 'Convert a Betway Book-A-Bet code into a Bangbet booking code for Bangbet users.',
+    intro:
+      'Got a Betway Book-A-Bet slip but want to play it on Bangbet, or pass it to someone who only uses Bangbet? This converter reads the Betway selections, matches them to the Sportradar events Bangbet uses, and returns a fresh Bangbet booking code you can load in seconds. No manual re-entry of each leg and no sign-in required.',
+    howTo: [
+      { title: 'Copy your Betway Book-A-Bet code', body: 'Copy the booking code from your Betway Book A Bet slip.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to Betway.' },
+      { title: 'Choose Bangbet and convert', body: 'Set the To bookmaker to Bangbet and tap Convert Code.' },
+      { title: 'Load it on Bangbet', body: 'Open Bangbet, paste the generated code into the code field and the slip loads ready to stake.' }
+    ],
+    faq: [
+      { q: 'Do all Betway Book-A-Bet codes convert to Bangbet?', a: 'Selections that Bangbet also offers on the same match convert cleanly. Markets unavailable on Bangbet are reported so you can drop them and retry the conversion.' },
+      { q: 'Will the combined odds change on the Bangbet code?', a: 'Selections are re-priced at Bangbet\'s current odds, so the total can differ slightly from your Betway original.' },
+      { q: 'How many legs can a Betway to Bangbet conversion carry?', a: 'Up to 30 legs, matching the platform limit for a Betway to Bangbet conversion.' },
+      { q: 'Is converting a Betway code to Bangbet free?', a: 'Yes, building the Bangbet booking code costs nothing; stake only if you place the bet on Bangbet.' }
+    ]
+  },
+  {
+    from: 'bet9ja',
+    to: 'bangbet',
+    blurb: 'Rebuild a Bet9ja Book-A-Bet code as a fresh Bangbet booking code.',
+    intro:
+      'A Bet9ja Book-A-Bet slip can be rebuilt as a fresh Bangbet booking code when you want to play the same selections on Bangbet. Paste the Bet9ja code below and the converter matches each 1X2 selection to its Bangbet event and re-encodes it with current odds. It is a quick way to move a coupon shared by a Bet9ja friend onto your own Bangbet account.',
+    howTo: [
+      { title: 'Copy your Bet9ja Book-A-Bet code', body: 'Copy the Book-A-Bet code from your Bet9ja coupon, email or SMS.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to Bet9ja.' },
+      { title: 'Choose Bangbet and convert', body: 'Set the To bookmaker to Bangbet and tap Convert Code.' },
+      { title: 'Load it on Bangbet', body: 'Open Bangbet, paste the new code into the code field and the slip loads ready to stake.' }
+    ],
+    faq: [
+      { q: 'Do I need a Bet9ja account to convert to Bangbet?', a: 'No — you only need the Bet9ja Book-A-Bet code to generate a fresh Bangbet booking code without logging in.' },
+      { q: 'Which Bet9ja selections convert to Bangbet?', a: 'Bet9ja slips built from 1X2 selections convert cleanly, because Bangbet encodes the same match result selections on its Sportradar platform.' },
+      { q: 'How long is the generated Bangbet code valid?', a: 'The Bangbet code is valid until the first match on the slip kicks off, so stake it before the earliest kick-off.' },
+      { q: 'How many legs are supported on a Bet9ja to Bangbet code?', a: 'Up to 30 legs, matching the coupon limit for a Bet9ja to Bangbet conversion.' }
+    ]
+  },
+  {
+    from: 'bangbet',
+    to: 'sportybet',
+    blurb: 'Turn a Bangbet booking code into a SportyBet share code you can load in seconds.',
+    intro:
+      'Bangbet and SportyBet share the same Sportradar code style, so converting a Bangbet booking code to SportyBet is one of the smoothest jumps this tool offers. If you hold a Bangbet code but play on SportyBet — the most widely used betting app in Nigeria — paste it below and get a SportyBet share code with the same selections and odds, no manual slip rebuilding required.',
+    howTo: [
+      { title: 'Copy your Bangbet booking code', body: 'Open the Bangbet booking you want to move and copy the short code it displays.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to Bangbet.' },
+      { title: 'Choose SportyBet and convert', body: 'Set the To bookmaker to SportyBet and tap Convert Code.' },
+      { title: 'Load it on SportyBet', body: 'Open SportyBet, paste the generated code into the code field and the slip loads ready to stake.' }
+    ],
+    faq: [
+      { q: 'Why convert a Bangbet code to SportyBet?', a: 'SportyBet has one of the largest betting communities in Nigeria, so converting a Bangbet code to SportyBet makes it easy to stake the slip yourself or share it with friends on SportyBet.' },
+      { q: 'Does the conversion preserve my selections?', a: 'Yes. The exact Bangbet selections and odds are re-encoded into a SportyBet share code as long as each match is still available on SportyBet.' },
+      { q: 'How many legs can a Bangbet to SportyBet slip have?', a: 'Up to 30 legs are supported for a Bangbet to SportyBet conversion.' },
+      { q: 'Is converting a Bangbet code to SportyBet free?', a: 'Yes, generating the SportyBet share code is free; you only stake if you place the bet on SportyBet.' }
+    ]
+  },
+  {
+    from: 'bangbet',
+    to: 'msport',
+    blurb: 'Re-encode a Bangbet booking code as an MSport share code with the same selection odds.',
+    intro:
+      'Bangbet and MSport both use the Sportradar share-code style, which makes Bangbet to MSport a direct conversion. Paste a Bangbet booking code and get an MSport share code carrying the identical selections and odds — handy for MSport users who receive a Bangbet slip, or who prefer an MSport bonus and want to play the same selections there.',
+    howTo: [
+      { title: 'Copy your Bangbet booking code', body: 'Open the Bangbet booking you want to move and copy the short code it displays.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to Bangbet.' },
+      { title: 'Choose MSport and convert', body: 'Set the To bookmaker to MSport and tap Convert Code.' },
+      { title: 'Load it on MSport', body: 'Open MSport, paste the generated code into the code field and the slip loads ready to stake.' }
+    ],
+    faq: [
+      { q: 'Is every Bangbet code convertible to MSport?', a: 'Selections still offered on the same match by MSport convert cleanly, because both platforms use identical Sportradar event and outcome ids.' },
+      { q: 'Do the odds survive the jump to MSport?', a: 'The Bangbet selections are re-encoded for MSport at their current odds, so the total is the same wherever MSport prices identically.' },
+      { q: 'How many legs can a Bangbet to MSport conversion hold?', a: 'Up to 30 legs are supported for a Bangbet to MSport conversion.' },
+      { q: 'Does converting to MSport cost anything?', a: 'No, building the MSport share code is free; you stake only if you place the bet on MSport.' }
+    ]
+  },
+  {
+    from: 'bangbet',
+    to: 'betway',
+    blurb: 'Convert a Bangbet booking code into a fresh Betway Book-A-Bet code.',
+    intro:
+      'Move a Bangbet booking code onto Betway\'s Book-A-Bet system. This is useful when you receive a Bangbet slip but play on Betway, or you want to hand it to someone who only uses Betway. The converter reads the Bangbet selections, matches each to the Betway market, and returns a fresh Betway booking code you can load in the Book A Bet section straight away.',
+    howTo: [
+      { title: 'Copy your Bangbet booking code', body: 'Open the Bangbet booking you want to move and copy the short code it displays.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to Bangbet.' },
+      { title: 'Choose Betway and convert', body: 'Set the To bookmaker to Betway and tap Convert Code.' },
+      { title: 'Load it on Betway', body: 'Open Betway, go to Book A Bet and enter the generated code to load the slip.' }
+    ],
+    faq: [
+      { q: 'Can every Bangbet selection become a Betway code?', a: 'Selections that Betway offers on the same match convert cleanly. Markets Betway no longer prices are flagged so you can drop them and retry.' },
+      { q: 'Will the Betway slip odds match Bangbet?', a: 'Selections are re-priced at Betway\'s current odds, so the combined total can differ slightly from the Bangbet original.' },
+      { q: 'How many legs can a Bangbet to Betway code have?', a: 'Up to 30 legs, matching the platform limit for a Bangbet to Betway conversion.' },
+      { q: 'Is the Bangbet to Betway conversion free?', a: 'Yes, generating the Betway booking code is free; you only stake when you place the bet on Betway.' }
+    ]
+  },
+  {
+    from: 'bangbet',
+    to: 'bet9ja',
+    blurb: 'Rebuild a Bangbet booking code as a Bet9ja Book-A-Bet code for Bet9ja users.',
+    intro:
+      'Bangbet to Bet9ja lets you turn a Bangbet booking code into a Bet9ja Book-A-Bet code so Bet9ja users can play your slip. Bet9ja code creation currently supports 1X2 selections, so the converted code is built from the match-result legs of your Bangbet slip and can be loaded straight into the Bet9ja coupon. If the slip has non-1X2 legs, they are reported so you can drop them.',
+    howTo: [
+      { title: 'Copy your Bangbet booking code', body: 'Open the Bangbet booking you want to move and copy the short code it displays.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to Bangbet.' },
+      { title: 'Choose Bet9ja and convert', body: 'Set the To bookmaker to Bet9ja and tap Convert Code.' },
+      { title: 'Load it on Bet9ja', body: 'Open coupon.bet9ja.com or the Bet9ja app and enter the code in the Book-A-Bet coupon.' }
+    ],
+    faq: [
+      { q: 'Which Bangbet selections convert to Bet9ja?', a: 'Only the 1X2 legs of your Bangbet slip convert to a Bet9ja code for now; other markets are skipped and reported so you can remove them.' },
+      { q: 'Where do I redeem the new Bet9ja code?', a: 'Enter the generated code in the Bet9ja Book-A-Bet coupon on coupon.bet9ja.com or in the Bet9ja app.' },
+      { q: 'How long is the resulting Bet9ja code valid?', a: 'The Bet9ja code is valid until the first match on the slip kicks off, so stake it before the earliest kick-off.' },
+      { q: 'How many legs can a Bangbet to Bet9ja code have?', a: 'Up to 30 legs, matching the Bet9ja coupon limit for a Bangbet to Bet9ja conversion.' }
+    ]
+  },
+  {
+    from: 'betking',
+    to: 'sportybet',
+    blurb: 'Decode a BetKing book bet code and re-issue it as a SportyBet share code.',
+    intro:
+      'BetKing book bet codes open at the /book-bet/ share link, and you can decode one here and re-issue it as a SportyBet share code you can load on your own account. This is handy when a friend shares a BetKing slip but you use SportyBet — you get a fresh SportyBet code with the same selections, matched via the shared Sportradar event id, instead of retyping each leg.',
+    howTo: [
+      { title: 'Copy your BetKing book bet code', body: 'Open your BetKing slip, book the bet to give it a code, and copy the book bet code it shows.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to BetKing.' },
+      { title: 'Choose SportyBet and convert', body: 'Set the To bookmaker to SportyBet and tap Convert Code.' },
+      { title: 'Load it on SportyBet', body: 'Open SportyBet, paste the generated code into the code field and the slip loads ready to stake.' }
+    ],
+    faq: [
+      { q: 'Can every BetKing code convert to SportyBet?', a: 'Most can. Each BetKing selection carries the shared Sportradar event id, so it converts to a SportyBet share code whenever SportyBet still offers that match.' },
+      { q: 'Why is BetKing decode-only here?', a: 'Creating a fresh BetKing code needs a signed-in BetKing Code Zone session, so a BetKing slip decodes and converts out to SportyBet but a new BetKing code is not issued yet.' },
+      { q: 'How many legs can a BetKing to SportyBet slip hold?', a: 'Up to 30 legs are supported for a BetKing to SportyBet conversion.' },
+      { q: 'Is BetKing to SportyBet conversion free?', a: 'Yes, generating the SportyBet share code is free; you only stake if you place the bet on SportyBet.' }
+    ]
+  },
+  {
+    from: 'betking',
+    to: 'msport',
+    blurb: 'Turn a BetKing book bet code into an MSport share code for MSport users.',
+    intro:
+      'If someone shares a BetKing book bet code but you play on MSport, paste it here and get a fresh MSport share code carrying the same selections. BetKing selections resolve to the shared Sportradar event id that MSport also uses, so the re-encoding is reliable. Handy for moving a winning slip onto your own MSport account or sharing it with an MSport-only friend.',
+    howTo: [
+      { title: 'Copy your BetKing book bet code', body: 'Open your BetKing slip, book the bet to give it a code, and copy the book bet code it shows.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to BetKing.' },
+      { title: 'Choose MSport and convert', body: 'Set the To bookmaker to MSport and tap Convert Code.' },
+      { title: 'Load it on MSport', body: 'Open MSport, paste the generated code into the code field and the slip loads ready to stake.' }
+    ],
+    faq: [
+      { q: 'Which BetKing selections convert to MSport?', a: 'Selections still offered on the same match by MSport convert, because BetKing and MSport share the same Sportradar event and outcome ids.' },
+      { q: 'Do the odds change on the MSport code?', a: 'The BetKing selections are re-encoded for MSport at their current odds, so the total can differ slightly where MSport prices differently.' },
+      { q: 'How many legs can a BetKing to MSport code have?', a: 'Up to 30 legs are supported for a BetKing to MSport conversion.' },
+      { q: 'Does converting a BetKing code to MSport cost anything?', a: 'No, building the MSport share code is free; you stake only if you place the bet on MSport.' }
+    ]
+  },
+  {
+    from: 'betking',
+    to: 'betway',
+    blurb: 'Convert a BetKing book bet code into a fresh Betway Book-A-Bet code.',
+    intro:
+      'Move a BetKing book bet code onto Betway\'s Book-A-Bet system. The converter decodes your BetKing selections via the shared Sportradar event id, matches them to the corresponding Betway market, and returns a fresh Betway booking code you can load in the Book A Bet section. No manual slip rebuilding and no sign-in required.',
+    howTo: [
+      { title: 'Copy your BetKing book bet code', body: 'Open your BetKing slip, book the bet to give it a code, and copy the book bet code it shows.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to BetKing.' },
+      { title: 'Choose Betway and convert', body: 'Set the To bookmaker to Betway and tap Convert Code.' },
+      { title: 'Load it on Betway', body: 'Open Betway, go to Book A Bet and enter the generated code to load the slip.' }
+    ],
+    faq: [
+      { q: 'Do all BetKing selections become a Betway code?', a: 'Selections that Betway offers on the same match convert cleanly. Markets unavailable on Betway are flagged so you can drop them and retry the conversion.' },
+      { q: 'Will the Betway odds match the BetKing original?', a: 'Selections are re-priced at Betway\'s current odds, so the combined total can differ slightly from your BetKing original.' },
+      { q: 'How many legs can a BetKing to Betway code hold?', a: 'Up to 30 legs, matching the platform limit for a BetKing to Betway conversion.' },
+      { q: 'Is the BetKing to Betway conversion free?', a: 'Yes, generating the Betway booking code is free; you only stake when you place the bet on Betway.' }
+    ]
+  },
+  {
+    from: 'betking',
+    to: 'bet9ja',
+    blurb: 'Re-issue a BetKing book bet code as a Bet9ja Book-A-Bet code (1X2 selections).',
+    intro:
+      'Turn a BetKing book bet code into a Bet9ja Book-A-Bet code so Bet9ja users can play your slip. BetKing selections resolve to the shared Sportradar event id, and Bet9ja code creation currently supports 1X2 selections, so the converted code is built from the match-result legs of your BetKing slip and loads straight into the Bet9ja coupon. Non-1X2 legs are reported so you can drop them.',
+    howTo: [
+      { title: 'Copy your BetKing book bet code', body: 'Open your BetKing slip, book the bet to give it a code, and copy the book bet code it shows.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to BetKing.' },
+      { title: 'Choose Bet9ja and convert', body: 'Set the To bookmaker to Bet9ja and tap Convert Code.' },
+      { title: 'Load it on Bet9ja', body: 'Open coupon.bet9ja.com or the Bet9ja app and enter the code in the Book-A-Bet coupon.' }
+    ],
+    faq: [
+      { q: 'Which BetKing selections convert to a Bet9ja code?', a: 'Only the 1X2 legs of your BetKing slip convert to a Bet9ja code for now; other markets are skipped and reported so you can remove them.' },
+      { q: 'Where do I redeem the BetKing to Bet9ja code?', a: 'Enter the generated code in the Bet9ja Book-A-Bet coupon on coupon.bet9ja.com or in the Bet9ja app.' },
+      { q: 'How long is the BetKing to Bet9ja code valid?', a: 'The Bet9ja code is valid until the first match on the slip kicks off.' },
+      { q: 'How many legs can a BetKing to Bet9ja code have?', a: 'Up to 30 legs, matching the Bet9ja coupon limit for a BetKing to Bet9ja conversion.' }
+    ]
+  },
+  {
+    from: 'betking',
+    to: 'bangbet',
+    blurb: 'Decode a BetKing book bet code and re-issue it as a fresh Bangbet booking code.',
+    intro:
+      'Convert a BetKing book bet code into a Bangbet booking code. BetKing selections carry the shared Sportradar event id that Bangbet also uses, so the converter can decode your BetKing slip and re-encode it as a fresh Bangbet booking code with current odds. Great for playing a friend\'s BetKing slip on your own Bangbet account without retyping each leg.',
+    howTo: [
+      { title: 'Copy your BetKing book bet code', body: 'Open your BetKing slip, book the bet to give it a code, and copy the book bet code it shows.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to BetKing.' },
+      { title: 'Choose Bangbet and convert', body: 'Set the To bookmaker to Bangbet and tap Convert Code.' },
+      { title: 'Load it on Bangbet', body: 'Open the Bangbet app, paste the generated code into the code field and the slip loads ready to stake.' }
+    ],
+    faq: [
+      { q: 'Which BetKing selections convert to Bangbet?', a: 'Selections still offered on the same match by Bangbet convert, because BetKing and Bangbet share the Sportradar event and outcome ids.' },
+      { q: 'Will the Bangbet code keep my odds?', a: 'The BetKing selections are re-encoded for Bangbet at their current odds, so the total is the same wherever Bangbet prices identically.' },
+      { q: 'How many legs can a BetKing to Bangbet code have?', a: 'Up to 30 legs are supported for a BetKing to Bangbet conversion.' },
+      { q: 'Does BetKing to Bangbet cost anything?', a: 'No, building the Bangbet booking code is free; you stake only if you place the bet on Bangbet.' }
+    ]
   }
 ];
 
 const HUB = {
   intro:
-    'Pick a conversion below or open the full tool. Paste a SportyBet, MSport, Bet9ja or Betway code, preview every selection and odds, then get a fresh playable code for the bookmaker you use. Free, no sign-in, up to 30 selections.',
+    'Pick a conversion below or open the full tool. Paste a SportyBet, MSport, Bet9ja, Betway, BetKing or Bangbet code, preview every selection and odds, then get a fresh playable code for the bookmaker you use. Free, no sign-in, up to 30 selections.',
   faq: [
     { q: 'Is converting booking codes free?', a: 'Yes. WinFulltime never charges for decoding, previewing or generating a booking code. You only stake money if you place the converted bet on your bookmaker.' },
-    { q: 'Which bookmakers can I convert between?', a: 'SportyBet, MSport, Betway and Bet9ja codes can be decoded, and 1X2 selections can be converted between any two of them. Codes are validated by the target bookmaker before they are returned.' },
+    { q: 'Which bookmakers can I convert between?', a: 'SportyBet, MSport, Betway, Bet9ja, BetKing and Bangbet codes can be decoded, and 1X2 selections can be converted between any two supported bookmakers. BetKing is decode-only for now. Codes are validated by the target bookmaker before they are returned.' },
     { q: 'Why is Bet9ja conversion limited?', a: 'Bet9ja code creation currently supports 1X2 selections only, and Bet9ja conversion is experiencing issues at the moment. Our technical team is working on it. SportyBet, MSport and Betway conversions are unaffected.' },
+    { q: 'Can I create a new BetKing code?', a: 'Not yet. BetKing codes decode and convert out to other bookmakers, but creating a fresh BetKing code needs a signed-in BetKing Code Zone session and is not supported yet. Bangbet codes both decode and create.' },
     { q: 'How many selections can a code have?', a: 'The maximum is 30 selections per code. Codes above that limit are rejected with a clear message.' },
     { q: 'How long does a converted code stay valid?', a: 'A converted code is valid until the first match on the slip kicks off, so load and stake it before the earliest kick-off.' }
   ]
