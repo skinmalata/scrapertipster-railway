@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/app.css">
 <link rel="alternate" type="application/rss+xml" title="WinFulltime Football Predictions RSS" href="/feed.xml">
+<script async src="https://news.google.com/swg/js/v1/publisher.js"></script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="WinFulltime">
@@ -103,6 +104,7 @@
   ]
 }
 </script>
+<script async src="https://news.google.com/swg/js/v1/publisher.js"></script>
 <style>
 .date-tabs{display:flex;justify-content:center;gap:0;margin-bottom:24px;background:var(--bg-card);border-radius:12px;padding:4px;width:fit-content;max-width:100%;margin-left:auto;margin-right:auto;border:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch}
 .date-tab{flex:1;padding:10px 20px;border:none;border-radius:8px;background:transparent;color:var(--text-secondary);font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;min-width:90px;min-height:44px;text-align:center}
@@ -156,6 +158,7 @@
   <a href="/predictions/1x2" id="tab-1x2" class="tab-btn active">1X2</a>
             <a href="/predictions/over-1-5" id="tab-over-1-5" class="tab-btn">Over 1.5</a>
             <a href="/predictions/over-2-5" id="tab-over-2-5" class="tab-btn">Over 2.5</a>
+            <a href="/author-picks.html" id="tab-author-picks" class="tab-btn">H2H Picks</a>
             <a href="/predictions/btts" id="tab-btts" class="tab-btn">BTTS Yes</a>
             <a href="/predictions/btts-no" id="tab-btts-no" class="tab-btn">BTTS No</a>
             <a href="/predictions/unbeaten" id="tab-unbeaten" class="tab-btn">Unbeaten</a>
@@ -164,7 +167,6 @@
             <a href="/predictions/winning-streak" id="tab-winning-streak" class="tab-btn">Win Streak</a>
             <a href="/predictions/losing-streak" id="tab-losing-streak" class="tab-btn">Loss Streak</a>
             <a href="/predictions/draws-streak" id="tab-draws-streak" class="tab-btn">Draw Streak</a>
-            <a href="/author-picks.html" id="tab-author-picks" class="tab-btn">H2H Picks</a>
 </div>
 
 <div class="stats-bar">
@@ -297,6 +299,7 @@
 <p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
 </div>
 <div style="text-align:center;padding:12px 0;"><button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">Light</button></div>
+<div style="text-align:center;padding:0 0 8px;"><div google-add-preferred-source-btn data-theme="dark"></div></div>
 </footer>
 <script src="/chat-widget.js"></script>
 <script>
@@ -317,6 +320,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
   var IS_UNBEATEN = false;
   var LINK_ANALYSIS = true;
   var CATEGORY_HEADING = '1X2 Predictions';
+  var AFFILIATE_URL = 'https://reffpa.com/L?tag=d_6034393m_97c_&site=6034393&ad=97';
 
   var allData = null;
   var h2hData = null;
@@ -350,6 +354,14 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     return new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', {
       weekday: 'short', month: 'short', day: 'numeric'
     });
+  }
+
+  function escAttr(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   }
 
   function getSelectedDateStr() {
@@ -477,9 +489,18 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
           reasonHtml + '</div></div>';
       }
 
-      var cardHtml = '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms">' +
+      var ctaHtml = '';
+      if (!IS_STREAK && home && away) {
+        ctaHtml = '<a href="' + AFFILIATE_URL + '" target="_blank" rel="noopener nofollow sponsored" class="wft-1xbet-cta" data-home="' + escAttr(home) + '" data-away="' + escAttr(away) + '" data-tip="' + escAttr(match.tip || '') + '" style="display:block;text-align:center;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:10px 12px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;margin-top:12px;">Bet on 1xBet<span class="wft-1xbet-odds" style="opacity:0.85;font-weight:600;"></span> &rarr;</a>';
+      }
+
+      var cardHtml = '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms"' +
+        (home ? ' data-home="' + escAttr(home) + '"' : '') +
+        (away ? ' data-away="' + escAttr(away) + '"' : '') +
+        (!IS_STREAK && match.tip ? ' data-tip="' + escAttr(match.tip) + '"' : '') +
+        '>' +
         '<div class="match-header"><span>' + (match.league || '') + '</span><span>' + (IS_STREAK ? (match.nextMatchDate ? formatDateShort(match.nextMatchDate) : (match.time || '')) : (match.time || '')) + '</span></div>' +
-        cardContent + '</div>';
+        cardContent + ctaHtml + '</div>';
 
       if (LINK_ANALYSIS && home && away) {
         var analysisHref = (typeof window.resolveAnalysisLink === 'function')
@@ -559,5 +580,6 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 })();
 </script>
 <script src="/pwa.js"></script>
+<script src="/1xbet-odds-widget.js" defer></script>
 </body>
 </html>

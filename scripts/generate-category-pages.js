@@ -3,6 +3,8 @@ const path = require('path');
 const { buildLeagueLabelBySlug, readableLeagueLabel, formatDateChips } = require('./league-labels');
 const { CHIPS_CSS, chipsSection, faqBlock, renderHead, collectionPageSchema, generateFaqSchema } = require('./lib/seo-blocks');
 
+const AFFILIATE_URL = 'https://reffpa.com/L?tag=d_6034393m_97c_&site=6034393&ad=97';
+
 const FAQ_SCHEMA = {
   '1x2': [
     { q: 'What does 1X2 mean in football betting?', a: '1X2 is the standard match result market. 1 means the home team wins, X means the match ends in a draw, and 2 means the away team wins. It covers the three possible outcomes after 90 minutes of regulation time including stoppage time.' },
@@ -440,6 +442,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
   var IS_UNBEATEN = ${isUnbeaten ? 'true' : 'false'};
   var LINK_ANALYSIS = ${catConfig.linkAnalysis ? 'true' : 'false'};
   var CATEGORY_HEADING = '${escapeHtml(catConfig.heading)}';
+  var AFFILIATE_URL = '${AFFILIATE_URL}';
 
   var allData = null;
   var h2hData = null;
@@ -473,6 +476,14 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     return new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', {
       weekday: 'short', month: 'short', day: 'numeric'
     });
+  }
+
+  function escAttr(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   }
 
   function getSelectedDateStr() {
@@ -600,9 +611,18 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
           reasonHtml + '</div></div>';
       }
 
-      var cardHtml = '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms">' +
+      var ctaHtml = '';
+      if (!IS_STREAK && home && away) {
+        ctaHtml = '<a href="' + AFFILIATE_URL + '" target="_blank" rel="noopener nofollow sponsored" class="wft-1xbet-cta" data-home="' + escAttr(home) + '" data-away="' + escAttr(away) + '" data-tip="' + escAttr(match.tip || '') + '" style="display:block;text-align:center;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:10px 12px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;margin-top:12px;">Bet on 1xBet<span class="wft-1xbet-odds" style="opacity:0.85;font-weight:600;"></span> &rarr;</a>';
+      }
+
+      var cardHtml = '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms"' +
+        (home ? ' data-home="' + escAttr(home) + '"' : '') +
+        (away ? ' data-away="' + escAttr(away) + '"' : '') +
+        (!IS_STREAK && match.tip ? ' data-tip="' + escAttr(match.tip) + '"' : '') +
+        '>' +
         '<div class="match-header"><span>' + (match.league || '') + '</span><span>' + (IS_STREAK ? (match.nextMatchDate ? formatDateShort(match.nextMatchDate) : (match.time || '')) : (match.time || '')) + '</span></div>' +
-        cardContent + '</div>';
+        cardContent + ctaHtml + '</div>';
 
       if (LINK_ANALYSIS && home && away) {
         var analysisHref = (typeof window.resolveAnalysisLink === 'function')
@@ -682,6 +702,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 })();
 </script>
 <script src="/pwa.js"></script>
+<script src="/1xbet-odds-widget.js" defer></script>
 </body>
 </html>`;
 }

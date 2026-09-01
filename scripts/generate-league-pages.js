@@ -72,6 +72,8 @@ function listDirSlugs(dir) {
   );
 }
 
+const AFFILIATE_URL = 'https://reffpa.com/L?tag=d_6034393m_97c_&site=6034393&ad=97';
+
 const MARKET_LABELS = {
   '1x2': '1X2',
   'over-1-5': 'Over 1.5',
@@ -147,7 +149,7 @@ function renderMatchCard(m, analysisUrls) {
   const analysisUrl = analysisKey && analysisUrls && analysisUrls.has(analysisKey) ? `/analysis/${analysisKey}/` : '';
 
   return `
-  <div class="match-card" data-tip="${tip}">
+  <div class="match-card" data-tip="${tip}" data-home="${escapeHtml(homeRaw)}" data-away="${escapeHtml(awayRaw)}">
     <div class="match-header">
       <span class="match-time">⏱ ${time}</span>
       <span class="match-country">${escapeHtml(m.country || m.league || 'Football')}</span>
@@ -163,6 +165,7 @@ function renderMatchCard(m, analysisUrls) {
       </div>
       ${analysisUrl ? `<a href="${analysisUrl}" class="analysis-btn" style="color:var(--text-secondary);font-size:12px;font-weight:600;text-decoration:none;">View Analysis &rarr;</a>` : ''}
     </div>
+    <a href="${AFFILIATE_URL}" target="_blank" rel="noopener nofollow sponsored" class="wft-1xbet-cta" data-tip="${tip}" style="display:block;text-align:center;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:10px 12px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;margin-top:12px;transition:transform 0.15s;">Bet on 1xBet<span class="wft-1xbet-odds" style="opacity:0.85;font-weight:600;"></span> &rarr;</a>
   </div>`;
 }
 
@@ -287,6 +290,7 @@ ${faqsList(leagueFaqs(leagueName))}
 <p style="text-align:center;color:var(--text-secondary);font-size:13px;">&copy; ${new Date().getFullYear()} WinFulltime. All rights reserved.</p>
 </div>
 </footer>
+<script src="/1xbet-odds-widget.js" defer></script>
 </div>
 </body>
 </html>`;
