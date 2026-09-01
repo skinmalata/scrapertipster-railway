@@ -65,7 +65,7 @@ const HEAD_BOILERPLATE = `<meta charset="UTF-8">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
-<link rel="stylesheet" href="/app.css">
+<link rel="stylesheet" href="/app.css?v=3">
 <link rel="alternate" type="application/rss+xml" title="WinFulltime Football Predictions RSS" href="/feed.xml">
 <script async src="https://news.google.com/swg/js/v1/publisher.js"></script>`;
 
