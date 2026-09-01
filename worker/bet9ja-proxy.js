@@ -1,16 +1,43 @@
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request));
-});
+export default {
+  async fetch(request, env, ctx) {
+    return handleRequest(request);
+  }
+};
 
-async function handleRequest(request) {
-  const corsHeaders = {
+const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+
+function buildCorsHeaders() {
+  return {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Accept, Origin, Referer',
+    'Access-Control-Max-Age': '86400',
   };
+}
+
+function buildBet9jaHeaders() {
+  return {
+    'User-Agent': BROWSER_UA,
+    'Accept': 'application/json, text/javascript, */*; q=0.01',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Cache-Control': 'no-cache',
+    'Pragma': 'no-cache',
+    'Connection': 'keep-alive',
+    'Referer': 'https://coupon.bet9ja.com/',
+    'Origin': 'https://coupon.bet9ja.com',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-site',
+    'X-Requested-With': 'XMLHttpRequest',
+  };
+}
+
+async function handleRequest(request) {
+  const corsHeaders = buildCorsHeaders();
 
   if (request.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { status: 204, headers: corsHeaders });
   }
 
   const url = new URL(request.url);
@@ -34,22 +61,19 @@ async function handleRequest(request) {
 
     const bet9jaResponse = await fetch(targetUrl, {
       method: 'GET',
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'application/json, text/javascript, */*; q=0.01',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Referer': 'https://coupon.bet9ja.com/',
-        'Origin': 'https://coupon.bet9ja.com',
-      },
+      headers: buildBet9jaHeaders(),
+      redirect: 'follow',
     });
 
+    const contentType = bet9jaResponse.headers.get('Content-Type') || 'application/json';
     const body = await bet9jaResponse.text();
 
     return new Response(body, {
       status: bet9jaResponse.status,
       headers: {
         ...corsHeaders,
-        'Content-Type': bet9jaResponse.headers.get('Content-Type') || 'application/json',
+        'Content-Type': contentType,
+        'Cache-Control': 'no-store',
       },
     });
   } catch (err) {
