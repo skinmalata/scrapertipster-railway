@@ -3,6 +3,7 @@
 const { decodeSportybet, decodeMsport, createSportybetCode, createMsportCode } = require('./sportradar');
 const { decodeBet9ja, createBet9jaCode } = require('./bet9ja');
 const { decodeBetway, createBetwayCode } = require('./betway');
+const { decodeBetking } = require('./betking');
 const { BOOKMAKERS, isSportradar, canonicalize, buildLegs, unsupportedMarketError } = require('./matcher');
 const { resolveLeg, getAvailableMatches } = require('./resolver');
 
@@ -57,14 +58,16 @@ const DECODERS = {
   sportybet: decodeSportybet,
   msport: decodeMsport,
   betway: decodeBetway,
-  bet9ja: decodeBet9ja
+  bet9ja: decodeBet9ja,
+  betking: decodeBetking
 };
 
 const LABELS = {
   sportybet: 'SportyBet',
   msport: 'MSport',
   betway: 'Betway',
-  bet9ja: 'Bet9ja'
+  bet9ja: 'Bet9ja',
+  betking: 'BetKing'
 };
 
 function badRequest(message) {
@@ -79,7 +82,7 @@ function normalizeCode(raw) {
 
 function assertBookmaker(bookmaker) {
   if (!BOOKMAKERS.includes(bookmaker)) {
-    throw badRequest('Unknown bookmaker "' + bookmaker + '". Choose sportybet, msport, betway or bet9ja.');
+    throw badRequest('Unknown bookmaker "' + bookmaker + '". Choose sportybet, msport, betway, bet9ja or betking.');
   }
 }
 
@@ -142,6 +145,11 @@ async function createCode(bookmaker, legs) {
   if (bookmaker === 'bet9ja') return createBet9jaCode(legs);
   if (bookmaker === 'msport') return createMsportCode(legs);
   if (bookmaker === 'betway') return createBetwayCode(legs);
+  if (bookmaker === 'betking') {
+    const err = new Error('BetKing booking code creation is not supported yet.');
+    err.code = 'INVALID_SELECTIONS';
+    throw err;
+  }
   return createSportybetCode(legs);
 }
 

@@ -2,7 +2,7 @@
 
 const { resolveExtid, resolveEidFromExtid } = require('./bet9ja');
 
-const BOOKMAKERS = ['sportybet', 'msport', 'betway', 'bet9ja'];
+const BOOKMAKERS = ['sportybet', 'msport', 'betway', 'bet9ja', 'betking'];
 
 function isSportradar(bookmaker) {
   return bookmaker === 'sportybet' || bookmaker === 'msport';
@@ -14,6 +14,10 @@ function isBetway(bookmaker) {
 
 function isBet9ja(bookmaker) {
   return bookmaker === 'bet9ja';
+}
+
+function isBetking(bookmaker) {
+  return bookmaker === 'betking';
 }
 
 // All four bookmakers resolve a match to the same Sportradar numeric event id
@@ -96,10 +100,26 @@ async function canonicalizeBet9ja(leg) {
   return { eventId: extid, sign: sign };
 }
 
+// BetKing legs carry the Sportradar match id in providerEventId and 1X2
+// selectionName "1"=Home / "2"=Draw / "3"=Away (same naming as Sportradar).
+function canonicalizeBetking(leg) {
+  const eventId = numericEventId(leg.providerEventId);
+  if (!eventId) return null;
+  if ((leg.marketName || '').toUpperCase() !== '1X2' && !(leg.marketTypeId === 110)) return null;
+  const outcomeName = String(leg.outcomeName || '');
+  let sign = null;
+  if (outcomeName === '1') sign = SIGN.H;
+  else if (outcomeName === '2') sign = SIGN.D;
+  else if (outcomeName === '3') sign = SIGN.A;
+  if (!sign) return null;
+  return { eventId: eventId, sign: sign };
+}
+
 async function canonicalize(bookmaker, leg) {
   if (isSportradar(bookmaker)) return canonicalizeSportradar(leg);
   if (isBetway(bookmaker)) return canonicalizeBetway(leg);
   if (isBet9ja(bookmaker)) return canonicalizeBet9ja(leg);
+  if (isBetking(bookmaker)) return canonicalizeBetking(leg);
   return null;
 }
 
@@ -151,6 +171,9 @@ async function buildLegs(bookmaker, canonicals) {
     }
     return games;
   }
+  if (isBetking(bookmaker)) {
+    throw new Error('BetKing booking code creation is not supported yet.');
+  }
   throw new Error('Unknown target bookmaker "' + bookmaker + '".');
 }
 
@@ -159,6 +182,7 @@ module.exports = {
   isSportradar,
   isBetway,
   isBet9ja,
+  isBetking,
   canonicalize,
   buildLegs,
   unsupportedMarketError

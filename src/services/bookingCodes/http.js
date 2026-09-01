@@ -48,6 +48,15 @@ function betwayHeaders() {
   };
 }
 
+function betkingHeaders() {
+  return {
+    'User-Agent': BROWSER_UA,
+    Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.9',
+    Referer: 'https://m.betking.com/en-ng/sports/book-bet/'
+  };
+}
+
 function wrapUpstreamError(err, label) {
   const status = err && err.response ? err.response.status : null;
   const reason = status
@@ -168,4 +177,4 @@ async function postForm(url, formBody, headers, timeout) {
   return postFormWithRetry(url, formBody, headers, timeout, 2);
 }
 
-module.exports = { sportradarHeaders, bet9jaHeaders, bet9jaSportsHeaders, betwayHeaders, getJson, postJson, postForm, BROWSER_UA };
+module.exports = { sportradarHeaders, bet9jaHeaders, bet9jaSportsHeaders, betwayHeaders, betkingHeaders, getJson, postJson, postForm, BROWSER_UA };
