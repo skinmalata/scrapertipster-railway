@@ -132,6 +132,11 @@ async function decodeBet9ja(code) {
   try {
     data = await getJson(url, bet9jaHeaders(), 20000);
   } catch (err) {
+    if (err.message && err.message.includes('403')) {
+      const blocked = new Error('Bet9ja blocked this request. Their coupon service restricts access from cloud servers. Please decode the code directly on bet9ja.com or try another bookmaker.');
+      blocked.code = 'NETWORK_ERROR';
+      throw blocked;
+    }
     const wrapped = new Error('Failed to connect to Bet9ja. Please try again shortly.');
     wrapped.code = err.code || 'NETWORK_ERROR';
     wrapped.originalError = err.message;
