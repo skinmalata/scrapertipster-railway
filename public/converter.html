@@ -1155,28 +1155,94 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
      return Number(v).toFixed(2);
    }
 
-   async function doDecode() {
-     var code = document.getElementById('cvCode').value.trim();
-     if (!code) { showStatus('Please enter a booking code.', 'error'); return; }
-     resultCard.style.display = 'none';
-     previewCard.style.display = 'none';
-     clearStatus();
-     setLoading(true);
-     try {
-       var data = await api('/api/converter/decode', { code: code, bookmaker: fromSel.value });
-       document.getElementById('cvPreviewMeta').textContent = BOOKMAKER_NAMES[data.bookmaker] + ' code \u00b7 ' + data.legCount + ' selection' + (data.legCount === 1 ? '' : 's');
-       document.getElementById('cvTotalOdds').textContent = formatOdds(data.totalOdds);
-       document.getElementById('cvLegCount').textContent = data.legCount;
-       renderLegs(data.legs);
-       previewCard.style.display = 'block';
-       showStatus('Code decoded successfully.', 'info');
-       previewCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-     } catch (err) {
-       showStatus(err.message, 'error');
-     } finally {
-       setLoading(false);
-     }
-   }
+    var BET9JA_PROXY = window.WFT_BET9JA_PROXY || 'https://bet9ja-proxy.winfulltime.workers.dev';
+
+    function sgnToOutcome(sgn) {
+      if (sgn === '1') return 'Home';
+      if (sgn === 'X') return 'Draw';
+      if (sgn === '2') return 'Away';
+      return sgn || '';
+    }
+
+    async function bet9jaClientDecode(code) {
+      var bet9jaUrl = 'https://coupon.bet9ja.com/desktop/feapi/CouponAjax/GetBookABetCoupon?couponCode=' + encodeURIComponent(code) + '&v_cache_version=1.295.4.219';
+      var proxyUrl = BET9JA_PROXY + '?url=' + encodeURIComponent(bet9jaUrl);
+      var res = await fetch(proxyUrl);
+      if (!res.ok) {
+        var text = await res.text().catch(function () { return ''; });
+        throw new Error('Could not reach Bet9ja (HTTP ' + res.status + '). ' + (text || 'Please try again.'));
+      }
+      var data = await res.json();
+      if (!data || data.R !== 'OK') {
+        var msg = (data && data.D && data.D.ERROR_MESSAGE) || 'Invalid or expired code.';
+        throw new Error(msg);
+      }
+      var games = data.D && data.D.O ? data.D.O : {};
+      var legs = Object.keys(games).map(function (key) {
+        var g = games[key] || {};
+        return {
+          id: String(key),
+          E_ID: Number(g.E_ID || 0),
+          E_C: g.E_C || '',
+          E_NAME: g.E_NAME || '',
+          SGN: g.SGN || '',
+          M_NAME: g.M_NAME || '',
+          V: g.V || '1.0',
+          GID: g.GID || '',
+          SGID: g.SGID || '',
+          SPORT_ID: Number(g.SPORT_ID || 1),
+          eventName: g.E_NAME || '',
+          competition: g.E_C || '',
+          marketName: g.M_NAME || '',
+          outcomeName: sgnToOutcome(g.SGN),
+          odds: Number(g.V || 1)
+        };
+      });
+      if (!legs.length) throw new Error('No games were found in this booking code.');
+      var product = 1;
+      legs.forEach(function (l) { product *= l.odds; });
+      return {
+        success: true,
+        bookmaker: 'bet9ja',
+        bookmakerName: 'Bet9ja',
+        code: code.toUpperCase(),
+        legCount: legs.length,
+        totalOdds: Number(product.toFixed(2)),
+        legs: legs
+      };
+    }
+
+    async function doDecode() {
+      var code = document.getElementById('cvCode').value.trim();
+      if (!code) { showStatus('Please enter a booking code.', 'error'); return; }
+      resultCard.style.display = 'none';
+      previewCard.style.display = 'none';
+      clearStatus();
+      setLoading(true);
+      try {
+        var data;
+        if (fromSel.value === 'bet9ja') {
+          try {
+            data = await bet9jaClientDecode(code);
+          } catch (clientErr) {
+            data = await api('/api/converter/decode', { code: code, bookmaker: fromSel.value });
+          }
+        } else {
+          data = await api('/api/converter/decode', { code: code, bookmaker: fromSel.value });
+        }
+        document.getElementById('cvPreviewMeta').textContent = BOOKMAKER_NAMES[data.bookmaker] + ' code \u00b7 ' + data.legCount + ' selection' + (data.legCount === 1 ? '' : 's');
+        document.getElementById('cvTotalOdds').textContent = formatOdds(data.totalOdds);
+        document.getElementById('cvLegCount').textContent = data.legCount;
+        renderLegs(data.legs);
+        previewCard.style.display = 'block';
+        showStatus('Code decoded successfully.', 'info');
+        previewCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (err) {
+        showStatus(err.message, 'error');
+      } finally {
+        setLoading(false);
+      }
+    }
 
    async function doConvert() {
      var code = document.getElementById('cvCode').value.trim();
@@ -1185,7 +1251,17 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
      clearStatus();
      setLoading(true);
      try {
-       var data = await api('/api/converter/convert', { code: code, from: fromSel.value, to: toSel.value });
+       var data;
+       if (fromSel.value === 'bet9ja') {
+         try {
+           var decoded = await bet9jaClientDecode(code);
+           data = await api('/api/converter/convert-decoded', { legs: decoded.legs, to: toSel.value });
+         } catch (clientErr) {
+           data = await api('/api/converter/convert', { code: code, from: fromSel.value, to: toSel.value });
+         }
+       } else {
+         data = await api('/api/converter/convert', { code: code, from: fromSel.value, to: toSel.value });
+       }
        document.getElementById('cvResultMeta').textContent = data.fromName + ' \u2192 ' + data.toName + ' \u00b7 ' + data.legCount + ' selection' + (data.legCount === 1 ? '' : 's') + (data.totalOdds ? ' \u00b7 total odds ' + Number(data.totalOdds).toFixed(2) : '');
         document.getElementById('cvNewCode').textContent = data.code;
         resultCard.style.display = 'block';
