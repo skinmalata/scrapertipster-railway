@@ -277,9 +277,9 @@ nav a.active::after {
 
  .matches-grid {
  display: grid;
- grid-template-columns: 1fr;
+ grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
  gap: 12px;
- max-width: 520px;
+ max-width: 900px;
  min-width: 0;
  margin: 0 auto;
  }
