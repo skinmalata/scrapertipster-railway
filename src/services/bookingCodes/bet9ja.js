@@ -34,7 +34,12 @@ async function resolveExtid(eid) {
   const cached = eidToExtidCache.get(key);
   if (cached && Date.now() - cached.at < EXTID_CACHE_TTL_MS) return cached.value;
   const url = BET9JA_EVENT + '?EVENTID=' + encodeURIComponent(key);
-  const data = await getJson(url, bet9jaSportsHeaders(), 15000);
+  let data;
+  try {
+    data = await getJson(url, bet9jaSportsHeaders(), 20000);
+  } catch (err) {
+    return null;
+  }
   const extid = data && data.D && data.D.EXTID ? String(data.D.EXTID) : null;
   cacheCleanup(eidToExtidCache);
   eidToExtidCache.set(key, { at: Date.now(), value: extid });
@@ -50,7 +55,13 @@ async function resolveExtid(eid) {
 // the index is cached for a few minutes.
 async function getSportsIndex() {
   if (sportsIndexCache && Date.now() - sportsIndexAt < 10 * 60 * 1000) return sportsIndexCache;
-  const data = await getJson(BET9JA_SPORTS, bet9jaSportsHeaders(), 20000);
+  let data;
+  try {
+    data = await getJson(BET9JA_SPORTS, bet9jaSportsHeaders(), 25000);
+  } catch (err) {
+    if (sportsIndexCache) return sportsIndexCache;
+    throw err;
+  }
   const pal = data && data.D && data.D.PAL ? data.D.PAL : {};
   const index = new Map();
   for (const sport of Object.values(pal)) {
@@ -117,7 +128,15 @@ function toGame(id, game) {
 
 async function decodeBet9ja(code) {
   const url = BET9JA_GET + '?couponCode=' + encodeURIComponent(code) + '&v_cache_version=' + CACHE_VERSION;
-  const data = await getJson(url, bet9jaHeaders(), 15000);
+  let data;
+  try {
+    data = await getJson(url, bet9jaHeaders(), 20000);
+  } catch (err) {
+    const wrapped = new Error('Failed to connect to Bet9ja. Please try again shortly.');
+    wrapped.code = err.code || 'NETWORK_ERROR';
+    wrapped.originalError = err.message;
+    throw wrapped;
+  }
   if (!data || data.R !== 'OK') {
     throw invalidError(data && data.D && data.D.ERROR_MESSAGE ? data.D.ERROR_MESSAGE : null);
   }

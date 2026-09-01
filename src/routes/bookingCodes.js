@@ -110,4 +110,36 @@ router.get('/converter/recent', function (req, res) {
   res.json({ success: true, ...getRecent(limit) });
 });
 
+router.get('/converter/test-bet9ja', async function (req, res) {
+  try {
+    const { bet9jaHeaders } = require('../services/bookingCodes/http');
+    const axios = require('axios');
+    const url = 'https://coupon.bet9ja.com/desktop/feapi/CouponAjax/GetBookABetCoupon?couponCode=TEST&v_cache_version=1.295.4.219';
+    const startTime = Date.now();
+    const response = await axios.get(url, {
+      headers: bet9jaHeaders(),
+      timeout: 10000,
+      validateStatus: () => true
+    });
+    const duration = Date.now() - startTime;
+    res.json({
+      success: true,
+      bet9jaStatus: response.status,
+      duration: duration + 'ms',
+      data: response.data,
+      headers: {
+        contentType: response.headers['content-type'],
+        server: response.headers['server']
+      }
+    });
+  } catch (err) {
+    res.json({
+      success: false,
+      error: err.message,
+      code: err.code,
+      timeout: err.code === 'ECONNABORTED'
+    });
+  }
+});
+
 module.exports = router;

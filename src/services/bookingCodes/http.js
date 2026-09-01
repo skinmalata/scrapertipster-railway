@@ -68,17 +68,46 @@ function blockedError(status) {
   return wrapped;
 }
 
-async function getJson(url, headers, timeout) {
-  try {
-    const res = await axios.get(url, { headers, timeout: timeout || 15000, validateStatus: function () { return true; } });
-    if (res.status >= 500 || res.status === 429 || res.status === 403) {
-      throw blockedError(res.status);
+async function getJsonWithRetry(url, headers, timeout, retries = 2) {
+  let lastError;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await axios.get(url, { headers, timeout: timeout || 15000, validateStatus: function () { return true; } });
+      if (res.status === 502 || res.status === 503 || res.status === 504) {
+        if (attempt < retries) {
+          await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+          continue;
+        }
+        throw blockedError(res.status);
+      }
+      if (res.status >= 500 || res.status === 429 || res.status === 403) {
+        throw blockedError(res.status);
+      }
+      return res.data;
+    } catch (err) {
+      if (err.code === 'NETWORK_ERROR') {
+        lastError = err;
+        if (attempt < retries) {
+          await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+          continue;
+        }
+        throw err;
+      }
+      if (err.code === 'ECONNABORTED' || err.code === 'ETIMEDOUT') {
+        if (attempt < retries) {
+          await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+          continue;
+        }
+        throw wrapUpstreamError(err, 'the bookmaker service');
+      }
+      throw wrapUpstreamError(err, 'the bookmaker service');
     }
-    return res.data;
-  } catch (err) {
-    if (err.code === 'NETWORK_ERROR') throw err;
-    throw wrapUpstreamError(err, 'the bookmaker service');
   }
+  throw lastError || wrapUpstreamError(new Error('Unknown error'), 'the bookmaker service');
+}
+
+async function getJson(url, headers, timeout) {
+  return getJsonWithRetry(url, headers, timeout, 2);
 }
 
 async function postJson(url, body, headers, timeout) {
@@ -94,20 +123,49 @@ async function postJson(url, body, headers, timeout) {
   }
 }
 
-async function postForm(url, formBody, headers, timeout) {
+async function postFormWithRetry(url, formBody, headers, timeout, retries = 2) {
   const params = new URLSearchParams();
   for (const key of Object.keys(formBody)) params.append(key, formBody[key]);
   const fullHeaders = Object.assign({ 'Content-Type': 'application/x-www-form-urlencoded' }, headers);
-  try {
-    const res = await axios.post(url, params.toString(), { headers: fullHeaders, timeout: timeout || 15000, validateStatus: function () { return true; } });
-    if (res.status >= 500 || res.status === 429 || res.status === 403) {
-      throw blockedError(res.status);
+  let lastError;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await axios.post(url, params.toString(), { headers: fullHeaders, timeout: timeout || 15000, validateStatus: function () { return true; } });
+      if (res.status === 502 || res.status === 503 || res.status === 504) {
+        if (attempt < retries) {
+          await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+          continue;
+        }
+        throw blockedError(res.status);
+      }
+      if (res.status >= 500 || res.status === 429 || res.status === 403) {
+        throw blockedError(res.status);
+      }
+      return res.data;
+    } catch (err) {
+      if (err.code === 'NETWORK_ERROR') {
+        lastError = err;
+        if (attempt < retries) {
+          await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+          continue;
+        }
+        throw err;
+      }
+      if (err.code === 'ECONNABORTED' || err.code === 'ETIMEDOUT') {
+        if (attempt < retries) {
+          await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+          continue;
+        }
+        throw wrapUpstreamError(err, 'the bookmaker service');
+      }
+      throw wrapUpstreamError(err, 'the bookmaker service');
     }
-    return res.data;
-  } catch (err) {
-    if (err.code === 'NETWORK_ERROR') throw err;
-    throw wrapUpstreamError(err, 'the bookmaker service');
   }
+  throw lastError || wrapUpstreamError(new Error('Unknown error'), 'the bookmaker service');
+}
+
+async function postForm(url, formBody, headers, timeout) {
+  return postFormWithRetry(url, formBody, headers, timeout, 2);
 }
 
 module.exports = { sportradarHeaders, bet9jaHeaders, bet9jaSportsHeaders, betwayHeaders, getJson, postJson, postForm, BROWSER_UA };
