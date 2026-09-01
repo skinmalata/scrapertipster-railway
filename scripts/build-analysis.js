@@ -506,8 +506,8 @@ function buildContentHtml(analysis, home, away, matchup, dateStr, ctx) {
     html += '<div class="summary-section"><h3>Match Summary</h3><div class="summary-text"><p>' + escapeHtml(summary) + '</p></div></div>';
   }
 
-  html += '<div class="wft-1xbet-wrap" style="margin:4px 0;">' +
-    '<a href="' + AFFILIATE_URL + '" target="_blank" rel="noopener nofollow sponsored" class="wft-1xbet-cta" data-home="' + escapeHtml(homeName) + '" data-away="' + escapeHtml(awayName) + '" data-tip="" data-date="' + escapeHtml(dateStr || '') + '" data-league="' + escapeHtml((matchup && matchup.league) || '') + '" style="display:block;text-align:center;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:12px 14px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;margin:12px 0;transition:transform 0.15s;">Bet on 1xBet<span class="wft-1xbet-odds" style="opacity:0.85;font-weight:600;"></span> &rarr;</a>' +
+  html += '<div class="wft-1xbet-wrap" style="margin:4px 0;text-align:center;">' +
+    '<a href="' + AFFILIATE_URL + '" target="_blank" rel="noopener nofollow sponsored" class="wft-1xbet-cta" data-home="' + escapeHtml(homeName) + '" data-away="' + escapeHtml(awayName) + '" data-tip="" data-date="' + escapeHtml(dateStr || '') + '" data-league="' + escapeHtml((matchup && matchup.league) || '') + '" style="display:inline-block;text-align:center;background:rgba(255,36,72,0.10);color:#ff7e7e;padding:6px 14px;border-radius:6px;text-decoration:none;font-weight:600;font-size:13px;margin:10px 0 2px;border:1px solid rgba(255,36,72,0.25);">Bet on 1xBet<span class="wft-1xbet-odds" style="opacity:0.85;font-weight:600;"></span> &rarr;</a>' +
     '<p style="color:#94a3b8;font-size:12px;text-align:center;margin:0 0 6px;">18+ | T&amp;Cs apply | Gamble responsibly | Includes affiliate commission disclosure</p>' +
     '</div>';
 

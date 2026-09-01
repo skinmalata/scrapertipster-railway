@@ -165,7 +165,7 @@ function renderMatchCard(m, analysisUrls) {
       </div>
       ${analysisUrl ? `<a href="${analysisUrl}" class="analysis-btn" style="color:var(--text-secondary);font-size:12px;font-weight:600;text-decoration:none;">View Analysis &rarr;</a>` : ''}
     </div>
-    <a href="${AFFILIATE_URL}" target="_blank" rel="noopener nofollow sponsored" class="wft-1xbet-cta" data-tip="${tip}" style="display:block;text-align:center;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:10px 12px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;margin-top:12px;transition:transform 0.15s;">Bet on 1xBet<span class="wft-1xbet-odds" style="opacity:0.85;font-weight:600;"></span> &rarr;</a>
+    <div style="text-align:center;"><a href="${AFFILIATE_URL}" target="_blank" rel="noopener nofollow sponsored" class="wft-1xbet-cta" data-tip="${tip}" style="display:inline-block;text-align:center;background:rgba(255,36,72,0.10);color:#ff7e7e;padding:4px 12px;border-radius:6px;text-decoration:none;font-weight:600;font-size:12px;margin-top:8px;border:1px solid rgba(255,36,72,0.25);">Bet on 1xBet<span class="wft-1xbet-odds" style="opacity:0.85;font-weight:600;"></span> &rarr;</a></div>
   </div>`;
 }
 
