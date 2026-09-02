@@ -123,7 +123,7 @@
     }
     var label = btn.childNodes[0];
     if (label && label.nodeType === 3) {
-      label.textContent = (tip ? '1xBet ' + tip + ' ' : '1xBet ') + '@ ' + odds.toFixed(2) + '   Bet';
+      label.textContent = (tip ? '1win ' + tip + ' ' : '1win ') + '@ ' + odds.toFixed(2) + '   Bet';
     }
   }
 

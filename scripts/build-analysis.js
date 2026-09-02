@@ -22,7 +22,7 @@ const TEAMS_OUTPUT_DIR = path.join(process.cwd(), 'public', 'teams');
 const H2H_OUTPUT_DIR = path.join(process.cwd(), 'public', 'h2h');
 const ANALYSIS_TEMPLATE_FILE = path.join(process.cwd(), 'public', 'analysis.html');
 const SITE_URL = 'https://winfulltime.com';
-const AFFILIATE_URL = 'https://reffpa.com/L?tag=d_6034393m_97c_&site=6034393&ad=97';
+const AFFILIATE_URL = 'https://one-vv6198.com/betting?open=register&p=f61e';
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const RETENTION_DAYS = 90;
@@ -507,7 +507,7 @@ function buildContentHtml(analysis, home, away, matchup, dateStr, ctx) {
   }
 
   html += '<div class="wft-1xbet-wrap" style="margin:4px 0;text-align:center;">' +
-    '<a href="' + AFFILIATE_URL + '" target="_blank" rel="noopener nofollow sponsored" class="wft-1xbet-cta" data-home="' + escapeHtml(homeName) + '" data-away="' + escapeHtml(awayName) + '" data-tip="" data-date="' + escapeHtml(dateStr || '') + '" data-league="' + escapeHtml((matchup && matchup.league) || '') + '" style="display:inline-block;text-align:center;background:rgba(255,36,72,0.10);color:#fff;padding:6px 14px;border-radius:6px;text-decoration:none;font-weight:600;font-size:13px;margin:10px 0 2px;border:1px solid rgba(255,36,72,0.25);">Bet on 1xBet<span class="wft-1xbet-odds" style="opacity:0.85;font-weight:600;"></span> &rarr;</a>' +
+    '<a href="' + AFFILIATE_URL + '" target="_blank" rel="noopener nofollow sponsored" class="wft-1xbet-cta" data-home="' + escapeHtml(homeName) + '" data-away="' + escapeHtml(awayName) + '" data-tip="" data-date="' + escapeHtml(dateStr || '') + '" data-league="' + escapeHtml((matchup && matchup.league) || '') + '" style="display:inline-block;text-align:center;background:rgba(255,36,72,0.10);color:#fff;padding:6px 14px;border-radius:6px;text-decoration:none;font-weight:600;font-size:13px;margin:10px 0 2px;border:1px solid rgba(255,36,72,0.25);">Bet on 1win<span class="wft-1xbet-odds" style="opacity:0.85;font-weight:600;"></span> &rarr;</a>' +
     '<p style="color:#94a3b8;font-size:12px;text-align:center;margin:0 0 6px;">18+ | T&amp;Cs apply | Gamble responsibly | Includes affiliate commission disclosure</p>' +
     '</div>';
 

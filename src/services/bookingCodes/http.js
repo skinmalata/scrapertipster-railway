@@ -68,6 +68,20 @@ function bangbetHeaders() {
   };
 }
 
+// betPawa exposes a JSON gateway at the brand origin. The web app (www.betpawa.ng)
+// calls the same /api/sportsbook/... endpoints same-origin; the gateway is
+// brand-aware via X-Pawa-Brand. The brand string is the full identifier used by
+// the SPA (e.g. "betpawa-nigeria"), NOT the two-letter country code.
+function betpawaHeaders(brand) {
+  return {
+    'User-Agent': BROWSER_UA,
+    Accept: 'application/json',
+    'Accept-Language': 'en-GB,en-US;q=0.9,en;q=0.8',
+    devicetype: 'web',
+    'x-pawa-brand': brand || 'betpawa-nigeria'
+  };
+}
+
 function wrapUpstreamError(err, label) {
   const status = err && err.response ? err.response.status : null;
   const reason = status
@@ -188,4 +202,4 @@ async function postForm(url, formBody, headers, timeout) {
   return postFormWithRetry(url, formBody, headers, timeout, 2);
 }
 
-module.exports = { sportradarHeaders, bet9jaHeaders, bet9jaSportsHeaders, betwayHeaders, betkingHeaders, bangbetHeaders, getJson, postJson, postForm, BROWSER_UA };
+module.exports = { sportradarHeaders, bet9jaHeaders, bet9jaSportsHeaders, betwayHeaders, betkingHeaders, bangbetHeaders, betpawaHeaders, getJson, postJson, postForm, BROWSER_UA };

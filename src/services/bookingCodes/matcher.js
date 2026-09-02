@@ -1,8 +1,9 @@
 'use strict';
 
 const { resolveExtid, resolveEidFromExtid } = require('./bet9ja');
+const { getPawaIndex, findEventBySrId, normaliseTeam } = require('./betpawa');
 
-const BOOKMAKERS = ['sportybet', 'msport', 'betway', 'bet9ja', 'betking', 'bangbet'];
+const BOOKMAKERS = ['sportybet', 'msport', 'betway', 'bet9ja', 'betking', 'bangbet', 'betpawa'];
 
 function isSportradar(bookmaker) {
   return bookmaker === 'sportybet' || bookmaker === 'msport';
@@ -22,6 +23,10 @@ function isBetking(bookmaker) {
 
 function isBangbet(bookmaker) {
   return bookmaker === 'bangbet';
+}
+
+function isBetpawa(bookmaker) {
+  return bookmaker === 'betpawa';
 }
 
 // All four bookmakers resolve a match to the same Sportradar numeric event id
@@ -126,12 +131,38 @@ function canonicalizeBangbet(leg) {
   return canonicalizeSportradar(leg);
 }
 
+// betPawa is a native platform, not Sportradar. Its decoded legs carry the
+// betPawa event id and a 1X2 selection named like the price ("1" = Home,
+// "X" = Draw, "2" = Away). The 1X2 - FT market type id is "3743". The shared
+// Sportradar match id is recovered by matching the teams against the live
+// betPawa events feed, which also embeds a SPORTRADAR widget id per event.
+async function canonicalizeBetpawa(leg) {
+  const sign = { '1': SIGN.H, X: SIGN.D, '2': SIGN.A }[String(leg.outcomeName || '').trim()];
+  if (!sign) return null;
+  if (String(leg.marketId) !== '3743') return null;
+  const pair = String(leg.eventName || '').split(/\s+(?:-|vs)\s+/i).map(function (part) { return part.trim(); });
+  if (pair.length !== 2) return null;
+  let event = null;
+  try {
+    const index = await getPawaIndex();
+    const key = normaliseTeam(pair[0]) + '|' + normaliseTeam(pair[1]);
+    for (const ev of index) {
+      if (ev.key === key) { event = ev; break; }
+    }
+  } catch (e) {
+    return null;
+  }
+  if (!event || !event.srId) return null;
+  return { eventId: event.srId, sign: sign };
+}
+
 async function canonicalize(bookmaker, leg) {
   if (isSportradar(bookmaker)) return canonicalizeSportradar(leg);
   if (isBetway(bookmaker)) return canonicalizeBetway(leg);
   if (isBet9ja(bookmaker)) return canonicalizeBet9ja(leg);
   if (isBetking(bookmaker)) return canonicalizeBetking(leg);
   if (isBangbet(bookmaker)) return canonicalizeBangbet(leg);
+  if (isBetpawa(bookmaker)) return canonicalizeBetpawa(leg);
   return null;
 }
 
@@ -185,6 +216,32 @@ async function toBet9jaGame(canonical) {
   };
 }
 
+// betPawa minting needs the live price id for each canonical leg. Resolve the
+// Sportradar match id to the betPawa event (the feed embeds a SPORTRADAR widget
+// id), then pick the price whose sign matches the canonical 1X2 pick.
+const PAWA_PRICE_NAME = { H: '1', D: 'X', A: '2' };
+
+async function toBetpawaSelection(canonical) {
+  if (!canonical || !canonical.eventId) throw unresolvedEventError(canonical && (canonical.eventName || canonical.eventId));
+  let event = null;
+  try {
+    const index = await getPawaIndex();
+    event = findEventBySrId(index, canonical.eventId);
+  } catch (e) {
+    throw unresolvedEventError(canonical.eventName || canonical.eventId);
+  }
+  if (!event) throw unresolvedEventError(canonical.eventName || canonical.eventId);
+  const price = event.prices[PAWA_PRICE_NAME[canonical.sign]];
+  if (!price) throw unsupportedMarketError(canonical);
+  return {
+    priceId: price.priceId,
+    odds: Number(canonical.odds) > 0 ? Number(canonical.odds) : 1,
+    eventName: event.home + ' - ' + event.away,
+    marketName: '1X2',
+    outcomeName: PAWA_PRICE_NAME[canonical.sign]
+  };
+}
+
 async function buildLegs(bookmaker, canonicals) {
   if (isSportradar(bookmaker)) return canonicals.map(toSportradarSelection);
   if (isBetway(bookmaker)) return canonicals.map(toBetwayOutcome);
@@ -201,6 +258,13 @@ async function buildLegs(bookmaker, canonicals) {
   if (isBangbet(bookmaker)) {
     return canonicals.map(toBangbetSelection);
   }
+  if (isBetpawa(bookmaker)) {
+    const resolved = [];
+    for (const canonical of canonicals) {
+      resolved.push(await toBetpawaSelection(canonical));
+    }
+    return resolved;
+  }
   throw new Error('Unknown target bookmaker "' + bookmaker + '".');
 }
 
@@ -211,6 +275,7 @@ module.exports = {
   isBet9ja,
   isBetking,
   isBangbet,
+  isBetpawa,
   canonicalize,
   buildLegs,
   unsupportedMarketError

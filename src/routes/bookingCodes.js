@@ -86,11 +86,13 @@ router.post('/converter/convert-decoded', async function (req, res) {
     const { createBet9jaCode } = require('../services/bookingCodes/bet9ja');
     const { createSportybetCode, createMsportCode } = require('../services/bookingCodes/sportradar');
     const { createBetwayCode } = require('../services/bookingCodes/betway');
+    const { createBetPawaCode } = require('../services/bookingCodes/betpawa');
 
     let newCode;
     if (to === 'bet9ja') newCode = await createBet9jaCode(targetLegs);
     else if (to === 'msport') newCode = await createMsportCode(targetLegs);
     else if (to === 'betway') newCode = await createBetwayCode(targetLegs);
+    else if (to === 'betpawa') newCode = await createBetPawaCode(targetLegs);
     else newCode = await createSportybetCode(targetLegs);
 
     const totalOdds = canonicals.reduce(function (p, c) { return p * (c.odds || 1); }, 1);
@@ -98,8 +100,7 @@ router.post('/converter/convert-decoded', async function (req, res) {
       from: 'bet9ja',
       fromName: 'Bet9ja',
       to: to,
-      to: to,
-      toName: { sportybet: 'SportyBet', msport: 'MSport', betway: 'Betway', bet9ja: 'Bet9ja', betking: 'BetKing' }[to],
+      toName: { sportybet: 'SportyBet', msport: 'MSport', betway: 'Betway', bet9ja: 'Bet9ja', betking: 'BetKing', betpawa: 'betPawa' }[to],
       code: newCode,
       legCount: legs.length,
       totalOdds: Number(totalOdds.toFixed(2))

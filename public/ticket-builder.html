@@ -1483,6 +1483,7 @@ nav.open { display: flex !important; }
  }
  .code-btn.sportybet { background: linear-gradient(135deg, #facc15, #eab308); color: #0a0e17; }
  .code-btn.betway { background: linear-gradient(135deg, #fb923c, #ea580c); }
+ .code-btn.betpawa { background: linear-gradient(135deg, #34d399, #059669); }
  .code-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 16px rgba(255,255,255,0.2);
@@ -2105,7 +2106,8 @@ nav.open { display: flex !important; }
         '</div></div>' +
         (bookingCodeMode ?
           '<button class="code-btn sportybet" data-code="sportybet" data-ticket="' + tidx + '">&#127881; SportyBet Code</button>' +
-          (betwayOk ? '<button class="code-btn betway" data-code="betway" data-ticket="' + tidx + '">&#127881; Betway Code</button>' : '') : '') +
+          (betwayOk ? '<button class="code-btn betway" data-code="betway" data-ticket="' + tidx + '">&#127881; Betway Code</button>' : '') +
+          (betwayOk ? '<button class="code-btn betpawa" data-code="betpawa" data-ticket="' + tidx + '">&#127881; betPawa Code</button>' : '') : '') +
         (AFFILIATE_URL ? '<a href="' + AFFILIATE_URL + '" target="_blank" rel="noopener" class="bet-btn"> Bet Now</a>' : '') +
         '</div></div>' +
         (bookingCodeMode ? '<div class="code-display" id="code-display-' + tidx + '"></div>' : '') +
@@ -2296,7 +2298,7 @@ nav.open { display: flex !important; }
 
     display.className = 'code-display';
     display.style.display = 'block';
-    display.innerHTML = '<span class="cd-label">Generating ' + (bookmaker === 'betway' ? 'Betway' : 'SportyBet') + ' code...</span>';
+    display.innerHTML = '<span class="cd-label">Generating ' + ({ sportybet: 'SportyBet', betway: 'Betway', betpawa: 'betPawa' }[bookmaker] || 'bookmaker') + ' code...</span>';
     btn.disabled = true;
 
     var api = (window.WFT_API || 'https://winfulltime-api.onrender.com') + '/api/converter/create';

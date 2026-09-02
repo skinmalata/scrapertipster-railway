@@ -3,7 +3,7 @@ const path = require('path');
 const { buildLeagueLabelBySlug, readableLeagueLabel, formatDateChips } = require('./league-labels');
 const { CHIPS_CSS, chipsSection, faqBlock, renderHead, collectionPageSchema, generateFaqSchema } = require('./lib/seo-blocks');
 
-const AFFILIATE_URL = 'https://reffpa.com/L?tag=d_6034393m_97c_&site=6034393&ad=97';
+const AFFILIATE_URL = 'https://one-vv6198.com/betting?open=register&p=f61e';
 
 const FAQ_SCHEMA = {
   '1x2': [
@@ -614,7 +614,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       var ctaHtml = '';
       if (!IS_STREAK && home && away) {
         ctaHtml = '<div style="text-align:center;">' +
-          '<a href="' + AFFILIATE_URL + '" target="_blank" rel="noopener nofollow sponsored" class="wft-1xbet-cta" data-home="' + escAttr(home) + '" data-away="' + escAttr(away) + '" data-tip="' + escAttr(match.tip || '') + '" style="display:inline-block;text-align:center;background:rgba(255,36,72,0.10);color:#fff;padding:4px 12px;border-radius:6px;text-decoration:none;font-weight:600;font-size:12px;margin-top:8px;border:1px solid rgba(255,36,72,0.25);">Bet on 1xBet<span class="wft-1xbet-odds" style="opacity:0.85;font-weight:600;"></span> &rarr;</a>' +
+          '<a href="' + AFFILIATE_URL + '" target="_blank" rel="noopener nofollow sponsored" class="wft-1xbet-cta" data-home="' + escAttr(home) + '" data-away="' + escAttr(away) + '" data-tip="' + escAttr(match.tip || '') + '" style="display:inline-block;text-align:center;background:rgba(255,36,72,0.10);color:#fff;padding:4px 12px;border-radius:6px;text-decoration:none;font-weight:600;font-size:12px;margin-top:8px;border:1px solid rgba(255,36,72,0.25);">Bet on 1win<span class="wft-1xbet-odds" style="opacity:0.85;font-weight:600;"></span> &rarr;</a>' +
           '</div>';
       }
 

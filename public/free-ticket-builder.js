@@ -64,7 +64,7 @@
     var staleHtml=staleNote?'<div class="htb-stale">'+esc(staleNote)+'</div>':'';
     var betwayOk=best.every(function(s){return String(s.category||'').toLowerCase()==='1x2'&&/^[1X2]$/.test(String(s.tip||'').trim())});
     var codeHtml=bookingCodeMode?
-      '<div class="htb-actions"><button class="code-btn sportybet" data-code="sportybet">SportyBet Code</button>'+(betwayOk?'<button class="code-btn betway" data-code="betway">Betway Code</button>':'')+'</div><div class="code-display" id="htbCodeDisplay"></div>':'';
+      '<div class="htb-actions"><button class="code-btn sportybet" data-code="sportybet">SportyBet Code</button>'+(betwayOk?'<button class="code-btn betway" data-code="betway">Betway Code</button><button class="code-btn betpawa" data-code="betpawa">betPawa Code</button>':'')+'</div><div class="code-display" id="htbCodeDisplay"></div>':'';
     return '<div class="htb-ticket"><div class="htb-ticket-head"><span class="htb-ticket-label">'+best.length+'-Leg Accumulator</span><span class="htb-ticket-odds">'+totalOdds.toFixed(2)+' odds</span></div>'+legs+staleHtml+codeHtml+'<a href="'+PRO_URL+'" class="htb-full">Want higher odds? Try the Pro Ticket Builder &rarr;</a></div>';
   }
 
@@ -223,8 +223,9 @@
     var display=document.getElementById('htbCodeDisplay');
     if(!display)return;
     var bookmaker=btn.getAttribute('data-code');
+    var BOOKMAKER_LABELS={sportybet:'SportyBet',betway:'Betway',betpawa:'betPawa'};
     btn.disabled=true;
-    btn.textContent=bookmaker==='sportybet'?'Creating SportyBet code...':'Creating Betway code...';
+    btn.textContent='Creating '+BOOKMAKER_LABELS[bookmaker]+' code...';
     display.style.display='none';
     var legs=(lastTicket||[]).map(function(s){return{match:s.match,tip:s.tip,category:mapCat(s.category)}});
     fetch(API_BASE+'/api/converter/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookmaker:bookmaker,legs:legs})})
@@ -237,6 +238,6 @@
         display.style.display='block';
       })
       .catch(function(){display.className='code-display error';display.innerHTML='<span class="cd-label">Unable to create code</span>Network error';display.style.display='block'})
-      .then(function(){btn.disabled=false;btn.textContent=bookmaker==='sportybet'?'SportyBet Code':'Betway Code'});
+      .then(function(){btn.disabled=false;btn.textContent=BOOKMAKER_LABELS[bookmaker]+' Code'});
   });
 })();
