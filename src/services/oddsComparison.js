@@ -439,6 +439,7 @@ function findEvent(events, home, away) {
 const BOOKMAKER_HOMEPAGES = {
   bet365: 'https://www.bet365.com',
   betway: 'https://www.betway.com',
+  '22bet': 'https://22bet.com',
   unibet: 'https://www.unibet.com',
   bwin: 'https://www.bwin.com',
   pinnacle: 'https://www.pinnacle.com',
@@ -468,6 +469,7 @@ const BOOKMAKER_KEY_BRANDS = [
   ['bet365', 'bet365'],
   ['betfair', 'betfair'],
   ['betway', 'betway'],
+  ['22bet', '22bet'],
   ['bwin', 'bwin'],
   ['pinnacle', 'pinnacle'],
   ['marathonbet', 'marathonbet'],
@@ -631,7 +633,18 @@ async function getOddsComparison(opts) {
   }
 
   var matchup = { home: event.home_team || home, away: event.away_team || away };
-  var bookmakers = mapBookmakers(event, matchup);
+  var allBookmakers = mapBookmakers(event, matchup);
+  if (!allBookmakers.length) return { available: false, reason: 'no-odds' };
+
+  // Only show 1xBet, Betway, and 22bet
+  var ALLOWED_BOOKMAKERS = ['1xbet', 'betway', '22bet'];
+  var bookmakers = allBookmakers.filter(function (b) {
+    var key = normalizeName(b.key || '');
+    var title = normalizeName(b.title || '');
+    return ALLOWED_BOOKMAKERS.some(function (name) {
+      return key.indexOf(name) !== -1 || title.indexOf(name) !== -1;
+    });
+  });
   if (!bookmakers.length) return { available: false, reason: 'no-odds' };
 
   return {
