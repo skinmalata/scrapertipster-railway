@@ -217,7 +217,7 @@ ${generateLeagueFaqSchema(leagueName)}
 .league-stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
 .league-stat-val{font-size:24px;font-weight:800;color:var(--accent)}
 .league-stat-lbl{font-size:12px;color:var(--text-secondary);margin-top:4px}
-.matches-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:24px}
+.matches-grid{margin-top:24px}
 .seo-content{margin-top:48px;border-top:1px solid var(--border);padding-top:32px}
 .seo-content h2{font-size:22px;font-weight:700;margin-bottom:16px;color:var(--text-primary)}
 ${FAQ_CSS}

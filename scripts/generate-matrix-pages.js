@@ -163,7 +163,7 @@ function generateMatrixPage(leagueName, leagueSlug, marketSlug, marketConfig, ma
     }
   ]);
 
-  const pageCss = `.matches-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:24px}`;
+  const pageCss = `.matches-grid{margin-top:24px}`;
 
   const body = `
 <div class="hero">
