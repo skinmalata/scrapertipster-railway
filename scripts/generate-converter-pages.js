@@ -200,7 +200,7 @@ function hubPageBody() {
    <h1>Booking Code Converter</h1>
    <p class="converter-hero-sub">${esc(HUB.intro)}</p>
    <div class="converter-badges">
-    <span>Free to use</span><span>No sign-in</span><span>Up to 30 selections</span><span>SportyBet · MSport · Bet9ja · Betway · BetKing · Bangbet</span>
+    <span>Free to use</span><span>No sign-in</span><span>Up to 30 selections</span><span>SportyBet · MSport · Bet9ja · Betway · BetKing · Bangbet · betPawa</span>
    </div>
   </div>
 
@@ -234,8 +234,8 @@ ${faq}
 
 function buildHubPage() {
   const canonical = `${SITE_URL}/convert/`;
-  const title = 'Booking Code Converter — SportyBet, MSport, Bet9ja, Betway, BetKing, Bangbet | WinFulltime';
-  const description = 'Free booking code converter for SportyBet, MSport, Bet9ja, Betway, BetKing and Bangbet. Decode any code, preview selections and odds, and generate a fresh playable code for the bookmaker you use — no sign-in, up to 30 selections.';
+  const title = 'Booking Code Converter — SportyBet, MSport, Bet9ja, Betway, BetKing, Bangbet, betPawa | WinFulltime';
+  const description = 'Free booking code converter for SportyBet, MSport, Bet9ja, Betway, BetKing, Bangbet and betPawa. Decode any code, preview selections and odds, and generate a fresh playable code for the bookmaker you use — no sign-in, up to 30 selections.';
   const keywords = 'booking code converter, convert betting code, SportyBet to Bet9ja, Betway to SportyBet, MSport code converter, Bangbet code converter, BetKing code converter';
 
   const webApp = {
@@ -248,7 +248,7 @@ function buildHubPage() {
     operatingSystem: 'Web',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     featureList: [
-      'Convert booking codes between SportyBet, MSport, Bet9ja, Betway, BetKing and Bangbet',
+      'Convert booking codes between SportyBet, MSport, Bet9ja, Betway, BetKing, Bangbet and betPawa',
       'Decode and preview every selection, market and odds line',
       'No sign-in required, up to 30 selections'
     ],

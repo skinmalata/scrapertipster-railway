@@ -57,6 +57,16 @@ const BOOKMAKERS = {
     redeemHint: 'Open the Bangbet app or site, paste the code into the code entry field and load the slip.',
     marketNote: 'Bangbet runs on the same Sportradar platform as SportyBet and MSport, so code creation works from 1X2 selections with their current odds.'
   },
+  betpawa: {
+    name: 'betPawa',
+    codeType: 'booking code',
+    findSteps: [
+      'Open the betPawa app and open the slip you want to convert from your betslip history.',
+      'Copy the booking code shown for that betslip.'
+    ],
+    redeemHint: 'In the betPawa app, tap Load Code, paste the code and the slip loads ready to stake before kick-off.',
+    marketNote: 'betPawa codes are minted live from the match-result (1X2) market on the event feed, so a new code is built from selections that are still on the board.'
+  },
   betking: {
     name: 'BetKing',
     codeType: 'book bet code',
@@ -550,15 +560,225 @@ const PAIRS = [
       { q: 'How many legs can a BetKing to Bangbet code have?', a: 'Up to 30 legs are supported for a BetKing to Bangbet conversion.' },
       { q: 'Does BetKing to Bangbet cost anything?', a: 'No, building the Bangbet booking code is free; you stake only if you place the bet on Bangbet.' }
     ]
+  },
+{
+    from: 'betpawa',
+    to: 'sportybet',
+    blurb: 'Turn a betPawa booking code into a SportyBet share code with the same 1X2 selections.',
+    intro:
+      'betPawa runs its own native booking-code platform, so moving a slip to SportyBet means matching each betPawa match to the shared Sportradar event and re-encoding it. If you built a slip on betPawa but want to play it on SportyBet — the most used betting app in Nigeria — paste your betPawa booking code here and get a fresh SportyBet share code with the same 1X2 selections, no sign-in and no fee.',
+    howTo: [
+      { title: 'Copy your betPawa booking code', body: 'Open the betPawa app, open the slip you want to move and copy the booking code it shows for that betslip.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to betPawa.' },
+      { title: 'Choose SportyBet and convert', body: 'Set the To bookmaker to SportyBet and tap Convert Code to re-encode the slip.' },
+      { title: 'Load it on SportyBet', body: 'Open SportyBet, paste the generated code into the code field and the slip loads ready to stake.' }
+    ],
+    faq: [
+      { q: 'Does a betPawa code convert cleanly to SportyBet?', a: 'Yes for 1X2 legs. Each betPawa selection is matched to the shared Sportradar event, so SportyBet receives a fresh share code whenever the match is still on its board.' },
+      { q: 'Which betPawa markets convert to SportyBet?', a: 'betPawa slips are built from 1X2 lines and those match-result selections convert to SportyBet exactly — SportyBet code creation is not limited to 1X2, so the carried legs stay playable when re-encoded.' },
+      { q: 'How many legs can a betPawa to SportyBet code carry?', a: 'Up to 30 selections are supported for a betPawa to SportyBet conversion, matching the site-wide limit.' },
+      { q: 'Is converting a betPawa code to SportyBet free?', a: 'Yes. Generating the SportyBet share code is free; you only stake if you place the bet on SportyBet.' }
+    ]
+  },
+  {
+    from: 'sportybet',
+    to: 'betpawa',
+    blurb: 'Re-encode a SportyBet share code as a betPawa booking code you can load in seconds.',
+    intro:
+      'Convert a SportyBet share code into a fresh betPawa booking code. The converter reads your SportyBet selections, matches each match to the matching event in the betPawa feed, and mints a betPawa code live with current prices. Great when you have been sent a SportyBet slip but you bet on betPawa, or you want to pass the slip to a betPawa-only friend.',
+    howTo: [
+      { title: 'Copy your SportyBet share code', body: 'Open the slip in the SportyBet app, tap Share, and copy the share code it displays.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to SportyBet.' },
+      { title: 'Choose betPawa and convert', body: 'Set the To bookmaker to betPawa and tap Convert Code.' },
+      { title: 'Load it on betPawa', body: 'Open the betPawa app, tap Load Code, paste the generated code and the slip loads ready to stake.' }
+    ],
+    faq: [
+      { q: 'Can a SportyBet slip convert to a betPawa code?', a: 'The 1X2 legs convert to a betPawa code, because each SportyBet match is matched to the same event in the betPawa feed before a new code is minted.' },
+      { q: 'Which SportyBet selections become betPawa codes?', a: 'Only 1X2 legs convert, because a betPawa code is built live from the match-result market on its event feed.' },
+      { q: 'Will my odds carry over to betPawa?', a: 'Selections are re-priced at betPawa current odds when the code is minted, so the total can differ from the SportyBet original.' },
+      { q: 'How many legs can a SportyBet to betPawa code hold?', a: 'Up to 30 selections are supported for a SportyBet to betPawa conversion.' },
+      { q: 'Is converting a SportyBet code to betPawa free?', a: 'Yes, generating the betPawa booking code is free; you only stake if you place the bet on betPawa.' }
+    ]
+  },
+  {
+    from: 'betpawa',
+    to: 'msport',
+    blurb: 'Re-issue a betPawa booking code as a fresh MSport share code for MSport users.',
+    intro:
+      'If you hold a betPawa booking code but play on MSport — or want to share the slip with an MSport-only friend — paste it here. The converter matches each betPawa match to the shared Sportradar event, then re-encodes your 1X2 selections as an MSport share code with current odds. No manual slip rebuilding and no sign-in required.',
+    howTo: [
+      { title: 'Copy your betPawa booking code', body: 'Open the betPawa app, open the slip you want to move and copy the booking code it shows for that betslip.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to betPawa.' },
+      { title: 'Choose MSport and convert', body: 'Set the To bookmaker to MSport and tap Convert Code.' },
+      { title: 'Load it on MSport', body: 'Open MSport, paste the generated code into the code field and the slip loads ready to stake.' }
+    ],
+    faq: [
+      { q: 'Can a betPawa slip become an MSport code?', a: 'Yes for the 1X2 legs, because each betPawa match is mapped to the same Sportradar event MSport uses before the fresh share code is minted.' },
+      { q: 'Do the odds carry over to MSport?', a: 'Your betPawa selections are re-priced at MSport current odds when the code is created, so the combined total reflects MSport prices at conversion time.' },
+      { q: 'How many selections can a betPawa to MSport code hold?', a: 'Up to 30 selections are supported for a betPawa to MSport conversion.' },
+      { q: 'Is betPawa to MSport conversion free?', a: 'Yes, creating the MSport share code costs nothing; you only stake if you place the bet on MSport.' }
+    ]
+  },
+  {
+    from: 'msport',
+    to: 'betpawa',
+    blurb: 'Re-encode an MSport share code as a betPawa booking code for betPawa users.',
+    intro:
+      'Move an MSport share code onto betPawa. The converter matches each MSport selection to the matching event in the betPawa feed and mints a fresh betPawa booking code with current prices. Useful when you play on betPawa but receive MSport slips, or you want to hand a slip to someone who only uses betPawa.',
+    howTo: [
+      { title: 'Copy your MSport share code', body: 'Open the slip in the MSport app, tap Share, and copy the share code it displays.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to MSport.' },
+      { title: 'Choose betPawa and convert', body: 'Set the To bookmaker to betPawa and tap Convert Code.' },
+      { title: 'Load it on betPawa', body: 'Open the betPawa app, tap Load Code, paste the generated code and the slip loads ready to stake.' }
+    ],
+    faq: [
+      { q: 'Can an MSport 1X2 slip become a betPawa code?', a: 'Yes. Each MSport match is matched to the betPawa event feed and a fresh betPawa code is minted from the 1X2 selections.' },
+      { q: 'Do all MSport markets convert to betPawa?', a: 'A betPawa code is built from the match-result market, so the 1X2 legs of your MSport slip convert and any other markets are reported.' },
+      { q: 'How many legs can an MSport to betPawa code have?', a: 'Up to 30 legs are supported for an MSport to betPawa conversion.' },
+      { q: 'Is converting an MSport code to betPawa free?', a: 'Yes, generating the betPawa booking code is free; you only stake if you place the bet on betPawa.' }
+    ]
+  },
+  {
+    from: 'betpawa',
+    to: 'betway',
+    blurb: 'Move a betPawa booking code onto Betway Book A Bet as a fresh booking code.',
+    intro:
+      'betPawa 1X2 selections can be matched to the same matches Betway offers, then re-issued as a fresh Betway Book-A-Bet code. This is handy when a friend shares a betPawa slip but you bet on Betway, or you simply prefer Betway promos. Paste the betPawa booking code below and the converter handles the match-matching for you.',
+    howTo: [
+      { title: 'Copy your betPawa booking code', body: 'Open the betPawa app, open the slip you want to move and copy the booking code it shows for that betslip.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to betPawa.' },
+      { title: 'Choose Betway and convert', body: 'Set the To bookmaker to Betway and tap Convert Code.' },
+      { title: 'Load it on Betway', body: 'Open Betway, go to Book A Bet and enter the generated code to load the slip.' }
+    ],
+    faq: [
+      { q: 'Does betPawa to Betway conversion need sign-in?', a: 'No. Paste a betPawa booking code and get a fresh Betway Book-A-Bet code without logging in; the conversion is free.' },
+      { q: 'Which betPawa selections convert to Betway?', a: 'Selections that Betway offers on the same match convert cleanly. Because betPawa slips are 1X2-based, matched legs become a Betway code whenever the market is still priced.' },
+      { q: 'How many legs can a betPawa to Betway code have?', a: 'Up to 30 legs, matching the limit for a betPawa to Betway conversion.' },
+      { q: 'Will the Betway odds match the betPawa slip?', a: 'Selections are re-priced at Betway current odds, so the combined total can differ from the betPawa original.' }
+    ]
+  },
+  {
+    from: 'betway',
+    to: 'betpawa',
+    blurb: 'Turn a Betway Book-A-Bet code into a betPawa booking code.',
+    intro:
+      'Convert a Betway Book-A-Bet code into a betPawa booking code. The converter reads your Betway selections, matches each match against the live betPawa event feed, and mints a fresh betPawa code with current prices. This is for betPawa users who receive Betway slips from friends, or who want to play a Betway-built slip on their betPawa account.',
+    howTo: [
+      { title: 'Copy your Betway Book-A-Bet code', body: 'Copy the booking code from your Betway Book A Bet slip.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to Betway.' },
+      { title: 'Choose betPawa and convert', body: 'Set the To bookmaker to betPawa and tap Convert Code.' },
+      { title: 'Load it on betPawa', body: 'Open the betPawa app, tap Load Code, paste the generated code and the slip loads ready to stake.' }
+    ],
+    faq: [
+      { q: 'Which Betway selections convert to a betPawa code?', a: 'The 1X2 legs convert, because a betPawa code is minted from the match-result market on the live event feed.' },
+      { q: 'Do I need a Betway account to convert to betPawa?', a: 'No — just the Betway Book-A-Bet code. You do not need to log in to generate the betPawa booking code.' },
+      { q: 'Will the odds match on the betPawa code?', a: 'Selections are re-priced at betPawa current odds, so the combined total can differ from the Betway original.' },
+      { q: 'How many legs can a Betway to betPawa code have?', a: 'Up to 30 legs are supported for a Betway to betPawa conversion.' }
+    ]
+  },
+  {
+    from: 'betpawa',
+    to: 'bet9ja',
+    blurb: 'Rebuild a betPawa booking code as a Bet9ja Book-A-Bet code for Bet9ja users.',
+    intro:
+      'Convert a betPawa booking code into a Bet9ja Book-A-Bet code so Bet9ja users can play your slip. Because both platforms price match results, the 1X2 legs of your betPawa slip map onto the Bet9ja coupon automatically. Paste the code below and get a Bet9ja code you can load into coupon.bet9ja.com or the Bet9ja app.',
+    howTo: [
+      { title: 'Copy your betPawa booking code', body: 'Open the betPawa app, open the slip you want to move and copy the booking code it shows for that betslip.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to betPawa.' },
+      { title: 'Choose Bet9ja and convert', body: 'Set the To bookmaker to Bet9ja and tap Convert Code.' },
+      { title: 'Load it on Bet9ja', body: 'Open coupon.bet9ja.com or the Bet9ja app and enter the code in the Book-A-Bet coupon.' }
+    ],
+    faq: [
+      { q: 'Which betPawa selections convert to a Bet9ja code?', a: 'Only the 1X2 legs of a betPawa slip convert to a Bet9ja code right now; other lines are skipped and reported so you can drop them.' },
+      { q: 'Where do I load the new Bet9ja code?', a: 'Enter the generated code in the Bet9ja Book-A-Bet coupon on coupon.bet9ja.com or in the Bet9ja app.' },
+      { q: 'How long is the betPawa to Bet9ja code valid?', a: 'The Bet9ja code is valid until the first match on the slip kicks off, so stake it before the earliest kick-off.' },
+      { q: 'Is converting a betPawa code to Bet9ja free?', a: 'Yes, generating the Bet9ja Book-A-Bet code is free; you only stake if you place the bet on Bet9ja.' }
+    ]
+  },
+  {
+    from: 'bet9ja',
+    to: 'betpawa',
+    blurb: 'Re-issue a Bet9ja Book-A-Bet code as a fresh betPawa booking code.',
+    intro:
+      'A Bet9ja Book-A-Bet slip can be rebuilt as a betPawa booking code. Paste the Bet9ja code and the converter matches each 1X2 selection to the matching event in the betPawa feed, then mints a fresh betPawa code with current odds. A quick way to move a coupon shared by a Bet9ja friend onto your own betPawa account without retyping each leg.',
+    howTo: [
+      { title: 'Copy your Bet9ja Book-A-Bet code', body: 'Copy the Book-A-Bet code from your Bet9ja coupon, email or SMS.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to Bet9ja.' },
+      { title: 'Choose betPawa and convert', body: 'Set the To bookmaker to betPawa and tap Convert Code.' },
+      { title: 'Load it on betPawa', body: 'Open the betPawa app, tap Load Code, paste the generated code and the slip loads ready to stake.' }
+    ],
+    faq: [
+      { q: 'Do I need a Bet9ja account to convert to betPawa?', a: 'No — you only need the Bet9ja Book-A-Bet code to generate a fresh betPawa booking code without logging in.' },
+      { q: 'Which Bet9ja selections convert to a betPawa code?', a: 'Bet9ja slips built from 1X2 selections convert cleanly, because a betPawa code is minted from the match-result market on the event feed.' },
+      { q: 'How long is the generated betPawa code valid?', a: 'The betPawa code stays valid until the first match on the slip kicks off, so load and stake it before the earliest kick-off.' },
+      { q: 'How many legs can a Bet9ja to betPawa code have?', a: 'Up to 30 legs are supported for a Bet9ja to betPawa conversion.' }
+    ]
+  },
+  {
+    from: 'betpawa',
+    to: 'bangbet',
+    blurb: 'Re-issue a betPawa booking code as a fresh Bangbet booking code.',
+    intro:
+      'Bangbet accepts bookings re-encoded from the shared Sportradar platform, and betPawa matches map onto those same events before a new code is built. If you hold a betPawa booking code but want to play on Bangbet — for its bundles or local-language promos — paste it here and get a Bangbet booking code carrying the same 1X2 selections at current odds.',
+    howTo: [
+      { title: 'Copy your betPawa booking code', body: 'Open the betPawa app, open the slip you want to move and copy the booking code it shows for that betslip.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to betPawa.' },
+      { title: 'Choose Bangbet and convert', body: 'Set the To bookmaker to Bangbet and tap Convert Code.' },
+      { title: 'Load it on Bangbet', body: 'Open the Bangbet app, paste the generated code into the code field and the slip loads ready to stake.' }
+    ],
+    faq: [
+      { q: 'Can my betPawa slip become a Bangbet code?', a: 'Yes for the 1X2 legs, because the betPawa match is matched to the shared Sportradar event and Bangbet re-encodes it with current odds.' },
+      { q: 'Which markets survive the jump to Bangbet?', a: 'betPawa slips are 1X2-based, and those match-result lines re-encode cleanly on Bangbet whenever the match is still on its board.' },
+      { q: 'How many selections can a betPawa to Bangbet code carry?', a: 'Up to 30 selections are supported for a betPawa to Bangbet conversion.' },
+      { q: 'Is generating a Bangbet code from betPawa free?', a: 'Yes, creating the Bangbet booking code is free; you only stake when you place the bet on Bangbet.' }
+    ]
+  },
+  {
+    from: 'bangbet',
+    to: 'betpawa',
+    blurb: 'Re-encode a Bangbet booking code as a betPawa booking code.',
+    intro:
+      'Convert a Bangbet booking code into a betPawa booking code. Bangbet runs on the Sportradar platform, and each match maps onto the matching betPawa event before the code is minted with current odds. Great for Bangbet users who also play on betPawa, or for moving a shared Bangbet slip onto your betPawa account.',
+    howTo: [
+      { title: 'Copy your Bangbet booking code', body: 'Open the Bangbet booking you want to move and copy the short code it displays.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to Bangbet.' },
+      { title: 'Choose betPawa and convert', body: 'Set the To bookmaker to betPawa and tap Convert Code.' },
+      { title: 'Load it on betPawa', body: 'Open the betPawa app, tap Load Code, paste the generated code and the slip loads ready to stake.' }
+    ],
+    faq: [
+      { q: 'Can every Bangbet code convert to betPawa?', a: '1X2 selections convert cleanly, because each Bangbet match is matched to the betPawa feed and a new code is minted with current odds.' },
+      { q: 'Do the odds survive the move to betPawa?', a: 'Selections are re-priced at betPawa current odds when the code is minted, so the total is whatever betPawa prices at conversion time.' },
+      { q: 'How many legs can a Bangbet to betPawa code hold?', a: 'Up to 30 legs are supported for a Bangbet to betPawa conversion.' },
+      { q: 'Is converting a Bangbet code to betPawa free?', a: 'Yes, creating the betPawa booking code is free; you only stake if you place the bet on betPawa.' }
+    ]
+  },
+  {
+    from: 'betking',
+    to: 'betpawa',
+    blurb: 'Decode a BetKing book bet code and re-issue it as a betPawa booking code.',
+    intro:
+      'BetKing book bet codes open at the /book-bet/ share link, and the converter decodes yours, matches each match to the matching betPawa event, and mints a fresh betPawa booking code. Handy when a friend shares a BetKing slip but you bet on betPawa, or you simply want the same selections on your betPawa account.',
+    howTo: [
+      { title: 'Copy your BetKing book bet code', body: 'Open your BetKing slip, book the bet to give it a code, and copy the book bet code it shows.' },
+      { title: 'Paste it here', body: 'Paste the code and confirm the From bookmaker is set to BetKing.' },
+      { title: 'Choose betPawa and convert', body: 'Set the To bookmaker to betPawa and tap Convert Code.' },
+      { title: 'Load it on betPawa', body: 'Open the betPawa app, tap Load Code, paste the generated code and the slip loads ready to stake.' }
+    ],
+    faq: [
+      { q: 'Can a BetKing code convert to betPawa?', a: 'Most can. Each BetKing selection resolves through the shared Sportradar event id, which is matched to the betPawa feed before a new code is minted from the 1X2 legs.' },
+      { q: 'Which BetKing selections become betPawa codes?', a: 'The 1X2 legs convert, because a betPawa code is minted from the match-result market on the live event feed.' },
+      { q: 'How many legs can a BetKing to betPawa code have?', a: 'Up to 30 legs are supported for a BetKing to betPawa conversion.' },
+      { q: 'Is BetKing to betPawa conversion free?', a: 'Yes, generating the betPawa booking code is free; you only stake if you place the bet on betPawa.' }
+    ]
   }
 ];
 
 const HUB = {
   intro:
-    'Pick a conversion below or open the full tool. Paste a SportyBet, MSport, Bet9ja, Betway, BetKing or Bangbet code, preview every selection and odds, then get a fresh playable code for the bookmaker you use. Free, no sign-in, up to 30 selections.',
+    'Pick a conversion below or open the full tool. Paste a SportyBet, MSport, Bet9ja, Betway, BetKing, Bangbet or betPawa code, preview every selection and odds, then get a fresh playable code for the bookmaker you use. Free, no sign-in, up to 30 selections.',
   faq: [
     { q: 'Is converting booking codes free?', a: 'Yes. WinFulltime never charges for decoding, previewing or generating a booking code. You only stake money if you place the converted bet on your bookmaker.' },
-    { q: 'Which bookmakers can I convert between?', a: 'SportyBet, MSport, Betway, Bet9ja, BetKing and Bangbet codes can be decoded, and 1X2 selections can be converted between any two supported bookmakers. BetKing is decode-only for now. Codes are validated by the target bookmaker before they are returned.' },
+    { q: 'Which bookmakers can I convert between?', a: 'SportyBet, MSport, Betway, Bet9ja, BetKing, Bangbet and betPawa codes can be decoded, and 1X2 selections can be converted between any two supported bookmakers. BetKing code creation is not supported yet. Codes are validated by the target bookmaker before they are returned.' },
     { q: 'Why is Bet9ja conversion limited?', a: 'Bet9ja code creation currently supports 1X2 selections only, and Bet9ja conversion is experiencing issues at the moment. Our technical team is working on it. SportyBet, MSport and Betway conversions are unaffected.' },
     { q: 'Can I create a new BetKing code?', a: 'Not yet. BetKing codes decode and convert out to other bookmakers, but creating a fresh BetKing code needs a signed-in BetKing Code Zone session and is not supported yet. Bangbet codes both decode and create.' },
     { q: 'How many selections can a code have?', a: 'The maximum is 30 selections per code. Codes above that limit are rejected with a clear message.' },
