@@ -312,7 +312,9 @@ function applyLayoutToHtml(html, activePath) {
     if (!/featured-bookmakers-carousel\.css/.test(html)) {
       html = html.replace(/<\/head>/i, FEATURED_BOOKS_CSS_LINK + '\n</head>');
     }
-    if (/<main[^>]*>/.test(html)) {
+    if (/<h1[^>]*>[\s\S]*?<\/h1>/.test(html)) {
+      html = html.replace(/(<h1[^>]*>[\s\S]*?<\/h1>)/, function (m) { return m + '\n' + FEATURED_BOOKS_SECTION; });
+    } else if (/<main[^>]*>/.test(html)) {
       html = html.replace(/(<main[^>]*>)/, function (m) { return m + '\n' + FEATURED_BOOKS_SECTION; });
     } else if (/<footer[^>]*>/i.test(html)) {
       html = html.replace(/(<footer[^>]*>)/i, FEATURED_BOOKS_SECTION + '\n$1');
