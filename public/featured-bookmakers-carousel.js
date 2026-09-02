@@ -71,13 +71,24 @@
       if (timer) { clearInterval(timer); timer = null; }
     }
 
-    function startAuto() {
-      if (reducedMotion || timer || !canScroll() || maxIndex() < 1) return;
-      timer = setInterval(function () {
-        if (document.hidden) return;
-        page = page >= maxIndex() ? 0 : page + 1;
+    function advanceAuto() {
+      if (document.hidden) return;
+      var max = maxIndex();
+      if (max < 1) return;
+      if (page >= max) {
+        page = 0;
+        scrollJs = true;
+        track.scrollTo({ left: 0, behavior: 'auto' });
+        updateArrows();
+      } else {
+        page += 1;
         snapToIndex(page);
-      }, AUTOPLAY_MS);
+      }
+    }
+
+    function startAuto() {
+      if (reducedMotion || timer || !canScroll()) return;
+      timer = setInterval(advanceAuto, AUTOPLAY_MS);
     }
 
     function restartAuto() {

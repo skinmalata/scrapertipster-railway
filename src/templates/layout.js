@@ -232,6 +232,20 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 // Pages that keep their own custom shell and must never get the shared layout.
 const SKIP_PAGES = new Set(['admin.html', 'app.html', 'offline.html', 'yandex_7d24d4a4103b655d.html']);
 
+const FEATURED_BOOKS_CSS_LINK = '<link rel="stylesheet" href="/featured-bookmakers-carousel.css">';
+
+const FEATURED_BOOKS_SECTION = "  <section class=\"featured-books\" id=\"featured-books\" aria-labelledby=\"featured-books-title\">\n   <div class=\"featured-books-head\">\n    <div>\n     <h2 id=\"featured-books-title\">Featured Bookmakers</h2>\n     <p class=\"featured-books-sub\">Reviewed and recommended betting sites &#8212; welcome offers are for new customers and vary by country.</p>\n    </div>\n    <div class=\"featured-books-nav\">\n     <button type=\"button\" class=\"featured-books-arrow\" id=\"fmPrev\" aria-label=\"Previous bookmakers\">&#8249;</button>\n     <button type=\"button\" class=\"featured-books-arrow\" id=\"fmNext\" aria-label=\"Next bookmakers\">&#8250;</button>\n    </div>\n   </div>\n   <div class=\"featured-books-viewport\">\n    <div class=\"featured-books-track\" id=\"fmTrack\" role=\"list\" aria-label=\"Featured bookmakers\">\n     <article class=\"featured-books-card\" role=\"listitem\">\n      <div class=\"featured-books-top\">\n       <span class=\"featured-books-badge\" style=\"background:linear-gradient(135deg,#1d4ed8,#1e3a8a);\">1xBet</span>\n       <span class=\"featured-books-rating\" title=\"Editorial rating out of 5\"><span class=\"fm-rating-num\">4.2</span><span class=\"fm-outof\">/5</span></span>\n      </div>\n      <p class=\"featured-books-tag\">Welcome Offer</p>\n      <p class=\"featured-books-offer\">First-deposit welcome bonus, pre-match odds across 20+ markets, and booking/code betting for Nigeria, Kenya and Ghana.</p>\n      <div class=\"featured-books-actions\">\n       <a class=\"featured-books-cta\" href=\"https://reffpa.com/L?tag=d_6034393m_97c_&amp;site=6034393&amp;ad=97\" target=\"_blank\" rel=\"noopener noreferrer nofollow sponsored\">Claim Offer &rarr;</a>\n       <a class=\"featured-books-review\" href=\"/blog/1xbet-review.html\">Read 1xBet review</a>\n      </div>\n      <p class=\"featured-books-terms\">18+ only. Bonus tied to your first deposit; minimum odds and wagering requirements apply. T&amp;Cs apply.</p>\n     </article>\n     <article class=\"featured-books-card\" role=\"listitem\">\n      <div class=\"featured-books-top\">\n       <span class=\"featured-books-badge\" style=\"background:linear-gradient(135deg,#e11d48,#881337);\">1win</span>\n       <span class=\"featured-books-rating\" title=\"Editorial rating out of 5\"><span class=\"fm-rating-num\">4.1</span><span class=\"fm-outof\">/5</span></span>\n      </div>\n      <p class=\"featured-books-tag\">Welcome Offer</p>\n      <p class=\"featured-books-offer\">First-deposit welcome bonus with daily accumulator boosts, cash-out and a dedicated mobile betting app.</p>\n      <div class=\"featured-books-actions\">\n       <a class=\"featured-books-cta\" href=\"https://one-vv6198.com/betting?open=register&amp;p=f61e\" target=\"_blank\" rel=\"noopener noreferrer nofollow sponsored\">Claim Offer &rarr;</a>\n       <a class=\"featured-books-review\" href=\"/options.html\">Compare bookmakers</a>\n      </div>\n      <p class=\"featured-books-terms\">18+ only. Bonus tied to your first deposit; minimum odds and wagering requirements apply. T&amp;Cs apply.</p>\n     </article>\n     <article class=\"featured-books-card\" role=\"listitem\">\n      <div class=\"featured-books-top\">\n       <span class=\"featured-books-badge\" style=\"background:linear-gradient(135deg,#16a34a,#0f3d1e);\">Stake</span>\n       <span class=\"featured-books-rating\" title=\"Editorial rating out of 5\"><span class=\"fm-rating-num\">4.3</span><span class=\"fm-outof\">/5</span></span>\n      </div>\n      <p class=\"featured-books-tag\">Welcome Offer</p>\n      <p class=\"featured-books-offer\">Sportsbook and casino with fast crypto deposits and withdrawals, live betting, cash-out and daily promotions.</p>\n      <div class=\"featured-books-actions\">\n       <a class=\"featured-books-cta\" href=\"https://stake.com/?c=FjhqQ3n3\" target=\"_blank\" rel=\"noopener noreferrer nofollow sponsored\">Visit Stake &rarr;</a>\n       <a class=\"featured-books-review\" href=\"/options.html\">Compare bookmakers</a>\n      </div>\n      <p class=\"featured-books-terms\">18+ only. Offer, minimum deposit and wagering requirements vary by location. T&amp;Cs apply.</p>\n     </article>\n     <article class=\"featured-books-card featured-books-slot\" role=\"listitem\" aria-label=\"Advertising slot for bookmakers\">\n      <span class=\"featured-books-slot-label\">Advertise here</span>\n      <p class=\"featured-books-slot-note\">Feature your bookmaker in front of thousands of daily bettors. Sponsored &amp; premium placements available.</p>\n      <a class=\"featured-books-slot-cta\" href=\"/advertise.html\" rel=\"nofollow\">Book this slot &rarr;</a>\n     </article>\n    </div>\n   </div>\n   <p class=\"featured-books-disclosure\">Advertising disclosure: links to bookmakers on this page are affiliate links &#8212; WinFulltime may earn a commission if you sign up, at no extra cost to you. 18+ &middot; T&amp;Cs apply &middot; Please gamble responsibly.</p>\n  </section>\n  <script src=\"/featured-bookmakers-carousel.js?v=20260902c\" defer></script>";
+
+const FEATURED_BOOKS_EXCLUDE = new Set(['about','account','admin','app','author-bio','contact','login','offline','policy','privacy','reset-password','signup','terms']);
+
+function shouldShowFeaturedBooks(url) {
+  if (!url) return false;
+  const last = (url.split('/').pop() || '').replace(/\.html$/, '');
+  const bare = url.replace(/^\/+/, '').replace(/\.html$/, '');
+  return !FEATURED_BOOKS_EXCLUDE.has(last) && !FEATURED_BOOKS_EXCLUDE.has(bare);
+}
+
+
 function applyLayout(html, req) {
   return applyLayoutToHtml(html, (req && req.path) || '/');
 }
@@ -291,6 +305,18 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(footerRe, (m, open, close) => open + FOOTER_HTML + '\n' + close);
   } else {
     html = html.replace(/<\/body>/i, '<footer>' + FOOTER_HTML + '\n</footer>\n</body>');
+  }
+
+  // 3b. Featured Bookmakers carousel (content/prediction pages only).
+  if (shouldShowFeaturedBooks(activePath) && !/class="featured-books-card"/.test(html)) {
+    if (!/featured-bookmakers-carousel\.css/.test(html)) {
+      html = html.replace(/<\/head>/i, FEATURED_BOOKS_CSS_LINK + '\n</head>');
+    }
+    if (/<main[^>]*>/.test(html)) {
+      html = html.replace(/(<main[^>]*>)/, function (m) { return m + '\n' + FEATURED_BOOKS_SECTION; });
+    } else if (/<footer[^>]*>/i.test(html)) {
+      html = html.replace(/(<footer[^>]*>)/i, FEATURED_BOOKS_SECTION + '\n$1');
+    }
   }
 
   // 4. Ensure the auth stack + theme/hamburger scripts are present so the
