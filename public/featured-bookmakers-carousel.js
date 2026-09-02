@@ -44,24 +44,66 @@
     prev.addEventListener('click', function () {
       page = Math.max(0, page - 1);
       snapToIndex(page);
+      restartAuto();
     });
     next.addEventListener('click', function () {
       page += 1;
       snapToIndex(page);
+      restartAuto();
     });
 
     track.addEventListener('scroll', function () {
       scrollJs = false;
+      var w = cardWidth();
+      if (w > 0) page = Math.round(track.scrollLeft / w);
       updateArrows();
     }, { passive: true });
+
+    var AUTOPLAY_MS = 4200;
+    var timer = null;
+    var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function maxIndex() {
+      return Math.max(0, Math.ceil(track.scrollWidth / cardWidth()) - 1);
+    }
+
+    function stopAuto() {
+      if (timer) { clearInterval(timer); timer = null; }
+    }
+
+    function startAuto() {
+      if (reducedMotion || timer || !canScroll() || maxIndex() < 1) return;
+      timer = setInterval(function () {
+        if (document.hidden) return;
+        page = page >= maxIndex() ? 0 : page + 1;
+        snapToIndex(page);
+      }, AUTOPLAY_MS);
+    }
+
+    function restartAuto() {
+      stopAuto();
+      startAuto();
+    }
+
+    section.addEventListener('mouseenter', stopAuto);
+    section.addEventListener('mouseleave', startAuto);
+    section.addEventListener('touchstart', stopAuto, { passive: true });
+    section.addEventListener('touchend', startAuto, { passive: true });
+    section.addEventListener('focusin', stopAuto);
+    section.addEventListener('focusout', startAuto);
 
     function onResize() {
       page = 0;
       updateArrows();
+      restartAuto();
     }
     window.addEventListener('resize', onResize);
-    window.addEventListener('load', updateArrows);
+    window.addEventListener('load', function () {
+      updateArrows();
+      startAuto();
+    });
     updateArrows();
+    startAuto();
   }
 
   if (document.readyState === 'loading') {

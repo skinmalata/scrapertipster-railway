@@ -26,6 +26,8 @@
 .featured-books-slot { justify-content: center; align-items: center; text-align: center; border-style: dashed; border-color: rgba(255,255,255,0.14); background: rgba(255,255,255,0.02); }
 .featured-books-slot-label { font-size: 13px; font-weight: 700; color: #64748b; }
 .featured-books-slot-note { font-size: 12px; color: #64748b; line-height: 1.5; margin: 0; max-width: 220px; }
+.featured-books-slot-cta { display: inline-block; margin-top: 4px; padding: 8px 16px; border: 1px dashed rgba(148,163,184,0.6); border-radius: 10px; font-size: 13px; font-weight: 700; color: #cbd5e1; text-decoration: none; transition: border-color 0.2s, color 0.2s, background 0.2s; }
+.featured-books-slot-cta:hover { border-color: #93c5fd; color: #93c5fd; background: rgba(147,197,253,0.06); }
 .featured-books-disclosure { font-size: 11.5px; color: #64748b; line-height: 1.6; margin: 2px 4px 0; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); }
 @media (min-width: 640px) {
   .featured-books-card { flex-basis: calc(50% - 6px); }
