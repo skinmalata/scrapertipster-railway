@@ -12,7 +12,7 @@
 // so they are not counted against the budget.
 
 const ODDS_API_BASE = 'https://api.the-odds-api.com';
-const ODDS_REGIONS = 'eu'; // 1xBet is available in the eu region
+const ODDS_REGIONS = 'eu,ng'; // eu for global bookmakers, ng for Nigerian bookmakers (Bet9ja, SportyBet, etc.)
 const ODDS_MARKETS = 'h2h';
 const ODDS_FORMAT = 'decimal';
 const DATE_FORMAT = 'iso';
@@ -20,7 +20,7 @@ const DATE_FORMAT = 'iso';
 const SPORTS_CACHE_MS = 12 * 60 * 60 * 1000;
 const ODDS_CACHE_MS = 20 * 60 * 1000;
 const MAX_ODDS_CACHE = 60;
-const DAILY_ODDS_BUDGET = 12;
+const DAILY_ODDS_BUDGET = 20;
 
 let sportsListCache = { createdAt: 0, data: null, key: null };
 let oddsCache = new Map();
@@ -118,7 +118,11 @@ const LEAGUE_SPORT_OVERRIDES = {
   'nations league': 'soccer_uefa_nations_league',
   'euro 2024': 'soccer_uefa_european_championship',
   'euro': 'soccer_uefa_european_championship',
-  'africa cup of nations': 'soccer_africa_cup_of_nations'
+  'africa cup of nations': 'soccer_africa_cup_of_nations',
+  'npfl': 'soccer_nigeria_premier_league',
+  'nigerian premier league': 'soccer_nigeria_premier_league',
+  'nigeria premier league': 'soccer_nigeria_premier_league',
+  'nigerian league': 'soccer_nigeria_premier_league'
 };
 
 // Ordered most-likely-first list of soccer sports used as a fallback for
@@ -157,7 +161,8 @@ const FALLBACK_PRIORITY_SPORTS = [
   'soccer_mexico_ligamx',
   'soccer_usa_mls',
   'soccer_argentina_primera_division',
-  'soccer_chile_campeonato'
+  'soccer_chile_campeonato',
+  'soccer_nigeria_premier_league'
 ];
 
 const MAX_FALLBACK_PROBES = 5;
@@ -343,7 +348,38 @@ const TEAM_ALIASES = {
   'newcastle': 'newcastle united',
   'united': 'united',
   'hod': 'hod',
-  'nb': 'nb'
+  'nb': 'nb',
+  // NPFL teams
+  'enyimba': 'enyimba',
+  'kano pillars': 'kano pillars',
+  'kano pill': 'kano pillars',
+  'rangers international': 'rangers international',
+  'heartland': 'heartland',
+  'sunshine stars': 'sunshine stars',
+  'warri wolves': 'warri wolves',
+  'obiobi stars': 'obiobi stars',
+  'lobi stars': 'lobi stars',
+  'nasarawa united': 'nasarawa united',
+  'katsina united': 'katsina united',
+  'fc izo': 'fc izo',
+  'dynamo star': 'dynamo star',
+  'abia warriors': 'abia warriors',
+  'remo stars': 'remo stars',
+  'shots': 'shots',
+  'bendel insurance': 'bendel insurance',
+  'tornadoes': 'tornadoes',
+  'oundary united': 'boundary united',
+  'niger tornadoes': 'niger tornadoes',
+  'akwa united': 'akwa united',
+  'delta force': 'delta force',
+  'crown fc': 'crown fc',
+  'eyeope': 'eyeope',
+  'squads': 'squads',
+  'fc plateau': 'fc plateau',
+  'plateau united': 'plateau united',
+  'mfm': 'mfm',
+  'mountain of fire': 'mountain of fire',
+  'sunshine': 'sunshine stars'
 };
 
 function aliasTokens(name) {
