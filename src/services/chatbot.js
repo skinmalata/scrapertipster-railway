@@ -53,7 +53,7 @@ const faq = [
   { keywords: ['about', 'what is', 'who are', 'tell me about', 'company'], response: knowledge.business.description },
   { keywords: ['prediction', 'tip', 'pick', 'bet'], response: knowledge.features.predictions },
   { keywords: ['league', 'leagues', 'competition', 'tournament', 'premier league', 'la liga', 'serie a', 'bundesliga', 'ligue 1'], response: knowledge.features.leagues },
-  { keywords: ['how', 'use', 'works', 'work', 'guide', 'start'], response: `To use WinFulltime:\n1. Visit ${knowledge.pages.home}\n2. Select a day tab (Today, Tomorrow)\n3. Choose a market category\n4. Browse predictions with confidence percentages\n5. Click any match for detailed analysis\n6. Try the Pro Ticket Builder for accumulators` },
+  { keywords: ['how', 'use', 'works', 'work', 'guide', 'start'], response: `To use WinFulltime:\n1. Visit ${knowledge.pages.home}\n2. Select a day tab (Today, Tomorrow)\n3. Choose a market category\n4. Browse predictions with confidence percentages\n5. Click any match for detailed analysis\n6. Try the Free Ticket Builder for accumulators` },
   { keywords: ['1x2', 'match result', 'home win', 'draw', 'away win'], response: knowledge.bettingMarkets['1x2'] },
   { keywords: ['over', 'under', 'goals', 'total goals', 'ou', 'over under'], response: knowledge.bettingMarkets['over/under'] },
   { keywords: ['btts', 'both teams', 'both teams to score', 'ots', 'one team'], response: knowledge.bettingMarkets['btts'] },

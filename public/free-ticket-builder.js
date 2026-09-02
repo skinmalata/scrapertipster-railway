@@ -65,7 +65,7 @@
     var betwayOk=best.every(function(s){return String(s.category||'').toLowerCase()==='1x2'&&/^[1X2]$/.test(String(s.tip||'').trim())});
     var codeHtml=bookingCodeMode?
       '<div class="htb-actions"><button class="code-btn sportybet" data-code="sportybet">SportyBet Code</button>'+(betwayOk?'<button class="code-btn betway" data-code="betway">Betway Code</button><button class="code-btn betpawa" data-code="betpawa">betPawa Code</button>':'')+'</div><div class="code-display" id="htbCodeDisplay"></div>':'';
-    return '<div class="htb-ticket"><div class="htb-ticket-head"><span class="htb-ticket-label">'+best.length+'-Leg Accumulator</span><span class="htb-ticket-odds">'+totalOdds.toFixed(2)+' odds</span></div>'+legs+staleHtml+codeHtml+'<a href="'+PRO_URL+'" class="htb-full">Want higher odds? Try the Pro Ticket Builder &rarr;</a></div>';
+    return '<div class="htb-ticket"><div class="htb-ticket-head"><span class="htb-ticket-label">'+best.length+'-Leg Accumulator</span><span class="htb-ticket-odds">'+totalOdds.toFixed(2)+' odds</span></div>'+legs+staleHtml+codeHtml+'<a href="'+PRO_URL+'" class="htb-full">Want higher odds? Try the full Ticket Builder &rarr;</a></div>';
   }
 
   function buildTicket(picks,target,shuffle){
@@ -100,7 +100,7 @@
     var res=document.getElementById('htbResult');
     var shuffleBtn=document.getElementById('htbShuffle');
     if(!Number.isFinite(target)||target<=1||!Number.isFinite(minO)||minO<=1||!Number.isFinite(maxO)||maxO<minO){res.innerHTML='<div class="htb-empty">Enter valid odds values.</div>';return}
-    if(target>5){res.innerHTML='<div class="htb-empty">For targets above 5 odds, use the <a href="'+PRO_URL+'" class="htb-full">Pro Ticket Builder</a>.</div>';return}
+    if(target>5){res.innerHTML='<div class="htb-empty">For targets above 5 odds, use the <a href="'+PRO_URL+'" class="htb-full">full Ticket Builder</a>.</div>';return}
     res.innerHTML='<div class="htb-loading"><div class="htb-spinner"></div><div class="htb-loading-text">Building ticket...</div></div>';
     try{
       var r=await fetch('/data/predictions.json',{cache:'no-store'});
@@ -109,7 +109,7 @@
       var feedKeys=null;
       if(bookingCodeMode){
         try{var fm=await fetch(API_BASE+'/api/converter/available-matches',{cache:'no-store'});if(fm.ok){var feed=await fm.json();feedKeys=new Set((feed.matches||[]).map(function(x){return normaliseTeam(x.home)+'|'+normaliseTeam(x.away)}))}}catch(e){}
-        if(!feedKeys){res.innerHTML='<div class="htb-empty">Could not load eligible matches. <a href="'+PRO_URL+'" class="htb-full">Try the Pro Ticket Builder</a></div>';return}
+        if(!feedKeys){res.innerHTML='<div class="htb-empty">Could not load eligible matches. <a href="'+PRO_URL+'" class="htb-full">Try the full Ticket Builder</a></div>';return}
       }
       var today=new Date().toISOString().split('T')[0];
       var staleNote=null;
@@ -152,7 +152,7 @@
             shuffleBtn.disabled=false;
             return;
           }
-          res.innerHTML='<div class="htb-empty">'+esc(fbRes.reason||bcRes.reason||'No qualifying picks for a booking code.')+' <a href="'+PRO_URL+'" class="htb-full">Try the Pro Ticket Builder</a></div>';
+          res.innerHTML='<div class="htb-empty">'+esc(fbRes.reason||bcRes.reason||'No qualifying picks for a booking code.')+' <a href="'+PRO_URL+'" class="htb-full">Try the full Ticket Builder</a></div>';
           shuffleBtn.disabled=true;
           return;
         }
@@ -206,13 +206,13 @@
           });
         }
       }
-      if(!picks.length){res.innerHTML='<div class="htb-empty">No qualifying picks. <a href="'+PRO_URL+'" class="htb-full">Try the Pro Ticket Builder</a></div>';shuffleBtn.disabled=true;return}
+      if(!picks.length){res.innerHTML='<div class="htb-empty">No qualifying picks. <a href="'+PRO_URL+'" class="htb-full">Try the full Ticket Builder</a></div>';shuffleBtn.disabled=true;return}
       lastPicks=picks;lastTarget=target;lastMinOdds=minO;
       var result=buildTicket(picks,target,shuffle);
-      if(!result){res.innerHTML='<div class="htb-empty">No valid ticket found. Try adjusting odds range. <a href="'+PRO_URL+'" class="htb-full">Try the Pro Ticket Builder</a></div>';shuffleBtn.disabled=true;return}
+      if(!result){res.innerHTML='<div class="htb-empty">No valid ticket found. Try adjusting odds range. <a href="'+PRO_URL+'" class="htb-full">Try the full Ticket Builder</a></div>';shuffleBtn.disabled=true;return}
       res.innerHTML=renderTicket(result.best,result.totalOdds,staleNote,bookingCodeMode);
       shuffleBtn.disabled=false;
-    }catch(e){res.innerHTML='<div class="htb-empty">Unable to load predictions. <a href="'+PRO_URL+'" class="htb-full">Try the Pro Ticket Builder</a></div>';shuffleBtn.disabled=true}
+    }catch(e){res.innerHTML='<div class="htb-empty">Unable to load predictions. <a href="'+PRO_URL+'" class="htb-full">Try the full Ticket Builder</a></div>';shuffleBtn.disabled=true}
   }
 
   document.getElementById('htbGenerate').addEventListener('click',function(){generate(false)});
