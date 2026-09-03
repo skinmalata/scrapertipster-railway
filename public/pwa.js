@@ -260,7 +260,7 @@
  // --- Install Prompt Banner ---
  let deferredPrompt = null;
  const DISMISSED_KEY = 'wf_pwa_dismissed';
- const DISMISSED_DURATION = 7 * 24 * 60 * 60 * 1000;
+  const DISMISSED_DURATION = 24 * 60 * 60 * 1000;
  const isBeforeInstallPromptSupported = 'onbeforeinstallprompt' in window;
 
  function wasDismissed() {
