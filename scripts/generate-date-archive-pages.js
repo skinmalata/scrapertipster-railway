@@ -141,13 +141,19 @@ function generateDateArchivePage(dateStr, resultsList, ctx, tipsForDate) {
   totalCount = allMatches.length;
 
   const MAX_CARDS = 200;
-  const cardsToShow = evaluatedMatches.slice(0, MAX_CARDS);
+  const sortedMatches = [...evaluatedMatches].sort((a, b) => {
+    const aEval = a.won === true || a.won === false ? 1 : 0;
+    const bEval = b.won === true || b.won === false ? 1 : 0;
+    return bEval - aEval;
+  });
+  const cardsToShow = sortedMatches.slice(0, MAX_CARDS);
   const resultCardsHtml = cardsToShow.map(r => {
     const home = escapeHtml(r.home || r.homeTeam || 'Home');
     const away = escapeHtml(r.away || r.awayTeam || 'Away');
     const score = escapeHtml(r.score || r.ft || (r.homeGoals != null ? `${r.homeGoals} - ${r.awayGoals}` : 'FT'));
-    const tip = escapeHtml(r.tip || '1X2');
-    const won = r.won;
+    const hasTip = !!(r.tip);
+    const tip = escapeHtml(r.tip || 'No prediction recorded');
+    const won = hasTip ? r.won : null;
 
     let statusBadge;
     if (won === true) {
@@ -155,7 +161,7 @@ function generateDateArchivePage(dateStr, resultsList, ctx, tipsForDate) {
     } else if (won === false) {
       statusBadge = `<span style="background:rgba(239,68,68,0.15);color:#ef4444;padding:3px 10px;border-radius:6px;font-weight:700;font-size:12px;">\u2718 LOST</span>`;
     } else {
-      statusBadge = `<span style="background:rgba(148,163,184,0.12);color:#94a3b8;padding:3px 10px;border-radius:6px;font-weight:700;font-size:12px;">SETTLED</span>`;
+      statusBadge = `<span style="background:rgba(148,163,184,0.12);color:#94a3b8;padding:3px 10px;border-radius:6px;font-weight:700;font-size:12px;">${escapeHtml(r.tip ? 'SETTLED' : 'RESULT ONLY')}</span>`;
     }
 
     return `
