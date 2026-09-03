@@ -97,27 +97,30 @@ function renderMatchCard(m, leagueSlug, analysisUrls, teamSlugs) {
   const homeTeamSlug = slugifyTeam(homeRaw);
   const awayTeamSlug = slugifyTeam(awayRaw);
 
+  const teamLinks = [
+    homeTeamSlug && teamSlugs && teamSlugs.has(homeTeamSlug) ? `<a href="/teams/${homeTeamSlug}/" style="color:var(--text-secondary);font-size:11px;text-decoration:none;">${home}</a>` : '',
+    awayTeamSlug && teamSlugs && teamSlugs.has(awayTeamSlug) ? `<a href="/teams/${awayTeamSlug}/" style="color:var(--text-secondary);font-size:11px;text-decoration:none;">${away}</a>` : '',
+    analysisUrl ? `<a href="${analysisUrl}" class="analysis-btn" style="color:var(--accent);font-size:12px;font-weight:600;text-decoration:none;">Analysis &rarr;</a>` : ''
+  ].filter(Boolean).join('');
+
   return `
-  <div class="match-card" data-tip="${tip}">
+  <div class="match-card fade-in" data-tip="${tip}" data-home="${escapeHtml(m.home || '')}" data-away="${escapeHtml(m.away || '')}">
     <div class="match-header">
-      <span class="match-time">\u23f1 ${time}</span>
-      <span class="match-country">${escapeHtml(m.country || m.league || 'Football')}</span>
+      <span>${escapeHtml(m.country || m.league || '')}</span>
+      <span>${time}</span>
     </div>
     <div class="match-teams">
-      <div class="team home">${home}</div>
-      <div class="vs">VS</div>
-      <div class="team away">${away}</div>
+      <span class="team team-home">${home}</span>
+      <span class="vs-score">vs</span>
+      <span class="team team-away">${away}</span>
     </div>
-    <div class="match-footer" style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
-      <div class="tip-badge" style="background:rgba(255,36,72,0.15);color:var(--accent);padding:4px 10px;border-radius:6px;font-weight:700;font-size:13px;">
-        ${tip} ${prob ? `<span style="opacity:0.8;font-size:11px;">(${prob}%)</span>` : ''}
-      </div>
-      <div style="display:flex;gap:12px;align-items:center;">
-        ${homeTeamSlug && teamSlugs && teamSlugs.has(homeTeamSlug) ? `<a href="/teams/${homeTeamSlug}/" style="color:var(--text-secondary);font-size:11px;text-decoration:none;">${home}</a>` : ''}
-        ${awayTeamSlug && teamSlugs && teamSlugs.has(awayTeamSlug) ? `<a href="/teams/${awayTeamSlug}/" style="color:var(--text-secondary);font-size:11px;text-decoration:none;">${away}</a>` : ''}
-        ${analysisUrl ? `<a href="${analysisUrl}" class="analysis-btn" style="color:var(--accent);font-size:12px;font-weight:600;text-decoration:none;">Analysis &rarr;</a>` : ''}
+    <div class="match-footer">
+      <div style="text-align:center;display:flex;flex-direction:column;align-items:center;">
+        <span class="tip-badge">${tip}</span>
+        ${prob ? `<div class="probability">${prob}%</div>` : ''}
       </div>
     </div>
+    ${teamLinks ? `<div style="text-align:center;margin-top:8px;">${teamLinks}</div>` : ''}
   </div>`;
 }
 

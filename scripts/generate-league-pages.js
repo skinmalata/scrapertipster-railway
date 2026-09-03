@@ -149,23 +149,24 @@ function renderMatchCard(m, analysisUrls) {
   const analysisUrl = analysisKey && analysisUrls && analysisUrls.has(analysisKey) ? `/analysis/${analysisKey}/` : '';
 
   return `
-  <div class="match-card" data-tip="${tip}" data-home="${escapeHtml(homeRaw)}" data-away="${escapeHtml(awayRaw)}">
+  <div class="match-card fade-in" data-tip="${tip}" data-home="${escapeHtml(homeRaw)}" data-away="${escapeHtml(awayRaw)}">
     <div class="match-header">
-      <span class="match-time">⏱ ${time}</span>
-      <span class="match-country">${escapeHtml(m.country || m.league || 'Football')}</span>
+      <span>${escapeHtml(m.country || m.league || '')}</span>
+      <span>${time}</span>
     </div>
     <div class="match-teams">
-      <div class="team home">${home}</div>
-      <div class="vs">VS</div>
-      <div class="team away">${away}</div>
+      <span class="team team-home">${home}</span>
+      <span class="vs-score">vs</span>
+      <span class="team team-away">${away}</span>
     </div>
-    <div class="match-footer" style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
-      <div class="tip-badge" style="background:rgba(255,36,72,0.15);color:var(--accent);padding:4px 10px;border-radius:6px;font-weight:700;font-size:13px;">
-        ${tip} ${prob ? `<span style="opacity:0.8;font-size:11px;">(${prob}%)</span>` : ''}
+    <div class="match-footer">
+      <div style="text-align:center;display:flex;flex-direction:column;align-items:center;">
+        <span class="tip-badge">${tip}</span>
+        ${prob ? `<div class="probability">${prob}%</div>` : ''}
       </div>
-      ${analysisUrl ? `<a href="${analysisUrl}" class="analysis-btn" style="color:var(--text-secondary);font-size:12px;font-weight:600;text-decoration:none;">View Analysis &rarr;</a>` : ''}
     </div>
-    <div style="text-align:center;"><a href="${AFFILIATE_URL}" target="_blank" rel="noopener nofollow sponsored" class="wft-1xbet-cta" data-tip="${tip}" style="display:inline-block;text-align:center;background:rgba(255,36,72,0.10);color:#fff;padding:4px 12px;border-radius:6px;text-decoration:none;font-weight:600;font-size:12px;margin-top:8px;border:1px solid rgba(255,36,72,0.25);">Bet on 1win<span class="wft-1xbet-odds" style="opacity:0.85;font-weight:600;"></span> &rarr;</a></div>
+    ${analysisUrl ? `<div style="text-align:center;margin-top:6px;"><a href="${analysisUrl}" class="analysis-btn" style="color:var(--accent);font-size:12px;font-weight:600;text-decoration:none;">View Analysis &rarr;</a></div>` : ''}
+    <div style="text-align:center;margin-top:8px;"><a href="${AFFILIATE_URL}" target="_blank" rel="noopener nofollow sponsored" class="wft-1xbet-cta" data-tip="${tip}" style="display:inline-block;text-align:center;background:rgba(255,36,72,0.10);color:#fff;padding:4px 12px;border-radius:6px;text-decoration:none;font-weight:600;font-size:12px;margin-top:8px;border:1px solid rgba(255,36,72,0.25);">Bet on 1win<span class="wft-1xbet-odds" style="opacity:0.85;font-weight:600;"></span> &rarr;</a></div>
   </div>`;
 }
 
