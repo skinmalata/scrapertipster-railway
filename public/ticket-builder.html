@@ -343,7 +343,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <div class="toggle-row" id="bookingCodeRow">
    <input type="checkbox" id="bookingCode">
-   <label for="bookingCode">Generate Booking Code <span class="booking-code-note">(1X2, Double Chance &amp; Over 1.5/2.5 only)</span></label>
+   <label for="bookingCode">Generate Booking Code <span class="booking-code-note">(builds 1X2 tickets; codes minted for SportyBet, Betway &amp; betPawa)</span></label>
   </div>
 
   <div class="legs-row">
@@ -2171,6 +2171,13 @@ nav.open { display: flex !important; }
     var bookingCodeMode = document.getElementById('bookingCode').checked;
     var selectedMarkets = getSelectedMarkets();
     var results = document.getElementById('ticketResults');
+
+    // Booking codes (SportyBet, Betway, betPawa) mint plain 1X2 only, so
+    // build the tickets from 1X2 picks whenever a code is requested. This
+    // guarantees every ticket can produce all three codes at once.
+    if (bookingCodeMode) {
+      selectedMarkets = ['1x2'];
+    }
 
     var timeWindowHours = 0;
     var activeWindow = document.querySelector('#timeWindowSeg button.active');
