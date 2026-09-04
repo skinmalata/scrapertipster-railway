@@ -1200,21 +1200,17 @@ router.get('/golden-tips', optionalAuth, async function (req, res) {
     goldenTipsCache = { createdAt: Date.now(), payload };
   }
 
-  // Tips with a signal strength of 70% and above are Pro only. Free users
-  // still see the cards, but the tip details are masked with a Pro-only message.
-  const isPro = await resolveIsPro(req);
+  // All in-play tips are completely free. Every tip is fully visible with its
+  // market, reason and league/teams — no Pro gating.
   const allOpportunities = Array.isArray(payload.opportunities) ? payload.opportunities : [];
-  const lockedTips = allOpportunities.filter(function (o) { return Number(o.signalScore || 0) >= 70; });
-  if (!isPro) {
-    payload.opportunities = allOpportunities.map(function (o) {
-      if (Number(o.signalScore || 0) >= 70) {
-        return Object.assign({}, o, { locked: true, market: '', reason: '' });
-      }
-      return o;
-    });
-  }
-  payload.isPro = !!isPro;
-  payload.lockedCount = lockedTips.length;
+  payload.opportunities = allOpportunities.map(function (o) {
+    if (o.locked) {
+      return Object.assign({}, o, { locked: false });
+    }
+    return o;
+  });
+  payload.isPro = true;
+  payload.lockedCount = 0;
   res.json(payload);
 });
 
@@ -1530,6 +1526,7 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
       maxOddsPerLeg: parseFloat(body.maxOddsPerLeg) || 100,
       targetOdds: parseFloat(body.targetOdds) || 20,
       shuffle: body.shuffle === true,
+      timeWindowHours: parseFloat(body.timeWindowHours) || 0,
       bookingCodeMode: body.bookingCode === true,
       availableMatches: availableMatches
     };

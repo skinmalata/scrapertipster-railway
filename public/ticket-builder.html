@@ -374,6 +374,18 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
 </div>
 
+  <div class="time-window-row">
+   <label for="timeWindowSeg">Kickoff Within (Best Picks Only)</label>
+   <div class="time-window-seg" id="timeWindowSeg" role="group" aria-label="Kickoff time window">
+    <button type="button" data-window="1">1 Hour</button>
+    <button type="button" data-window="2">2 Hours</button>
+    <button type="button" data-window="6">6 Hours</button>
+    <button type="button" data-window="12">12 Hours</button>
+    <button type="button" data-window="24">24 Hours</button>
+    <button type="button" data-window="0" class="active">Any Time</button>
+   </div>
+  </div>
+
 
   <div style="display:flex;gap:10px;margin-top:16px;">
    <button class="gen-btn" id="genBtn" style="flex:1;">Generate Tickets</button>
@@ -1054,6 +1066,47 @@ nav.open { display: flex !important; }
 
  font-weight: 500 !important;
 
+ }
+
+ .time-window-row {
+  margin-top: 18px;
+  margin-bottom: 20px;
+ }
+ .time-window-row label {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(232, 237, 245, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 10px;
+ }
+ .time-window-seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+ }
+ .time-window-seg button {
+  flex: 1 1 32%;
+  min-width: 0;
+  background: rgba(21,26,44,0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e8edf5;
+  padding: 10px 8px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+ }
+ .time-window-seg button:hover {
+  border-color: rgba(255, 36, 72, 0.4);
+ }
+ .time-window-seg button.active {
+  background: linear-gradient(135deg, #ff2448, #d41a38);
+  border-color: transparent;
+  color: #fff;
  }
 
 
@@ -1998,7 +2051,7 @@ nav.open { display: flex !important; }
   var MAX_LEGS = 30;
   var MAX_ODDS = 500;
 
-  function setupUI() {
+    function setupUI() {
 
     document.getElementById('safeTips').disabled = false;
     var targetInput = document.getElementById('ticketTarget');
@@ -2110,6 +2163,10 @@ nav.open { display: flex !important; }
     var selectedMarkets = getSelectedMarkets();
     var results = document.getElementById('ticketResults');
 
+    var timeWindowHours = 0;
+    var activeWindow = document.querySelector('#timeWindowSeg button.active');
+    if (activeWindow) timeWindowHours = parseInt(activeWindow.getAttribute('data-window'), 10) || 0;
+
     lastTarget = target;
     lastMinOdds = minOdds;
     lastBookingCode = bookingCodeMode;
@@ -2187,6 +2244,7 @@ nav.open { display: flex !important; }
         maxOddsPerLeg: maxOdds,
         targetOdds: target,
         shuffle: shuffle === true,
+        timeWindowHours: timeWindowHours,
         unbeatenData: unbeaten
       });
 
@@ -2258,6 +2316,16 @@ nav.open { display: flex !important; }
 
   document.getElementById('genBtn').addEventListener('click', function() { generateTickets(); });
   document.getElementById('shuffleBtn').addEventListener('click', function() { shuffleTickets(); });
+
+  var seg = document.getElementById('timeWindowSeg');
+  if (seg) {
+    seg.addEventListener('click', function(e) {
+      var btn = e.target.closest('button[data-window]');
+      if (!btn) return;
+      seg.querySelectorAll('button').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+    });
+  }
 
   document.addEventListener('click', function(e) {
     var btn = e.target.closest('[data-code]');

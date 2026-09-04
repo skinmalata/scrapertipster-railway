@@ -69,6 +69,40 @@
     return kickoff < lagosNowString();
   }
 
+  // Format a Date in Lagos local time as a comparable 'YYYY-MM-DD HH:MM'
+  // string. offsetHours shifts the instant so it can cross date boundaries.
+  function lagosDateTimeString(offsetHours) {
+    var d = new Date(Date.now() + (offsetHours || 0) * 3600 * 1000);
+    var parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Africa/Lagos', hour12: false,
+      year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+    }).formatToParts(d);
+    function get(type) {
+      var f = parts.find(function (p) { return p.type === type; });
+      return f ? f.value : '00';
+    }
+    var hour = get('hour') === '24' ? '00' : get('hour');
+    return get('year') + '-' + get('month') + '-' + get('day') + ' ' + hour + ':' + get('minute');
+  }
+
+  function kickoffString(dateStr, timeStr) {
+    if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return null;
+    var t = String(timeStr || '').trim();
+    if (!/^\d{1,2}:\d{2}$/.test(t)) return null;
+    var bits = t.split(':');
+    return dateStr + ' ' + (bits[0].length === 1 ? '0' + bits[0] : bits[0]) + ':' + bits[1];
+  }
+
+  // True when the match kicks off within the next windowHours (exclusive of
+  // already-kicked-off matches). Pass windowHours <= 0 to disable the filter.
+  function withinTimeWindow(dateStr, timeStr, windowHours) {
+    var h = Number(windowHours);
+    if (!(h > 0)) return true;
+    var ko = kickoffString(dateStr, timeStr);
+    if (!ko) return false; // unknown kickoff cannot be guaranteed within a window
+    return ko >= lagosDateTimeString(0) && ko <= lagosDateTimeString(h);
+  }
+
   function teamKey(match) {
     var parts = splitMatch(match);
     if (parts.length !== 2) return null;
@@ -97,6 +131,7 @@
     var maxOdds = options.maxOddsPerLeg || 100;
     var markets = options.markets;
     var maxEntries = options.maxEntries;
+    var timeWindowHours = Number(options.timeWindowHours) > 0 ? Number(options.timeWindowHours) : 0;
     var bookingCodeMode = options.bookingCodeMode || false;
     var availableMatches = options.availableMatches;
     // Booking-code mode relaxes the confidence floor so higher-odds legs are
@@ -153,6 +188,9 @@
         // Booking-code mode allows picks from any upcoming date (not only the
         // selected day) so matches the bookmaker actually offers still count.
         if (!bookingCodeMode && pickDate !== date) return;
+
+        // Restrict to kickoffs within the requested window (e.g. next 6 hours).
+        if (timeWindowHours > 0 && !withinTimeWindow(source.date || pickDate, source.time, timeWindowHours)) return;
 
         var key = pickKey(matchName, tip, pickDate);
         if (seen.has(key)) return;
@@ -391,6 +429,16 @@
     });
     onePerFixture = Array.from(usedPerFixture.values());
     var poolForCombos = onePerFixture.length > 50 ? onePerFixture : pool;
+
+    // When a kickoff time window is active, combine only the highest-confidence
+    // picks from that window so the ticket is built from the best winning
+    // outcomes rather than every marginal pick above the probability floor.
+    if (options.topPicksInWindow > 0 && poolForCombos.length > options.topPicksInWindow) {
+      var bestInWindow = poolForCombos.slice().sort(function (a, b) {
+        return (b.sourceProbability || 0) - (a.sourceProbability || 0);
+      }).slice(0, options.topPicksInWindow);
+      if (bestInWindow.length >= 2) poolForCombos = bestInWindow;
+    }
 
     // The schedule feed yields ~1300 fixtures, and the fallback adds several
     // markets per fixture. An exhaustive 3-leg sweep over that pool stalls the
@@ -749,6 +797,7 @@
     var targetOdds = options.targetOdds || 20;
     var maxTickets = options.maxTickets || 8;
     var bookingCodeMode = options.bookingCodeMode === true;
+    var timeWindowHours = Number(options.timeWindowHours) > 0 ? Number(options.timeWindowHours) : 0;
 
     // Booking-code legs are valid from ~1.05, so high-confidence picks that
     // estimate below the UI's 1.20 floor are not thrown away.
@@ -782,6 +831,7 @@
       maxOddsPerLeg: maxOddsPerLeg,
       markets: markets,
       maxEntries: 200,
+      timeWindowHours: timeWindowHours,
       bookingCodeMode: bookingCodeMode,
       availableMatches: options.availableMatches
     });
@@ -816,6 +866,7 @@
       targetOdds: targetOdds,
       maxOdds: maxOdds,
       shuffle: options.shuffle,
+      topPicksInWindow: timeWindowHours > 0 ? 15 : 0,
       maxTickets: maxTickets
     });
 

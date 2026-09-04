@@ -81,6 +81,7 @@ function buildTicket(predictions, options) {
   var targetOdds = options.targetOdds || 20;
   var maxTickets = options.maxTickets || 8;
   var bookingCodeMode = options.bookingCodeMode === true;
+  var timeWindowHours = Number(options.timeWindowHours) > 0 ? Number(options.timeWindowHours) : 0;
 
   // Booking-code legs are valid from ~1.05, so high-confidence picks that
   // estimate below the UI's 1.20 floor are not thrown away.
@@ -114,6 +115,7 @@ function buildTicket(predictions, options) {
     maxOddsPerLeg: maxOddsPerLeg,
     markets: markets,
     maxEntries: 200,
+    timeWindowHours: timeWindowHours,
     bookingCodeMode: options.bookingCodeMode === true,
     availableMatches: options.availableMatches
   });
@@ -156,6 +158,15 @@ function buildTicket(predictions, options) {
   });
   onePerFixture = Array.from(usedPerFixture.values());
   var poolForCombos = onePerFixture.length > 50 ? onePerFixture : filtered;
+
+  // When a kickoff time window is active, combine only the highest-confidence
+  // picks from that window so the ticket is built from the best winning
+  // outcomes rather than every marginal pick above the probability floor.
+  var TOP_PICKS_IN_WINDOW = 15;
+  if (timeWindowHours > 0 && poolForCombos.length > TOP_PICKS_IN_WINDOW) {
+    var bestInWindow = poolForCombos.slice().sort(function(a, b) { return b.sourceProbability - a.sourceProbability; }).slice(0, TOP_PICKS_IN_WINDOW);
+    if (bestInWindow.length >= 2) poolForCombos = bestInWindow;
+  }
 
   if (options.shuffle) {
     poolForCombos.sort(function() { return Math.random() - 0.5; });

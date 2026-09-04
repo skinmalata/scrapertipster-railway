@@ -41,6 +41,43 @@ function hasKickedOff(dateStr, timeStr) {
   return kickoff < lagosNowString();
 }
 
+// Format a Date in Lagos local time as a comparable 'YYYY-MM-DD HH:MM' string.
+// offsetHours shifts the underlying instant, so the result can cross date
+// boundaries cleanly. String comparison stays timezone-safe (no server-local
+// parsing), matching the approach used by hasKickedOff().
+function lagosDateTimeString(offsetHours) {
+  var d = new Date(Date.now() + (offsetHours || 0) * 3600 * 1000);
+  var parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Africa/Lagos', hour12: false,
+    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+  }).formatToParts(d);
+  function get(type) {
+    var f = parts.find(function (p) { return p.type === type; });
+    return f ? f.value : '00';
+  }
+  var hour = get('hour') === '24' ? '00' : get('hour');
+  return get('year') + '-' + get('month') + '-' + get('day') + ' ' + hour + ':' + get('minute');
+}
+
+// Convert a match's date + time into the comparable 'YYYY-MM-DD HH:MM' string.
+function kickoffString(dateStr, timeStr) {
+  if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return null;
+  var t = String(timeStr || '').trim();
+  if (!/^\d{1,2}:\d{2}$/.test(t)) return null;
+  var bits = t.split(':');
+  return dateStr + ' ' + (bits[0].length === 1 ? '0' + bits[0] : bits[0]) + ':' + bits[1];
+}
+
+// True when the match kicks off within the next windowHours (exclusive of
+// matches already kicked off). Pass windowHours <= 0 to disable the filter.
+function withinTimeWindow(dateStr, timeStr, windowHours) {
+  var h = Number(windowHours);
+  if (!(h > 0)) return true;
+  var kickoff = kickoffString(dateStr, timeStr);
+  if (!kickoff) return false; // unknown kickoff cannot be guaranteed within a window
+  return kickoff >= lagosDateTimeString(0) && kickoff <= lagosDateTimeString(h);
+}
+
 function teamKey(match) {
   var parts = splitMatchName(match);
   if (parts.length !== 2) return null;
@@ -61,6 +98,7 @@ function buildPool(predictions, options) {
   var maxOdds = options.maxOddsPerLeg || 100;
   var markets = options.markets;
   var maxEntries = options.maxEntries;
+  var timeWindowHours = Number(options.timeWindowHours) > 0 ? Number(options.timeWindowHours) : 0;
 
   var availableKeys = null;
   if (bookingCodeMode && Array.isArray(availableMatches)) {
@@ -113,6 +151,9 @@ function buildPool(predictions, options) {
       // Booking-code mode allows picks from any upcoming date so matches the
       // bookmaker actually offers still count.
       if (!bookingCodeMode && pickDate !== date) return;
+
+      // Restrict to kickoffs within the requested window (e.g. next 6 hours).
+      if (timeWindowHours > 0 && !withinTimeWindow(source.date || pickDate, source.time, timeWindowHours)) return;
 
       var key = pickKey(matchName, tip, pickDate);
       if (seen.has(key)) return;
