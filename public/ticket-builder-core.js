@@ -588,6 +588,7 @@
     var maxOddsPerLeg = options.maxOddsPerLeg || 100;
     var shuffle = options.shuffle === true;
     var date = options.date || watDate();
+    var timeWindowHours = Number(options.timeWindowHours) > 0 ? Number(options.timeWindowHours) : 0;
     var generatedAt = new Date().toISOString();
     // Confidence floor for fallback picks. Bookmaker odds are margin-inflated,
     // so 1/odds overstates the true probability; only keep legs where the
@@ -658,8 +659,10 @@
     availableMatches.forEach(function (m) {
       if (!(m.home && m.away)) return;
       var match = m.home + ' - ' + m.away;
+      var mDate = m.date || date;
       if (m.date && hasKickedOff(m.date, m.time)) return;
       if (!m.date && hasKickedOff(date, m.time)) return;
+      if (timeWindowHours > 0 && !withinTimeWindow(mDate, m.time, timeWindowHours)) return;
       var odds = m.odds || {};
       SIGNS.forEach(function (sign) {
         var odd = Number(odds[sign]);
