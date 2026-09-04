@@ -337,6 +337,13 @@ ${generateFaqSchema(FAQ_SCHEMA[slug])}
 .faq-item p{padding:0 20px 16px;font-size:14px;line-height:1.7;color:var(--text-secondary);margin:0}
 @media(max-width:640px){.seo-content h2{font-size:18px}.faq-item summary{padding:14px 16px;font-size:14px}.faq-item p{padding:0 16px 14px;font-size:13px}.date-tab{padding:8px 14px;font-size:13px;min-width:80px}.match-reason{font-size:12px;max-width:100%;word-break:break-word;margin-top:6px}}
 .match-reason{font-size:13px;color:#fff;margin-top:8px;line-height:1.5;text-align:center;max-width:100%;opacity:0.85}
+.telegram-cta{max-width:830px;margin:28px auto 0;padding:20px;border:1px solid rgba(30,150,200,0.25);border-radius:16px;background:linear-gradient(155deg,rgba(30,150,200,0.10),rgba(30,150,200,0.02));text-align:center}
+.telegram-cta .label{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.08em;color:#56e69c;text-transform:uppercase;margin-bottom:6px}
+.telegram-cta h3{margin:0 0 8px;font-size:20px;color:var(--text-primary)}
+.telegram-cta p{margin:0 0 16px;font-size:14px;line-height:1.6;color:var(--text-secondary)}
+.telegram-link{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#1e96c8,#1a7da8);color:#fff;padding:11px 22px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px;transition:transform 0.2s,box-shadow 0.3s}
+.telegram-link:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(30,150,200,0.3)}
+@media(max-width:640px){.telegram-cta h3{font-size:17px}.telegram-cta p{font-size:13px}.telegram-link{width:100%;justify-content:center}}
 ${CHIPS_CSS}
 </style>
 </head>
@@ -392,6 +399,17 @@ ${generateNoscriptFallback(slug, catConfig)}
 <h3>Build Winning Accumulator Tickets</h3>
 <p>Generate optimized accumulator combinations from today's data-driven predictions. Set your target odds and get instant ticket suggestions.</p>
 <a href="/ticket-builder.html">Free Ticket Builder &rarr;</a>
+</div>
+
+<div class="telegram-cta">
+<div class="telegram-cta-inner">
+<div class="telegram-cta-text">
+<div class="label">Join Our Community</div>
+<h3>Get Daily Tips on Telegram</h3>
+<p>Free daily tips, in-play alerts and updates delivered straight to the WinFulltime Telegram community.</p>
+</div>
+<a class="telegram-link" href="https://t.me/winfulltime" target="_blank" rel="noopener">&#9992; Join Telegram Group</a>
+</div>
 </div>
 
 ${leagueLinksHtml}
