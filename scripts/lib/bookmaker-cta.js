@@ -49,25 +49,34 @@ const AFFILIATE_LINKS = {
 const CTA_LABEL = 'BET ON';
 
 // Bookmaker display config (order here = display order).
-// logo: text/placeholder shown inside each box. Swap for an <img> later if an
-//       official logo asset becomes available (see renderBookmakerBox).
+// logoImg: path to the official transparent logo wordmark served from /img/logos/
+//          (self-hosted so the static site stays reliable). Render is an <img>
+//          inside the box; the brand name stays available for a11y via aria-label.
+// logoW/logoH: intrinsic pixel dimensions of the asset (used as width/height
+//          attributes so the browser reserves space before the image loads).
 const BOOKMAKERS = [
   {
     key: 'oneXBet',
     name: '1xBet',
-    logo: '1xBet',
+    logoImg: '/img/logos/1xbet.png',
+    logoW: 359,
+    logoH: 102,
     brandClass: 'wft-book--1xbet'
   },
   {
     key: 'stake',
     name: 'Stake',
-    logo: 'Stake',
+    logoImg: '/img/logos/stake.png',
+    logoW: 284,
+    logoH: 169,
     brandClass: 'wft-book--stake'
   },
   {
     key: 'oneWin',
     name: '1Win',
-    logo: '1Win',
+    logoImg: '/img/logos/1win.png',
+    logoW: 676,
+    logoH: 284,
     brandClass: 'wft-book--1win'
   }
 ];
@@ -76,14 +85,19 @@ function renderBookmakerBox(book) {
   var url = (AFFILIATE_LINKS[book.key] || '').trim();
   if (!isRealUrl(url)) return ''; // skip bookmakers without a real URL yet
 
-  // Brand background is applied via the brandClass in CSS. To use an official
-  // logo asset later, replace the <span class="wft-book-logo"> with an <img>,
-  // e.g. <img src="/img/logos/1xbet.svg" alt="1xBet logo" class="wft-book-logo-img">.
+  // Each box is a clean click target showing the official logo wordmark on the
+  // white bar. The brandClass is kept so the live-odds widget can still find
+  // the 1xBet box (.wft-book--1xbet) and the odds widget can append its price
+  // (<span class="wft-book-price">) inside it.
   return '' +
     '<a class="wft-book ' + book.brandClass + '" href="' + esc(url) + '" ' +
-      'target="_blank" rel="noopener nofollow sponsored" data-book="' + esc(book.key) + '">' +
-      '<span class="wft-book-logo">' + esc(book.logo) + '</span>' +
-      '<span class="wft-book-label">' + esc(book.name) + '</span>' +
+      'target="_blank" rel="noopener nofollow sponsored" data-book="' + esc(book.key) + '" ' +
+      'aria-label="' + esc(book.name) + '" title="' + esc(book.name) + '">' +
+      '<span class="wft-book-logo">' +
+        '<img src="' + esc(book.logoImg) + '" alt="' + esc(book.name) + '" ' +
+          'width="' + book.logoW + '" height="' + book.logoH + '" loading="lazy" ' +
+          'decoding="async" class="wft-book-logo-img">' +
+      '</span>' +
     '</a>';
 }
 

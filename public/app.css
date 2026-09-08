@@ -1319,110 +1319,119 @@ body { overflow-x: clip; overflow-clip-margin: 0; }
 }
 
 /* ==========================================================================
-   BET ON — reusable bookmaker CTA component (WinFulltime)
+   BET ON — transparent CTA (70% of the card, centered)
+   Transparent bar holding the slanted red CTA pill and the bookmaker logo
+   marks. The logo PNGs are keyed-out (transparent background) so the card
+   shows straight through; full width on small screens.
    ========================================================================== */
 .wft-bet-on {
   display: flex;
-  align-items: stretch;
-  width: 100%;
-  max-width: 100%;
-  overflow: hidden;
-  margin-top: 12px;
-  background: linear-gradient(180deg, rgba(21, 26, 48, 0.95), rgba(13, 17, 32, 0.98));
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 70%;
+  max-width: 680px;
+  min-width: 0;
+  margin: 12px auto 0;
+  padding: 6px 12px;
+  background: transparent;
   font-family: var(--font, 'Inter', system-ui, sans-serif);
 }
 
-/* Red BET ON CTA pill (left) */
+/* Red BET ON CTA pill (left, slanted like the reference button) */
 .wft-beton-label {
   display: flex;
   align-items: center;
   gap: 4px;
   flex: 0 0 auto;
-  padding: 0 16px;
-  background: linear-gradient(135deg, #ff2448, #d41a38);
+  height: 40px;
+  padding: 0 14px 0 16px;
+  background: linear-gradient(135deg, #f31234, #d41a38);
   color: #ffffff;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.5px;
-  border-radius: 11px 0 0 11px;
+  border-radius: 12px 8px 8px 12px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
   text-transform: uppercase;
   white-space: nowrap;
+  transform: skewX(-10deg);
+}
+.wft-beton-text {
+  display: inline-block;
+  transform: skewX(10deg);
 }
 .wft-beton-chevron {
-  font-size: 18px;
+  display: inline-block;
+  font-size: 17px;
   font-weight: 900;
   line-height: 1;
-  transform: translateY(-1px);
+  transform: translateY(-1px) skewX(10deg);
 }
 
-/* Container of the independent bookmaker boxes (right) */
+/* Container of the independent bookmaker logo links (right of the pill) */
 .wft-bookmakers {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex: 1 1 auto;
+  justify-content: center;
+  gap: 4px;
+  flex: 0 1 auto;
   min-width: 0;
-  padding: 8px 10px;
+  padding: 0 4px 0 10px;
   flex-wrap: wrap;
 }
 
-/* Individual clickable bookmaker box */
+/* Individual clickable bookmaker logo link */
 .wft-book {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  flex: 1 1 auto;
+  height: 42px;
   min-width: 0;
-  padding: 8px 12px;
+  padding: 0 6px;
   border-radius: 8px;
-  color: #ffffff;
   text-decoration: none;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.2;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2px 6px rgba(0, 0, 0, 0.2);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, filter 0.15s ease;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.wft-book-logo {
-  font-weight: 800;
-  letter-spacing: 0.3px;
-}
-.wft-book-label {
-  font-size: 11px;
-  font-weight: 700;
-  opacity: 0.92;
+  transition: background-color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
 }
 .wft-book:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
-  filter: brightness(1.08);
+  background: rgba(0, 0, 0, 0.05);
+  opacity: 0.85;
+  transform: translateY(-1px);
 }
 .wft-book:focus-visible {
   outline: 2px solid rgba(96, 165, 250, 0.9);
   outline-offset: 2px;
 }
 .wft-book:active {
-  transform: translateY(0) scale(0.97);
+  transform: scale(0.97);
+}
+.wft-book-logo {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+}
+.wft-book-logo-img {
+  display: block;
+  height: auto;
+  width: auto;
+  max-height: 42px;
+}
+.wft-book--1xbet .wft-book-logo-img {
+  width: 130px;
+}
+.wft-book--stake .wft-book-logo-img {
+  width: 66px;
+}
+.wft-book--1win .wft-book-logo-img {
+  width: 88px;
 }
 
-/* Brand tones */
-.wft-book--1xbet {
-  background: linear-gradient(135deg, #1f4fd8, #162f8a);
-}
-.wft-book--stake {
-  background: linear-gradient(135deg, #1faa59, #0f5c2e);
-}
-.wft-book--1win {
-  background: linear-gradient(135deg, #d60f2e, #8f0a20);
+/* Live-odds chip appended by the widget inside the 1xBet box */
+.wft-book .wft-book-price {
+  font-size: 12px;
+  font-weight: 800;
+  margin-left: 4px;
+  white-space: nowrap;
 }
 
 /* Live-odds fill target (visually hidden until the widget populates it) */
@@ -1432,25 +1441,41 @@ body { overflow-x: clip; overflow-clip-margin: 0; }
 
 @media (max-width: 640px) {
   .wft-bet-on {
+    width: 100%;
+    max-width: 100%;
     flex-wrap: wrap;
-    border-radius: 12px;
+    justify-content: center;
+    padding: 6px;
   }
   .wft-beton-label {
-    flex: 1 1 100%;
-    justify-content: center;
-    padding: 9px 8px;
-    border-radius: 11px 11px 0 0;
-    font-size: 13px;
+    height: 36px;
+    padding: 0 12px;
+    transform: none;
+  }
+  .wft-beton-text,
+  .wft-beton-chevron {
+    transform: none;
   }
   .wft-bookmakers {
-    padding: 8px;
-    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding: 6px 2px 2px;
+    gap: 2px;
   }
   .wft-book {
-    flex: 1 1 30%;
-    padding: 8px 6px;
-    font-size: 12px;
+    height: 34px;
+    padding: 0 4px;
   }
-  .wft-book-logo { font-size: 12px; }
-  .wft-book-label { font-size: 10px; }
+  .wft-book-logo-img {
+    max-height: 34px;
+  }
+  .wft-book--1xbet .wft-book-logo-img {
+    width: 96px;
+  }
+  .wft-book--stake .wft-book-logo-img {
+    width: 52px;
+  }
+  .wft-book--1win .wft-book-logo-img {
+    width: 64px;
+  }
 }

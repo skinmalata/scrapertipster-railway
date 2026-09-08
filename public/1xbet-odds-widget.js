@@ -121,13 +121,13 @@
     var span = card.querySelector('.wft-1xbet-odds');
     if (span) {
       span.textContent = ' ' + odds.toFixed(2);
-      span.style.color = '#facc15';
+      span.style.color = '#e2231a';
       span.style.display = 'inline-block';
     }
     var priceSpan = document.createElement('span');
     priceSpan.className = 'wft-book-price';
     priceSpan.textContent = ' @ ' + odds.toFixed(2);
-    priceSpan.style.cssText = 'font-weight:800;color:#facc15;margin-left:4px;white-space:nowrap;';
+    priceSpan.style.cssText = 'font-weight:800;color:#e2231a;margin-left:4px;white-space:nowrap;';
     box.appendChild(priceSpan);
   }
 
