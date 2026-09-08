@@ -102,11 +102,11 @@
   }
 
   function enhanceCard(card, oddsResponse) {
-    var btn = card.querySelector('.wft-1xbet-cta');
-    if (!btn || btn.getAttribute('data-wf-enriched')) return;
-    var home = btn.getAttribute('data-home') || card.getAttribute('data-home');
-    var away = btn.getAttribute('data-away') || card.getAttribute('data-away');
-    var tip = btn.getAttribute('data-tip') || card.getAttribute('data-tip');
+    var box = card.querySelector('.wft-book--1xbet');
+    if (!box) return;
+    var home = card.getAttribute('data-home') || '';
+    var away = card.getAttribute('data-away') || '';
+    var tip = card.getAttribute('data-tip') || '';
     if (!home || !away) return;
 
     var fixture = findFixture(oddsResponse, home, away);
@@ -115,22 +115,26 @@
     var odds = findOdds(fixture, tip);
     if (odds == null) return;
 
-    btn.setAttribute('data-wf-enriched', '1');
-    var span = btn.querySelector('.wft-1xbet-odds');
+    if (card.getAttribute('data-wf-enriched')) return;
+    card.setAttribute('data-wf-enriched', '1');
+
+    var span = card.querySelector('.wft-1xbet-odds');
     if (span) {
       span.textContent = ' ' + odds.toFixed(2);
       span.style.color = '#facc15';
+      span.style.display = 'inline-block';
     }
-    var label = btn.childNodes[0];
-    if (label && label.nodeType === 3) {
-      label.textContent = (tip ? '1win ' + tip + ' ' : '1win ') + '@ ' + odds.toFixed(2) + '   Bet';
-    }
+    var priceSpan = document.createElement('span');
+    priceSpan.className = 'wft-book-price';
+    priceSpan.textContent = ' @ ' + odds.toFixed(2);
+    priceSpan.style.cssText = 'font-weight:800;color:#facc15;margin-left:4px;white-space:nowrap;';
+    box.appendChild(priceSpan);
   }
 
   var enrichAll = function (oddsResponse) {
-    var cards = document.querySelectorAll('.wft-1xbet-cta');
-    for (var i = 0; i < cards.length; i++) {
-      enhanceCard(cards[i].closest('.match-card') || cards[i], oddsResponse);
+    var comps = document.querySelectorAll('.wft-bet-on');
+    for (var i = 0; i < comps.length; i++) {
+      enhanceCard(comps[i], oddsResponse);
     }
   };
 

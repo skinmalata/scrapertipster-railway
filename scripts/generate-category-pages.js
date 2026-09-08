@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { buildLeagueLabelBySlug, readableLeagueLabel, formatDateChips } = require('./league-labels');
 const { CHIPS_CSS, chipsSection, faqBlock, renderHead, collectionPageSchema, generateFaqSchema } = require('./lib/seo-blocks');
+const { renderBookmakerCTABody } = require('./lib/bookmaker-cta');
 
 const AFFILIATE_URL = 'https://one-vv6198.com/betting?open=register&p=f61e';
 
@@ -273,6 +274,7 @@ const EXTRA_TABS = [
 ];
 
 function generateCategoryPage(slug, catConfig, ctx) {
+  const BOOKMAKER_CTA_BODY = renderBookmakerCTABody();
   const allSlugs = Object.keys(CATEGORIES);
   const baseTabs = allSlugs.map(s => {
     const c = CATEGORIES[s];
@@ -460,7 +462,11 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
   var IS_UNBEATEN = ${isUnbeaten ? 'true' : 'false'};
   var LINK_ANALYSIS = ${catConfig.linkAnalysis ? 'true' : 'false'};
   var CATEGORY_HEADING = '${escapeHtml(catConfig.heading)}';
-  var AFFILIATE_URL = '${AFFILIATE_URL}';
+  var BOOKMAKER_CTA_BODY = '${BOOKMAKER_CTA_BODY}';
+
+  function bookmakerCTA(home, away, tip) {
+    return '<div class="wft-bet-on" data-home="' + escAttr(home) + '" data-away="' + escAttr(away) + '" data-tip="' + escAttr(tip) + '">' + BOOKMAKER_CTA_BODY + '</div>';
+  }
 
   var allData = null;
   var h2hData = null;
@@ -631,9 +637,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
       var ctaHtml = '';
       if (!IS_STREAK && home && away) {
-        ctaHtml = '<div style="text-align:center;">' +
-          '<a href="' + AFFILIATE_URL + '" target="_blank" rel="noopener nofollow sponsored" class="wft-1xbet-cta" data-home="' + escAttr(home) + '" data-away="' + escAttr(away) + '" data-tip="' + escAttr(match.tip || '') + '" style="display:inline-block;text-align:center;background:rgba(255,36,72,0.10);color:#fff;padding:4px 12px;border-radius:6px;text-decoration:none;font-weight:600;font-size:12px;margin-top:8px;border:1px solid rgba(255,36,72,0.25);">Bet on 1win<span class="wft-1xbet-odds" style="opacity:0.85;font-weight:600;"></span> &rarr;</a>' +
-          '</div>';
+        ctaHtml = bookmakerCTA(home, away, match.tip || '');
       }
 
       var cardHtml = '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms"' +

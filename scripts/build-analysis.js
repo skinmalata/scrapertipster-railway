@@ -5,6 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
+const { renderBookmakerCTA } = require('./lib/bookmaker-cta');
 
 const HTTP_TIMEOUT_MS = 10000;
 const DETAIL_CONCURRENCY = 3;
@@ -507,8 +508,14 @@ function buildContentHtml(analysis, home, away, matchup, dateStr, ctx) {
   }
 
   html += '<div class="wft-1xbet-wrap" style="margin:4px 0;text-align:center;">' +
-    '<a href="' + AFFILIATE_URL + '" target="_blank" rel="noopener nofollow sponsored" class="wft-1xbet-cta" data-home="' + escapeHtml(homeName) + '" data-away="' + escapeHtml(awayName) + '" data-tip="" data-date="' + escapeHtml(dateStr || '') + '" data-league="' + escapeHtml((matchup && matchup.league) || '') + '" style="display:inline-block;text-align:center;background:rgba(255,36,72,0.10);color:#fff;padding:6px 14px;border-radius:6px;text-decoration:none;font-weight:600;font-size:13px;margin:10px 0 2px;border:1px solid rgba(255,36,72,0.25);">Bet on 1win<span class="wft-1xbet-odds" style="opacity:0.85;font-weight:600;"></span> &rarr;</a>' +
-    '<p style="color:#94a3b8;font-size:12px;text-align:center;margin:0 0 6px;">18+ | T&amp;Cs apply | Gamble responsibly | Includes affiliate commission disclosure</p>' +
+    renderBookmakerCTA({
+      home: homeName,
+      away: awayName,
+      tip: '',
+      date: dateStr || '',
+      league: (matchup && matchup.league) || ''
+    }) +
+    '<p style="color:#94a3b8;font-size:12px;text-align:center;margin:6px 0 6px;">18+ | T&amp;Cs apply | Gamble responsibly | Includes affiliate commission disclosure</p>' +
     '</div>';
 
   const watch = [];

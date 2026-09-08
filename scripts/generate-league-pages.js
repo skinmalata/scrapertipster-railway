@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { CHIPS_CSS, FAQ_CSS, faqsList, chipsSection, renderHead, collectionPageSchema } = require('./lib/seo-blocks');
+const { renderBookmakerCTA } = require('./lib/bookmaker-cta');
 
 const PREDICTIONS_FILE = path.join(__dirname, '..', 'predictions-cache.json');
 const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions', 'league');
@@ -166,7 +167,7 @@ function renderMatchCard(m, analysisUrls) {
       </div>
     </div>
     ${analysisUrl ? `<div style="text-align:center;margin-top:6px;"><a href="${analysisUrl}" class="analysis-btn" style="color:var(--accent);font-size:12px;font-weight:600;text-decoration:none;">View Analysis &rarr;</a></div>` : ''}
-    <div style="text-align:center;margin-top:8px;"><a href="${AFFILIATE_URL}" target="_blank" rel="noopener nofollow sponsored" class="wft-1xbet-cta" data-tip="${tip}" style="display:inline-block;text-align:center;background:rgba(255,36,72,0.10);color:#fff;padding:4px 12px;border-radius:6px;text-decoration:none;font-weight:600;font-size:12px;margin-top:8px;border:1px solid rgba(255,36,72,0.25);">Bet on 1win<span class="wft-1xbet-odds" style="opacity:0.85;font-weight:600;"></span> &rarr;</a></div>
+    ${renderBookmakerCTA({ home: homeRaw, away: awayRaw, tip: m.tip, date: dateStr, league: m.country || m.league })}
   </div>`;
 }
 
