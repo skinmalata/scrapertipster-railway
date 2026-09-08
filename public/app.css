@@ -1414,18 +1414,9 @@ body { overflow-x: clip; overflow-clip-margin: 0; }
 }
 .wft-book-logo-img {
   display: block;
-  height: auto;
+  height: 100%;
   width: auto;
   max-height: 100%;
-}
-.wft-book--1xbet .wft-book-logo-img {
-  width: 106px;
-}
-.wft-book--stake .wft-book-logo-img {
-  width: 54px;
-}
-.wft-book--1win .wft-book-logo-img {
-  width: 72px;
 }
 
 /* Live-odds chip appended by the widget inside the 1xBet box */
@@ -1465,14 +1456,5 @@ body { overflow-x: clip; overflow-clip-margin: 0; }
   }
   .wft-book-logo-img {
     max-height: 32px;
-  }
-  .wft-book--1xbet .wft-book-logo-img {
-    width: 84px;
-  }
-  .wft-book--stake .wft-book-logo-img {
-    width: 46px;
-  }
-  .wft-book--1win .wft-book-logo-img {
-    width: 58px;
   }
 }

@@ -59,24 +59,24 @@ const BOOKMAKERS = [
     key: 'oneXBet',
     name: '1xBet',
     logoImg: '/img/logos/1xbet.png',
-    logoW: 359,
-    logoH: 102,
+    logoW: 399,
+    logoH: 205,
     brandClass: 'wft-book--1xbet'
   },
   {
     key: 'stake',
     name: 'Stake',
     logoImg: '/img/logos/stake.png',
-    logoW: 284,
-    logoH: 169,
+    logoW: 368,
+    logoH: 214,
     brandClass: 'wft-book--stake'
   },
   {
     key: 'oneWin',
     name: '1Win',
     logoImg: '/img/logos/1win.png',
-    logoW: 676,
-    logoH: 284,
+    logoW: 349,
+    logoH: 205,
     brandClass: 'wft-book--1win'
   }
 ];
