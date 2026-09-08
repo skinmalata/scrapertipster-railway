@@ -1436,23 +1436,30 @@ body { overflow-x: clip; overflow-clip-margin: 0; }
   .wft-bet-on {
     width: 100%;
     max-width: 100%;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: center;
-    padding: 6px;
+    gap: 8px;
+    padding: 4px 6px;
   }
   .wft-beton-label {
-    display: none;
+    height: 32px;
+    padding: 0 10px;
+    transform: none;
+  }
+  .wft-beton-text,
+  .wft-beton-chevron {
+    transform: none;
   }
   .wft-bookmakers {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: center;
-    height: auto;
-    padding: 0 4px;
-    gap: 4px;
+    height: 32px;
+    padding: 0 2px 0 0;
+    gap: 2px;
   }
   .wft-book {
     height: 32px;
-    padding: 0 4px;
+    padding: 0 2px;
   }
   .wft-book-logo-img {
     max-height: 32px;
