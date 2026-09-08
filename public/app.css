@@ -1344,8 +1344,8 @@ body { overflow-x: clip; overflow-clip-margin: 0; }
   align-items: center;
   gap: 4px;
   flex: 0 0 auto;
-  height: 40px;
-  padding: 0 14px 0 16px;
+  height: 38px;
+  padding: 0 13px 0 15px;
   background: linear-gradient(135deg, #f31234, #d41a38);
   color: #ffffff;
   font-size: 13px;
@@ -1369,7 +1369,9 @@ body { overflow-x: clip; overflow-clip-margin: 0; }
   transform: translateY(-1px) skewX(10deg);
 }
 
-/* Container of the independent bookmaker logo links (right of the pill) */
+/* Container of the independent bookmaker logo links (right of the pill) —
+   a light capsule button so the transparent logos sit on a bright surface,
+   matching the pill height exactly */
 .wft-bookmakers {
   display: flex;
   align-items: center;
@@ -1377,8 +1379,13 @@ body { overflow-x: clip; overflow-clip-margin: 0; }
   gap: 4px;
   flex: 0 1 auto;
   min-width: 0;
-  padding: 0 4px 0 10px;
-  flex-wrap: wrap;
+  height: 38px;
+  padding: 0 12px;
+  flex-wrap: nowrap;
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  border-radius: 999px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 /* Individual clickable bookmaker logo link */
@@ -1386,9 +1393,9 @@ body { overflow-x: clip; overflow-clip-margin: 0; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 42px;
+  height: 100%;
   min-width: 0;
-  padding: 0 6px;
+  padding: 0 4px;
   border-radius: 8px;
   text-decoration: none;
   transition: background-color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
@@ -1414,16 +1421,16 @@ body { overflow-x: clip; overflow-clip-margin: 0; }
   display: block;
   height: auto;
   width: auto;
-  max-height: 42px;
+  max-height: 100%;
 }
 .wft-book--1xbet .wft-book-logo-img {
-  width: 130px;
+  width: 106px;
 }
 .wft-book--stake .wft-book-logo-img {
-  width: 66px;
+  width: 54px;
 }
 .wft-book--1win .wft-book-logo-img {
-  width: 88px;
+  width: 72px;
 }
 
 /* Live-odds chip appended by the widget inside the 1xBet box */
@@ -1448,8 +1455,8 @@ body { overflow-x: clip; overflow-clip-margin: 0; }
     padding: 6px;
   }
   .wft-beton-label {
-    height: 36px;
-    padding: 0 12px;
+    height: 34px;
+    padding: 0 11px;
     transform: none;
   }
   .wft-beton-text,
@@ -1458,24 +1465,25 @@ body { overflow-x: clip; overflow-clip-margin: 0; }
   }
   .wft-bookmakers {
     flex-wrap: wrap;
-    justify-content: flex-start;
-    padding: 6px 2px 2px;
-    gap: 2px;
+    justify-content: center;
+    height: auto;
+    padding: 5px 12px;
+    gap: 4px;
   }
   .wft-book {
-    height: 34px;
+    height: 32px;
     padding: 0 4px;
   }
   .wft-book-logo-img {
-    max-height: 34px;
+    max-height: 32px;
   }
   .wft-book--1xbet .wft-book-logo-img {
-    width: 96px;
+    width: 84px;
   }
   .wft-book--stake .wft-book-logo-img {
-    width: 52px;
+    width: 46px;
   }
   .wft-book--1win .wft-book-logo-img {
-    width: 64px;
+    width: 58px;
   }
 }
