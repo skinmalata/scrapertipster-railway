@@ -174,6 +174,134 @@ footer { background: #1e2538; border-top: 1px solid rgba(255,255,255,0.06); padd
 .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
 .hamburger.active span:nth-child(2) { opacity: 0; }
 .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+/* BET ON — transparent CTA (70% of the card, centered) */
+.wft-bet-on {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 70%;
+  max-width: 680px;
+  min-width: 0;
+  margin: 12px auto 0;
+  padding: 6px 12px;
+  background: transparent;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+.wft-beton-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  height: 34px;
+  padding: 0 12px 0 14px;
+  background: linear-gradient(135deg, #f31234, #d41a38);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  border-radius: 12px 8px 8px 12px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: skewX(-10deg);
+}
+.wft-beton-text {
+  display: inline-block;
+  transform: skewX(10deg);
+}
+.wft-beton-chevron {
+  display: inline-block;
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1;
+  transform: translateY(-1px) skewX(10deg);
+}
+.wft-bookmakers {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: 0 1 auto;
+  min-width: 0;
+  height: 34px;
+  padding: 0 6px 0 4px;
+  flex-wrap: nowrap;
+}
+.wft-book {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-width: 0;
+  padding: 0 4px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
+}
+.wft-book:hover {
+  background: rgba(0, 0, 0, 0.05);
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+.wft-book:focus-visible {
+  outline: 2px solid rgba(96, 165, 250, 0.9);
+  outline-offset: 2px;
+}
+.wft-book:active {
+  transform: scale(0.97);
+}
+.wft-book-logo {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+}
+.wft-book-logo-img {
+  display: block;
+  height: 100%;
+  width: auto;
+  max-height: 100%;
+}
+.wft-book .wft-book-price {
+  font-size: 12px;
+  font-weight: 800;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .wft-bet-on {
+    width: 100%;
+    max-width: 100%;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 4px 6px;
+  }
+  .wft-beton-label {
+    height: 32px;
+    padding: 0 10px;
+    transform: none;
+  }
+  .wft-beton-text,
+  .wft-beton-chevron {
+    transform: none;
+  }
+  .wft-bookmakers {
+    flex-wrap: nowrap;
+    justify-content: center;
+    height: 32px;
+    padding: 0 2px 0 0;
+    gap: 2px;
+  }
+  .wft-book {
+    height: 32px;
+    padding: 0 2px;
+  }
+  .wft-book-logo-img {
+    max-height: 32px;
+  }
+}
 </style>
 
  <script type="application/ld+json">
