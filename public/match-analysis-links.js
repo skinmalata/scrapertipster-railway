@@ -41,7 +41,7 @@
     var cards = document.querySelectorAll('.match-card');
     for (var i = 0; i < cards.length; i++) {
       var card = cards[i];
-      if (card.closest('a')) continue;
+      if (card.closest('a') || card.querySelector('.match-card-link')) continue;
       var homeEl = card.querySelector('.team-home');
       var awayEl = card.querySelector('.team-away');
       if (!homeEl || !awayEl) continue;
@@ -51,8 +51,14 @@
       a.href = href;
       a.className = 'match-card-link';
       a.setAttribute('style', 'display:block;text-decoration:none;color:inherit;');
-      card.parentNode.insertBefore(a, card);
-      a.appendChild(card);
+      var cta = card.querySelector('.wft-bet-on');
+      if (cta) {
+        card.insertBefore(a, card.firstChild);
+        while (a.nextSibling && a.nextSibling !== cta) a.appendChild(a.nextSibling);
+      } else {
+        card.parentNode.insertBefore(a, card);
+        a.appendChild(card);
+      }
     }
   }
 

@@ -640,22 +640,23 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
         ctaHtml = bookmakerCTA(home, away, match.tip || '');
       }
 
+      var analysisHref = (LINK_ANALYSIS && home && away)
+        ? ((typeof window.resolveAnalysisLink === 'function')
+            ? window.resolveAnalysisLink(home, away, match)
+            : (analysisLinks[(home + '|' + away).toLowerCase()] || ''))
+        : '';
+
+      var matchHead = '<div class="match-header"><span>' + (match.league || '') + '</span><span>' + (IS_STREAK ? (match.nextMatchDate ? formatDateShort(match.nextMatchDate) : (match.time || '')) : (match.time || '')) + '</span></div>';
+
       var cardHtml = '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms"' +
         (home ? ' data-home="' + escAttr(home) + '"' : '') +
         (away ? ' data-away="' + escAttr(away) + '"' : '') +
         (!IS_STREAK && match.tip ? ' data-tip="' + escAttr(match.tip) + '"' : '') +
         '>' +
-        '<div class="match-header"><span>' + (match.league || '') + '</span><span>' + (IS_STREAK ? (match.nextMatchDate ? formatDateShort(match.nextMatchDate) : (match.time || '')) : (match.time || '')) + '</span></div>' +
-        cardContent + ctaHtml + '</div>';
-
-      if (LINK_ANALYSIS && home && away) {
-        var analysisHref = (typeof window.resolveAnalysisLink === 'function')
-          ? window.resolveAnalysisLink(home, away, match)
-          : (analysisLinks[(home + '|' + away).toLowerCase()] || '');
-        if (analysisHref) {
-          return '<a href="' + analysisHref + '" class="match-card-link" style="display:block;text-decoration:none;color:inherit;">' + cardHtml + '</a>';
-        }
-      }
+        (analysisHref
+          ? '<a href="' + analysisHref + '" class="match-card-link" style="display:block;text-decoration:none;color:inherit;">' + matchHead + cardContent + '</a>'
+          : matchHead + cardContent) +
+        ctaHtml + '</div>';
 
       return cardHtml;
     }).join('');
