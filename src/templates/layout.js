@@ -308,16 +308,18 @@ function applyLayoutToHtml(html, activePath) {
   }
 
   // 3b. Featured Bookmakers carousel (content/prediction pages only).
+  //     Placed at the END of the page content (before </main>) so it does not
+  //     compete with the hero/tabs at the top of the page.
   if (shouldShowFeaturedBooks(activePath) && !/class="featured-books-card"/.test(html)) {
     if (!/featured-bookmakers-carousel\.css/.test(html)) {
       html = html.replace(/<\/head>/i, FEATURED_BOOKS_CSS_LINK + '\n</head>');
     }
-    if (/<h1[^>]*>[\s\S]*?<\/h1>/.test(html)) {
-      html = html.replace(/(<h1[^>]*>[\s\S]*?<\/h1>)/, function (m) { return m + '\n' + FEATURED_BOOKS_SECTION; });
-    } else if (/<main[^>]*>/.test(html)) {
-      html = html.replace(/(<main[^>]*>)/, function (m) { return m + '\n' + FEATURED_BOOKS_SECTION; });
+    if (/<\/main>/i.test(html)) {
+      html = html.replace(/<\/main>/i, FEATURED_BOOKS_SECTION + '\n</main>');
     } else if (/<footer[^>]*>/i.test(html)) {
       html = html.replace(/(<footer[^>]*>)/i, FEATURED_BOOKS_SECTION + '\n$1');
+    } else if (/<\/body>/i.test(html)) {
+      html = html.replace(/<\/body>/i, FEATURED_BOOKS_SECTION + '\n</body>');
     }
   }
 
