@@ -56,22 +56,6 @@ const CTA_LABEL = 'BET ON';
 //          attributes so the browser reserves space before the image loads).
 const BOOKMAKERS = [
   {
-    key: 'oneXBet',
-    name: '1xBet',
-    logoImg: '/img/logos/1xbet.png',
-    logoW: 399,
-    logoH: 205,
-    brandClass: 'wft-book--1xbet'
-  },
-  {
-    key: 'stake',
-    name: 'Stake',
-    logoImg: '/img/logos/stake.png',
-    logoW: 368,
-    logoH: 214,
-    brandClass: 'wft-book--stake'
-  },
-  {
     key: 'oneWin',
     name: '1Win',
     logoImg: '/img/logos/1win.png',
