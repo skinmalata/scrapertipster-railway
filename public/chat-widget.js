@@ -10,7 +10,7 @@ var SITE={
   url:'https://winfulltime.com',
   tagline:'Free AI Football Predictions',
   email:'officialwinfulltime@gmail.com',
-  desc:'WinFulltime is a free football prediction website providing AI-driven betting tips across 50+ global leagues. No registration required.',
+  desc:'WinFulltime is a freemium football prediction platform providing data-driven betting tips across 50+ global leagues and 750+ teams. Predictions, analysis, blog and free tools (Ticket Builder, Code Converter) are accessible to everyone; an optional Pro subscription unlocks every prediction category, Best Picks, H2H Picks and golden in-play tips.',
   pages:{
     home:{url:'/',title:'Home - Daily Predictions'},
     '1x2':{url:'/predictions/1x2',title:'1X2 Predictions'},
@@ -41,7 +41,8 @@ var SITE={
     'Corners and Cards predictions',
     'Unbeaten team streaks (winning/drawing streaks)',
     'Free Accumulator/Ticket Builder with AI optimization',
-    '180+ educational blog articles on betting strategy',
+    'Free booking code converter (SportyBet, Bet9ja, MSport, Betway, Bangbet, BetKing)',
+    '350+ educational blog articles on betting strategy',
     '50+ leagues, 750+ teams worldwide',
     'PWA - installable as a mobile app'
   ],
@@ -78,9 +79,9 @@ function urlOf(slug){return slug?SITE.url+'/blog/'+slug+'.html':''}
 function titleOf(slug){if(!slug)return '';var t=slug.replace(/-/g,' ').replace(/\b\w/g,function(l){return l.toUpperCase()});return t}
 
 var FAQ=[
-{k:['free','cost','price','pricing','pay','payment','subscription','vip'],r:'WinFulltime is 100% free. No registration required. All predictions, analysis, blog content, ticket builder, and features are accessible without any payment.'},
+{k:['free','cost','price','pricing','pay','payment','subscription','vip','plan','membership','billing','whop','how much','pro monthly','pro yearly'],r:'WinFulltime is freemium:\n\u2022 Free plan — $0, forever. Sample predictions from each category, live scores and basic in-play tips.\n\u2022 Pro Monthly — $20/month. Every prediction category unlocked, daily Best Picks & H2H Picks, golden in-play tips and live opportunities, full win/loss/draw streak analysis, priority support.\n\u2022 Pro Yearly — $150/year (save 37%).\n\nPayments go through Whop, subscriptions auto-renew unless cancelled, and all plans have a 7-day money-back guarantee. Create your free account at '+SITE.url+'/signup.html or see '+SITE.url+'/pricing.html.'},
 {k:['contact','email','reach','message','support'],r:'Contact us at '+SITE.email+' or visit '+SITE.url+'/contact.html'},
-{k:['about','what is','who are','tell me about','company'],r:SITE.desc},
+{k:['about','what is winfulltime','who are','tell me about','who is','company','about us','organization'],r:SITE.desc},
 {k:['how','use','works','work','guide','start'],r:'Using WinFulltime:\n1. Visit '+SITE.url+'\n2. Pick a day using the tabs (Today, Tomorrow)\n3. Choose a market: 1X2, Over 2.5, BTTS, etc.\n4. Browse predictions with confidence percentages\n5. Click any match for detailed analysis\n6. Try the Free Ticket Builder to build accumulators'},
 {k:['leagues','competition','tournament'],r:'We cover 50+ leagues: '+SITE.leagues},
 {k:['prediction','tip','pick','bet'],r:'We provide: 1X2, Over 2.5, Over 1.5, BTTS YES, BTTS NO, Corners, Cards, Unbeaten Teams, and Winning/Losing Streak predictions. All with confidence percentages. Daily updates for 50+ leagues.'},
@@ -92,19 +93,23 @@ var FAQ=[
   {k:['streak','winning','losing','draw streak','unbeaten','form'],r:'We track teams on winning/drawing/unbeaten streaks. Great for momentum-based betting. Browse '+SITE.url+'/predictions/winning-streak, '+SITE.url+'/predictions/losing-streak, '+SITE.url+'/predictions/draws-streak and '+SITE.url+'/predictions/unbeaten.'},
 {k:['accuracy','accurate','reliable','confidence','probability','percentage'],r:'Each prediction shows a confidence percentage (e.g., 72%). This represents the statistical probability based on team form, H2H data, and league-wide metrics. Higher = more confident but typically lower odds.'},
 {k:['source','data','where','api','method','how'],r:'Our predictions combine statistical analysis with data from trusted sources. Each match factors in team form, head-to-head records, league performance metrics, and historical patterns.'},
-{k:['blog','article','post','guide','strategy','educational','read'],r:'Our blog features 180+ articles on betting strategies, market guides, league analysis, and betting education. Browse all categories at '+SITE.url+'/blog/'},
+{k:['blog','article','post','guide','strategy','educational','read'],r:'Our blog features 350+ articles on betting strategies, market guides, league analysis, betting site reviews, and betting education. Browse all categories at '+SITE.url+'/blog/'},
 {k:['responsible','gamble','gambling','addict','problem','18+'],r:'WinFulltime promotes responsible gambling. All predictions are informational. We recommend: set limits, never chase losses, treat betting as entertainment. If gambling becomes a problem, seek help at BeGambleAware.org.'},
 {k:['youtube','video','channel','subscribe'],r:'Check out our YouTube channel @winfulltime for video predictions, analysis, and betting tips: https://www.youtube.com/@winfulltime/videos'},
-{k:['register','sign up','signup','account','login','create','password'],r:'No registration needed! WinFulltime is completely free and accessible to everyone without creating an account.'},
+{k:['register','sign up','signup','account','login','create','password','forgot'],r:'Registration is free and optional. Create a free account at '+SITE.url+'/signup.html — no payment needed and no card required. Free accounts get the Free plan by default; you can browse predictions and use the Ticket Builder and Code Converter without paying. Upgrade to Pro anytime at '+SITE.url+'/pricing.html.'},
 {k:['ticket','builder','acca','accumulator','multi','parlay','generate'],r:SITE.ticketBuilder.desc+'\n\nHow to use: '+SITE.ticketBuilder.howto+'\n\nTip: '+SITE.ticketBuilder.tip},
+{k:['converter','convert','booking code','code convert','decode','transfer code','msport','betking','bangbet','bet9ja code','sportybet code'],r:'Free booking code converter for SportyBet, Bet9ja, MSport, Betway, Bangbet and BetKing. Paste a booking code to decode it, preview every selection, market and odds, and generate a fresh code for another site. No sign-up needed. Visit '+SITE.url+'/converter.html'},
+{k:['in play','in-play','inplay','live scores','live betting','golden tip','live opportunities','watch live'],r:'Live scores are available to everyone free of charge. Golden in-play tips and live opportunities are a Pro feature. Visit '+SITE.url+'/predictions/in-play'},
+{k:['best picks','h2h','head to head','head-to-head','author pick','2 odds of the day'],r:'Daily Best Picks and H2H (head-to-head) Picks are curated selections based on direct match history between two teams. They are available to Pro members — see '+SITE.url+'/best-picks.html and '+SITE.url+'/author-picks.html.'},
+{k:['bookmaker','bookmakers','betting site','betting sites','options','affiliate','compare','featured','1win','stake','1x bet','1xbet'],r:'Featured bookmakers: 1xBet, 1win and Stake — compare betting sites, welcome offers and payments at '+SITE.url+'/options.html. Links to bookmakers on the site are affiliate links: WinFulltime may earn a commission if you sign up, at no extra cost to you. 18+.'},
 {k:['app','install','pwa','mobile','home screen'],r:'Install WinFulltime as a mobile app! Open on Chrome/Edge/Samsung Internet and tap "Add to Home Screen" or "Install" when prompted. Our PWA works offline for previously viewed content.'},
 {k:['analysis','analytics','stats','statistics','form','h2h'],r:'Visit our Analysis page for detailed football statistics: '+SITE.url+'/analysis.html'},
 {k:['league','premier league','epl','la liga','serie a','bundesliga','ligue 1','champions league'],r:'We cover Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, and 40+ more leagues worldwide.'},
-{k:['features','what do','offer','provide','services'],r:'WinFulltime features:\n'+SITE.features.map(function(f,i){return (i+1)+'. '+f}).join('\n')},
+{k:['features','what can','offer','provide','services'],r:'WinFulltime features:\n'+SITE.features.map(function(f,i){return (i+1)+'. '+f}).join('\n')},
 {k:['blog','betting','tips','strategies','guides','education'],r:'Explore our blog categories:\n\u2022 Betting Strategies (40+ articles on value betting, bankroll, accumulators)\n\u2022 Market Guides (BTTS, Over/Under, Asian Handicap, Cards, Corners)\n\u2022 League Guides (Premier League, La Liga, Serie A, Champions League)\n\u2022 Analysis & Statistics (football stories, data analysis)\n\u2022 Betting Sites & Payments (reviews, deposits, withdrawals)\n\u2022 Guides & Education (basics, odds, dictionary)\n\nBrowse all: '+SITE.url+'/blog/'},
   {k:['page','site','website','pages','sitemap'],r:'WinFulltime pages:\n\u2022 Home - '+SITE.url+'\n\u2022 1X2 Predictions - '+SITE.url+'/predictions/1x2\n\u2022 Over 2.5 - '+SITE.url+'/predictions/over-2-5\n\u2022 Over 1.5 - '+SITE.url+'/predictions/over-1-5\n\u2022 BTTS Yes - '+SITE.url+'/predictions/btts\n\u2022 BTTS No - '+SITE.url+'/predictions/btts-no\n\u2022 Corners - '+SITE.url+'/predictions/corners\n\u2022 Cards - '+SITE.url+'/predictions/cards\n\u2022 Unbeaten - '+SITE.url+'/predictions/unbeaten\n\u2022 Ticket Builder - '+SITE.url+'/ticket-builder.html\n\u2022 Blog - '+SITE.url+'/blog/\n\u2022 About - '+SITE.url+'/about.html\n\u2022 Contact - '+SITE.url+'/contact.html'},
 {k:['bet9ja','sportybet','1xbet','betking','betway','melbet','22bet'],r:'We\'ve reviewed major betting sites:\n\u2022 Bet9ja vs SportyBet: '+SITE.url+'/blog/bet9ja-vs-sportybet.html\n\u2022 1xBet reviews across Africa: '+SITE.url+'/blog/1xbet-review.html\n\u2022 Best betting sites Nigeria: '+SITE.url+'/blog/best-betting-sites-nigeria.html\n\u2022 Best betting sites Kenya: '+SITE.url+'/blog/best-betting-sites-kenya.html\n\u2022 Best betting sites Ghana: '+SITE.url+'/blog/best-betting-sites-ghana.html'},
-{k:['what is','meaning','explain','define','definition','term'],r:'I can explain any betting term! Try asking about:\n\u2022 What is Asian Handicap?\n\u2022 What does BTTS mean?\n\u2022 What is Expected Goals (xG)?\n\u2022 What is the Kelly Criterion?\n\u2022 What is value betting?\n\u2022 What is Poisson distribution?\n\u2022 What is cash out?\n\u2022 What is a booking code?'},
+{k:['what is','meaning','explain','define','definition','term'],explainer:true,r:'I can explain any betting term! Try asking about:\n\u2022 What is Asian Handicap?\n\u2022 What does BTTS mean?\n\u2022 What is Expected Goals (xG)?\n\u2022 What is the Kelly Criterion?\n\u2022 What is value betting?\n\u2022 What is Poisson distribution?\n\u2022 What is cash out?\n\u2022 What is a booking code?'},
 {k:['podcast','radio','audio','listen'],r:'We don\'t have a podcast yet, but you can check out our YouTube channel for video content: https://www.youtube.com/@winfulltime/videos'},
 {k:['tipster','expert','professional','advice','recommend'],r:'Our predictions are data-driven, not from human tipsters. We analyze team form, H2H records, and league metrics to generate probability-based picks. Always combine with your own research and practice responsible gambling.'},
 {k:['privacy','policy','data','information','collect','cookie'],r:'Our privacy policy explains how we handle your data: '+SITE.url+'/privacy.html'},
@@ -254,12 +259,31 @@ function getPredictionResponse(msg,cb){
 }
 
 function findBest(msg){
-  var m=msg.toLowerCase().trim();
+  var m=String(msg||'').toLowerCase().trim();
   if(m.length<3)return 'Hi! I\'m the WinFulltime assistant. I know everything about our predictions, ticket builder, blog, betting markets, and more. Ask me anything!';
+  var tokens=m.split(/[^a-z0-9]+/).filter(function(t){return t.length>1});
   var matched=[];
-  for(var i=0;i<FAQ.length;i++){var score=0;for(var j=0;j<FAQ[i].k.length;j++){if(m.indexOf(FAQ[i].k[j])!==-1)score++}if(score>0)matched.push({score:score,response:FAQ[i].r})}
-  matched.sort(function(a,b){return b.score-a.score});
+  for(var i=0;i<FAQ.length;i++){
+    var item=FAQ[i];
+    if(item.explainer)continue;
+    var score=0,hits=0;
+    for(var j=0;j<item.k.length;j++){
+      var kw=String(item.k[j]).toLowerCase().trim();
+      if(!kw)continue;
+      var add=0;
+      if(kw.indexOf(' ')!==-1){if(m.indexOf(kw)!==-1)add=kw.length+4}
+      else if(/[^a-z0-9]/.test(kw)){if(m.indexOf(kw)!==-1)add=kw.length+2}
+      else if(kw.length<=2){if(tokens.indexOf(kw)!==-1)add=4}
+      else{var re=new RegExp('\\b'+kw.replace(/[.*+?^$()|[\]\\]/g,'\\$&')+'\\b','i');if(re.test(m))add=kw.length+2}
+      if(add>0){score+=add;hits++}
+    }
+    if(hits>0)matched.push({score:score,hits:hits,order:i,response:item.r});
+  }
+  matched.sort(function(a,b){return (b.score-a.score)||(b.hits-a.hits)||(a.order-b.order)});
   if(matched.length>0&&matched[0].score>=1)return matched[0].response;
+  for(var e=0;e<FAQ.length;e++){
+    if(FAQ[e].explainer&&/^(what is|whats|what are|what does|what do|explain|define|meaning of|what do you mean)[\w\s]*\?*$/.test(m))return FAQ[e].r;
+  }
   return null;
 }
 
