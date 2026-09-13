@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
-<link rel="stylesheet" href="/app.css?v=9">
+<link rel="stylesheet" href="/app.css?v=10">
 <style>
   header { position: static !important; }
   .hero-subtext { margin-bottom: 8px; }
@@ -153,11 +153,25 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
 <script src="/config.js"></script>
 <script src="/supabase-client.js"></script>
 <script src="/auth.js?v=20260801"></script>
+<script src="/1xbet-odds-widget.js" defer></script>
 <script>
 (function() {
   var API_BASE = window.WFT_API || 'https://winfulltime-api.onrender.com';
 
   function esc(v) { return String(v || '').replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function escAttr(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  var BOOKMAKER_CTA_BODY = '<span class="wft-beton-label" aria-hidden="true"><span class="wft-beton-text">BET ON</span><span class="wft-beton-chevron">&#8250;</span></span><span class="wft-bookmakers"><a class="wft-book wft-book--1xbet" href="https://reffpa.com/L?tag=d_6034393m_97c_&amp;site=6034393&amp;ad=97" target="_blank" rel="noopener nofollow sponsored" data-book="oneXBet" aria-label="1xBet" title="1xBet"><span class="wft-book-logo"><img src="/img/logos/1xbet.png" alt="1xBet" width="399" height="205" loading="lazy" decoding="async" class="wft-book-logo-img"></span></a><a class="wft-book wft-book--stake" href="https://stake.com/?c=FjhqQ3n3" target="_blank" rel="noopener nofollow sponsored" data-book="stake" aria-label="Stake" title="Stake"><span class="wft-book-logo"><img src="/img/logos/stake.png" alt="Stake" width="368" height="214" loading="lazy" decoding="async" class="wft-book-logo-img"></span></a><a class="wft-book wft-book--1win" href="https://one-vv6198.com/betting?open=register&amp;p=f61e" target="_blank" rel="noopener nofollow sponsored" data-book="oneWin" aria-label="1Win" title="1Win"><span class="wft-book-logo"><img src="/img/logos/1win.png" alt="1Win" width="349" height="205" loading="lazy" decoding="async" class="wft-book-logo-img"></span></a></span><span class="wft-1xbet-odds"></span>';
+
+  function bookmakerCTA(home, away, tip) {
+    return '<div class="wft-bet-on" data-home="' + escAttr(home) + '" data-away="' + escAttr(away) + '" data-tip="' + escAttr(tip) + '">' + BOOKMAKER_CTA_BODY + '</div>';
+  }
 
   function formatTime(kickoff) {
     if (!kickoff) return '';
@@ -194,7 +208,14 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
       var league = esc(m.league);
       var conf = m.tip.confidence || 0;
 
-      return '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms">' +
+      var ctaHtml = '';
+      if (m.home && m.away) {
+        ctaHtml = bookmakerCTA(m.home, m.away, m.tip.selection || '');
+      }
+
+      return '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms"' +
+        ' data-home="' + escAttr(m.home) + '" data-away="' + escAttr(m.away) + '"' +
+        (m.tip.selection ? ' data-tip="' + escAttr(m.tip.selection) + '"' : '') + '>' +
         '<div class="match-header"><span>' + league + '</span>' + liveHtml + '</div>' +
         '<div class="match-teams">' +
         '<span class="team team-home">' + home + '</span>' +
@@ -207,6 +228,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
         '</div>' +
         (m.h2h ? '<div class="h2h-row"><span>H2H: ' + m.h2h.homeWins + '-' + m.h2h.draws + '-' + m.h2h.awayWins + '</span></div>' : '') +
         '</div>' +
+        ctaHtml +
         '</div>';
     }).join('') + '</div>';
     content.innerHTML = html;
