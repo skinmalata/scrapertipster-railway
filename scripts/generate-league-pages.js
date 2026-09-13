@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { CHIPS_CSS, FAQ_CSS, faqsList, chipsSection, renderHead, collectionPageSchema } = require('./lib/seo-blocks');
 const { renderBookmakerCTA } = require('./lib/bookmaker-cta');
+const { spliceSponsorBetweenCards } = require('./lib/sponsor-banner');
 
 const PREDICTIONS_FILE = path.join(__dirname, '..', 'predictions-cache.json');
 const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions', 'league');
@@ -178,7 +179,8 @@ function generateLeaguePage(leagueName, leagueSlug, matches, ctx) {
   const metaDesc = `Free ${leagueName} football predictions for today. Data-driven 1X2, Over 2.5 goals, BTTS, and corner betting tips for ${leagueName}.`;
 
   const MAX_CARDS = 200;
-  const matchCardsHtml = matches.slice(0, MAX_CARDS).map(m => renderMatchCard(m, ctx && ctx.analysisUrls)).join('\n');
+  const renderedCards = matches.slice(0, MAX_CARDS).map(m => renderMatchCard(m, ctx && ctx.analysisUrls));
+  const matchCardsHtml = spliceSponsorBetweenCards(renderedCards, `league/${leagueSlug}`) || renderedCards.join('\n');
   const truncatedNote = matches.length > MAX_CARDS
     ? `<p style="color:var(--text-secondary);font-size:13px;margin-top:12px;">Showing the first ${MAX_CARDS} of ${matches.length} ${leagueName} fixtures for today.</p>`
     : '';

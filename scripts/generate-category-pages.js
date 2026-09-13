@@ -444,6 +444,7 @@ ${generateFaqHtml(slug)}
 <div style="text-align:center;padding:0 0 8px;"><div google-add-preferred-source-btn data-theme="dark"></div></div>
 </footer>
 <script src="/chat-widget.js"></script>
+<script src="/sponsor-banner.js"></script>
 <script>
 (function(){const s=localStorage.getItem("wf-theme");const t=s||"dark";document.documentElement.setAttribute("data-theme",t==="dark"?"":"light");const b=document.getElementById("themeToggle");if(b)b.textContent=t==="dark"?"Light":"Dark";})();
 document.addEventListener("DOMContentLoaded",function(){const b=document.getElementById("themeToggle");if(!b)return;b.addEventListener("click",function(){const h=document.documentElement;const l=h.getAttribute("data-theme")==="light";if(l){h.removeAttribute("data-theme");b.textContent="Light";localStorage.setItem("wf-theme","dark")}else{h.setAttribute("data-theme","light");b.textContent="Dark";localStorage.setItem("wf-theme","light")}});});
@@ -564,7 +565,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
         '<div class="match-teams" style="justify-content:center;"><span class="team team-home" style="text-align:center;width:100%;">' + (match.match || '') + '</span></div>' +
         '<div class="match-footer" style="flex-direction:column;gap:6px;">' + streaksHtml + '</div></div>';
     }).join('');
-    content.innerHTML = '<div class="matches-grid">' + html + '</div>';
+    content.innerHTML = '<div class="matches-grid">' + wftSponsor.insertSponsor(html) + '</div>';
   }
 
   function renderMatches(matches) {
@@ -661,7 +662,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       return cardHtml;
     }).join('');
 
-    content.innerHTML = '<div class="matches-grid">' + html + '</div>';
+    content.innerHTML = '<div class="matches-grid">' + wftSponsor.insertSponsor(html) + '</div>';
   }
 
   function renderCurrentView() {

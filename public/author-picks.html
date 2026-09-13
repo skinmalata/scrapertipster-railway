@@ -154,6 +154,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
 <script src="/supabase-client.js"></script>
 <script src="/auth.js?v=20260801"></script>
 <script src="/1xbet-odds-widget.js" defer></script>
+<script src="/sponsor-banner.js"></script>
 <script>
 (function() {
   var API_BASE = window.WFT_API || 'https://winfulltime-api.onrender.com';
@@ -199,8 +200,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
     }).join('');
     document.getElementById('statsBar').innerHTML = statsHtml;
 
-    var html = '';
-    html += '<div class="matches-grid">' + data.matches.map(function(m, i) {
+    var html = wftSponsor.insertSponsor(data.matches.map(function(m, i) {
       var liveHtml = m.isLive ? '<span>' + (m.minute ? esc(m.minute) + "'" : 'Live') + '</span>' : '<span>' + formatTime(m.kickoff) + '</span>';
 
       var home = esc(m.home);
@@ -230,8 +230,8 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
         '</div>' +
         ctaHtml +
         '</div>';
-    }).join('') + '</div>';
-    content.innerHTML = html;
+    }).join(''));
+    content.innerHTML = '<div class="matches-grid">' + html + '</div>';
   }
 
   function renderHistory(data) {
