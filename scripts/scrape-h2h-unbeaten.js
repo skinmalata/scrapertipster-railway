@@ -129,10 +129,15 @@ async function scrapeUnbeatenStreaks(dates) {
       cache.dates[date] = matches;
     } catch (err) {
       console.error(`Failed to scrape ${date}: ${err.message}`);
-      if (!cache.dates[date] || cache.dates[date].length === 0) {
-        cache.dates[date] = [];
-      } else {
+      // A failed fetch must never poison the cache with an empty placeholder:
+      // the empty array gets written back, committed and deployed, which makes
+      // the remote unbeaten page show "no data" for a date that actually has
+      // streaks. Leave the date untouched so an existing snapshot survives and
+      // a future successful scrape can still fill it.
+      if (Array.isArray(cache.dates[date]) && cache.dates[date].length > 0) {
         console.log(`Keeping existing ${cache.dates[date].length} matches for ${date}`);
+      } else {
+        delete cache.dates[date];
       }
     }
   }
