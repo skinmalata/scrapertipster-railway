@@ -94,6 +94,10 @@ const FOOTER_HTML = `
    <a href="/privacy.html">Privacy</a>
    <a href="/policy.html">Editorial Policy</a>
   </span>
+  <span class="kofi-footer">
+   <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
+   <script type='text/javascript'>kofiwidget2.init('Support us', '#ff2448', 'winfulltime');kofiwidget2.draw();</script>
+  </span>
    <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">Light</button>
  </div>
  <div style="text-align:center;padding:0 0 8px;"><div google-add-preferred-source-btn data-theme="dark"></div></div>
