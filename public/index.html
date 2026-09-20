@@ -861,6 +861,48 @@ gtag('config', 'G-HMGZMW9EDP');
 
  let dayLabel = currentDayOffset === 0 ? 'today' : currentDayOffset === 1 ? 'tomorrow' : currentDayOffset === -1 ? 'yesterday' : `on ${dateStr}`;
 
+ // Fallback: if the exact day has no data yet, show the newest day that does,
+ // with a notice, instead of a misleading "0 matches".
+ const dates = (unbeatenData && unbeatenData.dates) ? Object.keys(unbeatenData.dates).filter(k => unbeatenData.dates[k].length) : [];
+ dates.sort();
+ const lastDate = dates[dates.length - 1];
+ if (lastDate && lastDate < dateStr) {
+   const fallbackMatches = unbeatenData.dates[lastDate];
+   document.getElementById('totalMatches').textContent = fallbackMatches.length;
+   const notice = `
+   <div class="no-matches" style="margin-bottom: 12px;">
+   <p><strong>No data for ${dayLabel} yet.</strong> Showing latest available (${lastDate}). Data updates daily at 4:00 AM (WAT).</p>
+   </div>
+   `;
+   const fallbackHtml = fallbackMatches.map((match, i) => {
+     const streaksHtml = match.streaks.map(s => {
+       const loc = s.location ? ` ${s.location}` : '';
+       return `
+       <div class="streak-row">
+       <span class="streak-team">${s.team}</span>
+       <span class="streak-badge">${s.count} unbeaten${loc}</span>
+       </div>
+       `;
+     }).join('');
+     return `
+     <div class="match-card fade-in" style="animation-delay: ${i * 50}ms">
+     <div class="match-header">
+     <span>${match.league}</span>
+     <span>${match.time}</span>
+     </div>
+     <div class="match-teams" style="justify-content: center;">
+     <span class="team team-home" style="text-align: center; width: 100%;">${match.match}</span>
+     </div>
+     <div class="match-footer" style="flex-direction: column; gap: 6px;">
+     ${streaksHtml}
+     </div>
+     </div>
+     `;
+   }).join('');
+   content.innerHTML = notice + `<div class="matches-grid">${wftSponsor.insertSponsor(fallbackHtml)}</div>`;
+   return;
+ }
+
  content.innerHTML = `
 
  <div class="no-matches">

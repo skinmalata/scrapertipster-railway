@@ -423,9 +423,30 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     if (ogUrl) ogUrl.content = 'https://winfulltime.com' + newUrl;
   }
 
-  function renderUnbeaten(matches) {
+  function renderUnbeaten(matches, dateStr, dates) {
     var content = document.getElementById('content');
     if (matches.length === 0) {
+      if (dateStr && dates) {
+        var keys = Object.keys(dates).filter(function(k) { return dates[k] && dates[k].length; }).sort();
+        var lastDate = keys[keys.length - 1];
+        if (lastDate && lastDate < dateStr) {
+          var fb = dates[lastDate];
+          document.getElementById('totalMatches').textContent = fb.length;
+          var notice = '<div class="no-matches" style="margin-bottom:12px;"><p><strong>No data for this date yet.</strong> Showing latest available (' + lastDate + '). Data updates daily at 4:00 AM (WAT).</p></div>';
+          var html = fb.map(function(match, i) {
+            var streaksHtml = (match.streaks || []).map(function(s) {
+              var loc = s.location ? ' ' + s.location : '';
+              return '<div class="streak-row"><span class="streak-team">' + s.team + '</span><span class="streak-badge">' + s.count + ' unbeaten' + loc + '</span></div>';
+            }).join('');
+            return '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms">' +
+              '<div class="match-header"><span>' + (match.league || '') + '</span><span>' + (match.time || '') + '</span></div>' +
+              '<div class="match-teams" style="justify-content:center;"><span class="team team-home" style="text-align:center;width:100%;">' + (match.match || '') + '</span></div>' +
+              '<div class="match-footer" style="flex-direction:column;gap:6px;">' + streaksHtml + '</div></div>';
+          }).join('');
+          content.innerHTML = notice + '<div class="matches-grid">' + wftSponsor.insertSponsor(html) + '</div>';
+          return;
+        }
+      }
       content.innerHTML = '<div class="no-matches"><p>No unbeaten streak data for this date.</p></div>';
       document.getElementById('totalMatches').textContent = '0';
       return;
@@ -546,7 +567,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     if (IS_UNBEATEN) {
       var dates = h2hData ? (h2hData.dates || {}) : {};
       var dateStr = getSelectedDateStr();
-      renderUnbeaten(dates[dateStr] || []);
+      renderUnbeaten(dates[dateStr] || [], dateStr, dates);
     } else if (DATA_KEY && allData && allData[DATA_KEY]) {
       renderMatches(allData[DATA_KEY]);
     } else {

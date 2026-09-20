@@ -1,0 +1,111 @@
+name: Staleness Watchdog
+
+on:
+  schedule:
+    # 15:00 UTC (16:00 WAT) daily - runs well after the 09:00 UTC deploy cron,
+    # so a missing date now means the pipeline actually failed.
+    - cron: '0 15 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  actions: write
+
+jobs:
+  check-deployed-unbeaten:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Detect stale deployed unbeaten data and alert/redeploy
+        id: check
+        run: |
+          node <<'EOF' > watchdog-output.txt
+          const https = require('https');
+
+          const get = (url) => new Promise((resolve, reject) => {
+            https.get(url, { headers: { 'User-Agent': 'winfulltime-watchdog/1.0 (github-actions)' } }, (res) => {
+              let body = '';
+              res.on('data', (c) => (body += c));
+              res.on('end', () => resolve({ status: res.statusCode, body }));
+            }).on('error', reject);
+          });
+
+          const today = new Date().toISOString().slice(0, 10);
+
+          let committed, deployed;
+          try {
+            const raw = await get('https://raw.githubusercontent.com/skinmalata/scrapertipster-railway/main/h2h-unbeaten-cache.json');
+            committed = JSON.parse(raw.body).dates;
+          } catch (e) {
+            console.error(`committed cache fetch failed: ${e.message}`);
+          }
+          try {
+            const live = await get('https://winfulltime.com/data/h2h-unbeaten.json');
+            if (live.status === 404) {
+              deployed = null;
+            } else {
+              const parsed = JSON.parse(live.body);
+              deployed = parsed.dates || null;
+            }
+          } catch (e) {
+            console.error(`deployed data fetch failed: ${e.message}`);
+          }
+
+          const hasCommitted = !!(committed && Array.isArray(committed[today]) && committed[today].length);
+          const hasDeployed = !!(deployed && Array.isArray(deployed[today]) && deployed[today].length);
+
+          let state = 'ok';
+          if (!hasCommitted) {
+            state = 'cache-missing';      // local scheduled task did not push today
+          } else if (!hasDeployed) {
+            state = 'deploy-stale';       // committed cache updated but page not republished
+          }
+          console.log(`TODAY=${today}`);
+          console.log(`COMMITTED_HAS_TODAY=${hasCommitted}`);
+          console.log(`DEPLOYED_HAS_TODAY=${hasDeployed}`);
+          console.log(`STATE=${state}`);
+          EOF
+          cat watchdog-output.txt
+          grep -q '^STATE=ok$' watchdog-output.txt && echo "state=ok" >> "$GITHUB_OUTPUT" || echo "state=needs-attention" >> "$GITHUB_OUTPUT"
+          grep '^STATE=' watchdog-output.txt >> "$GITHUB_OUTPUT"
+          grep '^TODAY=' watchdog-output.txt >> "$GITHUB_OUTPUT"
+
+      - name: Force redeploy when committed cache is fine but page is stale
+        if: steps.check.outputs.STATE == 'deploy-stale'
+        run: |
+          gh workflow run scrape-and-deploy.yml --ref main
+          gh run watch --workflow=scrape-and-deploy.yml --exit-status || true
+
+      - name: Open/refresh a GitHub issue on real staleness (no alert spam)
+        if: steps.check.outputs.STATE == 'cache-missing'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TODAY: ${{ steps.check.outputs.TODAY }}
+        run: |
+          TITLE="[auto] No unbeaten cache pushed for $TODAY"
+          EXPR=".title == \"$TITLE\" and .state == \"open\""
+          if gh issue list --state open --json title,state --jq ".[] | select($EXPR)" | grep -q .; then
+            echo "Open issue already exists; skipping duplication"
+          else
+            gh issue create \
+              --title "$TITLE" \
+              --body "The **Staleness Watchdog** found the deployed site at _winfulltime.com/data/h2h-unbeaten.json_ is missing **$TODAY**, and the committed \`h2h-unbeaten-cache.json\` also lacks it.
+
+This means the local scheduled cache task (\`scripts/refresh-unbeaten-daily.ps1\` /\`scripts/update-h2h-cache.bat\`) failed to push before the 09:00 UTC deploy. Note: h2hstats.net 403s datacenter IPs, so CI cannot re-scrape.
+
+**Please check:**
+1. \`%TEMP%\\winfulltime-unbeaten-refresh.log\`
+2. Whether a rebase/merge is stuck in the repo (\`scripts/check-git-state.ps1\`)
+3. \`.scheduled-park/\` for a parked fresh snapshot, then commit+push it."
+          fi
+
+      - name: Always report final state
+        if: always()
+        run: |
+          echo "Watchdog state: $(cat watchdog-output.txt | tail -4)"
