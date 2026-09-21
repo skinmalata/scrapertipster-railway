@@ -76,9 +76,7 @@
   <a href="/vip.html" id="tab-vip" class="tab-btn active" style="background:#ff2448;color:#fff">VIP</a>
 </div>
 
-<div class="note-box" id="authState">
-  <p style="margin:0"><strong>VIP Pro Tips</strong> are published daily for members only. Each pick includes a confidence score, the value edge behind it, the best available odds and a short expert note.</p>
-</div>
+<div class="note-box" id="authState" style="display:none"></div>
 
 <div class="stats-bar" id="statsBar" style="display:none">
 <div class="stat-item"><div class="stat-value" id="totalMatches">0</div><div class="stat-label">VIP Tips</div></div>
@@ -249,7 +247,6 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       : '<p>Please sign in with your account to view your VIP picks.</p>';
     content.innerHTML = '<div class="paywall">' +
       '<h2>Exclusive VIP Pro Tips</h2>' + loginPart +
-      '<p>Get daily high-confidence picks with measured edge, best odds and expert notes &mdash; built from Forebet data you cannot see on the free markets.</p>' +
       '<a class="cta-btn" href="/pricing.html">Upgrade to VIP</a>' +
       '<a class="login-link" href="/login.html">Sign in</a>' +
       '</div>';
@@ -271,7 +268,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
         document.getElementById('statsBar').style.display = '';
         if (data.lastFetch) {
           var note = document.getElementById('authState');
-          if (note) note.innerHTML = '<p style="margin:0">VIP picks refreshed ' + new Date(data.lastFetch).toLocaleString() + '. Confidence score = model certainty + measured value edge + form/H2H + market agreement.</p>';
+          if (note) { note.style.display = ''; note.innerHTML = '<p style="margin:0">VIP picks refreshed ' + new Date(data.lastFetch).toLocaleString() + '. Confidence score = model certainty + measured value edge + form/H2H + market agreement.</p>'; }
         }
         renderContent();
       }).catch(function () {

@@ -2,12 +2,17 @@
 
 // Forebet VIP pro-tips engine.
 //
-// The VIP system uses Forebet as its single source of truth. Forebet 403s
-// datacenter IPs, so the daily scrape runs from a residential IP (Task
-// Scheduler wrapper: scripts/scrape-forebet-vip.ps1) and pushes a committed
-// forebet-vip-cache.json. The Node API serves VIP picks from that cache to
-// authenticated Pro members only (/api/vip). Static Pages never carry the
-// picks, so the tips cannot leak outside the paywall.
+// The VIP system uses Forebet as its single source of truth. Forebet serves a
+// Cloudflare managed challenge (HTTP 403 "Just a moment..." to non-browser
+// HTTP clients), which neither datacenter IPs nor canned axios requests can
+// pass. The daily scrape therefore runs from a residential machine (Task
+// Scheduler wrapper: scripts/scrape-forebet-vip.ps1) and, when Forebet
+// challenges the plain HTTP request, transparently falls back to a real
+// Chrome session via puppeteer-core (resolved from src/config/puppeteer's
+// detected binary) that clears the challenge. The runner then pushes a
+// committed forebet-vip-cache.json. The Node API serves VIP picks from that
+// cache to authenticated Pro members only (/api/vip). Static Pages never carry
+// the picks, so the tips cannot leak outside the paywall.
 //
 // Confidence score (0-100):
 //   - algorithm certainty  40 pts (margin between top-2 Forebet probabilities)
@@ -18,6 +23,84 @@
 // bookmaker odds are available, the edge is positive).
 
 const axios = require('axios');
+
+let _browserPromise = null;
+
+// Lazily launch a real Chrome session (via puppeteer-core, a devDependency)
+// used ONLY as a fetch fallback when Forebet serves a Cloudflare challenge to
+// plain HTTP. The browser is reused across every fetch in a run and closed at
+// the end, so cookies (cf_clearance) survive across detail pages.
+async function getVipBrowser() {
+  if (_browserPromise) return _browserPromise;
+  _browserPromise = (async () => {
+    const puppeteer = require('puppeteer-core');
+    const { executablePath, args } = require('../config/puppeteer');
+    return puppeteer.launch({
+      executablePath,
+      headless: 'new',
+      args,
+      ignoreHTTPSErrors: true
+    });
+  })().catch((err) => {
+    _browserPromise = null;
+    throw err;
+  });
+  return _browserPromise;
+}
+
+async function closeVipBrowser() {
+  if (_browserPromise) {
+    const b = await _browserPromise.catch(() => null);
+    _browserPromise = null;
+    if (b) await b.close().catch(() => {});
+  }
+}
+
+function isCloudflareChallenge(html) {
+  return typeof html === 'string' && /Just a moment\.\.\.|<title>Just a moment/.test(html.slice(0, 5000));
+}
+
+// Fetch + render a Forebet page through a real browser so the Cloudflare
+// managed challenge can be solved. Drains the challenge by waiting until the
+// challenge interstitial has gone and the requested selector has rendered.
+async function fetchWithBrowser(url, opts) {
+  const waitRows = !!(opts && opts.waitRows);
+  const browser = await getVipBrowser();
+  const page = await browser.newPage();
+  try {
+    await page.setUserAgent(UA);
+    const resp = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 });
+    const started = Date.now();
+    let html = await page.content();
+    let title = await page.title().catch(() => '');
+    // Cloudflare managed challenge needs a few seconds to solve; poll until
+    // the interstitial has cleared (or we run out of patience).
+    let tries = 0;
+    while ((resp && resp.status() === 403) || isCloudflareChallenge(html) || title === 'Just a moment...') {
+      await new Promise((r) => setTimeout(r, 3000));
+      html = await page.content();
+      title = await page.title().catch(() => '');
+      tries += 1;
+      if (Date.now() - started > 60000 || tries > 20) break;
+    }
+    // List pages render rows client-side after the challenge; wait for them.
+    if (waitRows) {
+      await page.waitForFunction(
+        () => document.querySelectorAll('.schema .rcnt').length > 0,
+        { timeout: 45000 }
+      ).catch(() => {});
+    } else {
+      await new Promise((r) => setTimeout(r, 700));
+    }
+    html = await page.content();
+    if (isCloudflareChallenge(html) || html.length < 500) {
+      throw new Error('Forebet challenge not cleared via real Chrome (tries=' + tries + ')');
+    }
+    return html;
+  } finally {
+    await page.close().catch(() => {});
+  }
+}
 
 const FOREBET_TODAY_URL = 'https://www.forebet.com/en/football-tips-and-predictions-for-today';
 const FOREBET_DATE_URL = 'https://www.forebet.com/en/football-predictions/predictions-1x2/';
@@ -359,24 +442,38 @@ function parseMatchDetail(html) {
   };
 }
 
-async function fetchUrl(url) {
-  const res = await axios.get(url, {
-    timeout: SCRAPE_TIMEOUT_MS,
-    validateStatus: function () { return true; },
-    headers: {
-      'User-Agent': UA,
-      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-      'Accept-Language': 'en-US,en;q=0.9',
-      'Accept-Encoding': 'gzip, deflate'
+let siteChallenged = false;
+
+async function fetchUrl(url, opts) {
+  let res = null;
+  if (!siteChallenged) {
+    try {
+      res = await axios.get(url, {
+        timeout: SCRAPE_TIMEOUT_MS,
+        validateStatus: function () { return true; },
+        headers: {
+          'User-Agent': UA,
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Accept-Encoding': 'gzip, deflate'
+        }
+      });
+    } catch (e) {
+      res = null;
     }
-  });
-  if (res.status === 429 || res.status === 403) {
-    throw new Error('Forebet blocked this scrape (HTTP ' + res.status + ')');
+    const blocked = !res || res.status === 403 || res.status === 429 || (res.status === 200 && isCloudflareChallenge(res.data));
+    if (!blocked) {
+      if (res.status !== 200 || typeof res.data !== 'string' || res.data.length < 500) {
+        throw new Error('Unexpected response (HTTP ' + res.status + ')');
+      }
+      return res.data;
+    }
+    // Site serves a Cloudflare challenge (or hard-block) to plain HTTP; from
+    // here on, go straight to the real browser instead of retrying axios per
+    // page. This is the hot path for every fixture on a challenged site.
+    siteChallenged = true;
   }
-  if (res.status !== 200 || typeof res.data !== 'string' || res.data.length < 500) {
-    throw new Error('Unexpected response (HTTP ' + res.status + ')');
-  }
-  return res.data;
+  return fetchWithBrowser(url, opts);
 }
 
 async function enrichMatch(match) {
@@ -393,6 +490,20 @@ async function enrichMatch(match) {
   }
 }
 
+async function enrichAll(matches, concurrency) {
+  const limit = Math.max(1, Number(concurrency || process.env.VIP_DETAIL_CONCURRENCY || 6));
+  const results = new Array(matches.length);
+  let next = 0;
+  async function worker() {
+    while (next < matches.length) {
+      const i = next++;
+      results[i] = await enrichMatch(matches[i]);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limit, matches.length) }, worker));
+  return results;
+}
+
 async function scrapeDay(dateStr) {
   let url = FOREBET_DATE_URL + dateStr;
   const todayLocal = new Date().toISOString().slice(0, 10);
@@ -400,7 +511,7 @@ async function scrapeDay(dateStr) {
   if (isToday) url = FOREBET_TODAY_URL;
 
   console.log('[forebetVip] Scraping ' + dateStr + ' (' + url + ')');
-  const html = await fetchUrl(url);
+  const html = await fetchUrl(url, { waitRows: true });
   const raw = parseMatchList(html);
   if (raw.length === 0) {
     console.warn('[forebetVip] No matches parsed for ' + dateStr + ' (structure may have changed)');
@@ -408,9 +519,9 @@ async function scrapeDay(dateStr) {
   }
   console.log('[forebetVip] Parsed ' + raw.length + ' fixtures for ' + dateStr + '; enriching ' + raw.length + ' match pages...');
 
+  const enriched = await enrichAll(raw);
   const out = [];
-  for (const match of raw) {
-    const m = await enrichMatch(match);
+  for (const m of enriched) {
     const probs = m.probs;
     const pick = predictionLabel(probs);
     const detailBooks = m.detail && Array.isArray(m.detail.books) ? m.detail.books : [];
@@ -463,13 +574,17 @@ async function scrapeDay(dateStr) {
 async function scrapeVip(dates) {
   const list = Array.isArray(dates) ? dates : [dates];
   const result = {};
-  for (const date of list) {
-    try {
-      result[date] = await scrapeDay(date);
-    } catch (err) {
-      console.error('[forebetVip] Failed to scrape ' + date + ': ' + err.message);
-      result[date] = [];
+  try {
+    for (const date of list) {
+      try {
+        result[date] = await scrapeDay(date);
+      } catch (err) {
+        console.error('[forebetVip] Failed to scrape ' + date + ': ' + err.message);
+        result[date] = [];
+      }
     }
+  } finally {
+    await closeVipBrowser();
   }
   return result;
 }
@@ -485,6 +600,7 @@ module.exports = {
   normaliseTeam,
   predictionLabel,
   impliedFromOdds,
+  closeVipBrowser,
   MIN_CONFIDENCE,
   MIN_TEAM_SCORE_ODD
 };

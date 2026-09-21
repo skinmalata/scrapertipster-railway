@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { scrapeVip, MIN_CONFIDENCE, MIN_TEAM_SCORE_ODD } = require('../src/services/forebetVip');
+const { scrapeVip, closeVipBrowser, MIN_CONFIDENCE, MIN_TEAM_SCORE_ODD } = require('../src/services/forebetVip');
 
 const CACHE_FILE = path.join(process.cwd(), 'forebet-vip-cache.json');
 
@@ -53,8 +53,7 @@ async function main() {
   cache.lastFetch = new Date().toISOString();
   cache.meta = {
     minConfidence: MIN_CONFIDENCE,
-    minTeamScoreOdd: MIN_TEAM_SCORE_ODD,
-    source: 'forebet.com'
+    minTeamScoreOdd: MIN_TEAM_SCORE_ODD
   };
   fs.writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2));
   console.log('Saved ' + CACHE_FILE);
@@ -72,7 +71,9 @@ async function main() {
   }
 }
 
-main().catch(err => {
-  console.error('Fatal:', err.message);
-  process.exit(1);
-});
+main()
+  .catch(err => {
+    console.error('Fatal:', err.message);
+    process.exitCode = 1;
+  })
+  .finally(() => closeVipBrowser().catch(() => {}));
