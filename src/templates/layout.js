@@ -334,11 +334,13 @@ function applyLayoutToHtml(html, activePath) {
   const needsSupabase = !/supabase-client\.js/.test(html);
   const needsAuth = !/auth\.js/.test(html);
   const needsHamburger = !/getElementById\(['"]hamburger['"]\)/.test(html);
-  if (needsTheme || needsAuth || needsConfig || needsSupabase || needsHamburger) {
+  const needsVipTab = !/vip-tab\.js/.test(html) && /id="categoryLinks"|id="categoryTabs"/.test(html);
+  if (needsTheme || needsAuth || needsConfig || needsSupabase || needsHamburger || needsVipTab) {
     let block = '\n';
     if (needsConfig) block += '<script src="/config.js"></script>\n';
     if (needsSupabase) block += '<script src="/supabase-client.js"></script>\n';
     if (needsAuth) block += '<script src="/auth.js?v=20260801"></script>\n';
+    if (needsVipTab) block += '<script src="/vip-tab.js" defer></script>\n';
     if (needsTheme) {
       block += `<script>
 (function() {

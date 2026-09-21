@@ -841,6 +841,43 @@ router.get('/h2h-unbeaten', (req, res) => {
   }
 });
 
+// GET /api/vip - Forebet VIP pro tips, served only to active Pro members.
+// Picks live in a committed forebet-vip-cache.json (scraped daily from a
+// residential IP by scripts/scrape-forebet-vip.ps1; Forebet blocks datacenter
+// IPs). This endpoint is the only way the picks leave the server - they are
+// never placed in the static public/ tree, so non-members cannot fetch them.
+const pathVipCache = path.join(__dirname, '../../forebet-vip-cache.json');
+router.get('/vip', requireProMiddleware, function (req, res) {
+  try {
+    if (!fs.existsSync(pathVipCache)) {
+      return res.json({ isPro: true, dates: {}, allDates: [], lastFetch: null, message: 'VIP picks publish each morning.' });
+    }
+    const cache = JSON.parse(fs.readFileSync(pathVipCache, 'utf8'));
+    const dates = (cache.dates || {});
+    const requestedDate = req.query.date;
+    if (requestedDate && dates[requestedDate]) {
+      return res.json({
+        isPro: true,
+        lastFetch: cache.lastFetch || null,
+        meta: cache.meta || null,
+        date: requestedDate,
+        picks: dates[requestedDate],
+        allDates: Object.keys(dates)
+      });
+    }
+    res.json({
+      isPro: true,
+      lastFetch: cache.lastFetch || null,
+      meta: cache.meta || null,
+      dates,
+      allDates: Object.keys(dates)
+    });
+  } catch (e) {
+    console.error('[api/vip] Error:', e.message);
+    res.status(500).json({ error: 'Failed to load VIP picks' });
+  }
+});
+
 router.get('/football-odds', async (req, res) => {
   const requestedDate = typeof req.query.date === 'string' ? req.query.date : new Date().toISOString().slice(0, 10);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(requestedDate)) {

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HMGZMW9EDP');</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ff2448">
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/app.css?v=10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WinFulltime">
+<title>VIP Pro Tips | WinFulltime</title>
+<style>
+.vip-badge{background:linear-gradient(135deg,#ff2448,#ff7e7e);color:#fff;font-weight:800;font-size:12px;letter-spacing:1px;padding:4px 10px;border-radius:20px;text-transform:uppercase}
+.confidence-meter{height:6px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden;width:100%;margin-top:6px}
+.confidence-meter span{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#ff2448,#ffb020)}
+.edge-chip{display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700}
+.edge-chip.positive{background:rgba(34,197,94,.15);color:#22c55e}
+.edge-chip.neutral{background:rgba(255,255,255,.08);color:var(--text-secondary)}
+.tip-badge.vip{background:#ff2448}
+.note-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:20px;margin:20px 0;line-height:1.7;color:rgba(232,237,245,.9)}
+.paywall{border:1px solid rgba(255,36,72,.35);background:linear-gradient(180deg,rgba(255,36,72,.08),rgba(24,30,48,.6));border-radius:16px;padding:36px 24px;text-align:center;margin:20px 0}
+.paywall h2{margin:0 0 10px;color:#fff}
+.paywall p{color:var(--text-secondary);margin:0 0 20px}
+.paywall .cta-btn{display:inline-block;background:var(--accent,#ff2448);color:#fff;font-weight:800;padding:12px 28px;border-radius:10px;text-decoration:none;font-size:15px}
+.paywall .login-link{color:var(--accent);text-decoration:underline;margin-left:14px}
+</style>
+</head>
+<body>
+<div>
+<header>
+<div class="header-content">
+<div class="logo"><a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a></div>
+<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+<nav id="nav">
+<a href="/">Home</a>
+<a href="/ticket-builder.html">Ticket Builder</a>
+<a href="/blog/">Blog</a>
+<a href="/contact.html">Contact</a>
+</nav>
+</div>
+</header>
+<main class="container">
+<div class="hero">
+<h1 id="pageHeading">VIP Pro Tips<span class="vip-badge" style="margin-left:10px;vertical-align:middle">VIP</span></h1>
+<p class="hero-date" id="currentDate"></p>
+</div>
+
+<div class="date-tabs" id="dateTabs">
+  <button class="date-tab active" data-date="today" onclick="switchDate('today')">Today</button>
+  <button class="date-tab" data-date="tomorrow" onclick="switchDate('tomorrow')">Tomorrow</button>
+</div>
+
+<div class="tabs-container" id="categoryLinks">
+  <a href="/predictions/1x2" id="tab-1x2" class="tab-btn">1X2</a>
+  <a href="/predictions/over-1-5" id="tab-over-1-5" class="tab-btn">Over 1.5</a>
+  <a href="/predictions/over-2-5" id="tab-over-2-5" class="tab-btn">Over 2.5</a>
+  <a href="/author-picks.html" id="tab-author-picks" class="tab-btn">H2H Picks</a>
+  <a href="/predictions/btts" id="tab-btts" class="tab-btn">BTTS Yes</a>
+  <a href="/predictions/btts-no" id="tab-btts-no" class="tab-btn">BTTS No</a>
+  <a href="/predictions/unbeaten" id="tab-unbeaten" class="tab-btn">Unbeaten</a>
+  <a href="/predictions/corners" id="tab-corners" class="tab-btn">Corners</a>
+  <a href="/predictions/cards" id="tab-cards" class="tab-btn">Cards</a>
+  <a href="/predictions/winning-streak" id="tab-winning-streak" class="tab-btn">Win Streak</a>
+  <a href="/predictions/losing-streak" id="tab-losing-streak" class="tab-btn">Loss Streak</a>
+  <a href="/predictions/draws-streak" id="tab-draws-streak" class="tab-btn">Draw Streak</a>
+  <a href="/vip.html" id="tab-vip" class="tab-btn active" style="background:#ff2448;color:#fff">VIP</a>
+</div>
+
+<div class="note-box" id="authState">
+  <p style="margin:0"><strong>VIP Pro Tips</strong> are published daily for members only. Each pick includes a confidence score, the value edge behind it, the best available odds and a short expert note.</p>
+</div>
+
+<div class="stats-bar" id="statsBar" style="display:none">
+<div class="stat-item"><div class="stat-value" id="totalMatches">0</div><div class="stat-label">VIP Tips</div></div>
+<div class="stat-item"><div class="stat-value" id="avgConfidence">0</div><div class="stat-label">Avg Confidence</div></div>
+<div class="stat-item"><div class="stat-value" id="avgEdge">0</div><div class="stat-label">Avg Edge %</div></div>
+</div>
+
+<div id="content">
+<div class="loading">
+<div class="progress-bar-container">
+<div class="progress-bar"></div>
+</div>
+<span class="loading-text">Checking membership...</span>
+</div>
+</div>
+
+<div class="featured-cta">
+<div class="label">Featured Tool</div>
+</div>
+</main>
+<footer>
+<div style="text-align:center;color:var(--text-secondary);font-size:14px;padding:20px">
+<div>&copy; <span id="year"></span> WinFulltime. All rights reserved.</div>
+<div style="text-align:center;padding:12px 0;"><button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">Light</button></div>
+</div>
+</footer>
+<script src="/config.js"></script>
+<script src="/supabase-client.js"></script>
+<script src="/auth.js?v=20260801"></script>
+<script src="/sponsor-banner.js"></script>
+<script src="/chat-widget.js"></script>
+<script>
+(function(){const s=localStorage.getItem("wf-theme");const t=s||"dark";document.documentElement.setAttribute("data-theme",t==="dark"?"":"light");const b=document.getElementById("themeToggle");if(b)b.textContent=t==="dark"?"Light":"Dark";})();
+document.addEventListener("DOMContentLoaded",function(){const b=document.getElementById("themeToggle");if(!b)return;b.addEventListener("click",function(){const h=document.documentElement;const l=h.getAttribute("data-theme")==="light";if(l){h.removeAttribute("data-theme");b.textContent="Light";localStorage.setItem("wf-theme","dark")}else{h.setAttribute("data-theme","light");b.textContent="Dark";localStorage.setItem("wf-theme","light")}});});
+document.getElementById('hamburger')?.addEventListener('click', function() { this.classList.toggle('active'); document.getElementById('nav')?.classList.toggle('open'); });
+</script>
+<script>
+(function() {
+  'use strict';
+  var currentDate = 'today';
+  var cache = null;
+
+  function getSelectedDateStr() {
+    var now = new Date();
+    var parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Africa/Lagos', year: 'numeric', month: '2-digit', day: '2-digit'
+    }).formatToParts(now);
+    var base = new Date(parseInt(parts.find(function(p){return p.type==='year'}).value),
+      parseInt(parts.find(function(p){return p.type==='month'}).value) - 1,
+      parseInt(parts.find(function(p){return p.type==='day'}).value));
+    var d = new Date(base);
+    if (currentDate === 'tomorrow') d.setDate(d.getDate() + 1);
+    return d.toISOString().slice(0, 10);
+  }
+
+  function updateDateDisplay() {
+    var label = currentDate === 'today' ? 'Predictions For Today' : 'Predictions For Tomorrow';
+    var el = document.getElementById('pageHeading');
+    if (el) el.innerHTML = 'VIP Pro Tips <span class="vip-badge" style="margin-left:10px;vertical-align:middle">VIP</span>';
+    var dateEl = document.getElementById('currentDate');
+    if (dateEl) dateEl.textContent = label + ' ' + getSelectedDateStr();
+  }
+
+  function escAttr(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function escHtml(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function switchDate(d) {
+    currentDate = d;
+    document.querySelectorAll('#dateTabs .date-tab').forEach(function(b) {
+      b.classList.toggle('active', b.getAttribute('data-date') === d);
+    });
+    updateDateDisplay();
+    renderPicks();
+  }
+  window.switchDate = switchDate;
+
+  function tipLabel(pick) {
+    return pick === '1' ? '1 (Home)' : pick === '2' ? '2 (Away)' : 'X (Draw)';
+  }
+
+  function probsHtml(probs, pick) {
+    var cells = ['home', 'draw', 'away'].map(function(k) {
+      var active = k === (pick === '1' ? 'home' : pick === '2' ? 'away' : 'draw') ? ' opacity:1;font-weight:700' : ' opacity:.6';
+      return '<div style="flex:1;text-align:center;font-size:13px;' + active + '">' + escHtml(k.toUpperCase() === 'DRAW' ? 'DRAW' : (k === 'home' ? 'HOME' : 'AWAY')) + '<br><span style="font-size:16px;font-weight:800">' + (probs && probs[k] != null ? probs[k] + '%' : '-') + '</span></div>';
+    }).join('');
+    return '<div style="display:flex;border-top:1px solid rgba(255,255,255,.06);padding-top:10px;margin-top:10px">' + cells + '</div>';
+  }
+
+  function renderContent() {
+    var content = document.getElementById('content');
+    if (!cache || !cache.dates) {
+      content.innerHTML = '<div class="no-matches"><p>No VIP picks yet. Picks publish daily.</p></div>';
+      return;
+    }
+    var dateStr = getSelectedDateStr();
+    var matches = cache.dates[dateStr] || [];
+    document.getElementById('totalMatches').textContent = matches.length;
+    var avgConfidence = matches.length ? Math.round(matches.reduce(function(s, m) { return s + (m.confidence || 0); }, 0) / matches.length) : 0;
+    var avgEdge = matches.length ? (matches.reduce(function(s, m) { return s + (m.edge || 0); }, 0) / matches.length).toFixed(1) : '0.0';
+    document.getElementById('avgConfidence').textContent = avgConfidence || '0';
+    document.getElementById('avgEdge').textContent = avgEdge + '%';
+
+    if (matches.length === 0) {
+      content.innerHTML = '<div class="no-matches"><p>No VIP picks for ' + dateStr + '. Check back after the daily update.</p></div>';
+      return;
+    }
+
+    var html = matches.map(function(m, i) {
+      var edgeChip = m.edge != null
+        ? '<span class="edge-chip ' + (m.edge > 0 ? 'positive' : 'neutral') + '">' + (m.edge > 0 ? '+' : '') + m.edge + '% edge</span>'
+        : '<span class="edge-chip neutral">edge N/A</span>';
+      var bestOddsHtml = m.bestOdds
+        ? '<div class="match-reason" style="margin-top:8px"><strong>Best odds ' + escHtml(tipLabel(m.pick)) + ':</strong> ' + m.bestOdds.toFixed(2) + '</div>'
+        : '';
+      var formHtml = '';
+      if (m.form) {
+        var f = '<span style="font-weight:700">' + escHtml(m.home) + '</span> ' + escHtml(m.form.home) + ' &middot; <span style="font-weight:700">' + escHtml(m.away) + '</span> ' + escHtml(m.form.away);
+        formHtml = '<div class="match-reason" style="margin-top:8px"><strong>Form:</strong> ' + f + '</div>';
+      }
+      var previewHtml = m.preview
+        ? '<div class="match-reason" style="margin-top:8px;font-style:italic;">' + escHtml(m.preview) + '</div>'
+        : '';
+      var tsHtml = '';
+      if (m.teamScoreProps && m.teamScoreProps.length) {
+        tsHtml = m.teamScoreProps.map(function(p) {
+          var teamName = p.side === 'home' ? escHtml(m.home) : escHtml(m.away);
+          return '<div class="match-reason" style="margin-top:6px;display:flex;justify-content:space-between;gap:8px;align-items:center">' +
+            '<span><strong>To score at least 1 goal:</strong> ' + teamName + '</span>' +
+            '<span style="white-space:nowrap"><span class="tip-badge vip">@' + p.estimatedOdd.toFixed(2) + '</span> ' + p.prob + '%</span>' +
+            '</div>';
+        }).join('');
+      }
+      return '<div class="match-card fade-in" style="animation-delay:' + (i * 60) + 'ms">' +
+        '<div class="match-header"><span>' + escHtml(m.league || '') + '</span><span>' + escHtml(m.time || '') + '</span></div>' +
+        '<div class="match-teams">' +
+        '<span class="team team-home">' + escHtml(m.home) + '</span>' +
+        '<span class="vs-score">vs</span>' +
+        '<span class="team team-away">' + escHtml(m.away) + '</span>' +
+        '</div>' +
+        '<div class="match-footer">' +
+        '<div style="text-align:center;display:flex;flex-direction:column;align-items:center;width:100%">' +
+        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center">' +
+        '<span class="tip-badge vip">' + escHtml(tipLabel(m.pick)) + '</span>' +
+        edgeChip +
+        '</div>' +
+        '<div class="confidence-meter"><span style="width:' + Math.min(100, m.confidence || 0) + '%"></span></div>' +
+        '<div class="probability">' + (m.confidence || 0) + '% confidence</div>' +
+        bestOddsHtml + formHtml + previewHtml + tsHtml +
+        probsHtml(m.probs, m.pick) +
+        '</div></div></div>';
+    }).join('');
+
+    content.innerHTML = '<div class="matches-grid">' + (window.wftSponsor ? window.wftSponsor.insertSponsor(html) : html) + '</div>';
+  }
+
+  function renderPicks() {
+    renderContent();
+  }
+
+  function showPaywall(hasUser) {
+    var content = document.getElementById('content');
+    var loginPart = hasUser
+      ? '<p>Your account is active but is not on a VIP plan.</p>'
+      : '<p>Please sign in with your account to view your VIP picks.</p>';
+    content.innerHTML = '<div class="paywall">' +
+      '<h2>Exclusive VIP Pro Tips</h2>' + loginPart +
+      '<p>Get daily high-confidence picks with measured edge, best odds and expert notes &mdash; built from Forebet data you cannot see on the free markets.</p>' +
+      '<a class="cta-btn" href="/pricing.html">Upgrade to VIP</a>' +
+      '<a class="login-link" href="/login.html">Sign in</a>' +
+      '</div>';
+  }
+
+  function loadMembers() {
+    window.WFT.onAuthReady(function (user) {
+      if (!user) {
+        showPaywall(false);
+        return;
+      }
+      window.WFT.apiFetch('/api/vip').then(function (data) {
+        if (!data || !data.isPro) {
+          if (window.location.hash === '#refresh') showPaywall(true);
+          else showPaywall(true);
+          return;
+        }
+        cache = data;
+        document.getElementById('statsBar').style.display = '';
+        if (data.lastFetch) {
+          var note = document.getElementById('authState');
+          if (note) note.innerHTML = '<p style="margin:0">VIP picks refreshed ' + new Date(data.lastFetch).toLocaleString() + '. Confidence score = model certainty + measured value edge + form/H2H + market agreement.</p>';
+        }
+        renderContent();
+      }).catch(function () {
+        showPaywall(true);
+      });
+    });
+  }
+
+  updateDateDisplay();
+  loadMembers();
+})();
+</script>
+<script src="/pwa.js"></script>
+</body>
+</html>

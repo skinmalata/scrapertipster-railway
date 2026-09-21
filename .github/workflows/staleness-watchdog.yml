@@ -109,3 +109,80 @@ This means the local scheduled cache task (\`scripts/refresh-unbeaten-daily.ps1\
         if: always()
         run: |
           echo "Watchdog state: $(cat watchdog-output.txt | tail -4)"
+
+  check-deployed-vip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Detect stale committed VIP cache and alert
+        id: check
+        run: |
+          node <<'EOF' > watchdog-vip-output.txt
+          const https = require('https');
+          const get = (url) => new Promise((resolve, reject) => {
+            https.get(url, { headers: { 'User-Agent': 'winfulltime-watchdog/1.0 (github-actions)' } }, (res) => {
+              let body = '';
+              res.on('data', (c) => (body += c));
+              res.on('end', () => resolve({ status: res.statusCode, body }));
+            }).on('error', reject);
+          });
+
+          const today = new Date().toISOString().slice(0, 10);
+          const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+
+          let cache;
+          try {
+            const raw = await get('https://raw.githubusercontent.com/skinmalata/scrapertipster-railway/main/forebet-vip-cache.json');
+            cache = JSON.parse(raw.body);
+          } catch (e) {
+            console.error(`committed VIP cache fetch failed: ${e.message}`);
+          }
+
+          const dates = (cache && cache.dates) || {};
+          const hasToday = Array.isArray(dates[today]) && dates[today].length;
+          const hasTomorrow = Array.isArray(dates[tomorrow]) && dates[tomorrow].length;
+
+          let state = 'ok';
+          if (!cache) state = 'cache-missing';
+          else if (!hasToday && !hasTomorrow) state = 'cache-stale';
+          console.log(`TODAY=${today}`);
+          console.log(`TOMORROW=${tomorrow}`);
+          console.log(`HAS_TODAY=${!!hasToday}`);
+          console.log(`HAS_TOMORROW=${!!hasTomorrow}`);
+          console.log(`STATE=${state}`);
+          EOF
+          cat watchdog-vip-output.txt
+          grep '^STATE=' watchdog-vip-output.txt >> "$GITHUB_OUTPUT"
+
+      - name: Open/refresh a GitHub issue on missed VIP push
+        if: steps.check.outputs.STATE != 'ok'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TODAY: ${{ steps.check.outputs.TODAY }}
+        run: |
+          TITLE="[auto] No VIP cache pushed for $TODAY"
+          EXPR=".title == \"$TITLE\" and .state == \"open\""
+          if gh issue list --state open --json title,state --jq ".[] | select($EXPR)" | grep -q .; then
+            echo "Open issue already exists; skipping duplication"
+          else
+            gh issue create \
+              --title "$TITLE" \
+              --body "The **Staleness Watchdog** found the committed \`forebet-vip-cache.json\` missing or stale for **$TODAY**.
+
+This means the local scheduled cache task (\`scripts/scrape-forebet-vip.ps1\`) failed to push before the deploy. Note: forebet.com 403s datacenter IPs, so CI cannot re-scrape.
+
+**Please check:**
+1. \`%TEMP%\\winfulltime-vip-refresh.log\`
+2. Whether a rebase/merge is stuck in the repo (\`scripts/check-git-state.ps1\`)
+3. \`.scheduled-park/\` for a parked fresh snapshot, then commit+push it."
+          fi
+
+      - name: Always report final state
+        if: always()
+        run: |
+          echo "VIP watchdog state: $(tail -5 watchdog-vip-output.txt)"
