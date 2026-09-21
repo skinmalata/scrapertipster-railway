@@ -37,3 +37,17 @@ services:
         value: "false"
       - key: THE_ODDS_API_KEY
         sync: false
+      - key: PAYMENT_PROVIDER
+        value: whop
+      - key: WHOP_API_KEY
+        sync: false
+      - key: WHOP_COMPANY_ID
+        sync: false
+      - key: WHOP_WEBHOOK_SECRET
+        sync: false
+      - key: WHOP_PRODUCT_MONTHLY
+        sync: false
+      - key: WHOP_PRODUCT_YEARLY
+        sync: false
+      - key: WHOP_PRODUCT_LIFETIME
+        sync: false

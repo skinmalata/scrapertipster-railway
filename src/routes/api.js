@@ -31,6 +31,22 @@ function activePayment() {
   return process.env.PAYMENT_PROVIDER === 'whop' ? whop : payment;
 }
 
+// Resolve the payment provider that actually owns a subscription, by looking
+// up the matching payments row (payment_method='whop' | 'lemonsqueezy').
+// Falls back to PAYMENT_PROVIDER so admin-/lifetime-created or legacy rows
+// without a payment still behave correctly.
+async function providerForPaymentId(paymentId) {
+  try {
+    if (supabase && paymentId) {
+      var pay = await supabase.from('payments').select('payment_method')
+        .eq('provider_payment_id', paymentId).limit(1).maybeSingle();
+      if (pay.data && pay.data.payment_method === 'whop') return whop;
+      if (pay.data && pay.data.payment_method === 'lemonsqueezy') return payment;
+    }
+  } catch (e) {}
+  return activePayment();
+}
+
 // API-Football responses are cached so one busy page does not consume the
 // provider quota for every visitor. The API key is deliberately kept here,
 // never sent to the browser.
@@ -2066,7 +2082,7 @@ router.get('/me/subscription', requireAuth, async function (req, res) {
     var profile = prof.data;
     var subscription = sub.data;
     var isAdmin = profile && profile.vip_status === 'admin';
-    var isPro = isAdmin || (profile && profile.vip_status === 'vip' && new Date(profile.vip_expires_at) > new Date());
+    var isPro = isAdmin || (profile && profile.vip_status === 'vip' && (!profile.vip_expires_at || new Date(profile.vip_expires_at) > new Date()));
 
     var emailConfirmed = false;
     var header = String(req.headers.authorization || '');
@@ -2112,11 +2128,12 @@ router.get('/portal', requireAuth, function (req, res) {
       if (!sub.data || !sub.data.payment_id) {
         return res.json({ error: 'No active subscription' });
       }
-      return activePayment().createCustomerPortal({ subscriptionId: sub.data.payment_id })
-        .then(function (result) {
-          if (result.error) return res.json({ error: result.error });
-          res.json({ url: result.url });
-        });
+      return providerForPaymentId(sub.data.payment_id).then(function (provider) {
+        return provider.createCustomerPortal({ subscriptionId: sub.data.payment_id });
+      }).then(function (result) {
+        if (result.error) return res.json({ error: result.error });
+        res.json({ url: result.url });
+      });
     }).catch(function (err) {
       console.error('[portal] Error:', err.message);
       res.status(500).json({ error: 'Failed to get portal URL' });
@@ -2138,10 +2155,11 @@ router.post('/subscription/cancel', requireAuth, function (req, res) {
       if (!sub.data || !sub.data.payment_id) {
         return res.json({ error: 'No active subscription found' });
       }
-      return activePayment().cancelSubscription(sub.data.payment_id)
-        .then(function () {
-          res.json({ message: 'Subscription cancelled' });
-        });
+      return providerForPaymentId(sub.data.payment_id).then(function (provider) {
+        return provider.cancelSubscription(sub.data.payment_id);
+      }).then(function () {
+        res.json({ message: 'Subscription cancelled' });
+      });
     }).catch(function (err) {
       console.error('[cancel] Error:', err.message);
       res.status(500).json({ error: 'Failed to cancel subscription' });
