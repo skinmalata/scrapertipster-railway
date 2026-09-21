@@ -1,7 +1,9 @@
-const CACHE_NAME = 'winfulltime-v9';
-const STATIC_CACHE = 'winfulltime-static-v9';
-const DYNAMIC_CACHE = 'winfulltime-dynamic-v9';
-const IMAGE_CACHE = 'winfulltime-images-v9';
+const CACHE_NAME = 'winfulltime-v10';
+const STATIC_CACHE = 'winfulltime-static-v10';
+const DYNAMIC_CACHE = 'winfulltime-dynamic-v10';
+const IMAGE_CACHE = 'winfulltime-images-v10';
+
+const API_BASE = 'https://winfulltime-api.onrender.com';
 
 const STATIC_ASSETS = [
   '/',
@@ -184,7 +186,7 @@ self.addEventListener('pushsubscriptionchange', event => {
   event.waitUntil(
     self.registration.pushManager.subscribe(event.oldSubscription ? event.oldSubscription.options : { userVisibleOnly: true }).then(sub => {
       const json = sub.toJSON();
-      return fetch('/api/push/subscribe', {
+      return fetch(API_BASE + '/api/push/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ endpoint: json.endpoint, keys: json.keys })
