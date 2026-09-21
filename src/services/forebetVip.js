@@ -111,6 +111,20 @@ const MIN_CONFIDENCE = 55;
 // is above this floor - below it the market is too short to be worth a VIP tip.
 const MIN_TEAM_SCORE_ODD = 1.3;
 const SCRAPE_TIMEOUT_MS = 25000;
+// Per-fixture detail pages add form/H2H/preview (max +15 confidence) but cost
+// one browser navigation each, which is slow against Forebet's Cloudflare
+// challenge. Off by default: the list page already yields probabilities and
+// average odds, which is enough for confidence, edge, best odds and the
+// team-to-score model. Set VIP_ENRICH_DETAIL=1 to opt in.
+const ENRICH_DETAIL = process.env.VIP_ENRICH_DETAIL === '1';
+// Hard wall-clock budget for a whole scrape run. When it is exceeded the run
+// stops starting new work and publishes whatever it has already scored, so the
+// scheduled task can never run long. Default 3 minutes.
+const SCRAPE_BUDGET_MS = Number(process.env.VIP_SCRAPE_BUDGET_MS || 180000);
+let _deadline = 0;
+function budgetExceeded() {
+  return _deadline > 0 && Date.now() > _deadline;
+}
 
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36';
 
@@ -490,17 +504,23 @@ async function enrichMatch(match) {
   }
 }
 
-async function enrichAll(matches, concurrency) {
-  const limit = Math.max(1, Number(concurrency || process.env.VIP_DETAIL_CONCURRENCY || 6));
-  const results = new Array(matches.length);
-  let next = 0;
-  async function worker() {
-    while (next < matches.length) {
-      const i = next++;
-      results[i] = await enrichMatch(matches[i]);
+// Enrichment is deliberately sequential: Cloudflare re-challenges parallel
+// tabs, so one shared browser session handling pages one-at-a-time is the
+// reliable path. Fixtures whose preliminary score (without the detail-only
+// form/H2H bonus) cannot possibly reach the gate are skipped entirely.
+async function enrichAll(matches, shouldEnrich) {
+  const results = [];
+  for (const match of matches) {
+    if (budgetExceeded()) {
+      results.push(Object.assign({}, match, { detail: null, detailOverBudget: true }));
+      continue;
+    }
+    if (shouldEnrich && !shouldEnrich(match)) {
+      results.push(Object.assign({}, match, { detail: null, detailSkipped: true }));
+    } else {
+      results.push(await enrichMatch(match));
     }
   }
-  await Promise.all(Array.from({ length: Math.min(limit, matches.length) }, worker));
   return results;
 }
 
@@ -517,9 +537,26 @@ async function scrapeDay(dateStr) {
     console.warn('[forebetVip] No matches parsed for ' + dateStr + ' (structure may have changed)');
     return [];
   }
-  console.log('[forebetVip] Parsed ' + raw.length + ' fixtures for ' + dateStr + '; enriching ' + raw.length + ' match pages...');
 
-  const enriched = await enrichAll(raw);
+  const listBooks = (m) => (m.avgOdds && m.avgOdds.home && m.avgOdds.draw && m.avgOdds.away)
+    ? [{ name: 'forebet-avg', odds: m.avgOdds }]
+    : [];
+  const shouldEnrich = (match) => {
+    const pick = predictionLabel(match.probs);
+    const prelim = computeConfidence({ probs: match.probs, pick, books: listBooks(match), form: null, h2h: null });
+    return prelim.confidence + 15 >= MIN_CONFIDENCE;
+  };
+
+  let enriched;
+  if (ENRICH_DETAIL) {
+    enriched = await enrichAll(raw, shouldEnrich);
+    const enrichedCount = enriched.filter((m) => m.detail).length;
+    console.log('[forebetVip] Parsed ' + raw.length + ' fixtures for ' + dateStr + '; enriched ' + enrichedCount + ' candidates...');
+  } else {
+    enriched = raw.map((m) => Object.assign({}, m, { detail: null, detailSkipped: true }));
+    console.log('[forebetVip] Parsed ' + raw.length + ' fixtures for ' + dateStr + ' (list-only scoring; set VIP_ENRICH_DETAIL=1 for form/H2H detail).');
+  }
+
   const out = [];
   for (const m of enriched) {
     const probs = m.probs;
@@ -574,8 +611,14 @@ async function scrapeDay(dateStr) {
 async function scrapeVip(dates) {
   const list = Array.isArray(dates) ? dates : [dates];
   const result = {};
+  _deadline = Date.now() + SCRAPE_BUDGET_MS;
   try {
     for (const date of list) {
+      if (budgetExceeded()) {
+        console.warn('[forebetVip] Skipping ' + date + ' - scrape budget of ' + Math.round(SCRAPE_BUDGET_MS / 1000) + 's exceeded');
+        result[date] = [];
+        continue;
+      }
       try {
         result[date] = await scrapeDay(date);
       } catch (err) {
@@ -584,6 +627,7 @@ async function scrapeVip(dates) {
       }
     }
   } finally {
+    _deadline = 0;
     await closeVipBrowser();
   }
   return result;
