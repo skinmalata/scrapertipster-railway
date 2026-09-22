@@ -391,13 +391,15 @@ async function scrapeDate(dateStr, retryCount = 0) {
   const fallbackMatches = [];
   let over25Matches = [];
   let over15Matches = [];
+  let under25Matches = [];
+  let under15Matches = [];
   let bttsMatches = [];
   let bttsNoMatches = [];
   
   const matchElements = $('.match');
   console.log(`Found ${matchElements.length} match elements for ${dateStr}`);
 
-  let matchId = 0, over25Id = 0, over15Id = 0, bttsId = 0, bttsNoId = 0;
+  let matchId = 0, over25Id = 0, over15Id = 0, under25Id = 0, under15Id = 0, bttsId = 0, bttsNoId = 0;
   
   matchElements.each((i, el) => {
     const $match = $(el);
@@ -446,6 +448,21 @@ async function scrapeDate(dateStr, retryCount = 0) {
     } else if (oValues.length === 1) {
       over15 = parseInt(oValues[0].txt) || 0;
       over25 = Math.max(0, over15 - 20);
+    }
+
+    // Under cells: Statarea marks them with class containing 'u'. Prefer the
+    // explicit value (quality); fall back to complement of the over line so
+    // the under market still works if the markup only exposes over cells.
+    const uValues = valueData.filter(v => v.cls.includes('u') && !v.cls.includes('r') && !v.cls.includes('o'));
+    if (uValues.length >= 2) {
+      under15 = parseInt(uValues[0].txt) || 0;
+      under25 = parseInt(uValues[1].txt) || 0;
+    } else if (uValues.length === 1) {
+      under15 = parseInt(uValues[0].txt) || 0;
+      under25 = Math.max(0, under15 - 20);
+    } else {
+      if (over15 > 0) under15 = Math.max(0, 100 - over15);
+      if (over25 > 0) under25 = Math.max(0, 100 - over25);
     }
     
     const gValues = valueData.filter(v => v.cls.includes('g'));
@@ -535,6 +552,38 @@ async function scrapeDate(dateStr, retryCount = 0) {
         score: score
       });
     }
+
+    // Quality over quantity: Under 1.5 at 80%+, Under 2.5 at 75%+ (stricter
+    // than the Over gates so only high-confidence low-scoring fixtures show).
+    if (homeTeam && awayTeam && under15 >= 80) {
+      under15Matches.push({
+        id: under15Id++,
+        league: leagueInfo.league,
+        country: leagueInfo.country,
+        time: time,
+        match: `${homeTeam} - ${awayTeam}`,
+        probabilities: { under15: under15, over15: over15 },
+        tip: 'Under 1.5',
+        probability: under15,
+        date: dateStr,
+        score: score
+      });
+    }
+
+    if (homeTeam && awayTeam && under25 >= 75) {
+      under25Matches.push({
+        id: under25Id++,
+        league: leagueInfo.league,
+        country: leagueInfo.country,
+        time: time,
+        match: `${homeTeam} - ${awayTeam}`,
+        probabilities: { under25: under25, over25: over25 },
+        tip: 'Under 2.5',
+        probability: under25,
+        date: dateStr,
+        score: score
+      });
+    }
      
       // BTTS YES - use the raw BTS probability (gg value)
       if (homeTeam && awayTeam && gg >= 55) {
@@ -586,10 +635,12 @@ async function scrapeDate(dateStr, retryCount = 0) {
   matches = dedup(matches);
   over25Matches = dedup(over25Matches);
   over15Matches = dedup(over15Matches);
+  under25Matches = dedup(under25Matches);
+  under15Matches = dedup(under15Matches);
   bttsMatches = dedup(bttsMatches);
   bttsNoMatches = dedup(bttsNoMatches);
   
-  return { matches, over25Matches, over15Matches, bttsMatches, bttsNoMatches };
+  return { matches, over25Matches, over15Matches, under25Matches, under15Matches, bttsMatches, bttsNoMatches };
 }
 
 const PROSOCCER_BASE_URL = 'https://www.prosoccer.gr/en/football/predictions';
@@ -1061,6 +1112,8 @@ async function fetchAndCachePredictions() {
     const allMatches = [];
     const allOver25 = [];
     const allOver15 = [];
+    const allUnder25 = [];
+    const allUnder15 = [];
     const allBtts = [];
     const allBttsNo = [];
      
@@ -1069,6 +1122,8 @@ async function fetchAndCachePredictions() {
       allMatches.push(...data.matches);
       allOver25.push(...data.over25Matches);
       allOver15.push(...data.over15Matches);
+      allUnder25.push(...(data.under25Matches || []));
+      allUnder15.push(...(data.under15Matches || []));
       allBtts.push(...data.bttsMatches);
       allBttsNo.push(...data.bttsNoMatches);
       await sleep(3000);
@@ -1114,6 +1169,8 @@ async function fetchAndCachePredictions() {
       matches: allMatches,
       over25Matches: allOver25,
       over15Matches: allOver15,
+      under25Matches: allUnder25,
+      under15Matches: allUnder15,
       bttsMatches: allBtts,
       bttsNoMatches: allBttsNo,
       winstreakMatches,
@@ -1130,6 +1187,8 @@ async function fetchAndCachePredictions() {
       totalMatches: allMatches.length,
       totalOver25: allOver25.length,
       totalOver15: allOver15.length,
+      totalUnder25: allUnder25.length,
+      totalUnder15: allUnder15.length,
       totalBtts: allBtts.length,
       totalBttsNo: allBttsNo.length,
       totalWinstreak: winstreakMatches.length,
@@ -1138,6 +1197,8 @@ async function fetchAndCachePredictions() {
       matches: allMatches,
       over25Matches: allOver25,
       over15Matches: allOver15,
+      under25Matches: allUnder25,
+      under15Matches: allUnder15,
       bttsMatches: allBtts,
       bttsNoMatches: allBttsNo,
       winstreakMatches,
@@ -1221,14 +1282,20 @@ function mergeMissedMatches(freshData, missedMatches, cached) {
   
   const missedOver25 = missedMatches.filter(m => m.over25 || (m.tip && m.tip.includes('Over 2.5')));
   const missedOver15 = missedMatches.filter(m => m.over15 || (m.tip && m.tip.includes('Over 1.5')));
+  const missedUnder25 = missedMatches.filter(m => m.under25 || (m.tip && m.tip.includes('Under 2.5')));
+  const missedUnder15 = missedMatches.filter(m => m.under15 || (m.tip && m.tip.includes('Under 1.5')));
   const missedBtts = missedMatches.filter(m => m.btts || (m.tip && m.tip.includes('BTTS')));
   
   merged.over25Matches = [...missedOver25, ...freshData.over25Matches];
   merged.over15Matches = [...missedOver15, ...freshData.over15Matches];
+  merged.under25Matches = [...missedUnder25, ...(freshData.under25Matches || [])];
+  merged.under15Matches = [...missedUnder15, ...(freshData.under15Matches || [])];
   merged.bttsMatches = [...missedBtts, ...freshData.bttsMatches];
   
   merged.totalOver25 = merged.over25Matches.length;
   merged.totalOver15 = merged.over15Matches.length;
+  merged.totalUnder25 = merged.under25Matches.length;
+  merged.totalUnder15 = merged.under15Matches.length;
   merged.totalBtts = merged.bttsMatches.length;
   
   merged.lastUpdated = new Date().toISOString();
@@ -1280,6 +1347,8 @@ function getAllMatchupsFromPredictions() {
     predictions.matches,
     predictions.over25Matches,
     predictions.over15Matches,
+    predictions.under25Matches,
+    predictions.under15Matches,
     predictions.bttsMatches,
     predictions.winstreakMatches,
     predictions.losestreakMatches,
@@ -1412,6 +1481,8 @@ async function batchScrapeAnalysis(matchesData) {
     { list: matchesData.matches },
     { list: matchesData.over25Matches },
     { list: matchesData.over15Matches },
+    { list: matchesData.under25Matches },
+    { list: matchesData.under15Matches },
     { list: matchesData.bttsMatches },
     { list: matchesData.winstreakMatches, preferNext: true },
     { list: matchesData.losestreakMatches, preferNext: true },
