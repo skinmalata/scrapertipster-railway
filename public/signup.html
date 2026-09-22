@@ -218,6 +218,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
         <div class="error" id="email-error"></div>
       </div>
       <button class="btn-primary" id="signup-btn" onclick="handleSignUp()">Pay &amp; Create Account</button>
+      <button class="btn-primary" id="signup-btn-paypal" onclick="handleSignUpPayPal()" style="background:#0070ba;margin-top:8px;display:none">Sign up with PayPal</button>
       <p class="auth-note">No free accounts. Your account is created only after your payment is confirmed.</p>
     </div>
   </div>
@@ -288,6 +289,66 @@ function handleSignUp() {
     showAlert('Failed to create checkout. Please try again.', 'error');
   });
 }
+
+// Paywall-first signup via PayPal — same form fields and pending-registration
+// flow as handleSignUp, just routed to /api/paypal/register-checkout.
+function handleSignUpPayPal() {
+  if (SUBMIT_TIMEOUT) return;
+  clearErrors();
+
+  var fullName = document.getElementById('fullName').value.trim();
+  var email = document.getElementById('email').value.trim();
+  var planType = document.getElementById('plan').value;
+
+  if (!fullName) { document.getElementById('name-error').textContent = 'Name is required'; document.getElementById('name-error').style.display = 'block'; return; }
+  if (!email) { document.getElementById('email-error').textContent = 'Email is required'; document.getElementById('email-error').style.display = 'block'; return; }
+
+  var btn = document.getElementById('signup-btn-paypal');
+  var primary = document.getElementById('signup-btn');
+  primary.disabled = true;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Redirecting to PayPal...';
+  SUBMIT_TIMEOUT = setTimeout(function() { SUBMIT_TIMEOUT = null; }, 15000);
+
+  function reset() {
+    primary.disabled = false;
+    btn.disabled = false;
+    btn.innerHTML = 'Sign up with PayPal';
+  }
+
+  fetch(window.WFT_API + '/api/paypal/register-checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email, fullName: fullName, planType: planType })
+  }).then(function (r) {
+    return r.json().then(function (data) { return { ok: r.ok, data: data }; });
+  }).then(function (res) {
+    SUBMIT_TIMEOUT = null;
+    if (!res.ok) {
+      reset();
+      showAlert(res.data.error || 'Failed to start PayPal checkout. Please try again.', 'error');
+      return;
+    }
+    if (res.data.checkoutUrl) {
+      window.location.href = res.data.checkoutUrl;
+    } else {
+      reset();
+      showAlert('Failed to start PayPal checkout. Please try again.', 'error');
+    }
+  }).catch(function () {
+    SUBMIT_TIMEOUT = null;
+    reset();
+    showAlert('Failed to start PayPal checkout. Please try again.', 'error');
+  });
+}
+
+// Show the PayPal sign-up button only when the API reports credentials exist.
+fetch((window.WFT_API || '') + '/api/paypal/config').then(function (r) { return r.json(); }).then(function (cfg) {
+  if (cfg && cfg.enabled) {
+    var b = document.getElementById('signup-btn-paypal');
+    if (b) b.style.display = '';
+  }
+}).catch(function () {});
 
 (function () {
   var params = new URLSearchParams(window.location.search);

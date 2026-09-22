@@ -53,10 +53,13 @@ function getAccessToken() {
 }
 
 function createCheckout(_a) {
-  var userId = _a.userId, email = _a.email, planType = _a.planType, returnUrl = _a.returnUrl;
+  var userId = _a.userId, email = _a.email, planType = _a.planType, returnUrl = _a.returnUrl, regToken = _a.regToken;
   if (!PLANS[planType]) return Promise.reject(new Error('Invalid plan type'));
-  if (!userId) return Promise.reject(new Error('Missing user'));
+  if (!regToken && !userId) return Promise.reject(new Error('Missing user'));
   var plan = PLANS[planType];
+  // custom_id (<=255 chars): 'u|<userId>|<plan>' for logged-in upgrades,
+  // 'r|<regToken>|<plan>' for paywall-first signups (no account yet).
+  var customId = (regToken ? 'r|' + regToken : 'u|' + userId) + '|' + planType;
   return getAccessToken().then(function (token) {
     return fetch(PAYPAL_API + '/v2/checkout/orders', {
       method: 'POST',
@@ -66,7 +69,7 @@ function createCheckout(_a) {
         purchase_units: [{
           amount: { currency_code: 'USD', value: plan.price },
           description: 'WinFulltime ' + plan.name,
-          custom_id: userId + '|' + planType
+          custom_id: customId
         }],
         application_context: {
           brand_name: 'WinFulltime',
@@ -130,11 +133,22 @@ function onCaptureCompleted(resource) {
   var orderId = resource.supplementary_data && resource.supplementary_data.related_ids
     ? resource.supplementary_data.related_ids.order_id
     : null;
-  return fetchOrderCustom(orderId).then(function (custom) {
-    if (!custom || !custom.userId) return { handled: false, reason: 'No user_id in order custom_id' };
-    var planType = custom.planType;
+  return fetchOrderCustom(orderId).then(function (meta) {
+    if (!meta) return { handled: false, reason: 'No custom_id on order' };
+    var planType = meta.planType;
     var paidAmount = amount || (PLANS[planType] ? PLANS[planType].price : '0');
-    return recordPayment(custom.userId, email, planType, captureId, computeExpiry(planType), paidAmount);
+    if (meta.regToken) {
+      return completeRegistration({
+        regToken: meta.regToken,
+        email: email,
+        planType: planType,
+        providerId: captureId,
+        expiresAt: computeExpiry(planType),
+        amount: paidAmount
+      });
+    }
+    if (!meta.userId) return { handled: false, reason: 'No user_id in order custom_id' };
+    return recordPayment(meta.userId, email, planType, captureId, computeExpiry(planType), paidAmount);
   });
 }
 
@@ -148,12 +162,17 @@ function fetchOrderCustom(orderId) {
       headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
     }).then(function (res) { return res.json(); }).then(function (order) {
       var unit = order.purchase_units && order.purchase_units[0];
-      var raw = (unit && unit.custom_id) || '';
-      var parts = String(raw).split('|');
-      if (!parts[0]) return null;
-      return { userId: parts[0], planType: parts[1] || 'monthly' };
+      return parseCustomId((unit && unit.custom_id) || '');
     });
   }).catch(function () { return null; });
+}
+
+function parseCustomId(raw) {
+  var parts = String(raw || '').split('|');
+  if (parts[0] === 'r' && parts[1]) return { regToken: parts[1], planType: parts[2] || 'monthly' };
+  if (parts[0] === 'u' && parts[1]) return { userId: parts[1], planType: parts[2] || 'monthly' };
+  if (parts[0] && parts[1]) return { userId: parts[0], planType: parts[1] || 'monthly' };
+  return null;
 }
 
 function computeExpiry(planType, fromDate) {
@@ -195,6 +214,67 @@ function recordPayment(userId, email, planType, providerId, expiresAt, amount) {
   });
 }
 
+// Paywall-first signup: the order custom_id carried a pending-registration
+// token instead of a user id. Create the account now that payment succeeded
+// (mirrors whop.completeRegistration, recording payment_method='paypal').
+function completeRegistration(_a) {
+  var regToken = _a.regToken, email = _a.email, fullName = _a.fullName, planType = _a.planType, providerId = _a.providerId, expiresAt = _a.expiresAt, amount = _a.amount;
+  if (!supabase) return Promise.resolve({ handled: false, reason: 'No database' });
+  if (!regToken) return Promise.resolve({ handled: false, reason: 'Missing reg_token' });
+
+  return supabase.from('pending_registrations')
+    .select('*')
+    .eq('reg_token', regToken)
+    .single()
+    .then(function (regResult) {
+      if (regResult.error || !regResult.data) {
+        return { handled: false, reason: 'Pending registration not found for token' };
+      }
+      var reg = regResult.data;
+      var regEmail = reg.email || email;
+      var regName = reg.full_name || fullName;
+      if (!regEmail) return { handled: false, reason: 'Pending registration has no email' };
+
+      return supabase.auth.admin.createUser({
+        email: regEmail,
+        email_confirm: true,
+        user_metadata: { full_name: regName }
+      }).then(function (createResult) {
+        if (createResult.error) {
+          if (createResult.error.message && /already/i.test(createResult.error.message)) {
+            return supabase.from('profiles').select('id').eq('email', regEmail).maybeSingle()
+              .then(function (profileResult) {
+                if (profileResult.error || !profileResult.data) {
+                  return { handled: false, reason: 'User exists but profile not found: ' + regEmail };
+                }
+                return attachRegistration(reg, profileResult.data.id, planType, providerId, expiresAt, amount);
+              });
+          }
+          return { handled: false, reason: 'Account creation failed: ' + createResult.error.message };
+        }
+        var userId = createResult.data && createResult.data.user && createResult.data.user.id;
+        if (!userId) return { handled: false, reason: 'Account created without a user id' };
+        return attachRegistration(reg, userId, planType, providerId, expiresAt, amount);
+      });
+    });
+}
+
+function attachRegistration(reg, userId, planType, providerId, expiresAt, amount) {
+  var cleanExpiry = expiresAt instanceof Date ? expiresAt : computeExpiry(planType);
+  return recordPayment(userId, reg.email, planType, providerId, cleanExpiry, amount)
+    .then(function () {
+      return supabase.from('pending_registrations')
+        .update({ status: 'completed', completed_at: new Date().toISOString() })
+        .eq('reg_token', reg.reg_token)
+        .then(function () {
+          return { handled: true, registration: true, userId: userId, planType: planType, providerId: providerId };
+        });
+    })
+    .catch(function (err) {
+      return { handled: false, reason: 'Payment recording failed: ' + err.message };
+    });
+}
+
 // PayPal one-time payments have no portal and nothing to cancel — they simply
 // expire at the end of the paid period. Kept for interface parity so the
 // portal/cancel endpoints resolve 'paypal' payment rows cleanly.
@@ -209,5 +289,5 @@ function cancelSubscription() {
 module.exports = {
   createCheckout, verifyWebhook, handleEvent,
   createCustomerPortal, cancelSubscription,
-  PLANS, isConfigured, PAYPAL_MODE
+  PLANS, isConfigured, PAYPAL_MODE, parseCustomId
 };

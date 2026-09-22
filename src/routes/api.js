@@ -1398,6 +1398,65 @@ router.post('/register-checkout', async function (req, res) {
   }
 });
 
+// POST /api/paypal/register-checkout — paywall-first signup via PayPal.
+// Same pending-registration token flow as /register-checkout; the token rides
+// in the order custom_id ('r|<token>|<plan>') and the PayPal webhook creates
+// the account after payment succeeds.
+router.post('/paypal/register-checkout', async function (req, res) {
+  try {
+    var email = String(req.body.email || '').trim().toLowerCase();
+    var fullName = String(req.body.fullName || '').trim();
+    var planType = req.body.planType;
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+    if (isDisposableEmail(email)) {
+      return res.status(400).json({ error: 'Temporary email addresses are not allowed' });
+    }
+    if (!fullName) {
+      return res.status(400).json({ error: 'Full name is required' });
+    }
+    if (!paypal.PLANS[planType]) {
+      return res.status(400).json({ error: 'Invalid plan. Choose: ' + Object.keys(paypal.PLANS).join(', ') });
+    }
+    if (!supabase) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    var existing = await supabase.from('profiles').select('id').eq('email', email).maybeSingle();
+    if (existing.data) {
+      return res.status(409).json({ error: 'An account with this email already exists. Please sign in instead.', code: 'EMAIL_EXISTS' });
+    }
+
+    var regToken = crypto.randomBytes(24).toString('hex');
+    var inserted = await supabase.from('pending_registrations').insert({
+      reg_token: regToken,
+      email: email,
+      full_name: fullName,
+      plan_type: planType,
+      status: 'pending'
+    });
+    if (inserted.error) {
+      console.error('[paypal-register-checkout] Pending insert failed:', inserted.error.message);
+      return res.status(500).json({ error: 'Failed to start registration. Please try again.' });
+    }
+
+    var result = await paypal.createCheckout({
+      userId: null,
+      email: email,
+      fullName: fullName,
+      planType: planType,
+      returnUrl: 'https://winfulltime.com/signup.html?paid=1',
+      regToken: regToken
+    });
+    res.json(result);
+  } catch (e) {
+    console.error('[paypal-register-checkout] Failed:', e.message);
+    res.status(500).json({ error: 'Failed to create checkout. ' + e.message });
+  }
+});
+
 // POST /api/checkout — create subscription checkout (Lemon Squeezy or Whop)
 router.post('/checkout', requireAuth, async function (req, res) {
   try {
