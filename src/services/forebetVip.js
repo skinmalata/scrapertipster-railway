@@ -459,9 +459,33 @@ function mustScoreFor({ prob, formPct, h2h }) {
   return { modelPts, formPts, h2hPts, score: modelPts + formPts + h2hPts };
 }
 
+// Loose team-name equality that survives accents (Vispeşti vs Vispesti) and
+// casing, so H2H meeting sides can be aligned to today's home/away names.
+function sameTeam(a, b) {
+  if (!a || !b) return false;
+  const norm = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim();
+  return norm(a) === norm(b);
+}
+
+// A side-relative H2H signal: the number of recent meetings (0..5) won by the
+// given side. Accepts both the parsed shape ({ wins: {home,away}, meets }) and
+// the legacy plain count for caches written before the shape change.
+function h2hCountFor(h2h, side) {
+  if (typeof h2h === 'number') return h2h > 0 ? h2h : 0;
+  if (h2h && h2h.wins) return Number(h2h.wins[side] || 0) || 0;
+  return 0;
+}
+
+// Whether real H2H records exist at all (any side with a win), the mark that
+// puts a pick under the full MUST_SCORE_MIN gate instead of the no-detail floor.
+function h2hHasSignal(h2h) {
+  if (typeof h2h === 'number') return h2h > 0;
+  return !!(h2h && h2h.wins && (h2h.wins.home > 0 || h2h.wins.away > 0));
+}
+
 function selectTeamScoreTip({ home, away, teamScoreProps, form, h2h }) {
   const props = teamScoreProps || [];
-  const hasDetailSignals = !!(form || (typeof h2h === 'number' && h2h > 0));
+  const hasDetailSignals = !!(form || h2hHasSignal(h2h));
   let best = null;
   for (const p of props) {
     const prob = (Number(p.prob) || 0) / 100;
@@ -470,7 +494,7 @@ function selectTeamScoreTip({ home, away, teamScoreProps, form, h2h }) {
     const sidePct = p.side === 'home'
       ? (form && typeof form.homeRecently === 'number' ? form.homeRecently : null)
       : (form && typeof form.awayRecently === 'number' ? form.awayRecently : null);
-    const { score, modelPts, formPts, h2hPts } = mustScoreFor({ prob, formPct: sidePct, h2h });
+    const { score, modelPts, formPts, h2hPts } = mustScoreFor({ prob, formPct: sidePct, h2h: h2hCountFor(h2h, p.side) });
     if (!best || score > best.score) {
       best = { side: p.side, prob, estimatedOdd: Number(p.estimatedOdd), score, modelPts, formPts, h2hPts };
     }
@@ -558,8 +582,9 @@ function computeConfidence({ probs, pick, books, form, h2h }) {
     if (relevant !== null) {
       formScore = Math.min(12, Math.max(0, relevant - 40) * 0.3);
     }
-    if (typeof h2h === 'number' && h2h > 0) {
-      formScore += Math.min(3, h2h);
+    const h2hW = pick === '1' ? h2hCountFor(h2h, 'home') : pick === '2' ? h2hCountFor(h2h, 'away') : 0;
+    if (h2hW > 0) {
+      formScore += Math.min(3, h2hW);
     }
   }
 
@@ -686,7 +711,11 @@ function buildTeamScoreAnalysis({ home, away, league, team, side, prob, mustScor
   }
 
   if (formPct != null) {
-    sentences.push('recent form fits - ' + team + ' has won ' + Math.round(formPct) + '% of recent outings and should be the front-foot side');
+    if (formPct >= 55) {
+      sentences.push('recent form fits - ' + team + ' has won ' + Math.round(formPct) + '% of recent outings and should be the front-foot side');
+    } else {
+      sentences.push('recent form is mixed at ' + Math.round(formPct) + '% wins, but the scoring history and head-to-head record carry the call');
+    }
   }
 
   if (h2h && h2h > 0) {
@@ -759,7 +788,9 @@ function parseMatchList(html) {
   return matches;
 }
 
-function parseMatchDetail(html) {
+function parseMatchDetail(html, refs) {
+  const refHome = refs && refs.home;
+  const refAway = refs && refs.away;
   let cheerio;
   try {
     cheerio = require('cheerio');
@@ -804,16 +835,15 @@ function parseMatchDetail(html) {
 
   let form = null;
   const formRows = [];
-  $('.form, .FormTable').first().each(function () {
-    $(this).find('tr').each(function () {
-      const cells = [];
-      $(this).find('td').each(function () {
-        const cls = $(this).attr('class') || '';
-        const t = $(this).text().trim();
-        if (cls.indexOf('ago') === -1 && t) cells.push(t.substring(0, 1));
-      });
-      if (cells.length >= 5) formRows.push(cells.join(''));
+  // Current DOM: one .prformcont per team (home first), each holding one
+  // <span class="form_w|form_d|form_l">W|D|L</span> per recent outing. The old
+  // .form/.FormTable tables are long gone.
+  $('.prformcont').each(function () {
+    const letters = [];
+    $(this).find('span.form_w, span.form_d, span.form_l').each(function () {
+      letters.push($(this).text().trim().substring(0, 1).toUpperCase());
     });
+    if (letters.length) formRows.push(letters.join(''));
   });
   if (formRows.length >= 2) {
     // Win-RATE, not "unbeaten" rate: only W counts toward recent form, so a
@@ -830,19 +860,35 @@ function parseMatchDetail(html) {
     };
   }
 
+  // Head-to-head: the "Head to head" module holds one .st_row per past
+  // meeting (most recent first). st_0/st_1 are zebra stripes, not result
+  // markers - parse the two team names and the score, compare each meeting's
+  // sides to TODAY'S home/away and count wins per side (capped at 5 meetings).
   let h2h = null;
-  $('.h2h_fix, .h2h, #h2h').each(function () {
-    const rows = [];
-    $(this).find('tr').each(function () {
-      const t = ($(this).text() || '').replace(/\s+/g, ' ').trim();
-      if (t) rows.push(t);
-    });
-    if (rows.length >= 2) {
-      const joined = rows.join(' ');
-      const homeW = (joined.match(/\bH\b|\bW\b/g) || []).length;
-      h2h = Math.min(5, homeW);
-    }
+  const h2hWins = { home: 0, away: 0 };
+  const MAX_H2H_MEETINGS = 5;
+  let h2hMeets = 0;
+  $('.mptlt').filter(function () {
+    return /head\s*to\s*head/i.test($(this).text());
+  }).parent().find('.st_row').each(function () {
+    if (h2hMeets >= MAX_H2H_MEETINGS) return;
+    const hteam = ($(this).find('.st_hteam').text() || '').trim();
+    const ateam = ($(this).find('.st_ateam').text() || '').trim();
+    const scoreText = ($(this).find('.st_res').text() || '').trim();
+    const m = scoreText.match(/(\d+)\s*-\s*(\d+)/);
+    if (!m || !hteam || !ateam) return;
+    const meetingHome = sameTeam(hteam, refHome);
+    const meetingAway = sameTeam(ateam, refAway);
+    if (!(meetingHome && meetingAway)) return;
+    h2hMeets += 1;
+    const hs = Number(m[1]);
+    const as = Number(m[2]);
+    if (hs > as) h2hWins.home += 1;
+    else if (as > hs) h2hWins.away += 1;
   });
+  if (h2hMeets > 0) {
+    h2h = { wins: h2hWins, meets: h2hMeets };
+  }
 
   let expGoals = null;
   $('.exp_goal, #exp_goal, .expected-goals, .avg_goals_home, .sh_info')
@@ -907,7 +953,7 @@ async function enrichMatch(match) {
   }
   try {
     const html = await fetchUrl(FOREBET_MATCH_BASE + '/en/football/matches/' + match.matchUrl);
-    const detail = parseMatchDetail(html);
+    const detail = parseMatchDetail(html, match);
     return Object.assign({}, match, { detail });
   } catch (e) {
     console.warn('[forebetVip] Detail scrape failed for ' + match.home + ' v ' + match.away + ': ' + e.message);
@@ -990,7 +1036,7 @@ async function scrapeDay(dateStr) {
     });
     // "Must score" from history (expected goals), recent form and head-to-head.
     const form = m.detail && m.detail.form ? m.detail.form : null;
-    const h2h = m.detail && typeof m.detail.h2h === 'number' ? m.detail.h2h : null;
+    const h2h = m.detail && m.detail.h2h ? m.detail.h2h : null;
     const tts = selectTeamScoreTip({ home: m.home, away: m.away, teamScoreProps, form, h2h });
 
     const hsh = computeHighestScoringHalf(htMap[m.matchId], expGoals, m.avgGoals);
@@ -1008,7 +1054,7 @@ async function scrapeDay(dateStr) {
       prob: tts.prob,
       mustScore: tts.mustScore,
       formPct,
-      h2h,
+      h2h: side === 'home' || side === 'away' ? h2hCountFor(h2h, side) : 0,
       expGoals,
       hsh
     }) : null;
