@@ -268,6 +268,10 @@ gtag('config', 'G-HMGZMW9EDP');
 
  <a href="/predictions/over-2-5" id="tab-over25" class="tab-btn">Over 2.5</a>
 
+ <a href="/predictions/under-1-5" id="tab-under15" class="tab-btn">Under 1.5</a>
+
+ <a href="/predictions/under-2-5" id="tab-under25" class="tab-btn">Under 2.5</a>
+
  <a href="/predictions/highest-scoring-half" id="tab-highest-scoring-half" class="tab-btn">Highest Scoring Half</a>
 
  <a href="/predictions/unbeaten" id="tab-unbeaten" class="tab-btn">Unbeaten</a>
@@ -317,7 +321,7 @@ gtag('config', 'G-HMGZMW9EDP');
    <div class="noscript-card" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:24px;margin:20px 0;line-height:1.7;color:rgba(232,237,245,.9);">
     <h2 style="margin-top:0;font-size:20px;color:#fff;">Today's Football Predictions</h2>
     <p>WinFulltime publishes free football predictions for the main betting markets every day. Browse today's and tomorrow's picks by market or competition below.</p>
-    <p><strong>Markets:</strong> <a href="/predictions/1x2">1X2</a> &middot; <a href="/predictions/over-1-5">Over 1.5</a> &middot; <a href="/predictions/over-2-5">Over 2.5</a> &middot; <a href="/predictions/btts">BTTS Yes</a> &middot; <a href="/predictions/btts-no">BTTS No</a> &middot; <a href="/predictions/unbeaten">Unbeaten</a> &middot; <a href="/predictions/corners">Corners</a> &middot; <a href="/predictions/cards">Cards</a></p>
+    <p><strong>Markets:</strong> <a href="/predictions/1x2">1X2</a> &middot; <a href="/predictions/over-1-5">Over 1.5</a> &middot; <a href="/predictions/over-2-5">Over 2.5</a> &middot; <a href="/predictions/under-1-5">Under 1.5</a> &middot; <a href="/predictions/under-2-5">Under 2.5</a> &middot; <a href="/predictions/btts">BTTS Yes</a> &middot; <a href="/predictions/btts-no">BTTS No</a> &middot; <a href="/predictions/unbeaten">Unbeaten</a> &middot; <a href="/predictions/corners">Corners</a> &middot; <a href="/predictions/cards">Cards</a></p>
     <p><strong>Leagues:</strong> <a href="/predictions/league/premier-league/">Premier League</a> &middot; <a href="/predictions/league/la-liga/">La Liga</a> &middot; <a href="/predictions/league/serie-a/">Serie A</a> &middot; <a href="/predictions/league/ligue-1/">Ligue 1</a> &middot; <a href="/predictions/league/uefa-champions-league/">Champions League</a> &middot; <a href="/predictions/league/turkish-super-lig/">Turkish Super Lig</a></p>
     <p>Every tip is derived from statistical analysis of form, head-to-head records and league trends. Football predictions can lose &mdash; bet responsibly.</p>
    </div>
@@ -803,7 +807,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
  function getCategoryLabel(cat) {
 
- const labels = { '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5', 'btts': 'BTTS YES', 'bttsno': 'BTTS NO', 'corners': 'Corners', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak', 'teamtoscore2plus': 'To Score 2+', 'cards': 'Cards' };
+ const labels = { '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5', 'under15': 'Under 1.5', 'under25': 'Under 2.5', 'btts': 'BTTS YES', 'bttsno': 'BTTS NO', 'corners': 'Corners', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak', 'teamtoscore2plus': 'To Score 2+', 'cards': 'Cards' };
 
  return labels[cat] || cat;
 
@@ -979,7 +983,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
  function getTipLabel(tip) {
 
- const labels = { '1': 'Home Win', 'X': 'Draw', '2': 'Away Win', '1X': 'Double Chance 1X', 'X2': 'Double Chance X2', 'Over 1.5': 'Over 1.5', 'Over 2.5': 'Over 2.5', 'BTTS YES': 'BTTS YES', 'BTTS NO': 'BTTS NO', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak' };
+ const labels = { '1': 'Home Win', 'X': 'Draw', '2': 'Away Win', '1X': 'Double Chance 1X', 'X2': 'Double Chance X2', 'Over 1.5': 'Over 1.5', 'Over 2.5': 'Over 2.5', 'Under 1.5': 'Under 1.5', 'Under 2.5': 'Under 2.5', 'BTTS YES': 'BTTS YES', 'BTTS NO': 'BTTS NO', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak' };
 
  return labels[tip] || tip;
 
@@ -1030,6 +1034,10 @@ gtag('config', 'G-HMGZMW9EDP');
  else if (currentCategory === 'over15') matches = currentData.over15Matches || [];
 
  else if (currentCategory === 'over25') matches = currentData.over25Matches || [];
+
+ else if (currentCategory === 'under15') matches = currentData.under15Matches || [];
+
+ else if (currentCategory === 'under25') matches = currentData.under25Matches || [];
 
  else if (currentCategory === 'btts') matches = currentData.bttsMatches || [];
 
@@ -1473,6 +1481,8 @@ renderDayTabs();
     <li><a href="/predictions/1x2.html">1X2</a></li>
     <li><a href="/predictions/over-2-5.html">Over 2.5</a></li>
     <li><a href="/predictions/over-1-5.html">Over 1.5</a></li>
+    <li><a href="/predictions/under-2-5.html">Under 2.5</a></li>
+    <li><a href="/predictions/under-1-5.html">Under 1.5</a></li>
     <li><a href="/predictions/btts.html">BTTS Yes</a></li>
     <li><a href="/predictions/btts-no.html">BTTS No</a></li>
     <li><a href="/predictions/unbeaten.html">Unbeaten</a></li>

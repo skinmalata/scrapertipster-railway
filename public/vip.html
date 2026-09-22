@@ -33,6 +33,11 @@
 .paywall p{color:var(--text-secondary);margin:0 0 20px}
 .paywall .cta-btn{display:inline-block;background:var(--accent,#ff2448);color:#fff;font-weight:800;padding:12px 28px;border-radius:10px;text-decoration:none;font-size:15px}
 .paywall .login-link{color:var(--accent);text-decoration:underline;margin-left:14px}
+.date-tabs{display:flex;justify-content:center;gap:0;margin-bottom:24px;background:var(--bg-card);border-radius:12px;padding:4px;width:fit-content;max-width:100%;margin-left:auto;margin-right:auto;border:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.date-tab{flex:1;padding:10px 20px;border:none;border-radius:8px;background:transparent;color:var(--text-secondary);font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;min-width:90px;min-height:44px;text-align:center}
+.date-tab:hover{color:var(--text-primary);background:var(--bg-card-hover)}
+.date-tab.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+@media(max-width:640px){.date-tab{padding:8px 14px;font-size:13px;min-width:80px}}
 </style>
 </head>
 <body>
@@ -64,6 +69,8 @@
   <a href="/predictions/1x2" id="tab-1x2" class="tab-btn">1X2</a>
   <a href="/predictions/over-1-5" id="tab-over-1-5" class="tab-btn">Over 1.5</a>
   <a href="/predictions/over-2-5" id="tab-over-2-5" class="tab-btn">Over 2.5</a>
+  <a href="/predictions/under-1-5" id="tab-under-1-5" class="tab-btn">Under 1.5</a>
+  <a href="/predictions/under-2-5" id="tab-under-2-5" class="tab-btn">Under 2.5</a>
   <a href="/predictions/highest-scoring-half" id="tab-highest-scoring-half" class="tab-btn">Highest Scoring Half</a>
   <a href="/author-picks.html" id="tab-author-picks" class="tab-btn">H2H Picks</a>
   <a href="/predictions/btts" id="tab-btts" class="tab-btn">BTTS Yes</a>
@@ -252,7 +259,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
         document.getElementById('statsBar').style.display = '';
         if (data.lastFetch) {
           var note = document.getElementById('authState');
-          if (note) { note.style.display = ''; note.innerHTML = '<p style="margin:0">VIP picks refreshed ' + new Date(data.lastFetch).toLocaleString() + '. Tips are match-winner picks on teams with near-perfect recent form and a clean head-to-head record, or team-to-score calls picked from expected-goals history, recent form and head-to-head records.</p>'; }
+          if (note) { note.style.display = ''; note.innerHTML = '<p style="margin:0">VIP picks refreshed ' + new Date(data.lastFetch).toLocaleString() + '. Tips are match-winner record certs on teams with near-perfect recent form and head-to-head records, or team-to-score calls picked from expected-goals history, recent form and head-to-head records.</p>'; }
         }
         renderContent();
       }).catch(function () {
