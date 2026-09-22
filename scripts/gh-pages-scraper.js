@@ -304,6 +304,15 @@ async function main() {
     }
   }
 
+  // Highest scoring half (free market): mirror the committed VIP scrape cache
+  // into the static data dir so the free tab works on GitHub Pages without a
+  // live API.
+  const hshFile = path.join(process.cwd(), 'highest-scoring-half-cache.json');
+  if (fs.existsSync(hshFile)) {
+    fs.copyFileSync(hshFile, path.join(dataDir, 'highest-scoring-half.json'));
+    console.log('Saved highest-scoring-half.json');
+  }
+
   // BTTS No from h2hstats
   console.log('Fetching BTTS No from h2hstats...');
   try {
