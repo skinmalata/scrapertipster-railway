@@ -175,7 +175,8 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     var matches = cache.dates[dateStr] || [];
     document.getElementById('totalMatches').textContent = matches.length;
     var avgConfidence = matches.length ? Math.round(matches.reduce(function(s, m) { return s + (m.confidence || 0); }, 0) / matches.length) : 0;
-    var avgScorePct = matches.length ? Math.round(matches.reduce(function(s, m) { return s + (m.teamScoreProb || 0); }, 0) / matches.length) : 0;
+    var scoreVals = matches.map(function(m) { return m.teamScoreProb; }).filter(function(v) { return v != null; });
+    var avgScorePct = scoreVals.length ? Math.round(scoreVals.reduce(function(s, v) { return s + v; }, 0) / scoreVals.length) : 0;
     document.getElementById('avgConfidence').textContent = avgConfidence || '0';
     document.getElementById('avgScorePct').textContent = (avgScorePct || 0) + '%';
 
@@ -185,17 +186,17 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     }
 
     var html = matches.map(function(m, i) {
-      var probLabel = m.teamScoreProb != null ? m.teamScoreProb + '% to score' : '';
+      var probLabel = m.market === 'match-winner'
+        ? (m.winProb != null ? m.winProb + '% win chance' : '')
+        : (m.teamScoreProb != null ? m.teamScoreProb + '% to score' : '');
       var formHtml = '';
       if (m.form) {
         var f = '<span style="font-weight:700">' + escHtml(m.home) + '</span> ' + escHtml(m.form.home) + ' &middot; <span style="font-weight:700">' + escHtml(m.away) + '</span> ' + escHtml(m.form.away);
         formHtml = '<div class="match-reason" style="margin-top:8px"><strong>Form:</strong> ' + f + '</div>';
       }
-      var analysisHtml = m.analysis
-        ? '<div class="match-reason" style="margin-top:10px;border-left:3px solid var(--accent,#ff2448);padding-left:12px"><strong>Expert analysis</strong><p style="margin:4px 0 0;line-height:1.7;color:var(--text-secondary)">' + escHtml(m.analysis) + '</p></div>'
-        : (m.preview
-            ? '<div class="match-reason" style="margin-top:8px;font-style:italic;">' + escHtml(m.preview) + '</div>'
-            : '');
+      var previewHtml = m.preview
+        ? '<div class="match-reason" style="margin-top:8px;font-style:italic;">' + escHtml(m.preview) + '</div>'
+        : '';
       return '<div class="match-card fade-in" style="animation-delay:' + (i * 60) + 'ms">' +
         '<div class="match-header"><span>' + escHtml(m.league || '') + '</span><span>' + escHtml(m.time || '') + '</span></div>' +
         '<div class="match-teams">' +
@@ -206,13 +207,13 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
         '<div class="match-footer">' +
         '<div style="text-align:center;display:flex;flex-direction:column;align-items:center;width:100%">' +
         '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center">' +
-        '<span class="tip-badge vip">Team to score</span>' +
+        '<span class="tip-badge vip">' + (m.market === 'match-winner' ? 'Match winner' : 'Team to score') + '</span>' +
         '<span style="font-weight:800;font-size:15px">' + escHtml(m.team || '') + '</span>' +
         '</div>' +
         (probLabel ? '<div class="probability">' + probLabel + '</div>' : '') +
         '<div class="confidence-meter"><span style="width:' + Math.min(100, m.confidence || 0) + '%"></span></div>' +
         '<div class="probability">' + (m.confidence || 0) + '% confidence</div>' +
-        formHtml + analysisHtml +
+        formHtml + previewHtml +
         '</div></div></div>';
     }).join('');
 
@@ -251,7 +252,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
         document.getElementById('statsBar').style.display = '';
         if (data.lastFetch) {
           var note = document.getElementById('authState');
-          if (note) { note.style.display = ''; note.innerHTML = '<p style="margin:0">VIP picks refreshed ' + new Date(data.lastFetch).toLocaleString() + '. Every tip is a team-to-score call - the team must score at least one goal, picked from its expected-goals history, recent form and head-to-head record. Each tip is backed by an expert analysis.</p>'; }
+          if (note) { note.style.display = ''; note.innerHTML = '<p style="margin:0">VIP picks refreshed ' + new Date(data.lastFetch).toLocaleString() + '. Tips are match-winner picks on teams with near-perfect recent form and a clean head-to-head record, or team-to-score calls picked from expected-goals history, recent form and head-to-head records.</p>'; }
         }
         renderContent();
       }).catch(function () {

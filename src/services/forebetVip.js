@@ -14,29 +14,30 @@
 // cache to authenticated Pro members only (/api/vip). Static Pages never carry
 // the picks, so the tips cannot leak outside the paywall.
 //
-// VIP market: TEAM-TO-SCORE. Every VIP tip is "Team X to score at least one
-// goal", derived from the expected-goals Poisson model. A tip is the strongest
-// "must score" call for the fixture and is published only when:
-//   - the fair price from the Poisson split is STRICTLY above
-//     MIN_TEAM_SCORE_ODD (default 1.25 - below it the pick is an
-//     ultra-short price that pays nothing), and
-//   - the model's scoring probability is >= TTS_MIN_PROB (55%), and
-//   - the must-score composite clears MUST_SCORE_MIN: history (expected-goal
-//     scoring model, max 40) + recent form win rate (max 35) + head-to-head
-//     record (max 25). When the detail pages were not scraped the
-//     history-backed probability alone must clear TTS_NO_DETAIL_PROB (75%).
-//   - form/H2H lock: a side that has won at least TTS_PERFECT_FORM_PCT (90%)
-//     of its recent matches AND a 100% head-to-head record over at least
-//     TTS_PERFECT_H2H_MEETS (3) meetings publishes even when the model's
-//     probability and fair price sit below the normal bars (the relaxed
-//     floors TTS_LOCK_MIN_PROB / TTS_LOCK_MIN_ODD apply instead), so a
-//     red-hot side that owns its opponent is never starved by a low
-//     expected-goals figure.
-// Every published tip carries a short expert analysis written in plain
-// English about ONLY the teams' form and records - the recent run of results
-// and the head-to-head meetings - with no expected goals, probabilities or
-// prices. The API strips every price field before the payload reaches a
-// member.
+// VIP markets: MATCH-WINNER RECORD CERT and TEAM-TO-SCORE. Every fixture
+// publishes at most ONE tip:
+//   1. Match-winner record cert: a side whose recent win rate clears
+//     TTS_PERFECT_FORM_PCT (90%) AND whose head-to-head ledger against this
+//      opponent is 100% over at least TTS_PERFECT_H2H_MEETS (3) meetings is
+//      published as "Team X to win". The records are the reasoning; the
+//      model's 1X2 win probability only has to clear TTS_WIN_CERT_MIN_PROB
+//      (35%) so the model never firmly expects the side to lose.
+//   2. Team to score: otherwise the strongest "must score" call publishes
+//      only when all of the following hold:
+//      - the fair price from the Poisson split is STRICTLY above
+//        MIN_TEAM_SCORE_ODD (default 1.25), and
+//      - the model's scoring probability is >= TTS_MIN_PROB (55%), and
+//      - the must-score composite clears MUST_SCORE_MIN: history
+//        (expected-goal scoring model, max 40) + recent form win rate
+//        (max 35) + head-to-head record (max 25). When detail pages were not
+//        scraped the history-backed probability alone must clear
+//        TTS_NO_DETAIL_PROB (75%), and
+//      - form/H2H lock: the same record perfection as the cert (form >= 90%,
+//        100% H2H over >= 3 meetings) may publish under the relaxed floors
+//        TTS_LOCK_MIN_PROB / TTS_LOCK_MIN_ODD instead of the bars above.
+// No analysis text ships with tips: members see the pick, its probability and
+// the form/H2H record rows. The API strips every price field before the
+// payload reaches a member.
 //
 // Confidence score (0-100) - kept for context and enrichment prefiltering:
 //   - algorithm certainty  40 pts (margin between top-2 Forebet probabilities)
@@ -172,7 +173,7 @@ const HSH_SHARE_MAX = envNumber('HSH_SHARE_MAX', 0.65, 0.1, 0.9);
 // with a razor-thin edge, or from a low-scoring fixture, is off the board.
 const HSH_MARGIN_MIN = envNumber('HSH_MARGIN_MIN', 0.05, 0.01, 0.5);
 const HSH_MIN_GOALS = envNumber('HSH_MIN_GOALS', 2.2, 0.5, 8);
-// Team-to-score is the VIP market. A team's scoring probability must clear
+// Team-to-score is a VIP market. A team's scoring probability must clear
 // this floor to be published as a VIP tip (default 55%, matching the gate the
 // old 1X2 confidence used).
 const TTS_MIN_PROB = envNumber('TTS_MIN_PROB', 0.55, 0.05, 0.95);
@@ -202,6 +203,10 @@ const TTS_PERFECT_FORM_PCT = envNumber('TTS_PERFECT_FORM_PCT', 90, 50, 100);
 const TTS_PERFECT_H2H_MEETS = envNumber('TTS_PERFECT_H2H_MEETS', 3, 2, 10);
 const TTS_LOCK_MIN_PROB = envNumber('TTS_LOCK_MIN_PROB', 0.35, 0.05, 0.95);
 const TTS_LOCK_MIN_ODD = envNumber('TTS_LOCK_MIN_ODD', 1.01, 1.01, 10);
+// Match-winner record cert: the model's 1X2 win probability for the
+// near-perfect side only has to clear this light floor - the records carry the
+// tip, the model merely guards against a side the model firmly expects to lose.
+const TTS_WIN_CERT_MIN_PROB = envNumber('TTS_WIN_CERT_MIN_PROB', 0.35, 0.1, 0.95);
 const SCRAPE_TIMEOUT_MS = 25000;
 // Per-fixture detail pages add the form/H2H records the must-score gate now
 // needs, but cost one browser navigation each, which is slow against Forebet's
@@ -595,6 +600,46 @@ function selectTeamScoreTip({ home, away, teamScoreProps, form, h2h }) {
   };
 }
 
+// VIP tip type: MATCH-WINNER RECORD CERT. A side with a near-perfect recent
+// win rate AND a 100% head-to-head record against this opponent publishes as
+// "Team X to win" - the records are the reasoning, the model's 1X2 win
+// probability only has to clear TTS_WIN_CERT_MIN_PROB. One row per fixture:
+// when this cert qualifies it takes the fixture ahead of the team-to-score
+// call. Confidence is the records+model must-score composite, so a dominant
+// record reads as strong confidence even when the model is only neutral-
+// positive.
+function selectMatchWinnerCert({ home, away, probs, form, h2h }) {
+  if (!form) return null;
+  const meets = h2hMeetsFor(h2h);
+  if (meets < TTS_PERFECT_H2H_MEETS) return null;
+  const pn = normalisePredictions(probs || { home: 0, draw: 0, away: 0 });
+  for (const side of ['home', 'away']) {
+    const formPct = side === 'home'
+      ? (typeof form.homeRecently === 'number' ? form.homeRecently : null)
+      : (typeof form.awayRecently === 'number' ? form.awayRecently : null);
+    if (formPct == null || formPct < TTS_PERFECT_FORM_PCT) continue;
+    const wins = h2hCountFor(h2h, side);
+    if (wins !== meets) continue;
+    const winProb = Number(side === 'home' ? pn.home : pn.away) / 100;
+    if (winProb < TTS_WIN_CERT_MIN_PROB) continue;
+    const { score, modelPts, formPts, h2hPts } = mustScoreFor({ prob: winProb, formPct, h2h: wins });
+    return {
+      market: 'match-winner',
+      side,
+      team: side === 'home' ? home : away,
+      prob: winProb,
+      estimatedOdd: null,
+      confidence: score,
+      mustScore: score,
+      mustScoreBreakdown: { model: modelPts, form: formPts, h2h: h2hPts },
+      locked: true,
+      edge: null,
+      marketPick: null
+    };
+  }
+  return null;
+}
+
 function bestAcross(books, pick) {
   const oddsKey = pick === '1' ? 'home' : pick === '2' ? 'away' : 'draw';
   let best = null;
@@ -766,52 +811,6 @@ function buildAnalysis(options) {
 
   if (h2h && h2h > 0) {
     sentences.push('head-to-head history favours the call');
-  }
-
-  return sentences.filter(Boolean).map(cap).join('. ') + '.';
-}
-
-// Expert analysis for a TEAM-TO-SCORE VIP tip. Plain English and only ever
-// about the teams' records: the picked side's recent run of results and the
-// head-to-head meetings against this opponent. No expected goals, model
-// probabilities, composites or prices - members read what the teams have
-// actually been doing, not the machinery. Sections are dropped when the record
-// is unknown.
-function buildTeamScoreAnalysis({ home, away, league, team, side, formPct, formSeq, h2hWins, h2hMeets }) {
-  const sentences = [];
-  const opponent = side === 'home' ? away : home;
-  const lead = [home, away].every(Boolean)
-    ? home + ' vs ' + away + (league ? ' (' + league + ')' : '')
-    : 'This fixture';
-  sentences.push(lead + ' - the VIP pick is ' + team + ' to score at least one goal');
-
-  const wins = (String(formSeq || '').match(/W/g) || []).length;
-  const played = String(formSeq || '').length;
-  if (played >= 3) {
-    if (wins === played) {
-      sentences.push(team + ' have won all of their last ' + played + ' matches and are in red-hot form');
-    } else if (wins / played >= 0.6) {
-      sentences.push(team + ' are in good form, having won ' + wins + ' of their last ' + played + ' matches');
-    } else {
-      sentences.push(team + ' have won ' + wins + ' of their last ' + played + ' matches, a mixed recent record');
-    }
-  } else if (formPct != null) {
-    const pct = Math.round(formPct);
-    sentences.push(pct >= 90
-      ? team + ' arrive in red-hot form, winning nearly every recent outing'
-      : pct >= 60
-        ? team + ' arrive in good form, winning most of their recent matches'
-        : team + ' have been in mixed form of late');
-  }
-
-  if (h2hMeets > 0) {
-    if (h2hWins === h2hMeets) {
-      sentences.push('the head-to-head record is perfect too - ' + team + ' have beaten ' + opponent + ' in all of their last ' + h2hMeets + ' meetings' + (h2hMeets >= 3 ? ', so they know how to get past this opponent' : ''));
-    } else if (h2hWins > 0 && h2hWins / h2hMeets >= 0.5) {
-      sentences.push('head-to-head history favours the call - ' + team + ' have won ' + h2hWins + ' of the last ' + h2hMeets + ' meetings against ' + opponent);
-    } else if (h2hWins > 0) {
-      sentences.push('the two sides have met ' + h2hMeets + ' times recently, with ' + team + ' winning ' + h2hWins + ' of those meetings');
-    }
   }
 
   return sentences.filter(Boolean).map(cap).join('. ') + '.';
@@ -1123,48 +1122,34 @@ async function scrapeDay(dateStr) {
     // "Must score" from history (expected goals), recent form and head-to-head.
     const form = m.detail && m.detail.form ? m.detail.form : null;
     const h2h = m.detail && m.detail.h2h ? m.detail.h2h : null;
-    const tts = selectTeamScoreTip({ home: m.home, away: m.away, teamScoreProps, form, h2h });
+    // One tip per fixture: a form/H2H record cert takes the row as a
+    // match-winner pick; only fixtures without a cert fall through to the
+    // team-to-score market.
+    const cert = selectMatchWinnerCert({ home: m.home, away: m.away, probs: m.probs, form, h2h });
+    const tip = cert || selectTeamScoreTip({ home: m.home, away: m.away, teamScoreProps, form, h2h });
 
     const hsh = computeHighestScoringHalf(htMap[m.matchId], expGoals, m.avgGoals);
 
-    const side = tts ? tts.side : null;
-    const formPct = side === 'home' ? (form && typeof form.homeRecently === 'number' ? form.homeRecently : null)
-      : side === 'away' ? (form && typeof form.awayRecently === 'number' ? form.awayRecently : null)
-      : null;
-    const formSeq = side === 'home' ? (form && typeof form.homeForm === 'string' ? form.homeForm : null)
-      : side === 'away' ? (form && typeof form.awayForm === 'string' ? form.awayForm : null)
-      : null;
-    const analysis = tts ? buildTeamScoreAnalysis({
-      home: m.home,
-      away: m.away,
-      league: m.league,
-      team: tts.team,
-      side: tts.side,
-      formPct,
-      formSeq,
-      h2hWins: side === 'home' || side === 'away' ? h2hCountFor(h2h, side) : 0,
-      h2hMeets: h2hMeetsFor(h2h)
-    }) : null;
-
+    const side = tip ? tip.side : null;
     out.push(Object.assign({}, m, {
-      market: 'team-to-score',
+      market: tip ? tip.market : null,
       pick: side,
-      team: tts ? tts.team : null,
-      teamScoreProb: tts ? Number((tts.prob * 100).toFixed(1)) : null,
-      mustScore: tts ? tts.mustScore : null,
-      mustScoreBreakdown: tts ? tts.mustScoreBreakdown : null,
-      locked: tts ? !!tts.locked : false,
-      estimatedOdd: tts ? tts.estimatedOdd : null,
-      confidence: tts ? tts.confidence : null,
+      team: tip ? tip.team : null,
+      teamScoreProb: tip && tip.market === 'team-to-score' ? Number((tip.prob * 100).toFixed(1)) : null,
+      winProb: tip && tip.market === 'match-winner' ? Number((tip.prob * 100).toFixed(1)) : null,
+      mustScore: tip ? tip.mustScore : null,
+      mustScoreBreakdown: tip ? tip.mustScoreBreakdown : null,
+      locked: tip ? !!tip.locked : false,
+      estimatedOdd: tip ? tip.estimatedOdd : null,
+      confidence: tip ? tip.confidence : null,
       edge: null,
       bestOdds: null,
       marketPick: null,
       margin: null,
-      passesGate: !!tts,
+      passesGate: !!tip,
       expGoals,
       teamScoreProps,
       hsh,
-      analysis,
       preview: m.detail && m.detail.previewText ? m.detail.previewText : null,
       form: form ? { home: form.homeForm, away: form.awayForm } : null,
       h2h: h2h
@@ -1206,8 +1191,8 @@ module.exports = {
   parseHtList,
   computeConfidence,
   buildAnalysis,
-  buildTeamScoreAnalysis,
   estimateTeamScoreProps,
+  selectMatchWinnerCert,
   selectTeamScoreTip,
   computeHighestScoringHalf,
   selectHshPicks,
@@ -1226,6 +1211,7 @@ module.exports = {
   TTS_PERFECT_H2H_MEETS,
   TTS_LOCK_MIN_PROB,
   TTS_LOCK_MIN_ODD,
+  TTS_WIN_CERT_MIN_PROB,
   h2hMeetsFor,
   estimateMatchExpGoals,
   HSH_MIN_PROB,
@@ -1245,7 +1231,8 @@ if (require.main === module) {
     for (const [date, matches] of Object.entries(byDate)) {
       console.log('\n=== ' + date + ' (' + matches.length + ' fixtures) ===');
       matches.forEach(m => {
-        console.log('[TTS] ' + m.home + ' v ' + m.away + ' | team=' + m.team + ' p=' + m.teamScoreProb + '% conf=' + m.confidence + ' mustScore=' + m.mustScore + ' gate=' + m.passesGate);
+        const tag = m.market === 'match-winner' ? 'WIN' : 'TTS';
+        console.log('[' + tag + '] ' + m.home + ' v ' + m.away + ' | team=' + m.team + ' p=' + (m.market === 'match-winner' ? m.winProb + '% win' : m.teamScoreProb + '% score') + ' conf=' + m.confidence + ' mustScore=' + m.mustScore + ' gate=' + m.passesGate);
       });
     }
   }).catch((err) => {

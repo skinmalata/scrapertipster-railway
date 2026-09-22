@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { scrapeVip, closeVipBrowser, selectHshPicks, HSH_MIN_PROB, HSH_MAX_PICKS, HSH_MARGIN_MIN, HSH_MIN_GOALS, HSH_SHARE_PRIOR, HSH_SHARE_REG, TTS_MIN_PROB, MUST_SCORE_MIN } = require('../src/services/forebetVip');
+const { scrapeVip, closeVipBrowser, selectHshPicks, HSH_MIN_PROB, HSH_MAX_PICKS, HSH_MARGIN_MIN, HSH_MIN_GOALS, HSH_SHARE_PRIOR, HSH_SHARE_REG, TTS_MIN_PROB, MUST_SCORE_MIN, TTS_WIN_CERT_MIN_PROB } = require('../src/services/forebetVip');
 const { lagosDate } = require('../src/utils/dates');
 
 const CACHE_FILE = path.join(process.cwd(), 'forebet-vip-cache.json');
@@ -78,7 +78,8 @@ async function main() {
   }
   cache.lastFetch = new Date().toISOString();
   cache.meta = {
-    market: 'team-to-score',
+    markets: ['match-winner', 'team-to-score'],
+    winCertMinProb: TTS_WIN_CERT_MIN_PROB,
     minTeamScoreProb: TTS_MIN_PROB,
     mustScoreMin: MUST_SCORE_MIN
   };
@@ -101,12 +102,13 @@ async function main() {
   console.log('Saved ' + HSH_STATIC_FILE);
 
   const total = Object.values(cache.dates || {}).reduce((s, m) => s + m.length, 0);
-  console.log('\n=== VIP PICKS (team-to-score, scoring prob >= ' + TTS_MIN_PROB + ', must-score >= ' + MUST_SCORE_MIN + '/100) ===');
-  console.log('Total team-to-score tips cached: ' + total);
+  console.log('\n=== VIP PICKS (match-winner record certs + team-to-score, score prob >= ' + TTS_MIN_PROB + ', must-score >= ' + MUST_SCORE_MIN + '/100) ===');
+  console.log('Total VIP tips cached: ' + total);
   for (const [date, matches] of Object.entries(cache.dates || {})) {
     console.log('\n--- ' + date + ' (' + matches.length + ') ---');
     matches.forEach(m => {
-      console.log('[TTS] ' + m.home + ' v ' + m.away + ' | team=' + m.team + ' p=' + m.teamScoreProb + '% conf=' + m.confidence + ' mustScore=' + m.mustScore);
+      const tag = m.market === 'match-winner' ? 'WIN' : 'TTS';
+      console.log('[' + tag + '] ' + m.home + ' v ' + m.away + ' | team=' + m.team + ' p=' + (m.market === 'match-winner' ? m.winProb + '% win' : m.teamScoreProb + '% score') + ' conf=' + m.confidence + ' mustScore=' + m.mustScore);
     });
   }
 

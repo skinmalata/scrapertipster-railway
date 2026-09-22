@@ -849,13 +849,15 @@ router.get('/h2h-unbeaten', (req, res) => {
 // never placed in the static public/ tree, so non-members cannot fetch them.
 const pathVipCache = path.join(__dirname, '../../forebet-vip-cache.json');
 
-// VIP picks are served as team-to-score calls. Odds are NOT part of the tip
-// presentation: strip every price field (top-level and inside the prop list)
-// before the payload ever leaves the server.
+// VIP picks are match-winner or team-to-score calls. Odds and any analysis
+// text are NOT part of the tip presentation: strip every price field
+// (top-level and inside the prop list) and any stale analysis field before
+// the payload ever leaves the server.
 function sanitizeVipPick(p) {
   if (!p || typeof p !== 'object') return p;
   const copy = Object.assign({}, p);
   delete copy.estimatedOdd;
+  delete copy.analysis;
   if (Array.isArray(copy.teamScoreProps)) {
     copy.teamScoreProps = copy.teamScoreProps.map(function (x) {
       if (!x || typeof x !== 'object') return x;
