@@ -450,10 +450,12 @@ async function scrapeDate(dateStr, retryCount = 0) {
       over25 = Math.max(0, over15 - 20);
     }
 
-    // Under cells: Statarea marks them with class containing 'u'. Prefer the
-    // explicit value (quality); fall back to complement of the over line so
-    // the under market still works if the markup only exposes over cells.
-    const uValues = valueData.filter(v => v.cls.includes('u') && !v.cls.includes('r') && !v.cls.includes('o'));
+    // Under cells: Statarea marks them with a bare 'u' class token followed by
+    // the value (e.g. 'u44'). A substring match is unreliable because every
+    // cell class contains 'u' (e.g. 'value b37'). Prefer the explicit value
+    // (quality); fall back to complement of the over line so the under market
+    // still works if the markup only exposes over cells.
+    const uValues = valueData.filter(v => (v.cls.match(/\S+/g) || []).some(t => /^u\d{1,2}$/.test(t)));
     if (uValues.length >= 2) {
       under15 = parseInt(uValues[0].txt) || 0;
       under25 = parseInt(uValues[1].txt) || 0;
@@ -553,9 +555,9 @@ async function scrapeDate(dateStr, retryCount = 0) {
       });
     }
 
-    // Quality over quantity: Under 1.5 at 80%+, Under 2.5 at 75%+ (stricter
-    // than the Over gates so only high-confidence low-scoring fixtures show).
-    if (homeTeam && awayTeam && under15 >= 80) {
+    // Quality over quantity: Under 1.5 at 60%+ and Under 2.5 at 65%+. Under
+    // probabilities are derived as the complement of Statarea's over line.
+    if (homeTeam && awayTeam && under15 >= 60) {
       under15Matches.push({
         id: under15Id++,
         league: leagueInfo.league,
@@ -570,7 +572,7 @@ async function scrapeDate(dateStr, retryCount = 0) {
       });
     }
 
-    if (homeTeam && awayTeam && under25 >= 75) {
+    if (homeTeam && awayTeam && under25 >= 65) {
       under25Matches.push({
         id: under25Id++,
         league: leagueInfo.league,
