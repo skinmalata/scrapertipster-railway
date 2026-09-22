@@ -14,15 +14,34 @@
 // cache to authenticated Pro members only (/api/vip). Static Pages never carry
 // the picks, so the tips cannot leak outside the paywall.
 //
-// Confidence score (0-100):
+// VIP market: TEAM-TO-SCORE. Every VIP tip is "Team X to score at least one
+// goal", derived from the expected-goals Poisson model. A tip is the strongest
+// "must score" call for the fixture and is published only when:
+//   - the fair price from the Poisson split is STRICTLY above
+//     MIN_TEAM_SCORE_ODD (default 1.25 - below it the pick is an
+//     ultra-short price that pays nothing), and
+//   - the model's scoring probability is >= TTS_MIN_PROB (55%), and
+//   - the must-score composite clears MUST_SCORE_MIN: history (expected-goal
+//     scoring model, max 40) + recent form win rate (max 35) + head-to-head
+//     record (max 25). When the detail pages were not scraped the
+//     history-backed probability alone must clear TTS_NO_DETAIL_PROB (75%).
+// Every published tip carries a short expert analysis (~100 words) backing
+// the scoring call with the expected-goals split, recent form and the
+// head-to-head record, plus the goal-timing (highest-scoring-half) lean. Odds
+// are never part of the tip presentation: the API strips every price field
+// before the payload reaches a member.
+//
+// Confidence score (0-100) - kept for context and enrichment prefiltering:
 //   - algorithm certainty  40 pts (margin between top-2 Forebet probabilities)
-//   - edge vs bookmakers   30 pts (alg implied prob minus market implied prob)
-//   - form + head-to-head  15 pts (recent form table + H2H confirmation)
-//   - market agreement     15 pts (Forebet pick matches the market favourite)
-// Gate: picks are published only when confidence >= 55 (and, when real
-// bookmaker odds are available, the edge is positive).
+//   - edge vs bookmakers   30 pts (model prob minus market-implied prob FOR THE
+//                            PICK - never compared against a different outcome)
+//   - form + head-to-head  15 pts (recent WIN-rate table + H2H confirmation;
+//                            detail-page only, so it only counts when
+//                            detail enrichment is enabled - on by default)
+//   - market agreement     10 pts (Forebet pick matches the market favourite)
 
 const axios = require('axios');
+const { lagosDate } = require('../utils/dates');
 
 let _browserPromise = null;
 
@@ -34,11 +53,22 @@ async function getVipBrowser() {
   if (_browserPromise) return _browserPromise;
   _browserPromise = (async () => {
     const puppeteer = require('puppeteer-core');
-    const { executablePath, args } = require('../config/puppeteer');
+    const { executablePath } = require('../config/puppeteer');
+    // Cloudflare's managed challenge needs a normal Chrome: the shared scraper
+    // args (--single-process, --disable-web-security, --disable-background-
+    // networking) break its worker/cookie handling, so use a clean, stable set.
     return puppeteer.launch({
       executablePath,
       headless: 'new',
-      args,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--no-first-run',
+        '--no-default-browser-check',
+        '--disable-blink-features=AutomationControlled'
+      ],
       ignoreHTTPSErrors: true
     });
   })().catch((err) => {
@@ -104,26 +134,61 @@ async function fetchWithBrowser(url, opts) {
 
 const FOREBET_TODAY_URL = 'https://www.forebet.com/en/football-tips-and-predictions-for-today';
 const FOREBET_DATE_URL = 'https://www.forebet.com/en/football-predictions/predictions-1x2/';
+const FOREBET_HT_TODAY_URL = 'https://www.forebet.com/en/football-tips-and-predictions-for-today/predictions-ht';
+const FOREBET_HT_DATE_URL = 'https://www.forebet.com/en/football-predictions/predictions-ht/';
 const FOREBET_MATCH_BASE = 'https://www.forebet.com';
 
 const MIN_CONFIDENCE = 55;
-// Team-to-score market is only published when the model's estimated fair odd
-// is above this floor - below it the market is too short to be worth a VIP tip.
-const MIN_TEAM_SCORE_ODD = 1.3;
+// Highest-scoring-half is a FREE market (never part of the VIP gate). It is
+// derived from Forebet's half-time 1X2 probabilities: the leading half must
+// clear this probability floor and at most this many picks are published per
+// day, so the tab only ever shows the strongest calls.
+const HSH_MIN_PROB = envNumber('HSH_MIN_PROB', 0.55, 0.05, 1);
+const HSH_MAX_PICKS = Math.round(envNumber('HSH_MAX_PICKS', 12, 1, 60));
+// A first-half share f is fit to Forebet's half-time 1X2 probs; the fit is
+// rejected when its mean squared error is above this bound, so a bad fit can
+// never publish a free-market pick it cannot reproduce.
+const HSH_MAX_FIT_ERR = envNumber('HSH_MAX_FIT_ERR', 0.04, 0.005, 1);
+// Team-to-score is the VIP market. A team's scoring probability must clear
+// this floor to be published as a VIP tip (default 55%, matching the gate the
+// old 1X2 confidence used).
+const TTS_MIN_PROB = envNumber('TTS_MIN_PROB', 0.55, 0.05, 0.95);
+// The fair price of a team-to-score call must be STRICTLY above this floor
+// (default 1.25). Below it the pick is an uninteresting ultra-short price that
+// pays next to nothing for a near-certainty.
+const MIN_TEAM_SCORE_ODD = envNumber('TTS_MIN_ODD', 1.25, 1.05, 10);
+// Composite "must score" gate (0-100). Three signals feed it: the
+// history-backed expected-goals scoring probability (max 40), the picked
+// side's recent-form win rate (max 35) and head-to-head support (max 25). A
+// tip only publishes when detail records (form/H2H) are available and the
+// composite clears this floor.
+const MUST_SCORE_MIN = envNumber('TTS_MUST_SCORE_MIN', 45, 0, 160);
+// Fallback for fixtures whose detail page was not scraped (enrichment skipped
+// or timed out): the history-backed scoring probability alone must clear this
+// higher bar, so strong calls survive a barren detail day but weak ones never
+// sneak through without form/H2H backing.
+const TTS_NO_DETAIL_PROB = envNumber('TTS_NO_DETAIL_PROB', 0.75, 0.55, 0.95);
 const SCRAPE_TIMEOUT_MS = 25000;
-// Per-fixture detail pages add form/H2H/preview (max +15 confidence) but cost
-// one browser navigation each, which is slow against Forebet's Cloudflare
-// challenge. Off by default: the list page already yields probabilities and
-// average odds, which is enough for confidence, edge, best odds and the
-// team-to-score model. Set VIP_ENRICH_DETAIL=1 to opt in.
-const ENRICH_DETAIL = process.env.VIP_ENRICH_DETAIL === '1';
+// Per-fixture detail pages add the form/H2H records the must-score gate now
+// needs, but cost one browser navigation each, which is slow against Forebet's
+// Cloudflare challenge. ON by default; set VIP_ENRICH_DETAIL=0 for list-only.
+const ENRICH_DETAIL = process.env.VIP_ENRICH_DETAIL !== '0';
 // Hard wall-clock budget for a whole scrape run. When it is exceeded the run
 // stops starting new work and publishes whatever it has already scored, so the
-// scheduled task can never run long. Default 3 minutes.
-const SCRAPE_BUDGET_MS = Number(process.env.VIP_SCRAPE_BUDGET_MS || 180000);
+// scheduled task can never run long. Default 5 minutes (detail enrichment
+// needs more headroom than the old list-only run).
+const SCRAPE_BUDGET_MS = Math.max(1000, envNumber('VIP_SCRAPE_BUDGET_MS', 300000, 1000, 3600000));
 let _deadline = 0;
 function budgetExceeded() {
   return _deadline > 0 && Date.now() > _deadline;
+}
+
+// Parse and clamp a positive numeric env var. Garbage (NaN) falls back to the
+// default instead of silently disabling a market or the whole run budget.
+function envNumber(key, def, min, max) {
+  const raw = Number(process.env[key]);
+  if (!Number.isFinite(raw)) return def;
+  return Math.min(max, Math.max(min, raw));
 }
 
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36';
@@ -192,29 +257,238 @@ function poissonAtLeastOne(lambda) {
   return 1 - Math.exp(-lambda);
 }
 
-// Estimate team-to-score props from expected goals. A market qualifies only
-// when the estimated fair odd is at least MIN_TEAM_SCORE_ODD, so value bets
-// are never diluted by ultra-short favourites.
-function estimateTeamScoreProps({ expHome, expAway, probs, avgGoals }) {
+// --- Highest-scoring-half model (free market) -----------------------------
+//
+// Forebet publishes half-time 1X2 probabilities per fixture. The market only
+// needs the split of a match's total expected goals (Forebet's avg goals)
+// between the two halves: the "which half scores more" comparison depends on
+// the first-half total and second-half total alone, not on the home/away split.
+//
+// The half-time 1X2 probabilities pin down the first-half total but only in
+// combination with the match's home/away strength, so the model fixes the
+// first-half home/away split to the full-match split (scaled) and fits a single
+// first-half share f in [0.2, 0.8] that reproduces Forebet's HT probabilities:
+//   lambdaHome1 = f * expHome, lambdaAway1 = f * expAway
+// Then lambda1 = f * total, lambda2 = (1 - f) * total, and two independent
+// Poisson distributions give P(1st > 2nd), P(2nd > 1st) and the tie. The
+// strongest call is published when it clears HSH_MIN_PROB. Always free.
+const POISSON_K = 10;
+const _factorial = [1];
+for (let i = 1; i <= POISSON_K + 1; i++) _factorial[i] = _factorial[i - 1] * i;
+
+function poissonPmf(lambda, k) {
+  return Math.exp(-lambda) * Math.pow(lambda, k) / _factorial[k];
+}
+
+// P(A > B), P(A == B), P(A < B) for independent Poissons A, B.
+function poissonThreeWay(lambdaA, lambdaB) {
+  const pA = [], pB = [];
+  for (let k = 0; k <= POISSON_K; k++) { pA.push(poissonPmf(lambdaA, k)); pB.push(poissonPmf(lambdaB, k)); }
+  let home = 0, draw = 0, away = 0;
+  for (let i = 0; i <= POISSON_K; i++) {
+    for (let j = 0; j <= POISSON_K; j++) {
+      const q = pA[i] * pB[j];
+      if (i > j) home += q; else if (i < j) away += q; else draw += q;
+    }
+  }
+  return { home, draw, away };
+}
+
+function computeHighestScoringHalf(htProbs, expGoals, avgGoals) {
+  if (!htProbs || htProbs.home == null || htProbs.draw == null || htProbs.away == null) return null;
+  const ph = htProbs.home / 100, pd = htProbs.draw / 100, pa = htProbs.away / 100;
+  if (ph + pd + pa <= 0) return null;
+
+  const expHomeRaw = expGoals && expGoals.home > 0 ? expGoals.home : 0;
+  const expAwayRaw = expGoals && expGoals.away > 0 ? expGoals.away : 0;
+  let total = Number(avgGoals) > 0 ? Number(avgGoals) : expHomeRaw + expAwayRaw;
+  if (!(total > 0)) return null;
+
+  // The fit must operate on the SAME goal scale that will produce the final
+  // half lambdas, otherwise the calibrated first-half share is meaningless.
+  // Rescale the home/away split so it sums to `total` (the match's expected
+  // goals), then solve for the first-half share f on that scale.
+  let expHome, expAway;
+  if (expHomeRaw + expAwayRaw > 0) {
+    const sum = expHomeRaw + expAwayRaw;
+    expHome = (expHomeRaw / sum) * total;
+    expAway = (expAwayRaw / sum) * total;
+  } else {
+    expHome = total / 2;
+    expAway = total / 2;
+  }
+
+  // Single-parameter fit: the share of the match's goals expected in the first
+  // half. Fixed home/away split keeps the fit stable where HT 1X2 alone is
+  // underdetermined.
+  let best = null;
+  for (let f = 0.2; f <= 0.8 + 1e-9; f += 0.01) {
+    const three = poissonThreeWay(expHome * f, expAway * f);
+    const err = (three.home - ph) * (three.home - ph) +
+      (three.draw - pd) * (three.draw - pd) +
+      (three.away - pa) * (three.away - pa);
+    if (!best || err < best.err) best = { err, f: Number(f.toFixed(2)) };
+  }
+  // Fit quality check: reject fixtures the model cannot reproduce - a bad fit
+  // must never publish a free-market call.
+  if (!best || best.err > HSH_MAX_FIT_ERR) return null;
+
+  const share = best.f;
+  const lambda1 = total * share;
+  const lambda2 = total * (1 - share);
+  const cmp = poissonThreeWay(lambda1, lambda2);
+  // The published market is "which half scores more" - a tie is a push/non-call
+  // and is never offered as a pick. Exclude it from the ranked options.
+  const options = [
+    { key: '1H', label: '1st Half', prob: cmp.home },
+    { key: '2H', label: '2nd Half', prob: cmp.away }
+  ].sort((a, b) => b.prob - a.prob);
+  const top = options[0];
+  return {
+    pick: top.key,
+    label: top.label,
+    prob: Number(top.prob.toFixed(3)),
+    firstHalfShare: share,
+    firstHalfExp: Number(lambda1.toFixed(2)),
+    secondHalfExp: Number(lambda2.toFixed(2)),
+    p1: Number(cmp.home.toFixed(3)),
+    p2: Number(cmp.away.toFixed(3)),
+    tie: Number(cmp.draw.toFixed(3)),
+    fitErr: Number(best.err.toFixed(5)),
+    firstHalfProbs: { home: htProbs.home, draw: htProbs.draw, away: htProbs.away }
+  };
+}
+
+// Parse half-time 1X2 probabilities (percentages) keyed by Forebet match id.
+function parseHtList(html) {
+  let cheerio;
+  try { cheerio = require('cheerio'); } catch (e) { return {}; }
+  const $ = cheerio.load(html);
+  const map = {};
+  $('.schema .rcnt').each(function () {
+    const $row = $(this);
+    const id = $row.find('.nofav, .fav_icon').attr('id') || '';
+    if (!id) return;
+    const spans = $row.find('.fprc span');
+    if (spans.length !== 3) return;
+    const home = parsePercent(spans.eq(0).text());
+    const draw = parsePercent(spans.eq(1).text());
+    const away = parsePercent(spans.eq(2).text());
+    if (home + draw + away <= 0) return;
+    map[id] = { home, draw, away };
+  });
+  return map;
+}
+
+// Best-only selection for the public tab: strongest calls that clear the
+// probability floor, highest first, capped per day.
+function selectHshPicks(matches, limit) {
+  const max = limit || HSH_MAX_PICKS;
+  return (matches || [])
+    .filter((m) => m.hsh && m.hsh.prob >= HSH_MIN_PROB)
+    .sort((a, b) => b.hsh.prob - a.hsh.prob)
+    .slice(0, max)
+    .map((m) => ({
+      matchId: m.matchId,
+      home: m.home,
+      away: m.away,
+      league: m.league,
+      time: m.time,
+      probs: m.probs,
+      avgGoals: m.avgGoals,
+      hsh: m.hsh
+    }));
+}
+
+// Estimate team-to-score props from expected goals. A market is a candidate
+// only when the fair price is STRICTLY above MIN_TEAM_SCORE_ODD and not
+// degenerate, so the field never includes ultra-short or meaningless prices.
+function estimateTeamScoreProps({ expHome, expAway }) {
   const props = [];
   const push = (side, team, lambda) => {
     const scoreAtLeastOne = poissonAtLeastOne(lambda);
     const fairProb = Math.min(0.98, Math.max(0.05, scoreAtLeastOne));
     const fairOdd = Number((1 / fairProb).toFixed(2));
-    if (fairOdd >= MIN_TEAM_SCORE_ODD && fairOdd < 1 / 0.05) {
+    if (fairOdd > MIN_TEAM_SCORE_ODD && fairOdd < 1 / 0.05) {
       props.push({
         market: 'team-to-score',
         side,
         team,
         prob: Number((fairProb * 100).toFixed(1)),
-        estimatedOdd: fairOdd,
-        qualifies: fairOdd >= MIN_TEAM_SCORE_ODD
+        estimatedOdd: fairOdd
       });
     }
   };
   push('home', 'home', expHome);
   push('away', 'away', expAway);
   return props;
+}
+
+// Expected goals for a match - the history-backed signal. Uses the detail-page
+// split when present, otherwise splits the match total (Forebet's aggregated
+// average goals, itself built from historical scoring) by the outcome
+// probabilities. Shared by the enrichment prefilter and the scorer so both
+// reason about the same number.
+function estimateMatchExpGoals(m) {
+  if (m.detail && m.detail.expGoals && (m.detail.expGoals.home > 0 || m.detail.expGoals.away > 0)) return m.detail.expGoals;
+  const pn = normalisePredictions(m.probs);
+  const total = (pn.home + pn.away) || 1;
+  return {
+    home: Number(((m.avgGoals || 0) * pn.home / total).toFixed(2)),
+    away: Number(((m.avgGoals || 0) * pn.away / total).toFixed(2))
+  };
+}
+
+// The VIP market: pick the single strongest team-to-score call for the match -
+// one distinct tip per fixture, never two rows from the same match.
+//
+// "Must score" is a composite of three records:
+//   - history/model    40 pts - the expected-goals scoring probability
+//   - recent form      35 pts - the picked side's win rate in recent outings
+//   - head-to-head     25 pts - historical meetings against this opponent
+// A candidate must clear the scoring-probability floor and the price floor,
+// and the composite must clear MUST_SCORE_MIN. When no detail records exist
+// (enrichment skipped/timed out) the history-backed probability alone must
+// clear the higher TTS_NO_DETAIL_PROB bar, so nothing weak is ever published.
+function mustScoreFor({ prob, formPct, h2h }) {
+  const modelPts = Math.max(0, Math.min(40, Math.round((prob - 0.3) * 100)));
+  let formPts = 0;
+  if (formPct != null) formPts = Math.max(0, Math.min(35, Math.round(formPct - 40)));
+  let h2hPts = 0;
+  if (typeof h2h === 'number' && h2h > 0) h2hPts = Math.max(0, Math.min(25, Math.round(h2h * 5)));
+  return { modelPts, formPts, h2hPts, score: modelPts + formPts + h2hPts };
+}
+
+function selectTeamScoreTip({ home, away, teamScoreProps, form, h2h }) {
+  const props = teamScoreProps || [];
+  const hasDetailSignals = !!(form || (typeof h2h === 'number' && h2h > 0));
+  let best = null;
+  for (const p of props) {
+    const prob = (Number(p.prob) || 0) / 100;
+    if (!(p.estimatedOdd > MIN_TEAM_SCORE_ODD)) continue;
+    if (prob < TTS_MIN_PROB) continue;
+    const sidePct = p.side === 'home'
+      ? (form && typeof form.homeRecently === 'number' ? form.homeRecently : null)
+      : (form && typeof form.awayRecently === 'number' ? form.awayRecently : null);
+    const { score, modelPts, formPts, h2hPts } = mustScoreFor({ prob, formPct: sidePct, h2h });
+    if (!best || score > best.score) {
+      best = { side: p.side, prob, estimatedOdd: Number(p.estimatedOdd), score, modelPts, formPts, h2hPts };
+    }
+  }
+  if (!best) return null;
+  if (hasDetailSignals ? best.score < MUST_SCORE_MIN : best.prob < TTS_NO_DETAIL_PROB) return null;
+  return {
+    market: 'team-to-score',
+    side: best.side,
+    team: best.side === 'home' ? home : away,
+    prob: best.prob,
+    estimatedOdd: best.estimatedOdd,
+    confidence: Math.round(best.prob * 100),
+    mustScore: best.score,
+    mustScoreBreakdown: { model: best.modelPts, form: best.formPts, h2h: best.h2hPts },
+    edge: null,
+    marketPick: null
+  };
 }
 
 function bestAcross(books, pick) {
@@ -246,21 +520,32 @@ function meanOdds(books) {
   };
 }
 
+function oddsKeyFor(pick) {
+  return pick === '1' ? 'home' : pick === '2' ? 'away' : 'draw';
+}
+
 function computeConfidence({ probs, pick, books, form, h2h }) {
   const p = normalisePredictions(probs || { home: 0, draw: 0, away: 0 });
   const top = Math.max(p.home, p.draw, p.away);
   const order = [p.home, p.draw, p.away].sort((a, b) => b - a);
   const margin = top - order[1];
+  const algProb = pick === '1' ? p.home : pick === '2' ? p.away : p.draw;
 
   let algScore = Math.min(40, margin * 2.5);
 
-  const market = impliedFromOdds(books && books.length ? meanOdds(books) : null);
+  // Market data means any odds at all: real bookmaker rows from the detail
+  // page OR Forebet's aggregated average odds from the list page. Both count
+  // as market data for the gate, because both give us a market-implied
+  // probability to measure value against.
+  const hasOddsData = Array.isArray(books) && books.length > 0;
+  const market = hasOddsData ? impliedFromOdds(meanOdds(books)) : null;
   const marketPick = market ? predictionLabel(market) : null;
   let edgePoints = 0;
   let edge = null;
-  if (market && marketPick) {
-    const algProb = pick === '1' ? p.home : pick === '2' ? p.away : p.draw;
-    const mktProb = marketPick === '1' ? market.home : marketPick === '2' ? market.away : market.draw;
+  if (market) {
+    // Value is always measured FOR THE PICK against the market's own price for
+    // the SAME outcome - never against a different outcome's probability.
+    const mktProb = market[oddsKeyFor(pick)];
     edge = Number((algProb - mktProb).toFixed(1));
     edgePoints = Math.min(30, Math.max(0, edge));
   }
@@ -271,26 +556,150 @@ function computeConfidence({ probs, pick, books, form, h2h }) {
     const awayPct = typeof form.awayRecently === 'number' ? form.awayRecently : null;
     const relevant = pick === '1' ? homePct : pick === '2' ? awayPct : null;
     if (relevant !== null) {
-      formScore = Math.min(12, Math.max(0, relevant - 50) * 0.3);
+      formScore = Math.min(12, Math.max(0, relevant - 40) * 0.3);
     }
     if (typeof h2h === 'number' && h2h > 0) {
       formScore += Math.min(3, h2h);
     }
   }
 
+  // Market agreement rewards alignment and only alignment: no points for a
+  // pick the market does not share.
   let marketScore = 0;
   if (marketPick === pick) {
     marketScore = 10;
-  } else if (market && pick === 'X') {
-    marketScore = 3;
   }
   const confidence = Math.round(Math.min(100, algScore + edgePoints + formScore + marketScore));
 
-  const hasRealOdds = Array.isArray(books) && books.length > 0;
+  // The gate: minimum confidence, and when any market data exists the pick
+  // must carry a positive value edge over the market's implied price. Without
+  // market data the pick rests on model certainty alone.
+  const passesGate = confidence >= MIN_CONFIDENCE && (!hasOddsData || edge === null || edge > 0);
   const bestOdds = bestAcross(books, pick);
-  const passesGate = confidence >= MIN_CONFIDENCE && (!hasRealOdds || edge === null || edge > 0);
 
-  return { confidence, edge, bestOdds, marketPick, passesGate, margin: Number(margin.toFixed(1)) };
+  return {
+    confidence,
+    edge,
+    edgeSource: hasOddsData ? 'books' : null,
+    marketPick,
+    bestOdds,
+    passesGate,
+    margin: Number(margin.toFixed(1)),
+    algProb: Number(algProb.toFixed(1)),
+    mktProb: market && typeof market[oddsKeyFor(pick)] === 'number' ? market[oddsKeyFor(pick)] : null,
+    algScore: Math.round(algScore),
+    edgePoints: Math.round(edgePoints),
+    formScore: Math.round(formScore),
+    marketScore
+  };
+}
+
+// --- Expert analysis -------------------------------------------------------
+//
+// Every published VIP tip ships with a plain-English write-up that backs the
+// pick with whatever the model actually measured: algorithm certainty (margin
+// over the second favourite), value edge vs the market's implied price, market
+// agreement, the expected-goals split, any team-to-score prop, the higher-
+// scoring-half lean and, when detail pages are on, form and head-to-head.
+// Sections are dropped when their data is absent, so the narrative stays true
+// to what was known at scrape time. Target length is roughly 100 words.
+
+function cap(s) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+}
+
+function buildAnalysis(options) {
+  const {
+    home, away, league,
+    pick, confidence, margin, edge, mktProb, algProb, marketPick,
+    avgGoals, expGoals, teamScoreProps, hsh,
+    formPct, h2h
+  } = options || {};
+
+  const sentences = [];
+  const pickDesc = pick === '1' ? home + ' to win' : pick === '2' ? away + ' to win' : 'the match to end level';
+  const lead = [home, away].every(Boolean)
+    ? home + ' vs ' + away + (league ? ' (' + league + ')' : '')
+    : 'This fixture';
+  sentences.push(lead + ', and the model backs ' + pickDesc + ' with ' + confidence + '/100 confidence');
+
+  if (margin != null) {
+    sentences.push('forebet places that outcome ' + margin.toFixed(1) + ' points clear of the next most likely result');
+  }
+
+  if (edge != null && mktProb != null && edge > 0) {
+    sentences.push('that price still leaves value - roughly ' + mktProb.toFixed(0) + '% implied chance against a ' + algProb.toFixed(0) + '% model estimate is a +' + edge.toFixed(1) + 'pt value edge');
+  } else if (edge != null && mktProb != null) {
+    sentences.push('the market already prices the call closely (edge ' + (edge > 0 ? '+' : '') + edge.toFixed(1) + 'pt), so certainty drives the pick rather than value');
+  } else {
+    sentences.push('no market odds were available, so this pick rests on model certainty alone');
+  }
+
+  if (marketPick) {
+    sentences.push(marketPick === pick
+      ? 'the model and the market favourite are aligned on the most likely outcome'
+      : 'the market leans the other way, making this a contrarian call that only pays if the model beats the crowd');
+  }
+
+  if (expGoals && (expGoals.home > 0 || expGoals.away > 0)) {
+    const totalNote = avgGoals > 0 ? ' off a ' + Number(avgGoals).toFixed(2) + '-goal match total' : '';
+    sentences.push('expected goals split ' + Number(expGoals.home).toFixed(2) + ' - ' + Number(expGoals.away).toFixed(2) + totalNote);
+  }
+
+  if (teamScoreProps && teamScoreProps.length) {
+    const prop = teamScoreProps[0];
+    sentences.push(prop.team + ' to score at least once is fairly priced near ' + Number(prop.estimatedOdd).toFixed(2));
+  }
+
+  if (hsh && hsh.prob > 0) {
+    sentences.push('the model also favours the ' + String(hsh.label || '').toLowerCase() + ' to produce more goals (' + Math.round(hsh.prob * 100) + '%)');
+  }
+
+  if (formPct != null) {
+    sentences.push('recent form backs it up - the chosen side has won ' + Math.round(formPct) + '% of its last outings');
+  }
+
+  if (h2h && h2h > 0) {
+    sentences.push('head-to-head history favours the call');
+  }
+
+  return sentences.filter(Boolean).map(cap).join('. ') + '.';
+}
+
+// Expert analysis for a TEAM-TO-SCORE VIP tip (~100 words). Backs the scoring
+// call with the team's expected goals, recent form, head-to-head history and
+// the goal-timing lean. Deliberately never mentions a price or odds - members
+// see the reasoning, not a number to bet into.
+function buildTeamScoreAnalysis({ home, away, league, team, side, prob, mustScore, formPct, h2h, expGoals, hsh }) {
+  const sentences = [];
+  const opponent = side === 'home' ? away : home;
+  const lead = [home, away].every(Boolean)
+    ? home + ' vs ' + away + (league ? ' (' + league + ')' : '')
+    : 'This fixture';
+  sentences.push(lead + ' - the VIP pick is ' + team + ' to score at least one goal, a ' + Math.round(prob * 100) + '% model probability');
+
+  if (expGoals && (Number(expGoals.home) > 0 || Number(expGoals.away) > 0)) {
+    const mine = Number(side === 'home' ? expGoals.home : expGoals.away || 0).toFixed(2);
+    const theirs = Number(side === 'home' ? expGoals.away : expGoals.home || 0).toFixed(2);
+    const totalNote = (Number(expGoals.home) + Number(expGoals.away)) > 0 ? ' off a ' + (Number(expGoals.home) + Number(expGoals.away)).toFixed(2) + '-goal expected total' : '';
+    sentences.push('the expected-goals model - built from the teams\u2019 scoring history - gives ' + team + ' ' + mine + ' against ' + opponent + '\u2019s ' + theirs + totalNote);
+  }
+
+  if (formPct != null) {
+    sentences.push('recent form fits - ' + team + ' has won ' + Math.round(formPct) + '% of recent outings and should be the front-foot side');
+  }
+
+  if (h2h && h2h > 0) {
+    sentences.push('head-to-head history has also seen ' + team + ' find the net regularly against this opponent');
+  }
+
+  if (hsh && hsh.prob > 0) {
+    sentences.push('the goal-timing model favours the ' + String(hsh.label || '').toLowerCase() + ' to carry the scoring');
+  }
+
+  sentences.push('scoring history, recent form' + (h2h ? ', head-to-head records' : '') + ' and model certainty combine into a must-score composite of ' + mustScore + '/100');
+
+  return sentences.filter(Boolean).map(cap).join('. ') + '.';
 }
 
 function parseMatchList(html) {
@@ -407,15 +816,17 @@ function parseMatchDetail(html) {
     });
   });
   if (formRows.length >= 2) {
-    const homeRecently = formRows[0].replace(/[^WD]/gi, '').length;
-    const awayRecently = formRows[1].replace(/[^WD]/gi, '').length;
+    // Win-RATE, not "unbeaten" rate: only W counts toward recent form, so a
+    // string of draws no longer inflates the score.
+    const homeWins = (formRows[0].match(/W/g) || []).length;
+    const awayWins = (formRows[1].match(/W/g) || []).length;
     const homeTotal = formRows[0].length || 1;
     const awayTotal = formRows[1].length || 1;
     form = {
       homeForm: formRows[0],
       awayForm: formRows[1],
-      homeRecently: Math.round((homeRecently / homeTotal) * 100),
-      awayRecently: Math.round((awayRecently / awayTotal) * 100)
+      homeRecently: Math.round((homeWins / homeTotal) * 100),
+      awayRecently: Math.round((awayWins / awayTotal) * 100)
     };
   }
 
@@ -526,8 +937,9 @@ async function enrichAll(matches, shouldEnrich) {
 
 async function scrapeDay(dateStr) {
   let url = FOREBET_DATE_URL + dateStr;
-  const todayLocal = new Date().toISOString().slice(0, 10);
-  const isToday = dateStr === todayLocal;
+  // "Today" is the current date in Africa/Lagos, not UTC - toISOString() flips
+  // the day between 23:00 and 00:00 UTC and previously mis-selected the URL.
+  const isToday = dateStr === lagosDate(0);
   if (isToday) url = FOREBET_TODAY_URL;
 
   console.log('[forebetVip] Scraping ' + dateStr + ' (' + url + ')');
@@ -538,68 +950,87 @@ async function scrapeDay(dateStr) {
     return [];
   }
 
-  const listBooks = (m) => (m.avgOdds && m.avgOdds.home && m.avgOdds.draw && m.avgOdds.away)
-    ? [{ name: 'forebet-avg', odds: m.avgOdds }]
-    : [];
+  // Half-time probabilities feed the free highest-scoring-half market. This is
+  // best-effort: a failure here must never affect the VIP run.
+  let htMap = {};
+  try {
+    const htUrl = isToday ? FOREBET_HT_TODAY_URL : FOREBET_HT_DATE_URL + dateStr;
+    const htHtml = await fetchUrl(htUrl, { waitRows: true });
+    htMap = parseHtList(htHtml);
+    console.log('[forebetVip] Parsed HT probabilities for ' + Object.keys(htMap).length + ' fixtures on ' + dateStr);
+  } catch (e) {
+    console.warn('[forebetVip] HT scrape failed for ' + dateStr + ': ' + e.message);
+  }
+
+  // Detail enrichment prefilter: only fixtures that could possibly produce a
+  // qualifying team-to-score call are worth a browser fetch for form/H2H. The
+  // same expected-goals derivation runs here and in the scorer below.
   const shouldEnrich = (match) => {
-    const pick = predictionLabel(match.probs);
-    const prelim = computeConfidence({ probs: match.probs, pick, books: listBooks(match), form: null, h2h: null });
-    return prelim.confidence + 15 >= MIN_CONFIDENCE;
+    const exp = estimateMatchExpGoals(match);
+    const props = estimateTeamScoreProps({ expHome: exp.home, expAway: exp.away });
+    return props.some((p) => (Number(p.prob) / 100) >= TTS_MIN_PROB);
   };
 
   let enriched;
   if (ENRICH_DETAIL) {
     enriched = await enrichAll(raw, shouldEnrich);
     const enrichedCount = enriched.filter((m) => m.detail).length;
-    console.log('[forebetVip] Parsed ' + raw.length + ' fixtures for ' + dateStr + '; enriched ' + enrichedCount + ' candidates...');
+    console.log('[forebetVip] Parsed ' + raw.length + ' fixtures for ' + dateStr + '; enriched ' + enrichedCount + ' candidates for form/H2H must-score check...');
   } else {
     enriched = raw.map((m) => Object.assign({}, m, { detail: null, detailSkipped: true }));
-    console.log('[forebetVip] Parsed ' + raw.length + ' fixtures for ' + dateStr + ' (list-only scoring; set VIP_ENRICH_DETAIL=1 for form/H2H detail).');
+    console.log('[forebetVip] Parsed ' + raw.length + ' fixtures for ' + dateStr + ' (list-only scoring; form/H2H must-score gate runs at a higher probability floor).');
   }
 
   const out = [];
   for (const m of enriched) {
-    const probs = m.probs;
-    const pick = predictionLabel(probs);
-    const detailBooks = m.detail && Array.isArray(m.detail.books) ? m.detail.books : [];
-    // Fall back to Forebet's aggregated average odds from the list page when
-    // the match-detail bookmaker table is unavailable, so the value edge is
-    // still estimated against the market.
-    let books = detailBooks;
-    if (books.length === 0 && m.avgOdds && m.avgOdds.home && m.avgOdds.draw && m.avgOdds.away) {
-      books = [{ name: 'forebet-avg', odds: m.avgOdds }];
-    }
-    const form = m.detail && m.detail.form ? m.detail.form : null;
-    const h2h = m.detail && typeof m.detail.h2h === 'number' ? m.detail.h2h : null;
-    const scored = computeConfidence({ probs, pick, books, form, h2h });
-
-    let expGoals = m.detail && m.detail.expGoals ? m.detail.expGoals : null;
-    if (!expGoals) {
-      const pn = normalisePredictions(probs);
-      const total = (pn.home + pn.away) || 1;
-      expGoals = {
-        home: Number(((m.avgGoals || 0) * pn.home / total).toFixed(2)),
-        away: Number(((m.avgGoals || 0) * pn.away / total).toFixed(2))
-      };
-    }
+    const expGoals = estimateMatchExpGoals(m);
     const teamScoreProps = estimateTeamScoreProps({
       expHome: expGoals.home,
-      expAway: expGoals.away,
-      probs,
-      avgGoals: m.avgGoals
+      expAway: expGoals.away
     });
+    // "Must score" from history (expected goals), recent form and head-to-head.
+    const form = m.detail && m.detail.form ? m.detail.form : null;
+    const h2h = m.detail && typeof m.detail.h2h === 'number' ? m.detail.h2h : null;
+    const tts = selectTeamScoreTip({ home: m.home, away: m.away, teamScoreProps, form, h2h });
+
+    const hsh = computeHighestScoringHalf(htMap[m.matchId], expGoals, m.avgGoals);
+
+    const side = tts ? tts.side : null;
+    const formPct = side === 'home' ? (form && typeof form.homeRecently === 'number' ? form.homeRecently : null)
+      : side === 'away' ? (form && typeof form.awayRecently === 'number' ? form.awayRecently : null)
+      : null;
+    const analysis = tts ? buildTeamScoreAnalysis({
+      home: m.home,
+      away: m.away,
+      league: m.league,
+      team: tts.team,
+      side: tts.side,
+      prob: tts.prob,
+      mustScore: tts.mustScore,
+      formPct,
+      h2h,
+      expGoals,
+      hsh
+    }) : null;
 
     out.push(Object.assign({}, m, {
-      pick,
-      market: pick,
-      confidence: scored.confidence,
-      edge: scored.edge,
-      bestOdds: scored.bestOdds,
-      marketPick: scored.marketPick,
-      margin: scored.margin,
-      passesGate: scored.passesGate,
+      market: 'team-to-score',
+      pick: side,
+      team: tts ? tts.team : null,
+      teamScoreProb: tts ? Number((tts.prob * 100).toFixed(1)) : null,
+      mustScore: tts ? tts.mustScore : null,
+      mustScoreBreakdown: tts ? tts.mustScoreBreakdown : null,
+      estimatedOdd: tts ? tts.estimatedOdd : null,
+      confidence: tts ? tts.confidence : null,
+      edge: null,
+      bestOdds: null,
+      marketPick: null,
+      margin: null,
+      passesGate: !!tts,
       expGoals,
       teamScoreProps,
+      hsh,
+      analysis,
       preview: m.detail && m.detail.previewText ? m.detail.previewText : null,
       form: form ? { home: form.homeForm, away: form.awayForm } : null,
       h2h: h2h
@@ -638,34 +1069,38 @@ module.exports = {
   scrapeVip,
   parseMatchList,
   parseMatchDetail,
+  parseHtList,
   computeConfidence,
+  buildAnalysis,
+  buildTeamScoreAnalysis,
   estimateTeamScoreProps,
+  selectTeamScoreTip,
+  computeHighestScoringHalf,
+  selectHshPicks,
   poissonAtLeastOne,
+  poissonPmf,
   normaliseTeam,
   predictionLabel,
   impliedFromOdds,
   closeVipBrowser,
   MIN_CONFIDENCE,
-  MIN_TEAM_SCORE_ODD
+  MIN_TEAM_SCORE_ODD,
+  TTS_MIN_PROB,
+  MUST_SCORE_MIN,
+  TTS_NO_DETAIL_PROB,
+  estimateMatchExpGoals,
+  HSH_MIN_PROB,
+  HSH_MAX_PICKS,
+  HSH_MAX_FIT_ERR
 };
 
 if (require.main === module) {
-  const ymd = (shift) => {
-    const parts = new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'Africa/Lagos',
-      year: 'numeric', month: '2-digit', day: '2-digit'
-    }).formatToParts(new Date(Date.now() + (shift || 0) * 86400000));
-    return parts.find(p => p.type === 'year').value + '-' +
-      parts.find(p => p.type === 'month').value + '-' +
-      parts.find(p => p.type === 'day').value;
-  };
-  const dates = process.argv.slice(2).length ? process.argv.slice(2) : [ymd(0), ymd(1)];
+  const dates = process.argv.slice(2).length ? process.argv.slice(2) : [lagosDate(0), lagosDate(1)];
   scrapeVip(dates).then((byDate) => {
     for (const [date, matches] of Object.entries(byDate)) {
       console.log('\n=== ' + date + ' (' + matches.length + ' fixtures) ===');
       matches.forEach(m => {
-        const ts = (m.teamScoreProps || []).map(p => 'TS ' + p.team + '@' + p.estimatedOdd).join(', ');
-        console.log('[' + m.pick + '] ' + m.home + ' v ' + m.away + ' | conf=' + m.confidence + ' edge=' + m.edge + ' gate=' + m.passesGate + (m.bestOdds ? ' best=' + m.bestOdds : '') + (ts ? ' | ' + ts : ''));
+        console.log('[TTS] ' + m.home + ' v ' + m.away + ' | team=' + m.team + ' p=' + m.teamScoreProb + '% conf=' + m.confidence + ' mustScore=' + m.mustScore + ' gate=' + m.passesGate);
       });
     }
   }).catch((err) => {

@@ -19,6 +19,7 @@ const { getAvailableMatches } = require('../services/bookingCodes/resolver');
 const { buildGiantPool, getGiantPoolHistory } = require('../services/authorPicks');
 const { fetchTodayStreaks } = require('../services/h2hWinningStreaks');
 const { findMatchingResult } = require('../utils/helpers');
+const { lagosDate } = require('../utils/dates');
 const { getOddsComparison } = require('../services/oddsComparison');
 const { optionalAuth, requireAuth, requirePro: requireProMiddleware, requireAdmin, logAdminAction } = require('../middleware/auth');
 const payment = require('../services/payment');
@@ -306,7 +307,7 @@ function vipPredictionData() {
 // fresh matches. The load*Cache helpers keep returning stale data by design, so
 // freshness is checked against the cache's own date field.
 async function refreshCornersAndCardsIfStale() {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = lagosDate(0);
 
   const corners = getScraperService().loadCornersCache();
   if (!corners || corners.date !== today || !corners.matches || !corners.matches.length) {
@@ -847,13 +848,35 @@ router.get('/h2h-unbeaten', (req, res) => {
 // IPs). This endpoint is the only way the picks leave the server - they are
 // never placed in the static public/ tree, so non-members cannot fetch them.
 const pathVipCache = path.join(__dirname, '../../forebet-vip-cache.json');
+
+// VIP picks are served as team-to-score calls. Odds are NOT part of the tip
+// presentation: strip every price field (top-level and inside the prop list)
+// before the payload ever leaves the server.
+function sanitizeVipPick(p) {
+  if (!p || typeof p !== 'object') return p;
+  const copy = Object.assign({}, p);
+  delete copy.estimatedOdd;
+  if (Array.isArray(copy.teamScoreProps)) {
+    copy.teamScoreProps = copy.teamScoreProps.map(function (x) {
+      if (!x || typeof x !== 'object') return x;
+      const c = Object.assign({}, x);
+      delete c.estimatedOdd;
+      return c;
+    });
+  }
+  return copy;
+}
+
 router.get('/vip', requireProMiddleware, function (req, res) {
   try {
     if (!fs.existsSync(pathVipCache)) {
       return res.json({ isPro: true, dates: {}, allDates: [], lastFetch: null, message: 'VIP picks publish each morning.' });
     }
     const cache = JSON.parse(fs.readFileSync(pathVipCache, 'utf8'));
-    const dates = (cache.dates || {});
+    const dates = {};
+    for (const d of Object.keys(cache.dates || {})) {
+      dates[d] = (cache.dates[d] || []).map(sanitizeVipPick);
+    }
     const requestedDate = req.query.date;
     if (requestedDate && dates[requestedDate]) {
       return res.json({

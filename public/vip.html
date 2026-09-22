@@ -81,7 +81,7 @@
 <div class="stats-bar" id="statsBar" style="display:none">
 <div class="stat-item"><div class="stat-value" id="totalMatches">0</div><div class="stat-label">VIP Tips</div></div>
 <div class="stat-item"><div class="stat-value" id="avgConfidence">0</div><div class="stat-label">Avg Confidence</div></div>
-<div class="stat-item"><div class="stat-value" id="avgEdge">0</div><div class="stat-label">Avg Edge %</div></div>
+  <div class="stat-item"><div class="stat-value" id="avgScorePct">0</div><div class="stat-label">Avg Score Pct</div></div>
 </div>
 
 <div id="content">
@@ -157,18 +157,6 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
   }
   window.switchDate = switchDate;
 
-  function tipLabel(pick) {
-    return pick === '1' ? '1 (Home)' : pick === '2' ? '2 (Away)' : 'X (Draw)';
-  }
-
-  function probsHtml(probs, pick) {
-    var cells = ['home', 'draw', 'away'].map(function(k) {
-      var active = k === (pick === '1' ? 'home' : pick === '2' ? 'away' : 'draw') ? ' opacity:1;font-weight:700' : ' opacity:.6';
-      return '<div style="flex:1;text-align:center;font-size:13px;' + active + '">' + escHtml(k.toUpperCase() === 'DRAW' ? 'DRAW' : (k === 'home' ? 'HOME' : 'AWAY')) + '<br><span style="font-size:16px;font-weight:800">' + (probs && probs[k] != null ? probs[k] + '%' : '-') + '</span></div>';
-    }).join('');
-    return '<div style="display:flex;border-top:1px solid rgba(255,255,255,.06);padding-top:10px;margin-top:10px">' + cells + '</div>';
-  }
-
   function renderContent() {
     var content = document.getElementById('content');
     if (!cache || !cache.dates) {
@@ -179,9 +167,9 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     var matches = cache.dates[dateStr] || [];
     document.getElementById('totalMatches').textContent = matches.length;
     var avgConfidence = matches.length ? Math.round(matches.reduce(function(s, m) { return s + (m.confidence || 0); }, 0) / matches.length) : 0;
-    var avgEdge = matches.length ? (matches.reduce(function(s, m) { return s + (m.edge || 0); }, 0) / matches.length).toFixed(1) : '0.0';
+    var avgScorePct = matches.length ? Math.round(matches.reduce(function(s, m) { return s + (m.teamScoreProb || 0); }, 0) / matches.length) : 0;
     document.getElementById('avgConfidence').textContent = avgConfidence || '0';
-    document.getElementById('avgEdge').textContent = avgEdge + '%';
+    document.getElementById('avgScorePct').textContent = (avgScorePct || 0) + '%';
 
     if (matches.length === 0) {
       content.innerHTML = '<div class="no-matches"><p>No VIP picks for ' + dateStr + '. Check back after the daily update.</p></div>';
@@ -189,30 +177,17 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     }
 
     var html = matches.map(function(m, i) {
-      var edgeChip = m.edge != null
-        ? '<span class="edge-chip ' + (m.edge > 0 ? 'positive' : 'neutral') + '">' + (m.edge > 0 ? '+' : '') + m.edge + '% edge</span>'
-        : '<span class="edge-chip neutral">edge N/A</span>';
-      var bestOddsHtml = m.bestOdds
-        ? '<div class="match-reason" style="margin-top:8px"><strong>Best odds ' + escHtml(tipLabel(m.pick)) + ':</strong> ' + m.bestOdds.toFixed(2) + '</div>'
-        : '';
+      var probLabel = m.teamScoreProb != null ? m.teamScoreProb + '% to score' : '';
       var formHtml = '';
       if (m.form) {
         var f = '<span style="font-weight:700">' + escHtml(m.home) + '</span> ' + escHtml(m.form.home) + ' &middot; <span style="font-weight:700">' + escHtml(m.away) + '</span> ' + escHtml(m.form.away);
         formHtml = '<div class="match-reason" style="margin-top:8px"><strong>Form:</strong> ' + f + '</div>';
       }
-      var previewHtml = m.preview
-        ? '<div class="match-reason" style="margin-top:8px;font-style:italic;">' + escHtml(m.preview) + '</div>'
-        : '';
-      var tsHtml = '';
-      if (m.teamScoreProps && m.teamScoreProps.length) {
-        tsHtml = m.teamScoreProps.map(function(p) {
-          var teamName = p.side === 'home' ? escHtml(m.home) : escHtml(m.away);
-          return '<div class="match-reason" style="margin-top:6px;display:flex;justify-content:space-between;gap:8px;align-items:center">' +
-            '<span><strong>To score at least 1 goal:</strong> ' + teamName + '</span>' +
-            '<span style="white-space:nowrap"><span class="tip-badge vip">@' + p.estimatedOdd.toFixed(2) + '</span> ' + p.prob + '%</span>' +
-            '</div>';
-        }).join('');
-      }
+      var analysisHtml = m.analysis
+        ? '<div class="match-reason" style="margin-top:10px;border-left:3px solid var(--accent,#ff2448);padding-left:12px"><strong>Expert analysis</strong><p style="margin:4px 0 0;line-height:1.7;color:var(--text-secondary)">' + escHtml(m.analysis) + '</p></div>'
+        : (m.preview
+            ? '<div class="match-reason" style="margin-top:8px;font-style:italic;">' + escHtml(m.preview) + '</div>'
+            : '');
       return '<div class="match-card fade-in" style="animation-delay:' + (i * 60) + 'ms">' +
         '<div class="match-header"><span>' + escHtml(m.league || '') + '</span><span>' + escHtml(m.time || '') + '</span></div>' +
         '<div class="match-teams">' +
@@ -222,14 +197,14 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
         '</div>' +
         '<div class="match-footer">' +
         '<div style="text-align:center;display:flex;flex-direction:column;align-items:center;width:100%">' +
-        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center">' +
-        '<span class="tip-badge vip">' + escHtml(tipLabel(m.pick)) + '</span>' +
-        edgeChip +
+        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center">' +
+        '<span class="tip-badge vip">Team to score</span>' +
+        '<span style="font-weight:800;font-size:15px">' + escHtml(m.team || '') + '</span>' +
         '</div>' +
+        (probLabel ? '<div class="probability">' + probLabel + '</div>' : '') +
         '<div class="confidence-meter"><span style="width:' + Math.min(100, m.confidence || 0) + '%"></span></div>' +
         '<div class="probability">' + (m.confidence || 0) + '% confidence</div>' +
-        bestOddsHtml + formHtml + previewHtml + tsHtml +
-        probsHtml(m.probs, m.pick) +
+        formHtml + analysisHtml +
         '</div></div></div>';
     }).join('');
 
@@ -268,7 +243,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
         document.getElementById('statsBar').style.display = '';
         if (data.lastFetch) {
           var note = document.getElementById('authState');
-          if (note) { note.style.display = ''; note.innerHTML = '<p style="margin:0">VIP picks refreshed ' + new Date(data.lastFetch).toLocaleString() + '. Confidence score = model certainty + measured value edge + form/H2H + market agreement.</p>'; }
+          if (note) { note.style.display = ''; note.innerHTML = '<p style="margin:0">VIP picks refreshed ' + new Date(data.lastFetch).toLocaleString() + '. Every tip is a team-to-score call - the team must score at least one goal, picked from its expected-goals history, recent form and head-to-head record. Each tip is backed by an expert analysis.</p>'; }
         }
         renderContent();
       }).catch(function () {

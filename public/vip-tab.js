@@ -8,7 +8,10 @@
     var containers = document.querySelectorAll('#categoryLinks, #categoryTabs');
     containers.forEach(function (container) {
       if (!container || container.querySelector('#tab-vip')) return;
-      var isActive = window.location.pathname === '/vip' || window.location.pathname === '/vip.html';
+      // Normalise the path so /vip, /vip.html, /vip/ and /vip.html/ all mark
+      // the tab active, without matching unrelated routes like /vip-archive.
+      var path = window.location.pathname.replace(/\/+$/, '');
+      var isActive = path === '/vip' || path === '/vip.html';
       var link = document.createElement('a');
       link.href = '/vip.html';
       link.id = 'tab-vip';
