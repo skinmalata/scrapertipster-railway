@@ -195,7 +195,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use(function (req, res, next) {
-  if (req.path === '/api/webhook/payment' || req.path === '/api/webhook/whop') {
+  if (req.path === '/api/webhook/payment' || req.path === '/api/webhook/whop' || req.path === '/api/webhook/paypal') {
     req._body = true;
     var chunks = [];
     req.on('data', function (chunk) { chunks.push(chunk); });

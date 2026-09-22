@@ -1,9 +1,11 @@
 // PayPal integration — mirrors the payment.js (Lemon Squeezy) / whop.js
 // interface so providerForPaymentId() can resolve 'paypal' rows the same way.
 // One-time Orders v2 checkout: the pricing page creates an order server-side,
-// the buyer approves on paypal.com, and the PAYMENT.CAPTURE.COMPLETED webhook
-// records the payment and grants Pro. Requires PAYPAL_CLIENT_ID / PAYPAL_SECRET
-// (plus PAYPAL_WEBHOOK_ID for signature verification); PAYPAL_MODE=sandbox for
+// the buyer approves on paypal.com, and payment completion is recorded from a
+// PAYMENT.CAPTURE.COMPLETED webhook OR — for accounts that cannot create
+// developer webhooks — from a verified IPN posted to the account-level notify
+// URL. Requires PAYPAL_CLIENT_ID / PAYPAL_SECRET (PAYPAL_WEBHOOK_ID only when
+// using webhooks); PAYPAL_MODE=sandbox for
 // test mode. The merchant e-mail receiving the money is whichever PayPal
 // account owns the REST app (officialwinfulltime@gmail.com).
 
@@ -115,6 +117,60 @@ function verifyWebhook(_a) {
       return data.verification_status === 'SUCCESS';
     });
   }).catch(function () { return false; });
+}
+
+// IPN verification: post the raw form body back to PayPal with
+// cmd=_notify-validate; only the exact string VERIFIED is trusted. No client
+// credentials needed — works even when the REST app cannot create webhooks.
+function verifyIpn(rawBody) {
+  if (typeof rawBody !== 'string' || !rawBody) return Promise.resolve(false);
+  var host = PAYPAL_MODE === 'sandbox' ? 'https://ipnpb.sandbox.paypal.com' : 'https://ipnpb.paypal.com';
+  var data = 'cmd=_notify-validate&' + rawBody;
+  return fetch(host + '/cgi-bin/webscr', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: data
+  }).then(function (res) { return res.text(); }).then(function (text) {
+    return String(text).trim() === 'VERIFIED';
+  }).catch(function () { return false; });
+}
+
+// Process a verified IPN. Same completion paths as the webhook: regToken →
+// create account, userId → record payment. Route-level payment_events dedupe
+// keyed on txn_id prevents PayPal's IPN retries from double-processing.
+function handleIpn(params) {
+  params = params || {};
+  if ((params.payment_status || '') !== 'Completed') {
+    return Promise.resolve({ handled: false, reason: 'payment_status ' + (params.payment_status || 'missing') });
+  }
+  if ((params.mc_currency || '') !== 'USD') {
+    return Promise.resolve({ handled: false, reason: 'currency ' + (params.mc_currency || 'missing') });
+  }
+  var txnId = params.txn_id || '';
+  if (!txnId) return Promise.resolve({ handled: false, reason: 'missing txn_id' });
+  var meta = parseCustomId(params.custom);
+  if (!meta) return Promise.resolve({ handled: false, reason: 'no custom_id' });
+  var plan = PLANS[meta.planType];
+  if (!plan) return Promise.resolve({ handled: false, reason: 'unknown plan ' + meta.planType });
+  if (Math.abs(parseFloat(params.mc_gross || '0') - parseFloat(plan.price)) > 0.01) {
+    return Promise.resolve({ handled: false, reason: 'amount mismatch ' + params.mc_gross });
+  }
+  var wantReceiver = process.env.PAYPAL_RECEIVER_EMAIL;
+  if (wantReceiver && String(params.receiver_email || '').toLowerCase() !== wantReceiver.toLowerCase()) {
+    return Promise.resolve({ handled: false, reason: 'receiver_email mismatch' });
+  }
+  var email = params.payer_email || '';
+  if (meta.regToken) {
+    return completeRegistration({
+      regToken: meta.regToken,
+      email: email,
+      planType: meta.planType,
+      providerId: txnId,
+      expiresAt: computeExpiry(meta.planType),
+      amount: plan.price
+    });
+  }
+  return recordPayment(meta.userId, email, meta.planType, txnId, computeExpiry(meta.planType), plan.price);
 }
 
 function handleEvent(event) {
@@ -289,5 +345,5 @@ function cancelSubscription() {
 module.exports = {
   createCheckout, verifyWebhook, handleEvent,
   createCustomerPortal, cancelSubscription,
-  PLANS, isConfigured, PAYPAL_MODE, parseCustomId
+  PLANS, isConfigured, PAYPAL_MODE, parseCustomId, verifyIpn, handleIpn
 };

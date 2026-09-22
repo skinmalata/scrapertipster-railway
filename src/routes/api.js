@@ -1552,6 +1552,45 @@ router.post('/webhook/paypal', function (req, res) {
   });
 });
 
+// POST /api/webhook/paypal-ipn — IPN fallback for accounts that cannot create
+// developer webhooks. The notify URL is set once in the PayPal account (Seller
+// tools → Instant Payment Notifications) and posts form-encoded here. Verify
+// by re-posting the raw body to PayPal, then run the same payment /
+// registration flow as the webhook, deduped on txn_id.
+router.post('/webhook/paypal-ipn', express.raw({ type: 'application/x-www-form-urlencoded', limit: '100kb' }), function (req, res) {
+  var rawBody = Buffer.isBuffer(req.body) ? req.body.toString('utf8') : '';
+  if (!rawBody) return res.sendStatus(400);
+
+  paypal.verifyIpn(rawBody).then(function (verified) {
+    if (!verified) {
+      console.warn('[paypal-ipn] Verification failed');
+      return res.sendStatus(200);
+    }
+    var params = Object.fromEntries(new URLSearchParams(rawBody));
+    var txnId = params.txn_id || '';
+    if (!txnId || !supabase) return res.sendStatus(200);
+
+    var eventId = 'ipn:' + txnId;
+    supabase.from('payment_events').select('provider, event_id').eq('provider', 'paypal').eq('event_id', eventId).single()
+      .then(function (existing) {
+        if (existing.data) {
+          console.log('[paypal-ipn] Duplicate IPN ignored:', txnId);
+          return;
+        }
+        return supabase.from('payment_events').insert({ provider: 'paypal', event_id: eventId }).then(function () {
+          return paypal.handleIpn(params).then(function (result) {
+            console.log('[paypal-ipn] Processed:', JSON.stringify(result));
+          });
+        });
+      })
+      .catch(function (err) { console.error('[paypal-ipn] Error:', err.message); })
+      .then(function () { res.sendStatus(200); });
+  }).catch(function (err) {
+    console.error('[paypal-ipn] Verification error:', err && err.message);
+    res.sendStatus(200);
+  });
+});
+
 // POST /api/webhook/payment — Lemon Squeezy webhook (raw body)
 router.post('/webhook/payment', function (req, res) {
   console.log('[webhook] Received event');
