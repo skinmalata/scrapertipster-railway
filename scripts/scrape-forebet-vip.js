@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { scrapeVip, closeVipBrowser, selectHshPicks, HSH_MIN_PROB, HSH_MAX_PICKS, HSH_MARGIN_MIN, HSH_MIN_GOALS, HSH_SHARE_PRIOR, HSH_SHARE_REG, TTS_MIN_PROB, MUST_SCORE_MIN, TTS_WIN_CERT_MIN_PROB, VIP_MAX_TIPS } = require('../src/services/forebetVip');
+const { scrapeVip, closeVipBrowser, selectHshPicks, HSH_MIN_PROB, HSH_MAX_PICKS, HSH_MARGIN_MIN, HSH_MIN_GOALS, HSH_SHARE_PRIOR, HSH_SHARE_REG, TTS_MIN_PROB, MUST_SCORE_MIN, TTS_WIN_CERT_MIN_PROB, VIP_MAX_TIPS, TTS_PERFECT_FORM_PCT, TTS_PERFECT_H2H_PCT } = require('../src/services/forebetVip');
 const { lagosDate } = require('../src/utils/dates');
 
 const CACHE_FILE = path.join(process.cwd(), 'forebet-vip-cache.json');
@@ -88,7 +88,9 @@ async function main() {
     winCertMinProb: TTS_WIN_CERT_MIN_PROB,
     minTeamScoreProb: TTS_MIN_PROB,
     mustScoreMin: MUST_SCORE_MIN,
-    maxTips: VIP_MAX_TIPS
+    maxTips: VIP_MAX_TIPS,
+    perfectFormPct: TTS_PERFECT_FORM_PCT,
+    perfectH2hPct: TTS_PERFECT_H2H_PCT
   };
   fs.writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2));
   console.log('Saved ' + CACHE_FILE);

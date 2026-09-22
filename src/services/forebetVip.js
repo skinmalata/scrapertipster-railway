@@ -17,8 +17,10 @@
 // VIP markets: MATCH-WINNER RECORD CERT and TEAM-TO-SCORE. Every fixture
 // publishes at most ONE tip:
 //   1. Match-winner record cert: a side whose recent win rate clears
-//     TTS_PERFECT_FORM_PCT (90%) AND whose head-to-head ledger against this
-//      opponent is 100% over at least TTS_PERFECT_H2H_MEETS (3) meetings is
+//      TTS_PERFECT_FORM_PCT (80%) over at least TTS_FORM_MIN_GAMES (5) recent
+//      outings with NO loss in its form string AND whose head-to-head ledger
+//      against this opponent is at least TTS_PERFECT_H2H_PCT (80%) of
+//      meetings won over at least TTS_PERFECT_H2H_MEETS (3) meetings is
 //      published as "Team X to win". The records are the reasoning; the
 //      model's 1X2 win probability only has to clear TTS_WIN_CERT_MIN_PROB
 //      (35%) so the model never firmly expects the side to lose.
@@ -32,9 +34,10 @@
 //        (max 35) + head-to-head record (max 25). When detail pages were not
 //        scraped the history-backed probability alone must clear
 //        TTS_NO_DETAIL_PROB (75%), and
-//      - form/H2H lock: the same record perfection as the cert (form >= 90%,
-//        100% H2H over >= 3 meetings) may publish under the relaxed floors
-//        TTS_LOCK_MIN_PROB / TTS_LOCK_MIN_ODD instead of the bars above.
+//      - form/H2H lock: the same near-perfect records as the cert (form >=
+//        80% and unbeaten, H2H win share >= 80% over >= 3 meetings) may
+//        publish under the relaxed floors TTS_LOCK_MIN_PROB /
+//        TTS_LOCK_MIN_ODD instead of the bars above.
 // No analysis text ships with tips: members see the pick, its probability and
 // the form/H2H record rows. The API strips every price field before the
 // payload reaches a member.
@@ -193,15 +196,19 @@ const MUST_SCORE_MIN = envNumber('TTS_MUST_SCORE_MIN', 50, 0, 160);
 // higher bar, so strong calls survive a barren detail day but weak ones never
 // sneak through without form/H2H backing.
 const TTS_NO_DETAIL_PROB = envNumber('TTS_NO_DETAIL_PROB', 0.75, 0.55, 0.95);
-// Form/H2H lock: a side that has won (near) all its recent matches AND a 100%
-// head-to-head record against this opponent is a must-score in its own right,
-// so such fixtures may also publish when the expected-goals model's
-// probability or fair price sit below the normal TTS bars. The lock only
-// engages on genuine perfection: the recent win rate must clear this percent
-// AND every recent meeting must have been won, over at least this many
-// meetings. A single hot streak or thin sample is never enough.
-const TTS_PERFECT_FORM_PCT = envNumber('TTS_PERFECT_FORM_PCT', 90, 50, 100);
+// Form/H2H lock and record cert share these bars: a side with NEAR-PERFECT
+// recent form - win rate at least TTS_PERFECT_FORM_PCT (80%) and not a
+// single loss in the recent string - that also owns this opponent with at
+// least TTS_PERFECT_H2H_PCT (80%) of meetings won, over at least
+// TTS_PERFECT_H2H_MEETS (3) meetings, qualifies. The unbeaten condition
+// keeps 4W1L (also 80%) out while 4W1D (80%) qualifies. A single hot streak
+// or thin sample is never enough.
+const TTS_PERFECT_FORM_PCT = envNumber('TTS_PERFECT_FORM_PCT', 80, 50, 100);
 const TTS_PERFECT_H2H_MEETS = envNumber('TTS_PERFECT_H2H_MEETS', 3, 2, 10);
+const TTS_PERFECT_H2H_PCT = envNumber('TTS_PERFECT_H2H_PCT', 0.8, 0.5, 1);
+// Minimum recent outings behind the form percentage. A single-game "W" is a
+// fake 100% (seen on reserve/new clubs) and must never carry a cert.
+const TTS_FORM_MIN_GAMES = envNumber('TTS_FORM_MIN_GAMES', 5, 3, 15);
 const TTS_LOCK_MIN_PROB = envNumber('TTS_LOCK_MIN_PROB', 0.35, 0.05, 0.95);
 const TTS_LOCK_MIN_ODD = envNumber('TTS_LOCK_MIN_ODD', 1.01, 1.01, 10);
 // Match-winner record cert: the model's 1X2 win probability for the
@@ -220,9 +227,9 @@ const SCRAPE_TIMEOUT_MS = 25000;
 const ENRICH_DETAIL = process.env.VIP_ENRICH_DETAIL !== '0';
 // Hard wall-clock budget for a whole scrape run. When it is exceeded the run
 // stops starting new work and publishes whatever it has already scored, so the
-// scheduled task can never run long. Default 5 minutes (detail enrichment
-// needs more headroom than the old list-only run).
-const SCRAPE_BUDGET_MS = Math.max(1000, envNumber('VIP_SCRAPE_BUDGET_MS', 300000, 1000, 3600000));
+// scheduled task can never run long. Default 7 minutes (every fixture now
+// needs a detail fetch for the record-cert path, on top of TTS enrichment).
+const SCRAPE_BUDGET_MS = Math.max(1000, envNumber('VIP_SCRAPE_BUDGET_MS', 420000, 1000, 3600000));
 let _deadline = 0;
 function budgetExceeded() {
   return _deadline > 0 && Date.now() > _deadline;
@@ -526,11 +533,18 @@ function mustScoreFor({ prob, formPct, h2h }) {
 }
 
 // Loose team-name equality that survives accents (Vispeşti vs Vispesti) and
-// casing, so H2H meeting sides can be aligned to today's home/away names.
+// casing, plus common club prefixes (FC/SC/CF/... leading or trailing), so
+// H2H meeting sides can be aligned to today's home/away names.
 function sameTeam(a, b) {
   if (!a || !b) return false;
-  const norm = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim();
-  return norm(a) === norm(b);
+  const strip = (s) => s
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/^(?:[a-z]{1,3}\.\s*)?(?:fc|sc|cf|afc|cd|ca|fk|sk|ss|as|ac|us|uv)\s+/, '')
+    .replace(/\s+(?:fc|sc|cf|afc|cd|ca|fk|sk|ss|as|ac|us|uv)$/, '');
+  return strip(a) === strip(b);
 }
 
 // A side-relative H2H signal: the number of recent meetings (0..5) won by the
@@ -566,10 +580,16 @@ function selectTeamScoreTip({ home, away, teamScoreProps, form, h2h }) {
     const sidePct = p.side === 'home'
       ? (form && typeof form.homeRecently === 'number' ? form.homeRecently : null)
       : (form && typeof form.awayRecently === 'number' ? form.awayRecently : null);
+    const sideForm = p.side === 'home'
+      ? (form && typeof form.homeForm === 'string' ? form.homeForm : null)
+      : (form && typeof form.awayForm === 'string' ? form.awayForm : null);
     const wins = h2hCountFor(h2h, p.side);
-    // The lock: near-perfect recent form AND a clean head-to-head ledger.
-    const locked = sidePct != null && meets >= TTS_PERFECT_H2H_MEETS &&
-      sidePct >= TTS_PERFECT_FORM_PCT && wins === meets;
+    // The lock: near-perfect, unbeaten recent form AND a near-perfect
+    // head-to-head ledger (>= TTS_PERFECT_H2H_PCT of meetings won).
+    const locked = sidePct != null && sideForm != null && sideForm.length >= TTS_FORM_MIN_GAMES &&
+      !/L/.test(sideForm) &&
+      meets >= TTS_PERFECT_H2H_MEETS &&
+      sidePct >= TTS_PERFECT_FORM_PCT && wins >= meets * TTS_PERFECT_H2H_PCT;
     if (locked) {
       if (prob < TTS_LOCK_MIN_PROB) continue;
     } else {
@@ -615,20 +635,38 @@ function selectTeamScoreTip({ home, away, teamScoreProps, form, h2h }) {
 // record reads as strong confidence even when the model is only neutral-
 // positive.
 function selectMatchWinnerCert({ home, away, probs, form, h2h }) {
-  if (!form) return null;
+  const dbg = process.env.VIP_CERT_DEBUG === '1';
+  const log = (msg) => { if (dbg) console.log('[cert] ' + home + ' v ' + away + ': ' + msg); };
+  if (!form) { log('REJECT no-form'); return null; }
   const meets = h2hMeetsFor(h2h);
-  if (meets < TTS_PERFECT_H2H_MEETS) return null;
+  if (meets < TTS_PERFECT_H2H_MEETS) {
+    log('REJECT meets=' + meets + ' wins=' + JSON.stringify(h2h && h2h.wins) +
+      ' form=(' + form.homeRecently + '/' + form.awayRecently + ')');
+    return null;
+  }
   const pn = normalisePredictions(probs || { home: 0, draw: 0, away: 0 });
   for (const side of ['home', 'away']) {
     const formPct = side === 'home'
       ? (typeof form.homeRecently === 'number' ? form.homeRecently : null)
       : (typeof form.awayRecently === 'number' ? form.awayRecently : null);
-    if (formPct == null || formPct < TTS_PERFECT_FORM_PCT) continue;
+    const formStr = side === 'home' ? form.homeForm : form.awayForm;
+    if (formPct == null || formPct < TTS_PERFECT_FORM_PCT || !formStr ||
+      formStr.length < TTS_FORM_MIN_GAMES || /L/.test(formStr)) {
+      log(side + ' REJECT formPct=' + formPct + ' str=' + formStr);
+      continue;
+    }
     const wins = h2hCountFor(h2h, side);
-    if (wins !== meets) continue;
+    if (wins < meets * TTS_PERFECT_H2H_PCT) {
+      log(side + ' REJECT h2hWins=' + wins + '/' + meets + ' (need>=' + (meets * TTS_PERFECT_H2H_PCT).toFixed(1) + ')');
+      continue;
+    }
     const winProb = Number(side === 'home' ? pn.home : pn.away) / 100;
-    if (winProb < TTS_WIN_CERT_MIN_PROB) continue;
+    if (winProb < TTS_WIN_CERT_MIN_PROB) {
+      log(side + ' REJECT winProb=' + winProb);
+      continue;
+    }
     const { score, modelPts, formPts, h2hPts } = mustScoreFor({ prob: winProb, formPct, h2h: wins });
+    log('FIRE side=' + side + ' form=' + formPct + '%(' + formStr + ') h2h=' + wins + '/' + meets + ' winProb=' + winProb);
     return {
       market: 'match-winner',
       side,
@@ -953,14 +991,17 @@ function parseMatchDetail(html, refs) {
 
   // Head-to-head: the "Head to head" module holds one .st_row per past
   // meeting (most recent first). st_0/st_1 are zebra stripes, not result
-  // markers - parse the two team names and the score, compare each meeting's
-  // sides to TODAY'S home/away and count wins per side (capped at 5 meetings).
+  // markers - parse the two team names and the score. Historical rows use
+  // the meeting's OWN venue order, which alternates: accept both the same
+  // order as today and fully swapped rows, then map each score onto today's
+  // home/away before counting wins (previously swapped rows were dropped,
+  // which starved the cert/lock paths of meetings). Capped at 5 meetings.
   let h2h = null;
   const h2hWins = { home: 0, away: 0 };
   const MAX_H2H_MEETINGS = 5;
   let h2hMeets = 0;
   $('.mptlt').filter(function () {
-    return /head\s*to\s*head/i.test($(this).text());
+    return /head[\s-]*to[\s-]*head/i.test($(this).text());
   }).parent().find('.st_row').each(function () {
     if (h2hMeets >= MAX_H2H_MEETINGS) return;
     const hteam = ($(this).find('.st_hteam').text() || '').trim();
@@ -968,14 +1009,20 @@ function parseMatchDetail(html, refs) {
     const scoreText = ($(this).find('.st_res').text() || '').trim();
     const m = scoreText.match(/(\d+)\s*-\s*(\d+)/);
     if (!m || !hteam || !ateam) return;
-    const meetingHome = sameTeam(hteam, refHome);
-    const meetingAway = sameTeam(ateam, refAway);
-    if (!(meetingHome && meetingAway)) return;
+    let hsToday;
+    let asToday;
+    if (sameTeam(hteam, refHome) && sameTeam(ateam, refAway)) {
+      hsToday = Number(m[1]);
+      asToday = Number(m[2]);
+    } else if (sameTeam(hteam, refAway) && sameTeam(ateam, refHome)) {
+      hsToday = Number(m[2]);
+      asToday = Number(m[1]);
+    } else {
+      return;
+    }
     h2hMeets += 1;
-    const hs = Number(m[1]);
-    const as = Number(m[2]);
-    if (hs > as) h2hWins.home += 1;
-    else if (as > hs) h2hWins.away += 1;
+    if (hsToday > asToday) h2hWins.home += 1;
+    else if (asToday > hsToday) h2hWins.away += 1;
   });
   if (h2hMeets > 0) {
     h2h = { wins: h2hWins, meets: h2hMeets };
@@ -1110,9 +1157,16 @@ async function scrapeDay(dateStr) {
 
   let enriched;
   if (ENRICH_DETAIL) {
-    enriched = await enrichAll(raw, shouldEnrich);
+    // Detail pages carry the form/H2H records BOTH markets need. Priority:
+    // fixtures that can produce a team-to-score call first (they feed the
+    // main VIP gate); every other fixture still gets a detail fetch for the
+    // record-cert path until the wall-clock budget stops new work. Skipping
+    // non-TTS fixtures outright starved the cert path of records entirely.
+    const prio = new Map(raw.map((m) => [m, shouldEnrich(m) ? 0 : 1]));
+    const ordered = raw.slice().sort((a, b) => prio.get(a) - prio.get(b));
+    enriched = await enrichAll(ordered, null);
     const enrichedCount = enriched.filter((m) => m.detail).length;
-    console.log('[forebetVip] Parsed ' + raw.length + ' fixtures for ' + dateStr + '; enriched ' + enrichedCount + ' candidates for form/H2H must-score check...');
+    console.log('[forebetVip] Parsed ' + raw.length + ' fixtures for ' + dateStr + '; enriched ' + enrichedCount + '/' + raw.length + ' detail pages for form/H2H (TTS candidates prioritised)...');
   } else {
     enriched = raw.map((m) => Object.assign({}, m, { detail: null, detailSkipped: true }));
     console.log('[forebetVip] Parsed ' + raw.length + ' fixtures for ' + dateStr + ' (list-only scoring; form/H2H must-score gate runs at a higher probability floor).');
@@ -1215,6 +1269,8 @@ module.exports = {
   TTS_NO_DETAIL_PROB,
   TTS_PERFECT_FORM_PCT,
   TTS_PERFECT_H2H_MEETS,
+  TTS_PERFECT_H2H_PCT,
+  TTS_FORM_MIN_GAMES,
   TTS_LOCK_MIN_PROB,
   TTS_LOCK_MIN_ODD,
   TTS_WIN_CERT_MIN_PROB,

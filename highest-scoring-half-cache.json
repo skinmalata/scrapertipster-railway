@@ -158,6 +158,37 @@
         }
       },
       {
+        "matchId": "2476373",
+        "home": "AGF W",
+        "away": "Farum BK W",
+        "league": "D1W",
+        "time": "",
+        "probs": {
+          "home": 12,
+          "draw": 14,
+          "away": 74
+        },
+        "avgGoals": 4.17,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.64,
+          "margin": 0.451,
+          "firstHalfShare": 0.35,
+          "firstHalfExp": 1.46,
+          "secondHalfExp": 2.71,
+          "p1": 0.189,
+          "p2": 0.64,
+          "tie": 0.171,
+          "fitErr": 0.00989,
+          "totalExp": 4.17,
+          "referenceFirstHalfProb": 0.14,
+          "referenceDrawProb": 0.25,
+          "referenceSecondHalfProb": 0.61,
+          "reason": "Expected 4.2 goals, split 1.5 in the 1st half vs 2.7 in the 2nd. The 2nd half wins the half race 64% of the time, 45% clear of the other half."
+        }
+      },
+      {
         "matchId": "2485658",
         "home": "ASA Târgu Mureș",
         "away": "CS Dinamo București",
@@ -533,7 +564,7 @@
       }
     ]
   },
-  "lastFetch": "2026-09-22T13:40:45.074Z",
+  "lastFetch": "2026-09-22T14:12:42.827Z",
   "meta": {
     "minProb": 0.55,
     "maxPicks": 12,

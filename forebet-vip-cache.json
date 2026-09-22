@@ -175,6 +175,96 @@
         "h2h": null
       },
       {
+        "matchId": "2554073",
+        "home": "KIF Orebro W",
+        "away": "AIK W",
+        "league": "SeCW",
+        "time": "",
+        "probs": {
+          "home": 37,
+          "draw": 34,
+          "away": 29
+        },
+        "predictionText": "1",
+        "avgGoals": 2.63,
+        "avgOdds": {
+          "home": null,
+          "draw": null,
+          "away": null
+        },
+        "matchUrl": "kif-orebro-w-aik-w-2554073",
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "WLDWWW",
+            "awayForm": "WWDLLL",
+            "homeRecently": 67,
+            "awayRecently": 33
+          },
+          "h2h": {
+            "wins": {
+              "home": 1,
+              "away": 3
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "home",
+        "team": "KIF Orebro W",
+        "teamScoreProb": 77,
+        "winProb": null,
+        "mustScore": 72,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 27,
+          "h2h": 5
+        },
+        "locked": false,
+        "estimatedOdd": 1.3,
+        "confidence": 77,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.47,
+          "away": 1.16
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 77,
+            "estimatedOdd": 1.3
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 68.7,
+            "estimatedOdd": 1.46
+          }
+        ],
+        "hsh": null,
+        "preview": null,
+        "form": {
+          "home": "WLDWWW",
+          "away": "WWDLLL"
+        },
+        "h2h": {
+          "wins": {
+            "home": 1,
+            "away": 3
+          },
+          "meets": 5
+        }
+      },
+      {
         "matchId": "2552166",
         "home": "Inter Milano W",
         "away": "Hacken W",
@@ -345,7 +435,24 @@
             "estimatedOdd": 1.31
           }
         ],
-        "hsh": null,
+        "hsh": {
+          "pick": "1H",
+          "label": "1st Half",
+          "prob": 0.543,
+          "margin": 0.341,
+          "firstHalfShare": 0.65,
+          "firstHalfExp": 1.55,
+          "secondHalfExp": 0.84,
+          "p1": 0.543,
+          "p2": 0.202,
+          "tie": 0.255,
+          "fitErr": 0.00693,
+          "totalExp": 2.39,
+          "referenceFirstHalfProb": 0.3,
+          "referenceDrawProb": 0.32,
+          "referenceSecondHalfProb": 0.38,
+          "reason": "Expected 2.4 goals, split 1.6 in the 1st half vs 0.8 in the 2nd. The 1st half wins the half race 54% of the time, 34% clear of the other half."
+        },
         "preview": null,
         "form": {
           "home": "LWLWWW",
@@ -389,7 +496,7 @@
           },
           "h2h": {
             "wins": {
-              "home": 2,
+              "home": 3,
               "away": 1
             },
             "meets": 5
@@ -401,11 +508,11 @@
         "team": "Metalul Plopeni",
         "teamScoreProb": 75.3,
         "winProb": null,
-        "mustScore": 60,
+        "mustScore": 65,
         "mustScoreBreakdown": {
           "model": 40,
           "form": 10,
-          "h2h": 10
+          "h2h": 15
         },
         "locked": false,
         "estimatedOdd": 1.33,
@@ -460,7 +567,7 @@
         },
         "h2h": {
           "wins": {
-            "home": 2,
+            "home": 3,
             "away": 1
           },
           "meets": 5
@@ -496,10 +603,10 @@
           },
           "h2h": {
             "wins": {
-              "home": 2,
+              "home": 1,
               "away": 2
             },
-            "meets": 4
+            "meets": 5
           },
           "expGoals": null
         },
@@ -508,11 +615,11 @@
         "team": "Al Bidda SC",
         "teamScoreProb": 75.3,
         "winProb": null,
-        "mustScore": 60,
+        "mustScore": 55,
         "mustScoreBreakdown": {
           "model": 40,
           "form": 10,
-          "h2h": 10
+          "h2h": 5
         },
         "locked": false,
         "estimatedOdd": 1.33,
@@ -567,10 +674,10 @@
         },
         "h2h": {
           "wins": {
-            "home": 2,
+            "home": 1,
             "away": 2
           },
-          "meets": 4
+          "meets": 5
         }
       },
       {
@@ -603,7 +710,7 @@
           },
           "h2h": {
             "wins": {
-              "home": 2,
+              "home": 1,
               "away": 2
             },
             "meets": 5
@@ -674,7 +781,7 @@
         },
         "h2h": {
           "wins": {
-            "home": 2,
+            "home": 1,
             "away": 2
           },
           "meets": 5
@@ -713,7 +820,7 @@
               "home": 2,
               "away": 2
             },
-            "meets": 4
+            "meets": 5
           },
           "expGoals": null
         },
@@ -784,7 +891,7 @@
             "home": 2,
             "away": 2
           },
-          "meets": 4
+          "meets": 5
         }
       },
       {
@@ -818,9 +925,9 @@
           "h2h": {
             "wins": {
               "home": 1,
-              "away": 0
+              "away": 1
             },
-            "meets": 1
+            "meets": 3
           },
           "expGoals": null
         },
@@ -829,11 +936,11 @@
         "team": "USV Iaşi",
         "teamScoreProb": 71.6,
         "winProb": null,
-        "mustScore": 67,
+        "mustScore": 72,
         "mustScoreBreakdown": {
           "model": 40,
           "form": 27,
-          "h2h": 0
+          "h2h": 5
         },
         "locked": false,
         "estimatedOdd": 1.4,
@@ -889,9 +996,9 @@
         "h2h": {
           "wins": {
             "home": 1,
-            "away": 0
+            "away": 1
           },
-          "meets": 1
+          "meets": 3
         }
       },
       {
@@ -1002,8 +1109,8 @@
           },
           "h2h": {
             "wins": {
-              "home": 2,
-              "away": 1
+              "home": 1,
+              "away": 2
             },
             "meets": 5
           },
@@ -1014,11 +1121,11 @@
         "team": "Saipa Karaj",
         "teamScoreProb": 70.5,
         "winProb": null,
-        "mustScore": 80,
+        "mustScore": 85,
         "mustScoreBreakdown": {
           "model": 40,
           "form": 35,
-          "h2h": 5
+          "h2h": 10
         },
         "locked": false,
         "estimatedOdd": 1.42,
@@ -1073,8 +1180,8 @@
         },
         "h2h": {
           "wins": {
-            "home": 2,
-            "away": 1
+            "home": 1,
+            "away": 2
           },
           "meets": 5
         }
@@ -1109,7 +1216,7 @@
           },
           "h2h": {
             "wins": {
-              "home": 2,
+              "home": 0,
               "away": 2
             },
             "meets": 5
@@ -1121,11 +1228,11 @@
         "team": "Al Hamriyah",
         "teamScoreProb": 69.9,
         "winProb": null,
-        "mustScore": 77,
+        "mustScore": 67,
         "mustScoreBreakdown": {
           "model": 40,
           "form": 27,
-          "h2h": 10
+          "h2h": 0
         },
         "locked": false,
         "estimatedOdd": 1.43,
@@ -1180,7 +1287,7 @@
         },
         "h2h": {
           "wins": {
-            "home": 2,
+            "home": 0,
             "away": 2
           },
           "meets": 5
@@ -1375,116 +1482,116 @@
           "away": "WWWWDW"
         },
         "h2h": null
-      },
+      }
+    ],
+    "2026-09-23": [
       {
-        "matchId": "2531538",
-        "home": "FCSB II",
-        "away": "FCM Alexandria",
-        "league": "Ro3",
+        "matchId": "2554086",
+        "home": "Vissel Kobe",
+        "away": "Sagan Tosu",
+        "league": "JpC",
         "time": "",
         "probs": {
-          "home": 32,
-          "draw": 35,
-          "away": 33
+          "home": 53,
+          "draw": 27,
+          "away": 20
         },
-        "predictionText": "X",
-        "avgGoals": 2.33,
+        "predictionText": "1",
+        "avgGoals": 2.05,
         "avgOdds": {
-          "home": 3.75,
-          "draw": 3.75,
-          "away": 1.72
+          "home": null,
+          "draw": null,
+          "away": null
         },
-        "matchUrl": "fcsb-ii-fcm-alexandria-2531538",
+        "matchUrl": "vissel-kobe-sagan-tosu-2554086",
         "detail": {
           "books": [],
           "previewText": "",
           "form": {
-            "homeForm": "WLLLWW",
-            "awayForm": "DLWDDW",
-            "homeRecently": 50,
-            "awayRecently": 33
+            "homeForm": "WWWWWW",
+            "awayForm": "LLWWDW",
+            "homeRecently": 100,
+            "awayRecently": 50
           },
           "h2h": {
             "wins": {
-              "home": 1,
+              "home": 4,
               "away": 0
             },
-            "meets": 1
+            "meets": 5
           },
           "expGoals": null
         },
-        "market": "team-to-score",
+        "market": "match-winner",
         "pick": "home",
-        "team": "FCSB II",
-        "teamScoreProb": 68.3,
-        "winProb": null,
-        "mustScore": 53,
+        "team": "Vissel Kobe",
+        "teamScoreProb": null,
+        "winProb": 53,
+        "mustScore": 78,
         "mustScoreBreakdown": {
-          "model": 38,
-          "form": 10,
-          "h2h": 5
+          "model": 23,
+          "form": 35,
+          "h2h": 20
         },
-        "locked": false,
-        "estimatedOdd": 1.46,
-        "confidence": 68,
+        "locked": true,
+        "estimatedOdd": null,
+        "confidence": 78,
         "edge": null,
         "bestOdds": null,
         "marketPick": null,
         "margin": null,
         "passesGate": true,
         "expGoals": {
-          "home": 1.15,
-          "away": 1.18
+          "home": 1.49,
+          "away": 0.56
         },
         "teamScoreProps": [
           {
             "market": "team-to-score",
             "side": "home",
             "team": "home",
-            "prob": 68.3,
-            "estimatedOdd": 1.46
+            "prob": 77.5,
+            "estimatedOdd": 1.29
           },
           {
             "market": "team-to-score",
             "side": "away",
             "team": "away",
-            "prob": 69.3,
-            "estimatedOdd": 1.44
+            "prob": 42.9,
+            "estimatedOdd": 2.33
           }
         ],
         "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.538,
-          "margin": 0.336,
-          "firstHalfShare": 0.65,
-          "firstHalfExp": 1.51,
-          "secondHalfExp": 0.82,
-          "p1": 0.538,
-          "p2": 0.202,
-          "tie": 0.26,
-          "fitErr": 0.01223,
-          "totalExp": 2.33,
-          "referenceFirstHalfProb": 0.38,
-          "referenceDrawProb": 0.28,
-          "referenceSecondHalfProb": 0.34,
-          "reason": "Expected 2.3 goals, split 1.5 in the 1st half vs 0.8 in the 2nd. The 1st half wins the half race 54% of the time, 34% clear of the other half."
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.447,
+          "margin": 0.19,
+          "firstHalfShare": 0.41,
+          "firstHalfExp": 0.84,
+          "secondHalfExp": 1.21,
+          "p1": 0.257,
+          "p2": 0.447,
+          "tie": 0.297,
+          "fitErr": 0.00259,
+          "totalExp": 2.05,
+          "referenceFirstHalfProb": 0.36,
+          "referenceDrawProb": 0.48,
+          "referenceSecondHalfProb": 0.16,
+          "reason": "Expected 2.0 goals, split 0.8 in the 1st half vs 1.2 in the 2nd. The 2nd half wins the half race 45% of the time, 19% clear of the other half."
         },
         "preview": null,
         "form": {
-          "home": "WLLLWW",
-          "away": "DLWDDW"
+          "home": "WWWWWW",
+          "away": "LLWWDW"
         },
         "h2h": {
           "wins": {
-            "home": 1,
+            "home": 4,
             "away": 0
           },
-          "meets": 1
+          "meets": 5
         }
-      }
-    ],
-    "2026-09-23": [
+      },
       {
         "matchId": "2554088",
         "home": "Kashima Antlers",
@@ -1622,10 +1729,10 @@
           },
           "h2h": {
             "wins": {
-              "home": 2,
-              "away": 0
+              "home": 3,
+              "away": 1
             },
-            "meets": 2
+            "meets": 4
           },
           "expGoals": null
         },
@@ -1634,11 +1741,11 @@
         "team": "Chachoengsao",
         "teamScoreProb": 78.6,
         "winProb": null,
-        "mustScore": 50,
+        "mustScore": 55,
         "mustScoreBreakdown": {
           "model": 40,
           "form": 0,
-          "h2h": 10
+          "h2h": 15
         },
         "locked": false,
         "estimatedOdd": 1.27,
@@ -1693,115 +1800,115 @@
         },
         "h2h": {
           "wins": {
-            "home": 2,
-            "away": 0
+            "home": 3,
+            "away": 1
           },
-          "meets": 2
+          "meets": 4
         }
       },
       {
-        "matchId": "2554086",
-        "home": "Vissel Kobe",
-        "away": "Sagan Tosu",
-        "league": "JpC",
+        "matchId": "2520448",
+        "home": "Nevesinje",
+        "away": "Zvijezda 09",
+        "league": "Ba3",
         "time": "",
         "probs": {
-          "home": 53,
-          "draw": 27,
-          "away": 20
+          "home": 48,
+          "draw": 22,
+          "away": 30
         },
         "predictionText": "1",
-        "avgGoals": 2.05,
+        "avgGoals": 3.85,
         "avgOdds": {
           "home": null,
           "draw": null,
           "away": null
         },
-        "matchUrl": "vissel-kobe-sagan-tosu-2554086",
+        "matchUrl": "nevesinje-zvijezda-09-2520448",
         "detail": {
           "books": [],
           "previewText": "",
           "form": {
-            "homeForm": "WWWWWW",
-            "awayForm": "LLWWDW",
-            "homeRecently": 100,
-            "awayRecently": 50
+            "homeForm": "LWDLLD",
+            "awayForm": "LLLLWL",
+            "homeRecently": 17,
+            "awayRecently": 17
           },
           "h2h": {
             "wins": {
-              "home": 4,
-              "away": 0
+              "home": 2,
+              "away": 3
             },
             "meets": 5
           },
           "expGoals": null
         },
         "market": "team-to-score",
-        "pick": "home",
-        "team": "Vissel Kobe",
-        "teamScoreProb": 77.5,
+        "pick": "away",
+        "team": "Zvijezda 09",
+        "teamScoreProb": 77.2,
         "winProb": null,
-        "mustScore": 95,
+        "mustScore": 55,
         "mustScoreBreakdown": {
           "model": 40,
-          "form": 35,
-          "h2h": 20
+          "form": 0,
+          "h2h": 15
         },
         "locked": false,
         "estimatedOdd": 1.29,
-        "confidence": 78,
+        "confidence": 77,
         "edge": null,
         "bestOdds": null,
         "marketPick": null,
         "margin": null,
         "passesGate": true,
         "expGoals": {
-          "home": 1.49,
-          "away": 0.56
+          "home": 2.37,
+          "away": 1.48
         },
         "teamScoreProps": [
           {
             "market": "team-to-score",
             "side": "home",
             "team": "home",
-            "prob": 77.5,
-            "estimatedOdd": 1.29
+            "prob": 90.7,
+            "estimatedOdd": 1.1
           },
           {
             "market": "team-to-score",
             "side": "away",
             "team": "away",
-            "prob": 42.9,
-            "estimatedOdd": 2.33
+            "prob": 77.2,
+            "estimatedOdd": 1.29
           }
         ],
         "hsh": {
           "pick": "2H",
           "label": "2nd Half",
-          "prob": 0.447,
-          "margin": 0.19,
-          "firstHalfShare": 0.41,
-          "firstHalfExp": 0.84,
-          "secondHalfExp": 1.21,
-          "p1": 0.257,
-          "p2": 0.447,
-          "tie": 0.297,
-          "fitErr": 0.00259,
-          "totalExp": 2.05,
-          "referenceFirstHalfProb": 0.36,
-          "referenceDrawProb": 0.48,
-          "referenceSecondHalfProb": 0.16,
-          "reason": "Expected 2.0 goals, split 0.8 in the 1st half vs 1.2 in the 2nd. The 2nd half wins the half race 45% of the time, 19% clear of the other half."
+          "prob": 0.767,
+          "margin": 0.671,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.96,
+          "secondHalfExp": 2.89,
+          "p1": 0.096,
+          "p2": 0.767,
+          "tie": 0.137,
+          "fitErr": 0.02368,
+          "totalExp": 3.85,
+          "referenceFirstHalfProb": 0.25,
+          "referenceDrawProb": 0.44,
+          "referenceSecondHalfProb": 0.31,
+          "reason": "Expected 3.9 goals, split 1.0 in the 1st half vs 2.9 in the 2nd. The 2nd half wins the half race 77% of the time, 67% clear of the other half."
         },
         "preview": null,
         "form": {
-          "home": "WWWWWW",
-          "away": "LLWWDW"
+          "home": "LWDLLD",
+          "away": "LLLLWL"
         },
         "h2h": {
           "wins": {
-            "home": 4,
-            "away": 0
+            "home": 2,
+            "away": 3
           },
           "meets": 5
         }
@@ -1902,113 +2009,6 @@
         "h2h": null
       },
       {
-        "matchId": "2554087",
-        "home": "Gamba Osaka",
-        "away": "Tokushima Vortis",
-        "league": "JpC",
-        "time": "",
-        "probs": {
-          "home": 41,
-          "draw": 30,
-          "away": 29
-        },
-        "predictionText": "1",
-        "avgGoals": 2.41,
-        "avgOdds": {
-          "home": null,
-          "draw": null,
-          "away": null
-        },
-        "matchUrl": "gamba-osaka-tokushima-vortis-2554087",
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "LWLLDD",
-            "awayForm": "WLWDWW",
-            "homeRecently": 17,
-            "awayRecently": 67
-          },
-          "h2h": {
-            "wins": {
-              "home": 5,
-              "away": 0
-            },
-            "meets": 5
-          },
-          "expGoals": null
-        },
-        "market": "team-to-score",
-        "pick": "home",
-        "team": "Gamba Osaka",
-        "teamScoreProb": 75.6,
-        "winProb": null,
-        "mustScore": 65,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 0,
-          "h2h": 25
-        },
-        "locked": false,
-        "estimatedOdd": 1.32,
-        "confidence": 76,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 1.41,
-          "away": 1
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 75.6,
-            "estimatedOdd": 1.32
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 63.2,
-            "estimatedOdd": 1.58
-          }
-        ],
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.409,
-          "margin": 0.093,
-          "firstHalfShare": 0.46,
-          "firstHalfExp": 1.11,
-          "secondHalfExp": 1.3,
-          "p1": 0.316,
-          "p2": 0.409,
-          "tie": 0.274,
-          "fitErr": 0.00059,
-          "totalExp": 2.41,
-          "referenceFirstHalfProb": 0.33,
-          "referenceDrawProb": 0.43,
-          "referenceSecondHalfProb": 0.24,
-          "reason": "Expected 2.4 goals, split 1.1 in the 1st half vs 1.3 in the 2nd. The 2nd half wins the half race 41% of the time, 9% clear of the other half."
-        },
-        "preview": null,
-        "form": {
-          "home": "LWLLDD",
-          "away": "WLWDWW"
-        },
-        "h2h": {
-          "wins": {
-            "home": 5,
-            "away": 0
-          },
-          "meets": 5
-        }
-      },
-      {
         "matchId": "2530797",
         "home": "Odorheiu",
         "away": "Aerostar",
@@ -2039,9 +2039,9 @@
           "h2h": {
             "wins": {
               "home": 2,
-              "away": 1
+              "away": 2
             },
-            "meets": 4
+            "meets": 5
           },
           "expGoals": null
         },
@@ -2050,11 +2050,11 @@
         "team": "Aerostar",
         "teamScoreProb": 76.3,
         "winProb": null,
-        "mustScore": 55,
+        "mustScore": 60,
         "mustScoreBreakdown": {
           "model": 40,
           "form": 10,
-          "h2h": 5
+          "h2h": 10
         },
         "locked": false,
         "estimatedOdd": 1.31,
@@ -2110,9 +2110,9 @@
         "h2h": {
           "wins": {
             "home": 2,
-            "away": 1
+            "away": 2
           },
-          "meets": 4
+          "meets": 5
         }
       },
       {
@@ -2240,10 +2240,10 @@
           },
           "h2h": {
             "wins": {
-              "home": 0,
+              "home": 1,
               "away": 1
             },
-            "meets": 1
+            "meets": 2
           },
           "expGoals": null
         },
@@ -2294,10 +2294,10 @@
         },
         "h2h": {
           "wins": {
-            "home": 0,
+            "home": 1,
             "away": 1
           },
-          "meets": 1
+          "meets": 2
         }
       },
       {
@@ -2330,10 +2330,10 @@
           },
           "h2h": {
             "wins": {
-              "home": 1,
+              "home": 2,
               "away": 0
             },
-            "meets": 1
+            "meets": 2
           },
           "expGoals": null
         },
@@ -2342,11 +2342,11 @@
         "team": "Khon Kaen United",
         "teamScoreProb": 70.5,
         "winProb": null,
-        "mustScore": 72,
+        "mustScore": 77,
         "mustScoreBreakdown": {
           "model": 40,
           "form": 27,
-          "h2h": 5
+          "h2h": 10
         },
         "locked": false,
         "estimatedOdd": 1.42,
@@ -2401,10 +2401,10 @@
         },
         "h2h": {
           "wins": {
-            "home": 1,
+            "home": 2,
             "away": 0
           },
-          "meets": 1
+          "meets": 2
         }
       },
       {
@@ -2437,7 +2437,7 @@
           },
           "h2h": {
             "wins": {
-              "home": 5,
+              "home": 4,
               "away": 0
             },
             "meets": 5
@@ -2449,11 +2449,11 @@
         "team": "Ind Santa Fe",
         "teamScoreProb": 69.9,
         "winProb": null,
-        "mustScore": 75,
+        "mustScore": 70,
         "mustScoreBreakdown": {
           "model": 40,
           "form": 10,
-          "h2h": 25
+          "h2h": 20
         },
         "locked": false,
         "estimatedOdd": 1.43,
@@ -2508,7 +2508,7 @@
         },
         "h2h": {
           "wins": {
-            "home": 5,
+            "home": 4,
             "away": 0
           },
           "meets": 5
@@ -2700,6 +2700,113 @@
         "h2h": null
       },
       {
+        "matchId": "2511631",
+        "home": "Sloga Pozega",
+        "away": "Real Podunavci",
+        "league": "Rs3",
+        "time": "",
+        "probs": {
+          "home": 42,
+          "draw": 30,
+          "away": 28
+        },
+        "predictionText": "1",
+        "avgGoals": 2.83,
+        "avgOdds": {
+          "home": null,
+          "draw": null,
+          "away": null
+        },
+        "matchUrl": "sloga-pozega-real-podunavci-2511631",
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "DLLDWL",
+            "awayForm": "WLLLWD",
+            "homeRecently": 17,
+            "awayRecently": 33
+          },
+          "h2h": {
+            "wins": {
+              "home": 2,
+              "away": 3
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "Real Podunavci",
+        "teamScoreProb": 67.7,
+        "winProb": null,
+        "mustScore": 53,
+        "mustScoreBreakdown": {
+          "model": 38,
+          "form": 0,
+          "h2h": 15
+        },
+        "locked": false,
+        "estimatedOdd": 1.48,
+        "confidence": 68,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.7,
+          "away": 1.13
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 81.7,
+            "estimatedOdd": 1.22
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 67.7,
+            "estimatedOdd": 1.48
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.701,
+          "margin": 0.59,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.71,
+          "secondHalfExp": 2.12,
+          "p1": 0.112,
+          "p2": 0.701,
+          "tie": 0.187,
+          "fitErr": 0.01239,
+          "totalExp": 2.83,
+          "referenceFirstHalfProb": 0.33,
+          "referenceDrawProb": 0.59,
+          "referenceSecondHalfProb": 0.08,
+          "reason": "Expected 2.8 goals, split 0.7 in the 1st half vs 2.1 in the 2nd. The 2nd half wins the half race 70% of the time, 59% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "DLLDWL",
+          "away": "WLLLWD"
+        },
+        "h2h": {
+          "wins": {
+            "home": 2,
+            "away": 3
+          },
+          "meets": 5
+        }
+      },
+      {
         "matchId": "2520447",
         "home": "FK Slavija",
         "away": "Kozara Gradiska",
@@ -2807,113 +2914,6 @@
         }
       },
       {
-        "matchId": "2537394",
-        "home": "Nakhon Si United",
-        "away": "Kasetsart FC",
-        "league": "ThC",
-        "time": "",
-        "probs": {
-          "home": 31,
-          "draw": 39,
-          "away": 30
-        },
-        "predictionText": "X",
-        "avgGoals": 2.16,
-        "avgOdds": {
-          "home": 1.95,
-          "draw": 3.25,
-          "away": 3.4
-        },
-        "matchUrl": "nakhon-si-united-kasetsart-fc-2537394",
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "DDWDWL",
-            "awayForm": "DLLLLL",
-            "homeRecently": 33,
-            "awayRecently": 0
-          },
-          "h2h": {
-            "wins": {
-              "home": 3,
-              "away": 0
-            },
-            "meets": 4
-          },
-          "expGoals": null
-        },
-        "market": "team-to-score",
-        "pick": "home",
-        "team": "Nakhon Si United",
-        "teamScoreProb": 66.7,
-        "winProb": null,
-        "mustScore": 52,
-        "mustScoreBreakdown": {
-          "model": 37,
-          "form": 0,
-          "h2h": 15
-        },
-        "locked": false,
-        "estimatedOdd": 1.5,
-        "confidence": 67,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 1.1,
-          "away": 1.06
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 66.7,
-            "estimatedOdd": 1.5
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 65.4,
-            "estimatedOdd": 1.53
-          }
-        ],
-        "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.364,
-          "margin": 0.022,
-          "firstHalfShare": 0.51,
-          "firstHalfExp": 1.1,
-          "secondHalfExp": 1.06,
-          "p1": 0.364,
-          "p2": 0.342,
-          "tie": 0.294,
-          "fitErr": 0.00036,
-          "totalExp": 2.16,
-          "referenceFirstHalfProb": 0.3,
-          "referenceDrawProb": 0.44,
-          "referenceSecondHalfProb": 0.26,
-          "reason": "Expected 2.2 goals, split 1.1 in the 1st half vs 1.1 in the 2nd. The 1st half wins the half race 36% of the time, 2% clear of the other half."
-        },
-        "preview": null,
-        "form": {
-          "home": "DDWDWL",
-          "away": "DLLLLL"
-        },
-        "h2h": {
-          "wins": {
-            "home": 3,
-            "away": 0
-          },
-          "meets": 4
-        }
-      },
-      {
         "matchId": "2511630",
         "home": "Radnicki Valjevo",
         "away": "Zlatibor Cajetina",
@@ -2944,9 +2944,9 @@
           "h2h": {
             "wins": {
               "home": 1,
-              "away": 0
+              "away": 1
             },
-            "meets": 1
+            "meets": 2
           },
           "expGoals": null
         },
@@ -3015,14 +3015,14 @@
         "h2h": {
           "wins": {
             "home": 1,
-            "away": 0
+            "away": 1
           },
-          "meets": 1
+          "meets": 2
         }
       }
     ]
   },
-  "lastFetch": "2026-09-22T13:40:45.060Z",
+  "lastFetch": "2026-09-22T14:12:42.824Z",
   "meta": {
     "markets": [
       "match-winner",
@@ -3031,6 +3031,8 @@
     "winCertMinProb": 0.35,
     "minTeamScoreProb": 0.62,
     "mustScoreMin": 50,
-    "maxTips": 15
+    "maxTips": 15,
+    "perfectFormPct": 80,
+    "perfectH2hPct": 0.8
   }
 }
