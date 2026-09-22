@@ -24,6 +24,7 @@ const { getOddsComparison } = require('../services/oddsComparison');
 const { optionalAuth, requireAuth, requirePro: requireProMiddleware, requireAdmin, logAdminAction } = require('../middleware/auth');
 const payment = require('../services/payment');
 const whop = require('../services/whop');
+const paypal = require('../services/paypal');
 
 // Active payment provider: set PAYMENT_PROVIDER=whop to route the existing
 // /api/checkout, /api/portal and /api/subscription/cancel endpoints to Whop
@@ -33,7 +34,7 @@ function activePayment() {
 }
 
 // Resolve the payment provider that actually owns a subscription, by looking
-// up the matching payments row (payment_method='whop' | 'lemonsqueezy').
+// up the matching payments row (payment_method='whop' | 'lemonsqueezy' | 'paypal').
 // Falls back to PAYMENT_PROVIDER so admin-/lifetime-created or legacy rows
 // without a payment still behave correctly.
 async function providerForPaymentId(paymentId) {
@@ -43,6 +44,7 @@ async function providerForPaymentId(paymentId) {
         .eq('provider_payment_id', paymentId).limit(1).maybeSingle();
       if (pay.data && pay.data.payment_method === 'whop') return whop;
       if (pay.data && pay.data.payment_method === 'lemonsqueezy') return payment;
+      if (pay.data && pay.data.payment_method === 'paypal') return paypal;
     }
   } catch (e) {}
   return activePayment();
@@ -1417,6 +1419,78 @@ router.post('/checkout', requireAuth, async function (req, res) {
     console.error('[checkout] Failed:', e.message);
     res.status(500).json({ error: 'Failed to create checkout. ' + e.message });
   }
+});
+
+// GET /api/paypal/config — public PayPal SDK settings (client id only, no secrets)
+router.get('/paypal/config', function (req, res) {
+  res.json({
+    enabled: !!(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_SECRET),
+    clientId: process.env.PAYPAL_CLIENT_ID || null,
+    mode: process.env.PAYPAL_MODE === 'sandbox' ? 'sandbox' : 'live'
+  });
+});
+
+// POST /api/paypal/checkout — create a PayPal order for the signed-in user
+router.post('/paypal/checkout', requireAuth, async function (req, res) {
+  try {
+    var planType = req.body.planType;
+    var returnUrl = req.body.returnUrl || 'https://winfulltime.com/account.html';
+    if (!paypal.PLANS[planType]) {
+      return res.status(400).json({ error: 'Invalid plan. Choose: ' + Object.keys(paypal.PLANS).join(', ') });
+    }
+    var result = await paypal.createCheckout({
+      userId: req.user.id,
+      email: req.user.email,
+      planType: planType,
+      returnUrl: returnUrl
+    });
+    res.json(result);
+  } catch (e) {
+    console.error('[paypal-checkout] Failed:', e.message);
+    res.status(500).json({ error: 'Failed to create PayPal checkout. ' + e.message });
+  }
+});
+
+// POST /api/webhook/paypal — PayPal webhook (verify-webhook-signature, raw body)
+router.post('/webhook/paypal', function (req, res) {
+  console.log('[paypal-webhook] Received event');
+  var rawBody = req.rawBody || JSON.stringify(req.body);
+  var headers = req.headers;
+
+  paypal.verifyWebhook({ rawBody: rawBody, headers: headers }).then(function (verified) {
+    if (!verified) {
+      console.warn('[paypal-webhook] Signature verification failed');
+      return res.status(400).json({ error: 'Invalid signature' });
+    }
+
+    if (!supabase) return res.status(503).json({ error: 'Database not configured' });
+
+    var event = typeof req.body === 'object' ? req.body : JSON.parse(rawBody);
+    var resource = event.resource || {};
+    var eventId = String(resource.id || event.id || 'unknown');
+    var eventName = event.event_type || 'unknown';
+
+    supabase.from('payment_events').select('provider, event_id').eq('provider', 'paypal').eq('event_id', eventId).single()
+      .then(function (existing) {
+        if (existing.data) {
+          console.log('[paypal-webhook] Duplicate event ignored:', eventId);
+          return res.json({ received: true, duplicate: true });
+        }
+
+        return supabase.from('payment_events').insert({ provider: 'paypal', event_id: eventId }).then(function () {
+          return paypal.handleEvent(event).then(function (result) {
+            console.log('[paypal-webhook] Processed event:', eventName, JSON.stringify(result));
+            res.json({ received: true, handled: true });
+          });
+        });
+      }).catch(function (err) {
+        console.error('[paypal-webhook] Error:', err.message);
+        res.status(500).json({ error: 'Webhook processing failed' });
+      });
+  }).catch(function (err) {
+    console.error('[paypal-webhook] Verification error:', err.message);
+    res.status(400).json({ error: 'Webhook verification failed' });
+  });
 });
 
 // POST /api/webhook/payment — Lemon Squeezy webhook (raw body)

@@ -227,6 +227,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
         <li>Priority support</li>
       </ul>
       <button class="btn-subscribe" onclick="handleSubscribe('monthly')">Subscribe</button>
+      <div id="paypal-monthly-btn" style="margin-top:10px"></div>
     </div>
     <div class="pricing-card featured" id="yearly-card">
       <h3>Pro Yearly</h3>
@@ -240,6 +241,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
         <li>Priority support</li>
       </ul>
       <button class="btn-subscribe" onclick="handleSubscribe('yearly')">Subscribe</button>
+      <div id="paypal-yearly-btn" style="margin-top:10px"></div>
     </div>
   </div>
 </div>
@@ -254,7 +256,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   <div class="faq-item"><summary>Is there a refund policy?</summary>
     <p>We offer a 7-day money-back guarantee on all plans. Contact our support team for assistance.</p></div>
   <div class="faq-item"><summary>How do payments work?</summary>
-    <p>Payments are processed securely through Whop. Your subscription automatically renews unless cancelled.</p></div>
+    <p>Payments are processed securely through Whop or PayPal. Whop subscriptions auto-renew unless cancelled; PayPal is a one-time payment for the chosen period (renew manually when it ends).</p></div>
 </div>
 <script src="/config.js"></script>
 <script src="/supabase-client.js"></script>
@@ -292,6 +294,56 @@ function handleSubscribe(planType) {
     showAlert(err.message || 'An error occurred', 'error');
   });
 }
+
+// Official PayPal buttons on the paid cards. The SDK loads only when the API
+// reports credentials are configured; until then the cards simply show the
+// existing Whop/checkout Subscribe button.
+function initPayPalButtons() {
+  fetch((window.WFT_API || '') + '/api/paypal/config').then(function (r) { return r.json(); }).then(function (cfg) {
+    if (!cfg || !cfg.enabled || !cfg.clientId) return;
+    var s = document.createElement('script');
+    s.src = 'https://www.paypal.com/sdk/js?client-id=' + encodeURIComponent(cfg.clientId) + '&currency=USD&intent=CAPTURE';
+    s.onload = function () {
+      if (!window.paypal || !window.paypal.Buttons) return;
+      ['monthly', 'yearly'].forEach(function (planType) {
+        var el = document.getElementById('paypal-' + planType + '-btn');
+        if (!el) return;
+        window.paypal.Buttons({
+          style: { shape: 'rect', color: 'gold', label: 'paypal', height: 37 },
+          createOrder: function () {
+            var user = window.WFT.getUser && window.WFT.getUser();
+            if (!user) {
+              showAlert('Sign in or create a free account first, then pay with PayPal.', 'error');
+              window.location.href = '/signup.html';
+              return Promise.reject(new Error('Sign in required'));
+            }
+            return window.WFT.apiFetch('/api/paypal/checkout', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ planType: planType, returnUrl: 'https://winfulltime.com/account.html' })
+            }).then(function (data) {
+              if (!data || !data.orderId) throw new Error((data && data.error) || 'Failed to start PayPal checkout');
+              return data.orderId;
+            });
+          },
+          onApprove: function (data, actions) {
+            return actions.order.capture().then(function () {
+              window.location.href = 'https://winfulltime.com/account.html';
+            });
+          },
+          onError: function (err) {
+            showAlert('PayPal checkout failed: ' + (err && err.message ? err.message : 'please try again'), 'error');
+          }
+        }).render(el);
+      });
+    };
+    s.onerror = function () {
+      console.warn('[paypal] SDK failed to load');
+    };
+    document.head.appendChild(s);
+  }).catch(function () {});
+}
+initPayPalButtons();
 
 window.WFT.onAuthReady(function (user) {
   if (!user) return;
