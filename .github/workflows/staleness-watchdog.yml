@@ -28,6 +28,7 @@ jobs:
           node <<'EOF' > watchdog-output.txt
           const https = require('https');
 
+          (async () => {
           const get = (url) => new Promise((resolve, reject) => {
             https.get(url, { headers: { 'User-Agent': 'winfulltime-watchdog/1.0 (github-actions)' } }, (res) => {
               let body = '';
@@ -70,6 +71,7 @@ jobs:
           console.log(`COMMITTED_HAS_TODAY=${hasCommitted}`);
           console.log(`DEPLOYED_HAS_TODAY=${hasDeployed}`);
           console.log(`STATE=${state}`);
+          })().catch((e) => { console.error('watchdog crashed:', e); process.exit(1); });
           EOF
           cat watchdog-output.txt
           grep -q '^STATE=ok$' watchdog-output.txt && echo "state=ok" >> "$GITHUB_OUTPUT" || echo "state=needs-attention" >> "$GITHUB_OUTPUT"
@@ -122,8 +124,10 @@ jobs:
       - name: Detect stale committed VIP cache and alert
         id: check
         run: |
-          node <<'EOF' > watchdog-vip-output.txt
+node <<'EOF' > watchdog-vip-output.txt
           const https = require('https');
+
+          (async () => {
           const get = (url) => new Promise((resolve, reject) => {
             https.get(url, { headers: { 'User-Agent': 'winfulltime-watchdog/1.0 (github-actions)' } }, (res) => {
               let body = '';
@@ -155,6 +159,7 @@ jobs:
           console.log(`HAS_TODAY=${!!hasToday}`);
           console.log(`HAS_TOMORROW=${!!hasTomorrow}`);
           console.log(`STATE=${state}`);
+          })().catch((e) => { console.error('watchdog crashed:', e); process.exit(1); });
           EOF
           cat watchdog-vip-output.txt
           grep '^STATE=' watchdog-vip-output.txt >> "$GITHUB_OUTPUT"
