@@ -26,7 +26,7 @@
 //      only when all of the following hold:
 //      - the fair price from the Poisson split is STRICTLY above
 //        MIN_TEAM_SCORE_ODD (default 1.25), and
-//      - the model's scoring probability is >= TTS_MIN_PROB (55%), and
+//      - the model's scoring probability is >= TTS_MIN_PROB (62%), and
 //      - the must-score composite clears MUST_SCORE_MIN: history
 //        (expected-goal scoring model, max 40) + recent form win rate
 //        (max 35) + head-to-head record (max 25). When detail pages were not
@@ -174,9 +174,9 @@ const HSH_SHARE_MAX = envNumber('HSH_SHARE_MAX', 0.65, 0.1, 0.9);
 const HSH_MARGIN_MIN = envNumber('HSH_MARGIN_MIN', 0.05, 0.01, 0.5);
 const HSH_MIN_GOALS = envNumber('HSH_MIN_GOALS', 2.2, 0.5, 8);
 // Team-to-score is a VIP market. A team's scoring probability must clear
-// this floor to be published as a VIP tip (default 55%, matching the gate the
-// old 1X2 confidence used).
-const TTS_MIN_PROB = envNumber('TTS_MIN_PROB', 0.55, 0.05, 0.95);
+// this floor to be published as a VIP tip (default 62% - quality over
+// quantity: the feed prefers fewer, stronger calls).
+const TTS_MIN_PROB = envNumber('TTS_MIN_PROB', 0.62, 0.05, 0.95);
 // The fair price of a team-to-score call must be STRICTLY above this floor
 // (default 1.25). Below it the pick is an uninteresting ultra-short price that
 // pays next to nothing for a near-certainty.
@@ -185,8 +185,9 @@ const MIN_TEAM_SCORE_ODD = envNumber('TTS_MIN_ODD', 1.25, 1.05, 10);
 // history-backed expected-goals scoring probability (max 40), the picked
 // side's recent-form win rate (max 35) and head-to-head support (max 25). A
 // tip only publishes when detail records (form/H2H) are available and the
-// composite clears this floor.
-const MUST_SCORE_MIN = envNumber('TTS_MUST_SCORE_MIN', 45, 0, 160);
+// composite clears this floor (default 50 - a bit more record support than
+// before the quality tightening; the prob floor already lifts modelPts).
+const MUST_SCORE_MIN = envNumber('TTS_MUST_SCORE_MIN', 50, 0, 160);
 // Fallback for fixtures whose detail page was not scraped (enrichment skipped
 // or timed out): the history-backed scoring probability alone must clear this
 // higher bar, so strong calls survive a barren detail day but weak ones never
@@ -207,6 +208,11 @@ const TTS_LOCK_MIN_ODD = envNumber('TTS_LOCK_MIN_ODD', 1.01, 1.01, 10);
 // near-perfect side only has to clear this light floor - the records carry the
 // tip, the model merely guards against a side the model firmly expects to lose.
 const TTS_WIN_CERT_MIN_PROB = envNumber('TTS_WIN_CERT_MIN_PROB', 0.35, 0.1, 0.95);
+// Hard per-day ceiling on published VIP tips (mirrors HSH_MAX_PICKS). The
+// scrape sorts qualified picks (locked certs first, then confidence/must-score)
+// and stores only the top VIP_MAX_TIPS per date. HSH picks are selected from
+// the full fixture list separately, so this cap never starves the free market.
+const VIP_MAX_TIPS = envNumber('VIP_MAX_TIPS', 15, 1, 200);
 const SCRAPE_TIMEOUT_MS = 25000;
 // Per-fixture detail pages add the form/H2H records the must-score gate now
 // needs, but cost one browser navigation each, which is slow against Forebet's
@@ -1212,6 +1218,7 @@ module.exports = {
   TTS_LOCK_MIN_PROB,
   TTS_LOCK_MIN_ODD,
   TTS_WIN_CERT_MIN_PROB,
+  VIP_MAX_TIPS,
   h2hMeetsFor,
   estimateMatchExpGoals,
   HSH_MIN_PROB,

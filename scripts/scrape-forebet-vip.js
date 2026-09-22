@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { scrapeVip, closeVipBrowser, selectHshPicks, HSH_MIN_PROB, HSH_MAX_PICKS, HSH_MARGIN_MIN, HSH_MIN_GOALS, HSH_SHARE_PRIOR, HSH_SHARE_REG, TTS_MIN_PROB, MUST_SCORE_MIN, TTS_WIN_CERT_MIN_PROB } = require('../src/services/forebetVip');
+const { scrapeVip, closeVipBrowser, selectHshPicks, HSH_MIN_PROB, HSH_MAX_PICKS, HSH_MARGIN_MIN, HSH_MIN_GOALS, HSH_SHARE_PRIOR, HSH_SHARE_REG, TTS_MIN_PROB, MUST_SCORE_MIN, TTS_WIN_CERT_MIN_PROB, VIP_MAX_TIPS } = require('../src/services/forebetVip');
 const { lagosDate } = require('../src/utils/dates');
 
 const CACHE_FILE = path.join(process.cwd(), 'forebet-vip-cache.json');
@@ -56,12 +56,18 @@ async function main() {
         ((existingHsh && existingHsh.length) || 0) + ' HSH picks');
       continue;
     }
-    // Strongest calls first so the API/page show the best value at the top.
-    const gated = matches
+    // Strongest calls first so the API/page show the best value at the top:
+    // record certs (locked) lead, then confidence, then must-score. Quality
+    // over quantity - store at most VIP_MAX_TIPS per day. HSH is selected from
+    // the full fixture list below, unaffected by this VIP cap.
+    const qualified = matches
       .filter(m => m.passesGate)
-      .sort((a, b) => (b.confidence - a.confidence) || (b.mustScore - a.mustScore));
+      .sort((a, b) => ((b.locked ? 1 : 0) - (a.locked ? 1 : 0)) || (b.confidence - a.confidence) || (b.mustScore - a.mustScore));
+    const gated = qualified.slice(0, VIP_MAX_TIPS);
     const hshPicks = selectHshPicks(matches);
-    console.log(date + ': ' + matches.length + ' fixtures, ' + gated.length + ' pass the confidence gate, ' + hshPicks.length + ' highest-scoring-half picks');
+    console.log(date + ': ' + matches.length + ' fixtures, ' + qualified.length + ' pass the confidence gate' +
+      (qualified.length > VIP_MAX_TIPS ? ' (capped to top ' + VIP_MAX_TIPS + ')' : '') +
+      ', ' + hshPicks.length + ' highest-scoring-half picks');
     // On a successful (non-empty) scrape the result is authoritative: an empty
     // selection legitimately means "no picks today", for both markets.
     cache.dates[date] = gated;
@@ -81,7 +87,8 @@ async function main() {
     markets: ['match-winner', 'team-to-score'],
     winCertMinProb: TTS_WIN_CERT_MIN_PROB,
     minTeamScoreProb: TTS_MIN_PROB,
-    mustScoreMin: MUST_SCORE_MIN
+    mustScoreMin: MUST_SCORE_MIN,
+    maxTips: VIP_MAX_TIPS
   };
   fs.writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2));
   console.log('Saved ' + CACHE_FILE);
@@ -102,7 +109,7 @@ async function main() {
   console.log('Saved ' + HSH_STATIC_FILE);
 
   const total = Object.values(cache.dates || {}).reduce((s, m) => s + m.length, 0);
-  console.log('\n=== VIP PICKS (match-winner record certs + team-to-score, score prob >= ' + TTS_MIN_PROB + ', must-score >= ' + MUST_SCORE_MIN + '/100) ===');
+  console.log('\n=== VIP PICKS (match-winner record certs + team-to-score, score prob >= ' + TTS_MIN_PROB + ', must-score >= ' + MUST_SCORE_MIN + '/100, max ' + VIP_MAX_TIPS + '/day) ===');
   console.log('Total VIP tips cached: ' + total);
   for (const [date, matches] of Object.entries(cache.dates || {})) {
     console.log('\n--- ' + date + ' (' + matches.length + ') ---');

@@ -149,7 +149,24 @@
             "estimatedOdd": 1.23
           }
         ],
-        "hsh": null,
+        "hsh": {
+          "pick": "1H",
+          "label": "1st Half",
+          "prob": 0.537,
+          "margin": 0.294,
+          "firstHalfShare": 0.61,
+          "firstHalfExp": 1.94,
+          "secondHalfExp": 1.24,
+          "p1": 0.537,
+          "p2": 0.243,
+          "tie": 0.221,
+          "fitErr": 0.00672,
+          "totalExp": 3.18,
+          "referenceFirstHalfProb": 0.25,
+          "referenceDrawProb": 0.32,
+          "referenceSecondHalfProb": 0.43,
+          "reason": "Expected 3.2 goals, split 1.9 in the 1st half vs 1.2 in the 2nd. The 1st half wins the half race 54% of the time, 29% clear of the other half."
+        },
         "preview": null,
         "form": {
           "home": "WWWWWW",
@@ -227,13 +244,120 @@
             "estimatedOdd": 1.31
           }
         ],
-        "hsh": null,
+        "hsh": {
+          "pick": "1H",
+          "label": "1st Half",
+          "prob": 0.566,
+          "margin": 0.365,
+          "firstHalfShare": 0.65,
+          "firstHalfExp": 1.77,
+          "secondHalfExp": 0.96,
+          "p1": 0.566,
+          "p2": 0.201,
+          "tie": 0.233,
+          "fitErr": 0.00159,
+          "totalExp": 2.73,
+          "referenceFirstHalfProb": 0.28,
+          "referenceDrawProb": 0.33,
+          "referenceSecondHalfProb": 0.39,
+          "reason": "Expected 2.7 goals, split 1.8 in the 1st half vs 1.0 in the 2nd. The 1st half wins the half race 57% of the time, 37% clear of the other half."
+        },
         "preview": null,
         "form": {
           "home": "WLLDWW",
           "away": "WWWDWW"
         },
         "h2h": null
+      },
+      {
+        "matchId": "2554072",
+        "home": "Husqvarna W",
+        "away": "Växjö W",
+        "league": "SeCW",
+        "time": "",
+        "probs": {
+          "home": 29,
+          "draw": 27,
+          "away": 44
+        },
+        "predictionText": "2",
+        "avgGoals": 2.39,
+        "avgOdds": {
+          "home": 5.5,
+          "draw": 5.25,
+          "away": 1.36
+        },
+        "matchUrl": "husqvarna-w-växjö-w-2554072",
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "LWLWWW",
+            "awayForm": "DLLLWL",
+            "homeRecently": 67,
+            "awayRecently": 17
+          },
+          "h2h": {
+            "wins": {
+              "home": 0,
+              "away": 2
+            },
+            "meets": 2
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "Växjö W",
+        "teamScoreProb": 76.3,
+        "winProb": null,
+        "mustScore": 50,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 0,
+          "h2h": 10
+        },
+        "locked": false,
+        "estimatedOdd": 1.31,
+        "confidence": 76,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 0.95,
+          "away": 1.44
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 61.3,
+            "estimatedOdd": 1.63
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 76.3,
+            "estimatedOdd": 1.31
+          }
+        ],
+        "hsh": null,
+        "preview": null,
+        "form": {
+          "home": "LWLWWW",
+          "away": "DLLLWL"
+        },
+        "h2h": {
+          "wins": {
+            "home": 0,
+            "away": 2
+          },
+          "meets": 2
+        }
       },
       {
         "matchId": "2531271",
@@ -1358,675 +1482,6 @@
           },
           "meets": 1
         }
-      },
-      {
-        "matchId": "2531801",
-        "home": "Unirea Alba Iulia",
-        "away": "Timişul Şag",
-        "league": "Ro3",
-        "time": "",
-        "probs": {
-          "home": 45,
-          "draw": 25,
-          "away": 30
-        },
-        "predictionText": "1",
-        "avgGoals": 2.75,
-        "avgOdds": {
-          "home": null,
-          "draw": null,
-          "away": null
-        },
-        "matchUrl": "unirea-alba-iulia-timişul-Şag-2531801",
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "DDLWLW",
-            "awayForm": "WWDWLW",
-            "homeRecently": 33,
-            "awayRecently": 67
-          },
-          "h2h": {
-            "wins": {
-              "home": 1,
-              "away": 0
-            },
-            "meets": 1
-          },
-          "expGoals": null
-        },
-        "market": "team-to-score",
-        "pick": "away",
-        "team": "Timişul Şag",
-        "teamScoreProb": 66.7,
-        "winProb": null,
-        "mustScore": 64,
-        "mustScoreBreakdown": {
-          "model": 37,
-          "form": 27,
-          "h2h": 0
-        },
-        "locked": false,
-        "estimatedOdd": 1.5,
-        "confidence": 67,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 1.65,
-          "away": 1.1
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 80.8,
-            "estimatedOdd": 1.24
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 66.7,
-            "estimatedOdd": 1.5
-          }
-        ],
-        "hsh": null,
-        "preview": null,
-        "form": {
-          "home": "DDLWLW",
-          "away": "WWDWLW"
-        },
-        "h2h": {
-          "wins": {
-            "home": 1,
-            "away": 0
-          },
-          "meets": 1
-        }
-      },
-      {
-        "matchId": "2525381",
-        "home": "US Biskra",
-        "away": "JS Saoura",
-        "league": "Dz1",
-        "time": "",
-        "probs": {
-          "home": 36,
-          "draw": 30,
-          "away": 34
-        },
-        "predictionText": "1",
-        "avgGoals": 2.13,
-        "avgOdds": {
-          "home": 2.5,
-          "draw": 2.62,
-          "away": 3.1
-        },
-        "matchUrl": "us-biskra-js-saoura-2525381",
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "LDDWWW",
-            "awayForm": "LLWWDD",
-            "homeRecently": 50,
-            "awayRecently": 33
-          },
-          "h2h": {
-            "wins": {
-              "home": 3,
-              "away": 1
-            },
-            "meets": 5
-          },
-          "expGoals": null
-        },
-        "market": "team-to-score",
-        "pick": "home",
-        "team": "US Biskra",
-        "teamScoreProb": 66.7,
-        "winProb": null,
-        "mustScore": 62,
-        "mustScoreBreakdown": {
-          "model": 37,
-          "form": 10,
-          "h2h": 15
-        },
-        "locked": false,
-        "estimatedOdd": 1.5,
-        "confidence": 67,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 1.1,
-          "away": 1.03
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 66.7,
-            "estimatedOdd": 1.5
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 64.3,
-            "estimatedOdd": 1.56
-          }
-        ],
-        "hsh": null,
-        "preview": null,
-        "form": {
-          "home": "LDDWWW",
-          "away": "LLWWDD"
-        },
-        "h2h": {
-          "wins": {
-            "home": 3,
-            "away": 1
-          },
-          "meets": 5
-        }
-      },
-      {
-        "matchId": "2466244",
-        "home": "SKChF Sevastopol",
-        "away": "Rubin Yalta",
-        "league": "Ru4",
-        "time": "",
-        "probs": {
-          "home": 40,
-          "draw": 26,
-          "away": 34
-        },
-        "predictionText": "1",
-        "avgGoals": 2.02,
-        "avgOdds": {
-          "home": 1.56,
-          "draw": 3.55,
-          "away": 5.6
-        },
-        "matchUrl": "skchf-sevastopol-rubin-yalta-2466244",
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "WWWLWW",
-            "awayForm": "LWWWDW",
-            "homeRecently": 83,
-            "awayRecently": 67
-          },
-          "h2h": {
-            "wins": {
-              "home": 2,
-              "away": 1
-            },
-            "meets": 3
-          },
-          "expGoals": null
-        },
-        "market": "team-to-score",
-        "pick": "home",
-        "team": "SKChF Sevastopol",
-        "teamScoreProb": 66.4,
-        "winProb": null,
-        "mustScore": 81,
-        "mustScoreBreakdown": {
-          "model": 36,
-          "form": 35,
-          "h2h": 10
-        },
-        "locked": false,
-        "estimatedOdd": 1.51,
-        "confidence": 66,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 1.09,
-          "away": 0.93
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 66.4,
-            "estimatedOdd": 1.51
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 60.5,
-            "estimatedOdd": 1.65
-          }
-        ],
-        "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.489,
-          "margin": 0.27,
-          "firstHalfShare": 0.63,
-          "firstHalfExp": 1.27,
-          "secondHalfExp": 0.75,
-          "p1": 0.489,
-          "p2": 0.219,
-          "tie": 0.292,
-          "fitErr": 0.002,
-          "totalExp": 2.02,
-          "referenceFirstHalfProb": 0.3,
-          "referenceDrawProb": 0.4,
-          "referenceSecondHalfProb": 0.3,
-          "reason": "Expected 2.0 goals, split 1.3 in the 1st half vs 0.7 in the 2nd. The 1st half wins the half race 49% of the time, 27% clear of the other half."
-        },
-        "preview": null,
-        "form": {
-          "home": "WWWLWW",
-          "away": "LWWWDW"
-        },
-        "h2h": {
-          "wins": {
-            "home": 2,
-            "away": 1
-          },
-          "meets": 3
-        }
-      },
-      {
-        "matchId": "2550773",
-        "home": "Naft M. Soleyman",
-        "away": "Naft Bandar Abbas",
-        "league": "Ir2",
-        "time": "",
-        "probs": {
-          "home": 28,
-          "draw": 61,
-          "away": 11
-        },
-        "predictionText": "X",
-        "avgGoals": 1.37,
-        "avgOdds": {
-          "home": 2.7,
-          "draw": 2.9,
-          "away": 2.7
-        },
-        "matchUrl": "naft-m-soleyman-naft-bandar-abbas-2550773",
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "WWLWWW",
-            "awayForm": "DLWDDW",
-            "homeRecently": 83,
-            "awayRecently": 33
-          },
-          "h2h": {
-            "wins": {
-              "home": 0,
-              "away": 0
-            },
-            "meets": 1
-          },
-          "expGoals": null
-        },
-        "market": "team-to-score",
-        "pick": "home",
-        "team": "Naft M. Soleyman",
-        "teamScoreProb": 62.5,
-        "winProb": null,
-        "mustScore": 68,
-        "mustScoreBreakdown": {
-          "model": 33,
-          "form": 35,
-          "h2h": 0
-        },
-        "locked": false,
-        "estimatedOdd": 1.6,
-        "confidence": 63,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 0.98,
-          "away": 0.39
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 62.5,
-            "estimatedOdd": 1.6
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 32.3,
-            "estimatedOdd": 3.1
-          }
-        ],
-        "hsh": null,
-        "preview": null,
-        "form": {
-          "home": "WWLWWW",
-          "away": "DLWDDW"
-        },
-        "h2h": {
-          "wins": {
-            "home": 0,
-            "away": 0
-          },
-          "meets": 1
-        }
-      },
-      {
-        "matchId": "2489654",
-        "home": "Ararat-2",
-        "away": "Pyunik-2",
-        "league": "Am2",
-        "time": "",
-        "probs": {
-          "home": 23,
-          "draw": 24,
-          "away": 53
-        },
-        "predictionText": "2",
-        "avgGoals": 3.3,
-        "avgOdds": {
-          "home": null,
-          "draw": null,
-          "away": null
-        },
-        "matchUrl": "ararat-2-pyunik-2-2489654",
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "WLLLLL",
-            "awayForm": "LLWDDW",
-            "homeRecently": 17,
-            "awayRecently": 33
-          },
-          "h2h": {
-            "wins": {
-              "home": 3,
-              "away": 2
-            },
-            "meets": 5
-          },
-          "expGoals": null
-        },
-        "market": "team-to-score",
-        "pick": "home",
-        "team": "Ararat-2",
-        "teamScoreProb": 63.2,
-        "winProb": null,
-        "mustScore": 48,
-        "mustScoreBreakdown": {
-          "model": 33,
-          "form": 0,
-          "h2h": 15
-        },
-        "locked": false,
-        "estimatedOdd": 1.58,
-        "confidence": 63,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 1,
-          "away": 2.3
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 63.2,
-            "estimatedOdd": 1.58
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 90,
-            "estimatedOdd": 1.11
-          }
-        ],
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.528,
-          "margin": 0.274,
-          "firstHalfShare": 0.4,
-          "firstHalfExp": 1.32,
-          "secondHalfExp": 1.98,
-          "p1": 0.254,
-          "p2": 0.528,
-          "tie": 0.218,
-          "fitErr": 0.02752,
-          "totalExp": 3.3,
-          "referenceFirstHalfProb": 0.29,
-          "referenceDrawProb": 0.32,
-          "referenceSecondHalfProb": 0.39,
-          "reason": "Expected 3.3 goals, split 1.3 in the 1st half vs 2.0 in the 2nd. The 2nd half wins the half race 53% of the time, 27% clear of the other half."
-        },
-        "preview": null,
-        "form": {
-          "home": "WLLLLL",
-          "away": "LLWDDW"
-        },
-        "h2h": {
-          "wins": {
-            "home": 3,
-            "away": 2
-          },
-          "meets": 5
-        }
-      },
-      {
-        "matchId": "2531272",
-        "home": "Petrolul Berca",
-        "away": "Progresul Drăgăneşti",
-        "league": "Ro3",
-        "time": "",
-        "probs": {
-          "home": 34,
-          "draw": 37,
-          "away": 29
-        },
-        "predictionText": "X",
-        "avgGoals": 1.63,
-        "avgOdds": {
-          "home": null,
-          "draw": null,
-          "away": null
-        },
-        "matchUrl": "petrolul-berca-progresul-drăgăneşti-2531272",
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "WDWW",
-            "awayForm": "WDWL",
-            "homeRecently": 75,
-            "awayRecently": 50
-          },
-          "h2h": null,
-          "expGoals": null
-        },
-        "market": "team-to-score",
-        "pick": "home",
-        "team": "Petrolul Berca",
-        "teamScoreProb": 58.5,
-        "winProb": null,
-        "mustScore": 63,
-        "mustScoreBreakdown": {
-          "model": 28,
-          "form": 35,
-          "h2h": 0
-        },
-        "locked": false,
-        "estimatedOdd": 1.71,
-        "confidence": 59,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 0.88,
-          "away": 0.75
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 58.5,
-            "estimatedOdd": 1.71
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 52.8,
-            "estimatedOdd": 1.9
-          }
-        ],
-        "hsh": null,
-        "preview": null,
-        "form": {
-          "home": "WDWW",
-          "away": "WDWL"
-        },
-        "h2h": null
-      },
-      {
-        "matchId": "2504927",
-        "home": "Santa Clara U23",
-        "away": "Portimonense U23",
-        "league": "PtU",
-        "time": "",
-        "probs": {
-          "home": 50,
-          "draw": 36,
-          "away": 14
-        },
-        "predictionText": "1",
-        "avgGoals": 1.13,
-        "avgOdds": {
-          "home": 1.7,
-          "draw": 3.7,
-          "away": 4
-        },
-        "matchUrl": "santa-clara-u23-portimonense-u23-2504927",
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "WWWLLL",
-            "awayForm": "LLDLDD",
-            "homeRecently": 50,
-            "awayRecently": 0
-          },
-          "h2h": {
-            "wins": {
-              "home": 3,
-              "away": 1
-            },
-            "meets": 5
-          },
-          "expGoals": null
-        },
-        "market": "team-to-score",
-        "pick": "home",
-        "team": "Santa Clara U23",
-        "teamScoreProb": 58.5,
-        "winProb": null,
-        "mustScore": 53,
-        "mustScoreBreakdown": {
-          "model": 28,
-          "form": 10,
-          "h2h": 15
-        },
-        "locked": false,
-        "estimatedOdd": 1.71,
-        "confidence": 59,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 0.88,
-          "away": 0.25
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 58.5,
-            "estimatedOdd": 1.71
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 22.1,
-            "estimatedOdd": 4.52
-          }
-        ],
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.477,
-          "margin": 0.359,
-          "firstHalfShare": 0.25,
-          "firstHalfExp": 0.28,
-          "secondHalfExp": 0.85,
-          "p1": 0.118,
-          "p2": 0.477,
-          "tie": 0.405,
-          "fitErr": 0.00151,
-          "totalExp": 1.13,
-          "referenceFirstHalfProb": 0.19,
-          "referenceDrawProb": 0.79,
-          "referenceSecondHalfProb": 0.02,
-          "reason": "Expected 1.1 goals, split 0.3 in the 1st half vs 0.8 in the 2nd. The 2nd half wins the half race 48% of the time, 36% clear of the other half."
-        },
-        "preview": null,
-        "form": {
-          "home": "WWWLLL",
-          "away": "LLDLDD"
-        },
-        "h2h": {
-          "wins": {
-            "home": 3,
-            "away": 1
-          },
-          "meets": 5
-        }
       }
     ],
     "2026-09-23": [
@@ -2554,6 +2009,113 @@
         }
       },
       {
+        "matchId": "2530797",
+        "home": "Odorheiu",
+        "away": "Aerostar",
+        "league": "Ro3",
+        "time": "",
+        "probs": {
+          "home": 40,
+          "draw": 29,
+          "away": 31
+        },
+        "predictionText": "1",
+        "avgGoals": 3.29,
+        "avgOdds": {
+          "home": null,
+          "draw": null,
+          "away": null
+        },
+        "matchUrl": "odorheiu-aerostar-2530797",
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "DDDWLW",
+            "awayForm": "WLWLWL",
+            "homeRecently": 33,
+            "awayRecently": 50
+          },
+          "h2h": {
+            "wins": {
+              "home": 2,
+              "away": 1
+            },
+            "meets": 4
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "Aerostar",
+        "teamScoreProb": 76.3,
+        "winProb": null,
+        "mustScore": 55,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 10,
+          "h2h": 5
+        },
+        "locked": false,
+        "estimatedOdd": 1.31,
+        "confidence": 76,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.85,
+          "away": 1.44
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 84.3,
+            "estimatedOdd": 1.19
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 76.3,
+            "estimatedOdd": 1.31
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.399,
+          "margin": 0.028,
+          "firstHalfShare": 0.49,
+          "firstHalfExp": 1.61,
+          "secondHalfExp": 1.68,
+          "p1": 0.371,
+          "p2": 0.399,
+          "tie": 0.231,
+          "fitErr": 0.00576,
+          "totalExp": 3.29,
+          "referenceFirstHalfProb": 0.43,
+          "referenceDrawProb": 0.36,
+          "referenceSecondHalfProb": 0.21,
+          "reason": "Expected 3.3 goals, split 1.6 in the 1st half vs 1.7 in the 2nd. The 2nd half wins the half race 40% of the time, 3% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "DDDWLW",
+          "away": "WLWLWL"
+        },
+        "h2h": {
+          "wins": {
+            "home": 2,
+            "away": 1
+          },
+          "meets": 4
+        }
+      },
+      {
         "matchId": "2537391",
         "home": "Samui United",
         "away": "Chainat FC",
@@ -2646,88 +2208,6 @@
           "home": "WDLDWW",
           "away": "WDLWLL"
         },
-        "h2h": null
-      },
-      {
-        "matchId": "2530797",
-        "home": "Odorheiu",
-        "away": "Aerostar",
-        "league": "Ro3",
-        "time": "",
-        "probs": {
-          "home": 40,
-          "draw": 29,
-          "away": 31
-        },
-        "predictionText": "1",
-        "avgGoals": 3.29,
-        "avgOdds": {
-          "home": null,
-          "draw": null,
-          "away": null
-        },
-        "matchUrl": "odorheiu-aerostar-2530797",
-        "detail": null,
-        "detailOverBudget": true,
-        "market": "team-to-score",
-        "pick": "away",
-        "team": "Aerostar",
-        "teamScoreProb": 76.3,
-        "winProb": null,
-        "mustScore": 40,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 0,
-          "h2h": 0
-        },
-        "locked": false,
-        "estimatedOdd": 1.31,
-        "confidence": 76,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 1.85,
-          "away": 1.44
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 84.3,
-            "estimatedOdd": 1.19
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 76.3,
-            "estimatedOdd": 1.31
-          }
-        ],
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.399,
-          "margin": 0.028,
-          "firstHalfShare": 0.49,
-          "firstHalfExp": 1.61,
-          "secondHalfExp": 1.68,
-          "p1": 0.371,
-          "p2": 0.399,
-          "tie": 0.231,
-          "fitErr": 0.00576,
-          "totalExp": 3.29,
-          "referenceFirstHalfProb": 0.43,
-          "referenceDrawProb": 0.36,
-          "referenceSecondHalfProb": 0.21,
-          "reason": "Expected 3.3 goals, split 1.6 in the 1st half vs 1.7 in the 2nd. The 2nd half wins the half race 40% of the time, 3% clear of the other half."
-        },
-        "preview": null,
-        "form": null,
         "h2h": null
       },
       {
@@ -3539,309 +3019,18 @@
           },
           "meets": 1
         }
-      },
-      {
-        "matchId": "2537402",
-        "home": "Chanthaburi",
-        "away": "Chiangmai FC",
-        "league": "ThC",
-        "time": "",
-        "probs": {
-          "home": 37,
-          "draw": 31,
-          "away": 32
-        },
-        "predictionText": "1",
-        "avgGoals": 2.35,
-        "avgOdds": {
-          "home": 1.95,
-          "draw": 3.25,
-          "away": 3.4
-        },
-        "matchUrl": "chanthaburi-chiangmai-fc-2537402",
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "LWDLDL",
-            "awayForm": "WWWLLL",
-            "homeRecently": 17,
-            "awayRecently": 50
-          },
-          "h2h": {
-            "wins": {
-              "home": 1,
-              "away": 0
-            },
-            "meets": 2
-          },
-          "expGoals": null
-        },
-        "market": "team-to-score",
-        "pick": "away",
-        "team": "Chiangmai FC",
-        "teamScoreProb": 66.4,
-        "winProb": null,
-        "mustScore": 46,
-        "mustScoreBreakdown": {
-          "model": 36,
-          "form": 10,
-          "h2h": 0
-        },
-        "locked": false,
-        "estimatedOdd": 1.51,
-        "confidence": 66,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 1.26,
-          "away": 1.09
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 71.6,
-            "estimatedOdd": 1.4
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 66.4,
-            "estimatedOdd": 1.51
-          }
-        ],
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.539,
-          "margin": 0.337,
-          "firstHalfShare": 0.35,
-          "firstHalfExp": 0.82,
-          "secondHalfExp": 1.53,
-          "p1": 0.202,
-          "p2": 0.539,
-          "tie": 0.259,
-          "fitErr": 0.00883,
-          "totalExp": 2.35,
-          "referenceFirstHalfProb": 0.2,
-          "referenceDrawProb": 0.51,
-          "referenceSecondHalfProb": 0.29,
-          "reason": "Expected 2.4 goals, split 0.8 in the 1st half vs 1.5 in the 2nd. The 2nd half wins the half race 54% of the time, 34% clear of the other half."
-        },
-        "preview": null,
-        "form": {
-          "home": "LWDLDL",
-          "away": "WWWLLL"
-        },
-        "h2h": {
-          "wins": {
-            "home": 1,
-            "away": 0
-          },
-          "meets": 2
-        }
-      },
-      {
-        "matchId": "2537396",
-        "home": "See Kwae City FC",
-        "away": "Kamphaengphet FC",
-        "league": "ThC",
-        "time": "",
-        "probs": {
-          "home": 34,
-          "draw": 30,
-          "away": 36
-        },
-        "predictionText": "2",
-        "avgGoals": 2.09,
-        "avgOdds": {
-          "home": 1.95,
-          "draw": 3.25,
-          "away": 3.4
-        },
-        "matchUrl": "see-kwae-city-fc-kamphaengphet-fc-2537396",
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "LLLLWD",
-            "awayForm": "WLWLLL",
-            "homeRecently": 17,
-            "awayRecently": 33
-          },
-          "h2h": {
-            "wins": {
-              "home": 4,
-              "away": 0
-            },
-            "meets": 5
-          },
-          "expGoals": null
-        },
-        "market": "team-to-score",
-        "pick": "home",
-        "team": "See Kwae City FC",
-        "teamScoreProb": 63.9,
-        "winProb": null,
-        "mustScore": 54,
-        "mustScoreBreakdown": {
-          "model": 34,
-          "form": 0,
-          "h2h": 20
-        },
-        "locked": false,
-        "estimatedOdd": 1.56,
-        "confidence": 64,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 1.02,
-          "away": 1.07
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 63.9,
-            "estimatedOdd": 1.56
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 65.7,
-            "estimatedOdd": 1.52
-          }
-        ],
-        "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.518,
-          "margin": 0.316,
-          "firstHalfShare": 0.65,
-          "firstHalfExp": 1.36,
-          "secondHalfExp": 0.73,
-          "p1": 0.518,
-          "p2": 0.201,
-          "tie": 0.281,
-          "fitErr": 0.00313,
-          "totalExp": 2.09,
-          "referenceFirstHalfProb": 0.34,
-          "referenceDrawProb": 0.36,
-          "referenceSecondHalfProb": 0.3,
-          "reason": "Expected 2.1 goals, split 1.4 in the 1st half vs 0.7 in the 2nd. The 1st half wins the half race 52% of the time, 32% clear of the other half."
-        },
-        "preview": null,
-        "form": {
-          "home": "LLLLWD",
-          "away": "WLWLLL"
-        },
-        "h2h": {
-          "wins": {
-            "home": 4,
-            "away": 0
-          },
-          "meets": 5
-        }
-      },
-      {
-        "matchId": "2520451",
-        "home": "FK Majevica Lopare",
-        "away": "FK Laktasi",
-        "league": "Ba3",
-        "time": "",
-        "probs": {
-          "home": 27,
-          "draw": 31,
-          "away": 42
-        },
-        "predictionText": "2",
-        "avgGoals": 1.4,
-        "avgOdds": {
-          "home": 4.75,
-          "draw": 3.8,
-          "away": 1.57
-        },
-        "matchUrl": "fk-majevica-lopare-fk-laktasi-2520451",
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "LWWWDD",
-            "awayForm": "WWWWWW",
-            "homeRecently": 50,
-            "awayRecently": 100
-          },
-          "h2h": null,
-          "expGoals": null
-        },
-        "market": "team-to-score",
-        "pick": "away",
-        "team": "FK Laktasi",
-        "teamScoreProb": 57.3,
-        "winProb": null,
-        "mustScore": 62,
-        "mustScoreBreakdown": {
-          "model": 27,
-          "form": 35,
-          "h2h": 0
-        },
-        "locked": false,
-        "estimatedOdd": 1.75,
-        "confidence": 57,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 0.55,
-          "away": 0.85
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 42.3,
-            "estimatedOdd": 2.36
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 57.3,
-            "estimatedOdd": 1.75
-          }
-        ],
-        "hsh": null,
-        "preview": null,
-        "form": {
-          "home": "LWWWDD",
-          "away": "WWWWWW"
-        },
-        "h2h": null
       }
     ]
   },
-  "lastFetch": "2026-09-22T11:59:00.031Z",
+  "lastFetch": "2026-09-22T13:40:45.060Z",
   "meta": {
     "markets": [
       "match-winner",
       "team-to-score"
     ],
     "winCertMinProb": 0.35,
-    "minTeamScoreProb": 0.55,
-    "mustScoreMin": 45
+    "minTeamScoreProb": 0.62,
+    "mustScoreMin": 50,
+    "maxTips": 15
   }
 }
