@@ -18,7 +18,7 @@ var PAYPAL_WEBHOOK_ID = process.env.PAYPAL_WEBHOOK_ID;
 
 var PLANS = {
   monthly: { name: 'Pro Monthly', price: '20', interval: 'monthly' },
-  yearly: { name: 'Pro Yearly', price: '150', interval: 'yearly' }
+  yearly: { name: 'Pro Yearly', price: '100', interval: 'yearly' }
 };
 
 var supabase = null;

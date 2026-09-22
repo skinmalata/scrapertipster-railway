@@ -14,7 +14,7 @@ var WHOP_WEBHOOK_SECRET = process.env.WHOP_WEBHOOK_SECRET;
 // Each plan references the product created in the Whop dashboard (WHOP_PRODUCT_* env vars).
 var PLANS = {
   monthly: { name: 'Pro Monthly', price: '20', productId: 'prod_nefnMoSf6OLTC', interval: 'monthly' },
-  yearly: { name: 'Pro Yearly', price: '150', productId: 'prod_gfimWW2Emb3OA', interval: 'yearly' }
+  yearly: { name: 'Pro Yearly', price: '100', productId: 'prod_gfimWW2Emb3OA', interval: 'yearly' }
 };
 
 var VARIANT_IDS = {}; // populated at runtime by createCheckout

@@ -12,7 +12,7 @@ const knowledge = {
   plans: {
     free: 'There is a Free plan ($0, forever). Free members get sample predictions from each category, live scores and basic in-play tips, plus daily match results and form stats. Create it free at /signup.html — no payment needed.',
     proMonthly: 'Pro Monthly is $20/month. It unlocks every prediction category (1X2, Over/Under, BTTS, Corners, Cards, streaks and more), daily Best Picks & H2H Picks, golden in-play tips and live opportunities, full win/loss/draw streak analysis, and priority support.',
-    proYearly: 'Pro Yearly is $150/year (save 37%). It includes everything in Pro Monthly.',
+    proYearly: 'Pro Yearly is $100/year (save 58%). It includes everything in Pro Monthly.',
     billing: 'Payments are processed securely through Whop. Subscriptions auto-renew unless cancelled. You can upgrade or downgrade at any time (changes apply from the next billing cycle). All plans come with a 7-day money-back guarantee. See /pricing.html.'
   },
   features: {
@@ -75,7 +75,7 @@ const knowledge = {
 };
 
 const faq = [
-  { keywords: ['free', 'cost', 'price', 'pricing', 'pay', 'payment', 'vip', 'plan', 'plans', 'how much', 'subscribe', 'billing', 'membership', 'pro monthly', 'pro yearly', 'pro'], response: `WinFulltime is freemium:\n\n- Free plan: $0 forever — sample predictions from each category, live scores and basic in-play tips, daily match results and form stats.\n- Pro Monthly: $20/month — every prediction category unlocked, daily Best Picks & H2H Picks, golden in-play tips and live opportunities, full streak analysis, priority support.\n- Pro Yearly: $150/year (save 37%).\n\nPayments go through Whop, subscriptions auto-renew unless cancelled, and all plans have a 7-day money-back guarantee.\n\n${knowledge.pages.pricing}` },
+  { keywords: ['free', 'cost', 'price', 'pricing', 'pay', 'payment', 'vip', 'plan', 'plans', 'how much', 'subscribe', 'billing', 'membership', 'pro monthly', 'pro yearly', 'pro'], response: `WinFulltime is freemium:\n\n- Free plan: $0 forever — sample predictions from each category, live scores and basic in-play tips, daily match results and form stats.\n- Pro Monthly: $20/month — every prediction category unlocked, daily Best Picks & H2H Picks, golden in-play tips and live opportunities, full streak analysis, priority support.\n- Pro Yearly: $100/year (save 58%).\n\nPayments go through Whop, subscriptions auto-renew unless cancelled, and all plans have a 7-day money-back guarantee.\n\n${knowledge.pages.pricing}` },
   { keywords: ['refund', 'money back', 'guarantee', 'cancel', 'unsubscribe', 'cancel subscription', 'switch plans', 'upgrade', 'downgrade', 'subscription', 'renew'], response: knowledge.plans.billing },
   { keywords: ['whop', 'checkout', 'payment method', 'payments', 'payment', 'payments work', 'how do payments', 'card payment', 'paystack', 'flutterwave'], response: 'Payments are processed securely through Whop. Subscriptions auto-renew unless cancelled, changes apply from the next billing cycle, and a 7-day money-back guarantee covers all plans. See /pricing.html for details.' },
   { keywords: ['contact', 'email', 'reach', 'message', 'support', 'help'], response: `Contact: ${knowledge.business.email} or visit ${knowledge.pages.contact}` },
@@ -193,7 +193,7 @@ SITE OVERVIEW:
 PLANS:
 - Free: $0 forever — sample predictions per category, live scores and basic in-play tips, daily match results and form stats
 - Pro Monthly: $20/month — every prediction category unlocked, daily Best Picks & H2H Picks, golden in-play tips and live opportunities, full win/loss/draw streak analysis, priority support
-- Pro Yearly: $150/year (save 37%)
+- Pro Yearly: $100/year (save 58%)
 - Payments via Whop, auto-renew unless cancelled, upgrade/downgrade anytime, 7-day money-back guarantee. See /pricing.html
 
 PREDICTION MARKETS:
