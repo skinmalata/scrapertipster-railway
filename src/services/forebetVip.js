@@ -149,6 +149,22 @@ const HSH_MAX_PICKS = Math.round(envNumber('HSH_MAX_PICKS', 12, 1, 60));
 // rejected when its mean squared error is above this bound, so a bad fit can
 // never publish a free-market pick it cannot reproduce.
 const HSH_MAX_FIT_ERR = envNumber('HSH_MAX_FIT_ERR', 0.04, 0.005, 1);
+// The fitted first-half share is pulled toward the empirical prior of how many
+// goals land before half-time (~0.44) so a weak half-time signal cannot pin the
+// share on the 0.20/0.80 boundary and publish absurd half splits. The
+// regularizer adds REG * (share - prior)^2 to the fit error; a strong signal
+// still moves the share away from the prior. Shares outside HSH_SHARE_MIN..MAX
+// are not even considered.
+const HSH_SHARE_PRIOR = envNumber('HSH_SHARE_PRIOR', 0.44, 0.1, 0.9);
+const HSH_SHARE_REG = envNumber('HSH_SHARE_REG', 0.004, 0, 0.1);
+const HSH_SHARE_MIN = envNumber('HSH_SHARE_MIN', 0.25, 0.1, 0.9);
+const HSH_SHARE_MAX = envNumber('HSH_SHARE_MAX', 0.65, 0.1, 0.9);
+// The leading half must clear the other half's race probability by at least
+// this margin, and the match must carry at least this many expected goals, or
+// the pick is not published. Together they keep the free tab honest: a call
+// with a razor-thin edge, or from a low-scoring fixture, is off the board.
+const HSH_MARGIN_MIN = envNumber('HSH_MARGIN_MIN', 0.05, 0.01, 0.5);
+const HSH_MIN_GOALS = envNumber('HSH_MIN_GOALS', 2.2, 0.5, 8);
 // Team-to-score is the VIP market. A team's scoring probability must clear
 // this floor to be published as a VIP tip (default 55%, matching the gate the
 // old 1X2 confidence used).
@@ -320,14 +336,17 @@ function computeHighestScoringHalf(htProbs, expGoals, avgGoals) {
 
   // Single-parameter fit: the share of the match's goals expected in the first
   // half. Fixed home/away split keeps the fit stable where HT 1X2 alone is
-  // underdetermined.
+  // underdetermined. A ridge on the share toward the empirical half-goal prior
+  // stops the optimizer from pinning f on the range boundary just to shave the
+  // error; the raw fit error is still reported against HSH_MAX_FIT_ERR.
   let best = null;
-  for (let f = 0.2; f <= 0.8 + 1e-9; f += 0.01) {
+  for (let f = HSH_SHARE_MIN; f <= HSH_SHARE_MAX + 1e-9; f += 0.01) {
     const three = poissonThreeWay(expHome * f, expAway * f);
-    const err = (three.home - ph) * (three.home - ph) +
+    const rawErr = (three.home - ph) * (three.home - ph) +
       (three.draw - pd) * (three.draw - pd) +
       (three.away - pa) * (three.away - pa);
-    if (!best || err < best.err) best = { err, f: Number(f.toFixed(2)) };
+    const penalized = rawErr + HSH_SHARE_REG * (f - HSH_SHARE_PRIOR) * (f - HSH_SHARE_PRIOR);
+    if (!best || penalized < best.penalized) best = { penalized, err: rawErr, f: Number(f.toFixed(2)) };
   }
   // Fit quality check: reject fixtures the model cannot reproduce - a bad fit
   // must never publish a free-market call.
@@ -344,10 +363,13 @@ function computeHighestScoringHalf(htProbs, expGoals, avgGoals) {
     { key: '2H', label: '2nd Half', prob: cmp.away }
   ].sort((a, b) => b.prob - a.prob);
   const top = options[0];
+  const other = options[1];
+  const margin = top.prob - other.prob;
   return {
     pick: top.key,
     label: top.label,
     prob: Number(top.prob.toFixed(3)),
+    margin: Number(margin.toFixed(3)),
     firstHalfShare: share,
     firstHalfExp: Number(lambda1.toFixed(2)),
     secondHalfExp: Number(lambda2.toFixed(2)),
@@ -355,7 +377,14 @@ function computeHighestScoringHalf(htProbs, expGoals, avgGoals) {
     p2: Number(cmp.away.toFixed(3)),
     tie: Number(cmp.draw.toFixed(3)),
     fitErr: Number(best.err.toFixed(5)),
-    firstHalfProbs: { home: htProbs.home, draw: htProbs.draw, away: htProbs.away }
+    totalExp: Number(total.toFixed(2)),
+    referenceFirstHalfProb: Number(ph.toFixed(3)),
+    referenceDrawProb: Number(pd.toFixed(3)),
+    referenceSecondHalfProb: Number(pa.toFixed(3)),
+    reason: 'Expected ' + total.toFixed(1) + ' goals, split ' + lambda1.toFixed(1) +
+      ' in the 1st half vs ' + lambda2.toFixed(1) + ' in the 2nd. The ' + top.label.toLowerCase() +
+      ' wins the half race ' + (top.prob * 100).toFixed(0) + '% of the time, ' +
+      (margin * 100).toFixed(0) + '% clear of the other half.'
   };
 }
 
@@ -381,12 +410,15 @@ function parseHtList(html) {
 }
 
 // Best-only selection for the public tab: strongest calls that clear the
-// probability floor, highest first, capped per day.
+// probability floor, the race margin and the expected-goals floor, then ranked
+// by margin (the most decisive call first), capped per day.
 function selectHshPicks(matches, limit) {
   const max = limit || HSH_MAX_PICKS;
   return (matches || [])
-    .filter((m) => m.hsh && m.hsh.prob >= HSH_MIN_PROB)
-    .sort((a, b) => b.hsh.prob - a.hsh.prob)
+    .filter((m) => m.hsh && m.hsh.prob >= HSH_MIN_PROB &&
+      m.hsh.margin >= HSH_MARGIN_MIN &&
+      Number(m.avgGoals) >= HSH_MIN_GOALS)
+    .sort((a, b) => (b.hsh.margin - a.hsh.margin) || (b.hsh.prob - a.hsh.prob))
     .slice(0, max)
     .map((m) => ({
       matchId: m.matchId,
@@ -1137,7 +1169,13 @@ module.exports = {
   estimateMatchExpGoals,
   HSH_MIN_PROB,
   HSH_MAX_PICKS,
-  HSH_MAX_FIT_ERR
+  HSH_MAX_FIT_ERR,
+  HSH_SHARE_PRIOR,
+  HSH_SHARE_REG,
+  HSH_SHARE_MIN,
+  HSH_SHARE_MAX,
+  HSH_MARGIN_MIN,
+  HSH_MIN_GOALS
 };
 
 if (require.main === module) {

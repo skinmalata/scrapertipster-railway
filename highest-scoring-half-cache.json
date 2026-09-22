@@ -17,79 +17,20 @@
         "hsh": {
           "pick": "2H",
           "label": "2nd Half",
-          "prob": 0.835,
-          "firstHalfShare": 0.2,
-          "firstHalfExp": 0.8,
-          "secondHalfExp": 3.2,
-          "p1": 0.06,
-          "p2": 0.835,
-          "tie": 0.105,
-          "fitErr": 0.00632,
-          "firstHalfProbs": {
-            "home": 23,
-            "draw": 53,
-            "away": 25
-          }
-        }
-      },
-      {
-        "matchId": "2531538",
-        "home": "FCSB II",
-        "away": "FCM Alexandria",
-        "league": "Ro3",
-        "time": "",
-        "probs": {
-          "home": 32,
-          "draw": 35,
-          "away": 33
-        },
-        "avgGoals": 2.33,
-        "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.714,
-          "firstHalfShare": 0.8,
-          "firstHalfExp": 1.86,
-          "secondHalfExp": 0.47,
-          "p1": 0.714,
-          "p2": 0.084,
-          "tie": 0.202,
-          "fitErr": 0.00404,
-          "firstHalfProbs": {
-            "home": 38,
-            "draw": 28,
-            "away": 34
-          }
-        }
-      },
-      {
-        "matchId": "2537399",
-        "home": "Roi Et Alan",
-        "away": "Songkhla FC",
-        "league": "ThC",
-        "time": "",
-        "probs": {
-          "home": 14,
-          "draw": 35,
-          "away": 51
-        },
-        "avgGoals": 2.1,
-        "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.687,
-          "firstHalfShare": 0.8,
-          "firstHalfExp": 1.68,
-          "secondHalfExp": 0.42,
-          "p1": 0.687,
-          "p2": 0.087,
-          "tie": 0.225,
-          "fitErr": 0.00111,
-          "firstHalfProbs": {
-            "home": 12,
-            "draw": 26,
-            "away": 62
-          }
+          "prob": 0.775,
+          "margin": 0.681,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 1,
+          "secondHalfExp": 3,
+          "p1": 0.094,
+          "p2": 0.775,
+          "tie": 0.131,
+          "fitErr": 0.01424,
+          "totalExp": 4,
+          "referenceFirstHalfProb": 0.23,
+          "referenceDrawProb": 0.53,
+          "referenceSecondHalfProb": 0.25,
+          "reason": "Expected 4.0 goals, split 1.0 in the 1st half vs 3.0 in the 2nd. The 2nd half wins the half race 77% of the time, 68% clear of the other half."
         }
       },
       {
@@ -108,6 +49,7 @@
           "pick": "2H",
           "label": "2nd Half",
           "prob": 0.678,
+          "margin": 0.539,
           "firstHalfShare": 0.29,
           "firstHalfExp": 0.93,
           "secondHalfExp": 2.29,
@@ -115,11 +57,11 @@
           "p2": 0.678,
           "tie": 0.183,
           "fitErr": 0.00153,
-          "firstHalfProbs": {
-            "home": 43,
-            "draw": 44,
-            "away": 13
-          }
+          "totalExp": 3.22,
+          "referenceFirstHalfProb": 0.43,
+          "referenceDrawProb": 0.44,
+          "referenceSecondHalfProb": 0.13,
+          "reason": "Expected 3.2 goals, split 0.9 in the 1st half vs 2.3 in the 2nd. The 2nd half wins the half race 68% of the time, 54% clear of the other half."
         }
       },
       {
@@ -137,139 +79,20 @@
         "hsh": {
           "pick": "2H",
           "label": "2nd Half",
-          "prob": 0.665,
-          "firstHalfShare": 0.24,
-          "firstHalfExp": 0.55,
-          "secondHalfExp": 1.75,
-          "p1": 0.112,
-          "p2": 0.665,
-          "tie": 0.223,
-          "fitErr": 0.0194,
-          "firstHalfProbs": {
-            "home": 7,
-            "draw": 63,
-            "away": 31
-          }
-        }
-      },
-      {
-        "matchId": "2550533",
-        "home": "UD Songo",
-        "away": "CD Maxaquene",
-        "league": "Mz1",
-        "time": "",
-        "probs": {
-          "home": 59,
-          "draw": 32,
-          "away": 9
-        },
-        "avgGoals": 1.92,
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.664,
-          "firstHalfShare": 0.2,
-          "firstHalfExp": 0.38,
-          "secondHalfExp": 1.54,
-          "p1": 0.089,
-          "p2": 0.664,
-          "tie": 0.247,
-          "fitErr": 0.02353,
-          "firstHalfProbs": {
-            "home": 15,
-            "draw": 73,
-            "away": 12
-          }
-        }
-      },
-      {
-        "matchId": "2489657",
-        "home": "Sardarapat II",
-        "away": "FC Ararat-Armenia-2",
-        "league": "Am2",
-        "time": "",
-        "probs": {
-          "home": 33,
-          "draw": 38,
-          "away": 29
-        },
-        "avgGoals": 1.83,
-        "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.651,
-          "firstHalfShare": 0.8,
-          "firstHalfExp": 1.46,
-          "secondHalfExp": 0.37,
-          "p1": 0.651,
-          "p2": 0.09,
-          "tie": 0.259,
-          "fitErr": 0.03189,
-          "firstHalfProbs": {
-            "home": 47,
-            "draw": 25,
-            "away": 29
-          }
-        }
-      },
-      {
-        "matchId": "2531139",
-        "home": "Tricolorul Breaza",
-        "away": "Corona Braşov",
-        "league": "Ro3",
-        "time": "",
-        "probs": {
-          "home": 22,
-          "draw": 27,
-          "away": 51
-        },
-        "avgGoals": 1.83,
-        "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.651,
-          "firstHalfShare": 0.8,
-          "firstHalfExp": 1.46,
-          "secondHalfExp": 0.37,
-          "p1": 0.651,
-          "p2": 0.09,
-          "tie": 0.259,
-          "fitErr": 0.02938,
-          "firstHalfProbs": {
-            "home": 28,
-            "draw": 23,
-            "away": 48
-          }
-        }
-      },
-      {
-        "matchId": "2537390",
-        "home": "Futera United",
-        "away": "Pattaya City",
-        "league": "ThC",
-        "time": "",
-        "probs": {
-          "home": 32,
-          "draw": 29,
-          "away": 39
-        },
-        "avgGoals": 3.07,
-        "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.641,
-          "firstHalfShare": 0.69,
-          "firstHalfExp": 2.12,
-          "secondHalfExp": 0.95,
-          "p1": 0.641,
-          "p2": 0.159,
-          "tie": 0.199,
-          "fitErr": 0.0005,
-          "firstHalfProbs": {
-            "home": 28,
-            "draw": 30,
-            "away": 42
-          }
+          "prob": 0.654,
+          "margin": 0.535,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.57,
+          "secondHalfExp": 1.72,
+          "p1": 0.119,
+          "p2": 0.654,
+          "tie": 0.227,
+          "fitErr": 0.01949,
+          "totalExp": 2.3,
+          "referenceFirstHalfProb": 0.07,
+          "referenceDrawProb": 0.63,
+          "referenceSecondHalfProb": 0.31,
+          "reason": "Expected 2.3 goals, split 0.6 in the 1st half vs 1.7 in the 2nd. The 2nd half wins the half race 65% of the time, 54% clear of the other half."
         }
       },
       {
@@ -288,6 +111,7 @@
           "pick": "2H",
           "label": "2nd Half",
           "prob": 0.633,
+          "margin": 0.493,
           "firstHalfShare": 0.28,
           "firstHalfExp": 0.69,
           "secondHalfExp": 1.76,
@@ -295,11 +119,11 @@
           "p2": 0.633,
           "tie": 0.227,
           "fitErr": 0.00055,
-          "firstHalfProbs": {
-            "home": 21,
-            "draw": 56,
-            "away": 23
-          }
+          "totalExp": 2.45,
+          "referenceFirstHalfProb": 0.21,
+          "referenceDrawProb": 0.56,
+          "referenceSecondHalfProb": 0.23,
+          "reason": "Expected 2.5 goals, split 0.7 in the 1st half vs 1.8 in the 2nd. The 2nd half wins the half race 63% of the time, 49% clear of the other half."
         }
       },
       {
@@ -318,6 +142,7 @@
           "pick": "2H",
           "label": "2nd Half",
           "prob": 0.622,
+          "margin": 0.48,
           "firstHalfShare": 0.28,
           "firstHalfExp": 0.65,
           "secondHalfExp": 1.68,
@@ -325,75 +150,108 @@
           "p2": 0.622,
           "tie": 0.237,
           "fitErr": 0.00016,
-          "firstHalfProbs": {
-            "home": 32,
-            "draw": 57,
-            "away": 11
-          }
+          "totalExp": 2.33,
+          "referenceFirstHalfProb": 0.32,
+          "referenceDrawProb": 0.57,
+          "referenceSecondHalfProb": 0.11,
+          "reason": "Expected 2.3 goals, split 0.7 in the 1st half vs 1.7 in the 2nd. The 2nd half wins the half race 62% of the time, 48% clear of the other half."
         }
       },
       {
-        "matchId": "2531272",
-        "home": "Petrolul Berca",
-        "away": "Progresul Drăgăneşti",
-        "league": "Ro3",
+        "matchId": "2537390",
+        "home": "Futera United",
+        "away": "Pattaya City",
+        "league": "ThC",
         "time": "",
         "probs": {
-          "home": 34,
-          "draw": 37,
-          "away": 29
+          "home": 32,
+          "draw": 29,
+          "away": 39
         },
-        "avgGoals": 1.63,
+        "avgGoals": 3.07,
         "hsh": {
           "pick": "1H",
           "label": "1st Half",
-          "prob": 0.62,
-          "firstHalfShare": 0.8,
-          "firstHalfExp": 1.3,
-          "secondHalfExp": 0.33,
-          "p1": 0.62,
-          "p2": 0.092,
-          "tie": 0.289,
-          "fitErr": 0.0388,
-          "firstHalfProbs": {
-            "home": 39,
-            "draw": 24,
-            "away": 37
-          }
+          "prob": 0.587,
+          "margin": 0.388,
+          "firstHalfShare": 0.65,
+          "firstHalfExp": 2,
+          "secondHalfExp": 1.07,
+          "p1": 0.587,
+          "p2": 0.199,
+          "tie": 0.214,
+          "fitErr": 0.00067,
+          "totalExp": 3.07,
+          "referenceFirstHalfProb": 0.28,
+          "referenceDrawProb": 0.3,
+          "referenceSecondHalfProb": 0.42,
+          "reason": "Expected 3.1 goals, split 2.0 in the 1st half vs 1.1 in the 2nd. The 1st half wins the half race 59% of the time, 39% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2554050",
+        "home": "Fortis",
+        "away": "Fakirerpool",
+        "league": "BdC",
+        "time": "",
+        "probs": {
+          "home": 40,
+          "draw": 47,
+          "away": 13
+        },
+        "avgGoals": 3.41,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.591,
+          "margin": 0.384,
+          "firstHalfShare": 0.36,
+          "firstHalfExp": 1.23,
+          "secondHalfExp": 2.18,
+          "p1": 0.207,
+          "p2": 0.591,
+          "tie": 0.202,
+          "fitErr": 0.00215,
+          "totalExp": 3.41,
+          "referenceFirstHalfProb": 0.52,
+          "referenceDrawProb": 0.4,
+          "referenceSecondHalfProb": 0.08,
+          "reason": "Expected 3.4 goals, split 1.2 in the 1st half vs 2.2 in the 2nd. The 2nd half wins the half race 59% of the time, 38% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2537406",
+        "home": "Kanchanaburi FC",
+        "away": "Phetchabun United",
+        "league": "ThC",
+        "time": "",
+        "probs": {
+          "home": 51,
+          "draw": 32,
+          "away": 17
+        },
+        "avgGoals": 3.35,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.559,
+          "margin": 0.329,
+          "firstHalfShare": 0.38,
+          "firstHalfExp": 1.27,
+          "secondHalfExp": 2.08,
+          "p1": 0.23,
+          "p2": 0.559,
+          "tie": 0.21,
+          "fitErr": 0.00125,
+          "totalExp": 3.35,
+          "referenceFirstHalfProb": 0.49,
+          "referenceDrawProb": 0.36,
+          "referenceSecondHalfProb": 0.15,
+          "reason": "Expected 3.4 goals, split 1.3 in the 1st half vs 2.1 in the 2nd. The 2nd half wins the half race 56% of the time, 33% clear of the other half."
         }
       }
     ],
     "2026-09-23": [
-      {
-        "matchId": "2554090",
-        "home": "Kyoto Sanga",
-        "away": "Fujieda MYFC",
-        "league": "JpC",
-        "time": "",
-        "probs": {
-          "home": 37,
-          "draw": 33,
-          "away": 30
-        },
-        "avgGoals": 3.65,
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.816,
-          "firstHalfShare": 0.2,
-          "firstHalfExp": 0.73,
-          "secondHalfExp": 2.92,
-          "p1": 0.064,
-          "p2": 0.816,
-          "tie": 0.119,
-          "fitErr": 0.00078,
-          "firstHalfProbs": {
-            "home": 24,
-            "draw": 54,
-            "away": 22
-          }
-        }
-      },
       {
         "matchId": "2493372",
         "home": "Neftohimik Burgas",
@@ -409,19 +267,20 @@
         "hsh": {
           "pick": "2H",
           "label": "2nd Half",
-          "prob": 0.812,
-          "firstHalfShare": 0.22,
-          "firstHalfExp": 0.88,
-          "secondHalfExp": 3.12,
-          "p1": 0.072,
-          "p2": 0.812,
-          "tie": 0.116,
-          "fitErr": 0.01299,
-          "firstHalfProbs": {
-            "home": 37,
-            "draw": 44,
-            "away": 19
-          }
+          "prob": 0.775,
+          "margin": 0.681,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 1,
+          "secondHalfExp": 3,
+          "p1": 0.094,
+          "p2": 0.775,
+          "tie": 0.131,
+          "fitErr": 0.01628,
+          "totalExp": 4,
+          "referenceFirstHalfProb": 0.37,
+          "referenceDrawProb": 0.44,
+          "referenceSecondHalfProb": 0.19,
+          "reason": "Expected 4.0 goals, split 1.0 in the 1st half vs 3.0 in the 2nd. The 2nd half wins the half race 77% of the time, 68% clear of the other half."
         }
       },
       {
@@ -440,6 +299,7 @@
           "pick": "2H",
           "label": "2nd Half",
           "prob": 0.767,
+          "margin": 0.671,
           "firstHalfShare": 0.25,
           "firstHalfExp": 0.96,
           "secondHalfExp": 2.89,
@@ -447,71 +307,42 @@
           "p2": 0.767,
           "tie": 0.137,
           "fitErr": 0.02368,
-          "firstHalfProbs": {
-            "home": 25,
-            "draw": 44,
-            "away": 31
-          }
+          "totalExp": 3.85,
+          "referenceFirstHalfProb": 0.25,
+          "referenceDrawProb": 0.44,
+          "referenceSecondHalfProb": 0.31,
+          "reason": "Expected 3.9 goals, split 1.0 in the 1st half vs 2.9 in the 2nd. The 2nd half wins the half race 77% of the time, 67% clear of the other half."
         }
       },
       {
-        "matchId": "2532376",
-        "home": "Ironi Baka El Garbiya",
-        "away": "Hapoel Tirat HaCarmel",
-        "league": "Il3",
+        "matchId": "2554090",
+        "home": "Kyoto Sanga",
+        "away": "Fujieda MYFC",
+        "league": "JpC",
         "time": "",
         "probs": {
-          "home": 63,
-          "draw": 24,
-          "away": 13
+          "home": 37,
+          "draw": 33,
+          "away": 30
         },
-        "avgGoals": 2.75,
+        "avgGoals": 3.65,
         "hsh": {
           "pick": "2H",
           "label": "2nd Half",
-          "prob": 0.754,
-          "firstHalfShare": 0.2,
-          "firstHalfExp": 0.55,
-          "secondHalfExp": 2.2,
-          "p1": 0.078,
-          "p2": 0.754,
-          "tie": 0.168,
-          "fitErr": 0.03974,
-          "firstHalfProbs": {
-            "home": 20,
-            "draw": 60,
-            "away": 20
-          }
-        }
-      },
-      {
-        "matchId": "2537403",
-        "home": "Bangsaen Saensuk",
-        "away": "Phichit United",
-        "league": "ThC",
-        "time": "",
-        "probs": {
-          "home": 28,
-          "draw": 11,
-          "away": 61
-        },
-        "avgGoals": 2.67,
-        "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.747,
-          "firstHalfShare": 0.8,
-          "firstHalfExp": 2.14,
-          "secondHalfExp": 0.53,
-          "p1": 0.747,
-          "p2": 0.079,
-          "tie": 0.174,
-          "fitErr": 0.02649,
-          "firstHalfProbs": {
-            "home": 27,
-            "draw": 14,
-            "away": 59
-          }
+          "prob": 0.756,
+          "margin": 0.657,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.91,
+          "secondHalfExp": 2.74,
+          "p1": 0.099,
+          "p2": 0.756,
+          "tie": 0.145,
+          "fitErr": 0.00511,
+          "totalExp": 3.65,
+          "referenceFirstHalfProb": 0.24,
+          "referenceDrawProb": 0.54,
+          "referenceSecondHalfProb": 0.22,
+          "reason": "Expected 3.6 goals, split 0.9 in the 1st half vs 2.7 in the 2nd. The 2nd half wins the half race 76% of the time, 66% clear of the other half."
         }
       },
       {
@@ -529,19 +360,20 @@
         "hsh": {
           "pick": "2H",
           "label": "2nd Half",
-          "prob": 0.729,
-          "firstHalfShare": 0.23,
-          "firstHalfExp": 0.66,
-          "secondHalfExp": 2.22,
-          "p1": 0.096,
-          "p2": 0.729,
-          "tie": 0.174,
-          "fitErr": 0.00021,
-          "firstHalfProbs": {
-            "home": 25,
-            "draw": 57,
-            "away": 18
-          }
+          "prob": 0.705,
+          "margin": 0.594,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.72,
+          "secondHalfExp": 2.16,
+          "p1": 0.111,
+          "p2": 0.705,
+          "tie": 0.184,
+          "fitErr": 0.00095,
+          "totalExp": 2.88,
+          "referenceFirstHalfProb": 0.25,
+          "referenceDrawProb": 0.57,
+          "referenceSecondHalfProb": 0.18,
+          "reason": "Expected 2.9 goals, split 0.7 in the 1st half vs 2.2 in the 2nd. The 2nd half wins the half race 71% of the time, 59% clear of the other half."
         }
       },
       {
@@ -559,19 +391,20 @@
         "hsh": {
           "pick": "2H",
           "label": "2nd Half",
-          "prob": 0.726,
-          "firstHalfShare": 0.23,
-          "firstHalfExp": 0.65,
-          "secondHalfExp": 2.18,
-          "p1": 0.097,
-          "p2": 0.726,
-          "tie": 0.178,
-          "fitErr": 0.01167,
-          "firstHalfProbs": {
-            "home": 33,
-            "draw": 59,
-            "away": 8
-          }
+          "prob": 0.701,
+          "margin": 0.59,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.71,
+          "secondHalfExp": 2.12,
+          "p1": 0.112,
+          "p2": 0.701,
+          "tie": 0.187,
+          "fitErr": 0.01239,
+          "totalExp": 2.83,
+          "referenceFirstHalfProb": 0.33,
+          "referenceDrawProb": 0.59,
+          "referenceSecondHalfProb": 0.08,
+          "reason": "Expected 2.8 goals, split 0.7 in the 1st half vs 2.1 in the 2nd. The 2nd half wins the half race 70% of the time, 59% clear of the other half."
         }
       },
       {
@@ -589,79 +422,20 @@
         "hsh": {
           "pick": "2H",
           "label": "2nd Half",
-          "prob": 0.689,
-          "firstHalfShare": 0.23,
-          "firstHalfExp": 0.56,
-          "secondHalfExp": 1.86,
-          "p1": 0.103,
-          "p2": 0.689,
-          "tie": 0.208,
-          "fitErr": 0.01479,
-          "firstHalfProbs": {
-            "home": 34,
-            "draw": 64,
-            "away": 2
-          }
-        }
-      },
-      {
-        "matchId": "2537395",
-        "home": "Khon Kaen United",
-        "away": "Siam Navy",
-        "league": "ThC",
-        "time": "",
-        "probs": {
-          "home": 43,
-          "draw": 28,
-          "away": 29
-        },
-        "avgGoals": 2.05,
-        "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.681,
-          "firstHalfShare": 0.8,
-          "firstHalfExp": 1.64,
-          "secondHalfExp": 0.41,
-          "p1": 0.681,
-          "p2": 0.088,
-          "tie": 0.231,
-          "fitErr": 0.00166,
-          "firstHalfProbs": {
-            "home": 45,
-            "draw": 33,
-            "away": 22
-          }
-        }
-      },
-      {
-        "matchId": "2537397",
-        "home": "Chachoengsao",
-        "away": "Bangkok FC",
-        "league": "ThC",
-        "time": "",
-        "probs": {
-          "home": 49,
-          "draw": 28,
-          "away": 23
-        },
-        "avgGoals": 2.27,
-        "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.651,
-          "firstHalfShare": 0.75,
-          "firstHalfExp": 1.7,
-          "secondHalfExp": 0.57,
-          "p1": 0.651,
-          "p2": 0.119,
-          "tie": 0.23,
-          "fitErr": 0.00034,
-          "firstHalfProbs": {
-            "home": 50,
-            "draw": 31,
-            "away": 19
-          }
+          "prob": 0.666,
+          "margin": 0.548,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.6,
+          "secondHalfExp": 1.81,
+          "p1": 0.117,
+          "p2": 0.666,
+          "tie": 0.217,
+          "fitErr": 0.01567,
+          "totalExp": 2.42,
+          "referenceFirstHalfProb": 0.34,
+          "referenceDrawProb": 0.64,
+          "referenceSecondHalfProb": 0.02,
+          "reason": "Expected 2.4 goals, split 0.6 in the 1st half vs 1.8 in the 2nd. The 2nd half wins the half race 67% of the time, 55% clear of the other half."
         }
       },
       {
@@ -680,6 +454,7 @@
           "pick": "2H",
           "label": "2nd Half",
           "prob": 0.636,
+          "margin": 0.489,
           "firstHalfShare": 0.29,
           "firstHalfExp": 0.76,
           "secondHalfExp": 1.87,
@@ -687,49 +462,116 @@
           "p2": 0.636,
           "tie": 0.218,
           "fitErr": 0.00105,
-          "firstHalfProbs": {
-            "home": 30,
-            "draw": 52,
-            "away": 18
-          }
+          "totalExp": 2.63,
+          "referenceFirstHalfProb": 0.3,
+          "referenceDrawProb": 0.52,
+          "referenceSecondHalfProb": 0.18,
+          "reason": "Expected 2.6 goals, split 0.8 in the 1st half vs 1.9 in the 2nd. The 2nd half wins the half race 64% of the time, 49% clear of the other half."
         }
       },
       {
-        "matchId": "2537396",
-        "home": "See Kwae City FC",
-        "away": "Kamphaengphet FC",
-        "league": "ThC",
+        "matchId": "2535129",
+        "home": "Levoca",
+        "away": "Liptovsky Mikulas",
+        "league": "SiC",
         "time": "",
         "probs": {
-          "home": 34,
-          "draw": 30,
-          "away": 36
+          "home": 16,
+          "draw": 25,
+          "away": 59
         },
-        "avgGoals": 2.09,
+        "avgGoals": 2.73,
         "hsh": {
           "pick": "1H",
           "label": "1st Half",
-          "prob": 0.62,
-          "firstHalfShare": 0.74,
-          "firstHalfExp": 1.55,
-          "secondHalfExp": 0.54,
-          "p1": 0.62,
-          "p2": 0.128,
-          "tie": 0.252,
-          "fitErr": 0.00189,
-          "firstHalfProbs": {
-            "home": 34,
-            "draw": 36,
-            "away": 30
-          }
+          "prob": 0.566,
+          "margin": 0.365,
+          "firstHalfShare": 0.65,
+          "firstHalfExp": 1.77,
+          "secondHalfExp": 0.96,
+          "p1": 0.566,
+          "p2": 0.201,
+          "tie": 0.233,
+          "fitErr": 0,
+          "totalExp": 2.73,
+          "referenceFirstHalfProb": 0.1,
+          "referenceDrawProb": 0.27,
+          "referenceSecondHalfProb": 0.63,
+          "reason": "Expected 2.7 goals, split 1.8 in the 1st half vs 1.0 in the 2nd. The 1st half wins the half race 57% of the time, 37% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2520445",
+        "home": "Drina Zvornik",
+        "away": "Rudar Prijedor",
+        "league": "Ba3",
+        "time": "",
+        "probs": {
+          "home": 41,
+          "draw": 39,
+          "away": 20
+        },
+        "avgGoals": 2.63,
+        "hsh": {
+          "pick": "1H",
+          "label": "1st Half",
+          "prob": 0.56,
+          "margin": 0.358,
+          "firstHalfShare": 0.65,
+          "firstHalfExp": 1.71,
+          "secondHalfExp": 0.92,
+          "p1": 0.56,
+          "p2": 0.201,
+          "tie": 0.239,
+          "fitErr": 0.00014,
+          "totalExp": 2.63,
+          "referenceFirstHalfProb": 0.51,
+          "referenceDrawProb": 0.32,
+          "referenceSecondHalfProb": 0.17,
+          "reason": "Expected 2.6 goals, split 1.7 in the 1st half vs 0.9 in the 2nd. The 1st half wins the half race 56% of the time, 36% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2537393",
+        "home": "Jalor City FC",
+        "away": "Ayutthaya FC",
+        "league": "ThC",
+        "time": "",
+        "probs": {
+          "home": 42,
+          "draw": 30,
+          "away": 28
+        },
+        "avgGoals": 2.9,
+        "hsh": {
+          "pick": "1H",
+          "label": "1st Half",
+          "prob": 0.564,
+          "margin": 0.353,
+          "firstHalfShare": 0.64,
+          "firstHalfExp": 1.86,
+          "secondHalfExp": 1.04,
+          "p1": 0.564,
+          "p2": 0.21,
+          "tie": 0.226,
+          "fitErr": 0.00448,
+          "totalExp": 2.9,
+          "referenceFirstHalfProb": 0.48,
+          "referenceDrawProb": 0.33,
+          "referenceSecondHalfProb": 0.19,
+          "reason": "Expected 2.9 goals, split 1.9 in the 1st half vs 1.0 in the 2nd. The 1st half wins the half race 56% of the time, 35% clear of the other half."
         }
       }
     ]
   },
-  "lastFetch": "2026-09-22T09:49:25.747Z",
+  "lastFetch": "2026-09-22T10:15:13.072Z",
   "meta": {
     "minProb": 0.55,
     "maxPicks": 12,
+    "marginMin": 0.05,
+    "minGoals": 2.2,
+    "sharePrior": 0.44,
+    "shareReg": 0.004,
     "free": true
   }
 }

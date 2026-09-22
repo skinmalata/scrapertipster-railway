@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { scrapeVip, closeVipBrowser, selectHshPicks, HSH_MIN_PROB, HSH_MAX_PICKS, TTS_MIN_PROB, MUST_SCORE_MIN } = require('../src/services/forebetVip');
+const { scrapeVip, closeVipBrowser, selectHshPicks, HSH_MIN_PROB, HSH_MAX_PICKS, HSH_MARGIN_MIN, HSH_MIN_GOALS, HSH_SHARE_PRIOR, HSH_SHARE_REG, TTS_MIN_PROB, MUST_SCORE_MIN } = require('../src/services/forebetVip');
 const { lagosDate } = require('../src/utils/dates');
 
 const CACHE_FILE = path.join(process.cwd(), 'forebet-vip-cache.json');
@@ -86,6 +86,10 @@ async function main() {
   hshCache.meta = {
     minProb: HSH_MIN_PROB,
     maxPicks: HSH_MAX_PICKS,
+    marginMin: HSH_MARGIN_MIN,
+    minGoals: HSH_MIN_GOALS,
+    sharePrior: HSH_SHARE_PRIOR,
+    shareReg: HSH_SHARE_REG,
     free: true
   };
   fs.writeFileSync(HSH_CACHE_FILE, JSON.stringify(hshCache, null, 2));
@@ -102,12 +106,12 @@ async function main() {
   }
 
   const totalHsh = Object.values(hshCache.dates || {}).reduce((s, m) => s + m.length, 0);
-  console.log('\n=== HIGHEST-SCORING-HALF PICKS (free, prob >= ' + HSH_MIN_PROB + ', max ' + HSH_MAX_PICKS + '/day) ===');
+  console.log('\n=== HIGHEST-SCORING-HALF PICKS (free, prob >= ' + HSH_MIN_PROB + ', margin >= ' + HSH_MARGIN_MIN + ', max ' + HSH_MAX_PICKS + '/day) ===');
   console.log('Total HSH picks cached: ' + totalHsh);
   for (const [date, picks] of Object.entries(hshCache.dates || {})) {
     console.log('\n--- ' + date + ' (' + picks.length + ') ---');
     picks.forEach(p => {
-      console.log('[' + p.hsh.label + '] ' + p.home + ' v ' + p.away + ' | p=' + (p.hsh.prob * 100).toFixed(0) + '% (1H ' + (p.hsh.firstHalfExp) + ' vs 2H ' + (p.hsh.secondHalfExp) + ' xG)');
+      console.log('[' + p.hsh.label + '] ' + p.home + ' v ' + p.away + ' | p=' + (p.hsh.prob * 100).toFixed(0) + '% margin=' + (p.hsh.margin * 100).toFixed(0) + '% (1H ' + (p.hsh.firstHalfExp) + ' vs 2H ' + (p.hsh.secondHalfExp) + ' xG, share ' + (p.hsh.firstHalfShare).toFixed(2) + ')');
     });
   }
 }

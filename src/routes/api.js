@@ -901,6 +901,43 @@ router.get('/vip', requireProMiddleware, function (req, res) {
   }
 });
 
+// GET /api/highest-scoring-half - FREE market, served to everyone. Picks live
+// in the committed highest-scoring-half-cache.json produced by the same daily
+// Forebet scrape. No membership gate and no odds anywhere in the payload; the
+// tab only presents the modelled "which half scores more" call.
+const pathHshCache = path.join(__dirname, '../../highest-scoring-half-cache.json');
+
+router.get('/highest-scoring-half', function (req, res) {
+  try {
+    if (!fs.existsSync(pathHshCache)) {
+      return res.json({ free: true, dates: {}, allDates: [], lastFetch: null, message: 'Highest-scoring-half picks publish each morning.' });
+    }
+    const cache = JSON.parse(fs.readFileSync(pathHshCache, 'utf8'));
+    const dates = cache.dates || {};
+    const requestedDate = req.query.date;
+    if (requestedDate && dates[requestedDate]) {
+      return res.json({
+        free: true,
+        lastFetch: cache.lastFetch || null,
+        meta: cache.meta || null,
+        date: requestedDate,
+        picks: dates[requestedDate],
+        allDates: Object.keys(dates)
+      });
+    }
+    res.json({
+      free: true,
+      lastFetch: cache.lastFetch || null,
+      meta: cache.meta || null,
+      dates,
+      allDates: Object.keys(dates)
+    });
+  } catch (e) {
+    console.error('[api/highest-scoring-half] Error:', e.message);
+    res.status(500).json({ error: 'Failed to load highest-scoring-half picks' });
+  }
+});
+
 router.get('/football-odds', async (req, res) => {
   const requestedDate = typeof req.query.date === 'string' ? req.query.date : new Date().toISOString().slice(0, 10);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(requestedDate)) {
