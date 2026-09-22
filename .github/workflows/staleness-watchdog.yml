@@ -124,7 +124,7 @@ jobs:
       - name: Detect stale committed VIP cache and alert
         id: check
         run: |
-node <<'EOF' > watchdog-vip-output.txt
+          node <<'EOF' > watchdog-vip-output.txt
           const https = require('https');
 
           (async () => {
