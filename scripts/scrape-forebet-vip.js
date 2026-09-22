@@ -5,6 +5,9 @@ const { lagosDate } = require('../src/utils/dates');
 
 const CACHE_FILE = path.join(process.cwd(), 'forebet-vip-cache.json');
 const HSH_CACHE_FILE = path.join(process.cwd(), 'highest-scoring-half-cache.json');
+// The free HSH tab reads a STATIC file on the public (GitHub Pages) host - the
+// same cache is mirrored here so the scrape publishes to the real site.
+const HSH_STATIC_FILE = path.join(process.cwd(), 'public', 'data', 'highest-scoring-half.json');
 // Calendar days kept in the cache. Old dates are pruned on every write so the
 // file cannot grow without bound across daily scraper runs.
 const KEEP_DAYS = 3;
@@ -94,6 +97,8 @@ async function main() {
   };
   fs.writeFileSync(HSH_CACHE_FILE, JSON.stringify(hshCache, null, 2));
   console.log('Saved ' + HSH_CACHE_FILE);
+  fs.writeFileSync(HSH_STATIC_FILE, JSON.stringify(hshCache, null, 2));
+  console.log('Saved ' + HSH_STATIC_FILE);
 
   const total = Object.values(cache.dates || {}).reduce((s, m) => s + m.length, 0);
   console.log('\n=== VIP PICKS (team-to-score, scoring prob >= ' + TTS_MIN_PROB + ', must-score >= ' + MUST_SCORE_MIN + '/100) ===');

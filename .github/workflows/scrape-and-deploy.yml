@@ -14,6 +14,7 @@ on:
       - 'scripts/**'
       - 'h2h-unbeaten-cache.json'
       - 'forebet-vip-cache.json'
+      - 'highest-scoring-half-cache.json'
       - '.github/workflows/scrape-and-deploy.yml'
   schedule:
     # 09:00 UTC (10:00 WAT) daily, once per day

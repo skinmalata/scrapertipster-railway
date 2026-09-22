@@ -555,6 +555,15 @@ function rebuildStatic() {
     console.log('Saved h2h-unbeaten.json');
   }
 
+  // Free highest-scoring-half picks come from the same committed VIP scrape
+  // cache; the static page reads this file so the market works on GitHub Pages
+  // without any live API.
+  const hshFile = path.join(process.cwd(), 'highest-scoring-half-cache.json');
+  if (fs.existsSync(hshFile)) {
+    fs.copyFileSync(hshFile, path.join(dataDir, 'highest-scoring-half.json'));
+    console.log('Saved highest-scoring-half.json');
+  }
+
   // Generate static category pages
   console.log('Generating category pages...');
   const categoryPagesDir = path.join(process.cwd(), 'public', 'predictions');
