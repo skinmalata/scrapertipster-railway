@@ -4,15 +4,16 @@
 // the buyer approves on paypal.com, and payment completion is recorded from a
 // PAYMENT.CAPTURE.COMPLETED webhook OR — for accounts that cannot create
 // developer webhooks — from a verified IPN posted to the account-level notify
-// URL. Requires PAYPAL_CLIENT_ID / PAYPAL_SECRET (PAYPAL_WEBHOOK_ID only when
-// using webhooks); PAYPAL_MODE=sandbox for
+// URL. Requires PAYPAL_CLIENT_ID and PAYPAL_SECRET (PAYPAL_CLIENT_SECRET
+// accepted as an alias); PAYPAL_WEBHOOK_ID only when using webhooks.
+// PAYPAL_MODE=sandbox for
 // test mode. The merchant e-mail receiving the money is whichever PayPal
 // account owns the REST app (officialwinfulltime@gmail.com).
 
 var PAYPAL_MODE = process.env.PAYPAL_MODE === 'sandbox' ? 'sandbox' : 'live';
 var PAYPAL_API = PAYPAL_MODE === 'sandbox' ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com';
 var PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
-var PAYPAL_SECRET = process.env.PAYPAL_SECRET;
+var PAYPAL_SECRET = process.env.PAYPAL_SECRET || process.env.PAYPAL_CLIENT_SECRET;
 var PAYPAL_WEBHOOK_ID = process.env.PAYPAL_WEBHOOK_ID;
 
 var PLANS = {

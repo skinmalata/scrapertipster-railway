@@ -1483,7 +1483,7 @@ router.post('/checkout', requireAuth, async function (req, res) {
 // GET /api/paypal/config — public PayPal SDK settings (client id only, no secrets)
 router.get('/paypal/config', function (req, res) {
   res.json({
-    enabled: !!(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_SECRET),
+    enabled: paypal.isConfigured(),
     clientId: process.env.PAYPAL_CLIENT_ID || null,
     mode: process.env.PAYPAL_MODE === 'sandbox' ? 'sandbox' : 'live'
   });
