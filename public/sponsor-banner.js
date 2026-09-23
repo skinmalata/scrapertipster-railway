@@ -21,18 +21,21 @@
 
   function insertSponsor(gridHtml) {
     var marker = '<div class="match-card fade-in"';
-    var first = gridHtml.indexOf(marker);
-    if (first < 0) return gridHtml;
-    var second = gridHtml.indexOf(marker, first + marker.length);
-    if (second < 0) return gridHtml;
+    var positions = [];
+    var pos = gridHtml.indexOf(marker);
+    while (pos !== -1 && positions.length < 6) {
+      positions.push(pos);
+      pos = gridHtml.indexOf(marker, pos + marker.length);
+    }
+    if (positions.length === 0) return gridHtml;
     var banner = '<div class="wft-sponsor"><a href="' + SPONSOR_HREF +
       '" target="_blank" rel="noopener nofollow sponsored" title="1Win" aria-label="1Win">' +
       '<img src="' + SPONSOR_BANNERS[index] + '" alt="1Win" width="800" height="800" ' +
       'loading="lazy" decoding="async" style="display:block;width:100%;height:auto;border-radius:12px;">' +
       '</a></div>';
-    var insertAt = second;
+    var insertAt = positions.length >= 6 ? positions[5] : gridHtml.length;
     while (insertAt > 0 && (gridHtml[insertAt - 1] === '\n' || gridHtml[insertAt - 1] === ' ')) insertAt--;
-    return gridHtml.slice(0, insertAt) + '\n\n' + banner + '\n\n  ' + gridHtml.slice(second);
+    return gridHtml.slice(0, insertAt) + '\n\n' + banner + '\n\n  ' + gridHtml.slice(insertAt);
   }
 
   window.wftSponsor = { insertSponsor: insertSponsor };

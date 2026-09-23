@@ -323,10 +323,12 @@ function escapeHtml(str) {
 const EXTRA_TABS = [
   { id: 'author-picks', href: '/author-picks.html', label: 'H2H Picks' }
 ];
+const TAB_SKIP = new Set(['winning-streak', 'losing-streak']);
+const HSH_TAB = { id: 'highest-scoring-half', href: '/predictions/highest-scoring-half', label: 'Highest Scoring Half' };
 
 function generateCategoryPage(slug, catConfig, ctx) {
   const BOOKMAKER_CTA_BODY = renderBookmakerCTABody();
-  const allSlugs = Object.keys(CATEGORIES);
+  const allSlugs = Object.keys(CATEGORIES).filter(s => !TAB_SKIP.has(s));
   const baseTabs = allSlugs.map(s => {
     const c = CATEGORIES[s];
     const active = s === slug ? ' active' : '';
@@ -337,6 +339,12 @@ function generateCategoryPage(slug, catConfig, ctx) {
   );
   const insertIdx = allSlugs.indexOf('over-2-5') + 1;
   baseTabs.splice(insertIdx, 0, ...extraTabsHtml);
+  const hshIdx = baseTabs.findIndex(t => t.indexOf('/predictions/gg2') !== -1) + 1;
+  if (hshIdx > 0) {
+    baseTabs.splice(hshIdx, 0,
+      `<a href="${HSH_TAB.href}" id="tab-${HSH_TAB.id}" class="tab-btn">${escapeHtml(HSH_TAB.label)}</a>`
+    );
+  }
   const categoryTabs = baseTabs.join('\n            ');
 
   const isStreak = slug === 'winning-streak' || slug === 'losing-streak' || slug === 'draws-streak';
