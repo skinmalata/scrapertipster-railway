@@ -1,6 +1,5 @@
 {
   "dates": {
-    "2026-09-21": [],
     "2026-09-22": [
       {
         "matchId": "2531797",
@@ -284,6 +283,37 @@
         }
       },
       {
+        "matchId": "2531138",
+        "home": "Kids Tâmpa Braşov",
+        "away": "Olimpic Zărneşti",
+        "league": "Ro3",
+        "time": "",
+        "probs": {
+          "home": 26,
+          "draw": 14,
+          "away": 60
+        },
+        "avgGoals": 4.2,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.771,
+          "margin": 0.672,
+          "firstHalfShare": 0.26,
+          "firstHalfExp": 1.09,
+          "secondHalfExp": 3.11,
+          "p1": 0.099,
+          "p2": 0.771,
+          "tie": 0.129,
+          "fitErr": 0.01351,
+          "totalExp": 4.2,
+          "referenceFirstHalfProb": 0.05,
+          "referenceDrawProb": 0.46,
+          "referenceSecondHalfProb": 0.48,
+          "reason": "Expected 4.2 goals, split 1.1 in the 1st half vs 3.1 in the 2nd. The 2nd half wins the half race 77% of the time, 67% clear of the other half."
+        }
+      },
+      {
         "matchId": "2520448",
         "home": "Nevesinje",
         "away": "Zvijezda 09",
@@ -315,65 +345,34 @@
         }
       },
       {
-        "matchId": "2554090",
-        "home": "Kyoto Sanga",
-        "away": "Fujieda MYFC",
-        "league": "JpC",
+        "matchId": "2531404",
+        "home": "Progresul Fundulea",
+        "away": "CSA Axiopolis",
+        "league": "Ro3",
         "time": "",
         "probs": {
           "home": 37,
-          "draw": 33,
+          "draw": 32,
           "away": 30
         },
-        "avgGoals": 3.65,
+        "avgGoals": 2.94,
         "hsh": {
           "pick": "2H",
           "label": "2nd Half",
-          "prob": 0.756,
-          "margin": 0.657,
+          "prob": 0.71,
+          "margin": 0.6,
           "firstHalfShare": 0.25,
-          "firstHalfExp": 0.91,
-          "secondHalfExp": 2.74,
-          "p1": 0.099,
-          "p2": 0.756,
-          "tie": 0.145,
-          "fitErr": 0.00511,
-          "totalExp": 3.65,
-          "referenceFirstHalfProb": 0.24,
-          "referenceDrawProb": 0.54,
-          "referenceSecondHalfProb": 0.22,
-          "reason": "Expected 3.6 goals, split 0.9 in the 1st half vs 2.7 in the 2nd. The 2nd half wins the half race 76% of the time, 66% clear of the other half."
-        }
-      },
-      {
-        "matchId": "2537401",
-        "home": "Nara United",
-        "away": "Chiangmai United",
-        "league": "ThC",
-        "time": "",
-        "probs": {
-          "home": 29,
-          "draw": 51,
-          "away": 20
-        },
-        "avgGoals": 2.88,
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.705,
-          "margin": 0.594,
-          "firstHalfShare": 0.25,
-          "firstHalfExp": 0.72,
-          "secondHalfExp": 2.16,
-          "p1": 0.111,
-          "p2": 0.705,
-          "tie": 0.184,
-          "fitErr": 0.00095,
-          "totalExp": 2.88,
+          "firstHalfExp": 0.73,
+          "secondHalfExp": 2.21,
+          "p1": 0.11,
+          "p2": 0.71,
+          "tie": 0.18,
+          "fitErr": 0.0208,
+          "totalExp": 2.94,
           "referenceFirstHalfProb": 0.25,
-          "referenceDrawProb": 0.57,
-          "referenceSecondHalfProb": 0.18,
-          "reason": "Expected 2.9 goals, split 0.7 in the 1st half vs 2.2 in the 2nd. The 2nd half wins the half race 71% of the time, 59% clear of the other half."
+          "referenceDrawProb": 0.65,
+          "referenceSecondHalfProb": 0.1,
+          "reason": "Expected 2.9 goals, split 0.7 in the 1st half vs 2.2 in the 2nd. The 2nd half wins the half race 71% of the time, 60% clear of the other half."
         }
       },
       {
@@ -470,6 +469,99 @@
         }
       },
       {
+        "matchId": "2531402",
+        "home": "Dunarea Calarasi",
+        "away": "Sporting Lieşti",
+        "league": "Ro3",
+        "time": "",
+        "probs": {
+          "home": 40,
+          "draw": 16,
+          "away": 44
+        },
+        "avgGoals": 3,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.637,
+          "margin": 0.477,
+          "firstHalfShare": 0.31,
+          "firstHalfExp": 0.93,
+          "secondHalfExp": 2.07,
+          "p1": 0.16,
+          "p2": 0.637,
+          "tie": 0.203,
+          "fitErr": 0.01627,
+          "totalExp": 3,
+          "referenceFirstHalfProb": 0.15,
+          "referenceDrawProb": 0.49,
+          "referenceSecondHalfProb": 0.36,
+          "reason": "Expected 3.0 goals, split 0.9 in the 1st half vs 2.1 in the 2nd. The 2nd half wins the half race 64% of the time, 48% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2531666",
+        "home": "Academica Balș",
+        "away": "Jiul Petrosani",
+        "league": "Ro3",
+        "time": "",
+        "probs": {
+          "home": 53,
+          "draw": 33,
+          "away": 14
+        },
+        "avgGoals": 3.25,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.611,
+          "margin": 0.424,
+          "firstHalfShare": 0.34,
+          "firstHalfExp": 1.1,
+          "secondHalfExp": 2.14,
+          "p1": 0.187,
+          "p2": 0.611,
+          "tie": 0.202,
+          "fitErr": 0.00025,
+          "totalExp": 3.25,
+          "referenceFirstHalfProb": 0.5,
+          "referenceDrawProb": 0.4,
+          "referenceSecondHalfProb": 0.11,
+          "reason": "Expected 3.3 goals, split 1.1 in the 1st half vs 2.1 in the 2nd. The 2nd half wins the half race 61% of the time, 42% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2531406",
+        "home": "Agricola Borcea",
+        "away": "Recolta Gheorghe Doja",
+        "league": "Ro3",
+        "time": "",
+        "probs": {
+          "home": 55,
+          "draw": 13,
+          "away": 32
+        },
+        "avgGoals": 4.8,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.63,
+          "margin": 0.423,
+          "firstHalfShare": 0.37,
+          "firstHalfExp": 1.78,
+          "secondHalfExp": 3.02,
+          "p1": 0.207,
+          "p2": 0.63,
+          "tie": 0.162,
+          "fitErr": 0.0074,
+          "totalExp": 4.8,
+          "referenceFirstHalfProb": 0.42,
+          "referenceDrawProb": 0.29,
+          "referenceSecondHalfProb": 0.28,
+          "reason": "Expected 4.8 goals, split 1.8 in the 1st half vs 3.0 in the 2nd. The 2nd half wins the half race 63% of the time, 42% clear of the other half."
+        }
+      },
+      {
         "matchId": "2535129",
         "home": "Levoca",
         "away": "Liptovsky Mikulas",
@@ -530,41 +622,10 @@
           "referenceSecondHalfProb": 0.17,
           "reason": "Expected 2.6 goals, split 1.7 in the 1st half vs 0.9 in the 2nd. The 1st half wins the half race 56% of the time, 36% clear of the other half."
         }
-      },
-      {
-        "matchId": "2537393",
-        "home": "Jalor City FC",
-        "away": "Ayutthaya FC",
-        "league": "ThC",
-        "time": "",
-        "probs": {
-          "home": 42,
-          "draw": 30,
-          "away": 28
-        },
-        "avgGoals": 2.9,
-        "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.564,
-          "margin": 0.353,
-          "firstHalfShare": 0.64,
-          "firstHalfExp": 1.86,
-          "secondHalfExp": 1.04,
-          "p1": 0.564,
-          "p2": 0.21,
-          "tie": 0.226,
-          "fitErr": 0.00448,
-          "totalExp": 2.9,
-          "referenceFirstHalfProb": 0.48,
-          "referenceDrawProb": 0.33,
-          "referenceSecondHalfProb": 0.19,
-          "reason": "Expected 2.9 goals, split 1.9 in the 1st half vs 1.0 in the 2nd. The 1st half wins the half race 56% of the time, 35% clear of the other half."
-        }
       }
     ]
   },
-  "lastFetch": "2026-09-22T14:12:42.827Z",
+  "lastFetch": "2026-09-23T13:11:02.523Z",
   "meta": {
     "minProb": 0.55,
     "maxPicks": 12,

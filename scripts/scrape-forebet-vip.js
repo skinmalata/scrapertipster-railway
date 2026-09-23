@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { scrapeVip, closeVipBrowser, selectHshPicks, HSH_MIN_PROB, HSH_MAX_PICKS, HSH_MARGIN_MIN, HSH_MIN_GOALS, HSH_SHARE_PRIOR, HSH_SHARE_REG, TTS_MIN_PROB, MUST_SCORE_MIN, TTS_WIN_CERT_MIN_PROB, VIP_MAX_TIPS, TTS_PERFECT_FORM_PCT, TTS_PERFECT_H2H_PCT } = require('../src/services/forebetVip');
+const { scrapeVip, closeVipBrowser, selectHshPicks, HSH_MIN_PROB, HSH_MAX_PICKS, HSH_MARGIN_MIN, HSH_MIN_GOALS, HSH_SHARE_PRIOR, HSH_SHARE_REG, TTS_MIN_PROB, TTS_MIN_CONF, MIN_TEAM_SCORE_ODD, MUST_SCORE_MIN, TTS_WIN_CERT_MIN_PROB, VIP_MAX_TIPS, TTS_PERFECT_FORM_PCT, TTS_PERFECT_H2H_PCT } = require('../src/services/forebetVip');
 const { lagosDate } = require('../src/utils/dates');
 
 const CACHE_FILE = path.join(process.cwd(), 'forebet-vip-cache.json');
@@ -87,6 +87,8 @@ async function main() {
     markets: ['match-winner', 'team-to-score'],
     winCertMinProb: TTS_WIN_CERT_MIN_PROB,
     minTeamScoreProb: TTS_MIN_PROB,
+    minTeamScoreConf: TTS_MIN_CONF,
+    minTeamScoreOdd: MIN_TEAM_SCORE_ODD,
     mustScoreMin: MUST_SCORE_MIN,
     maxTips: VIP_MAX_TIPS,
     perfectFormPct: TTS_PERFECT_FORM_PCT,
@@ -111,7 +113,7 @@ async function main() {
   console.log('Saved ' + HSH_STATIC_FILE);
 
   const total = Object.values(cache.dates || {}).reduce((s, m) => s + m.length, 0);
-  console.log('\n=== VIP PICKS (match-winner record certs + team-to-score, score prob >= ' + TTS_MIN_PROB + ', must-score >= ' + MUST_SCORE_MIN + '/100, max ' + VIP_MAX_TIPS + '/day) ===');
+  console.log('\n=== VIP PICKS (match-winner record certs + team-to-score, odd > ' + MIN_TEAM_SCORE_ODD + ', conf > ' + TTS_MIN_CONF + ', must-score >= ' + MUST_SCORE_MIN + '/100, max ' + VIP_MAX_TIPS + '/day) ===');
   console.log('Total VIP tips cached: ' + total);
   for (const [date, matches] of Object.entries(cache.dates || {})) {
     console.log('\n--- ' + date + ' (' + matches.length + ') ---');
