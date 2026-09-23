@@ -543,7 +543,7 @@ async function scrapeDate(dateStr, retryCount = 0) {
       });
     }
 
-    if (homeTeam && awayTeam && under25 >= 65) {
+    if (homeTeam && awayTeam && under25 >= 60) {
       under25Matches.push({
         id: under25Id++,
         league: leagueInfo.league,
