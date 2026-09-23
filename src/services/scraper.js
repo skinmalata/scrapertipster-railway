@@ -449,22 +449,11 @@ async function scrapeDate(dateStr, retryCount = 0) {
       over25 = Math.max(0, over15 - 20);
     }
 
-    // Under cells: Statarea marks them with a bare 'u' class token followed by
-    // the value (e.g. 'u44'). A substring match is unreliable because every
-    // cell class contains 'u' (e.g. 'value b37'). Prefer the explicit value
-    // (quality); fall back to complement of the over line so the under market
-    // still works if the markup only exposes over cells.
-    const uValues = valueData.filter(v => (v.cls.match(/\S+/g) || []).some(t => /^u\d{1,2}$/.test(t)));
-    if (uValues.length >= 2) {
-      under15 = parseInt(uValues[0].txt) || 0;
-      under25 = parseInt(uValues[1].txt) || 0;
-    } else if (uValues.length === 1) {
-      under15 = parseInt(uValues[0].txt) || 0;
-      under25 = Math.max(0, under15 - 20);
-    } else {
-      if (over15 > 0) under15 = Math.max(0, 100 - over15);
-      if (over25 > 0) under25 = Math.max(0, 100 - over25);
-    }
+    // Statarea only exposes Over probabilities (cells are classed like
+    // 'o81', 'o54', 'o34' for Over 1.5/2.5/3.5). There are no Under cells, so
+    // the Under market is the complement of the Over line.
+    if (over15 > 0) under15 = Math.max(0, 100 - over15);
+    if (over25 > 0) under25 = Math.max(0, 100 - over25);
     
     const gValues = valueData.filter(v => v.cls.includes('g'));
     if (gValues.length >= 2) {
