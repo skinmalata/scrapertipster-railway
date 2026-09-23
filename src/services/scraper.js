@@ -341,6 +341,83 @@ async function scrapeYesterdayResults() {
   return dateResults;
 }
 
+function factorial(n) {
+  let r = 1;
+  for (let i = 2; i <= n; i++) r *= i;
+  return r;
+}
+
+function poissonPmf(k, lambda) {
+  if (lambda <= 0) return k === 0 ? 1 : 0;
+  return Math.exp(-lambda) * Math.pow(lambda, k) / factorial(k);
+}
+
+// P(X >= k) for X ~ Poisson(lambda)
+function poissonTail(k, lambda) {
+  if (lambda <= 0) return k <= 0 ? 1 : 0;
+  let s = 0;
+  for (let i = 0; i <= k - 1; i++) s += poissonPmf(i, lambda);
+  return 1 - s;
+}
+
+// Fit lambda for total goals from over-lines (P(X>=2), P(X>=3), P(X>=4)).
+function fitTotalLambda(tailTargets) {
+  let best = 2.5;
+  let bestErr = Infinity;
+  for (let lam = 0.5; lam <= 6.001; lam += 0.01) {
+    let err = 0;
+    for (const t of tailTargets) err += Math.pow(poissonTail(t.k, lam) - t.p, 2);
+    if (err < bestErr) { bestErr = err; best = lam; }
+  }
+  return best;
+}
+
+// GG2+ = both teams score 2+ goals each (e.g. 2-2, 2-3, 3-2).
+// Statarea exposes only total-goal over-lines plus BTTS, so we fit a Poisson
+// total lambda, split it between home/away from the 1X2 spread, and compute
+// P(home>=2) * P(away>=2).
+function estimateGg2Plus(over15, over25, over35, prob1, prob2) {
+  if (over15 <= 0 || over25 <= 0) return 0;
+  const targets = [{ k: 2, p: over15 / 100 }, { k: 3, p: over25 / 100 }];
+  if (over35 > 0) targets.push({ k: 4, p: over35 / 100 });
+  const lam = fitTotalLambda(targets);
+  let share = 0.5 + (prob1 - prob2) / 400;
+  share = Math.max(0.35, Math.min(0.65, share));
+  const lamh = lam * share;
+  const lama = lam * (1 - share);
+  const pBoth2 = poissonTail(2, lamh) * poissonTail(2, lama);
+  return Math.round(pBoth2 * 100);
+}
+
+// HT/FT (half-time/full-time): combine the HT 1X2 and FT 1X2 into the single
+// most likely diagonal or swing combo. Diagonal combos (HT = FT) are far more
+// likely, so they get a probability boost over swings like 1/X.
+function bestHtftCombo(ht1, htX, ht2, prob1, probX, prob2) {
+  const ht = { '1': ht1, 'X': htX, '2': ht2 };
+  const ft = { '1': prob1, 'X': probX, '2': prob2 };
+  const candidates = [];
+  const pairs = [
+    ['1', '1'], ['X', 'X'], ['2', '2'],
+    ['1', 'X'], ['X', '1'], ['2', 'X'], ['X', '2'],
+    ['1', '2'], ['2', '1']
+  ];
+  for (const [h, f] of pairs) {
+    const hp = ht[h];
+    const fp = ft[f];
+    if (hp < 1 || fp < 1) continue;
+    const diagonal = h === f;
+    const swing = (h === '1' && f === '2') || (h === '2' && f === '1');
+    if (swing && (hp < 70 || fp < 70)) continue;
+    const minLeg = Math.min(hp, fp);
+    const prob = diagonal ? Math.round(minLeg) : Math.round(minLeg * 0.8);
+    if (prob < 40) continue;
+    candidates.push({ tip: `${h}/${f}`, probability: prob, score: prob + (diagonal ? 8 : 0) });
+  }
+  if (candidates.length === 0) return null;
+  candidates.sort((a, b) => b.score - a.score);
+  return { tip: candidates[0].tip, probability: candidates[0].probability };
+}
+
 async function scrapeDate(dateStr, retryCount = 0) {
   const url = `${STATAREA_URL}/date/${dateStr}`;
   let html;
@@ -394,11 +471,13 @@ async function scrapeDate(dateStr, retryCount = 0) {
   let under25Matches = [];
   let bttsMatches = [];
   let bttsNoMatches = [];
+  let htftMatches = [];
+  let gg2PlusMatches = [];
   
   const matchElements = $('.match');
   console.log(`Found ${matchElements.length} match elements for ${dateStr}`);
 
-  let matchId = 0, over25Id = 0, over15Id = 0, under25Id = 0, bttsId = 0, bttsNoId = 0;
+  let matchId = 0, over25Id = 0, over15Id = 0, under25Id = 0, bttsId = 0, bttsNoId = 0, htftId = 0, gg2Id = 0;
   
   matchElements.each((i, el) => {
     const $match = $(el);
@@ -421,7 +500,7 @@ async function scrapeDate(dateStr, retryCount = 0) {
     }
     
     const allValues = $match.find('.value');
-    let prob1 = 0, probX = 0, prob2 = 0, over25 = 0, under25 = 0, over15 = 0, under15 = 0, gg = 0, ng = 0;
+    let prob1 = 0, probX = 0, prob2 = 0, over25 = 0, under25 = 0, over15 = 0, under15 = 0, gg = 0, ng = 0, over35 = 0, ht1 = 0, htX = 0, ht2 = 0;
     
     const valueData = [];
     allValues.each((vi, vel) => {
@@ -441,12 +520,25 @@ async function scrapeDate(dateStr, retryCount = 0) {
     const oValues = valueData.filter(v => v.cls.includes('o'));
     const bValues = valueData.filter(v => v.cls.includes('b'));
     
-    if (oValues.length >= 2) {
+    if (oValues.length >= 3) {
+      over15 = parseInt(oValues[0].txt) || 0;
+      over25 = parseInt(oValues[1].txt) || 0;
+      over35 = parseInt(oValues[2].txt) || 0;
+    } else if (oValues.length >= 2) {
       over15 = parseInt(oValues[0].txt) || 0;
       over25 = parseInt(oValues[1].txt) || 0;
     } else if (oValues.length === 1) {
       over15 = parseInt(oValues[0].txt) || 0;
       over25 = Math.max(0, over15 - 20);
+    }
+
+    if (bValues.length >= 3) {
+      ht1 = parseInt(bValues[0].txt) || 0;
+      htX = parseInt(bValues[1].txt) || 0;
+      ht2 = parseInt(bValues[2].txt) || 0;
+    } else if (bValues.length === 2) {
+      ht1 = parseInt(bValues[0].txt) || 0;
+      htX = parseInt(bValues[1].txt) || 0;
     }
 
     // Statarea only exposes Over probabilities (cells are classed like
@@ -590,6 +682,42 @@ async function scrapeDate(dateStr, retryCount = 0) {
           score: score
         });
       }
+
+      if (homeTeam && awayTeam && ht1 + htX + ht2 > 0 && prob1 + probX + prob2 > 0) {
+        const combo = bestHtftCombo(ht1, htX, ht2, prob1, probX, prob2);
+        if (combo) {
+          htftMatches.push({
+            id: htftId++,
+            league: leagueInfo.league,
+            country: leagueInfo.country,
+            time: time,
+            match: `${homeTeam} - ${awayTeam}`,
+            probabilities: { htHome: ht1, htDraw: htX, htAway: ht2, homeWin: prob1, draw: probX, awayWin: prob2, comboProb: combo.probability },
+            tip: combo.tip,
+            probability: combo.probability,
+            date: dateStr,
+            score: score
+          });
+        }
+      }
+
+      if (homeTeam && awayTeam && gg >= 50 && over35 >= 40) {
+        const gg2Prob = estimateGg2Plus(over15, over25, over35, prob1, prob2);
+        if (gg2Prob >= 15) {
+          gg2PlusMatches.push({
+            id: gg2Id++,
+            league: leagueInfo.league,
+            country: leagueInfo.country,
+            time: time,
+            match: `${homeTeam} - ${awayTeam}`,
+            probabilities: { over15: over15, over25: over25, over35: over35, bttsYes: gg, bttsNo: ng },
+            tip: 'GG2+',
+            probability: gg2Prob,
+            date: dateStr,
+            score: score
+          });
+        }
+      }
     });
 
   if (matches.length < 6 && fallbackMatches.length > 0) {
@@ -597,22 +725,28 @@ async function scrapeDate(dateStr, retryCount = 0) {
     matches.push(...fallbackMatches);
   }
   
-  // Deduplicate within Statarea results (same match may appear in multiple sections)
-  const seenKeys = new Set();
-  const dedup = (arr) => arr.filter(m => {
-    const key = normalizeMatchKey(m.match, m.date);
-    if (seenKeys.has(key)) return false;
-    seenKeys.add(key);
-    return true;
-  });
-  matches = dedup(matches);
-  over25Matches = dedup(over25Matches);
-  over15Matches = dedup(over15Matches);
-  under25Matches = dedup(under25Matches);
-  bttsMatches = dedup(bttsMatches);
-  bttsNoMatches = dedup(bttsNoMatches);
+  // Deduplicate within each Statarea section (same match may appear in multiple
+  // sections). Each category uses its own key set so a fixture can legitimately
+  // appear in several markets (1X2 + Over 2.5 + BTTS + HT/FT + GG2+).
+  const makeDeduper = () => {
+    const seenKeys = new Set();
+    return (arr) => arr.filter(m => {
+      const key = normalizeMatchKey(m.match, m.date);
+      if (seenKeys.has(key)) return false;
+      seenKeys.add(key);
+      return true;
+    });
+  };
+  matches = makeDeduper()(matches);
+  over25Matches = makeDeduper()(over25Matches);
+  over15Matches = makeDeduper()(over15Matches);
+  under25Matches = makeDeduper()(under25Matches);
+  bttsMatches = makeDeduper()(bttsMatches);
+  bttsNoMatches = makeDeduper()(bttsNoMatches);
+  htftMatches = makeDeduper()(htftMatches);
+  gg2PlusMatches = makeDeduper()(gg2PlusMatches);
   
-  return { matches, over25Matches, over15Matches, under25Matches, bttsMatches, bttsNoMatches };
+  return { matches, over25Matches, over15Matches, under25Matches, bttsMatches, bttsNoMatches, htftMatches, gg2PlusMatches };
 }
 
 const PROSOCCER_BASE_URL = 'https://www.prosoccer.gr/en/football/predictions';
@@ -1087,6 +1221,8 @@ async function fetchAndCachePredictions() {
     const allUnder25 = [];
     const allBtts = [];
     const allBttsNo = [];
+    const allHtft = [];
+    const allGg2 = [];
      
     for (const dateStr of dateRange) {
       const data = await scrapeDate(dateStr);
@@ -1096,6 +1232,8 @@ async function fetchAndCachePredictions() {
       allUnder25.push(...(data.under25Matches || []));
       allBtts.push(...data.bttsMatches);
       allBttsNo.push(...data.bttsNoMatches);
+      allHtft.push(...(data.htftMatches || []));
+      allGg2.push(...(data.gg2PlusMatches || []));
       await sleep(3000);
     }
     
@@ -1142,6 +1280,8 @@ async function fetchAndCachePredictions() {
       under25Matches: allUnder25,
       bttsMatches: allBtts,
       bttsNoMatches: allBttsNo,
+      htftMatches: allHtft,
+      gg2PlusMatches: allGg2,
       winstreakMatches,
       losestreakMatches,
       drawstreakMatches,
@@ -1159,6 +1299,8 @@ async function fetchAndCachePredictions() {
       totalUnder25: allUnder25.length,
       totalBtts: allBtts.length,
       totalBttsNo: allBttsNo.length,
+      totalHtft: allHtft.length,
+      totalGg2: allGg2.length,
       totalWinstreak: winstreakMatches.length,
       totalLosestreak: losestreakMatches.length,
       totalDrawstreak: drawstreakMatches.length,
@@ -1168,6 +1310,8 @@ async function fetchAndCachePredictions() {
       under25Matches: allUnder25,
       bttsMatches: allBtts,
       bttsNoMatches: allBttsNo,
+      htftMatches: allHtft,
+      gg2PlusMatches: allGg2,
       winstreakMatches,
       losestreakMatches,
       drawstreakMatches,
@@ -1257,10 +1401,19 @@ function mergeMissedMatches(freshData, missedMatches, cached) {
   merged.under25Matches = [...missedUnder25, ...(freshData.under25Matches || [])];
   merged.bttsMatches = [...missedBtts, ...freshData.bttsMatches];
   
+  const missedKeys = new Set(missedMatches.map(m => normalizeMatchKey(m.match, m.date)));
+  const missedHtft = (cached.htftMatches || []).filter(m => missedKeys.has(normalizeMatchKey(m.match, m.date)));
+  const missedGg2 = (cached.gg2PlusMatches || []).filter(m => missedKeys.has(normalizeMatchKey(m.match, m.date)));
+  
+  merged.htftMatches = [...missedHtft, ...(freshData.htftMatches || [])];
+  merged.gg2PlusMatches = [...missedGg2, ...(freshData.gg2PlusMatches || [])];
+  
   merged.totalOver25 = merged.over25Matches.length;
   merged.totalOver15 = merged.over15Matches.length;
   merged.totalUnder25 = merged.under25Matches.length;
   merged.totalBtts = merged.bttsMatches.length;
+  merged.totalHtft = merged.htftMatches.length;
+  merged.totalGg2 = merged.gg2PlusMatches.length;
   
   merged.lastUpdated = new Date().toISOString();
   merged.recoveredMatches = missedMatches.length;
@@ -1317,7 +1470,9 @@ function getAllMatchupsFromPredictions() {
     predictions.losestreakMatches,
     predictions.drawstreakMatches,
     predictions.teamToScoreMatches,
-    predictions.teamToScore2PlusMatches
+    predictions.teamToScore2PlusMatches,
+    predictions.htftMatches,
+    predictions.gg2PlusMatches
   ];
   
   for (const category of categories) {

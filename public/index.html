@@ -270,6 +270,10 @@ gtag('config', 'G-HMGZMW9EDP');
 
  <a href="/predictions/under-2-5" id="tab-under25" class="tab-btn">Under 2.5</a>
 
+ <a href="/predictions/ht-ft" id="tab-htft" class="tab-btn">HT/FT</a>
+
+ <a href="/predictions/gg2" id="tab-gg2" class="tab-btn">GG2+</a>
+
  <a href="/predictions/highest-scoring-half" id="tab-highest-scoring-half" class="tab-btn">Highest Scoring Half</a>
 
  <a href="/predictions/unbeaten" id="tab-unbeaten" class="tab-btn">Unbeaten</a>
@@ -805,7 +809,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
  function getCategoryLabel(cat) {
 
- const labels = { '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5', 'under25': 'Under 2.5', 'btts': 'BTTS YES', 'bttsno': 'BTTS NO', 'corners': 'Corners', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak', 'teamtoscore2plus': 'To Score 2+', 'cards': 'Cards' };
+ const labels = { '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5', 'under25': 'Under 2.5', 'htft': 'HT/FT', 'gg2': 'GG2+', 'btts': 'BTTS YES', 'bttsno': 'BTTS NO', 'corners': 'Corners', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak', 'teamtoscore2plus': 'To Score 2+', 'cards': 'Cards' };
 
  return labels[cat] || cat;
 
@@ -1034,6 +1038,10 @@ gtag('config', 'G-HMGZMW9EDP');
  else if (currentCategory === 'over25') matches = currentData.over25Matches || [];
 
  else if (currentCategory === 'under25') matches = currentData.under25Matches || [];
+
+ else if (currentCategory === 'htft') matches = currentData.htftMatches || [];
+
+ else if (currentCategory === 'gg2') matches = currentData.gg2PlusMatches || [];
 
  else if (currentCategory === 'btts') matches = currentData.bttsMatches || [];
 
