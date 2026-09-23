@@ -832,6 +832,7 @@ function collectMatchups(predictions) {
     predictions.matches,
     predictions.over15Matches,
     predictions.over25Matches,
+    predictions.under25Matches,
     predictions.bttsMatches,
     predictions.bttsNoMatches,
     predictions.cardsMatches,

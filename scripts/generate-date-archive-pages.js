@@ -14,6 +14,7 @@ const MARKET_LINKS = [
   { slug: '1x2', label: '1X2' },
   { slug: 'over-1-5', label: 'Over 1.5' },
   { slug: 'over-2-5', label: 'Over 2.5' },
+  { slug: 'under-2-5', label: 'Under 2.5' },
   { slug: 'btts', label: 'BTTS Yes' },
   { slug: 'btts-no', label: 'BTTS No' },
   { slug: 'corners', label: 'Corners' },
@@ -66,6 +67,7 @@ function buildTipLookup() {
     const preds = JSON.parse(fs.readFileSync(PREDICTIONS_FILE, 'utf8'));
     const buckets = [
       preds.matches, preds.over15Matches, preds.over25Matches,
+      preds.under25Matches,
       preds.bttsMatches, preds.bttsNoMatches, preds.winstreakMatches,
       preds.losestreakMatches, preds.drawstreakMatches, preds.teamToScoreMatches,
       preds.teamToScore2PlusMatches, preds.cornersMatches, preds.cardsMatches

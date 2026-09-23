@@ -32,6 +32,7 @@ const MARKETS = {
   '1x2': { label: '1X2 Result', dataKey: 'matches', heading: '1X2 Predictions', desc: 'match outcome' },
   'over-1-5': { label: 'Over 1.5 Goals', dataKey: 'over15Matches', heading: 'Over 1.5 Goals Predictions', desc: 'at least two goals' },
   'over-2-5': { label: 'Over 2.5 Goals', dataKey: 'over25Matches', heading: 'Over 2.5 Goals Predictions', desc: 'three or more goals' },
+  'under-2-5': { label: 'Under 2.5 Goals', dataKey: 'under25Matches', heading: 'Under 2.5 Goals Predictions', desc: 'two goals or fewer' },
   'btts': { label: 'BTTS Yes', dataKey: 'bttsMatches', heading: 'Both Teams to Score Predictions', desc: 'both teams scoring' },
   'btts-no': { label: 'BTTS No', dataKey: 'bttsNoMatches', heading: 'BTTS No Predictions', desc: 'at least one team failing to score' },
   'corners': { label: 'Corners', dataKey: 'cornersMatches', heading: 'Corner Kick Predictions', desc: 'corner kick totals' },

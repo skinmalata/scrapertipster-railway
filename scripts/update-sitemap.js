@@ -55,6 +55,7 @@ function buildSitemap() {
     { loc: 'https://winfulltime.com/predictions/1x2', changefreq: 'daily', priority: '0.9' },
     { loc: 'https://winfulltime.com/predictions/over-1-5', changefreq: 'daily', priority: '0.9' },
     { loc: 'https://winfulltime.com/predictions/over-2-5', changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://winfulltime.com/predictions/under-2-5', changefreq: 'daily', priority: '0.9' },
     { loc: 'https://winfulltime.com/predictions/btts', changefreq: 'daily', priority: '0.9' },
     { loc: 'https://winfulltime.com/predictions/btts-no', changefreq: 'daily', priority: '0.8' },
     { loc: 'https://winfulltime.com/predictions/unbeaten', changefreq: 'daily', priority: '0.8' },
@@ -154,7 +155,7 @@ function buildSitemap() {
   // Prerendered Matrix Pages (/predictions/{league}/{market}/).
   const matrixEntries = [];
   if (fs.existsSync(path.join(ROOT, 'predictions'))) {
-    const MARKET_SLUGS = ['1x2', 'over-1-5', 'over-2-5', 'btts', 'btts-no', 'corners', 'cards'];
+    const MARKET_SLUGS = ['1x2', 'over-1-5', 'over-2-5', 'under-2-5', 'btts', 'btts-no', 'corners', 'cards'];
     fs.readdirSync(path.join(ROOT, 'predictions')).forEach(leagueSlug => {
       if (!/^[\w-]+$/.test(leagueSlug)) return;
       const leagueDir = path.join(ROOT, 'predictions', leagueSlug);

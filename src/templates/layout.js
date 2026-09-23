@@ -47,7 +47,6 @@ const FOOTER_HTML = `
      <li><a href="/predictions/over-2-5.html">Over 2.5</a></li>
      <li><a href="/predictions/over-1-5.html">Over 1.5</a></li>
      <li><a href="/predictions/under-2-5.html">Under 2.5</a></li>
-     <li><a href="/predictions/under-1-5.html">Under 1.5</a></li>
      <li><a href="/predictions/highest-scoring-half.html">Highest Scoring Half</a></li>
     <li><a href="/predictions/btts.html">BTTS Yes</a></li>
     <li><a href="/predictions/btts-no.html">BTTS No</a></li>

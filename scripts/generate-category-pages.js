@@ -31,14 +31,6 @@ const FAQ_SCHEMA = {
     { q: 'Which leagues produce the most Over 2.5 results?', a: 'The Eredivisie (Netherlands), Bundesliga (Germany), and Swiss Super League consistently produce the highest Over 2.5 rates. The Premier League and La Liga also tend to have above-average goal totals.' },
     { q: 'When are Over 2.5 predictions updated?', a: 'Predictions refresh daily at 1:00 AM WAT with a secondary update at 6:00 AM WAT to catch late-appearing fixtures. Coverage spans 50+ leagues worldwide.' }
   ],
-  'under-1-5': [
-    { q: 'What does Under 1.5 goals mean?', a: 'Under 1.5 means the total goals scored by both teams combined must be 1 or fewer. Only scores of 0-0, 1-0, or 0-1 win. Any match with 2 or more goals loses the bet.' },
-    { q: 'How often do matches go under 1.5 goals?', a: 'Globally, roughly 25-30% of professional football matches finish with 1 or fewer total goals. The rate varies by league — defensive leagues like Ligue 1 and Serie A tend higher, while the Eredivisie and Bundesliga tend lower.' },
-    { q: 'Is Under 1.5 a good bet?', a: 'Under 1.5 is a high-odds, lower-strike-rate market best used selectively. WinFulltime only publishes Under 1.5 picks with strong model confidence so you are not guessing on every low-scoring fixture.' },
-    { q: 'How do Under 1.5 predictions differ from Under 2.5?', a: 'Under 1.5 requires 0 or 1 total goal while Under 2.5 allows up to 2. Under 1.5 is stricter and less frequent; Under 2.5 is the more common low-scoring market.' },
-    { q: 'Do Under 1.5 predictions include own goals?', a: 'Yes. Own goals count toward the total in all goal-based markets including Under 1.5. Any goal scored by either team counts against the Under.' },
-    { q: 'How are Under 1.5 predictions generated?', a: 'Our statistical model evaluates average goals per game, attack vs defense matchups, both teams\' defensive records, historical under 1.5 rates, and home/away scoring patterns. Only high-confidence fixtures clear the publish threshold.' }
-  ],
   'under-2-5': [
     { q: 'What does Under 2.5 goals mean?', a: 'Under 2.5 means the total goals scored by both teams must be 2 or fewer. Scores of 0-0, 1-0, 0-1, and 1-1 win. Any match with 3 or more goals loses.' },
     { q: 'How often do matches go under 2.5 goals?', a: 'Approximately 45-50% of professional football matches finish with 2 or fewer total goals. The rate varies significantly by league — Ligue 1 and Serie A consistently produce higher Under 2.5 rates than the Eredivisie or Bundesliga.' },
@@ -205,15 +197,6 @@ const CATEGORIES = {
     keywords: 'over 2.5 predictions, over 2.5 goals tips, high scoring football tips, soccer goals betting',
     heading: 'Over 2.5 Goals',
     label: 'Over 2.5',
-    linkAnalysis: true
-  },
-  'under-1-5': {
-    dataKey: 'under15Matches',
-    title: 'Under 1.5 Goals Predictions Today',
-    description: 'Free Under 1.5 goals football predictions for today. Data-driven tips for matches likely to stay low-scoring.',
-    keywords: 'under 1.5 predictions, under 1.5 goals tips, low scoring football tips, soccer under tips',
-    heading: 'Under 1.5 Goals',
-    label: 'Under 1.5',
     linkAnalysis: true
   },
   'under-2-5': {

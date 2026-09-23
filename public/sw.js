@@ -41,6 +41,7 @@ const STATIC_ASSETS = [
   '/predictions/1x2.html',
   '/predictions/over-2-5.html',
   '/predictions/over-1-5.html',
+  '/predictions/under-2-5.html',
   '/predictions/btts.html',
   '/predictions/btts-no.html',
   '/predictions/corners.html',

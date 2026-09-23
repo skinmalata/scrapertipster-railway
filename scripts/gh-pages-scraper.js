@@ -131,7 +131,6 @@ function enrichWithResults(predictions, resultsCache) {
   predictions.over25Matches = enrich(predictions.over25Matches);
   predictions.over15Matches = enrich(predictions.over15Matches);
   predictions.under25Matches = enrich(predictions.under25Matches);
-  predictions.under15Matches = enrich(predictions.under15Matches);
   predictions.bttsMatches = enrich(predictions.bttsMatches);
   predictions.bttsNoMatches = enrich(predictions.bttsNoMatches);
   predictions.cornersMatches = enrich(predictions.cornersMatches);
@@ -200,17 +199,14 @@ function recoverMissedFixtures(freshData, committed) {
   const missedOver25 = missed.filter(m => m.over25 || (m.tip && m.tip.includes('Over 2.5')));
   const missedOver15 = missed.filter(m => m.over15 || (m.tip && m.tip.includes('Over 1.5')));
   const missedUnder25 = missed.filter(m => m.under25 || (m.tip && m.tip.includes('Under 2.5')));
-  const missedUnder15 = missed.filter(m => m.under15 || (m.tip && m.tip.includes('Under 1.5')));
   const missedBtts = missed.filter(m => m.btts || (m.tip && m.tip.includes('BTTS')));
   merged.over25Matches = [...missedOver25, ...(freshData.over25Matches || [])];
   merged.over15Matches = [...missedOver15, ...(freshData.over15Matches || [])];
   merged.under25Matches = [...missedUnder25, ...(freshData.under25Matches || [])];
-  merged.under15Matches = [...missedUnder15, ...(freshData.under15Matches || [])];
   merged.bttsMatches = [...missedBtts, ...(freshData.bttsMatches || [])];
   merged.totalOver25 = merged.over25Matches.length;
   merged.totalOver15 = merged.over15Matches.length;
   merged.totalUnder25 = merged.under25Matches.length;
-  merged.totalUnder15 = merged.under15Matches.length;
   merged.totalBtts = merged.bttsMatches.length;
 
   console.log(`Recovered ${missed.length} fixture(s) missing from fresh scrape:`);

@@ -46,12 +46,13 @@ function saveH2hRegistry(list) {
   }
 }
 
-const CATEGORY_KEYS = ['matches', 'over15Matches', 'over25Matches', 'bttsMatches', 'bttsNoMatches', 'cornersMatches', 'cardsMatches'];
+const CATEGORY_KEYS = ['matches', 'over15Matches', 'over25Matches', 'under25Matches', 'bttsMatches', 'bttsNoMatches', 'cornersMatches', 'cardsMatches'];
 
 const DATA_KEY_TO_MARKET = {
   matches: '1x2',
   over15Matches: 'over-1-5',
   over25Matches: 'over-2-5',
+  under25Matches: 'under-2-5',
   bttsMatches: 'btts',
   bttsNoMatches: 'btts-no',
   cornersMatches: 'corners',
@@ -62,6 +63,7 @@ const MARKET_LABELS = {
   '1x2': '1X2',
   'over-1-5': 'Over 1.5 Goals',
   'over-2-5': 'Over 2.5 Goals',
+  'under-2-5': 'Under 2.5 Goals',
   'btts': 'BTTS Yes',
   'btts-no': 'BTTS No',
   'corners': 'Corners',

@@ -289,6 +289,7 @@ function didLegWin(leg, score) {
   }
   if (cat === 'over15') return (h + a) > 1.5;
   if (cat === 'over25') return (h + a) > 2.5;
+  if (cat === 'under25') return (h + a) < 2.5;
   if (cat === 'btts') return h > 0 && a > 0;
   if (cat === 'bttsno') return h === 0 || a === 0;
   return null;
@@ -388,6 +389,7 @@ router.get('/predictions', optionalAuth, async (req, res) => {
           matches: [],
           over15Matches: [],
           over25Matches: [],
+          under25Matches: [],
           bttsMatches: [],
           winstreakMatches: [],
           losestreakMatches: [],
@@ -399,6 +401,7 @@ router.get('/predictions', optionalAuth, async (req, res) => {
           totalMatches: 0,
           totalOver15: 0,
           totalOver25: 0,
+          totalUnder25: 0,
           totalBtts: 0,
           totalWinstreak: 0,
           totalLosestreak: 0,
@@ -559,6 +562,7 @@ router.get('/predictions', optionalAuth, async (req, res) => {
     data.matches = enrichWithResults(data.matches);
     data.over25Matches = enrichWithResults(data.over25Matches);
     data.over15Matches = enrichWithResults(data.over15Matches);
+    data.under25Matches = enrichWithResults(data.under25Matches);
     data.bttsMatches = enrichWithResults(data.bttsMatches);
     
     // Load corners data
@@ -591,6 +595,9 @@ router.get('/predictions', optionalAuth, async (req, res) => {
     if (!data.over25Matches || data.over25Matches.length === 0) {
       data.over25Matches = data.matches ? data.matches.filter(m => m.tip === 'Over 2.5') : [];
     }
+    if (!data.under25Matches || data.under25Matches.length === 0) {
+      data.under25Matches = data.matches ? data.matches.filter(m => m.tip === 'Under 2.5') : [];
+    }
     if (!data.bttsMatches || data.bttsMatches.length === 0) {
       data.bttsMatches = data.matches ? data.matches.filter(m => m.tip === 'BTTS') : [];
     }
@@ -612,6 +619,7 @@ router.get('/predictions', optionalAuth, async (req, res) => {
       matches: [],
       over25Matches: [],
       over15Matches: [],
+      under25Matches: [],
       bttsMatches: [],
       winstreakMatches: [],
       losestreakMatches: [],
@@ -1919,6 +1927,10 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
           if (ov === 1.5) return { type: 'over15', label: 'Over 1.5', tip: sel, probability: conf, match: match };
           if (ov === 2.5) return { type: 'over25', label: 'Over 2.5', tip: sel, probability: conf, match: match };
         }
+        var um = sel.match(/^Under\s+(\d+\.?\d*)$/);
+        if (um) { var uv = parseFloat(um[1]);
+          if (uv === 2.5) return { type: 'under25', label: 'Under 2.5', tip: sel, probability: conf, match: match };
+        }
       }
       if (market === 'Both Teams Score') {
         if (sel === 'BTTS Yes') return { type: 'btts', label: 'BTTS Yes', tip: 'BTTS YES', probability: conf, match: match };
@@ -1930,6 +1942,7 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
     }
     var CATEGORY_DEFS = [
       { type: '1x2', label: '1X2' }, { type: 'over15', label: 'Over 1.5' }, { type: 'over25', label: 'Over 2.5' },
+      { type: 'under25', label: 'Under 2.5' },
       { type: 'btts', label: 'BTTS Yes' }, { type: 'bttsNo', label: 'BTTS No' },
       { type: 'corners', label: 'Corners' }, { type: 'cards', label: 'Cards' }
     ];
@@ -1961,6 +1974,7 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
         { key: 'matches', label: '1X2', type: '1x2' },
         { key: 'over15Matches', label: 'Over 1.5', type: 'over15' },
         { key: 'over25Matches', label: 'Over 2.5', type: 'over25' },
+        { key: 'under25Matches', label: 'Under 2.5', type: 'under25' },
         { key: 'bttsMatches', label: 'BTTS Yes', type: 'btts' },
         { key: 'bttsNoMatches', label: 'BTTS No', type: 'bttsNo' },
         { key: 'cornersMatches', label: 'Corners', type: 'corners' },
@@ -2096,6 +2110,7 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
         { key: 'matches', label: '1X2', type: '1x2' },
         { key: 'over15Matches', label: 'Over 1.5', type: 'over15' },
         { key: 'over25Matches', label: 'Over 2.5', type: 'over25' },
+        { key: 'under25Matches', label: 'Under 2.5', type: 'under25' },
         { key: 'bttsMatches', label: 'BTTS Yes', type: 'btts' },
         { key: 'bttsNoMatches', label: 'BTTS No', type: 'bttsNo' },
         { key: 'cornersMatches', label: 'Corners', type: 'corners' },

@@ -80,6 +80,7 @@ const MARKET_LABELS = {
   '1x2': '1X2',
   'over-1-5': 'Over 1.5',
   'over-2-5': 'Over 2.5',
+  'under-2-5': 'Under 2.5',
   'btts': 'BTTS Yes',
   'btts-no': 'BTTS No',
   'corners': 'Corners',
@@ -90,6 +91,7 @@ const MARKET_DATA_KEYS = {
   '1x2': 'matches',
   'over-1-5': 'over15Matches',
   'over-2-5': 'over25Matches',
+  'under-2-5': 'under25Matches',
   'btts': 'bttsMatches',
   'btts-no': 'bttsNoMatches',
   'corners': 'cornersMatches',
@@ -313,6 +315,7 @@ function main() {
     .concat(data.matches || [])
     .concat(data.over25Matches || [])
     .concat(data.over15Matches || [])
+    .concat(data.under25Matches || [])
     .concat(data.bttsMatches || [])
     .concat(data.bttsNoMatches || [])
     .concat(data.cornersMatches || [])

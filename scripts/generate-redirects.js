@@ -123,7 +123,8 @@ const TOP_LEVEL_REDIRECTS = {
 // Nested dead URLs (dir stubs or flat files under public/).
 const NESTED_REDIRECTS = [
   ['predictions/live.html', '/predictions/in-play'],
-  ['predictions/leagues/index.html', '/predictions/']
+  ['predictions/leagues/index.html', '/predictions/'],
+  ['predictions/under-1-5.html', '/predictions/under-2-5']
 ];
 
 // Legacy team URLs with no page on this site (team pages are generated only
@@ -181,7 +182,7 @@ function loadKnown404Map() {
 }
 
 const FLAT_SLUGS = new Set([
-  '1x2', 'over-1-5', 'over-2-5', 'btts', 'btts-no', 'unbeaten',
+  '1x2', 'over-1-5', 'over-2-5', 'under-2-5', 'btts', 'btts-no', 'unbeaten',
   'winning-streak', 'losing-streak', 'draws-streak', 'corners', 'cards',
   'in-play', 'live', 'leagues', 'index'
 ]);

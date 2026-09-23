@@ -6,14 +6,16 @@
     "2026-09-23"
   ],
   "date": "2026-09-22",
-  "totalMatches": 19,
+  "totalMatches": 22,
   "totalOver25": 6,
-  "totalOver15": 39,
+  "totalOver15": 40,
+  "totalUnder25": 0,
+  "totalUnder15": 0,
   "totalBtts": 8,
   "totalBttsNo": 5,
   "totalWinstreak": 100,
   "totalLosestreak": 100,
-  "totalDrawstreak": 26,
+  "totalDrawstreak": 81,
   "matches": [
     {
       "id": 0,
@@ -160,6 +162,22 @@
       "score": null
     },
     {
+      "id": 2,
+      "league": "La Liga",
+      "country": "Spain",
+      "time": "15:00",
+      "match": "Barcelona (w) - Paris FC (w)",
+      "probabilities": {
+        "homeWin": 74,
+        "draw": 14,
+        "awayWin": 12
+      },
+      "tip": "1",
+      "probability": 74,
+      "date": "2026-09-23",
+      "score": null
+    },
+    {
       "id": 0,
       "league": "Liga 1 Peru",
       "country": "Peru",
@@ -169,6 +187,38 @@
         "homeWin": 63,
         "draw": 28,
         "awayWin": 9
+      },
+      "tip": "1X",
+      "probability": 63,
+      "date": "2026-09-23",
+      "score": null
+    },
+    {
+      "id": 3,
+      "league": "Dutch Eredivisie",
+      "country": "Netherlands",
+      "time": "12:00",
+      "match": "Azerbaijan - Tajikistan",
+      "probabilities": {
+        "homeWin": 60,
+        "draw": 21,
+        "awayWin": 19
+      },
+      "tip": "1X",
+      "probability": 60,
+      "date": "2026-09-23",
+      "score": null
+    },
+    {
+      "id": 4,
+      "league": "",
+      "country": "",
+      "time": "12:00",
+      "match": "Gibraltar - Sao Tome and Principe",
+      "probabilities": {
+        "homeWin": 63,
+        "draw": 18,
+        "awayWin": 19
       },
       "tip": "1X",
       "probability": 63,
@@ -338,7 +388,7 @@
       "match": "Muaither SC - Al-Khor",
       "probabilities": {
         "over25": 70,
-        "under25": 0
+        "under25": 4
       },
       "tip": "Over 2.5",
       "probability": 70,
@@ -353,7 +403,7 @@
       "match": "Elgin City - Dundee FC B",
       "probabilities": {
         "over25": 75,
-        "under25": 0
+        "under25": 1
       },
       "tip": "Over 2.5",
       "probability": 75,
@@ -368,7 +418,7 @@
       "match": "Gala Fairydean Rovers - Spartans",
       "probabilities": {
         "over25": 72,
-        "under25": 0
+        "under25": 1
       },
       "tip": "Over 2.5",
       "probability": 72,
@@ -398,7 +448,7 @@
       "match": "Three Bridges - Leatherhead",
       "probabilities": {
         "over25": 72,
-        "under25": 0
+        "under25": 2
       },
       "tip": "Over 2.5",
       "probability": 72,
@@ -413,7 +463,7 @@
       "match": "Kvant Obninsk - Avangard Kursk",
       "probabilities": {
         "over25": 73,
-        "under25": 0
+        "under25": 1
       },
       "tip": "Over 2.5",
       "probability": 73,
@@ -430,7 +480,7 @@
       "match": "Audax Italiano - Colo Colo",
       "probabilities": {
         "over15": 82,
-        "under15": 0
+        "under15": 3
       },
       "tip": "Over 1.5",
       "probability": 82,
@@ -460,7 +510,7 @@
       "match": "Cobreloa - Coquimbo",
       "probabilities": {
         "over15": 85,
-        "under15": 0
+        "under15": 1
       },
       "tip": "Over 1.5",
       "probability": 85,
@@ -475,7 +525,7 @@
       "match": "Criciuma - Operario-PR",
       "probabilities": {
         "over15": 83,
-        "under15": 0
+        "under15": 2
       },
       "tip": "Over 1.5",
       "probability": 83,
@@ -490,7 +540,7 @@
       "match": "Alloa Athletic - Hibernian B",
       "probabilities": {
         "over15": 85,
-        "under15": 0
+        "under15": 1
       },
       "tip": "Over 1.5",
       "probability": 85,
@@ -505,7 +555,7 @@
       "match": "Berwick Rangers - Stranraer",
       "probabilities": {
         "over15": 83,
-        "under15": 0
+        "under15": 2
       },
       "tip": "Over 1.5",
       "probability": 83,
@@ -520,7 +570,7 @@
       "match": "Forfar Athletic - Peterhead",
       "probabilities": {
         "over15": 82,
-        "under15": 0
+        "under15": 1
       },
       "tip": "Over 1.5",
       "probability": 82,
@@ -535,7 +585,7 @@
       "match": "Formartine Utd - Montrose",
       "probabilities": {
         "over15": 92,
-        "under15": 0
+        "under15": 2
       },
       "tip": "Over 1.5",
       "probability": 92,
@@ -550,7 +600,7 @@
       "match": "Fraserburgh - Cove Rangers",
       "probabilities": {
         "over15": 92,
-        "under15": 0
+        "under15": 1
       },
       "tip": "Over 1.5",
       "probability": 92,
@@ -565,7 +615,7 @@
       "match": "Stirling Albion - Cumbernauld Colts",
       "probabilities": {
         "over15": 91,
-        "under15": 0
+        "under15": 5
       },
       "tip": "Over 1.5",
       "probability": 91,
@@ -574,73 +624,13 @@
     },
     {
       "id": 16,
-      "league": "",
-      "country": "",
-      "time": "14:45",
-      "match": "Gainsborough - Leamington",
-      "probabilities": {
-        "over15": 87,
-        "under15": 0
-      },
-      "tip": "Over 1.5",
-      "probability": 87,
-      "date": "2026-09-22",
-      "score": null
-    },
-    {
-      "id": 18,
-      "league": "",
-      "country": "",
-      "time": "14:00",
-      "match": "York - Rotherham",
-      "probabilities": {
-        "over15": 82,
-        "under15": 0
-      },
-      "tip": "Over 1.5",
-      "probability": 82,
-      "date": "2026-09-22",
-      "score": null
-    },
-    {
-      "id": 19,
-      "league": "",
-      "country": "",
-      "time": "14:00",
-      "match": "Oldham - Fleetwood Town",
-      "probabilities": {
-        "over15": 83,
-        "under15": 0
-      },
-      "tip": "Over 1.5",
-      "probability": 83,
-      "date": "2026-09-22",
-      "score": null
-    },
-    {
-      "id": 20,
-      "league": "League One",
-      "country": "England",
-      "time": "14:00",
-      "match": "Cheltenham - Exeter",
-      "probabilities": {
-        "over15": 82,
-        "under15": 0
-      },
-      "tip": "Over 1.5",
-      "probability": 82,
-      "date": "2026-09-22",
-      "score": null
-    },
-    {
-      "id": 21,
       "league": "League One",
       "country": "England",
       "time": "14:00",
       "match": "Peterborough - Colchester",
       "probabilities": {
         "over15": 80,
-        "under15": 0
+        "under15": 2
       },
       "tip": "Over 1.5",
       "probability": 80,
@@ -648,37 +638,7 @@
       "score": null
     },
     {
-      "id": 22,
-      "league": "",
-      "country": "",
-      "time": "14:00",
-      "match": "Milton Keynes Dons - Crawley Town",
-      "probabilities": {
-        "over15": 80,
-        "under15": 0
-      },
-      "tip": "Over 1.5",
-      "probability": 80,
-      "date": "2026-09-22",
-      "score": null
-    },
-    {
-      "id": 23,
-      "league": "Bundesliga",
-      "country": "Germany",
-      "time": "12:45",
-      "match": "Bayern Munich (w) - Manchester City (w)",
-      "probabilities": {
-        "over15": 88,
-        "under15": 0
-      },
-      "tip": "Over 1.5",
-      "probability": 88,
-      "date": "2026-09-22",
-      "score": null
-    },
-    {
-      "id": 24,
+      "id": 17,
       "league": "UEFA Champions League",
       "country": "Europe",
       "time": "15:00",
@@ -693,6 +653,96 @@
       "score": null
     },
     {
+      "id": 18,
+      "league": "Bundesliga",
+      "country": "Germany",
+      "time": "12:45",
+      "match": "Bayern Munich (w) - Manchester City (w)",
+      "probabilities": {
+        "over15": 88,
+        "under15": 4
+      },
+      "tip": "Over 1.5",
+      "probability": 88,
+      "date": "2026-09-22",
+      "score": null
+    },
+    {
+      "id": 19,
+      "league": "League One",
+      "country": "England",
+      "time": "14:00",
+      "match": "Cheltenham - Exeter",
+      "probabilities": {
+        "over15": 82,
+        "under15": 2
+      },
+      "tip": "Over 1.5",
+      "probability": 82,
+      "date": "2026-09-22",
+      "score": null
+    },
+    {
+      "id": 20,
+      "league": "",
+      "country": "",
+      "time": "14:00",
+      "match": "Oldham - Fleetwood Town",
+      "probabilities": {
+        "over15": 83,
+        "under15": 1
+      },
+      "tip": "Over 1.5",
+      "probability": 83,
+      "date": "2026-09-22",
+      "score": null
+    },
+    {
+      "id": 21,
+      "league": "",
+      "country": "",
+      "time": "14:00",
+      "match": "York - Rotherham",
+      "probabilities": {
+        "over15": 82,
+        "under15": 4
+      },
+      "tip": "Over 1.5",
+      "probability": 82,
+      "date": "2026-09-22",
+      "score": null
+    },
+    {
+      "id": 23,
+      "league": "",
+      "country": "",
+      "time": "14:45",
+      "match": "Gainsborough - Leamington",
+      "probabilities": {
+        "over15": 87,
+        "under15": 1
+      },
+      "tip": "Over 1.5",
+      "probability": 87,
+      "date": "2026-09-22",
+      "score": null
+    },
+    {
+      "id": 24,
+      "league": "",
+      "country": "",
+      "time": "14:00",
+      "match": "Milton Keynes Dons - Crawley Town",
+      "probabilities": {
+        "over15": 80,
+        "under15": 0
+      },
+      "tip": "Over 1.5",
+      "probability": 80,
+      "date": "2026-09-22",
+      "score": null
+    },
+    {
       "id": 27,
       "league": "",
       "country": "",
@@ -700,7 +750,7 @@
       "match": "Poole Town - Wimborne Town",
       "probabilities": {
         "over15": 83,
-        "under15": 0
+        "under15": 1
       },
       "tip": "Over 1.5",
       "probability": 83,
@@ -715,7 +765,7 @@
       "match": "Malvern Town - Gloucester City",
       "probabilities": {
         "over15": 85,
-        "under15": 0
+        "under15": 2
       },
       "tip": "Over 1.5",
       "probability": 85,
@@ -730,7 +780,7 @@
       "match": "Taunton Town - Bath City",
       "probabilities": {
         "over15": 84,
-        "under15": 0
+        "under15": 1
       },
       "tip": "Over 1.5",
       "probability": 84,
@@ -745,7 +795,7 @@
       "match": "Yate Town - Evesham United",
       "probabilities": {
         "over15": 84,
-        "under15": 0
+        "under15": 1
       },
       "tip": "Over 1.5",
       "probability": 84,
@@ -760,7 +810,7 @@
       "match": "Bury Town - Hitchin",
       "probabilities": {
         "over15": 86,
-        "under15": 0
+        "under15": 3
       },
       "tip": "Over 1.5",
       "probability": 86,
@@ -775,7 +825,7 @@
       "match": "Leiston FC - Peterborough Sports",
       "probabilities": {
         "over15": 85,
-        "under15": 0
+        "under15": 1
       },
       "tip": "Over 1.5",
       "probability": 85,
@@ -790,7 +840,7 @@
       "match": "Rushall Olympic - Kettering",
       "probabilities": {
         "over15": 80,
-        "under15": 0
+        "under15": 4
       },
       "tip": "Over 1.5",
       "probability": 80,
@@ -805,7 +855,7 @@
       "match": "Stourbridge - Real Bedford",
       "probabilities": {
         "over15": 91,
-        "under15": 0
+        "under15": 1
       },
       "tip": "Over 1.5",
       "probability": 91,
@@ -820,7 +870,7 @@
       "match": "Stratford - Bromsgrove Sporting FC",
       "probabilities": {
         "over15": 81,
-        "under15": 0
+        "under15": 2
       },
       "tip": "Over 1.5",
       "probability": 81,
@@ -835,7 +885,7 @@
       "match": "MFK Petrzalka - FK Pohronie Dolna Zdana",
       "probabilities": {
         "over15": 87,
-        "under15": 0
+        "under15": 3
       },
       "tip": "Over 1.5",
       "probability": 87,
@@ -850,7 +900,7 @@
       "match": "Guidonia Montecelio - Livorno",
       "probabilities": {
         "over15": 83,
-        "under15": 0
+        "under15": 6
       },
       "tip": "Over 1.5",
       "probability": 83,
@@ -865,7 +915,7 @@
       "match": "Central Espanol - Montevideo City Torque",
       "probabilities": {
         "over15": 82,
-        "under15": 0
+        "under15": 3
       },
       "tip": "Over 1.5",
       "probability": 82,
@@ -880,7 +930,7 @@
       "match": "Petrolul Ploiesti - Csikszereda",
       "probabilities": {
         "over15": 86,
-        "under15": 0
+        "under15": 7
       },
       "tip": "Over 1.5",
       "probability": 86,
@@ -895,7 +945,7 @@
       "match": "Vasalunds IF - Assyriska FF",
       "probabilities": {
         "over15": 93,
-        "under15": 0
+        "under15": 5
       },
       "tip": "Over 1.5",
       "probability": 93,
@@ -910,7 +960,7 @@
       "match": "FC Arlanda - Hammarby Talang FF",
       "probabilities": {
         "over15": 80,
-        "under15": 0
+        "under15": 4
       },
       "tip": "Over 1.5",
       "probability": 80,
@@ -940,7 +990,7 @@
       "match": "Angelholms FF - Eskilsminne IF",
       "probabilities": {
         "over15": 84,
-        "under15": 0
+        "under15": 1
       },
       "tip": "Over 1.5",
       "probability": 84,
@@ -969,11 +1019,11 @@
       "time": "10:00",
       "match": "Kladno - Banik Ostrava",
       "probabilities": {
-        "over15": 90,
+        "over15": 92,
         "under15": 0
       },
       "tip": "Over 1.5",
-      "probability": 90,
+      "probability": 92,
       "date": "2026-09-23",
       "score": null
     },
@@ -984,16 +1034,31 @@
       "time": "21:30",
       "match": "Seattle Sounders - Real Salt Lake",
       "probabilities": {
-        "over15": 87,
+        "over15": 86,
         "under15": 0
       },
       "tip": "Over 1.5",
-      "probability": 87,
+      "probability": 86,
       "date": "2026-09-23",
       "score": null
     },
     {
-      "id": 4,
+      "id": 3,
+      "league": "Copa Libertadores",
+      "country": "Colombia",
+      "time": "20:30",
+      "match": "America De Cali - Rionegro FC",
+      "probabilities": {
+        "over15": 85,
+        "under15": 0
+      },
+      "tip": "Over 1.5",
+      "probability": 85,
+      "date": "2026-09-23",
+      "score": null
+    },
+    {
+      "id": 5,
       "league": "Urvalsdeild",
       "country": "Iceland",
       "time": "21:00",
@@ -1008,6 +1073,7 @@
       "score": null
     }
   ],
+  "under25Matches": [],
   "bttsMatches": [
     {
       "id": 6,
@@ -1026,55 +1092,7 @@
       "score": null
     },
     {
-      "id": 10,
-      "league": "",
-      "country": "",
-      "time": "14:45",
-      "match": "Worksop - AFC Telford Utd",
-      "probabilities": {
-        "bttsYes": 55,
-        "bttsNo": 45,
-        "ots": 45
-      },
-      "tip": "BTTS YES",
-      "probability": 55,
-      "date": "2026-09-22",
-      "score": null
-    },
-    {
-      "id": 12,
-      "league": "",
-      "country": "",
-      "time": "14:45",
-      "match": "Truro City - Merthyr",
-      "probabilities": {
-        "bttsYes": 55,
-        "bttsNo": 45,
-        "ots": 45
-      },
-      "tip": "BTTS YES",
-      "probability": 55,
-      "date": "2026-09-22",
-      "score": null
-    },
-    {
       "id": 14,
-      "league": "",
-      "country": "",
-      "time": "14:00",
-      "match": "Chesterfield - Port Vale",
-      "probabilities": {
-        "bttsYes": 55,
-        "bttsNo": 45,
-        "ots": 45
-      },
-      "tip": "BTTS YES",
-      "probability": 55,
-      "date": "2026-09-22",
-      "score": null
-    },
-    {
-      "id": 15,
       "league": "",
       "country": "",
       "time": "14:00",
@@ -1090,7 +1108,55 @@
       "score": null
     },
     {
+      "id": 15,
+      "league": "",
+      "country": "",
+      "time": "14:00",
+      "match": "Chesterfield - Port Vale",
+      "probabilities": {
+        "bttsYes": 55,
+        "bttsNo": 45,
+        "ots": 45
+      },
+      "tip": "BTTS YES",
+      "probability": 55,
+      "date": "2026-09-22",
+      "score": null
+    },
+    {
+      "id": 17,
+      "league": "",
+      "country": "",
+      "time": "14:45",
+      "match": "Worksop - AFC Telford Utd",
+      "probabilities": {
+        "bttsYes": 55,
+        "bttsNo": 45,
+        "ots": 45
+      },
+      "tip": "BTTS YES",
+      "probability": 55,
+      "date": "2026-09-22",
+      "score": null
+    },
+    {
       "id": 19,
+      "league": "",
+      "country": "",
+      "time": "14:45",
+      "match": "Truro City - Merthyr",
+      "probabilities": {
+        "bttsYes": 55,
+        "bttsNo": 45,
+        "ots": 45
+      },
+      "tip": "BTTS YES",
+      "probability": 55,
+      "date": "2026-09-22",
+      "score": null
+    },
+    {
+      "id": 20,
       "league": "",
       "country": "",
       "time": "14:00",
@@ -1340,25 +1406,6 @@
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "South Korea U23",
-      "nextMatch": "South Korea U23 - Saudi Arabia U23",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 80,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 8",
-      "probability": 80,
-      "date": "2026-09-22",
-      "streak": 8,
-      "isHome": true
-    },
-    {
-      "id": 7,
-      "league": "Various",
-      "country": "",
-      "time": "",
       "match": "FC Stockholm Internazionale",
       "nextMatch": "Sollentuna - Stockholm Internazionale",
       "nextMatchDate": "2026-09-22",
@@ -1374,7 +1421,7 @@
       "isHome": false
     },
     {
-      "id": 8,
+      "id": 7,
       "league": "Various",
       "country": "",
       "time": "",
@@ -1390,6 +1437,25 @@
       "probability": 70,
       "date": "2026-09-22",
       "streak": 7,
+      "isHome": true
+    },
+    {
+      "id": 8,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Kosovo",
+      "nextMatch": "Austria - Kosovo",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 60,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 6",
+      "probability": 60,
+      "date": "2026-09-22",
+      "streak": 6,
       "isHome": true
     },
     {
@@ -1416,8 +1482,8 @@
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Kosovo",
-      "nextMatch": "Austria - Kosovo",
+      "match": "Cittadella",
+      "nextMatch": "Cittadella - Lecco",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 60,
@@ -1432,63 +1498,6 @@
     },
     {
       "id": 11,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Japan",
-      "nextMatch": "Japan - Uruguay",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 60,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 6",
-      "probability": 60,
-      "date": "2026-09-22",
-      "streak": 6,
-      "isHome": true
-    },
-    {
-      "id": 12,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Coleraine",
-      "nextMatch": "Coleraine - Linfield",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 60,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 6",
-      "probability": 60,
-      "date": "2026-09-22",
-      "streak": 6,
-      "isHome": true
-    },
-    {
-      "id": 13,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Stenhousemuir",
-      "nextMatch": "Ayr - Stenhousemuir",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 60,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 6",
-      "probability": 60,
-      "date": "2026-09-22",
-      "streak": 6,
-      "isHome": true
-    },
-    {
-      "id": 14,
       "league": "Various",
       "country": "",
       "time": "",
@@ -1507,12 +1516,69 @@
       "isHome": true
     },
     {
+      "id": 12,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Japan",
+      "nextMatch": "Japan - Uruguay",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 60,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 6",
+      "probability": 60,
+      "date": "2026-09-22",
+      "streak": 6,
+      "isHome": true
+    },
+    {
+      "id": 13,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Coleraine",
+      "nextMatch": "Coleraine - Linfield",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 60,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 6",
+      "probability": 60,
+      "date": "2026-09-22",
+      "streak": 6,
+      "isHome": true
+    },
+    {
+      "id": 14,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Stenhousemuir",
+      "nextMatch": "Ayr - Stenhousemuir",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 60,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 6",
+      "probability": 60,
+      "date": "2026-09-22",
+      "streak": 6,
+      "isHome": true
+    },
+    {
       "id": 15,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Nordsjaelland W",
-      "nextMatch": "Aarhus W - Nordsjaelland W",
+      "match": "Montrose",
+      "nextMatch": "Airdrieonians - Montrose",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 50,
@@ -1527,6 +1593,25 @@
     },
     {
       "id": 16,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Sepsi 2",
+      "nextMatch": "Inter Sibiu - Sepsi Sf. Gheorghe 2",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 50,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 5",
+      "probability": 50,
+      "date": "2026-09-22",
+      "streak": 5,
+      "isHome": true
+    },
+    {
+      "id": 17,
       "league": "Various",
       "country": "",
       "time": "",
@@ -1545,7 +1630,26 @@
       "isHome": true
     },
     {
-      "id": 17,
+      "id": 18,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Spezia",
+      "nextMatch": "Pescara - Spezia",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 50,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 5",
+      "probability": 50,
+      "date": "2026-09-22",
+      "streak": 5,
+      "isHome": true
+    },
+    {
+      "id": 19,
       "league": "Various",
       "country": "",
       "time": "",
@@ -1564,64 +1668,7 @@
       "isHome": true
     },
     {
-      "id": 18,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Montrose",
-      "nextMatch": "Airdrieonians - Montrose",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 50,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 5",
-      "probability": 50,
-      "date": "2026-09-22",
-      "streak": 5,
-      "isHome": true
-    },
-    {
-      "id": 19,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Haugesund",
-      "nextMatch": "Haugesund - Stabaek",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 50,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 5",
-      "probability": 50,
-      "date": "2026-09-22",
-      "streak": 5,
-      "isHome": true
-    },
-    {
       "id": 20,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Philadelphia Union",
-      "nextMatch": "Philadelphia Union - Orlando City",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 50,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 5",
-      "probability": 50,
-      "date": "2026-09-22",
-      "streak": 5,
-      "isHome": true
-    },
-    {
-      "id": 21,
       "league": "Various",
       "country": "",
       "time": "",
@@ -1640,7 +1687,83 @@
       "isHome": true
     },
     {
+      "id": 21,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Samorin",
+      "nextMatch": "Samorin - Zvolen",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 50,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 5",
+      "probability": 50,
+      "date": "2026-09-22",
+      "streak": 5,
+      "isHome": true
+    },
+    {
       "id": 22,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Haugesund",
+      "nextMatch": "Haugesund - Stabaek",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 50,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 5",
+      "probability": 50,
+      "date": "2026-09-22",
+      "streak": 5,
+      "isHome": true
+    },
+    {
+      "id": 23,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Enskede",
+      "nextMatch": "Bollstanas - Enskede",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 50,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 5",
+      "probability": 50,
+      "date": "2026-09-22",
+      "streak": 5,
+      "isHome": true
+    },
+    {
+      "id": 24,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Philadelphia Union",
+      "nextMatch": "Philadelphia Union - Orlando City",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 50,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 5",
+      "probability": 50,
+      "date": "2026-09-22",
+      "streak": 5,
+      "isHome": true
+    },
+    {
+      "id": 25,
       "league": "Various",
       "country": "",
       "time": "",
@@ -1659,7 +1782,26 @@
       "isHome": true
     },
     {
-      "id": 23,
+      "id": 26,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Manchester City W",
+      "nextMatch": "Charlton W - Manchester City W",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 50,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 5",
+      "probability": 50,
+      "date": "2026-09-22",
+      "streak": 5,
+      "isHome": true
+    },
+    {
+      "id": 27,
       "league": "Various",
       "country": "",
       "time": "",
@@ -1678,7 +1820,7 @@
       "isHome": false
     },
     {
-      "id": 24,
+      "id": 28,
       "league": "Various",
       "country": "",
       "time": "",
@@ -1697,7 +1839,7 @@
       "isHome": true
     },
     {
-      "id": 25,
+      "id": 29,
       "league": "Various",
       "country": "",
       "time": "",
@@ -1716,7 +1858,7 @@
       "isHome": true
     },
     {
-      "id": 26,
+      "id": 30,
       "league": "Various",
       "country": "",
       "time": "",
@@ -1735,7 +1877,7 @@
       "isHome": true
     },
     {
-      "id": 27,
+      "id": 31,
       "league": "Various",
       "country": "",
       "time": "",
@@ -1754,7 +1896,7 @@
       "isHome": true
     },
     {
-      "id": 28,
+      "id": 32,
       "league": "Various",
       "country": "",
       "time": "",
@@ -1773,12 +1915,12 @@
       "isHome": true
     },
     {
-      "id": 29,
+      "id": 33,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Santos",
-      "nextMatch": "Sao Paulo - Santos",
+      "match": "Bronshoj",
+      "nextMatch": "Vanlose - Bronshoj",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 40,
@@ -1792,45 +1934,7 @@
       "isHome": true
     },
     {
-      "id": 30,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "S. Kostroma",
-      "nextMatch": "S. Kostroma - Ural",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 40,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 4",
-      "probability": 40,
-      "date": "2026-09-22",
-      "streak": 4,
-      "isHome": true
-    },
-    {
-      "id": 31,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Trollhattan",
-      "nextMatch": "Trollhattan - Tvaaker",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 40,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 4",
-      "probability": 40,
-      "date": "2026-09-22",
-      "streak": 4,
-      "isHome": true
-    },
-    {
-      "id": 32,
+      "id": 34,
       "league": "Various",
       "country": "",
       "time": "",
@@ -1849,7 +1953,45 @@
       "isHome": true
     },
     {
-      "id": 33,
+      "id": 35,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "S. Kostroma",
+      "nextMatch": "S. Kostroma - Ural",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 40,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 36,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Trollhattan",
+      "nextMatch": "Trollhattan - Tvaaker",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 40,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 37,
       "league": "Various",
       "country": "",
       "time": "",
@@ -1868,12 +2010,12 @@
       "isHome": true
     },
     {
-      "id": 34,
+      "id": 38,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Saipa",
-      "nextMatch": "Mes Kerman - Saipa",
+      "match": "Santos",
+      "nextMatch": "Sao Paulo - Santos",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 40,
@@ -1887,7 +2029,45 @@
       "isHome": true
     },
     {
-      "id": 35,
+      "id": 39,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "CA Juventus U20",
+      "nextMatch": "Gremio Prudente U20 - CA Juventus U20",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 40,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 40,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Corinthians W",
+      "nextMatch": "Corinthians W - Sao Paulo W",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 40,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 41,
       "league": "Various",
       "country": "",
       "time": "",
@@ -1906,7 +2086,7 @@
       "isHome": true
     },
     {
-      "id": 36,
+      "id": 42,
       "league": "Various",
       "country": "",
       "time": "",
@@ -1925,254 +2105,7 @@
       "isHome": true
     },
     {
-      "id": 37,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Estudiantes L.P.",
-      "nextMatch": "Platense - Estudiantes L.P.",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 30,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": true
-    },
-    {
-      "id": 38,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "FC Dimona",
-      "nextMatch": "SC Dimona - M. Ironi Kiryat Malachi",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 30,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": false
-    },
-    {
-      "id": 39,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Almeria",
-      "nextMatch": "Mallorca - Almeria",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 30,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": true
-    },
-    {
-      "id": 40,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Salcedo",
-      "nextMatch": "Salcedo - Cibao",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 30,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": true
-    },
-    {
-      "id": 41,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "CS U Craiova 2",
-      "nextMatch": "CSO Filiasi - CS U Craiova 2",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 30,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": true
-    },
-    {
-      "id": 42,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Marko",
-      "nextMatch": "Marko - Panthrakikos",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 30,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": true
-    },
-    {
       "id": 43,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Racing Club",
-      "nextMatch": "Racing Club - Boca Juniors",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 30,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": true
-    },
-    {
-      "id": 44,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "FC Dimona",
-      "nextMatch": "SC Dimona - M. Ironi Kiryat Malachi",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 30,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": false
-    },
-    {
-      "id": 45,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Santa Clara U23",
-      "nextMatch": "Santa Clara U23 - Portimonense U23",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 30,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": true
-    },
-    {
-      "id": 46,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Uganda U20",
-      "nextMatch": "Uganda U20 - Sudan U20",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 30,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": true
-    },
-    {
-      "id": 47,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Tanzania U20",
-      "nextMatch": "Tanzania U20 - Burundi U20",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 30,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": true
-    },
-    {
-      "id": 48,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Estudiantes L.P.",
-      "nextMatch": "Platense - Estudiantes L.P.",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 30,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": true
-    },
-    {
-      "id": 49,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Racing Club",
-      "nextMatch": "Racing Club - Boca Juniors",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 30,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": true
-    },
-    {
-      "id": 50,
       "league": "Various",
       "country": "",
       "time": "",
@@ -2191,12 +2124,12 @@
       "isHome": true
     },
     {
-      "id": 51,
+      "id": 44,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "CS U Craiova 2",
-      "nextMatch": "CSO Filiasi - CS U Craiova 2",
+      "match": "Ravenna",
+      "nextMatch": "Ravenna - Gubbio",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 30,
@@ -2210,64 +2143,7 @@
       "isHome": true
     },
     {
-      "id": 52,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "East Kilbride",
-      "nextMatch": "East Kilbride - Celtic B",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 30,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": true
-    },
-    {
-      "id": 53,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Marko",
-      "nextMatch": "Marko - Panthrakikos",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 30,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": true
-    },
-    {
-      "id": 54,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Santa Clara U23",
-      "nextMatch": "Santa Clara U23 - Portimonense U23",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 30,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": true
-    },
-    {
-      "id": 55,
+      "id": 45,
       "league": "Various",
       "country": "",
       "time": "",
@@ -2286,12 +2162,202 @@
       "isHome": true
     },
     {
+      "id": 46,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "La Nucia",
+      "nextMatch": "La Nucia - Mallorca B",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 47,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Moca",
+      "nextMatch": "Moca - Delfines Del Este",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 48,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Almeria",
+      "nextMatch": "Mallorca - Almeria",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 49,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Iran",
+      "nextMatch": "Uzbekistan - Iran",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 50,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Omega Sport",
+      "nextMatch": "Omega Sport - Mogosoaia",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 51,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Castellonense",
+      "nextMatch": "Lorca Deportiva - Castellonense",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 52,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Olimpic Zarnesti",
+      "nextMatch": "Kids Tampa Brasov - Olimpic Zarnesti",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 53,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "FC Dimona",
+      "nextMatch": "SC Dimona - M. Ironi Kiryat Malachi",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": false
+    },
+    {
+      "id": 54,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Estudiantes L.P.",
+      "nextMatch": "Platense - Estudiantes L.P.",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 55,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Zaragoza",
+      "nextMatch": "UD Ibiza - Zaragoza",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
       "id": 56,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Uganda U20",
-      "nextMatch": "Uganda U20 - Sudan U20",
+      "match": "Racing Club",
+      "nextMatch": "Racing Club - Boca Juniors",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 30,
@@ -2309,8 +2375,8 @@
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Montrose",
-      "nextMatch": "Formartine Utd - Montrose",
+      "match": "D. Concepcion",
+      "nextMatch": "Curico Unido - D. Concepcion",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 30,
@@ -2328,8 +2394,8 @@
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Tanzania U20",
-      "nextMatch": "Tanzania U20 - Burundi U20",
+      "match": "Castellonense",
+      "nextMatch": "Lorca Deportiva - Castellonense",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 30,
@@ -2347,8 +2413,8 @@
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Stirling",
-      "nextMatch": "Stirling - Cumbernauld Colts",
+      "match": "La Nucia",
+      "nextMatch": "La Nucia - Mallorca B",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 30,
@@ -2366,8 +2432,27 @@
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Peterhead",
-      "nextMatch": "Forfar Athletic - Peterhead",
+      "match": "Beitar Nahariya",
+      "nextMatch": "Nahariya - Maccabi Neve Shaanan Eldad",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": false
+    },
+    {
+      "id": 61,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Marko",
+      "nextMatch": "Marko - Panthrakikos",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 30,
@@ -2381,7 +2466,102 @@
       "isHome": true
     },
     {
-      "id": 61,
+      "id": 62,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Nojima Stella W",
+      "nextMatch": "Nojima Stella W - Saitama W",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 63,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "River Plate W",
+      "nextMatch": "Lanus W - River Plate W",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 64,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "D. Concepcion",
+      "nextMatch": "Curico Unido - D. Concepcion",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 65,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Racing Club",
+      "nextMatch": "Racing Club - Boca Juniors",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 66,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "FC Dimona",
+      "nextMatch": "SC Dimona - M. Ironi Kiryat Malachi",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": false
+    },
+    {
+      "id": 67,
       "league": "Various",
       "country": "",
       "time": "",
@@ -2400,7 +2580,216 @@
       "isHome": true
     },
     {
-      "id": 62,
+      "id": 68,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Beitar Nahariya",
+      "nextMatch": "Nahariya - Maccabi Neve Shaanan Eldad",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": false
+    },
+    {
+      "id": 69,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Zaragoza",
+      "nextMatch": "UD Ibiza - Zaragoza",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 70,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Marko",
+      "nextMatch": "Marko - Panthrakikos",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 71,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Nojima Stella W",
+      "nextMatch": "Nojima Stella W - Saitama W",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 72,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "River Plate W",
+      "nextMatch": "Lanus W - River Plate W",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 73,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Sao Paulo W",
+      "nextMatch": "Corinthians W - Sao Paulo W",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 74,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Montrose",
+      "nextMatch": "Formartine Utd - Montrose",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 75,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "East Kilbride",
+      "nextMatch": "East Kilbride - Celtic B",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 76,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Stirling",
+      "nextMatch": "Stirling - Cumbernauld Colts",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 77,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Peterhead",
+      "nextMatch": "Forfar Athletic - Peterhead",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 78,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Sao Paulo W",
+      "nextMatch": "Corinthians W - Sao Paulo W",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 79,
       "league": "Various",
       "country": "",
       "time": "",
@@ -2419,7 +2808,26 @@
       "isHome": true
     },
     {
-      "id": 63,
+      "id": 80,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Ravenna",
+      "nextMatch": "Ravenna - Gubbio",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 81,
       "league": "Various",
       "country": "",
       "time": "",
@@ -2438,12 +2846,12 @@
       "isHome": true
     },
     {
-      "id": 64,
+      "id": 82,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Almeria",
-      "nextMatch": "Mallorca - Almeria",
+      "match": "Omega Sport",
+      "nextMatch": "Omega Sport - Mogosoaia",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 30,
@@ -2457,7 +2865,64 @@
       "isHome": true
     },
     {
-      "id": 65,
+      "id": 83,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Olimpic Zarnesti",
+      "nextMatch": "Kids Tampa Brasov - Olimpic Zarnesti",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 84,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Estudiantes L.P.",
+      "nextMatch": "Platense - Estudiantes L.P.",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 85,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Salcedo",
+      "nextMatch": "Salcedo - Cibao",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 86,
       "league": "Various",
       "country": "",
       "time": "",
@@ -2476,410 +2941,87 @@
       "isHome": true
     },
     {
-      "id": 66,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Hebar",
-      "nextMatch": "Hebar - Dobrudzha",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 67,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Eritrea",
-      "nextMatch": "Kenya - Eritrea",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 68,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Santa Fe",
-      "nextMatch": "Santa Fe - Dep. Cali",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 69,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Dep. Pasto",
-      "nextMatch": "Chico - Dep. Pasto",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 70,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Millonarios",
-      "nextMatch": "Atl. Nacional - Millonarios",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 71,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Dep. Cali",
-      "nextMatch": "Santa Fe - Dep. Cali",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 72,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Santos Laguna",
-      "nextMatch": "Santos Laguna - Pachuca",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 73,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Gibraltar",
-      "nextMatch": "Gibraltar - Sao Tome and Principe",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 74,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Airdrieonians",
-      "nextMatch": "Airdrieonians - Montrose",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 75,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Chernomorets 1919",
-      "nextMatch": "Chernomorets 1919 - Montana",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 76,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "CSKA Sofia II",
-      "nextMatch": "CSKA Sofia II - Svoge",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 77,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Kremser",
-      "nextMatch": "Traiskirchen - Kremser",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 78,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Haverfordwest",
-      "nextMatch": "Colwyn Bay - Haverfordwest",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 79,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "East Kilbride",
-      "nextMatch": "East Fife - East Kilbride",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 80,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Stromsgodset",
-      "nextMatch": "Stromsgodset - Asane",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 81,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Edinburgh City",
-      "nextMatch": "Stranraer - Edinburgh City",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 82,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Ross County",
-      "nextMatch": "Ross County - Alloa",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 83,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Connahs Q.",
-      "nextMatch": "Barry - Connahs Q.",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 84,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Venlo",
-      "nextMatch": "FC Volendam - Venlo",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 85,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Concarneau",
-      "nextMatch": "Bourg en Bresse - Concarneau",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 86,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Bryne",
-      "nextMatch": "Bryne - Lyn",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
       "id": 87,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Lidingo IFK",
+      "match": "Moca",
+      "nextMatch": "Moca - Delfines Del Este",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 88,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Almeria",
+      "nextMatch": "Mallorca - Almeria",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 89,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Iran",
+      "nextMatch": "Uzbekistan - Iran",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 30,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 90,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Orebro Syrianska",
+      "nextMatch": "Ragsved - Orebro Syr.",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 20,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 91,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Sunnersta AIF",
       "nextMatch": "Sunnersta AIF - Lidingo IFK",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
@@ -2894,7 +3036,45 @@
       "isHome": true
     },
     {
-      "id": 88,
+      "id": 92,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "IFK Berga",
+      "nextMatch": "Solvesborgs - IFK Berga",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 20,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 93,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "FC Arlanda",
+      "nextMatch": "Arlanda - Enkoping SK",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 20,
+        "draw": 0,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Wins: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": false
+    },
+    {
+      "id": 94,
       "league": "Various",
       "country": "",
       "time": "",
@@ -2913,126 +3093,12 @@
       "isHome": true
     },
     {
-      "id": 89,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "St. Louis City",
-      "nextMatch": "New York Red Bulls - St. Louis City",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 90,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Huracan",
-      "nextMatch": "Huracan - Aldosivi",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 91,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Instituto",
-      "nextMatch": "Independiente - Instituto",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 92,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Ind. Rivadavia",
-      "nextMatch": "Ind. Rivadavia - Gimnasia L.P.",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 93,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Nacional Asuncion",
-      "nextMatch": "Nacional Asuncion - Ameliano",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 94,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Rosario Central",
-      "nextMatch": "Banfield - Rosario Central",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 20,
-        "draw": 0,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Wins: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
       "id": 95,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Boca Juniors",
-      "nextMatch": "Boca Juniors - Union de Santa Fe",
+      "match": "Forward",
+      "nextMatch": "Karlslund - Forward",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 20,
@@ -3050,8 +3116,8 @@
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Bray",
-      "nextMatch": "UC Dublin - Bray",
+      "match": "Stromsgodset",
+      "nextMatch": "Stromsgodset - Asane",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 20,
@@ -3069,8 +3135,8 @@
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Defensores de Belgrano",
-      "nextMatch": "Def. de Belgrano - Ferro",
+      "match": "Burundi",
+      "nextMatch": "Togo - Burundi",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 20,
@@ -3081,15 +3147,15 @@
       "probability": 20,
       "date": "2026-09-22",
       "streak": 2,
-      "isHome": false
+      "isHome": true
     },
     {
       "id": 98,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "CA Estudiantes",
-      "nextMatch": "CA Estudiantes - San Miguel",
+      "match": "Jonkoping",
+      "nextMatch": "Utsikten - Jonkoping",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 20,
@@ -3107,8 +3173,8 @@
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Midland",
-      "nextMatch": "Midland - Tristan Suarez",
+      "match": "Umea FC",
+      "nextMatch": "Umea FC - FBK Karlstad",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 20,
@@ -3128,8 +3194,8 @@
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "TerDU",
-      "nextMatch": "TerDU - Gazalkent",
+      "match": "BK Astrio",
+      "nextMatch": "Galtabacks - Astrio",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -3140,7 +3206,7 @@
       "probability": 95,
       "date": "2026-09-22",
       "streak": 12,
-      "isHome": true
+      "isHome": false
     },
     {
       "id": 1,
@@ -3185,8 +3251,8 @@
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "BuxDu",
-      "nextMatch": "FarDU - BuxDu",
+      "match": "AC Parceiro Nagano W",
+      "nextMatch": "Urawa W - Parceiro Nagano W",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -3197,10 +3263,67 @@
       "probability": 80,
       "date": "2026-09-22",
       "streak": 8,
-      "isHome": true
+      "isHome": false
     },
     {
       "id": 4,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Albion",
+      "nextMatch": "Wanderers - Albion",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 70
+      },
+      "tip": "Back To Back Losses: 7",
+      "probability": 70,
+      "date": "2026-09-22",
+      "streak": 7,
+      "isHome": true
+    },
+    {
+      "id": 5,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Vanersborgs IF",
+      "nextMatch": "Vanersborgs IF - Ahlafors IF",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 70
+      },
+      "tip": "Back To Back Losses: 7",
+      "probability": 70,
+      "date": "2026-09-22",
+      "streak": 7,
+      "isHome": true
+    },
+    {
+      "id": 6,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Lindo FF",
+      "nextMatch": "Lindo FF - Eker Orebro",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 70
+      },
+      "tip": "Back To Back Losses: 7",
+      "probability": 70,
+      "date": "2026-09-22",
+      "streak": 7,
+      "isHome": true
+    },
+    {
+      "id": 7,
       "league": "Various",
       "country": "",
       "time": "",
@@ -3219,64 +3342,26 @@
       "isHome": true
     },
     {
-      "id": 5,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Finland",
-      "nextMatch": "San Marino - Finland",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 60
-      },
-      "tip": "Back To Back Losses: 6",
-      "probability": 60,
-      "date": "2026-09-22",
-      "streak": 6,
-      "isHome": true
-    },
-    {
-      "id": 6,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Brentwood",
-      "nextMatch": "Brentwood - Maldon & Tiptree",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 60
-      },
-      "tip": "Back To Back Losses: 6",
-      "probability": 60,
-      "date": "2026-09-22",
-      "streak": 6,
-      "isHome": true
-    },
-    {
-      "id": 7,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Beitar Nordia Jerusalem",
-      "nextMatch": "Ironi Beit Shemesh - Nordia Jerusalem",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 60
-      },
-      "tip": "Back To Back Losses: 6",
-      "probability": 60,
-      "date": "2026-09-22",
-      "streak": 6,
-      "isHome": false
-    },
-    {
       "id": 8,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Brescia W",
+      "nextMatch": "Brescia W - Venezia W",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 60
+      },
+      "tip": "Back To Back Losses: 6",
+      "probability": 60,
+      "date": "2026-09-22",
+      "streak": 6,
+      "isHome": true
+    },
+    {
+      "id": 9,
       "league": "Various",
       "country": "",
       "time": "",
@@ -3295,64 +3380,64 @@
       "isHome": true
     },
     {
-      "id": 9,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "FC Andorra",
-      "nextMatch": "Granada CF - Andorra",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 50
-      },
-      "tip": "Back To Back Losses: 5",
-      "probability": 50,
-      "date": "2026-09-22",
-      "streak": 5,
-      "isHome": false
-    },
-    {
       "id": 10,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Aston Villa U21",
-      "nextMatch": "Crewe - Aston Villa U21",
+      "match": "Beitar Nordia Jerusalem",
+      "nextMatch": "Ironi Beit Shemesh - Nordia Jerusalem",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
         "draw": 0,
-        "awayWin": 50
+        "awayWin": 60
       },
-      "tip": "Back To Back Losses: 5",
-      "probability": 50,
+      "tip": "Back To Back Losses: 6",
+      "probability": 60,
       "date": "2026-09-22",
-      "streak": 5,
-      "isHome": true
+      "streak": 6,
+      "isHome": false
     },
     {
       "id": 11,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Atlantico FC",
-      "nextMatch": "Universidad O&M - Atlantico",
+      "match": "Finland",
+      "nextMatch": "San Marino - Finland",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
         "draw": 0,
-        "awayWin": 50
+        "awayWin": 60
       },
-      "tip": "Back To Back Losses: 5",
-      "probability": 50,
+      "tip": "Back To Back Losses: 6",
+      "probability": 60,
       "date": "2026-09-22",
-      "streak": 5,
+      "streak": 6,
       "isHome": true
     },
     {
       "id": 12,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Brentwood",
+      "nextMatch": "Brentwood - Maldon & Tiptree",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 60
+      },
+      "tip": "Back To Back Losses: 6",
+      "probability": 60,
+      "date": "2026-09-22",
+      "streak": 6,
+      "isHome": true
+    },
+    {
+      "id": 13,
       "league": "Various",
       "country": "",
       "time": "",
@@ -3371,7 +3456,83 @@
       "isHome": true
     },
     {
-      "id": 13,
+      "id": 14,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Atlantico FC",
+      "nextMatch": "Universidad O&M - Atlantico",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 50
+      },
+      "tip": "Back To Back Losses: 5",
+      "probability": 50,
+      "date": "2026-09-22",
+      "streak": 5,
+      "isHome": true
+    },
+    {
+      "id": 15,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "FC Andorra",
+      "nextMatch": "Granada CF - Andorra",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 50
+      },
+      "tip": "Back To Back Losses: 5",
+      "probability": 50,
+      "date": "2026-09-22",
+      "streak": 5,
+      "isHome": false
+    },
+    {
+      "id": 16,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Aston Villa U21",
+      "nextMatch": "Crewe - Aston Villa U21",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 50
+      },
+      "tip": "Back To Back Losses: 5",
+      "probability": 50,
+      "date": "2026-09-22",
+      "streak": 5,
+      "isHome": true
+    },
+    {
+      "id": 17,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Fuerte San Francisco",
+      "nextMatch": "Alianza FC - Fuerte San Francisco",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 50
+      },
+      "tip": "Back To Back Losses: 5",
+      "probability": 50,
+      "date": "2026-09-22",
+      "streak": 5,
+      "isHome": true
+    },
+    {
+      "id": 18,
       "league": "Various",
       "country": "",
       "time": "",
@@ -3390,7 +3551,26 @@
       "isHome": true
     },
     {
-      "id": 14,
+      "id": 19,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Rubin Kazan U19",
+      "nextMatch": "Rubin Kazan U19 - Krasnodar U19",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 50
+      },
+      "tip": "Back To Back Losses: 5",
+      "probability": 50,
+      "date": "2026-09-22",
+      "streak": 5,
+      "isHome": true
+    },
+    {
+      "id": 20,
       "league": "Various",
       "country": "",
       "time": "",
@@ -3409,7 +3589,7 @@
       "isHome": true
     },
     {
-      "id": 15,
+      "id": 21,
       "league": "Various",
       "country": "",
       "time": "",
@@ -3428,102 +3608,7 @@
       "isHome": true
     },
     {
-      "id": 16,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Minnesota United",
-      "nextMatch": "Seattle Sounders - Minnesota United",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 40
-      },
-      "tip": "Back To Back Losses: 4",
-      "probability": 40,
-      "date": "2026-09-22",
-      "streak": 4,
-      "isHome": true
-    },
-    {
-      "id": 17,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Loudoun United",
-      "nextMatch": "Sporting Jax - Loudoun",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 40
-      },
-      "tip": "Back To Back Losses: 4",
-      "probability": 40,
-      "date": "2026-09-22",
-      "streak": 4,
-      "isHome": true
-    },
-    {
-      "id": 18,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "AD Tarma",
-      "nextMatch": "AD Tarma - Cienciano",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 40
-      },
-      "tip": "Back To Back Losses: 4",
-      "probability": 40,
-      "date": "2026-09-22",
-      "streak": 4,
-      "isHome": true
-    },
-    {
-      "id": 19,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Malvern Town",
-      "nextMatch": "Malvern Town - Gloucester",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 40
-      },
-      "tip": "Back To Back Losses: 4",
-      "probability": 40,
-      "date": "2026-09-22",
-      "streak": 4,
-      "isHome": true
-    },
-    {
-      "id": 20,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Clyde",
-      "nextMatch": "Clyde - Rangers B",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 40
-      },
-      "tip": "Back To Back Losses: 4",
-      "probability": 40,
-      "date": "2026-09-22",
-      "streak": 4,
-      "isHome": true
-    },
-    {
-      "id": 21,
+      "id": 22,
       "league": "Various",
       "country": "",
       "time": "",
@@ -3542,7 +3627,330 @@
       "isHome": true
     },
     {
-      "id": 22,
+      "id": 23,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Clyde",
+      "nextMatch": "Clyde - Rangers B",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 40
+      },
+      "tip": "Back To Back Losses: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 24,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Malvern Town",
+      "nextMatch": "Malvern Town - Gloucester",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 40
+      },
+      "tip": "Back To Back Losses: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 25,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "AD Tarma",
+      "nextMatch": "AD Tarma - Cienciano",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 40
+      },
+      "tip": "Back To Back Losses: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 26,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Bollstanas",
+      "nextMatch": "Bollstanas - Enskede",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 40
+      },
+      "tip": "Back To Back Losses: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 27,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Minnesota United",
+      "nextMatch": "Seattle Sounders - Minnesota United",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 40
+      },
+      "tip": "Back To Back Losses: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 28,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Fiji W",
+      "nextMatch": "Fiji W - Solomon Islands W",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 40
+      },
+      "tip": "Back To Back Losses: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 29,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Loudoun United",
+      "nextMatch": "Sporting Jax - Loudoun",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 40
+      },
+      "tip": "Back To Back Losses: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 30,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "UD Poblense",
+      "nextMatch": "Poblense - Valencia B",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 40
+      },
+      "tip": "Back To Back Losses: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": false
+    },
+    {
+      "id": 31,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Don Bosco Jarabacoa",
+      "nextMatch": "Vega Real - Jarabacoa",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 40
+      },
+      "tip": "Back To Back Losses: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": false
+    },
+    {
+      "id": 32,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Vado",
+      "nextMatch": "Torres - Vado",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 40
+      },
+      "tip": "Back To Back Losses: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 33,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Vis Pesaro",
+      "nextMatch": "Vis Pesaro - Guidonia",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 40
+      },
+      "tip": "Back To Back Losses: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 34,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Kids Tampa Brasov",
+      "nextMatch": "Kids Tampa Brasov - Olimpic Zarnesti",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 40
+      },
+      "tip": "Back To Back Losses: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 35,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Otelul 2",
+      "nextMatch": "Otelul 2 - Gloria Baneasa",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 40
+      },
+      "tip": "Back To Back Losses: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 36,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Transilvania Sport Academy",
+      "nextMatch": "Academica Recea - Transilvania Sport Academy",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 40
+      },
+      "tip": "Back To Back Losses: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 37,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "UD Ourense",
+      "nextMatch": "UD Ourense - Cacereno",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 40
+      },
+      "tip": "Back To Back Losses: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 38,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Petrolul Hartiesti",
+      "nextMatch": "Petrolul Hartiesti - Unirea Bascov",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 40
+      },
+      "tip": "Back To Back Losses: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 39,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "AD Merida",
+      "nextMatch": "AD Merida - UD Logrones",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 40,
       "league": "Various",
       "country": "",
       "time": "",
@@ -3561,12 +3969,12 @@
       "isHome": true
     },
     {
-      "id": 23,
+      "id": 41,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Albirex Niigata W",
-      "nextMatch": "Beleza W - Albirex Niigata W",
+      "match": "Juventus U23",
+      "nextMatch": "Desenzano - Juventus U23",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -3580,7 +3988,197 @@
       "isHome": true
     },
     {
-      "id": 24,
+      "id": 42,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Picerno",
+      "nextMatch": "Picerno - Audace Cerignola",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 43,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Perugia",
+      "nextMatch": "Perugia - Reggiana",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 44,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Academica Recea",
+      "nextMatch": "Academica Recea - Transilvania Sport Academy",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 45,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Arenas Getxo",
+      "nextMatch": "Arenas Getxo - Ath Bilbao B",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 46,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Teruel",
+      "nextMatch": "Teruel - Huesca",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 47,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Enyimba International",
+      "nextMatch": "Enyimba - Sporting Lagos",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 48,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Torremolinos",
+      "nextMatch": "Torremolinos - Algeciras",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 49,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Real Murcia B",
+      "nextMatch": "Pena Deportiva - Real Murcia B",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 50,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Charlton W",
+      "nextMatch": "Charlton W - Manchester City W",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 51,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Charlton W",
+      "nextMatch": "Charlton W - Manchester City W",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 52,
       "league": "Various",
       "country": "",
       "time": "",
@@ -3599,12 +4197,12 @@
       "isHome": true
     },
     {
-      "id": 25,
+      "id": 53,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Fort Lauderdale United W",
-      "nextMatch": "DC Power W - Fort Lauderdale W",
+      "match": "Albirex Niigata W",
+      "nextMatch": "Beleza W - Albirex Niigata W",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -3618,45 +4216,7 @@
       "isHome": true
     },
     {
-      "id": 26,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Cadiz",
-      "nextMatch": "Tenerife - Cadiz CF",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 30
-      },
-      "tip": "Back To Back Losses: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": true
-    },
-    {
-      "id": 27,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Fort Lauderdale United W",
-      "nextMatch": "DC Power W - Fort Lauderdale W",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 30
-      },
-      "tip": "Back To Back Losses: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": true
-    },
-    {
-      "id": 28,
+      "id": 54,
       "league": "Various",
       "country": "",
       "time": "",
@@ -3675,12 +4235,12 @@
       "isHome": true
     },
     {
-      "id": 29,
+      "id": 55,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Oldham",
-      "nextMatch": "Oldham - Salford",
+      "match": "Tamaraceite",
+      "nextMatch": "Mijas Las Lagunas - Tamaraceite",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -3694,12 +4254,12 @@
       "isHome": true
     },
     {
-      "id": 30,
+      "id": 56,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Gala Fairydean Rovers",
-      "nextMatch": "Gala Fairydean - Spartans",
+      "match": "Teruel",
+      "nextMatch": "Teruel - Huesca",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -3713,7 +4273,102 @@
       "isHome": true
     },
     {
-      "id": 31,
+      "id": 57,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Tamaraceite",
+      "nextMatch": "Mijas Las Lagunas - Tamaraceite",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 58,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Cadiz",
+      "nextMatch": "Tenerife - Cadiz CF",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 59,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Real Murcia B",
+      "nextMatch": "Pena Deportiva - Real Murcia B",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 60,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Albirex Niigata W",
+      "nextMatch": "Beleza W - Albirex Niigata W",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 61,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Kyrgyzstan U23",
+      "nextMatch": "Kyrgyzstan U23 - Hong Kong U23",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 62,
       "league": "Various",
       "country": "",
       "time": "",
@@ -3732,12 +4387,12 @@
       "isHome": true
     },
     {
-      "id": 32,
+      "id": 63,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Kyrgyzstan U23",
-      "nextMatch": "Kyrgyzstan U23 - Hong Kong U23",
+      "match": "Gala Fairydean Rovers",
+      "nextMatch": "Gala Fairydean - Spartans",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -3751,26 +4406,7 @@
       "isHome": true
     },
     {
-      "id": 33,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Albirex Niigata W",
-      "nextMatch": "Beleza W - Albirex Niigata W",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 30
-      },
-      "tip": "Back To Back Losses: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": true
-    },
-    {
-      "id": 34,
+      "id": 64,
       "league": "Various",
       "country": "",
       "time": "",
@@ -3789,7 +4425,26 @@
       "isHome": true
     },
     {
-      "id": 35,
+      "id": 65,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Oldham",
+      "nextMatch": "Oldham - Salford",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 66,
       "league": "Various",
       "country": "",
       "time": "",
@@ -3808,611 +4463,22 @@
       "isHome": true
     },
     {
-      "id": 36,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Vanraure",
-      "nextMatch": "Iwata - Vanraure",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 37,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Scunthorpe",
-      "nextMatch": "Scunthorpe - Hartlepool",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 38,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Harrogate",
-      "nextMatch": "Harrogate - Eastleigh",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 39,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Wealdstone",
-      "nextMatch": "Wealdstone - Gateshead",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 40,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Kofu",
-      "nextMatch": "Omiya Ardija - Kofu",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 41,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Sagan Tosu",
-      "nextMatch": "Montedio Yamagata - Sagan Tosu",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 42,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Orleans",
-      "nextMatch": "Orleans - Cannes",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 43,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Valenciennes",
-      "nextMatch": "Valenciennes - Le Puy-en-Velay",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 44,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Aubagne FC",
-      "nextMatch": "Fleury-Merogis - Aubagne",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 45,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Cliftonville",
-      "nextMatch": "Limavady - Cliftonville",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 46,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "FC Emmen",
-      "nextMatch": "FC Emmen - Oss",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 47,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Atl. Tucuman 2",
-      "nextMatch": "Central Cordoba 2 - Atl. Tucuman 2",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 48,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Kelty Hearts",
-      "nextMatch": "Spartans - Kelty Hearts",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 49,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Queen's Park",
-      "nextMatch": "Arbroath - Queen's Park",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 50,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Maldon & Tiptree",
-      "nextMatch": "Brentwood - Maldon & Tiptree",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 51,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Rangers B",
-      "nextMatch": "Clyde - Rangers B",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 52,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Three Bridges",
-      "nextMatch": "Three Bridges - Leatherhead",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 53,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Pyrgos",
-      "nextMatch": "Ellas Syrou - Pyrgos",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 54,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Cove Rangers",
-      "nextMatch": "Queen of South - Cove Rangers",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 55,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Dreams FC",
-      "nextMatch": "Dreams - Medeama",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 56,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Inac Kobe Leonesa W",
-      "nextMatch": "JEF United W - Inac Kobe Leonesa W",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 57,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Apollon Kalamaria",
-      "nextMatch": "Kalamaria - Karditsa",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": false
-    },
-    {
-      "id": 58,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Hapoel Bnei Musmus",
-      "nextMatch": "MS Tira - Hapoel Bnei Musmus",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 59,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Zakynthos",
-      "nextMatch": "Panionios - Zakynthos",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 60,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Hapoel Marmorek",
-      "nextMatch": "H. Marmorek - Shimshon Tel Aviv",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": false
-    },
-    {
-      "id": 61,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Maastricht",
-      "nextMatch": "Maastricht - Helmond",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 62,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Celta Vigo B",
-      "nextMatch": "Celta Vigo B - Sabadell",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 63,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "2 de Mayo",
-      "nextMatch": "Rubio Nu - 2 de Mayo",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 64,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Swindon",
-      "nextMatch": "Swindon - Accrington",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 65,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Bristol Rovers",
-      "nextMatch": "Bristol Rovers - Exeter",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 66,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Formartine Utd",
-      "nextMatch": "Formartine Utd - Montrose",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
       "id": 67,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Clachnacuddin",
-      "nextMatch": "Clachnacuddin - Ross County",
+      "match": "Juventus U23",
+      "nextMatch": "Desenzano - Juventus U23",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
         "draw": 0,
-        "awayWin": 20
+        "awayWin": 30
       },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
       "date": "2026-09-22",
-      "streak": 2,
+      "streak": 3,
       "isHome": true
     },
     {
@@ -4420,18 +4486,18 @@
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Portimonense U23",
-      "nextMatch": "Santa Clara U23 - Portimonense U23",
+      "match": "Torremolinos",
+      "nextMatch": "Torremolinos - Algeciras",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
         "draw": 0,
-        "awayWin": 20
+        "awayWin": 30
       },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
       "date": "2026-09-22",
-      "streak": 2,
+      "streak": 3,
       "isHome": true
     },
     {
@@ -4439,8 +4505,122 @@
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Alloa",
-      "nextMatch": "Ross County - Alloa",
+      "match": "Perugia",
+      "nextMatch": "Perugia - Reggiana",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 70,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Academica Recea",
+      "nextMatch": "Academica Recea - Transilvania Sport Academy",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 71,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Arenas Getxo",
+      "nextMatch": "Arenas Getxo - Ath Bilbao B",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 72,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "AD Merida",
+      "nextMatch": "AD Merida - UD Logrones",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 73,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Enyimba International",
+      "nextMatch": "Enyimba - Sporting Lagos",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 74,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Picerno",
+      "nextMatch": "Picerno - Audace Cerignola",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 30
+      },
+      "tip": "Back To Back Losses: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 75,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Solvesborgs",
+      "nextMatch": "Solvesborgs - IFK Berga",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -4454,7 +4634,26 @@
       "isHome": true
     },
     {
-      "id": 70,
+      "id": 76,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "IK Franke",
+      "nextMatch": "IK Franke - Kungsangen",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 77,
       "league": "Various",
       "country": "",
       "time": "",
@@ -4473,145 +4672,12 @@
       "isHome": false
     },
     {
-      "id": 71,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Queen of the South",
-      "nextMatch": "Queen of South - Cove Rangers",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 72,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Chicago Fire",
-      "nextMatch": "Charlotte - Chicago Fire",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 73,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Seattle Reign W",
-      "nextMatch": "Seattle Reign W - Boston Legacy W",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 74,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "North Carolina Courage W",
-      "nextMatch": "Utah Royals W - North Carolina Courage W",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 75,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Orange County SC",
-      "nextMatch": "Orange County SC - Pittsburgh",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 76,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Sporting Jax",
-      "nextMatch": "Sporting Jax - Loudoun",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 77,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Portland Timbers",
-      "nextMatch": "San Jose Earthquakes - Portland Timbers",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
       "id": 78,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Toronto FC",
-      "nextMatch": "Nashville SC - Toronto FC",
+      "match": "Karlbergs",
+      "nextMatch": "Karlstad - Karlbergs",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -4626,367 +4692,6 @@
     },
     {
       "id": 79,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Dundalk",
-      "nextMatch": "Dundalk - Bohemians",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 80,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Criciuma",
-      "nextMatch": "Criciuma - Operario-PR",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 81,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Kerry",
-      "nextMatch": "Kerry - Wexford",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 82,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Poland",
-      "nextMatch": "Sweden - Poland",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 83,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Hungary",
-      "nextMatch": "Northern Ireland - Hungary",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 84,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Atl. Tucuman",
-      "nextMatch": "Atl. Tucuman - Barracas Central",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 85,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Union de Santa Fe",
-      "nextMatch": "Boca Juniors - Union de Santa Fe",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 86,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Platense",
-      "nextMatch": "Velez Sarsfield - Platense",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 87,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "EC Juventude",
-      "nextMatch": "America MG - Juventude",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": false
-    },
-    {
-      "id": 88,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "America MG",
-      "nextMatch": "America MG - Juventude",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 89,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Arbroath",
-      "nextMatch": "Arbroath - Queen's Park",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 90,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Inter Bogotá",
-      "nextMatch": "Pereira - Inter Bogotá",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 91,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Hellerup",
-      "nextMatch": "Hellerup - Roskilde",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 92,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Dobrudzha",
-      "nextMatch": "Hebar - Dobrudzha",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 93,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Yantra Gabrovo",
-      "nextMatch": "Beroe - Yantra Gabrovo",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 94,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Etar",
-      "nextMatch": "Ludogorets II - Etar",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 95,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Tsirang",
-      "nextMatch": "RTC - Tsirang",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 96,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Necaxa",
-      "nextMatch": "Necaxa - Club America",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 97,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Cucuta",
-      "nextMatch": "Cucuta - Llaneros",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 0,
-        "awayWin": 20
-      },
-      "tip": "Back To Back Losses: 2",
-      "probability": 20,
-      "date": "2026-09-22",
-      "streak": 2,
-      "isHome": true
-    },
-    {
-      "id": 98,
       "league": "Various",
       "country": "",
       "time": "",
@@ -5005,12 +4710,373 @@
       "isHome": false
     },
     {
-      "id": 99,
+      "id": 80,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Tvaaker",
+      "nextMatch": "Trollhattan - Tvaaker",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 81,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Hodd",
+      "nextMatch": "Hodd - Odd",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 82,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Skovde",
+      "nextMatch": "Skovde AIK - Olympic",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 83,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Klubi 04",
+      "nextMatch": "Klubi 04 - JaPS",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 84,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Sandnes Ulf",
+      "nextMatch": "Strommen - Sandnes",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 85,
       "league": "Various",
       "country": "",
       "time": "",
       "match": "Chico",
       "nextMatch": "Chico - Dep. Pasto",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 86,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Cucuta",
+      "nextMatch": "Cucuta - Llaneros",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 87,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Inter Bogotá",
+      "nextMatch": "Pereira - Inter Bogotá",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 88,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Lucksta IF",
+      "nextMatch": "Lucksta - Taftea IK",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 89,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Smedby",
+      "nextMatch": "Haninge - Smedby",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 90,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Frolunda",
+      "nextMatch": "Frolunda - Astorps",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 91,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Toronto FC",
+      "nextMatch": "Nashville SC - Toronto FC",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 92,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Eker Orebro",
+      "nextMatch": "Lindo FF - Eker Orebro",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 93,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Dundalk",
+      "nextMatch": "Dundalk - Bohemians",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 94,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Platense",
+      "nextMatch": "Velez Sarsfield - Platense",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 95,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Union de Santa Fe",
+      "nextMatch": "Boca Juniors - Union de Santa Fe",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 96,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Atl. Tucuman",
+      "nextMatch": "Atl. Tucuman - Barracas Central",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 97,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Hungary",
+      "nextMatch": "Northern Ireland - Hungary",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 98,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Poland",
+      "nextMatch": "Sweden - Poland",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 0,
+        "awayWin": 20
+      },
+      "tip": "Back To Back Losses: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 99,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Kerry",
+      "nextMatch": "Kerry - Wexford",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -5030,8 +5096,8 @@
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Seattle Sounders",
-      "nextMatch": "Seattle Sounders - Real Salt Lake",
+      "match": "Crewe",
+      "nextMatch": "Rotherham - Crewe",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -5049,8 +5115,8 @@
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Crewe",
-      "nextMatch": "Rotherham - Crewe",
+      "match": "Seattle Sounders",
+      "nextMatch": "Seattle Sounders - Real Salt Lake",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -5065,6 +5131,44 @@
     },
     {
       "id": 2,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Sao Paulo Crystal",
+      "nextMatch": "Sao Paulo Crystal - Spartax",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 40,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 3,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "PSG W",
+      "nextMatch": "Real Madrid W - PSG W",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 40,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 4",
+      "probability": 40,
+      "date": "2026-09-22",
+      "streak": 4,
+      "isHome": true
+    },
+    {
+      "id": 4,
       "league": "Various",
       "country": "",
       "time": "",
@@ -5083,7 +5187,7 @@
       "isHome": true
     },
     {
-      "id": 3,
+      "id": 5,
       "league": "Various",
       "country": "",
       "time": "",
@@ -5102,12 +5206,12 @@
       "isHome": true
     },
     {
-      "id": 4,
+      "id": 6,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Truro",
-      "nextMatch": "Truro - Merthyr Town",
+      "match": "Maccabi Neve Shaanan Eldad",
+      "nextMatch": "Nahariya - Maccabi Neve Shaanan Eldad",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -5121,7 +5225,7 @@
       "isHome": true
     },
     {
-      "id": 5,
+      "id": 7,
       "league": "Various",
       "country": "",
       "time": "",
@@ -5140,12 +5244,12 @@
       "isHome": true
     },
     {
-      "id": 6,
+      "id": 8,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Somalia",
-      "nextMatch": "Gambia - Somalia",
+      "match": "Truro",
+      "nextMatch": "Truro - Merthyr Town",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -5159,7 +5263,64 @@
       "isHome": true
     },
     {
-      "id": 7,
+      "id": 9,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Odorheiu",
+      "nextMatch": "Odorheiu - Aerostar",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 30,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 10,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "A.C. Savoia",
+      "nextMatch": "Cavese - Savoia",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 30,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": false
+    },
+    {
+      "id": 11,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Guidonia 1937",
+      "nextMatch": "Vis Pesaro - Guidonia",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 30,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 12,
       "league": "Various",
       "country": "",
       "time": "",
@@ -5178,7 +5339,64 @@
       "isHome": true
     },
     {
-      "id": 8,
+      "id": 13,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Middelfart",
+      "nextMatch": "Naestved - Middelfart",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 30,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 14,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Uniao Frederiquense De Futebol",
+      "nextMatch": "Frederiquense - Aimore",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 30,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": false
+    },
+    {
+      "id": 15,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Somalia",
+      "nextMatch": "Gambia - Somalia",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 30,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 16,
       "league": "Various",
       "country": "",
       "time": "",
@@ -5197,45 +5415,7 @@
       "isHome": true
     },
     {
-      "id": 9,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Tristan Suarez",
-      "nextMatch": "Midland - Tristan Suarez",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 30,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Draws: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": true
-    },
-    {
-      "id": 10,
-      "league": "Various",
-      "country": "",
-      "time": "",
-      "match": "Deportivo Maipu",
-      "nextMatch": "Deportivo Maipu - Temperley",
-      "nextMatchDate": "2026-09-22",
-      "probabilities": {
-        "homeWin": 0,
-        "draw": 30,
-        "awayWin": 0
-      },
-      "tip": "Back To Back Draws: 3",
-      "probability": 30,
-      "date": "2026-09-22",
-      "streak": 3,
-      "isHome": true
-    },
-    {
-      "id": 11,
+      "id": 17,
       "league": "Various",
       "country": "",
       "time": "",
@@ -5254,12 +5434,69 @@
       "isHome": true
     },
     {
-      "id": 12,
+      "id": 18,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Arsenal W",
-      "nextMatch": "Chelsea W - Arsenal W",
+      "match": "Tristan Suarez",
+      "nextMatch": "Midland - Tristan Suarez",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 30,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 19,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Deportivo Maipu",
+      "nextMatch": "Deportivo Maipu - Temperley",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 30,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 20,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "New Mexico",
+      "nextMatch": "New Mexico - Sacramento Republic",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 30,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 3",
+      "probability": 30,
+      "date": "2026-09-22",
+      "streak": 3,
+      "isHome": true
+    },
+    {
+      "id": 21,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Pineto",
+      "nextMatch": "Pineto - Grosseto",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -5273,12 +5510,12 @@
       "isHome": true
     },
     {
-      "id": 13,
+      "id": 22,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Newport",
-      "nextMatch": "Newport - Grimsby",
+      "match": "Treviso",
+      "nextMatch": "Renate - Treviso",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -5292,12 +5529,12 @@
       "isHome": true
     },
     {
-      "id": 14,
+      "id": 23,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Brighton W",
-      "nextMatch": "London City Lionesses W - Brighton W",
+      "match": "Forli FC",
+      "nextMatch": "Ostiamare - Forli",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -5311,12 +5548,12 @@
       "isHome": true
     },
     {
-      "id": 15,
+      "id": 24,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Havadar SC",
-      "nextMatch": "Havadar SC - Besat Kermanshah",
+      "match": "Folgore Caratese",
+      "nextMatch": "Lumezzane - Folgore Caratese",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -5330,7 +5567,83 @@
       "isHome": true
     },
     {
-      "id": 16,
+      "id": 25,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Monopoli",
+      "nextMatch": "Casarano - Monopoli",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 26,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Campobasso",
+      "nextMatch": "Sambenedettese - Campobasso",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 27,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Deportiva Minera",
+      "nextMatch": "Alcoyano - Deportiva Minera",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 28,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "St Francis",
+      "nextMatch": "St Francis - Salthill",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 29,
       "league": "Various",
       "country": "",
       "time": "",
@@ -5349,12 +5662,12 @@
       "isHome": true
     },
     {
-      "id": 17,
+      "id": 30,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Colchester",
-      "nextMatch": "Shrewsbury - Colchester",
+      "match": "Antequera",
+      "nextMatch": "Antequera - Jaen",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -5368,7 +5681,64 @@
       "isHome": true
     },
     {
-      "id": 18,
+      "id": 31,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Madureira",
+      "nextMatch": "Madureira - Sampaio Correa FE",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 32,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "CF Intercity",
+      "nextMatch": "UCAM Murcia - CF Intercity",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 33,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Barra FC (Santa Catarina)",
+      "nextMatch": "Barra FC - Nacao",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 34,
       "league": "Various",
       "country": "",
       "time": "",
@@ -5387,12 +5757,12 @@
       "isHome": true
     },
     {
-      "id": 19,
+      "id": 35,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Uruguay",
-      "nextMatch": "Japan - Uruguay",
+      "match": "Real Madrid C",
+      "nextMatch": "Atl. Madrid C - Real Madrid C",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -5406,12 +5776,12 @@
       "isHome": true
     },
     {
-      "id": 20,
+      "id": 36,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Woking",
-      "nextMatch": "Carlisle - Woking",
+      "match": "CF Talavera",
+      "nextMatch": "CF Talavera - Valladolid Promesas",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -5425,7 +5795,254 @@
       "isHome": true
     },
     {
-      "id": 21,
+      "id": 37,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Brighton W",
+      "nextMatch": "London City Lionesses W - Brighton W",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 38,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Arsenal W",
+      "nextMatch": "Chelsea W - Arsenal W",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 39,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Antoniano",
+      "nextMatch": "Antoniano - Ciudad de Lucena",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 40,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Mijas Las Lagunas",
+      "nextMatch": "Mijas Las Lagunas - Tamaraceite",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 41,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "CSKA Moscow W",
+      "nextMatch": "Lokomotiv Moscow W - CSKA Moscow W",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 42,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Itabirito W",
+      "nextMatch": "Itabirito W - Cruzeiro W",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 43,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Giana Erminio",
+      "nextMatch": "Giana Erminio - Pro Vercelli",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 44,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "San Lorenzo",
+      "nextMatch": "San Lorenzo - 4 de Mayo",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 45,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Libertad Asuncion",
+      "nextMatch": "Fernando de la Mora - Libertad Asuncion",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 46,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Spartax",
+      "nextMatch": "Sao Paulo Crystal - Spartax",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 47,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Hemel Hempstead",
+      "nextMatch": "Wingate & Finchley - Hemel Hempstead",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 48,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Wanderers",
+      "nextMatch": "Wanderers - Albion",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 49,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Athlone W",
+      "nextMatch": "Athlone WFC W - Shelbourne W",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 50,
       "league": "Various",
       "country": "",
       "time": "",
@@ -5444,12 +6061,12 @@
       "isHome": true
     },
     {
-      "id": 22,
+      "id": 51,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Gimnasia L.P.",
-      "nextMatch": "Ind. Rivadavia - Gimnasia L.P.",
+      "match": "Barletta",
+      "nextMatch": "Barletta - Potenza",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -5463,12 +6080,12 @@
       "isHome": true
     },
     {
-      "id": 23,
+      "id": 52,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "FC Cincinnati",
-      "nextMatch": "CF Montreal - FC Cincinnati",
+      "match": "GE Gloria",
+      "nextMatch": "Brasil de Pelotas - GE Gloria",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -5482,7 +6099,7 @@
       "isHome": true
     },
     {
-      "id": 24,
+      "id": 53,
       "league": "Various",
       "country": "",
       "time": "",
@@ -5501,12 +6118,506 @@
       "isHome": true
     },
     {
-      "id": 25,
+      "id": 54,
       "league": "Various",
       "country": "",
       "time": "",
-      "match": "Hemel Hempstead",
-      "nextMatch": "Wingate & Finchley - Hemel Hempstead",
+      "match": "FC Cincinnati",
+      "nextMatch": "CF Montreal - FC Cincinnati",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 55,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Vaxjo Norra",
+      "nextMatch": "Rappe GOIF - Vaxjo Norra",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 56,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Lilla Torg",
+      "nextMatch": "Osterlen - Lilla Torg",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 57,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "FBK Karlstad",
+      "nextMatch": "Umea FC - FBK Karlstad",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 58,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Karlstad",
+      "nextMatch": "Karlstad - Karlbergs",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 59,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "SKA Khabarovsk",
+      "nextMatch": "Shinnik Yaroslavl - SKA Khabarovsk",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 60,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Shanghai Shenhua",
+      "nextMatch": "Shanghai Shenhua - Zenit",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 61,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Bom Jesus",
+      "nextMatch": "Gremio Anapolis - Bom Jesus",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 62,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Dorados de Sinaloa",
+      "nextMatch": "Dorados de Sinaloa - Alacranes de Durango",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 63,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "VSK Aarhus",
+      "nextMatch": "VSK Aarhus - Skive",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 64,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "TSC Backa Topola",
+      "nextMatch": "Borac 1926 - TSC",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 65,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Gramadense",
+      "nextMatch": "Gramadense - Pelotas",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 66,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Pergolettese",
+      "nextMatch": "Pergolettese - Trento",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 67,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "GE Bage",
+      "nextMatch": "Brasil de Farroupilha - GE Bage",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 68,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Brasil de Farroupilha",
+      "nextMatch": "Brasil de Farroupilha - GE Bage",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 69,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Cannes",
+      "nextMatch": "Orleans - Cannes",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 70,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Gimnasia L.P.",
+      "nextMatch": "Ind. Rivadavia - Gimnasia L.P.",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 71,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Ballymena",
+      "nextMatch": "Ballymena - Portadown",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 72,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Woking",
+      "nextMatch": "Carlisle - Woking",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 73,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Uruguay",
+      "nextMatch": "Japan - Uruguay",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 74,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Newport",
+      "nextMatch": "Newport - Grimsby",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 75,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Colchester",
+      "nextMatch": "Shrewsbury - Colchester",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 76,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Teteks",
+      "nextMatch": "Teteks - Rabotnicki",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 77,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Carpi",
+      "nextMatch": "Carpi - Arzignano",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 78,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Scafatese",
+      "nextMatch": "Scafatese - Altamura",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 79,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Novara",
+      "nextMatch": "Novara - Ospitaletto",
+      "nextMatchDate": "2026-09-22",
+      "probabilities": {
+        "homeWin": 0,
+        "draw": 20,
+        "awayWin": 0
+      },
+      "tip": "Back To Back Draws: 2",
+      "probability": 20,
+      "date": "2026-09-22",
+      "streak": 2,
+      "isHome": true
+    },
+    {
+      "id": 80,
+      "league": "Various",
+      "country": "",
+      "time": "",
+      "match": "Danubio",
+      "nextMatch": "Defensor Sp. - Danubio",
       "nextMatchDate": "2026-09-22",
       "probabilities": {
         "homeWin": 0,
@@ -5574,6 +6685,19 @@
       "id": 7
     },
     {
+      "team": "Port Vale",
+      "match": "Chesterfield - Port Vale",
+      "nextMatch": "Chesterfield - Port Vale",
+      "nextMatchDate": "2026-09-22",
+      "time": "14:00",
+      "league": "",
+      "country": "",
+      "probability": 55,
+      "streak": "Good scoring form",
+      "isHome": false,
+      "id": 9
+    },
+    {
       "team": "AFC Telford Utd",
       "match": "Worksop - AFC Telford Utd",
       "nextMatch": "Worksop - AFC Telford Utd",
@@ -5584,7 +6708,7 @@
       "probability": 55,
       "streak": "Good scoring form",
       "isHome": false,
-      "id": 9
+      "id": 11
     },
     {
       "team": "Merthyr",
@@ -5592,19 +6716,6 @@
       "nextMatch": "Truro City - Merthyr",
       "nextMatchDate": "2026-09-22",
       "time": "14:45",
-      "league": "",
-      "country": "",
-      "probability": 55,
-      "streak": "Good scoring form",
-      "isHome": false,
-      "id": 11
-    },
-    {
-      "team": "Port Vale",
-      "match": "Chesterfield - Port Vale",
-      "nextMatch": "Chesterfield - Port Vale",
-      "nextMatchDate": "2026-09-22",
-      "time": "14:00",
       "league": "",
       "country": "",
       "probability": 55,
@@ -5641,6 +6752,6 @@
       "id": 0
     }
   ],
-  "fetchTime": "2026-09-22T09:51:33.652Z",
+  "fetchTime": "2026-09-22T19:43:18.194Z",
   "cacheVersion": "2"
 }
