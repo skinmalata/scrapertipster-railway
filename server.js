@@ -509,6 +509,8 @@ const { buildGoldenTips } = require('./src/services/goldenOpportunities');
 const { buildGiantPool } = require('./src/services/authorPicks');
 const { startTelegramBot } = require('./src/services/telegramBot');
 const { startMastodonBot } = require('./src/services/mastodonBot');
+const { announceDailyCode } = require('./src/services/codeAnnouncer');
+const { getToday: getTodayBetwayCode } = require('./src/services/betwayDailyCode');
 
 // The pre-match scrape (fetchPredictions), the H2H Picks build
 // (buildGiantPool) and the FotMob live scrape all buffer large responses in
@@ -652,6 +654,12 @@ startTelegramBot(
   process.env.TELEGRAM_BOT_TOKEN,
   process.env.TELEGRAM_CHAT_ID
 );
+
+// Publish today's Betway booking code to the Telegram channel as soon as the
+// server boots (the code is delivered to the app through a deploy). Skips when
+// the code is unchanged since the last announce or when Telegram is not
+// configured.
+announceDailyCode(getTodayBetwayCode());
 
 startMastodonBot(
   getLiveTipsFromCache,

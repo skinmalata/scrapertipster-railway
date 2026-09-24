@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 const { decodeCode, convertCode, createCodeFromLegs, providerStatus, getAvailableMatches, BOOKMAKERS, MAX_LEGS } = require('../services/bookingCodes/converter');
 const { recordConversion, getRecent } = require('../services/bookingCodes/recentConversions');
+const { announceConversion } = require('../services/codeAnnouncer');
 const STATUS_BY_CODE = {
   BAD_REQUEST: 400,
   INVALID_CODE: 404,
@@ -44,6 +45,7 @@ router.post('/converter/convert', async function (req, res) {
     const body = req.body || {};
     const result = await convertCode({ code: body.code, from: body.from, to: body.to, keepLegs: body.keepLegs });
     recordConversion(result);
+    announceConversion(result);
     res.json({
       success: true,
       from: result.from,
@@ -107,6 +109,7 @@ router.post('/converter/convert-decoded', async function (req, res) {
       totalOdds: Number(totalOdds.toFixed(2))
     };
     recordConversion(result);
+    announceConversion(result);
     res.json({ success: true, ...result });
   } catch (err) {
     sendError(res, err);

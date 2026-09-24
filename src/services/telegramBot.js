@@ -139,4 +139,11 @@ function startTelegramBot(getLiveTips, botToken, chatId) {
   }, POST_INTERVAL_MS);
 }
 
-module.exports = { postNewTips, startTelegramBot };
+// Generic send used by the converter/code announcements. Silent no-op when the
+// bot is not configured (token/chat missing) so callers can fire-and-forget.
+async function sendMessage(botToken, chatId, text) {
+  if (!botToken || !chatId || !text) return { ok: false, description: 'not configured' };
+  return sendToChannel(botToken, chatId, text);
+}
+
+module.exports = { postNewTips, startTelegramBot, sendMessage };
