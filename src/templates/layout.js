@@ -6,6 +6,8 @@
 const fs = require('fs');
 const path = require('path');
 
+const { getToday: getTodayBetwayCode } = require('../services/betwayDailyCode');
+
 const NAV_LINKS = [
   { href: '/', label: 'Home', match: (p) => p === '/' || p === '/index.html' },
   { href: '/ticket-builder.html', label: 'Ticket Builder', match: (p) => p.startsWith('/ticket-builder') },
@@ -250,6 +252,39 @@ function shouldShowFeaturedBooks(url) {
   return !FEATURED_BOOKS_EXCLUDE.has(last) && !FEATURED_BOOKS_EXCLUDE.has(bare);
 }
 
+// Homepage + every prediction page (matrix, league, strategy hub) get the
+// daily Betway booking code banner. Other pages (blog, about, legal...) skip it.
+function shouldShowBetwayCode(url) {
+  if (!url) return false;
+  return url === '/' || url === '/index.html' || url.startsWith('/predictions');
+}
+
+const BETWAY_SECTION_STYLE = `
+  .bw-code-card{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;max-width:960px;margin:14px auto 0;padding:12px 16px;border:1px solid rgba(0,112,243,0.4);border-radius:14px;background:linear-gradient(135deg,rgba(0,112,243,0.14),rgba(0,196,255,0.08));}
+  .bw-code-card::before{content:"B";display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;font-weight:900;font-size:18px;}
+  .bw-code-label{font-size:13px;font-weight:800;color:var(--text,#e8edf5);line-height:1.3;}
+  .bw-code-label small{display:block;font-weight:500;opacity:0.7;}
+  .bw-code-value{display:inline-block;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:20px;font-weight:900;letter-spacing:2px;color:#0a84ff;background:rgba(10,132,255,0.12);padding:5px 14px;border-radius:10px;animation:bwFlash 1s steps(1,end) infinite;}
+  @keyframes bwFlash{0%,52%{opacity:1}53%,100%{opacity:0.12}}
+  .bw-copy{margin-left:auto;background:none;border:1px solid rgba(10,132,255,0.5);color:#0a84ff;border-radius:8px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer;}
+  .bw-copy:hover{background:rgba(10,132,255,0.12);}
+`;
+
+function betwayCodeSection(entry) {
+  const hasCode = !!entry && !!entry.code;
+  const dateLabel = entry && entry.date ? entry.date : '';
+  const body = hasCode
+    ? `<span class="bw-code-label">Betway Booking Code of the Day<small>${dateLabel} &middot; valid until first match kicks off</small></span><code class="bw-code-value">${entry.code}</code><button type="button" class="bw-copy" data-bw-copy="${entry.code}">&#128203; Copy</button>`
+    : `<span class="bw-code-label">Betway Booking Code of the Day<small>${dateLabel}</small></span><span class="bw-code-label" style="opacity:0.75;">Today's betway booking code is not available yet &#8212; check back later.</span>`;
+  return `<section class="bw-code-card" data-betway-code aria-label="Betway booking code of the day">
+<style>${BETWAY_SECTION_STYLE}</style>
+${body}
+<script>
+(function(){var b=document.querySelector('button[data-bw-copy]');if(!b)return;b.addEventListener('click',function(){try{navigator.clipboard.writeText(b.getAttribute('data-bw-copy'));}catch(e){var t=document.createElement('textarea');t.value=b.getAttribute('data-bw-copy');document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();}var o=b.textContent;b.textContent='Copied \\u2713';setTimeout(function(){b.textContent=o;},1600);});})();
+</script>
+</section>`;
+}
+
 
 function applyLayout(html, req) {
   return applyLayoutToHtml(html, (req && req.path) || '/');
@@ -325,6 +360,21 @@ function applyLayoutToHtml(html, activePath) {
       html = html.replace(/(<footer[^>]*>)/i, FEATURED_BOOKS_SECTION + '\n$1');
     } else if (/<\/body>/i.test(html)) {
       html = html.replace(/<\/body>/i, FEATURED_BOOKS_SECTION + '\n</body>');
+    }
+  }
+
+  // 3c. Daily Betway booking code banner (home + prediction pages only).
+  //     Placed directly under the header so it tops the page content; falls
+  //     back to a "not available yet" message when the operator has not added
+  //     today's code yet.
+  if (shouldShowBetwayCode(activePath) && !/data-betway-code/.test(html)) {
+    const betwayHtml = betwayCodeSection(getTodayBetwayCode());
+    const headerClose = html.indexOf('</header>');
+    if (headerClose !== -1) {
+      const at = headerClose + '</header>'.length;
+      html = html.slice(0, at) + '\n' + betwayHtml + html.slice(at);
+    } else {
+      html = html.replace(/<body([^>]*)>/i, (m, attrs) => `<body${attrs}>` + betwayHtml);
     }
   }
 
