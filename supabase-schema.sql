@@ -182,6 +182,58 @@ DROP POLICY IF EXISTS "No client access to admin_audit_log" ON public.admin_audi
 CREATE POLICY "No client access to admin_audit_log" ON public.admin_audit_log
   FOR ALL USING (false);
 
+-- === DATA API GRANTS ===
+-- Required for every public-schema table from October 30 onward: new tables
+-- are unreachable through the Data API without explicit grants. RLS policies
+-- above still govern actual access, so these grants are safe for all rows.
+
+GRANT SELECT ON public.profiles TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO service_role;
+
+GRANT SELECT ON public.subscriptions TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.subscriptions TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.subscriptions TO service_role;
+
+GRANT SELECT ON public.payments TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.payments TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.payments TO service_role;
+
+GRANT SELECT ON public.usage TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.usage TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.usage TO service_role;
+
+GRANT SELECT ON public.payment_events TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.payment_events TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.payment_events TO service_role;
+
+GRANT SELECT ON public.tip_history TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.tip_history TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.tip_history TO service_role;
+
+GRANT SELECT ON public.two_odds_history TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.two_odds_history TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.two_odds_history TO service_role;
+
+GRANT SELECT ON public.pending_registrations TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.pending_registrations TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.pending_registrations TO service_role;
+
+GRANT SELECT ON public.admin_audit_log TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.admin_audit_log TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.admin_audit_log TO service_role;
+
+-- Future tables in public inherit these grants automatically. NOTE: default
+-- privileges only apply to tables created by the role that runs them (the
+-- SQL editor / postgres), so any table created outside this path still needs
+-- explicit grants.
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO anon;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO authenticated;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO anon;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO authenticated;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO service_role;
+
 -- === FUNCTIONS ===
 
 -- Auto-create profile on signup. No free trial is granted: accounts created
