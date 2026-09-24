@@ -101,6 +101,7 @@ router.post('/converter/convert-decoded', async function (req, res) {
       fromName: 'Bet9ja',
       to: to,
       toName: { sportybet: 'SportyBet', msport: 'MSport', betway: 'Betway', bet9ja: 'Bet9ja', betking: 'BetKing', betpawa: 'betPawa' }[to],
+      sourceCode: body.code ? String(body.code) : null,
       code: newCode,
       legCount: legs.length,
       totalOdds: Number(totalOdds.toFixed(2))

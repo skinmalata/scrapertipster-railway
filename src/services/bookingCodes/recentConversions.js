@@ -1,10 +1,12 @@
 'use strict';
 
-// Rolling record of successful code conversions for the "Converted today"
-// social-proof feed on the converter page. Mirrors the live-tip-history disk
-// pattern (env-path override -> /var/data on Render) so the feed survives
-// redeploys. Only the from/to pair, selection count, odds and timestamp are
-// stored — never the booking code itself — so no visitor slip is exposed.
+// Rolling record of successful code conversions for the "Converted in the last
+// 24 hours" social-proof feed on the converter page. Mirrors the
+// live-tip-history disk pattern (env-path override -> /var/data on Render/
+// Railway volume) so the feed survives redeploys. The anonymised from/to
+// bookmaker pair, the source and generated codes, selection count, odds and
+// timestamp are stored so the public feed can link "Betway code X -> SportyBet
+// code Y".
 //
 // All storage failures are swallowed: conversion logging must never block or
 // fail a successful convert request.
@@ -72,6 +74,8 @@ function recordConversion(result) {
     to: result.to,
     fromName: result.fromName,
     toName: result.toName,
+    sourceCode: result.sourceCode || null,
+    resultCode: result.code || null,
     legCount: Number(result.legCount) || 0,
     totalOdds: hasOdds && Number.isFinite(Number(oddsValue)) ? Number(oddsValue) : null,
     createdAt: new Date().toISOString()
@@ -83,11 +87,13 @@ function recordConversion(result) {
 
 function getRecent(limit) {
   prune();
-  const today = dayKey();
-  const todayEntries = entries.filter(e => dayKey(e.createdAt) === today);
-  const count = todayEntries.length;
-  const list = todayEntries.slice(0, limit || 25);
-  return { date: today, count: count, entries: list };
+  // Rolling 24-hour window (not a calendar day) so the feed always reflects
+  // "the past 24 hours" regardless of timezone.
+  const cutoff = Date.now() - 24 * 3600 * 1000;
+  const recent = entries.filter(e => new Date(e.createdAt).getTime() >= cutoff);
+  const count = recent.length;
+  const list = recent.slice(0, limit || 25);
+  return { date: dayKey(), windowHours: 24, count: count, entries: list };
 }
 
 load();
