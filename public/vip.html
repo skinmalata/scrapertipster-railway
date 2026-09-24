@@ -60,6 +60,10 @@
 <p class="hero-date" id="currentDate"></p>
 </div>
 
+<div class="note-box">
+  <strong>Note:</strong> please don't play every pick on this list as-is. These tips match the stats, but no tip wins every time &mdash; do your own independent research on form, lineups and odds, and select just a few games you feel strongest about each day.
+</div>
+
 <div class="date-tabs" id="dateTabs">
   <button class="date-tab active" data-date="today" onclick="switchDate('today')">Today</button>
   <button class="date-tab" data-date="tomorrow" onclick="switchDate('tomorrow')">Tomorrow</button>
@@ -82,8 +86,6 @@
   <a href="/predictions/draws-streak" id="tab-draws-streak" class="tab-btn">Draw Streak</a>
   <a href="/vip.html" id="tab-vip" class="tab-btn active" style="background:#ff2448;color:#fff">VIP</a>
 </div>
-
-<div class="note-box" id="authState" style="display:none"></div>
 
 <div class="stats-bar" id="statsBar" style="display:none">
 <div class="stat-item"><div class="stat-value" id="totalMatches">0</div><div class="stat-label">VIP Tips</div></div>
@@ -256,10 +258,6 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
         }
         cache = data;
         document.getElementById('statsBar').style.display = '';
-        if (data.lastFetch) {
-          var note = document.getElementById('authState');
-          if (note) { note.style.display = ''; note.innerHTML = '<p style="margin:0">VIP picks refreshed ' + new Date(data.lastFetch).toLocaleString() + '. Tips are match-winner record certs on teams with near-perfect recent form and head-to-head records, or team-to-score calls picked from expected-goals history, recent form and head-to-head records.</p>'; }
-        }
         renderContent();
       }).catch(function () {
         showPaywall(true);
