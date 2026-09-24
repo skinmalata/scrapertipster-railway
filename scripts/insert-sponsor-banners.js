@@ -1,20 +1,24 @@
 'use strict';
 
-// Bulk-inject the shared sponsor banner into already-deployed static prediction
+// Bulk-inject the shared sponsor banners into already-deployed static prediction
 // grids (public/predictions/<league>/<market>/index.html and
-// public/predictions/league/<slug>/index.html). Idempotent: skips any page that
-// already carries a .wft-sponsor slot. Generators that (re)create these pages
-// already splice the banner themselves (see generate-matrix-pages.js and
-// generate-league-pages.js); this script is a one-time migration for committed
-// pages.
+// public/predictions/league/<slug>/index.html). Idempotent: injects the 1win
+// banner between the first and second match card (skip any page that already
+// carries a .wft-sponsor slot) and appends the refbanners.com affiliate iframe
+// after the last card (skip any page that already has a .wft-affiliate slot).
+// Generators that (re)create these pages already splice the banners themselves
+// (see generate-matrix-pages.js and generate-league-pages.js); this script is a
+// one-time migration for committed pages.
 
 const fs = require('fs');
 const path = require('path');
-const { renderSponsorBanner } = require('./lib/sponsor-banner');
+const { renderSponsorBanner, renderAffiliateBanner } = require('./lib/sponsor-banner');
 
 const PREDICTIONS_DIR = path.join(__dirname, '..', 'public', 'predictions');
 const GUARD = '<div class="wft-sponsor">';
+const AFFILIATE_GUARD = '<div class="wft-affiliate">';
 const CARD_MARKER = '<div class="match-card fade-in"';
+const GRID_MARKER = '<div class="matches-grid">';
 
 function pageHasCards(html) {
   return html.indexOf('<div class="matches-grid">') !== -1 && html.indexOf(CARD_MARKER) !== -1;
@@ -46,17 +50,68 @@ function insertBanner(html, seed) {
   };
 }
 
+function findGridClose(html, openIdx) {
+  let depth = 1;
+  let i = openIdx + GRID_MARKER.length;
+  while (i < html.length) {
+    const openTag = html.indexOf('<div', i);
+    const closeTag = html.indexOf('</div>', i);
+    if (closeTag < 0) return -1;
+    if (openTag !== -1 && openTag < closeTag) {
+      depth += 1;
+      i = openTag + 4;
+    } else {
+      depth -= 1;
+      if (depth === 0) return closeTag;
+      i = closeTag + 6;
+    }
+  }
+  return -1;
+}
+
+function appendAffiliateBanner(html) {
+  if (html.indexOf(AFFILIATE_GUARD) !== -1) return { html, inserted: false, reason: 'already has affiliate' };
+  if (!pageHasCards(html)) return { html, inserted: false, reason: 'no match-card grid' };
+
+  const openIdx = html.indexOf(GRID_MARKER);
+  if (openIdx < 0) return { html, inserted: false, reason: 'no matches-grid' };
+  const closeIdx = findGridClose(html, openIdx);
+  if (closeIdx < 0) return { html, inserted: false, reason: 'grid close not found' };
+
+  return {
+    html: html.slice(0, closeIdx) + '\n  ' + renderAffiliateBanner() + '\n' + html.slice(closeIdx),
+    inserted: true,
+    reason: 'ok'
+  };
+}
+
 function ensureTrailingNewline(s) {
   return s.endsWith('\n') ? s : s + '\n';
 }
 
 function processFile(filePath, seed) {
-  const original = fs.readFileSync(filePath, 'utf8');
-  const result = insertBanner(original, seed);
-  if (result.inserted) {
-    fs.writeFileSync(filePath, ensureTrailingNewline(result.html));
+  let current = fs.readFileSync(filePath, 'utf8');
+  let changed = false;
+  const results = {};
+
+  const sponsor = insertBanner(current, seed);
+  if (sponsor.inserted) {
+    current = sponsor.html;
+    changed = true;
   }
-  return result;
+  results.sponsor = sponsor;
+
+  const affiliate = appendAffiliateBanner(current);
+  if (affiliate.inserted) {
+    current = affiliate.html;
+    changed = true;
+  }
+  results.affiliate = affiliate;
+
+  if (changed) {
+    fs.writeFileSync(filePath, ensureTrailingNewline(current));
+  }
+  return results;
 }
 
 function collectTargets() {
@@ -87,25 +142,31 @@ function collectTargets() {
 
 function main() {
   const targets = collectTargets();
-  let inserted = 0;
-  let skipped = 0;
-  const skippedReasons = {};
+  const inserted = { sponsor: 0, affiliate: 0 };
+  const skippedReasons = { sponsor: {}, affiliate: {} };
 
   targets.forEach(({ file, seed }) => {
     const result = processFile(file, seed);
-    if (result.inserted) {
-      inserted += 1;
+    if (result.sponsor.inserted) {
+      inserted.sponsor += 1;
       console.log(`[sponsor] ${seed}`);
     } else {
-      skipped += 1;
-      skippedReasons[result.reason] = (skippedReasons[result.reason] || 0) + 1;
+      skippedReasons.sponsor[result.sponsor.reason] = (skippedReasons.sponsor[result.sponsor.reason] || 0) + 1;
+    }
+    if (result.affiliate.inserted) {
+      inserted.affiliate += 1;
+      console.log(`[affiliate] ${seed}`);
+    } else {
+      skippedReasons.affiliate[result.affiliate.reason] = (skippedReasons.affiliate[result.affiliate.reason] || 0) + 1;
     }
   });
 
-  console.log(`[sponsor] Inserted into ${inserted} pages, skipped ${skipped}`);
-  Object.keys(skippedReasons).forEach(r => console.log(`[sponsor]   skipped (${r}): ${skippedReasons[r]}`));
+  console.log(`[sponsor] Inserted into ${inserted.sponsor} pages, skipped ${targets.length - inserted.sponsor}`);
+  Object.keys(skippedReasons.sponsor).forEach(r => console.log(`[sponsor]   skipped (${r}): ${skippedReasons.sponsor[r]}`));
+  console.log(`[affiliate] Inserted into ${inserted.affiliate} pages, skipped ${targets.length - inserted.affiliate}`);
+  Object.keys(skippedReasons.affiliate).forEach(r => console.log(`[affiliate]   skipped (${r}): ${skippedReasons.affiliate[r]}`));
 }
 
 if (require.main === module) main();
 
-module.exports = { insertBanner, processFile, collectTargets, main };
+module.exports = { insertBanner, appendAffiliateBanner, findGridClose, processFile, collectTargets, main };

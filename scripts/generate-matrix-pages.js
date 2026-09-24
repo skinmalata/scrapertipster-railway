@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { escapeHtml, slugifyTeam, generateFaqSchema, wrapPage } = require('./lib/layout');
-const { spliceSponsorBetweenCards } = require('./lib/sponsor-banner');
+const { buildGridHtml } = require('./lib/sponsor-banner');
 
 const PREDICTIONS_FILE = path.join(__dirname, '..', 'predictions-cache.json');
 const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions');
@@ -133,7 +133,7 @@ function generateMatrixPage(leagueName, leagueSlug, marketSlug, marketConfig, ma
   const metaDesc = `Statistical ${leagueName} ${marketConfig.label.toLowerCase()} predictions with probability scores. Free ${marketConfig.desc} tips, form analysis, and match previews updated daily for ${leagueName}.`;
 
   const renderedCards = matches.map(m => renderMatchCard(m, leagueSlug, analysisUrls, teamSlugs));
-  const matchCardsHtml = spliceSponsorBetweenCards(renderedCards, `${leagueSlug}/${marketSlug}`) || renderedCards.join('\n');
+  const matchCardsHtml = buildGridHtml(renderedCards, `${leagueSlug}/${marketSlug}`);
 
   const relatedLinks = [];
   if (leagueHubExists) relatedLinks.push(`<a href="/predictions/league/${leagueSlug}/">${escapeHtml(leagueName)} Hub</a>`);

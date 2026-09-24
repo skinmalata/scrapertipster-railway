@@ -283,6 +283,15 @@ nav a.active::after {
  min-width: 0;
  margin: 0 auto;
  }
+ .wft-affiliate {
+ grid-column: 1 / -1;
+ width: 100%;
+ min-width: 0;
+ }
+ .wft-affiliate iframe {
+ border-radius: 12px;
+ overflow: hidden;
+ }
 
  .match-card {
  background: var(--bg-card);
