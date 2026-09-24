@@ -133,7 +133,7 @@ function generateMatrixPage(leagueName, leagueSlug, marketSlug, marketConfig, ma
   const metaDesc = `Statistical ${leagueName} ${marketConfig.label.toLowerCase()} predictions with probability scores. Free ${marketConfig.desc} tips, form analysis, and match previews updated daily for ${leagueName}.`;
 
   const renderedCards = matches.map(m => renderMatchCard(m, leagueSlug, analysisUrls, teamSlugs));
-  const matchCardsHtml = buildGridHtml(renderedCards, `${leagueSlug}/${marketSlug}`);
+  const matchCardsHtml = buildGridHtml(renderedCards);
 
   const relatedLinks = [];
   if (leagueHubExists) relatedLinks.push(`<a href="/predictions/league/${leagueSlug}/">${escapeHtml(leagueName)} Hub</a>`);

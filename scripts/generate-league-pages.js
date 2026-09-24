@@ -182,7 +182,7 @@ function generateLeaguePage(leagueName, leagueSlug, matches, ctx) {
 
   const MAX_CARDS = 200;
   const renderedCards = matches.slice(0, MAX_CARDS).map(m => renderMatchCard(m, ctx && ctx.analysisUrls));
-  const matchCardsHtml = buildGridHtml(renderedCards, `league/${leagueSlug}`);
+  const matchCardsHtml = buildGridHtml(renderedCards);
   const truncatedNote = matches.length > MAX_CARDS
     ? `<p style="color:var(--text-secondary);font-size:13px;margin-top:12px;">Showing the first ${MAX_CARDS} of ${matches.length} ${leagueName} fixtures for today.</p>`
     : '';

@@ -1,72 +1,25 @@
-// Reusable sponsored banner slots for WinFulltime prediction grids.
-// Two self-hosted 1win creatives alternate across pages (one per page, picked
-// deterministically by seed so the assignment is stable per URL), spliced
-// between the first and second match card. A refbanners.com affiliate iframe is
-// appended after the last card of the grid.
-// Output mirrors the client-side renderSponsor() used by the JS-rendered pages
-// (see generate-category-pages.js / index.html / author-picks.html).
+// Reusable 1xBet affiliate banner slot for WinFulltime prediction grids.
+// The refbanners.com iframe (owner account 6034393) is appended after the last
+// match card of the grid, server-side via buildGridHtml() / insert script and
+// client-side by public/sponsor-banner.js.
 
-const SPONSOR_HREF = 'https://one-vv5314.com/betting?open=register&p=f61e';
-const SPONSOR_BANNERS = [
-  '/img/banners/1win-banner-a.webp',
-  '/img/banners/1win-banner-b.webp'
-];
-
-const AFFILIATE_IFRAME = "<iframe scrolling='no' frameBorder='0' loading='lazy' referrerpolicy='no-referrer' title='Affiliate promotion' style='padding:0px; margin:0px; border:0px;border-style:none;' width='100%' height='320' src=\"https://refbanners.com/I?tag=d_6034393m_196840c_&site=6034393&ad=196840\"></iframe>";
-
-function pickSponsorIndex(seed) {
-  const s = String(seed == null ? '' : seed);
-  let h = 0;
-  for (let i = 0; i < s.length; i++) {
-    h = ((h * 31) + s.charCodeAt(i)) >>> 0;
-  }
-  return h % SPONSOR_BANNERS.length;
-}
-
-function renderSponsorBanner(seed) {
-  var idx = pickSponsorIndex(seed);
-  return '<div class="wft-sponsor"><a href="' + SPONSOR_HREF +
-    '" target="_blank" rel="noopener nofollow sponsored" title="1Win" aria-label="1Win">' +
-    '<img src="' + SPONSOR_BANNERS[idx] + '" alt="1Win" width="800" height="800" ' +
-    'loading="lazy" decoding="async" style="display:block;width:100%;height:auto;border-radius:12px;">' +
-    '</a></div>';
-}
+const AFFILIATE_IFRAME = "<iframe scrolling='no' frameBorder='0' style='padding:0px; margin:0px; border:0px;border-style:none;' width='320' height='320' src=\"https://refbanners.com/I?tag=d_6034393m_78736c_&site=6034393&ad=78736\" ></iframe>";
 
 function renderAffiliateBanner() {
   return '<div class="wft-affiliate">' + AFFILIATE_IFRAME + '</div>';
 }
 
 /**
- * @returns {string} sponsor HTML (single line) or null if fewer than 2 places.
+ * Full grid slot assembly: cards joined together plus the 1xBet affiliate
+ * iframe appended after the last card. Returns '' when there are no cards.
  */
-function spliceSponsorBetweenCards(cards, seed) {
-  if (!Array.isArray(cards) || cards.length < 2) return null;
-  const banner = renderSponsorBanner(seed);
-  return cards[0] + '\n' + banner + '\n' + cards.slice(1).join('\n');
-}
-
-/**
- * Full grid slot assembly: 1win banner (after the first card, or between the
- * first and second card when there are 2+) plus the affiliate iframe appended
- * after the last card. Returns '' when there are no cards. Mirrors the
- * client-side insertSponsor(), which also shows the banner on 1-card grids.
- */
-function buildGridHtml(cards, seed) {
+function buildGridHtml(cards) {
   if (!Array.isArray(cards) || cards.length === 0) return '';
-  const banner = renderSponsorBanner(seed);
-  const body = cards.length >= 2
-    ? spliceSponsorBetweenCards(cards, seed)
-    : cards[0] + '\n' + banner;
-  return body + '\n\n' + renderAffiliateBanner();
+  return cards.join('\n') + '\n\n' + renderAffiliateBanner();
 }
 
 module.exports = {
-  SPONSOR_HREF,
-  SPONSOR_BANNERS,
   AFFILIATE_IFRAME,
-  pickSponsorIndex,
-  renderSponsorBanner,
   renderAffiliateBanner,
-  spliceSponsorBetweenCards,
   buildGridHtml
 };

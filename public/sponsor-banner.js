@@ -1,25 +1,10 @@
-// Shared sponsored-banner slots for WinFulltime prediction grids.
+// Shared 1xBet affiliate slot for WinFulltime prediction grids (client-side).
 // Loaded by the JS-rendered pages (index.html, author-picks.html,
 // predictions/<slug>.html). Mirrors scripts/lib/sponsor-banner.js used by the
-// server-rendered matrix and league pages. One 1win banner per page, inserted
-// between the first and second match card, creative chosen deterministically
-// per page load (stable across date-tab re-renders). A refbanners.com affiliate
-// iframe is appended after the last card of the grid.
+// server-rendered matrix and league pages. The refbanners.com affiliate iframe
+// is appended after the last card of the grid.
 (function () {
-  var SPONSOR_HREF = 'https://one-vv5314.com/betting?open=register&p=f61e';
-  var SPONSOR_BANNERS = ['/img/banners/1win-banner-a.webp', '/img/banners/1win-banner-b.webp'];
-  var AFFILIATE_IFRAME = "<iframe scrolling='no' frameBorder='0' loading='lazy' referrerpolicy='no-referrer' title='Affiliate promotion' style='padding:0px; margin:0px; border:0px;border-style:none;' width='100%' height='320' src=\"https://refbanners.com/I?tag=d_6034393m_196840c_&site=6034393&ad=196840\"></iframe>";
-
-  function pickSponsorIndex(seed) {
-    var s = String(seed == null ? '' : seed);
-    var h = 0;
-    for (var i = 0; i < s.length; i++) {
-      h = ((h * 31) + s.charCodeAt(i)) >>> 0;
-    }
-    return h % SPONSOR_BANNERS.length;
-  }
-
-  var index = pickSponsorIndex(window.location.pathname);
+  var AFFILIATE_IFRAME = "<iframe scrolling='no' frameBorder='0' style='padding:0px; margin:0px; border:0px;border-style:none;' width='320' height='320' src=\"https://refbanners.com/I?tag=d_6034393m_78736c_&site=6034393&ad=78736\" ></iframe>";
 
   function renderAffiliateBanner() {
     return '<div class="wft-affiliate">' + AFFILIATE_IFRAME + '</div>';
@@ -27,22 +12,8 @@
 
   function insertSponsor(gridHtml) {
     var marker = '<div class="match-card fade-in"';
-    var positions = [];
-    var pos = gridHtml.indexOf(marker);
-    while (pos !== -1 && positions.length < 6) {
-      positions.push(pos);
-      pos = gridHtml.indexOf(marker, pos + marker.length);
-    }
-    if (positions.length === 0) return gridHtml;
-    var banner = '<div class="wft-sponsor"><a href="' + SPONSOR_HREF +
-      '" target="_blank" rel="noopener nofollow sponsored" title="1Win" aria-label="1Win">' +
-      '<img src="' + SPONSOR_BANNERS[index] + '" alt="1Win" width="800" height="800" ' +
-      'loading="lazy" decoding="async" style="display:block;width:100%;height:auto;border-radius:12px;">' +
-      '</a></div>';
-    var insertAt = positions.length >= 6 ? positions[5] : gridHtml.length;
-    while (insertAt > 0 && (gridHtml[insertAt - 1] === '\n' || gridHtml[insertAt - 1] === ' ')) insertAt--;
-    var html = gridHtml.slice(0, insertAt) + '\n\n' + banner + '\n\n  ' + gridHtml.slice(insertAt);
-    return html + '\n\n' + renderAffiliateBanner();
+    if (gridHtml.indexOf(marker) === -1) return gridHtml;
+    return gridHtml + '\n\n' + renderAffiliateBanner();
   }
 
   window.wftSponsor = { insertSponsor: insertSponsor };
