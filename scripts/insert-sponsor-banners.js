@@ -38,7 +38,18 @@ function insertBanner(html, seed) {
     if (count === 2) second = idx;
     from = idx + CARD_MARKER.length;
   }
-  if (second < 0) return { html, inserted: false, reason: 'fewer than 2 cards' };
+  if (second < 0) {
+    const affIdx = html.indexOf(AFFILIATE_GUARD);
+    const anchor = affIdx > -1 ? affIdx : html.indexOf(GRID_MARKER);
+    let start = anchor;
+    while (start > 0 && /\s/.test(html[start - 1])) start--;
+    if (anchor < 0) return { html, inserted: false, reason: 'grid close not found' };
+    return {
+      html: html.slice(0, start) + '\n' + renderSponsorBanner(seed) + '\n\n  ' + html.slice(anchor),
+      inserted: true,
+      reason: 'single card'
+    };
+  }
 
   let runStart = second;
   while (runStart > 0 && /\s/.test(html[runStart - 1])) runStart--;

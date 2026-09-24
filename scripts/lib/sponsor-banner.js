@@ -37,7 +37,7 @@ function renderAffiliateBanner() {
 }
 
 /**
- * @returns {string} sponsor HTML (single line) or '' if fewer than 2 places.
+ * @returns {string} sponsor HTML (single line) or null if fewer than 2 places.
  */
 function spliceSponsorBetweenCards(cards, seed) {
   if (!Array.isArray(cards) || cards.length < 2) return null;
@@ -46,12 +46,17 @@ function spliceSponsorBetweenCards(cards, seed) {
 }
 
 /**
- * Full grid slot assembly: 1win banner (if >=2 cards) plus the affiliate
- * iframe appended after the last card. Returns '' when there are no cards.
+ * Full grid slot assembly: 1win banner (after the first card, or between the
+ * first and second card when there are 2+) plus the affiliate iframe appended
+ * after the last card. Returns '' when there are no cards. Mirrors the
+ * client-side insertSponsor(), which also shows the banner on 1-card grids.
  */
 function buildGridHtml(cards, seed) {
   if (!Array.isArray(cards) || cards.length === 0) return '';
-  const body = spliceSponsorBetweenCards(cards, seed) || cards.join('\n');
+  const banner = renderSponsorBanner(seed);
+  const body = cards.length >= 2
+    ? spliceSponsorBetweenCards(cards, seed)
+    : cards[0] + '\n' + banner;
   return body + '\n\n' + renderAffiliateBanner();
 }
 
