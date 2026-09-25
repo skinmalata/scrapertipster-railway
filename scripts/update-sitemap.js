@@ -9,11 +9,65 @@
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const ROOT = path.join(__dirname, '..', 'public');
 const SITEMAP_PATH = path.join(ROOT, 'sitemap.xml');
+const STATE_PATH = path.join(__dirname, '..', 'data', 'sitemap-lastmod.json');
 const BASE_URL = 'https://winfulltime.com';
 const ANALYSIS_SITEMAP_DAYS = 60;
+
+// <lastmod> is a crawl signal, so it must only move when the page actually
+// changes. These generators rewrite thousands of files on every run (the layout
+// baker touches every page), so stamping `today` on everything made Google
+// re-crawl the whole sitemap daily and it learned to ignore the signal.
+//
+// Three truthful strategies are used instead:
+//   1. Dated archive URLs (/analysis/YYYY-MM-DD/..., /predictions/date/...) are
+//      immutable - lastmod is the date in the path.
+//   2. Genuinely daily hubs (home, market hubs, league + matrix pages) reflect
+//      the current prediction run, so `today` is accurate.
+//   3. Evergreen pages (teams, h2h, convert, static) keep their previous
+//      lastmod until their content hash changes, tracked in data/sitemap-lastmod.json.
+let lastmodState = null;
+
+function loadState() {
+  if (lastmodState) return lastmodState;
+  lastmodState = {};
+  try {
+    const raw = JSON.parse(fs.readFileSync(STATE_PATH, 'utf8'));
+    if (raw && typeof raw === 'object') lastmodState = raw;
+  } catch (err) {
+    if (err.code !== 'ENOENT') console.warn('sitemap lastmod state unreadable:', err.message);
+  }
+  return lastmodState;
+}
+
+function saveState() {
+  if (!lastmodState) return;
+  fs.mkdirSync(path.dirname(STATE_PATH), { recursive: true });
+  fs.writeFileSync(STATE_PATH, JSON.stringify(lastmodState));
+}
+
+function hashOf(absPath) {
+  try {
+    return crypto.createHash('md5').update(fs.readFileSync(absPath)).digest('hex');
+  } catch (err) {
+    return null;
+  }
+}
+
+// Returns the lastmod to publish for an evergreen URL, and records the new
+// state. Stable across runs: identical content keeps its original date.
+function evergreenLastmod(url, absPath, today) {
+  const hash = hashOf(absPath);
+  if (!hash) return today;
+  const state = loadState();
+  const prev = state[url];
+  const lastmod = prev && prev.hash === hash ? prev.lastmod : today;
+  state[url] = { hash, lastmod };
+  return lastmod;
+}
 
 function listPageSlugs(subDir) {
   const dir = path.join(ROOT, subDir);
@@ -40,32 +94,40 @@ function buildSitemap() {
   const today = new Date().toISOString().split('T')[0];
 
   const coreUrls = [
-    { loc: 'https://winfulltime.com/', changefreq: 'daily', priority: '1.0' },
-    { loc: 'https://winfulltime.com/options.html', changefreq: 'weekly', priority: '0.8' },
-    { loc: 'https://winfulltime.com/analysis.html', changefreq: 'daily', priority: '0.8' },
-    { loc: 'https://winfulltime.com/about.html', changefreq: 'monthly', priority: '0.7' },
-    { loc: 'https://winfulltime.com/contact.html', changefreq: 'monthly', priority: '0.5' },
-    { loc: 'https://winfulltime.com/policy.html', changefreq: 'monthly', priority: '0.4' },
-    { loc: 'https://winfulltime.com/privacy.html', changefreq: 'monthly', priority: '0.4' },
-    { loc: 'https://winfulltime.com/terms.html', changefreq: 'monthly', priority: '0.4' },
-    { loc: 'https://winfulltime.com/advertise.html', changefreq: 'monthly', priority: '0.6' },
-    { loc: 'https://winfulltime.com/ticket-builder.html', changefreq: 'weekly', priority: '0.8' },
-    { loc: 'https://winfulltime.com/blog/', changefreq: 'weekly', priority: '0.9' },
-    { loc: 'https://winfulltime.com/predictions/', changefreq: 'daily', priority: '0.9' },
-    { loc: 'https://winfulltime.com/predictions/1x2', changefreq: 'daily', priority: '0.9' },
-    { loc: 'https://winfulltime.com/predictions/over-1-5', changefreq: 'daily', priority: '0.9' },
-    { loc: 'https://winfulltime.com/predictions/over-2-5', changefreq: 'daily', priority: '0.9' },
-    { loc: 'https://winfulltime.com/predictions/under-2-5', changefreq: 'daily', priority: '0.9' },
-    { loc: 'https://winfulltime.com/predictions/btts', changefreq: 'daily', priority: '0.9' },
-    { loc: 'https://winfulltime.com/predictions/btts-no', changefreq: 'daily', priority: '0.8' },
-    { loc: 'https://winfulltime.com/predictions/unbeaten', changefreq: 'daily', priority: '0.8' },
-    { loc: 'https://winfulltime.com/predictions/winning-streak', changefreq: 'daily', priority: '0.8' },
-    { loc: 'https://winfulltime.com/predictions/losing-streak', changefreq: 'daily', priority: '0.8' },
-    { loc: 'https://winfulltime.com/predictions/draws-streak', changefreq: 'daily', priority: '0.8' },
-    { loc: 'https://winfulltime.com/predictions/corners', changefreq: 'daily', priority: '0.8' },
-    { loc: 'https://winfulltime.com/predictions/cards', changefreq: 'daily', priority: '0.8' }
+    // daily: reflects the current prediction run
+    { loc: 'https://winfulltime.com/', file: 'index.html', changefreq: 'daily', priority: '1.0' },
+    { loc: 'https://winfulltime.com/analysis.html', file: 'analysis.html', changefreq: 'daily', priority: '0.8' },
+    { loc: 'https://winfulltime.com/predictions/', file: 'predictions/index.html', changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://winfulltime.com/predictions/1x2', file: 'predictions/1x2.html', changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://winfulltime.com/predictions/over-1-5', file: 'predictions/over-1-5.html', changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://winfulltime.com/predictions/over-2-5', file: 'predictions/over-2-5.html', changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://winfulltime.com/predictions/under-2-5', file: 'predictions/under-2-5.html', changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://winfulltime.com/predictions/btts', file: 'predictions/btts.html', changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://winfulltime.com/predictions/btts-no', file: 'predictions/btts-no.html', changefreq: 'daily', priority: '0.8' },
+    { loc: 'https://winfulltime.com/predictions/unbeaten', file: 'predictions/unbeaten.html', changefreq: 'daily', priority: '0.8' },
+    { loc: 'https://winfulltime.com/predictions/winning-streak', file: 'predictions/winning-streak.html', changefreq: 'daily', priority: '0.8' },
+    { loc: 'https://winfulltime.com/predictions/losing-streak', file: 'predictions/losing-streak.html', changefreq: 'daily', priority: '0.8' },
+    { loc: 'https://winfulltime.com/predictions/draws-streak', file: 'predictions/draws-streak.html', changefreq: 'daily', priority: '0.8' },
+    { loc: 'https://winfulltime.com/predictions/corners', file: 'predictions/corners.html', changefreq: 'daily', priority: '0.8' },
+    { loc: 'https://winfulltime.com/predictions/cards', file: 'predictions/cards.html', changefreq: 'daily', priority: '0.8' },
+    // evergreen: only moves when the file itself changes
+    { loc: 'https://winfulltime.com/options.html', file: 'options.html', changefreq: 'weekly', priority: '0.8' },
+    { loc: 'https://winfulltime.com/about.html', file: 'about.html', changefreq: 'monthly', priority: '0.7' },
+    { loc: 'https://winfulltime.com/contact.html', file: 'contact.html', changefreq: 'monthly', priority: '0.5' },
+    { loc: 'https://winfulltime.com/policy.html', file: 'policy.html', changefreq: 'monthly', priority: '0.4' },
+    { loc: 'https://winfulltime.com/privacy.html', file: 'privacy.html', changefreq: 'monthly', priority: '0.4' },
+    { loc: 'https://winfulltime.com/terms.html', file: 'terms.html', changefreq: 'monthly', priority: '0.4' },
+    { loc: 'https://winfulltime.com/advertise.html', file: 'advertise.html', changefreq: 'monthly', priority: '0.6' },
+    { loc: 'https://winfulltime.com/ticket-builder.html', file: 'ticket-builder.html', changefreq: 'weekly', priority: '0.8' },
+    { loc: 'https://winfulltime.com/blog/', file: 'blog/index.html', changefreq: 'weekly', priority: '0.9' }
   ];
-  const coreXml = coreUrls.map(u => urlEntry(u.loc, today, u.changefreq, u.priority)).join('\n');
+  const DAILY_FILES = new Set(coreUrls.slice(0, 16).map(u => u.file));
+  const coreXml = coreUrls.map(u => {
+    const lastmod = DAILY_FILES.has(u.file)
+      ? today
+      : evergreenLastmod(u.loc, path.join(ROOT, u.file), today);
+    return urlEntry(u.loc, lastmod, u.changefreq, u.priority);
+  }).join('\n');
 
   // Blog posts. The HTML files are the source of truth — a post can be live
   // before it is added to articles-manifest.json.
@@ -78,7 +140,8 @@ function buildSitemap() {
       if (/<meta name="robots"[^>]*noindex/i.test(html)) return null;
       const canonical = (html.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i) || [])[1]
         || `https://winfulltime.com/blog/${file}`;
-      const modified = (html.match(/["']dateModified["']\s*:\s*["'](\d{4}-\d{2}-\d{2})/i) || [])[1] || today;
+      const modified = (html.match(/["']dateModified["']\s*:\s*["'](\d{4}-\d{2}-\d{2})/i) || [])[1]
+        || evergreenLastmod(canonical, path.join(blogDir, file), today);
       return urlEntry(canonical, modified, 'monthly', '0.7');
     })
     .filter(Boolean)
@@ -103,7 +166,9 @@ function buildSitemap() {
         if (!fs.existsSync(page)) return;
         const robots = (fs.readFileSync(page, 'utf8').match(/<meta name="robots"[^>]*>/i) || [''])[0];
         if (/noindex/i.test(robots)) return;
-        analysisEntries.push(urlEntry(`https://winfulltime.com/analysis/${d}/${slug}/`, today, 'daily', '0.8'));
+        // The match date is part of the URL and the page is an immutable
+        // archive of that fixture, so it is the accurate lastmod.
+        analysisEntries.push(urlEntry(`https://winfulltime.com/analysis/${d}/${slug}/`, d, 'monthly', '0.8'));
       });
     });
   }
@@ -124,7 +189,7 @@ function buildSitemap() {
     if (/<meta name="robots"[^>]*noindex/i.test(html)) return null;
     const canonical = (html.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i) || [])[1]
       || `https://winfulltime.com/h2h/${slug}/`;
-    return urlEntry(canonical, today, 'weekly', '0.7');
+    return urlEntry(canonical, evergreenLastmod(canonical, page, today), 'weekly', '0.7');
   }).filter(Boolean).join('\n');
 
   // Prerendered Team Profile Pages (/teams/slug/). Same treatment - stubs and
@@ -136,20 +201,24 @@ function buildSitemap() {
     if (/<meta name="robots"[^>]*noindex/i.test(html)) return null;
     const canonical = (html.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i) || [])[1]
       || `https://winfulltime.com/teams/${slug}/`;
-    return urlEntry(canonical, today, 'weekly', '0.7');
+    return urlEntry(canonical, evergreenLastmod(canonical, page, today), 'weekly', '0.7');
   }).filter(Boolean).join('\n');
 
-  // Prerendered Date Archive Pages (/predictions/date/YYYY-MM-DD/).
+  // Prerendered Date Archive Pages (/predictions/date/YYYY-MM-DD/). Immutable
+  // per date, so lastmod is the date in the path.
   const dateEntries = listPageSlugs('predictions/date').filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)).map(d =>
-    urlEntry(`https://winfulltime.com/predictions/date/${d}/`, today, 'never', '0.6')
+    urlEntry(`https://winfulltime.com/predictions/date/${d}/`, d, 'never', '0.6')
   ).join('\n');
 
   // Prerendered Booking Code Converter Pages (/convert/ hub + /convert/<from>-to-<to>/).
+  const convertHub = 'https://winfulltime.com/convert/';
   const convertEntries = [
-    urlEntry('https://winfulltime.com/convert/', today, 'weekly', '0.8'),
-    ...listPageSlugs('convert').map(slug =>
-      urlEntry(`https://winfulltime.com/convert/${slug}/`, today, 'weekly', '0.7')
-    )
+    urlEntry(convertHub, evergreenLastmod(convertHub, path.join(ROOT, 'convert', 'index.html'), today), 'weekly', '0.8'),
+    ...listPageSlugs('convert').map(slug => {
+      const page = path.join(ROOT, 'convert', slug, 'index.html');
+      const loc = `https://winfulltime.com/convert/${slug}/`;
+      return urlEntry(loc, evergreenLastmod(loc, page, today), 'weekly', '0.7');
+    })
   ].join('\n');
 
   // Prerendered Matrix Pages (/predictions/{league}/{market}/).
@@ -188,6 +257,7 @@ ${blogEntries}
 
 function main() {
   fs.writeFileSync(SITEMAP_PATH, buildSitemap());
+  saveState();
   console.log('Sitemap updated from on-disk page trees');
 
   try {
