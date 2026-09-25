@@ -10,6 +10,7 @@ const { BOOKMAKERS, isSportradar, canonicalize, buildLegs, unsupportedMarketErro
 const { resolveLeg, getAvailableMatches } = require('./resolver');
 
 const MAX_LEGS = 30;
+const MAX_CODES = 20;
 
 // Short in-memory cache so the same code is not re-sent to the bookmaker on
 // every click. 5 minutes TTL keeps returned odds current enough for a preview.
@@ -213,6 +214,176 @@ function sameFamily(from, to) {
   return from === to || (isSportradar(from) && isSportradar(to));
 }
 
+// Maps decoded source legs onto the target bookmaker's native ids. Same-family
+// bookmakers (SportyBet <-> MSport) pass through untouched so any market
+// survives; everything else is reduced to the shared Sportradar event id and
+// rebuilt for the target.
+async function toTargetLegs(from, to, legs) {
+  if (sameFamily(from, to)) return legs;
+  const canonicals = [];
+  for (const leg of legs) {
+    const canonical = await canonicalize(from, leg);
+    if (!canonical) throw unsupportedMarketError(leg);
+    canonical.eventName = leg.eventName || leg.E_NAME || '';
+    canonical.marketName = leg.marketName || leg.M_NAME || '';
+    canonical.outcomeName = leg.outcomeName || leg.SGN || '';
+    canonical.odds = Number(leg.odds || leg.V || 0);
+    canonicals.push(canonical);
+  }
+  return buildLegs(to, canonicals);
+}
+
+// Identity of a single selection, used to collapse duplicate legs when codes
+// are merged. Bet9ja legs arrive with Bet9ja field names, so both shapes are
+// accepted.
+function legIdentity(leg) {
+  const event = leg.eventId || leg.E_ID || leg.eventName || leg.E_NAME || '';
+  const market = leg.marketId || leg.GID || leg.marketName || leg.M_NAME || '';
+  const outcome = leg.outcomeId || leg.SGID || leg.SGN || leg.outcomeName || '';
+  return [event, market, outcome].join('|');
+}
+
+function chunkLegs(legs, size) {
+  const chunks = [];
+  for (let i = 0; i < legs.length; i += size) {
+    chunks.push(legs.slice(i, i + size));
+  }
+  return chunks;
+}
+
+function legCountError(count) {
+  const err = new Error('That would need ' + count + ' selections, but a single SportyBet booking code holds at most ' + MAX_LEGS + '. Reduce the number of selections and try again.');
+  err.code = 'TOO_MANY_LEGS';
+  return err;
+}
+
+// Split one booking code into several codes for the target bookmaker (default
+// SportyBet). The caller chooses how many selections go into each code.
+async function splitCode(input) {
+  const from = input && input.from;
+  const to = (input && input.to) || 'sportybet';
+  const perCode = Number(input && input.perCode);
+  assertBookmaker(from);
+  assertBookmaker(to);
+
+  if (!Number.isInteger(perCode) || perCode < 2 || perCode > MAX_LEGS) {
+    throw badRequest('Choose how many selections go into each code (between 2 and ' + MAX_LEGS + ').');
+  }
+
+  const supplied = input && Array.isArray(input.legs) ? input.legs : null;
+  if (supplied && !supplied.length) throw badRequest('No selections were found in this booking code.');
+
+  const source = supplied
+    ? { code: normalizeCode(input.code) || '', bookmaker: from, legs: supplied, legCount: supplied.length }
+    : await decodeCode({ code: input.code, bookmaker: from });
+
+  const targetLegs = await toTargetLegs(from, to, source.legs);
+  if (targetLegs.length < 2) {
+    throw badRequest('This code has a single selection, so there is nothing to split.');
+  }
+  if (perCode >= targetLegs.length) {
+    throw badRequest('This code has ' + targetLegs.length + ' selections, which already fits in one SportyBet code. Choose ' + targetLegs.length + ' or fewer selections per code to split it.');
+  }
+
+  const parts = [];
+  for (const chunk of chunkLegs(targetLegs, perCode)) {
+    const code = await createCode(to, chunk);
+    parts.push({
+      code: code,
+      legCount: chunk.length,
+      totalOdds: totalOdds(chunk),
+      legs: chunk
+    });
+  }
+
+  return {
+    from: from,
+    fromName: LABELS[from],
+    to: to,
+    toName: LABELS[to],
+    sourceCode: source.code,
+    totalSelections: targetLegs.length,
+    perCode: perCode,
+    partCount: parts.length,
+    parts: parts
+  };
+}
+
+// Merge several booking codes into a single code for the target bookmaker
+// (default SportyBet). Duplicate selections are collapsed into one leg.
+async function mergeCodes(input) {
+  const to = (input && input.to) || 'sportybet';
+  assertBookmaker(to);
+
+  const raw = Array.isArray(input && input.codes) ? input.codes : [];
+  if (raw.length < 2) throw badRequest('Add at least two booking codes to merge.');
+  if (raw.length > MAX_CODES) {
+    throw badRequest('Merge at most ' + MAX_CODES + ' booking codes at a time. You entered ' + raw.length + '.');
+  }
+
+  const entries = raw.map(function (item, index) {
+    if (item && typeof item === 'object') {
+      const bookmaker = item.bookmaker;
+      assertBookmaker(bookmaker);
+      if (Array.isArray(item.legs) && item.legs.length) {
+        return { bookmaker: bookmaker, legs: item.legs, code: normalizeCode(item.code) || '' };
+      }
+      if (!item.code) throw badRequest('Booking code ' + (index + 1) + ' is empty.');
+      return { bookmaker: bookmaker, code: String(item.code) };
+    }
+    throw badRequest('Could not read booking code ' + (index + 1) + '.');
+  });
+
+  const sources = [];
+  const targetLegs = [];
+  for (const entry of entries) {
+    const decoded = entry.legs
+      ? { code: entry.code || '', bookmaker: entry.bookmaker, legs: entry.legs, legCount: entry.legs.length }
+      : await decodeCode({ code: entry.code, bookmaker: entry.bookmaker });
+    sources.push({
+      code: decoded.code,
+      bookmaker: entry.bookmaker,
+      bookmakerName: LABELS[entry.bookmaker],
+      legCount: decoded.legs.length
+    });
+    for (const leg of await toTargetLegs(entry.bookmaker, to, decoded.legs)) {
+      targetLegs.push(leg);
+    }
+  }
+
+  if (!targetLegs.length) throw badRequest('The booking codes you entered contain no selections.');
+
+  const seen = new Set();
+  const unique = [];
+  let duplicatesMerged = 0;
+  for (const leg of targetLegs) {
+    const key = legIdentity(leg);
+    if (seen.has(key)) {
+      duplicatesMerged++;
+      continue;
+    }
+    seen.add(key);
+    unique.push(leg);
+  }
+
+  if (!unique.length) throw badRequest('Every selection in these codes is a duplicate, so there is nothing to merge.');
+  if (unique.length > MAX_LEGS) throw legCountError(unique.length);
+
+  const code = await createCode(to, unique);
+
+  return {
+    code: code,
+    to: to,
+    toName: LABELS[to],
+    legCount: unique.length,
+    totalOdds: totalOdds(unique),
+    sourceCount: sources.length,
+    sources: sources,
+    duplicatesMerged: duplicatesMerged,
+    legs: unique
+  };
+}
+
 // Cross-bookmaker conversion reduces every leg to its Sportradar event id and
 // 1X2 sign (all four bookmakers share the numeric id), then rebuilds native
 // ids for the target. Same-family conversions (SportyBet <-> MSport) keep the
@@ -232,25 +403,9 @@ async function convertCode(input) {
 
   try {
     const source = await decodeCode({ code: code, bookmaker: from });
-    let legs = source.legs;
-    legs = keepLegsFilter(legs, keepLegs);
+    const legs = keepLegsFilter(source.legs, keepLegs);
 
-    let newCode;
-    if (sameFamily(from, to)) {
-      newCode = await createCode(to, legs);
-    } else {
-      const canonicals = [];
-      for (const leg of legs) {
-        const canonical = await canonicalize(from, leg);
-        if (!canonical) throw unsupportedMarketError(leg);
-        canonical.eventName = leg.eventName || leg.E_NAME || '';
-        canonical.marketName = leg.marketName || leg.M_NAME || '';
-        canonical.outcomeName = leg.outcomeName || leg.SGN || '';
-        canonical.odds = Number(leg.odds || leg.V || 0);
-        canonicals.push(canonical);
-      }
-      newCode = await createCode(to, await buildLegs(to, canonicals));
-    }
+    const newCode = await createCode(to, await toTargetLegs(from, to, legs));
 
     const result = {
       code: newCode,
@@ -270,4 +425,16 @@ async function convertCode(input) {
   }
 }
 
-module.exports = { decodeCode, convertCode, createCodeFromLegs, providerStatus, getAvailableMatches, BOOKMAKERS, LABELS, MAX_LEGS };
+module.exports = {
+  decodeCode,
+  convertCode,
+  splitCode,
+  mergeCodes,
+  createCodeFromLegs,
+  providerStatus,
+  getAvailableMatches,
+  BOOKMAKERS,
+  LABELS,
+  MAX_LEGS,
+  MAX_CODES
+};

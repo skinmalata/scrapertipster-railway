@@ -1,0 +1,227 @@
+/* Shared content shell for the WinFulltime tool landing pages
+   (/code-splitter.html, /code-merger.html).
+
+   Kept in one file so the two tool pages cannot drift apart, and so the
+   long-form copy below the tool gets the same rhythm on every page. */
+
+:root {
+  --wt-bg: #0d1120;
+  --wt-card: #151a2c;
+  --wt-border: rgba(255, 255, 255, 0.08);
+  --wt-border-strong: rgba(255, 255, 255, 0.14);
+  --wt-text: #e8edf5;
+  --wt-muted: #94a3b8;
+  --wt-accent: #ff2448;
+  --wt-accent-soft: #ff6b8a;
+}
+
+[data-theme="light"] {
+  --wt-bg: #f4f6fb;
+  --wt-card: #ffffff;
+  --wt-border: #e2e5ee;
+  --wt-border-strong: #d3d8e5;
+  --wt-text: #1a1a2e;
+  --wt-muted: #5a6274;
+}
+
+body {
+  background: var(--wt-bg);
+  background-image:
+    radial-gradient(ellipse 60% 40% at 50% -10%, rgba(255, 36, 72, 0.10), transparent),
+    radial-gradient(ellipse 40% 30% at 100% 0%, rgba(59, 130, 246, 0.08), transparent);
+  background-attachment: fixed;
+  color: var(--wt-text);
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wt-wrap {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 20px 72px;
+}
+
+/* Hero */
+.wt-hero {
+  text-align: center;
+  padding: 44px 0 30px;
+}
+
+.wt-hero h1 {
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  line-height: 1.2;
+  background: linear-gradient(135deg, #e8edf5 0%, #ff6b8a 50%, #ff2448 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.wt-hero p {
+  font-size: 16px;
+  color: var(--wt-muted);
+  max-width: 680px;
+  margin: 14px auto 0;
+  line-height: 1.7;
+}
+
+@media (max-width: 640px) {
+  .wt-hero { padding: 26px 0 20px; }
+  .wt-hero h1 { font-size: 27px; }
+  .wt-hero p { font-size: 15px; }
+}
+
+/* Long-form copy */
+.wt-prose {
+  margin: 34px 0 0;
+  padding: 28px;
+  background: linear-gradient(180deg, var(--wt-card), var(--wt-bg));
+  border: 1px solid var(--wt-border);
+  border-radius: 18px;
+}
+
+.wt-prose h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 30px 0 10px;
+  line-height: 1.3;
+  letter-spacing: -0.3px;
+}
+
+.wt-prose h2:first-child { margin-top: 0; }
+
+.wt-prose h3 {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 22px 0 8px;
+}
+
+.wt-prose p {
+  font-size: 15px;
+  color: var(--wt-muted);
+  line-height: 1.8;
+  margin: 0 0 14px;
+}
+
+.wt-prose a {
+  color: var(--wt-accent-soft);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.wt-prose a:hover { color: var(--wt-accent); }
+
+.wt-prose ul,
+.wt-prose ol {
+  margin: 0 0 16px;
+  padding-left: 22px;
+  color: var(--wt-muted);
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.wt-prose ul { list-style: disc; }
+.wt-prose ol { list-style: decimal; }
+.wt-prose li { margin-bottom: 8px; }
+.wt-prose strong { color: var(--wt-text); font-weight: 700; }
+
+/* Comparison table */
+.wt-table-wrap { overflow-x: auto; margin: 0 0 18px; }
+
+.wt-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  min-width: 520px;
+}
+
+.wt-prose th,
+.wt-prose td {
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--wt-border);
+  vertical-align: top;
+  line-height: 1.6;
+}
+
+.wt-prose th {
+  color: var(--wt-text);
+  font-weight: 700;
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom-color: var(--wt-border-strong);
+}
+
+.wt-prose td { color: var(--wt-muted); }
+.wt-prose td:first-child { color: var(--wt-text); font-weight: 600; white-space: nowrap; }
+.wt-prose tbody tr:last-child td { border-bottom: none; }
+
+/* FAQ */
+.wt-faq {
+  margin: 22px 0 0;
+  padding: 28px;
+  background: linear-gradient(180deg, var(--wt-card), var(--wt-bg));
+  border: 1px solid var(--wt-border);
+  border-radius: 18px;
+}
+
+.wt-faq h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 18px;
+  letter-spacing: -0.3px;
+}
+
+.wt-faq h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 22px 0 7px;
+  color: var(--wt-text);
+}
+
+.wt-faq h3:first-of-type { margin-top: 0; }
+
+.wt-faq p {
+  font-size: 14.5px;
+  color: var(--wt-muted);
+  line-height: 1.8;
+  margin: 0 0 8px;
+}
+
+.wt-faq a { color: var(--wt-accent-soft); text-decoration: underline; text-underline-offset: 2px; }
+
+/* Related tools */
+.wt-related {
+  margin: 22px 0 0;
+  padding: 26px 28px;
+  background: var(--wt-card);
+  border: 1px solid var(--wt-border);
+  border-radius: 18px;
+}
+
+.wt-related h2 {
+  font-size: 19px;
+  font-weight: 700;
+  margin: 0 0 14px;
+}
+
+.wt-related ul { list-style: none; margin: 0; padding: 0; }
+
+.wt-related li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--wt-border);
+  font-size: 14.5px;
+  color: var(--wt-muted);
+}
+
+.wt-related li:last-child { border-bottom: none; }
+.wt-related a { color: var(--wt-accent-soft); text-decoration: none; font-weight: 600; }
+.wt-related a:hover { color: var(--wt-accent); text-decoration: underline; text-underline-offset: 2px; }
+
+@media (max-width: 640px) {
+  .wt-prose, .wt-faq, .wt-related { padding: 20px 16px; }
+  .wt-prose h2, .wt-faq h2 { font-size: 19px; }
+}

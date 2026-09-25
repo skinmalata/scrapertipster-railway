@@ -77,6 +77,8 @@ const FOOTER_HTML = `
     <li><a href="/author-picks.html">H2H Picks</a></li>
     <li><a href="/ticket-builder.html">Ticket Builder</a></li>
     <li><a href="/converter.html">Code Converter</a></li>
+    <li><a href="/code-splitter.html">Code Splitter</a></li>
+    <li><a href="/code-merger.html">Code Merger</a></li>
    </ul>
   </div>
 

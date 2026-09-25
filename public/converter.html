@@ -34,6 +34,7 @@
  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
  <meta name="apple-mobile-web-app-title" content="WinFulltime">
  <link rel="stylesheet" href="/styles.css">
+ <link rel="stylesheet" href="/css/booking-code-tools.css">
  <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -831,6 +832,8 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <p class="cv-note" style="margin-top:12px;">Codes are validated by the target bookmaker before they are returned. They are valid until the first match in the code kicks off.</p>
   </div>
 
+  <div data-bct-root data-bct-country="cvCountry" data-bct-api="https://winfulltime-api.onrender.com"></div>
+
   <div class="cv-card">
    <h2 class="cv-card-title"><span class="step" style="background:linear-gradient(135deg,#a855f7,#7c3aed);box-shadow:0 10px 40px rgba(168,85,247,0.25);">&#9881;</span> How the converter works</h2>
    <div class="cv-steps">
@@ -1514,7 +1517,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
 });
-</script><script>
+</script><script src="/js/booking-code-tools.js?v=20260925a" defer></script><script>
 document.getElementById('hamburger')?.addEventListener('click', function() {
   this.classList.toggle('active');
   document.getElementById('nav')?.classList.toggle('open');

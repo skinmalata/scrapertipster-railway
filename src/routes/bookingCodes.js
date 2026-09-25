@@ -2,9 +2,9 @@
 
 const express = require('express');
 const router = express.Router();
-const { decodeCode, convertCode, createCodeFromLegs, providerStatus, getAvailableMatches, BOOKMAKERS, MAX_LEGS } = require('../services/bookingCodes/converter');
+const { decodeCode, convertCode, splitCode, mergeCodes, createCodeFromLegs, providerStatus, getAvailableMatches, BOOKMAKERS, MAX_LEGS, MAX_CODES } = require('../services/bookingCodes/converter');
 const { recordConversion, getRecent } = require('../services/bookingCodes/recentConversions');
-const { announceConversion } = require('../services/codeAnnouncer');
+const { announceConversion, announceSplit, announceMerge } = require('../services/codeAnnouncer');
 const STATUS_BY_CODE = {
   BAD_REQUEST: 400,
   INVALID_CODE: 404,
@@ -27,6 +27,10 @@ function normalizeCountry(value) {
   if (!raw || raw.length > 60 || /[\r\n]/.test(raw)) return '';
   return raw.replace(/\s+/g, ' ');
 }
+
+// Telegram announcements are fire-and-forget: a failure there must never take
+// down the request, and must never surface as an unhandled rejection.
+function noop() {}
 
 router.post('/converter/decode', async function (req, res) {
   try {
@@ -121,6 +125,78 @@ router.post('/converter/convert-decoded', async function (req, res) {
   }
 });
 
+// Split one booking code into several SportyBet codes. Accepts pre-decoded
+// Bet9ja legs (from client-side decode) the same way /convert-decoded does.
+router.post('/converter/split', async function (req, res) {
+  try {
+    const body = req.body || {};
+    const result = await splitCode({
+      code: body.code,
+      from: body.from,
+      to: body.to,
+      perCode: body.perCode,
+      legs: body.legs
+    });
+    announceSplit({
+      fromName: result.fromName,
+      toName: result.toName,
+      totalSelections: result.totalSelections,
+      perCode: result.perCode,
+      parts: result.parts,
+      country: normalizeCountry(body.country)
+    }).catch(noop);
+    res.json({
+      success: true,
+      from: result.from,
+      fromName: result.fromName,
+      to: result.to,
+      toName: result.toName,
+      sourceCode: result.sourceCode,
+      totalSelections: result.totalSelections,
+      perCode: result.perCode,
+      partCount: result.partCount,
+      parts: result.parts
+    });
+  } catch (err) {
+    sendError(res, err);
+  }
+});
+
+// Merge several booking codes into a single SportyBet code. Codes may come from
+// different bookmakers; each entry is { code, bookmaker } or { legs, bookmaker }.
+router.post('/converter/merge', async function (req, res) {
+  try {
+    const body = req.body || {};
+    const result = await mergeCodes({ codes: body.codes, to: body.to });
+    const fromName = Array.from(new Set(result.sources.map(function (s) { return s.bookmakerName; }))).join(' + ');
+    const record = {
+      from: fromName,
+      fromName: fromName,
+      to: result.to,
+      toName: result.toName,
+      code: result.code,
+      legCount: result.legCount,
+      totalOdds: result.totalOdds
+    };
+    recordConversion(record);
+    announceMerge({ ...record, sourceCount: result.sourceCount, duplicatesMerged: result.duplicatesMerged, country: normalizeCountry(body.country) }).catch(noop);
+    res.json({
+      success: true,
+      code: result.code,
+      to: result.to,
+      toName: result.toName,
+      legCount: result.legCount,
+      totalOdds: result.totalOdds,
+      sourceCount: result.sourceCount,
+      sources: result.sources,
+      duplicatesMerged: result.duplicatesMerged,
+      legs: result.legs
+    });
+  } catch (err) {
+    sendError(res, err);
+  }
+});
+
 // Create a booking code from plain ticket selections (ticket builder feature).
 router.post('/converter/create', async function (req, res) {
   try {
@@ -147,7 +223,9 @@ router.get('/converter', function (req, res) {
       preMatchOnly: true,
       maxSelections: MAX_LEGS,
       region: 'NG'
-    }
+    },
+    split: { minPerCode: 2, maxPerCode: MAX_LEGS },
+    merge: { minCodes: 2, maxCodes: MAX_CODES, maxSelections: MAX_LEGS }
   });
 });
 

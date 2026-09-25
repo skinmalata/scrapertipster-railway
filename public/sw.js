@@ -1,7 +1,7 @@
-const CACHE_NAME = 'winfulltime-v10';
-const STATIC_CACHE = 'winfulltime-static-v10';
-const DYNAMIC_CACHE = 'winfulltime-dynamic-v10';
-const IMAGE_CACHE = 'winfulltime-images-v10';
+const CACHE_NAME = 'winfulltime-v11';
+const STATIC_CACHE = 'winfulltime-static-v11';
+const DYNAMIC_CACHE = 'winfulltime-dynamic-v11';
+const IMAGE_CACHE = 'winfulltime-images-v11';
 
 const API_BASE = 'https://winfulltime-api.onrender.com';
 
@@ -11,6 +11,8 @@ const STATIC_ASSETS = [
   '/app.html',
   '/ticket-builder.html',
   '/converter.html',
+  '/code-splitter.html',
+  '/code-merger.html',
   '/best-picks.html',
   '/author-picks.html',
   '/2-odds-of-the-day.html',
@@ -26,6 +28,9 @@ const STATIC_ASSETS = [
   '/blog/',
   '/styles.css',
   '/app.css',
+  '/css/tool-page.css',
+  '/css/booking-code-tools.css',
+  '/js/booking-code-tools.js',
   '/auth.js',
   '/config.js',
   '/pwa.js',
