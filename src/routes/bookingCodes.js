@@ -22,6 +22,12 @@ function sendError(res, err) {
   res.status(status).json({ success: false, error: err.message, code: err.code || 'INTERNAL_ERROR' });
 }
 
+function normalizeCountry(value) {
+  const raw = String(value || '').trim();
+  if (!raw || raw.length > 60 || /[\r\n]/.test(raw)) return '';
+  return raw.replace(/\s+/g, ' ');
+}
+
 router.post('/converter/decode', async function (req, res) {
   try {
     const body = req.body || {};
@@ -45,7 +51,7 @@ router.post('/converter/convert', async function (req, res) {
     const body = req.body || {};
     const result = await convertCode({ code: body.code, from: body.from, to: body.to, keepLegs: body.keepLegs });
     recordConversion(result);
-    announceConversion(result);
+    announceConversion({ ...result, country: normalizeCountry(body.country) });
     res.json({
       success: true,
       from: result.from,
@@ -103,13 +109,12 @@ router.post('/converter/convert-decoded', async function (req, res) {
       fromName: 'Bet9ja',
       to: to,
       toName: { sportybet: 'SportyBet', msport: 'MSport', betway: 'Betway', bet9ja: 'Bet9ja', betking: 'BetKing', betpawa: 'betPawa' }[to],
-      sourceCode: body.code ? String(body.code) : null,
       code: newCode,
       legCount: legs.length,
       totalOdds: Number(totalOdds.toFixed(2))
     };
     recordConversion(result);
-    announceConversion(result);
+    announceConversion({ ...result, country: normalizeCountry(body.country) });
     res.json({ success: true, ...result });
   } catch (err) {
     sendError(res, err);

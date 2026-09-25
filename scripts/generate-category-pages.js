@@ -39,22 +39,6 @@ const FAQ_SCHEMA = {
     { q: 'Which leagues produce the most Under 2.5 results?', a: 'Ligue 1 (France), Serie A (Italy), and several South American leagues consistently produce the highest Under 2.5 rates. Defensive tactical setups drive these totals down.' },
     { q: 'When are Under 2.5 predictions updated?', a: 'Predictions refresh daily at 1:00 AM WAT with a secondary update at 6:00 AM WAT to catch late-appearing fixtures. Coverage spans 50+ leagues worldwide.' }
   ],
-  'ht-ft': [
-    { q: 'What does HT/FT mean in football betting?', a: 'HT/FT (Half Time/Full Time) is a two-part market. The first part predicts the scoreline state at half time (1 = home leading, X = level, 2 = away leading), and the second part predicts the match result at full time. A tip like "1/1" means the home team is ahead at half time and still wins at full time.' },
-    { q: 'Which HT/FT combos are most likely?', a: 'Diagonal combos where the half-time and full-time results match (1/1, X/X, 2/2) are the most probable because half-time leaders usually go on to win. We always boost these over swing combos where a half-time lead shifts before the final whistle.' },
-    { q: 'How likely is a home team that leads at half time to win?', a: 'Historically, roughly 70-80% of teams that hold a lead at half time go on to win the match. This makes diagonal home-win combos like 1/1 among the more reliable HT/FT selections.' },
-    { q: 'Are HT/FT odds higher than normal match result odds?', a: 'Yes. Because you must predict two outcomes instead of one, HT/FT odds are substantially higher than a simple 1X2 bet. Diagonal combos pay moderate multiples while swing combos like 2/1 carry much larger odds.' },
-    { q: 'Which leagues are best for HT/FT betting?', a: 'Matches in leagues with clear favourite/underdog mismatches (e.g. Eredivisie, Bundesliga, and South American top splits) tend to produce the cleanest diagonal HT/FT patterns. We scan all 50+ covered leagues daily.' },
-    { q: 'How are HT/FT predictions generated?', a: 'We combine Statarea\'s half-time probability matrix with the full-time 1X2 probabilities, then rank combos by their combined likelihood, always favouring diagonal outcomes and confidence thresholds before publishing.' }
-  ],
-  'gg2': [
-    { q: 'What does GG2+ mean in football betting?', a: 'GG2+ (Gol Gol 2+) means you expect both teams to score 2 or more goals each in the match. Winning scorelines include 2-2, 3-2, 2-3, 3-3 and anything else where each side nets at least twice.' },
-    { q: 'How is GG2+ different from BTTS?', a: 'BTTS Yes only needs both teams to score at least once (a 1-1 wins). GG2+ needs each team to score at least twice (a 1-1 loses, a 2-2 wins), making it a far bigger price and a rarer outcome.' },
-    { q: 'Does GG2+ require over 4.5 total goals?', a: 'Yes. Since each team must score 2+, the match always produces 4 or more goals in total. That makes Over 3.5 goals a strict prerequisite and Over 4.5 an implied requirement of every GG2+ ticket.' },
-    { q: 'Are GG2+ tips good for accumulators?', a: 'GG2+ pays very high odds, so a single selection is often strong enough for a multi. We recommend pairing GG2+ picks with Over 3.5 goals or lower-stakes legs rather than stacking several GG2+ selections together.' },
-    { q: 'Which matches suit GG2+?', a: 'High-scoring fixtures between two attacking teams with vulnerable defences — typically the Eredivisie, Bundesliga, or open South American matchups — suit GG2+ best. Our model looks for strong Over 3.5 and BTTS signals.' },
-    { q: 'How are GG2+ probabilities calculated?', a: 'Using Statarea over-lines (Over 1.5/2.5/3.5) we fit a Poisson goal model, split expected goals between home and away from the 1X2 spread, then multiply P(home scores 2+) by P(away scores 2+). Only picks above a confidence threshold are published.' }
-  ],
   'btts': [
     { q: 'What does BTTS mean in football betting?', a: 'BTTS stands for Both Teams To Score. A BTTS Yes bet wins if both teams score at least one goal during the 90 minutes of regulation time. It does not matter which team wins or loses.' },
     { q: 'How often does BTTS land?', a: 'BTTS Yes occurs in roughly 50-55% of professional football matches globally. The rate is higher in attacking leagues like the Eredivisie and Bundesliga where teams play more open football.' },
@@ -224,24 +208,6 @@ const CATEGORIES = {
     label: 'Under 2.5',
     linkAnalysis: true
   },
-  'ht-ft': {
-    dataKey: 'htftMatches',
-    title: 'Half Time Full Time Predictions Today',
-    description: 'Free Half Time Full Time (HT/FT) football predictions for today. Combined half-time and full-time result tips across 50+ leagues worldwide.',
-    keywords: 'HT FT predictions, half time full time tips, HT/FT betting tips, half time full time predictions, football HT FT',
-    heading: 'Half Time / Full Time',
-    label: 'HT/FT',
-    linkAnalysis: true
-  },
-  'gg2': {
-    dataKey: 'gg2PlusMatches',
-    title: 'GG2+ Predictions Today (Both Teams 2+ Goals)',
-    description: 'Free GG2+ football predictions for today. Tips for matches where both teams are expected to score 2 or more goals each.',
-    keywords: 'GG2+ predictions, both teams score 2+ goals, GG2+ tips, both teams to score 2, high scoring football tips',
-    heading: 'GG2+ (Both Teams 2+ Goals)',
-    label: 'GG2+',
-    linkAnalysis: true
-  },
   'btts': {
     dataKey: 'bttsMatches',
     title: 'BTTS Yes Predictions Today',
@@ -323,12 +289,10 @@ function escapeHtml(str) {
 const EXTRA_TABS = [
   { id: 'author-picks', href: '/author-picks.html', label: 'H2H Picks' }
 ];
-const TAB_SKIP = new Set(['winning-streak', 'losing-streak']);
-const HSH_TAB = { id: 'highest-scoring-half', href: '/predictions/highest-scoring-half', label: 'Highest Scoring Half' };
 
 function generateCategoryPage(slug, catConfig, ctx) {
   const BOOKMAKER_CTA_BODY = renderBookmakerCTABody();
-  const allSlugs = Object.keys(CATEGORIES).filter(s => !TAB_SKIP.has(s));
+  const allSlugs = Object.keys(CATEGORIES);
   const baseTabs = allSlugs.map(s => {
     const c = CATEGORIES[s];
     const active = s === slug ? ' active' : '';
@@ -339,12 +303,6 @@ function generateCategoryPage(slug, catConfig, ctx) {
   );
   const insertIdx = allSlugs.indexOf('over-2-5') + 1;
   baseTabs.splice(insertIdx, 0, ...extraTabsHtml);
-  const hshIdx = baseTabs.findIndex(t => t.indexOf('/predictions/gg2') !== -1) + 1;
-  if (hshIdx > 0) {
-    baseTabs.splice(hshIdx, 0,
-      `<a href="${HSH_TAB.href}" id="tab-${HSH_TAB.id}" class="tab-btn">${escapeHtml(HSH_TAB.label)}</a>`
-    );
-  }
   const categoryTabs = baseTabs.join('\n            ');
 
   const isStreak = slug === 'winning-streak' || slug === 'losing-streak' || slug === 'draws-streak';
@@ -469,7 +427,7 @@ ${generateNoscriptFallback(slug, catConfig)}
 <h3>Get Daily Tips on Telegram</h3>
 <p>Free daily tips, in-play alerts and updates delivered straight to the WinFulltime Telegram community.</p>
 </div>
-<a class="telegram-link" href="https://t.me/winfulltime" target="_blank" rel="noopener">&#9992; Join Telegram Group</a>
+<a class="telegram-link" href="https://t.me/winfulltime" target="_blank" rel="noopener">&#9992; Telegram Channel</a>
 </div>
 </div>
 

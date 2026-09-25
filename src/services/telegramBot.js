@@ -120,6 +120,11 @@ async function postNewTips(opportunities, botToken, chatId) {
   }
 }
 
+async function sendMessage(botToken, chatId, text) {
+  if (!botToken || !chatId || !text) return { ok: false, description: 'not configured' };
+  return sendToChannel(botToken, chatId, text);
+}
+
 function startTelegramBot(getLiveTips, botToken, chatId) {
   if (!botToken || !chatId) {
     console.log('[telegram] Bot not configured (missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID)');
@@ -137,13 +142,6 @@ function startTelegramBot(getLiveTips, botToken, chatId) {
       console.warn('[telegram] Alert cycle failed:', e.message);
     }
   }, POST_INTERVAL_MS);
-}
-
-// Generic send used by the converter/code announcements. Silent no-op when the
-// bot is not configured (token/chat missing) so callers can fire-and-forget.
-async function sendMessage(botToken, chatId, text) {
-  if (!botToken || !chatId || !text) return { ok: false, description: 'not configured' };
-  return sendToChannel(botToken, chatId, text);
 }
 
 module.exports = { postNewTips, startTelegramBot, sendMessage };

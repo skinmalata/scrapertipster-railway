@@ -6,8 +6,6 @@
 const fs = require('fs');
 const path = require('path');
 
-const { getToday: getTodayBetwayCode } = require('../services/betwayDailyCode');
-
 const NAV_LINKS = [
   { href: '/', label: 'Home', match: (p) => p === '/' || p === '/index.html' },
   { href: '/ticket-builder.html', label: 'Ticket Builder', match: (p) => p.startsWith('/ticket-builder') },
@@ -17,6 +15,8 @@ const NAV_LINKS = [
 ];
 
 const AUTH_BTN_STYLE = 'background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;';
+
+const TELEGRAM_BTN_STYLE = 'display:inline-flex;align-items:center;background:linear-gradient(135deg,#1e96c8,#1a7da8);color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;';
 
 function navLinksHtml(activePath) {
   let html = '';
@@ -97,9 +97,11 @@ const FOOTER_HTML = `
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
    <a href="/policy.html">Editorial Policy</a>
+   <a href="https://t.me/winfulltime" target="_blank" rel="noopener" style="${TELEGRAM_BTN_STYLE}">Telegram Channel</a>
   </span>
   <span class="kofi-footer">
-   <a href="https://ko-fi.com/winfulltime" target="_blank" rel="noopener nofollow">Support us on Ko-fi</a>
+   <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
+   <script type='text/javascript'>kofiwidget2.init('Support us', '#ff2448', 'winfulltime');kofiwidget2.draw();</script>
   </span>
    <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">Light</button>
  </div>
@@ -241,7 +243,7 @@ const SKIP_PAGES = new Set(['admin.html', 'app.html', 'offline.html', 'yandex_7d
 
 const FEATURED_BOOKS_CSS_LINK = '<link rel="stylesheet" href="/featured-bookmakers-carousel.css">';
 
-const FEATURED_BOOKS_SECTION = "  <section class=\"featured-books\" id=\"featured-books\" aria-labelledby=\"featured-books-title\">\n   <div class=\"featured-books-head\">\n    <h2 id=\"featured-books-title\">Featured Bookmakers</h2>\n   </div>\n   <ol class=\"featured-books-list\">\n    <li class=\"featured-books-row\">\n     <span class=\"featured-books-rank\">1</span>\n     <span class=\"featured-books-name\">Stake</span>\n     <span class=\"featured-books-bonus\">Bonus up to: <b>$2,000</b></span>\n     <a class=\"featured-books-cta\" href=\"https://stake.com/?c=FjhqQ3n3\" target=\"_blank\" rel=\"noopener noreferrer nofollow sponsored\">Claim Bonus</a>\n    </li>\n    <li class=\"featured-books-row\">\n     <span class=\"featured-books-rank\">2</span>\n     <span class=\"featured-books-name\">1win</span>\n     <span class=\"featured-books-bonus\">Bonus up to: <b>$1,900</b></span>\n     <a class=\"featured-books-cta\" href=\"https://one-vv6198.com/betting?open=register&amp;p=f61e\" target=\"_blank\" rel=\"noopener noreferrer nofollow sponsored\">Claim Bonus</a>\n    </li>\n    <li class=\"featured-books-row\">\n     <span class=\"featured-books-rank\">3</span>\n     <span class=\"featured-books-name\">1xBet</span>\n     <span class=\"featured-books-bonus\">Bonus up to: <b>$400</b></span>\n     <a class=\"featured-books-cta\" href=\"https://reffpa.com/L?tag=d_6034393m_97c_&amp;site=6034393&amp;ad=97\" target=\"_blank\" rel=\"noopener noreferrer nofollow sponsored\">Claim Bonus</a>\n    </li>\n   </ol>\n   <p class=\"featured-books-disclosure\">18+ only. Welcome offers are for new customers and vary by country. <a href=\"/options.html\">Compare all bookmakers</a></p>\n  </section>";
+const FEATURED_BOOKS_SECTION = "  <section class=\"featured-books\" id=\"featured-books\" aria-labelledby=\"featured-books-title\">\n   <div class=\"featured-books-head\">\n    <div>\n     <h2 id=\"featured-books-title\">Featured Bookmakers</h2>\n     <p class=\"featured-books-sub\">Reviewed and recommended betting sites &#8212; welcome offers are for new customers and vary by country.</p>\n    </div>\n    <div class=\"featured-books-nav\">\n     <button type=\"button\" class=\"featured-books-arrow\" id=\"fmPrev\" aria-label=\"Previous bookmakers\">&#8249;</button>\n     <button type=\"button\" class=\"featured-books-arrow\" id=\"fmNext\" aria-label=\"Next bookmakers\">&#8250;</button>\n    </div>\n   </div>\n   <div class=\"featured-books-viewport\">\n    <div class=\"featured-books-track\" id=\"fmTrack\" role=\"list\" aria-label=\"Featured bookmakers\">\n     <article class=\"featured-books-card\" role=\"listitem\">\n      <div class=\"featured-books-top\">\n       <span class=\"featured-books-badge\" style=\"background:linear-gradient(135deg,#1d4ed8,#1e3a8a);\">1xBet</span>\n       <span class=\"featured-books-rating\" title=\"Editorial rating out of 5\"><span class=\"fm-rating-num\">4.2</span><span class=\"fm-outof\">/5</span></span>\n      </div>\n      <p class=\"featured-books-tag\">Welcome Offer</p>\n      <p class=\"featured-books-offer\">First-deposit welcome bonus, pre-match odds across 20+ markets, and booking/code betting for Nigeria, Kenya and Ghana.</p>\n      <div class=\"featured-books-actions\">\n       <a class=\"featured-books-cta\" href=\"https://reffpa.com/L?tag=d_6034393m_97c_&amp;site=6034393&amp;ad=97\" target=\"_blank\" rel=\"noopener noreferrer nofollow sponsored\">Claim Offer &rarr;</a>\n       <a class=\"featured-books-review\" href=\"/blog/1xbet-review.html\">Read 1xBet review</a>\n      </div>\n      <p class=\"featured-books-terms\">18+ only. Bonus tied to your first deposit; minimum odds and wagering requirements apply. T&amp;Cs apply.</p>\n     </article>\n     <article class=\"featured-books-card\" role=\"listitem\">\n      <div class=\"featured-books-top\">\n       <span class=\"featured-books-badge\" style=\"background:linear-gradient(135deg,#e11d48,#881337);\">1win</span>\n       <span class=\"featured-books-rating\" title=\"Editorial rating out of 5\"><span class=\"fm-rating-num\">4.1</span><span class=\"fm-outof\">/5</span></span>\n      </div>\n      <p class=\"featured-books-tag\">Welcome Offer</p>\n      <p class=\"featured-books-offer\">First-deposit welcome bonus with daily accumulator boosts, cash-out and a dedicated mobile betting app.</p>\n      <div class=\"featured-books-actions\">\n       <a class=\"featured-books-cta\" href=\"https://one-vv6198.com/betting?open=register&amp;p=f61e\" target=\"_blank\" rel=\"noopener noreferrer nofollow sponsored\">Claim Offer &rarr;</a>\n       <a class=\"featured-books-review\" href=\"/options.html\">Compare bookmakers</a>\n      </div>\n      <p class=\"featured-books-terms\">18+ only. Bonus tied to your first deposit; minimum odds and wagering requirements apply. T&amp;Cs apply.</p>\n     </article>\n     <article class=\"featured-books-card\" role=\"listitem\">\n      <div class=\"featured-books-top\">\n       <span class=\"featured-books-badge\" style=\"background:linear-gradient(135deg,#16a34a,#0f3d1e);\">Stake</span>\n       <span class=\"featured-books-rating\" title=\"Editorial rating out of 5\"><span class=\"fm-rating-num\">4.3</span><span class=\"fm-outof\">/5</span></span>\n      </div>\n      <p class=\"featured-books-tag\">Welcome Offer</p>\n      <p class=\"featured-books-offer\">Sportsbook and casino with fast crypto deposits and withdrawals, live betting, cash-out and daily promotions.</p>\n      <div class=\"featured-books-actions\">\n       <a class=\"featured-books-cta\" href=\"https://stake.com/?c=FjhqQ3n3\" target=\"_blank\" rel=\"noopener noreferrer nofollow sponsored\">Visit Stake &rarr;</a>\n       <a class=\"featured-books-review\" href=\"/options.html\">Compare bookmakers</a>\n      </div>\n      <p class=\"featured-books-terms\">18+ only. Offer, minimum deposit and wagering requirements vary by location. T&amp;Cs apply.</p>\n     </article>\n    </div>\n   </div>\n   <p class=\"featured-books-disclosure\">Advertising disclosure: links to bookmakers on this page are affiliate links &#8212; WinFulltime may earn a commission if you sign up, at no extra cost to you. 18+ &middot; T&amp;Cs apply &middot; Please gamble responsibly.</p>\n  </section>\n  <script src=\"/featured-bookmakers-carousel.js?v=20260902c\" defer></script>";
 
 const FEATURED_BOOKS_EXCLUDE = new Set(['about','account','admin','app','author-bio','contact','login','offline','policy','privacy','reset-password','signup','terms']);
 
@@ -250,39 +252,6 @@ function shouldShowFeaturedBooks(url) {
   const last = (url.split('/').pop() || '').replace(/\.html$/, '');
   const bare = url.replace(/^\/+/, '').replace(/\.html$/, '');
   return !FEATURED_BOOKS_EXCLUDE.has(last) && !FEATURED_BOOKS_EXCLUDE.has(bare);
-}
-
-// Homepage + every prediction page (matrix, league, strategy hub) get the
-// daily Betway booking code banner. Other pages (blog, about, legal...) skip it.
-function shouldShowBetwayCode(url) {
-  if (!url) return false;
-  return url === '/' || url === '/index.html' || url.startsWith('/predictions');
-}
-
-const BETWAY_SECTION_STYLE = `
-  .bw-code-card{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;max-width:960px;margin:14px auto 0;padding:12px 16px;border:1px solid rgba(0,112,243,0.4);border-radius:14px;background:linear-gradient(135deg,rgba(0,112,243,0.14),rgba(0,196,255,0.08));}
-  .bw-code-card::before{content:"B";display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;font-weight:900;font-size:18px;}
-  .bw-code-label{font-size:13px;font-weight:800;color:var(--text,#e8edf5);line-height:1.3;}
-  .bw-code-label small{display:block;font-weight:500;opacity:0.7;}
-  .bw-code-value{display:inline-block;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:20px;font-weight:900;letter-spacing:2px;color:#0a84ff;background:rgba(10,132,255,0.12);padding:5px 14px;border-radius:10px;animation:bwFlash 1s steps(1,end) infinite;}
-  @keyframes bwFlash{0%,52%{opacity:1}53%,100%{opacity:0.12}}
-  .bw-copy{margin-left:auto;background:none;border:1px solid rgba(10,132,255,0.5);color:#0a84ff;border-radius:8px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer;}
-  .bw-copy:hover{background:rgba(10,132,255,0.12);}
-`;
-
-function betwayCodeSection(entry) {
-  const hasCode = !!entry && !!entry.code;
-  const dateLabel = entry && entry.date ? entry.date : '';
-  const body = hasCode
-    ? `<span class="bw-code-label">Betway Booking Code of the Day<small>${dateLabel} &middot; valid until first match kicks off</small></span><code class="bw-code-value">${entry.code}</code><button type="button" class="bw-copy" data-bw-copy="${entry.code}">&#128203; Copy</button>`
-    : `<span class="bw-code-label">Betway Booking Code of the Day<small>${dateLabel}</small></span><span class="bw-code-label" style="opacity:0.75;">Today's betway booking code is not available yet &#8212; check back later.</span>`;
-  return `<section class="bw-code-card" data-betway-code aria-label="Betway booking code of the day">
-<style>${BETWAY_SECTION_STYLE}</style>
-${body}
-<script>
-(function(){var b=document.querySelector('button[data-bw-copy]');if(!b)return;b.addEventListener('click',function(){try{navigator.clipboard.writeText(b.getAttribute('data-bw-copy'));}catch(e){var t=document.createElement('textarea');t.value=b.getAttribute('data-bw-copy');document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();}var o=b.textContent;b.textContent='Copied \\u2713';setTimeout(function(){b.textContent=o;},1600);});})();
-</script>
-</section>`;
 }
 
 
@@ -347,10 +316,10 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(/<\/body>/i, '<footer>' + FOOTER_HTML + '\n</footer>\n</body>');
   }
 
-  // 3b. Featured Bookmakers sidebar list (content/prediction pages only).
+  // 3b. Featured Bookmakers carousel (content/prediction pages only).
   //     Placed at the END of the page content (before </main>) so it does not
   //     compete with the hero/tabs at the top of the page.
-  if (shouldShowFeaturedBooks(activePath) && !/id="featured-books"/.test(html)) {
+  if (shouldShowFeaturedBooks(activePath) && !/class="featured-books-card"/.test(html)) {
     if (!/featured-bookmakers-carousel\.css/.test(html)) {
       html = html.replace(/<\/head>/i, FEATURED_BOOKS_CSS_LINK + '\n</head>');
     }
@@ -360,21 +329,6 @@ function applyLayoutToHtml(html, activePath) {
       html = html.replace(/(<footer[^>]*>)/i, FEATURED_BOOKS_SECTION + '\n$1');
     } else if (/<\/body>/i.test(html)) {
       html = html.replace(/<\/body>/i, FEATURED_BOOKS_SECTION + '\n</body>');
-    }
-  }
-
-  // 3c. Daily Betway booking code banner (home + prediction pages only).
-  //     Placed directly under the header so it tops the page content; falls
-  //     back to a "not available yet" message when the operator has not added
-  //     today's code yet.
-  if (shouldShowBetwayCode(activePath) && !/data-betway-code/.test(html)) {
-    const betwayHtml = betwayCodeSection(getTodayBetwayCode());
-    const headerClose = html.indexOf('</header>');
-    if (headerClose !== -1) {
-      const at = headerClose + '</header>'.length;
-      html = html.slice(0, at) + '\n' + betwayHtml + html.slice(at);
-    } else {
-      html = html.replace(/<body([^>]*)>/i, (m, attrs) => `<body${attrs}>` + betwayHtml);
     }
   }
 

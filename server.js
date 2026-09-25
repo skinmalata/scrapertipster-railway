@@ -191,7 +191,7 @@ app.use(cors({
   origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['https://winfulltime.com', 'https://www.winfulltime.com']
 }));
 app.use((req, res, next) => {
-  res.setHeader('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: https://www.googletagmanager.com https://www.google-analytics.com https://unpkg.com https://app.lemonsqueezy.com https://js.whop.com; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https: https://i.ytimg.com https://yt3.ggpht.com; connect-src 'self' https: http://localhost http://127.0.0.1 ws://localhost ws://127.0.0.1 https://www.google-analytics.com https://www.googletagmanager.com https://xogkqpjtxfemcxzsuwke.supabase.co https://api.lemonsqueezy.com https://api.whop.com https://js.whop.com; frame-src https://www.youtube.com https://youtube.com https://app.lemonsqueezy.com https://refbanners.com;");
+  res.setHeader('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: https://www.googletagmanager.com https://www.google-analytics.com https://unpkg.com https://app.lemonsqueezy.com https://js.whop.com; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https: https://i.ytimg.com https://yt3.ggpht.com; connect-src 'self' https: http://localhost http://127.0.0.1 ws://localhost ws://127.0.0.1 https://www.google-analytics.com https://www.googletagmanager.com https://xogkqpjtxfemcxzsuwke.supabase.co https://api.lemonsqueezy.com https://api.whop.com https://js.whop.com; frame-src https://www.youtube.com https://youtube.com https://app.lemonsqueezy.com;");
   next();
 });
 app.use(function (req, res, next) {
@@ -509,8 +509,6 @@ const { buildGoldenTips } = require('./src/services/goldenOpportunities');
 const { buildGiantPool } = require('./src/services/authorPicks');
 const { startTelegramBot } = require('./src/services/telegramBot');
 const { startMastodonBot } = require('./src/services/mastodonBot');
-const { announceDailyCode } = require('./src/services/codeAnnouncer');
-const { getToday: getTodayBetwayCode } = require('./src/services/betwayDailyCode');
 
 // The pre-match scrape (fetchPredictions), the H2H Picks build
 // (buildGiantPool) and the FotMob live scrape all buffer large responses in
@@ -654,12 +652,6 @@ startTelegramBot(
   process.env.TELEGRAM_BOT_TOKEN,
   process.env.TELEGRAM_CHAT_ID
 );
-
-// Publish today's Betway booking code to the Telegram channel as soon as the
-// server boots (the code is delivered to the app through a deploy). Skips when
-// the code is unchanged since the last announce or when Telegram is not
-// configured.
-announceDailyCode(getTodayBetwayCode());
 
 startMastodonBot(
   getLiveTipsFromCache,
