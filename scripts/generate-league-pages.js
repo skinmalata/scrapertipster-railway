@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { CHIPS_CSS, FAQ_CSS, faqsList, chipsSection, renderHead, collectionPageSchema } = require('./lib/seo-blocks');
 const { renderBookmakerCTA } = require('./lib/bookmaker-cta');
-const { buildGridHtml } = require('./lib/sponsor-banner');
+const { spliceSponsorBetweenCards } = require('./lib/sponsor-banner');
 
 const PREDICTIONS_FILE = path.join(__dirname, '..', 'predictions-cache.json');
 const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions', 'league');
@@ -182,7 +182,7 @@ function generateLeaguePage(leagueName, leagueSlug, matches, ctx) {
 
   const MAX_CARDS = 200;
   const renderedCards = matches.slice(0, MAX_CARDS).map(m => renderMatchCard(m, ctx && ctx.analysisUrls));
-  const matchCardsHtml = buildGridHtml(renderedCards);
+  const matchCardsHtml = spliceSponsorBetweenCards(renderedCards, `league/${leagueSlug}`) || renderedCards.join('\n');
   const truncatedNote = matches.length > MAX_CARDS
     ? `<p style="color:var(--text-secondary);font-size:13px;margin-top:12px;">Showing the first ${MAX_CARDS} of ${matches.length} ${leagueName} fixtures for today.</p>`
     : '';

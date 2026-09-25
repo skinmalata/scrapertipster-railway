@@ -1,25 +1,46 @@
-// Reusable 1xBet affiliate banner slot for WinFulltime prediction grids.
-// The refbanners.com iframe (owner account 6034393) is appended after the last
-// match card of the grid, server-side via buildGridHtml() / insert script and
-// client-side by public/sponsor-banner.js.
+// Reusable sponsored banner slot for WinFulltime prediction grids.
+// Two self-hosted 1win creatives alternate across pages (one per page, picked
+// deterministically by seed so the assignment is stable per URL).
+// Output mirrors the client-side renderSponsor() used by the JS-rendered pages
+// (see generate-category-pages.js / index.html / author-picks.html).
 
-const AFFILIATE_IFRAME = "<iframe scrolling='no' frameBorder='0' style='padding:0px; margin:0px; border:0px;border-style:none;' width='320' height='320' src=\"https://refbanners.com/I?tag=d_6034393m_78736c_&site=6034393&ad=78736\" ></iframe>";
+const SPONSOR_HREF = 'https://one-vv5314.com/betting?open=register&p=f61e';
+const SPONSOR_BANNERS = [
+  '/img/banners/1win-banner-a.webp',
+  '/img/banners/1win-banner-b.webp'
+];
 
-function renderAffiliateBanner() {
-  return '<div class="wft-affiliate">' + AFFILIATE_IFRAME + '</div>';
+function pickSponsorIndex(seed) {
+  const s = String(seed == null ? '' : seed);
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = ((h * 31) + s.charCodeAt(i)) >>> 0;
+  }
+  return h % SPONSOR_BANNERS.length;
+}
+
+function renderSponsorBanner(seed) {
+  var idx = pickSponsorIndex(seed);
+  return '<div class="wft-sponsor"><a href="' + SPONSOR_HREF +
+    '" target="_blank" rel="noopener nofollow sponsored" title="1Win" aria-label="1Win">' +
+    '<img src="' + SPONSOR_BANNERS[idx] + '" alt="1Win" width="800" height="800" ' +
+    'loading="lazy" decoding="async" style="display:block;width:100%;height:auto;border-radius:12px;">' +
+    '</a></div>';
 }
 
 /**
- * Full grid slot assembly: cards joined together plus the 1xBet affiliate
- * iframe appended after the last card. Returns '' when there are no cards.
+ * @returns {string} sponsor HTML (single line) or '' if fewer than 2 places.
  */
-function buildGridHtml(cards) {
-  if (!Array.isArray(cards) || cards.length === 0) return '';
-  return cards.join('\n') + '\n\n' + renderAffiliateBanner();
+function spliceSponsorBetweenCards(cards, seed) {
+  if (!Array.isArray(cards) || cards.length < 2) return null;
+  const banner = renderSponsorBanner(seed);
+  return cards[0] + '\n' + banner + '\n' + cards.slice(1).join('\n');
 }
 
 module.exports = {
-  AFFILIATE_IFRAME,
-  renderAffiliateBanner,
-  buildGridHtml
+  SPONSOR_HREF,
+  SPONSOR_BANNERS,
+  pickSponsorIndex,
+  renderSponsorBanner,
+  spliceSponsorBetweenCards
 };

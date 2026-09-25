@@ -1,71 +1,46 @@
 'use strict';
 
-// Migrate/sync the 1xBet affiliate slot on committed static prediction grids
-// (public/predictions/<league>/<market>/index.html and
-// public/predictions/league/<slug>/index.html). Idempotent: strips any legacy
-// 1win .wft-sponsor block (one-time cleanup), replaces any existing
-// refbanners.com iframe with the current active tag, and appends the affiliate
-// slot after the last card on pages that lack it. Generators that (re)create
-// these pages already splice the affiliate slot themselves (see
-// generate-matrix-pages.js and generate-league-pages.js); this script is a
-// one-time migration for committed pages.
+// Bulk-inject the shared sponsor banner into already-deployed static prediction
+// grids (public/predictions/<league>/<market>/index.html and
+// public/predictions/league/<slug>/index.html). Idempotent: skips any page that
+// already carries a .wft-sponsor slot. Generators that (re)create these pages
+// already splice the banner themselves (see generate-matrix-pages.js and
+// generate-league-pages.js); this script is a one-time migration for committed
+// pages.
 
 const fs = require('fs');
 const path = require('path');
-const { renderAffiliateBanner, AFFILIATE_IFRAME } = require('./lib/sponsor-banner');
+const { renderSponsorBanner } = require('./lib/sponsor-banner');
 
 const PREDICTIONS_DIR = path.join(__dirname, '..', 'public', 'predictions');
-const AFFILIATE_GUARD = '<div class="wft-affiliate">';
-const CARD_RE = /<div class="match-card\b/;
-const GRID_MARKER = '<div class="matches-grid">';
+const GUARD = '<div class="wft-sponsor">';
+const CARD_MARKER = '<div class="match-card fade-in"';
 
 function pageHasCards(html) {
-  return html.indexOf(GRID_MARKER) !== -1 && CARD_RE.test(html);
+  return html.indexOf('<div class="matches-grid">') !== -1 && html.indexOf(CARD_MARKER) !== -1;
 }
 
-function stripLegacySponsor(html) {
-  // Remove single-line legacy 1win sponsor blocks: <div class="wft-sponsor">...</div>
-  const without = html.replace(/<div class="wft-sponsor">.*?<\/div>/g, '');
-  const changed = without !== html;
-  return { html: without, changed };
-}
-
-function setAffiliateIframe(html) {
-  // Replace any existing refbanners.com iframe with the current active tag.
-  const replaced = html.replace(/<iframe[^>]*refbanners\.com[^>]*><\/iframe>/g, AFFILIATE_IFRAME);
-  return { html: replaced, changed: replaced !== html };
-}
-
-function findGridClose(html, openIdx) {
-  let depth = 1;
-  let i = openIdx + GRID_MARKER.length;
-  while (i < html.length) {
-    const openTag = html.indexOf('<div', i);
-    const closeTag = html.indexOf('</div>', i);
-    if (closeTag < 0) return -1;
-    if (openTag !== -1 && openTag < closeTag) {
-      depth += 1;
-      i = openTag + 4;
-    } else {
-      depth -= 1;
-      if (depth === 0) return closeTag;
-      i = closeTag + 6;
-    }
-  }
-  return -1;
-}
-
-function appendAffiliateBanner(html) {
+function insertBanner(html, seed) {
+  if (html.indexOf(GUARD) !== -1) return { html, inserted: false, reason: 'already has sponsor' };
   if (!pageHasCards(html)) return { html, inserted: false, reason: 'no match-card grid' };
-  if (html.indexOf(AFFILIATE_GUARD) !== -1) return { html, inserted: false, reason: 'already has affiliate' };
 
-  const openIdx = html.indexOf(GRID_MARKER);
-  if (openIdx < 0) return { html, inserted: false, reason: 'no matches-grid' };
-  const closeIdx = findGridClose(html, openIdx);
-  if (closeIdx < 0) return { html, inserted: false, reason: 'grid close not found' };
+  let count = 0;
+  let second = -1;
+  let from = 0;
+  while (count < 2) {
+    const idx = html.indexOf(CARD_MARKER, from);
+    if (idx < 0) break;
+    count += 1;
+    if (count === 2) second = idx;
+    from = idx + CARD_MARKER.length;
+  }
+  if (second < 0) return { html, inserted: false, reason: 'fewer than 2 cards' };
+
+  let runStart = second;
+  while (runStart > 0 && /\s/.test(html[runStart - 1])) runStart--;
 
   return {
-    html: html.slice(0, closeIdx) + '\n  ' + renderAffiliateBanner() + '\n' + html.slice(closeIdx),
+    html: html.slice(0, runStart) + '\n' + renderSponsorBanner(seed) + '\n\n  ' + html.slice(second),
     inserted: true,
     reason: 'ok'
   };
@@ -75,32 +50,13 @@ function ensureTrailingNewline(s) {
   return s.endsWith('\n') ? s : s + '\n';
 }
 
-function processFile(filePath) {
-  let current = fs.readFileSync(filePath, 'utf8');
-  let changed = false;
-
-  const legacy = stripLegacySponsor(current);
-  if (legacy.changed) {
-    current = legacy.html;
-    changed = true;
+function processFile(filePath, seed) {
+  const original = fs.readFileSync(filePath, 'utf8');
+  const result = insertBanner(original, seed);
+  if (result.inserted) {
+    fs.writeFileSync(filePath, ensureTrailingNewline(result.html));
   }
-
-  const iframe = setAffiliateIframe(current);
-  if (iframe.changed) {
-    current = iframe.html;
-    changed = true;
-  }
-
-  const affiliate = appendAffiliateBanner(current);
-  if (affiliate.inserted) {
-    current = affiliate.html;
-    changed = true;
-  }
-
-  if (changed) {
-    fs.writeFileSync(filePath, ensureTrailingNewline(current));
-  }
-  return { legacy, iframe, affiliate };
+  return result;
 }
 
 function collectTargets() {
@@ -113,7 +69,7 @@ function collectTargets() {
       if (!fs.statSync(leagueDir).isDirectory()) return;
       fs.readdirSync(leagueDir).forEach(marketSlug => {
         const file = path.join(leagueDir, marketSlug, 'index.html');
-        if (fs.existsSync(file)) targets.push(file);
+        if (fs.existsSync(file)) targets.push({ file, seed: `${leagueSlug}/${marketSlug}` });
       });
     });
 
@@ -121,7 +77,7 @@ function collectTargets() {
     if (fs.existsSync(leagueHubDir)) {
       fs.readdirSync(leagueHubDir).forEach(slug => {
         const file = path.join(leagueHubDir, slug, 'index.html');
-        if (fs.existsSync(file)) targets.push(file);
+        if (fs.existsSync(file)) targets.push({ file, seed: `league/${slug}` });
       });
     }
   }
@@ -131,25 +87,25 @@ function collectTargets() {
 
 function main() {
   const targets = collectTargets();
-  let stripped = 0;
-  let iframeReplaced = 0;
-  let appended = 0;
-  const skipped = { noMatchCards: 0, intro: 0, noGrid: 0, gridClose: 0 };
+  let inserted = 0;
+  let skipped = 0;
+  const skippedReasons = {};
 
-  targets.forEach(file => {
-    const r = processFile(file);
-    if (r.legacy.changed) stripped += 1;
-    if (r.iframe.changed) iframeReplaced += 1;
-    if (r.affiliate.inserted) appended += 1;
-    else skipped[r.affiliate.reason] = (skipped[r.affiliate.reason] || 0) + 1;
+  targets.forEach(({ file, seed }) => {
+    const result = processFile(file, seed);
+    if (result.inserted) {
+      inserted += 1;
+      console.log(`[sponsor] ${seed}`);
+    } else {
+      skipped += 1;
+      skippedReasons[result.reason] = (skippedReasons[result.reason] || 0) + 1;
+    }
   });
 
-  console.log(`[cleanup] stripped 1win sponsor blocks: ${stripped}`);
-  console.log(`[iframe] replaced refbanners iframe: ${iframeReplaced}`);
-  console.log(`[affiliate] appended to ${appended} pages, skipped ${targets.length - appended}`);
-  Object.keys(skipped).forEach(k => console.log(`[affiliate]   skipped (${k}): ${skipped[k]}`));
+  console.log(`[sponsor] Inserted into ${inserted} pages, skipped ${skipped}`);
+  Object.keys(skippedReasons).forEach(r => console.log(`[sponsor]   skipped (${r}): ${skippedReasons[r]}`));
 }
 
 if (require.main === module) main();
 
-module.exports = { stripLegacySponsor, setAffiliateIframe, findGridClose, appendAffiliateBanner, processFile, collectTargets, main };
+module.exports = { insertBanner, processFile, collectTargets, main };

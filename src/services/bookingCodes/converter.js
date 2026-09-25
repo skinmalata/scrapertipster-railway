@@ -254,7 +254,6 @@ async function convertCode(input) {
 
     const result = {
       code: newCode,
-      sourceCode: code,
       from: from,
       fromName: LABELS[from],
       to: to,

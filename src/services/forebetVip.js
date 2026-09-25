@@ -25,20 +25,19 @@
 //      model's 1X2 win probability only has to clear TTS_WIN_CERT_MIN_PROB
 //      (35%) so the model never firmly expects the side to lose.
 //   2. Team to score: otherwise the strongest "must score" call publishes
-//      only when all of the following UNIVERSAL bars hold (the form/H2H lock
-//      never relaxes them):
+//      only when all of the following hold:
 //      - the fair price from the Poisson split is STRICTLY above
-//        MIN_TEAM_SCORE_ODD (default 1.20), and
-//      - the displayed confidence (rounded scoring probability) is STRICTLY
-//        over TTS_MIN_CONF (default 70), and
+//        MIN_TEAM_SCORE_ODD (default 1.25), and
+//      - the model's scoring probability is >= TTS_MIN_PROB (62%), and
 //      - the must-score composite clears MUST_SCORE_MIN: history
 //        (expected-goal scoring model, max 40) + recent form win rate
 //        (max 35) + head-to-head record (max 25). When detail pages were not
 //        scraped the history-backed probability alone must clear
 //        TTS_NO_DETAIL_PROB (75%), and
 //      - form/H2H lock: the same near-perfect records as the cert (form >=
-//        80% and unbeaten, H2H win share >= 80% over >= 3 meetings) ranks the
-//        call highest, but only after the odds/confidence bars above pass.
+//        80% and unbeaten, H2H win share >= 80% over >= 3 meetings) may
+//        publish under the relaxed floors TTS_LOCK_MIN_PROB /
+//        TTS_LOCK_MIN_ODD instead of the bars above.
 // No analysis text ships with tips: members see the pick, its probability and
 // the form/H2H record rows. The API strips every price field before the
 // payload reaches a member.
@@ -178,19 +177,13 @@ const HSH_SHARE_MAX = envNumber('HSH_SHARE_MAX', 0.65, 0.1, 0.9);
 const HSH_MARGIN_MIN = envNumber('HSH_MARGIN_MIN', 0.05, 0.01, 0.5);
 const HSH_MIN_GOALS = envNumber('HSH_MIN_GOALS', 2.2, 0.5, 8);
 // Team-to-score is a VIP market. A team's scoring probability must clear
-// this floor to be published as a VIP tip (default 70% - quality over
-// quantity: the feed prefers fewer, stronger calls). Used by the enrichment
-// prefilter so fixtures that cannot possibly qualify are never detail-scraped.
-const TTS_MIN_PROB = envNumber('TTS_MIN_PROB', 0.7, 0.05, 0.95);
-// Displayed-confidence hard floor for every team-to-score tip, lock included:
-// the rounded confidence shown to members must be STRICTLY over this (default
-// 70 -> "over 70%").
-const TTS_MIN_CONF = Math.round(envNumber('TTS_MIN_CONF', 70, 50, 100));
+// this floor to be published as a VIP tip (default 62% - quality over
+// quantity: the feed prefers fewer, stronger calls).
+const TTS_MIN_PROB = envNumber('TTS_MIN_PROB', 0.62, 0.05, 0.95);
 // The fair price of a team-to-score call must be STRICTLY above this floor
-// (default 1.20). Below it the pick is an uninteresting ultra-short price that
-// pays next to nothing for a near-certainty. Hard floor for every tip, lock
-// included - a lock ranks higher but never lowers these bars.
-const MIN_TEAM_SCORE_ODD = envNumber('TTS_MIN_ODD', 1.2, 1.05, 10);
+// (default 1.25). Below it the pick is an uninteresting ultra-short price that
+// pays next to nothing for a near-certainty.
+const MIN_TEAM_SCORE_ODD = envNumber('TTS_MIN_ODD', 1.25, 1.05, 10);
 // Composite "must score" gate (0-100). Three signals feed it: the
 // history-backed expected-goals scoring probability (max 40), the picked
 // side's recent-form win rate (max 35) and head-to-head support (max 25). A
@@ -216,6 +209,8 @@ const TTS_PERFECT_H2H_PCT = envNumber('TTS_PERFECT_H2H_PCT', 0.8, 0.5, 1);
 // Minimum recent outings behind the form percentage. A single-game "W" is a
 // fake 100% (seen on reserve/new clubs) and must never carry a cert.
 const TTS_FORM_MIN_GAMES = envNumber('TTS_FORM_MIN_GAMES', 5, 3, 15);
+const TTS_LOCK_MIN_PROB = envNumber('TTS_LOCK_MIN_PROB', 0.35, 0.05, 0.95);
+const TTS_LOCK_MIN_ODD = envNumber('TTS_LOCK_MIN_ODD', 1.01, 1.01, 10);
 // Match-winner record cert: the model's 1X2 win probability for the
 // near-perfect side only has to clear this light floor - the records carry the
 // tip, the model merely guards against a side the model firmly expects to lose.
@@ -474,16 +469,17 @@ function selectHshPicks(matches, limit) {
 }
 
 // Estimate team-to-score props from expected goals. Props are generated down to
-// MIN_TEAM_SCORE_ODD so the hard floor applies at generation time too; the
-// selector re-applies the same bars, so the field never includes ultra-short
-// or meaningless prices.
+// TTS_LOCK_MIN_ODD so a form/H2H lock can still surface a near-certain scorer;
+// the normal path re-applies the stricter MIN_TEAM_SCORE_ODD floor in
+// selectTeamScoreTip, so the field never includes ultra-short or meaningless
+// prices for ordinary picks.
 function estimateTeamScoreProps({ expHome, expAway }) {
   const props = [];
   const push = (side, team, lambda) => {
     const scoreAtLeastOne = poissonAtLeastOne(lambda);
     const fairProb = Math.min(0.98, Math.max(0.05, scoreAtLeastOne));
     const fairOdd = Number((1 / fairProb).toFixed(2));
-    if (fairOdd > MIN_TEAM_SCORE_ODD && fairOdd < 1 / 0.05) {
+    if (fairOdd > TTS_LOCK_MIN_ODD && fairOdd < 1 / 0.05) {
       props.push({
         market: 'team-to-score',
         side,
@@ -580,12 +576,7 @@ function selectTeamScoreTip({ home, away, teamScoreProps, form, h2h }) {
   let best = null;
   for (const p of props) {
     const prob = (Number(p.prob) || 0) / 100;
-    // Universal hard floor for EVERY team-to-score tip, lock included: the
-    // fair price must be strictly above MIN_TEAM_SCORE_ODD and the rounded
-    // confidence shown to members strictly over TTS_MIN_CONF. A lock ranks
-    // higher on must-score but never lowers these bars.
-    if (!(p.estimatedOdd > MIN_TEAM_SCORE_ODD)) continue;
-    if (Math.round(prob * 100) <= TTS_MIN_CONF) continue;
+    if (!(p.estimatedOdd > TTS_LOCK_MIN_ODD)) continue;
     const sidePct = p.side === 'home'
       ? (form && typeof form.homeRecently === 'number' ? form.homeRecently : null)
       : (form && typeof form.awayRecently === 'number' ? form.awayRecently : null);
@@ -599,6 +590,12 @@ function selectTeamScoreTip({ home, away, teamScoreProps, form, h2h }) {
       !/L/.test(sideForm) &&
       meets >= TTS_PERFECT_H2H_MEETS &&
       sidePct >= TTS_PERFECT_FORM_PCT && wins >= meets * TTS_PERFECT_H2H_PCT;
+    if (locked) {
+      if (prob < TTS_LOCK_MIN_PROB) continue;
+    } else {
+      if (!(p.estimatedOdd > MIN_TEAM_SCORE_ODD)) continue;
+      if (prob < TTS_MIN_PROB) continue;
+    }
     const { score, modelPts, formPts, h2hPts } = mustScoreFor({ prob, formPct: sidePct, h2h: wins });
     if (!best || score > best.score) {
       best = { side: p.side, prob, estimatedOdd: Number(p.estimatedOdd), score, modelPts, formPts, h2hPts, locked };
@@ -607,10 +604,9 @@ function selectTeamScoreTip({ home, away, teamScoreProps, form, h2h }) {
   if (!best) return null;
   if (best.locked) {
     // A near-100% form side that also owns this opponent 100% head-to-head is
-    // a must-score even without the must-score composite (it already cleared
-    // the universal odd > MIN_TEAM_SCORE_ODD and conf > TTS_MIN_CONF bars in
-    // the loop). Only an absence of detail records (which is impossible here -
-    // the lock needs them) could block it.
+    // a must-score regardless of the model's probability/price bars. Only an
+    // absence of detail records (which is impossible here - the lock needs
+    // them) could block it.
     if (!hasDetailSignals) return null;
   } else if (hasDetailSignals ? best.score < MUST_SCORE_MIN : best.prob < TTS_NO_DETAIL_PROB) {
     return null;
@@ -1152,13 +1148,11 @@ async function scrapeDay(dateStr) {
 
   // Detail enrichment prefilter: only fixtures that could possibly produce a
   // qualifying team-to-score call are worth a browser fetch for form/H2H. The
-  // same expected-goals derivation runs here and in the scorer below. A prop
-  // only qualifies when its rounded confidence clears TTS_MIN_CONF AND its
-  // fair price clears MIN_TEAM_SCORE_ODD - mirrors the selector's hard floor.
+  // same expected-goals derivation runs here and in the scorer below.
   const shouldEnrich = (match) => {
     const exp = estimateMatchExpGoals(match);
     const props = estimateTeamScoreProps({ expHome: exp.home, expAway: exp.away });
-    return props.some((p) => (Math.round(Number(p.prob)) > TTS_MIN_CONF) && p.estimatedOdd > MIN_TEAM_SCORE_ODD);
+    return props.some((p) => (Number(p.prob) / 100) >= TTS_MIN_PROB);
   };
 
   let enriched;
@@ -1271,13 +1265,14 @@ module.exports = {
   MIN_CONFIDENCE,
   MIN_TEAM_SCORE_ODD,
   TTS_MIN_PROB,
-  TTS_MIN_CONF,
   MUST_SCORE_MIN,
   TTS_NO_DETAIL_PROB,
   TTS_PERFECT_FORM_PCT,
   TTS_PERFECT_H2H_MEETS,
   TTS_PERFECT_H2H_PCT,
   TTS_FORM_MIN_GAMES,
+  TTS_LOCK_MIN_PROB,
+  TTS_LOCK_MIN_ODD,
   TTS_WIN_CERT_MIN_PROB,
   VIP_MAX_TIPS,
   h2hMeetsFor,
