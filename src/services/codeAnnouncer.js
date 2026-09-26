@@ -36,18 +36,30 @@ async function announceConversion(conv) {
   const country = normalizeCountry(conv.country);
   if (!country) return undefined;
 
+  const fromLabel = conv.fromName || conv.from || 'Source';
+  const toLabel = conv.toName || conv.to || 'Target';
+
+  // Both ends of the conversion are posted: the code the user submitted and the
+  // one it became. Without a source code (a client-decoded conversion) only the
+  // result is shown, so the alert is never half-empty.
+  const codeLines = conv.sourceCode
+    ? ['\uD83D\uDD11 ' + fromLabel + ' code: ' + conv.sourceCode, '\u27A1\uFE0F ' + toLabel + ' code: ' + conv.code]
+    : ['\uD83D\uDD11 ' + toLabel + ' code: ' + conv.code];
+
   const text = [
     '\uD83C\uDFAB CODE CONVERTED SUCCESSFULLY',
     '\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501',
     '\uD83C\uDF0D A user from ' + country + ' converted this code.',
-    '\uD83D\uDCC8 From: ' + (conv.fromName || conv.from || 'Source'),
-    '\uD83D\uDCC8 To: ' + (conv.toName || conv.to || 'Target'),
+    '\uD83D\uDCC8 From: ' + fromLabel,
+    '\uD83D\uDCC8 To: ' + toLabel,
     '\uD83E\uDDFE ' + (Number(conv.legCount) || 0) + ' selections  |  Odds: ' + (conv.totalOdds != null ? conv.totalOdds : '-'),
-    '',
+    '\u00A0'
+  ].concat(codeLines, [
+    '\u00A0',
     '\uD83D\uDD17 winfulltime.com/converter.html'
-  ].join('\n');
+  ]).join('\n');
 
-  return deliver(text, 'conversion from ' + country + ' (' + (conv.fromName || conv.from) + ' -> ' + (conv.toName || conv.to) + ')');
+  return deliver(text, 'conversion from ' + country + ' (' + fromLabel + ' -> ' + toLabel + ')');
 }
 
 // A split produces several codes, so every one of them is posted back to the

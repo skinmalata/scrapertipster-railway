@@ -55,7 +55,7 @@ router.post('/converter/convert', async function (req, res) {
     const body = req.body || {};
     const result = await convertCode({ code: body.code, from: body.from, to: body.to, keepLegs: body.keepLegs });
     recordConversion(result);
-    announceConversion({ ...result, country: normalizeCountry(body.country) });
+    announceConversion({ ...result, sourceCode: body.code, country: normalizeCountry(body.country) });
     res.json({
       success: true,
       from: result.from,
@@ -118,7 +118,7 @@ router.post('/converter/convert-decoded', async function (req, res) {
       totalOdds: Number(totalOdds.toFixed(2))
     };
     recordConversion(result);
-    announceConversion({ ...result, country: normalizeCountry(body.country) });
+    announceConversion({ ...result, sourceCode: body.code, country: normalizeCountry(body.country) });
     res.json({ success: true, ...result });
   } catch (err) {
     sendError(res, err);
