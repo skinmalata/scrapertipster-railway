@@ -10,6 +10,8 @@ const NAV_LINKS = [
   { href: '/', label: 'Home', match: (p) => p === '/' || p === '/index.html' },
   { href: '/ticket-builder.html', label: 'Ticket Builder', match: (p) => p.startsWith('/ticket-builder') },
   { href: '/converter.html', label: 'Code Converter', match: (p) => p.startsWith('/converter') },
+  { href: '/code-splitter.html', label: 'Code Splitter', match: (p) => p.startsWith('/code-splitter') },
+  { href: '/code-merger.html', label: 'Code Merger', match: (p) => p.startsWith('/code-merger') },
   { href: '/predictions/in-play', label: 'In-Play', match: (p) => p.startsWith('/predictions/in-play') },
   { href: '/blog/', label: 'Blog', match: (p) => p.startsWith('/blog') }
 ];
@@ -188,7 +190,10 @@ body > header .hamburger span {
 body > header .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
 body > header .hamburger.active span:nth-child(2) { opacity: 0; }
 body > header .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
-body > header nav { display: flex; gap: 24px; }
+/* Seven links plus the login button need ~680px, and .header-content caps at
+   960px, so the inline nav only fits on genuinely wide screens. Collapse to
+   the hamburger earlier to keep the header from overflowing on tablets. */
+body > header nav { display: flex; gap: 18px; }
 body > header nav a {
   color: var(--text-muted, #94a3b8);
   text-decoration: none;
@@ -221,8 +226,8 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   min-height: 44px;
 }
 .theme-toggle:hover { border-color: var(--border-hover, rgba(255,255,255,0.12)); color: var(--text-primary, #e8edf5); }
-@media (max-width: 640px) {
-  body > header .hamburger { display: block; }
+@media (max-width: 1024px) {
+body > header .hamburger { display: block; }
   body > header nav {
     display: none !important;
     position: absolute;
