@@ -279,6 +279,11 @@ function loadAccount() {
       var expiresRow = document.getElementById('expires-row');
       var expiresAt = document.getElementById('expires-at');
 
+      if (data.__status && data.__status >= 400) {
+        renderSubscriptionError(data.__status);
+        return;
+      }
+
       if (data.isPro) {
         badge.textContent = 'Pro';
         badge.className = 'badge badge-pro';
@@ -294,8 +299,21 @@ function loadAccount() {
         upgradeBtn.style.display = '';
         portalBtn.style.display = 'none';
       }
+    }).catch(function (err) {
+      renderSubscriptionError(0);
     });
   });
+}
+
+function renderSubscriptionError(status) {
+  var badge = document.getElementById('plan-badge');
+  var portalBtn = document.getElementById('portal-btn');
+  if (badge) {
+    badge.textContent = 'Error';
+    badge.className = 'badge badge-free';
+  }
+  if (portalBtn) portalBtn.style.display = 'none';
+  console.warn('[account] Could not load subscription (status ' + status + '). Showing error instead of assuming Free.');
 }
 
 function handlePasswordChange() {

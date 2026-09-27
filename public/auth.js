@@ -156,31 +156,72 @@
     }, 1000);
   }
 
+  function tagStatus(data, status) {
+    try {
+      Object.defineProperty(data, '__status', { value: status, enumerable: false, configurable: true });
+    } catch (e) {}
+    return data;
+  }
+
   window.WFT.apiFetch = function (path, options) {
     options = options || {};
     var isApiPath = path.startsWith('/api/');
     var url = isApiPath ? window.WFT_API + path : path;
 
     var sb = window.WFT.supabase;
-    var tokenPromise = sb ? sb.auth.getSession().then(function(s) { return s.data.session?.access_token || null; }) : Promise.resolve(null);
-    return tokenPromise.then(function(token) {
+
+    function send(token) {
+      var opts = options;
       if (token) {
-        options.headers = options.headers || {};
-        options.headers['Authorization'] = 'Bearer ' + token;
+        opts = {};
+        for (var key in options) {
+          if (Object.prototype.hasOwnProperty.call(options, key)) opts[key] = options[key];
+        }
+        opts.headers = options.headers || {};
+        opts.headers['Authorization'] = 'Bearer ' + token;
       }
-      return fetch(url, options).then(function (res) {
-        return res.json().then(function (data) {
-          if (userState.user) {
-            if (typeof data.isPro !== 'undefined') {
-              userState.user.isPro = data.isPro;
-            }
-            if (data.plan) {
-              userState.user.plan = data.plan;
-            } else if (typeof data.isLifetime !== 'undefined') {
-              userState.user.plan = data.isLifetime ? 'lifetime' : 'pro';
-            }
-          }
-          return data;
+      return fetch(url, opts).then(function (res) {
+        return res.text().then(function (text) {
+          var data;
+          try { data = text ? JSON.parse(text) : {}; } catch (e) { data = { error: text }; }
+          return { res: res, data: data };
+        });
+      });
+    }
+
+    function sessionToken() {
+      if (!sb) return Promise.resolve(null);
+      return sb.auth.getSession().then(function (s) {
+        return s.data.session?.access_token || null;
+      });
+    }
+
+    function finish(result) {
+      if (userState.user) {
+        if (typeof result.data.isPro !== 'undefined') {
+          userState.user.isPro = result.data.isPro;
+        }
+        if (result.data.plan) {
+          userState.user.plan = result.data.plan;
+        } else if (typeof result.data.isLifetime !== 'undefined') {
+          userState.user.plan = result.data.isLifetime ? 'lifetime' : 'pro';
+        }
+      }
+      return tagStatus(result.data, result.res.status);
+    }
+
+    return sessionToken().then(function (token) {
+      return send(token).then(function (first) {
+        if (first.res.status !== 401 || !sb) return finish(first);
+        return sb.auth.refreshSession().then(function () {
+          return sessionToken();
+        }).then(function (freshToken) {
+          return send(freshToken).then(function (second) {
+            return finish(second);
+          });
+        }).catch(function () {
+          console.warn('[apiFetch] Token refresh failed, keeping original response');
+          return finish(first);
         });
       });
     });
