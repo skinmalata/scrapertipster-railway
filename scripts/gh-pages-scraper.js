@@ -136,6 +136,8 @@ function enrichWithResults(predictions, resultsCache) {
   predictions.cornersMatches = enrich(predictions.cornersMatches);
   predictions.cardsMatches = enrich(predictions.cardsMatches);
   predictions.teamToScore2PlusMatches = enrich(predictions.teamToScore2PlusMatches);
+  predictions.htftMatches = enrich(predictions.htftMatches);
+  predictions.gg2PlusMatches = enrich(predictions.gg2PlusMatches);
 
   return predictions;
 }
