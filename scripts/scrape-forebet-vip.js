@@ -57,15 +57,27 @@ async function main() {
       continue;
     }
     // Strongest calls first so the API/page show the best value at the top:
-    // record certs (locked) lead, then confidence, then must-score. Quality
+    // match-winner record certs lead, then confidence, then must-score. Quality
     // over quantity - store at most VIP_MAX_TIPS per day. HSH is selected from
     // the full fixture list below, unaffected by this VIP cap.
+    //
+    // Market rank is the leading key rather than `locked`, because `locked`
+    // only means "this row is locked in" and team-to-score rows can be locked
+    // too. A near-perfect form/H2H record on a match-winner pick is the
+    // product we want at the top, so it is ranked explicitly.
+    const MARKET_RANK = { 'match-winner': 0, 'team-to-score': 1 };
+    const marketRank = m => (MARKET_RANK[m.market] === undefined ? 2 : MARKET_RANK[m.market]);
     const qualified = matches
-      .filter(m => m.passesGate)
-      .sort((a, b) => ((b.locked ? 1 : 0) - (a.locked ? 1 : 0)) || (b.confidence - a.confidence) || (b.mustScore - a.mustScore));
+      .filter(m => m.passesGate && m.sportybetAvailable !== false)
+      .sort((a, b) =>
+        (marketRank(a) - marketRank(b)) ||
+        ((b.locked ? 1 : 0) - (a.locked ? 1 : 0)) ||
+        (b.confidence - a.confidence) ||
+        (b.mustScore - a.mustScore));
     const gated = qualified.slice(0, VIP_MAX_TIPS);
     const hshPicks = selectHshPicks(matches);
-    console.log(date + ': ' + matches.length + ' fixtures, ' + qualified.length + ' pass the confidence gate' +
+    const bettable = matches.filter(m => m.sportybetAvailable !== false).length;
+    console.log(date + ': ' + matches.length + ' fixtures, ' + bettable + ' on SportyBet, ' + qualified.length + ' pass the confidence gate' +
       (qualified.length > VIP_MAX_TIPS ? ' (capped to top ' + VIP_MAX_TIPS + ')' : '') +
       ', ' + hshPicks.length + ' highest-scoring-half picks');
     // On a successful (non-empty) scrape the result is authoritative: an empty

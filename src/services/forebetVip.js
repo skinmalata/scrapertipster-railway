@@ -53,6 +53,7 @@
 
 const axios = require('axios');
 const { lagosDate } = require('../utils/dates');
+const { findSportybetFixture, loadSportybetSchedule } = require('./sportybetSchedule');
 
 let _browserPromise = null;
 
@@ -1119,7 +1120,13 @@ async function enrichAll(matches, shouldEnrich) {
   return results;
 }
 
-async function scrapeDay(dateStr) {
+async function scrapeDay(dateStr, options) {
+  // SportyBet availability gate. When a schedule is supplied, only fixtures
+  // the bookmaker actually lists can produce a published pick. When the
+  // schedule is null (feed unreachable) we fall open and keep today's
+  // behaviour, because the alternative - publishing nothing - is worse.
+  const schedule = options && options.schedule ? options.schedule : null;
+  const sportyOnly = !!schedule;
   let url = FOREBET_DATE_URL + dateStr;
   // "Today" is the current date in Africa/Lagos, not UTC - toISOString() flips
   // the day between 23:00 and 00:00 UTC and previously mis-selected the URL.
@@ -1146,6 +1153,20 @@ async function scrapeDay(dateStr) {
     console.warn('[forebetVip] HT scrape failed for ' + dateStr + ': ' + e.message);
   }
 
+  // Resolve every fixture against the bookmaker before any browser work, so
+  // the schedule is downloaded once and the answer reused.
+  const annotated = raw.map((m) => {
+    const book = sportyOnly ? findSportybetFixture(schedule.index, dateStr, m.home, m.away) : null;
+    return sportyOnly
+      ? Object.assign({}, m, { sportybetAvailable: !!book, sportybet: book })
+      : Object.assign({}, m, { sportybetAvailable: true, sportybet: null });
+  });
+  if (sportyOnly) {
+    const onBook = annotated.filter((m) => m.sportybetAvailable).length;
+    console.log('[forebetVip] ' + onBook + '/' + raw.length + ' fixtures on ' + dateStr +
+      ' are offered by SportyBet (' + schedule.total + ' events over ' + schedule.dates.length + ' days)');
+  }
+
   // Detail enrichment prefilter: only fixtures that could possibly produce a
   // qualifying team-to-score call are worth a browser fetch for form/H2H. The
   // same expected-goals derivation runs here and in the scorer below.
@@ -1155,6 +1176,12 @@ async function scrapeDay(dateStr) {
     return props.some((p) => (Number(p.prob) / 100) >= TTS_MIN_PROB);
   };
 
+  // Unavailable fixtures cannot be published, so they never justify a browser
+  // fetch. Available ones are still enriched whether or not they look like a
+  // team-to-score candidate, because the record-cert path needs those
+  // form/H2H pages too.
+  const worthDetail = (match) => !sportyOnly || match.sportybetAvailable;
+
   let enriched;
   if (ENRICH_DETAIL) {
     // Detail pages carry the form/H2H records BOTH markets need. Priority:
@@ -1162,13 +1189,14 @@ async function scrapeDay(dateStr) {
     // main VIP gate); every other fixture still gets a detail fetch for the
     // record-cert path until the wall-clock budget stops new work. Skipping
     // non-TTS fixtures outright starved the cert path of records entirely.
-    const prio = new Map(raw.map((m) => [m, shouldEnrich(m) ? 0 : 1]));
-    const ordered = raw.slice().sort((a, b) => prio.get(a) - prio.get(b));
-    enriched = await enrichAll(ordered, null);
+    // Unavailable fixtures sort last and are never fetched.
+    const prio = new Map(annotated.map((m) => [m, !worthDetail(m) ? 2 : shouldEnrich(m) ? 0 : 1]));
+    const ordered = annotated.slice().sort((a, b) => prio.get(a) - prio.get(b));
+    enriched = await enrichAll(ordered, worthDetail);
     const enrichedCount = enriched.filter((m) => m.detail).length;
     console.log('[forebetVip] Parsed ' + raw.length + ' fixtures for ' + dateStr + '; enriched ' + enrichedCount + '/' + raw.length + ' detail pages for form/H2H (TTS candidates prioritised)...');
   } else {
-    enriched = raw.map((m) => Object.assign({}, m, { detail: null, detailSkipped: true }));
+    enriched = annotated.map((m) => Object.assign({}, m, { detail: null, detailSkipped: true }));
     console.log('[forebetVip] Parsed ' + raw.length + ' fixtures for ' + dateStr + ' (list-only scoring; form/H2H must-score gate runs at a higher probability floor).');
   }
 
@@ -1184,9 +1212,14 @@ async function scrapeDay(dateStr) {
     const h2h = m.detail && m.detail.h2h ? m.detail.h2h : null;
     // One tip per fixture: a form/H2H record cert takes the row as a
     // match-winner pick; only fixtures without a cert fall through to the
-    // team-to-score market.
-    const cert = selectMatchWinnerCert({ home: m.home, away: m.away, probs: m.probs, form, h2h });
-    const tip = cert || selectTeamScoreTip({ home: m.home, away: m.away, teamScoreProps, form, h2h });
+    // team-to-score market. A fixture the bookmaker does not list gets no tip
+    // at all - the highest-scoring-half call is still computed, since that
+    // market is free and needs only list-page data.
+    const publishable = worthDetail(m);
+    const cert = publishable ? selectMatchWinnerCert({ home: m.home, away: m.away, probs: m.probs, form, h2h }) : null;
+    const tip = publishable
+      ? (cert || selectTeamScoreTip({ home: m.home, away: m.away, teamScoreProps, form, h2h }))
+      : null;
 
     const hsh = computeHighestScoringHalf(htMap[m.matchId], expGoals, m.avgGoals);
 
@@ -1212,7 +1245,9 @@ async function scrapeDay(dateStr) {
       hsh,
       preview: m.detail && m.detail.previewText ? m.detail.previewText : null,
       form: form ? { home: form.homeForm, away: form.awayForm } : null,
-      h2h: h2h
+      h2h: h2h,
+      sportybetAvailable: !!m.sportybetAvailable,
+      sportybetLeague: m.sportybet ? m.sportybet.league : null
     }));
   }
   return out;
@@ -1223,6 +1258,16 @@ async function scrapeVip(dates) {
   const result = {};
   _deadline = Date.now() + SCRAPE_BUDGET_MS;
   try {
+    // One schedule fetch for the whole run, not one per date. Fails open: if
+    // SportyBet is unreachable we keep the pre-gate behaviour rather than
+    // publishing an empty day.
+    let schedule = null;
+    try {
+      schedule = await loadSportybetSchedule();
+      console.log('[forebetVip] SportyBet schedule loaded: ' + schedule.total + ' events for ' + schedule.dates.join(', '));
+    } catch (e) {
+      console.warn('[forebetVip] SportyBet schedule unavailable (' + e.message + '); publishing without the availability gate');
+    }
     for (const date of list) {
       if (budgetExceeded()) {
         console.warn('[forebetVip] Skipping ' + date + ' - scrape budget of ' + Math.round(SCRAPE_BUDGET_MS / 1000) + 's exceeded');
@@ -1230,7 +1275,7 @@ async function scrapeVip(dates) {
         continue;
       }
       try {
-        result[date] = await scrapeDay(date);
+        result[date] = await scrapeDay(date, { schedule: schedule });
       } catch (err) {
         console.error('[forebetVip] Failed to scrape ' + date + ': ' + err.message);
         result[date] = [];

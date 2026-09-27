@@ -324,6 +324,12 @@ const EXTRA_TABS = [
   { id: 'author-picks', href: '/author-picks.html', label: 'H2H Picks' }
 ];
 
+// In-Play is a standalone page (public/predictions/in-play.html), not a
+// generated category, so it cannot live in CATEGORIES. It joins the market tabs
+// right after Cards, matching the hand-written menus on index/best-picks/
+// author-picks/vip. Never marked active: no generated category IS in-play.
+const INPLAY_TAB = { id: 'in-play', href: '/predictions/in-play', label: 'In-Play' };
+
 function generateCategoryPage(slug, catConfig, ctx) {
   const BOOKMAKER_CTA_BODY = renderBookmakerCTABody();
   const allSlugs = Object.keys(CATEGORIES);
@@ -332,6 +338,8 @@ function generateCategoryPage(slug, catConfig, ctx) {
     const active = s === slug ? ' active' : '';
     return `<a href="/predictions/${s}" id="tab-${s}" class="tab-btn${active}">${escapeHtml(c.label)}</a>`;
   });
+  baseTabs.splice(allSlugs.indexOf('cards') + 1, 0,
+    `<a href="${INPLAY_TAB.href}" id="tab-${INPLAY_TAB.id}" class="tab-btn">${escapeHtml(INPLAY_TAB.label)}</a>`);
   const extraTabsHtml = EXTRA_TABS.map(t =>
     `<a href="${t.href}" id="tab-${t.id}" class="tab-btn">${escapeHtml(t.label)}</a>`
   );
