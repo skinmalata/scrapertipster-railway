@@ -52,7 +52,7 @@
     else if(category==='BTTS YES'||category==='BTTS NO'){marketNames=['both teams score','both teams to score'];acceptableValues=[category==='BTTS YES'?'yes':'no']}
     else return null;
     var bookmakers=Array.isArray(fixture.bookmakers)?fixture.bookmakers:[];
-    for(var b=0;b<bookmakers.length;b++){var bets=Array.isArray(bookmakers[b].bets)?bookmakers[b].bets:[];for(var bt=0;bt<bets.length;bt++){if(!marketNames.includes(String(bets[bt].name||'').toLowerCase()))continue;var vals=Array.isArray(bets[bt].values)?bets[bt].values:[];for(var vi=0;vi<vals.length;vi++){if(acceptableValues.some(function(a){return normaliseTeam(vals[vi].value)===normaliseTeam(a)})){var odds=Number.parseFloat(vals[vi].odd);if(Number.isFinite(odds)&&odds>1)return{odds:Number(odds.toFixed(2)),bookmaker:bookmakers[b].name||'API-Football'}}}}}
+    for(var b=0;b<bookmakers.length;b++){var bets=Array.isArray(bookmakers[b].bets)?bookmakers[b].bets:[];for(var bt=0;bt<bets.length;bt++){if(!marketNames.includes(String(bets[bt].name||'').toLowerCase()))continue;var vals=Array.isArray(bets[bt].values)?bets[bt].values:[];for(var vi=0;vi<vals.length;vi++){if(acceptableValues.some(function(a){return normaliseTeam(vals[vi].value)===normaliseTeam(a)})){var odds=Number.parseFloat(vals[vi].odd);if(Number.isFinite(odds)&&odds>1)return{odds:Number(odds.toFixed(2)),bookmaker:bookmakers[b].name||'Bookmaker'}}}}}
     return null;
   }
 
@@ -185,7 +185,7 @@
           var key=matchIdentity(match)+'|'+normaliseTeam(m.tip)+'|'+m.date;
           if(seen.has(key))return;
           seen.add(key);
-          picks.push({match:match,tip:m.tip,odds:odds,prob:prob,date:m.date,time:m.time||'',league:m.league||'',category:cat,oddsSource:liveOdd?'API-Football':'Estimated'});
+          picks.push({match:match,tip:m.tip,odds:odds,prob:prob,date:m.date,time:m.time||'',league:m.league||'',category:cat,oddsSource:liveOdd?'Bookmaker':'Estimated'});
         });
       });
       var todayMatches=(dataDate===today);

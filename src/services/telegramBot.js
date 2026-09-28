@@ -1,7 +1,9 @@
 const https = require('https');
 
 const TELEGRAM_API = 'https://api.telegram.org';
-const POST_INTERVAL_MS = 90 * 1000;
+// Aligned to the 5 min in-play scrape cadence: there is no point re-checking
+// for new tips faster than the source data is refreshed.
+const POST_INTERVAL_MS = 5 * 60 * 1000;
 const MAX_MESSAGE_LENGTH = 4000;
 
 let sentKeys = new Map();
@@ -130,12 +132,20 @@ function startTelegramBot(getLiveTips, botToken, chatId) {
     console.log('[telegram] Bot not configured (missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID)');
     return;
   }
-  console.log('[telegram] Starting alert loop (every 90s) for chat', chatId);
+  console.log('[telegram] Starting alert loop (every ' + Math.round(POST_INTERVAL_MS / 1000) + 's) for chat', chatId);
+  let lastTipCount = -1;
   setInterval(async function() {
     try {
       var tips = getLiveTips();
-      console.log('[telegram] Polling: ' + (tips ? tips.length : 0) + ' live tips available');
-      if (tips && tips.length) {
+      var count = tips ? tips.length : 0;
+      // Only log when the available tip count actually changes. The old code
+      // logged on every 90s cycle, which buried real signal in noise (and kept
+      // the process busy for a poll that almost always returned nothing).
+      if (count !== lastTipCount) {
+        lastTipCount = count;
+        console.log('[telegram] Live tips available: ' + count);
+      }
+      if (count) {
         await postNewTips(tips, botToken, chatId);
       }
     } catch (e) {

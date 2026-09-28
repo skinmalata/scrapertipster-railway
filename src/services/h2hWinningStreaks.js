@@ -14,6 +14,13 @@ const MARKET_STREAK_MINIMUM = 6;
 let streakCache = null;
 let streakCacheTime = null;
 let streakCacheDate = null;
+// h2hstats.net answers 403 for datacenter IPs (Render, GitHub Actions). That
+// block is stable for a given host, not transient, so a single 403 is remembered
+// and the doomed request is skipped until the block is re-probed. This removes a
+// guaranteed-to-fail outbound call from the two-odds request path.
+let blockedUntil = 0;
+let blockedLogged = false;
+const BLOCK_RETRY_MS = 12 * 60 * 60 * 1000;
 
 function todayDateStr() {
   var parts = new Intl.DateTimeFormat('en-CA', {
@@ -198,9 +205,24 @@ async function fetchTodayStreaks() {
   var today = todayDateStr();
   if (streakCache && streakCacheTime && streakCacheDate === today && (Date.now() - streakCacheTime) < STREAK_CACHE_TTL) return streakCache;
 
+  var isBlocked = Date.now() < blockedUntil;
+  if (isBlocked) {
+    if (streakCache) return streakCache;
+    var cachedWhileBlocked = loadUnbeatenCacheForToday();
+    if (cachedWhileBlocked.length) {
+      streakCache = cachedWhileBlocked;
+      streakCacheTime = Date.now();
+      streakCacheDate = today;
+      return streakCache;
+    }
+  }
+
   try {
     var params = { show_finished: 0, date: today, category: 'overview', filter: '', gmt: '0', sport: '1' };
     var res = await axios.get(API_URL, { params: params, timeout: 15000 });
+    // A successful call clears any remembered block.
+    blockedUntil = 0;
+    blockedLogged = false;
     streakCache = parseAllStreaks(res.data);
     streakCacheTime = Date.now();
     streakCacheDate = today;
@@ -211,7 +233,16 @@ async function fetchTodayStreaks() {
     console.log('[h2h-streaks] Fetched', streakCache.length, 'qualified candidate matches (' + counts.all + ' streaks; 8+ results, 6+ markets; wins:' + counts.win + ' ht-o1.5:' + counts['ht-over-1.5'] + ' ht-o0.5:' + counts['ht-over-0.5'] + ' ht-draw:' + counts['ht-draw'] + ')');
     return streakCache;
   } catch (err) {
-    console.warn('[h2h-streaks] Fetch failed:', err.message);
+    var isForbidden = (err.response && err.response.status === 403) || /403/.test(err.message || '');
+    if (isForbidden) {
+      blockedUntil = Date.now() + BLOCK_RETRY_MS;
+      if (!blockedLogged) {
+        blockedLogged = true;
+        console.warn('[h2h-streaks] Upstream returned 403 for this host — skipping direct fetches for ' + Math.round(BLOCK_RETRY_MS / 3600000) + 'h and using the local h2h-unbeaten-cache.json');
+      }
+    } else {
+      console.warn('[h2h-streaks] Fetch failed:', err.message);
+    }
     if (streakCache) return streakCache;
     var fromCache = loadUnbeatenCacheForToday();
     if (fromCache.length) {

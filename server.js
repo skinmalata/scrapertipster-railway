@@ -93,7 +93,73 @@ setInterval(() => {
 
   const memMB = Math.round(process.memoryUsage().heapUsed / 1024 / 1024);
   console.log('[memory] Heap:', memMB + 'MB | visits:', visitorData.visits.length, '| dailyStats:', Object.keys(visitorData.dailyStats).length);
+  logTrafficSummary();
 }, 10 * 60 * 1000);
+
+// ---------------------------------------------------------------------------
+// Traffic telemetry.
+//
+// Render free instances stay awake only while inbound requests keep arriving,
+// so the only way to find what is consuming service hours is to log the
+// request rate and the endpoints responsible. This is deliberately aggregated
+// on a 10 minute cadence: logging every request costs measurable CPU and would
+// distort the very numbers it is trying to capture.
+// ---------------------------------------------------------------------------
+const trafficStats = {
+  windowStartedAt: Date.now(),
+  windowRequests: 0,
+  byRoute: new Map(),
+  byStatusClass: new Map()
+};
+
+// Coarse route labels: collapse ids and query noise so a few hot endpoints do
+// not fragment into hundreds of keys.
+function routeLabel(req) {
+  const raw = (req.path || '/').replace(/\/+$/, '') || '/';
+  return raw
+    .split('/')
+    .map(function (segment) {
+      if (!segment) return '';
+      if (/^\d{4}-\d{2}-\d{2}$/.test(segment)) return ':date';
+      if (/^\d+$/.test(segment)) return ':id';
+      if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(segment)) return ':uuid';
+      return segment;
+    })
+    .join('/') || '/';
+}
+
+function trackTraffic(req, res) {
+  trafficStats.windowRequests += 1;
+  const route = routeLabel(req);
+  trafficStats.byRoute.set(route, (trafficStats.byRoute.get(route) || 0) + 1);
+  // Record the status on finish so failed upstream calls are visible too.
+  res.on('finish', function () {
+    const bucket = res.statusCode >= 500 ? '5xx' : res.statusCode >= 400 ? '4xx' : '2xx-3xx';
+    trafficStats.byStatusClass.set(bucket, (trafficStats.byStatusClass.get(bucket) || 0) + 1);
+  });
+}
+
+function logTrafficSummary() {
+  const now = Date.now();
+  const elapsedMin = Math.max(1, Math.round((now - trafficStats.windowStartedAt) / 60000));
+  const top = Array.from(trafficStats.byRoute.entries())
+    .sort(function (a, b) { return b[1] - a[1]; })
+    .slice(0, 8)
+    .map(function (entry) { return entry[0] + '=' + entry[1]; })
+    .join(' ');
+  const statuses = Array.from(trafficStats.byStatusClass.entries())
+    .map(function (entry) { return entry[0] + '=' + entry[1]; })
+    .join(' ') || 'none';
+
+  console.log('[traffic] ' + trafficStats.windowRequests + ' req in ' + elapsedMin + 'min (' +
+    (trafficStats.windowRequests / elapsedMin).toFixed(1) + '/min) | up=' +
+    Math.round(process.uptime() / 60) + 'min | status ' + statuses + ' | top: ' + (top || 'none'));
+
+  trafficStats.windowStartedAt = now;
+  trafficStats.windowRequests = 0;
+  trafficStats.byRoute = new Map();
+  trafficStats.byStatusClass = new Map();
+}
 
 function trackVisit(req, res, next) {
   const today = new Date().toISOString().split('T')[0];
@@ -190,6 +256,10 @@ app.use((req, res, next) => {
 app.use(cors({
   origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['https://winfulltime.com', 'https://www.winfulltime.com']
 }));
+// Placed before the rate limiters so throttled and rejected requests are still
+// counted: those inbound hits are exactly what keeps a Render free instance
+// awake, so they must appear in the traffic summary.
+app.use(trackTraffic);
 app.use((req, res, next) => {
   res.setHeader('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: https://www.googletagmanager.com https://www.google-analytics.com https://unpkg.com https://app.lemonsqueezy.com https://js.whop.com; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https: https://i.ytimg.com https://yt3.ggpht.com; connect-src 'self' https: http://localhost http://127.0.0.1 ws://localhost ws://127.0.0.1 https://www.google-analytics.com https://www.googletagmanager.com https://xogkqpjtxfemcxzsuwke.supabase.co https://api.lemonsqueezy.com https://api.whop.com https://js.whop.com; frame-src https://www.youtube.com https://youtube.com https://app.lemonsqueezy.com;");
   next();

@@ -10,7 +10,7 @@ function getGeneratePostThumbnail() {
   }
   return generatePostThumbnail;
 }
-const { asNumber, buildOpportunities } = require('../services/liveTips');
+const { asNumber } = require('../services/liveTips');
 const { getCachedLive } = require('../services/scrapeLive');
 const { getSettledTodayTips, getSettledTipsForDate } = require('../services/liveTipHistory');
 const { buildTwoOddsOfDay, watDate } = require('../services/twoOddsOfDay');
@@ -50,32 +50,10 @@ async function providerForPaymentId(paymentId) {
   return activePayment();
 }
 
-// API-Football responses are cached so one busy page does not consume the
-// provider quota for every visitor. The API key is deliberately kept here,
-// never sent to the browser.
-const footballOddsCache = new Map();
-const FOOTBALL_ODDS_CACHE_MS = 10 * 60 * 1000;
-const MAX_FOOTBALL_ODDS_CACHE = 30;
-// When the API-Football subscription is suspended or intentionally disabled,
-// the whole API-Football feature set (odds, live tips, verified prices) is
-// bypassed so the site keeps working on model estimates. Set this env var to
-// "false" to turn it off, or re-enable by setting it to "true" again.
-const API_FOOTBALL_ENABLED = process.env.API_FOOTBALL_ENABLED !== 'false';
-function apiFootballAvailable() {
-  return API_FOOTBALL_ENABLED && Boolean(process.env.API_FOOTBALL_KEY);
-}
-let liveTipsCache = null;
-// API-Football's free plan allows 100 requests/day. Live analysis is capped
-// well below that, leaving a reserve for the rest of the site.
-const LIVE_TIPS_CACHE_MS = 15 * 60 * 1000;
-const LIVE_TIPS_DAILY_BUDGET = 60;
-const API_REQUEST_RESERVE = 20;
-const MAX_LIVE_TIP_CANDIDATES = 3;
-let liveTipsBudget = { day: '', used: 0, remaining: null };
-const headToHeadCache = new Map();
-const HEAD_TO_HEAD_CACHE_MS = 12 * 60 * 60 * 1000;
-const fixtureResultsCache = new Map();
-const FIXTURE_RESULTS_CACHE_MS = 24 * 60 * 60 * 1000;
+// API-Football was fully removed: the upstream subscription is suspended, so every
+// call failed and the request path was pure overhead. All pricing now comes from
+// resident model estimates (estimatedOdds), which is what buildTwoOddsOfDay and
+// buildTicket already fall back to when no verified bookmaker line is supplied.
 let scraperService = null;
 let cornersLastScrape = null;
 const SCRAPE_INTERVAL_MS = 2 * 60 * 60 * 1000;
@@ -195,60 +173,7 @@ async function isAuthenticatedVip(req) {
   return result.isVip === true;
 }
 
-async function fetchPreMatchOdds(date) {
-  const apiKey = process.env.API_FOOTBALL_KEY;
-  if (!apiFootballAvailable()) return [];
-  const cached = footballOddsCache.get(date);
-  if (cached && Date.now() - cached.createdAt < FOOTBALL_ODDS_CACHE_MS) return cached.payload.response || [];
-  try {
-    const upstream = await fetch('https://v3.football.api-sports.io/odds?date=' + encodeURIComponent(date) + '&timezone=Africa%2FLagos', {
-      headers: { 'x-apisports-key': apiKey, accept: 'application/json' },
-      signal: AbortSignal.timeout(25000)
-    });
-    const data = await upstream.json();
-    if (!upstream.ok || (data.errors && Object.keys(data.errors).length)) {
-      console.warn('[two-odds] Pre-match odds unavailable:', upstream.status, data.errors || data.message || 'Unknown error');
-      return [];
-    }
-    const payload = { available: true, source: 'API-Football', date: date, fetchedAt: new Date().toISOString(), response: Array.isArray(data.response) ? data.response : [] };
-    footballOddsCache.set(date, { createdAt: Date.now(), payload });
-    if (footballOddsCache.size > MAX_FOOTBALL_ODDS_CACHE) {
-      var oldestKey = footballOddsCache.keys().next().value;
-      footballOddsCache.delete(oldestKey);
-    }
-    return payload.response;
-  } catch (error) {
-    console.warn('[two-odds] Pre-match odds fetch failed:', error.message);
-    return [];
-  }
-}
 
-async function fetchFixtureResults(date) {
-  if (!apiFootballAvailable()) return [];
-  const cached = fixtureResultsCache.get(date);
-  if (cached && Date.now() - cached.createdAt < FIXTURE_RESULTS_CACHE_MS) return cached.data;
-  try {
-    const upstream = await fetch('https://v3.football.api-sports.io/fixtures?date=' + encodeURIComponent(date) + '&timezone=Africa%2FLagos', {
-      headers: { 'x-apisports-key': apiKey, accept: 'application/json' },
-      signal: AbortSignal.timeout(25000)
-    });
-    const data = await upstream.json();
-    if (!upstream.ok || (data.errors && Object.keys(data.errors).length)) return [];
-    const finished = (data.response || []).filter(function(f) {
-      return f.fixture && f.fixture.status && f.fixture.status.short === 'FT';
-    }).map(function(f) {
-      return {
-        key: (f.teams.home.name || '') + ' - ' + (f.teams.away.name || ''),
-        score: { home: Number(f.goals.home), away: Number(f.goals.away) }
-      };
-    });
-    fixtureResultsCache.set(date, { createdAt: Date.now(), data: finished });
-    return finished;
-  } catch (error) {
-    console.warn('[two-odds-history] Fixture results fetch failed for', date, error.message);
-    return [];
-  }
-}
 
 function findLegResult(predMatch, fixtureResults) {
   const predTeams = splitMatch(predMatch);
@@ -950,27 +875,20 @@ router.get('/highest-scoring-half', function (req, res) {
   }
 });
 
-router.get('/football-odds', async (req, res) => {
-  const requestedDate = typeof req.query.date === 'string' ? req.query.date : new Date().toISOString().slice(0, 10);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(requestedDate)) {
-    return res.status(400).json({ available: false, message: 'date must use YYYY-MM-DD', response: [] });
-  }
-
-  const apiKey = process.env.API_FOOTBALL_KEY;
-  if (!apiKey) {
-    return res.json({
-      available: false,
-      source: 'API-Football',
-      message: 'API_FOOTBALL_KEY is not configured',
-      response: []
-    });
-  }
-
-  const cached = footballOddsCache.get(requestedDate);
-  const response = await fetchPreMatchOdds(requestedDate);
-  if (!response.length && !cached) return res.json({ available: false, source: 'API-Football', date: requestedDate, message: 'Pre-match odds are temporarily unavailable. The ticket builder will use model estimates instead.', response: [] });
-  const payload = footballOddsCache.get(requestedDate).payload;
-  res.json({ ...payload, cached: Boolean(cached) });
+// API-Football was removed. The ticket builder and the 1X2 widget fall back to
+// model estimates when this reports available:false, so this stays a stable
+// endpoint rather than a 404.
+router.get('/football-odds', function(req, res) {
+  const requestedDate = typeof req.query.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(req.query.date)
+    ? req.query.date
+    : new Date().toISOString().slice(0, 10);
+  res.json({
+    available: false,
+    source: 'Model estimate',
+    date: requestedDate,
+    message: 'Verified bookmaker prices are no longer available. The ticket builder will use model estimates instead.',
+    response: []
+  });
 });
 
 // Live 1X2 odds comparison for the analysis pages, backed by The Odds API.
@@ -996,25 +914,41 @@ router.get('/odds/comparison', async (req, res) => {
 // the same data and risk rules; only the membership presentation is disabled.
 let twoOddsCache = null;
 const TWO_ODDS_CACHE_MS = 10 * 60 * 1000;
+// Fix 1.1: the stale-prediction branch used to fire an un-deduplicated
+// fetchPredictions() on every single request. Under concurrency that started
+// several heavy scrapes at once on a small heap (memoryGuard names
+// fetchPredictions as a spike source). One in-flight refresh + a cooldown.
+let twoOddsRefreshPending = null;
+let twoOddsRefreshLastAttempt = 0;
+const TWO_ODDS_REFRESH_COOLDOWN_MS = 30 * 60 * 1000;
+function triggerTwoOddsBackgroundRefresh() {
+  const now = Date.now();
+  if (twoOddsRefreshPending) return twoOddsRefreshPending;
+  if (now - twoOddsRefreshLastAttempt < TWO_ODDS_REFRESH_COOLDOWN_MS) return null;
+  twoOddsRefreshLastAttempt = now;
+  console.log('[two-odds] Pre-match data is stale, scheduling single background refresh...');
+  twoOddsRefreshPending = getScraperService().fetchPredictions()
+    .then(function() { twoOddsCache = null; })
+    .catch(function(e) { console.error('[two-odds] Background refresh failed:', e.message); })
+    .finally(function() { twoOddsRefreshPending = null; });
+  return twoOddsRefreshPending;
+}
 
 router.get('/two-odds/today', async function(req, res) {
   try {
     const date = typeof req.query.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(req.query.date) ? req.query.date : watDate();
-    if (twoOddsCache && twoOddsCache.date === date && Date.now() - twoOddsCache.createdAt < TWO_ODDS_CACHE_MS && twoOddsCache.payload && twoOddsCache.payload.available) {
+    if (twoOddsCache && twoOddsCache.date === date && Date.now() - twoOddsCache.createdAt < TWO_ODDS_CACHE_MS) {
       return res.json({ ...twoOddsCache.payload, cached: true });
     }
     const predictions = vipPredictionData();
     if (predictions && predictions.isStale) {
-      console.log('[two-odds] Pre-match data is stale, triggering background refresh...');
-      setImmediate(async () => {
-        try {
-          await getScraperService().fetchPredictions();
-          twoOddsCache = null;
-        } catch (e) { console.error('[two-odds] Background refresh failed:', e.message); }
-      });
+      triggerTwoOddsBackgroundRefresh();
     }
-    const [oddsResponse, h2hMatches] = await Promise.all([fetchPreMatchOdds(date), fetchTodayStreaks()]);
-    const payload = buildTwoOddsOfDay(predictions, { date: date, oddsResponse: oddsResponse, h2hMatches: h2hMatches });
+    // API-Football was removed. buildTwoOddsOfDay prices legs from the resident
+    // model (estimatedOdds) when no verified bookmaker line is supplied, which is
+    // the same fallback the ticket builder already uses.
+    const h2hMatches = await fetchTodayStreaks();
+    const payload = buildTwoOddsOfDay(predictions, { date: date, oddsResponse: null, h2hMatches: h2hMatches });
     if (payload && payload.available) {
       twoOddsCache = { date, createdAt: Date.now(), payload };
       const entry = { date: date, available: true, ticket: payload.ticket, generatedAt: payload.generatedAt, savedAt: new Date().toISOString() };
@@ -1028,7 +962,10 @@ router.get('/two-odds/today', async function(req, res) {
       } catch (e) { console.warn('[two-odds] Failed to save to history disk:', e.message); }
       saveTwoOddsHistorySupabase(date, entry);
     } else {
-      twoOddsCache = null;
+      // Fix 1.3: this used to be twoOddsCache = null, so a failed build was never
+      // cached and every request rebuilt from scratch. Cache the unavailable
+      // result for the normal TTL instead.
+      twoOddsCache = { date, createdAt: Date.now(), payload: payload || { available: false, ticket: null } };
     }
     res.json({ ...payload, isVip: false, freeAccess: true, feature: '2 Odds of the Day' });
   } catch (error) {
@@ -1037,144 +974,18 @@ router.get('/two-odds/today', async function(req, res) {
   }
 });
 
-let liveTipsPending = null;
 
-router.get('/live-tips', async (req, res) => {
-  if (!apiFootballAvailable()) {
-    return res.json({ available: false, opportunities: [], budgetLimited: false, message: 'Live data is not configured yet.' });
-  }
-
-  if (liveTipsCache && Date.now() - liveTipsCache.createdAt < LIVE_TIPS_CACHE_MS) {
-    return res.json({ ...liveTipsCache.payload, cached: true });
-  }
-
-  if (liveTipsPending) return liveTipsPending.then(function(payload) { res.json(payload); }).catch(function() { res.json({ available: false, opportunities: [], message: 'Live data is temporarily unavailable.' }); });
-
-  liveTipsPending = (async function() {
-    const API_TIMEOUT_MS = 25000;
-    const request = async function(endpoint, retries) {
-      retries = retries || 1;
-      const today = new Date().toISOString().slice(0, 10);
-      if (liveTipsBudget.day !== today) liveTipsBudget = { day: today, used: 0, remaining: null };
-      if (liveTipsBudget.remaining !== null && liveTipsBudget.remaining <= API_REQUEST_RESERVE) {
-        const quotaError = new Error('The daily API quota is nearly exhausted. Tips will resume after the reset.');
-        quotaError.code = 'LIVE_TIPS_BUDGET_REACHED';
-        throw quotaError;
-      }
-      if (liveTipsBudget.used >= LIVE_TIPS_DAILY_BUDGET) {
-        const quotaError = new Error('The daily live-data budget has been reached. Please check again after the reset.');
-        quotaError.code = 'LIVE_TIPS_BUDGET_REACHED';
-        throw quotaError;
-      }
-      liveTipsBudget.used++;
-      try {
-        const response = await fetch('https://v3.football.api-sports.io/' + endpoint, {
-          headers: { 'x-apisports-key': process.env.API_FOOTBALL_KEY, accept: 'application/json' },
-          signal: AbortSignal.timeout(API_TIMEOUT_MS)
-        });
-        const remaining = Number(response.headers.get('x-ratelimit-requests-remaining'));
-        if (Number.isFinite(remaining)) liveTipsBudget.remaining = remaining;
-        const data = await response.json();
-        if (!response.ok || (data.errors && Object.keys(data.errors).length)) throw new Error(data.message || 'API returned status ' + response.status);
-        return Array.isArray(data.response) ? data.response : [];
-      } catch (fetchErr) {
-        if (retries > 1) throw fetchErr;
-        console.warn('[live-tips] Retrying endpoint', endpoint, 'after error:', fetchErr.message);
-        liveTipsBudget.used--;
-        return request(endpoint, retries + 1);
-      }
-    };
-
-    const fixtures = await request('fixtures?live=all');
-    const candidates = fixtures.filter(function(fixture) {
-      const minute = Number(fixture.fixture?.status?.elapsed || 0);
-      // At minute 75, exactly 15 minutes remain; after that, exclude it.
-      return minute >= 51 && minute <= 75;
-    }).sort(function(a, b) {
-      const scoreA = asNumber(a.goals?.home) + asNumber(a.goals?.away);
-      const scoreB = asNumber(b.goals?.home) + asNumber(b.goals?.away);
-      if (scoreA !== scoreB) return scoreA - scoreB;
-      return Number(b.fixture?.status?.elapsed || 0) - Number(a.fixture?.status?.elapsed || 0);
-    }).slice(0, MAX_LIVE_TIP_CANDIDATES);
-    // Do not spend additional quota when there are no matches in the time
-    // window that this feature can evaluate.
-    if (!candidates.length) {
-      const payload = {
-        available: true,
-        fetchedAt: new Date().toISOString(),
-        refreshSeconds: LIVE_TIPS_CACHE_MS / 1000,
-        liveMatches: fixtures.length,
-        analyzedMatches: 0,
-        opportunities: []
-      };
-      liveTipsCache = { createdAt: Date.now(), payload };
-      return payload;
-    }
-    // Reserve the rest of a full refresh before fetching odds. This avoids
-    // spending part of the daily allowance and then failing halfway through
-    // the statistics/H2H calls needed to evaluate the shortlist.
-    const additionalCalls = 1 + candidates.length * 2;
-    if (liveTipsBudget.used + additionalCalls > LIVE_TIPS_DAILY_BUDGET) {
-      const quotaError = new Error('The daily live-data budget has been reached. Please check again after the reset.');
-      quotaError.code = 'LIVE_TIPS_BUDGET_REACHED';
-      throw quotaError;
-    }
-    const odds = await request('odds/live');
-    const oddsByFixture = new Map(odds.map(function(entry) { return [entry.fixture?.id, entry]; }));
-    const statistics = await Promise.all(candidates.map(async function(fixture) {
-      try {
-        const data = await request('fixtures/statistics?fixture=' + encodeURIComponent(fixture.fixture.id));
-        return [fixture.fixture.id, data];
-      } catch (error) {
-        return [fixture.fixture.id, []];
-      }
-    }));
-    const statisticsByFixture = new Map(statistics);
-    const headToHead = await Promise.all(candidates.map(async function(fixture) {
-      const homeId = fixture.teams?.home?.id;
-      const awayId = fixture.teams?.away?.id;
-      const cacheKey = [homeId, awayId].sort().join('-');
-      const cached = headToHeadCache.get(cacheKey);
-      if (cached && Date.now() - cached.createdAt < HEAD_TO_HEAD_CACHE_MS) return [fixture.fixture.id, cached.data];
-      try {
-        const data = await request('fixtures/headtohead?h2h=' + encodeURIComponent(homeId + '-' + awayId) + '&last=10');
-        if (headToHeadCache.size >= 200) {
-          const oldest = headToHeadCache.keys().next().value;
-          headToHeadCache.delete(oldest);
-        }
-        headToHeadCache.set(cacheKey, { createdAt: Date.now(), data });
-        return [fixture.fixture.id, data];
-      } catch (error) {
-        return [fixture.fixture.id, []];
-      }
-    }));
-    const headToHeadByFixture = new Map(headToHead);
-    const payload = {
-      available: true,
-      fetchedAt: new Date().toISOString(),
-      refreshSeconds: LIVE_TIPS_CACHE_MS / 1000,
-      liveMatches: fixtures.length,
-      analyzedMatches: candidates.length,
-      opportunities: buildOpportunities(fixtures, oddsByFixture, statisticsByFixture, headToHeadByFixture)
-    };
-    console.log('[live-tips] budget=' + liveTipsBudget.used + '/' + LIVE_TIPS_DAILY_BUDGET + ' remaining=' + liveTipsBudget.remaining + ' live=' + fixtures.length + ' candidates=' + candidates.length + ' opportunities=' + payload.opportunities.length);
-    liveTipsCache = { createdAt: Date.now(), payload };
-    return payload;
-  })();
-
-  try {
-    const payload = await liveTipsPending;
-    res.json(payload);
-  } catch (error) {
-    if (error.code === 'LIVE_TIPS_BUDGET_REACHED') {
-      return res.json({ available: false, opportunities: [], budgetLimited: true, refreshSeconds: LIVE_TIPS_CACHE_MS / 1000, message: error.message });
-    }
-    console.warn('Live tips request error:', error.message);
-    res.json({ available: false, opportunities: [], message: 'Live data is temporarily unavailable. Please try again shortly.' });
-  } finally {
-    liveTipsPending = null;
-  }
-});
+  // API-Football was removed (subscription suspended upstream). Live tips now
+  // come from the resident FotMob engine served by /golden-tips and /live-matches.
+  router.get('/live-tips', function(req, res) {
+    res.json({
+      available: false,
+      opportunities: [],
+      budgetLimited: false,
+      message: 'Live tips are served from the in-play engine.',
+      redirect: '/api/golden-tips'
+    });
+  });
 
 const TWO_ODDS_HISTORY_DAYS = 4;
 let twoOddsHistoryCache = null;
@@ -1797,7 +1608,7 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
 
     var date = watDate();
     var predictions = vipPredictionData();
-    var oddsResponse = await fetchPreMatchOdds(date);
+    var oddsResponse = null; // API-Football removed: buildTicket falls back to model estimates.
     var h2hMatches = await fetchTodayStreaks();
 
     var availableMatches = null;

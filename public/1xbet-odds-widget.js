@@ -27,7 +27,7 @@
     return false;
   }
 
-  // Map a page tip string to the API-Football market name + acceptable values.
+  // Map a page tip string to a market name + acceptable values.
   function resolveMarket(tip) {
     var t = String(tip || '').trim().toLowerCase();
     if (!t) return null;

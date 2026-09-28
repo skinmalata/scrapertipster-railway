@@ -31,10 +31,6 @@ services:
         value: "441411"
       - key: LEMONSQUEEZY_WEBHOOK_SECRET
         sync: false
-      - key: API_FOOTBALL_KEY
-        sync: false
-      - key: API_FOOTBALL_ENABLED
-        value: "false"
       - key: THE_ODDS_API_KEY
         sync: false
       - key: PAYMENT_PROVIDER

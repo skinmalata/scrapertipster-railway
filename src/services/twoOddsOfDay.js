@@ -176,7 +176,7 @@ function applyOdds(candidates, oddsResponse) {
           if (Number.isFinite(price) && price > 1) {
             candidate.price = Number(price.toFixed(2));
             candidate.priceStatus = 'verified';
-            candidate.bookmaker = bookmaker.name || 'API-Football bookmaker';
+            candidate.bookmaker = bookmaker.name || 'Bookmaker';
             candidate.evidence.push(`Verified at ${candidate.price} (${candidate.bookmaker})`);
             return;
           }

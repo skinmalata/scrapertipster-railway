@@ -341,7 +341,7 @@
           if (Number.isFinite(price) && price > 1) {
             pick.odds = Number(price.toFixed(2));
             pick.oddsSource = 'verified';
-            pick.bookmaker = ordered[bi].name || 'API-Football';
+            pick.bookmaker = ordered[bi].name || 'Bookmaker';
             return;
           }
         }

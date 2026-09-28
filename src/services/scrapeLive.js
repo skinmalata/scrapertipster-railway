@@ -4,6 +4,12 @@ const { buildGoldenTips } = require('./goldenOpportunities');
 const { recordTips, settleTips, getPendingTipsForDate, getPendingCornerFixtureIds } = require('./liveTipHistory');
 
 const SCRAPE_INTERVAL_MS = 5 * 60 * 1000;
+// Adaptive backoff: nothing is in-play for most of the day, so the idle tiers
+// cut wasted FotMob classification work without ever relaxing below the 5 min
+// cadence required while matches are actually live.
+const IDLE_SCRAPE_INTERVAL_MS = 20 * 60 * 1000;
+const DORMANT_SCRAPE_INTERVAL_MS = 60 * 60 * 1000;
+const DORMANT_MAX_EMPTY_CYCLES = 5;
 const FOTMOB_STATS_DELAY_MS = 300;
 const MAX_FOTMOB_DETAIL_MATCHES = 60;
 const FOTMOB_DETAIL_CONCURRENCY = 4;
@@ -248,10 +254,13 @@ async function fetchFotMobLive() {
   ]);
   var res = responses[0];
   var previousRes = responses[1];
-  console.log('[fotmob-live] API responses — today:', res ? 'status=' + res.statusCode + ' hasLeagues=' + Boolean(res.data && res.data.leagues) : 'null', '| yesterday:', previousRes ? 'status=' + previousRes.statusCode + ' hasLeagues=' + Boolean(previousRes.data && previousRes.data.leagues) : 'null');
-  var validResponses = [previousRes, res].filter(function(response) {
-    return response && response.status === 200 && response.data && response.data.leagues;
-  });
+  // httpGet resolves { status, data } - there is no statusCode property, so
+  // logging res.statusCode here always printed "undefined" and hid real failures.
+  console.log('[fotmob-live] API responses — today:', res ? 'status=' + res.status + ' hasLeagues=' + Boolean(res.data && res.data.leagues) : 'null', '| yesterday:', previousRes ? 'status=' + previousRes.status + ' hasLeagues=' + Boolean(previousRes.data && previousRes.data.leagues) : 'null');
+  var isUsable = function(response) { return response && response.status === 200 && response.data && response.data.leagues; };
+  var todayResponse = isUsable(res) ? res : null;
+  var previousResponse = isUsable(previousRes) ? previousRes : null;
+  var validResponses = [previousResponse, todayResponse].filter(Boolean);
   if (!validResponses.length) {
     console.warn('[fotmob-live] No valid FotMob responses — both today and yesterday returned no data');
     return [];
@@ -263,12 +272,18 @@ async function fetchFotMobLive() {
   validResponses.forEach(function(response) { indexFotMobFixtures(response.data, fotmobFixtureIndex); });
 
   // Around midnight, FotMob can keep a match on its previous-date feed until
-  // it is finished. Include live fixtures from both feeds, then de-duplicate
-  // by fixture ID so those matches are analysed rather than silently omitted.
+  // it is finished. Classify yesterday's feed only when today's produced no
+  // live matches: in practice today's feed holds all the live games and
+  // yesterday's is a large finished pile, so this skips hundreds of needless
+  // per-fixture classifications while still covering the late-night case.
   var matches = [];
   var seenMatchIds = new Set();
-  validResponses.forEach(function(response) { appendLiveMatches(response.data, matches, seenMatchIds); });
-  console.log('[fotmob-live] Live matches after filtering:', matches.length);
+  if (todayResponse) appendLiveMatches(todayResponse.data, matches, seenMatchIds);
+  var todayLiveCount = matches.length;
+  if (!todayLiveCount && previousResponse) {
+    appendLiveMatches(previousResponse.data, matches, seenMatchIds);
+  }
+  console.log('[fotmob-live] Live matches after filtering:', matches.length, '(today feed:', todayLiveCount + ')');
   return matches;
 }
 
@@ -698,24 +713,60 @@ function getCachedLive() {
 
 const { forceRestartIfMemoryCritical } = require('./memoryGuard');
 
-function scheduleNextScrape() {
-  // Jittered delay: each cycle waits 5 min plus a random +-45s so the scrape
-  // cadence is not a fixed, easily-fingerprinted pattern.
+let lastLiveCount = 0;
+let consecutiveEmptyCycles = 0;
+let loopStarted = false;
+
+function nextScrapeDelayMs() {
+  if (lastLiveCount > 0) {
+    consecutiveEmptyCycles = 0;
+  } else {
+    consecutiveEmptyCycles += 1;
+  }
+  let base = SCRAPE_INTERVAL_MS;
+  if (lastLiveCount === 0) {
+    // Cap the dormant tier: if the feed has been empty for a long stretch we
+    // fall back to the 20 min tier so a match day that starts with an empty
+    // feed is still picked up promptly instead of waiting a full hour.
+    base = (consecutiveEmptyCycles >= 2 && consecutiveEmptyCycles <= DORMANT_MAX_EMPTY_CYCLES)
+      ? DORMANT_SCRAPE_INTERVAL_MS
+      : IDLE_SCRAPE_INTERVAL_MS;
+  }
   const jitterMs = Math.round((Math.random() * 2 - 1) * SCRAPE_JITTER_MS);
-  const delayMs = Math.max(1000, SCRAPE_INTERVAL_MS + jitterMs);
+  return Math.max(1000, base + jitterMs);
+}
+
+function runScrapeCycle() {
+  forceRestartIfMemoryCritical();
+  return scrapeLive()
+    .then(function (result) {
+      lastLiveCount = result && typeof result.matchCount === 'number' ? result.matchCount : 0;
+      return result;
+    })
+    .catch(function (e) {
+      // A failed cycle must not kill the loop; treat it as an empty cycle.
+      console.warn('[fotmob-live] Scrape cycle failed:', e.message);
+      lastLiveCount = 0;
+    });
+}
+
+function scheduleNextScrape() {
+  const delayMs = nextScrapeDelayMs();
+  console.log('[fotmob-live] Next scrape in', Math.round(delayMs / 1000) + 's', '(last cycle live matches:', lastLiveCount + ', consecutive empty cycles:', consecutiveEmptyCycles + ')');
   scrapeTimer = setTimeout(function () {
-    forceRestartIfMemoryCritical();
-    scrapeLive();
-    scheduleNextScrape();
+    scrapeTimer = null;
+    runScrapeCycle().then(scheduleNextScrape);
   }, delayMs);
 }
 
 function startLiveScrapeLoop() {
-  if (scrapeTimer) return;
-  console.log('[fotmob-live] Starting scrape loop (every 5 min with +/-' + Math.round(SCRAPE_JITTER_MS / 1000) + 's jitter)');
-  forceRestartIfMemoryCritical();
-  scrapeLive();
-  scheduleNextScrape();
+  if (loopStarted) return;
+  loopStarted = true;
+  console.log('[fotmob-live] Starting scrape loop (5 min live / 20 min idle / 60 min dormant, +/-' + Math.round(SCRAPE_JITTER_MS / 1000) + 's jitter)');
+  // Schedule only after the first cycle resolves so the initial interval is
+  // chosen from real data rather than assuming an empty feed. loopStarted (not
+  // scrapeTimer) guards re-entry because the timer does not exist yet.
+  runScrapeCycle().then(scheduleNextScrape);
 }
 
 module.exports = { scrapeLive, getCachedLive, startLiveScrapeLoop };

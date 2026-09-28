@@ -100,51 +100,52 @@ async function safeRequestWithBackoff(fn, maxRetries = 3, baseDelay = 5000) {
       return await fn();
     } catch (err) {
       const isRateLimit = err.message.includes('429') || err.message.includes('rate limit');
-      if (isRateLimit && attempt < maxRetries - 1) {
-        const delay = baseDelay * Math.pow(2, attempt);
-        console.log(`Rate limited. Retrying in ${delay/1000}s... (attempt ${attempt + 1}/${maxRetries})`);
-        await sleep(delay);
-      } else if (attempt >= maxRetries - 1) {
+      // Only a transient rate-limit failure is worth retrying. Previously any
+      // other error matched neither branch and fell through to the next
+      // iteration with no delay, so a permanent failure (such as the disabled
+      // Puppeteer path) burned every attempt instantly before throwing.
+      if (!isRateLimit || attempt >= maxRetries - 1) {
         throw err;
       }
+      const delay = baseDelay * Math.pow(2, attempt);
+      console.log(`Rate limited. Retrying in ${delay/1000}s... (attempt ${attempt + 1}/${maxRetries})`);
+      await sleep(delay);
     }
   }
 }
 
 function loadCachedPredictions() {
-  console.log('[Debug] loadCachedPredictions called');
-  console.log('[Debug] CWD:', process.cwd());
-  console.log('[Debug] Cache file:', CACHE_FILE);
-  console.log('[Debug] Cache file exists:', fs.existsSync(CACHE_FILE));
+  const refreshReasons = [];
   try {
     if (fs.existsSync(CACHE_FILE)) {
       const data = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8'));
-      console.log('[Debug] Loaded cache, matches:', data.matches?.length);
       
       if (data.matches && data.matches.length > 0) {
         const cacheDate = new Date(data.fetchTime || data.date);
         const now = new Date();
         const hoursOld = (now - cacheDate) / (1000 * 60 * 60);
         
-        console.log('[Debug] Cache age:', hoursOld.toFixed(1), 'hours');
-        
         if (data.cacheVersion !== CACHE_VERSION) {
-          console.log('[Debug] Cache version mismatch (cached: ' + data.cacheVersion + ', current: ' + CACHE_VERSION + '), marking for refresh');
+          refreshReasons.push('cache version ' + data.cacheVersion + ' != ' + CACHE_VERSION);
           data.isStale = true;
         }
         
         const MAX_CACHE_AGE_HOURS = 12;
         if (!data.isStale && hoursOld > MAX_CACHE_AGE_HOURS) {
-          console.log('[Debug] Cache is stale (>' + MAX_CACHE_AGE_HOURS + ' hours old), marking for refresh');
+          refreshReasons.push('cache is ' + hoursOld.toFixed(1) + 'h old (max ' + MAX_CACHE_AGE_HOURS + 'h)');
           data.isStale = true;
         }
 
         const todayStr = getLocalDateStr();
         if (!data.isStale && data.date && data.date !== todayStr && !(data.dates || []).includes(todayStr)) {
-          console.log('[Debug] Cache date (' + data.date + ') does not match today (' + todayStr + '), marking for refresh');
+          refreshReasons.push('cache date ' + data.date + ' is not today (' + todayStr + ')');
           data.isStale = true;
         }
         
+        if (refreshReasons.length) {
+          console.log('[predictions-cache] Marking cache stale:', refreshReasons.join('; '));
+        }
+
         return data;
       }
     }

@@ -89,6 +89,19 @@ CREATE TABLE IF NOT EXISTS public.pending_registrations (
 CREATE INDEX IF NOT EXISTS idx_pending_registrations_reg_token ON public.pending_registrations(reg_token);
 CREATE INDEX IF NOT EXISTS idx_pending_registrations_email ON public.pending_registrations(email);
 
+-- 9. Web push subscriptions.
+-- src/services/pushStore.js upserts with { onConflict: 'endpoint' }, so the
+-- endpoint column must carry a UNIQUE constraint for that conflict target to
+-- resolve. created_at is written as an ISO 8601 string by pushStore, which
+-- Postgres accepts directly as a timestamptz literal.
+CREATE TABLE IF NOT EXISTS public.push_subscriptions (
+  endpoint TEXT PRIMARY KEY,
+  p256dh TEXT NOT NULL,
+  auth TEXT NOT NULL,
+  user_agent TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- === INDEXES ===
 CREATE INDEX IF NOT EXISTS idx_profiles_email ON public.profiles(email);
 CREATE INDEX IF NOT EXISTS idx_profiles_vip_status ON public.profiles(vip_status);
