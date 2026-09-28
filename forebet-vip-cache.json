@@ -3,52 +3,176 @@
     "2026-09-27": [],
     "2026-09-28": [
       {
-        "matchId": "2557062",
-        "home": "Huracán FC (URU)",
-        "away": "Miramar Misiones",
-        "league": "Uy2",
+        "matchId": "2552266",
+        "home": "Georgia",
+        "away": "Ukraine",
+        "league": "UNL",
         "time": "",
         "probs": {
-          "home": 33,
-          "draw": 36,
-          "away": 31
+          "home": 27,
+          "draw": 39,
+          "away": 34
         },
         "predictionText": "X",
-        "avgGoals": 3,
+        "avgGoals": 2.35,
         "avgOdds": {
-          "home": 2.15,
-          "draw": 3.3,
-          "away": 3
+          "home": 2.7,
+          "draw": 3.1,
+          "away": 2.7
         },
-        "matchUrl": "huracán-fc-(uru)-miramar-misiones-2557062",
+        "matchUrl": "georgia-ukraine-2552266",
         "sportybetAvailable": true,
         "sportybet": {
-          "home": "Huracan FC",
-          "away": "Miramar Misiones",
-          "league": "Uruguay - Segunda Division",
-          "country": "Uruguay",
+          "home": "Georgia",
+          "away": "Ukraine",
+          "league": "International - UEFA Nations League",
+          "country": null,
           "womens": false,
           "homeLevel": "",
           "awayLevel": "",
-          "time": "00:00",
+          "time": "17:00",
           "odds": {
-            "1": 2.15,
-            "2": 3.1,
-            "X": 3.25
+            "1": 2.78,
+            "2": 2.83,
+            "X": 3.26
           }
         },
         "detail": {
           "books": [],
           "previewText": "",
           "form": {
-            "homeForm": "DLWWDW",
-            "awayForm": "WWLDDL",
-            "homeRecently": 50,
-            "awayRecently": 33
+            "homeForm": "LLLLLW",
+            "awayForm": "WLWLWW",
+            "homeRecently": 17,
+            "awayRecently": 67
           },
           "h2h": {
             "wins": {
-              "home": 3,
+              "home": 0,
+              "away": 2
+            },
+            "meets": 4
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "Ukraine",
+        "teamScoreProb": 73,
+        "winProb": null,
+        "mustScore": 77,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 27,
+          "h2h": 10
+        },
+        "locked": false,
+        "estimatedOdd": 1.37,
+        "confidence": 73,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.04,
+          "away": 1.31
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 64.7,
+            "estimatedOdd": 1.55
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 73,
+            "estimatedOdd": 1.37
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.467,
+          "margin": 0.205,
+          "firstHalfShare": 0.41,
+          "firstHalfExp": 0.96,
+          "secondHalfExp": 1.39,
+          "p1": 0.261,
+          "p2": 0.467,
+          "tie": 0.272,
+          "fitErr": 0.00035,
+          "totalExp": 2.35,
+          "referenceFirstHalfProb": 0.24,
+          "referenceDrawProb": 0.47,
+          "referenceSecondHalfProb": 0.29,
+          "reason": "Expected 2.4 goals, split 1.0 in the 1st half vs 1.4 in the 2nd. The 2nd half wins the half race 47% of the time, 21% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "LLLLLW",
+          "away": "WLWLWW"
+        },
+        "h2h": {
+          "wins": {
+            "home": 0,
+            "away": 2
+          },
+          "meets": 4
+        },
+        "sportybetLeague": "International - UEFA Nations League"
+      },
+      {
+        "matchId": "2535343",
+        "home": "Centro Español",
+        "away": "Defensores de Cambaceres",
+        "league": "Ar4",
+        "time": "",
+        "probs": {
+          "home": 30,
+          "draw": 33,
+          "away": 37
+        },
+        "predictionText": "2",
+        "avgGoals": 2.39,
+        "avgOdds": {
+          "home": 1.75,
+          "draw": 3.1,
+          "away": 4.75
+        },
+        "matchUrl": "centro-español-defensores-de-cambaceres-2535343",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Centro Espanol",
+          "away": "Defensores de Cambaceres",
+          "league": "Argentina - Primera C",
+          "country": "Argentina",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "19:00",
+          "odds": {
+            "1": 1.85,
+            "2": 4,
+            "X": 3.2
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "LDDDWD",
+            "awayForm": "DWWDWL",
+            "homeRecently": 17,
+            "awayRecently": 50
+          },
+          "h2h": {
+            "wins": {
+              "home": 2,
               "away": 2
             },
             "meets": 5
@@ -56,133 +180,9 @@
           "expGoals": null
         },
         "market": "team-to-score",
-        "pick": "home",
-        "team": "Huracán FC (URU)",
-        "teamScoreProb": 78.8,
-        "winProb": null,
-        "mustScore": 65,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 10,
-          "h2h": 15
-        },
-        "locked": false,
-        "estimatedOdd": 1.27,
-        "confidence": 79,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 1.55,
-          "away": 1.45
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 78.8,
-            "estimatedOdd": 1.27
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 76.5,
-            "estimatedOdd": 1.31
-          }
-        ],
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.392,
-          "margin": 0.026,
-          "firstHalfShare": 0.49,
-          "firstHalfExp": 1.47,
-          "secondHalfExp": 1.53,
-          "p1": 0.365,
-          "p2": 0.392,
-          "tie": 0.243,
-          "fitErr": 0.02028,
-          "totalExp": 3,
-          "referenceFirstHalfProb": 0.43,
-          "referenceDrawProb": 0.38,
-          "referenceSecondHalfProb": 0.2,
-          "reason": "Expected 3.0 goals, split 1.5 in the 1st half vs 1.5 in the 2nd. The 2nd half wins the half race 39% of the time, 3% clear of the other half."
-        },
-        "preview": null,
-        "form": {
-          "home": "DLWWDW",
-          "away": "WWLDDL"
-        },
-        "h2h": {
-          "wins": {
-            "home": 3,
-            "away": 2
-          },
-          "meets": 5
-        },
-        "sportybetLeague": "Uruguay - Segunda Division"
-      },
-      {
-        "matchId": "2553972",
-        "home": "Deportes Santa Cruz",
-        "away": "O Higgins",
-        "league": "ClC",
-        "time": "",
-        "probs": {
-          "home": 30,
-          "draw": 39,
-          "away": 31
-        },
-        "predictionText": "X",
-        "avgGoals": 2.94,
-        "avgOdds": {
-          "home": 3.4,
-          "draw": 3.1,
-          "away": 1.95
-        },
-        "matchUrl": "deportes-santa-cruz-o-higgins-2553972",
-        "sportybetAvailable": true,
-        "sportybet": {
-          "home": "CD Santa Cruz",
-          "away": "CD O'Higgins",
-          "league": "Chile - Copa Chile",
-          "country": "Chile",
-          "womens": false,
-          "homeLevel": "",
-          "awayLevel": "",
-          "time": "00:00",
-          "odds": {
-            "1": 3.4,
-            "2": 2.05,
-            "X": 3.33
-          }
-        },
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "LDWDDL",
-            "awayForm": "WLWLWL",
-            "homeRecently": 17,
-            "awayRecently": 50
-          },
-          "h2h": {
-            "wins": {
-              "home": 1,
-              "away": 2
-            },
-            "meets": 3
-          },
-          "expGoals": null
-        },
-        "market": "team-to-score",
         "pick": "away",
-        "team": "O Higgins",
-        "teamScoreProb": 77.5,
+        "team": "Defensores de Cambaceres",
+        "teamScoreProb": 73.3,
         "winProb": null,
         "mustScore": 60,
         "mustScoreBreakdown": {
@@ -191,312 +191,64 @@
           "h2h": 10
         },
         "locked": false,
-        "estimatedOdd": 1.29,
-        "confidence": 78,
+        "estimatedOdd": 1.36,
+        "confidence": 73,
         "edge": null,
         "bestOdds": null,
         "marketPick": null,
         "margin": null,
         "passesGate": true,
         "expGoals": {
-          "home": 1.45,
-          "away": 1.49
+          "home": 1.07,
+          "away": 1.32
         },
         "teamScoreProps": [
           {
             "market": "team-to-score",
             "side": "home",
             "team": "home",
-            "prob": 76.5,
-            "estimatedOdd": 1.31
+            "prob": 65.7,
+            "estimatedOdd": 1.52
           },
           {
             "market": "team-to-score",
             "side": "away",
             "team": "away",
-            "prob": 77.5,
-            "estimatedOdd": 1.29
+            "prob": 73.3,
+            "estimatedOdd": 1.36
           }
         ],
         "hsh": {
           "pick": "2H",
           "label": "2nd Half",
-          "prob": 0.498,
-          "margin": 0.232,
-          "firstHalfShare": 0.41,
-          "firstHalfExp": 1.21,
-          "secondHalfExp": 1.73,
-          "p1": 0.266,
-          "p2": 0.498,
-          "tie": 0.237,
-          "fitErr": 0.00005,
-          "totalExp": 2.94,
-          "referenceFirstHalfProb": 0.28,
-          "referenceDrawProb": 0.42,
-          "referenceSecondHalfProb": 0.3,
-          "reason": "Expected 2.9 goals, split 1.2 in the 1st half vs 1.7 in the 2nd. The 2nd half wins the half race 50% of the time, 23% clear of the other half."
+          "prob": 0.53,
+          "margin": 0.319,
+          "firstHalfShare": 0.36,
+          "firstHalfExp": 0.86,
+          "secondHalfExp": 1.53,
+          "p1": 0.212,
+          "p2": 0.53,
+          "tie": 0.258,
+          "fitErr": 0.00096,
+          "totalExp": 2.39,
+          "referenceFirstHalfProb": 0.24,
+          "referenceDrawProb": 0.5,
+          "referenceSecondHalfProb": 0.26,
+          "reason": "Expected 2.4 goals, split 0.9 in the 1st half vs 1.5 in the 2nd. The 2nd half wins the half race 53% of the time, 32% clear of the other half."
         },
         "preview": null,
         "form": {
-          "home": "LDWDDL",
-          "away": "WLWLWL"
+          "home": "LDDDWD",
+          "away": "DWWDWL"
         },
         "h2h": {
           "wins": {
-            "home": 1,
+            "home": 2,
             "away": 2
           },
-          "meets": 3
-        },
-        "sportybetLeague": "Chile - Copa Chile"
-      },
-      {
-        "matchId": "2483394",
-        "home": "Municipal Limeño",
-        "away": "CD FAS",
-        "league": "Sv1",
-        "time": "",
-        "probs": {
-          "home": 22,
-          "draw": 32,
-          "away": 46
-        },
-        "predictionText": "2",
-        "avgGoals": 2.09,
-        "avgOdds": {
-          "home": 2.87,
-          "draw": 3.2,
-          "away": 2.25
-        },
-        "matchUrl": "municipal-limeño-cd-fas-2483394",
-        "sportybetAvailable": true,
-        "sportybet": {
-          "home": "Municipal Limeno",
-          "away": "CD FAS Santa Ana",
-          "league": "El Salvador - Primera Division",
-          "country": "El Salvador",
-          "womens": false,
-          "homeLevel": "",
-          "awayLevel": "",
-          "time": "00:00",
-          "odds": {
-            "1": 2.9,
-            "2": 2.25,
-            "X": 3.2
-          }
-        },
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "LWDWWW",
-            "awayForm": "WDWWWL",
-            "homeRecently": 67,
-            "awayRecently": 67
-          },
-          "h2h": {
-            "wins": {
-              "home": 1,
-              "away": 3
-            },
-            "meets": 5
-          },
-          "expGoals": null
-        },
-        "market": "team-to-score",
-        "pick": "away",
-        "team": "CD FAS",
-        "teamScoreProb": 75.6,
-        "winProb": null,
-        "mustScore": 82,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 27,
-          "h2h": 15
-        },
-        "locked": false,
-        "estimatedOdd": 1.32,
-        "confidence": 76,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 0.68,
-          "away": 1.41
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 49.3,
-            "estimatedOdd": 2.03
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 75.6,
-            "estimatedOdd": 1.32
-          }
-        ],
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.35,
-          "margin": 0,
-          "firstHalfShare": 0.5,
-          "firstHalfExp": 1.04,
-          "secondHalfExp": 1.04,
-          "p1": 0.35,
-          "p2": 0.35,
-          "tie": 0.3,
-          "fitErr": 0.00134,
-          "totalExp": 2.09,
-          "referenceFirstHalfProb": 0.13,
-          "referenceDrawProb": 0.45,
-          "referenceSecondHalfProb": 0.42,
-          "reason": "Expected 2.1 goals, split 1.0 in the 1st half vs 1.0 in the 2nd. The 2nd half wins the half race 35% of the time, 0% clear of the other half."
-        },
-        "preview": null,
-        "form": {
-          "home": "LWDWWW",
-          "away": "WDWWWL"
-        },
-        "h2h": {
-          "wins": {
-            "home": 1,
-            "away": 3
-          },
           "meets": 5
         },
-        "sportybetLeague": "El Salvador - Primera Division"
-      },
-      {
-        "matchId": "2476091",
-        "home": "Fortaleza (COL)",
-        "away": "Deportes Tolima",
-        "league": "Co1",
-        "time": "",
-        "probs": {
-          "home": 26,
-          "draw": 33,
-          "away": 41
-        },
-        "predictionText": "2",
-        "avgGoals": 2.3,
-        "avgOdds": {
-          "home": 3.4,
-          "draw": 3.1,
-          "away": 2.25
-        },
-        "matchUrl": "fortaleza-(col)-deportes-tolima-2476091",
-        "sportybetAvailable": true,
-        "sportybet": {
-          "home": "Fortaleza FC",
-          "away": "CD Tolima",
-          "league": "Colombia - Liga DIMAYOR",
-          "country": "Colombia",
-          "womens": false,
-          "homeLevel": "",
-          "awayLevel": "",
-          "time": "00:05",
-          "odds": {
-            "1": 3.2,
-            "2": 2.25,
-            "X": 3.2
-          }
-        },
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "LDDLDL",
-            "awayForm": "DLLWWL",
-            "homeRecently": 0,
-            "awayRecently": 33
-          },
-          "h2h": {
-            "wins": {
-              "home": 0,
-              "away": 3
-            },
-            "meets": 5
-          },
-          "expGoals": null
-        },
-        "market": "team-to-score",
-        "pick": "away",
-        "team": "Deportes Tolima",
-        "teamScoreProb": 75.6,
-        "winProb": null,
-        "mustScore": 55,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 0,
-          "h2h": 15
-        },
-        "locked": false,
-        "estimatedOdd": 1.32,
-        "confidence": 76,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 0.89,
-          "away": 1.41
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 58.9,
-            "estimatedOdd": 1.7
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 75.6,
-            "estimatedOdd": 1.32
-          }
-        ],
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.56,
-          "margin": 0.376,
-          "firstHalfShare": 0.33,
-          "firstHalfExp": 0.76,
-          "secondHalfExp": 1.54,
-          "p1": 0.184,
-          "p2": 0.56,
-          "tie": 0.257,
-          "fitErr": 0.0081,
-          "totalExp": 2.3,
-          "referenceFirstHalfProb": 0.24,
-          "referenceDrawProb": 0.52,
-          "referenceSecondHalfProb": 0.24,
-          "reason": "Expected 2.3 goals, split 0.8 in the 1st half vs 1.5 in the 2nd. The 2nd half wins the half race 56% of the time, 38% clear of the other half."
-        },
-        "preview": null,
-        "form": {
-          "home": "LDDLDL",
-          "away": "DLLWWL"
-        },
-        "h2h": {
-          "wins": {
-            "home": 0,
-            "away": 3
-          },
-          "meets": 5
-        },
-        "sportybetLeague": "Colombia - Liga DIMAYOR"
+        "sportybetLeague": "Argentina - Primera C"
       },
       {
         "matchId": "2510015",
@@ -512,9 +264,9 @@
         "predictionText": "1",
         "avgGoals": 3.88,
         "avgOdds": {
-          "home": null,
-          "draw": null,
-          "away": null
+          "home": 1.7,
+          "draw": 3.8,
+          "away": 3.7
         },
         "matchUrl": "hapoel-kfar-shalem-maccabi-kabilio-jaffa-2510015",
         "sportybetAvailable": true,
@@ -528,9 +280,9 @@
           "awayLevel": "",
           "time": "17:00",
           "odds": {
-            "1": 1.81,
-            "2": 3.7,
-            "X": 3.75
+            "1": 1.84,
+            "2": 3.6,
+            "X": 3.8
           }
         },
         "detail": {
@@ -623,6 +375,130 @@
         "sportybetLeague": "Israel - National League"
       },
       {
+        "matchId": "2552024",
+        "home": "Shahaniya SC",
+        "away": "Al-Duhail",
+        "league": "QaC",
+        "time": "",
+        "probs": {
+          "home": 30,
+          "draw": 36,
+          "away": 34
+        },
+        "predictionText": "X",
+        "avgGoals": 2.48,
+        "avgOdds": {
+          "home": 2.62,
+          "draw": 3.5,
+          "away": 2.2
+        },
+        "matchUrl": "shahaniya-sc-al-duhail-2552024",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Al Shahaniya",
+          "away": "Al Duhail SC",
+          "league": "Qatar - QSL Cup",
+          "country": "Qatar",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "18:15",
+          "odds": {
+            "1": 2.8,
+            "2": 2.2,
+            "X": 3.5
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "WDLWLW",
+            "awayForm": "WDDDWL",
+            "homeRecently": 50,
+            "awayRecently": 33
+          },
+          "h2h": {
+            "wins": {
+              "home": 1,
+              "away": 1
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "home",
+        "team": "Shahaniya SC",
+        "teamScoreProb": 68.7,
+        "winProb": null,
+        "mustScore": 54,
+        "mustScoreBreakdown": {
+          "model": 39,
+          "form": 10,
+          "h2h": 5
+        },
+        "locked": false,
+        "estimatedOdd": 1.46,
+        "confidence": 69,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.16,
+          "away": 1.32
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 68.7,
+            "estimatedOdd": 1.46
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 73.3,
+            "estimatedOdd": 1.36
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.499,
+          "margin": 0.258,
+          "firstHalfShare": 0.39,
+          "firstHalfExp": 0.97,
+          "secondHalfExp": 1.51,
+          "p1": 0.242,
+          "p2": 0.499,
+          "tie": 0.259,
+          "fitErr": 0.0043,
+          "totalExp": 2.48,
+          "referenceFirstHalfProb": 0.29,
+          "referenceDrawProb": 0.47,
+          "referenceSecondHalfProb": 0.24,
+          "reason": "Expected 2.5 goals, split 1.0 in the 1st half vs 1.5 in the 2nd. The 2nd half wins the half race 50% of the time, 26% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "WDLWLW",
+          "away": "WDDDWL"
+        },
+        "h2h": {
+          "wins": {
+            "home": 1,
+            "away": 1
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "Qatar - QSL Cup"
+      },
+      {
         "matchId": "2535213",
         "home": "Flandria",
         "away": "Sportivo Dock Sud",
@@ -636,9 +512,9 @@
         "predictionText": "X",
         "avgGoals": 2.35,
         "avgOdds": {
-          "home": 2.3,
+          "home": 2.15,
           "draw": 2.9,
-          "away": 2.9
+          "away": 3.1
         },
         "matchUrl": "flandria-sportivo-dock-sud-2535213",
         "sportybetAvailable": true,
@@ -652,9 +528,9 @@
           "awayLevel": "",
           "time": "19:00",
           "odds": {
-            "1": 2.3,
-            "2": 3.1,
-            "X": 3
+            "1": 2.2,
+            "2": 3.5,
+            "X": 2.95
           }
         },
         "detail": {
@@ -745,54 +621,180 @@
           "meets": 5
         },
         "sportybetLeague": "Argentina - Primera B"
-      },
+      }
+    ],
+    "2026-09-29": [
       {
-        "matchId": "2489446",
-        "home": "Tigres UANL W",
-        "away": "Atlético San Luis W",
+        "matchId": "2489448",
+        "home": "León W",
+        "away": "América W",
         "league": "MxW",
         "time": "",
         "probs": {
-          "home": 58,
-          "draw": 11,
-          "away": 32
+          "home": 16,
+          "draw": 18,
+          "away": 66
         },
-        "predictionText": "1",
-        "avgGoals": 3.1,
+        "predictionText": "2",
+        "avgGoals": 3.57,
         "avgOdds": {
-          "home": 1.07,
-          "draw": 12.76,
-          "away": 17.76
+          "home": 8.5,
+          "draw": 6,
+          "away": 1.22
         },
-        "matchUrl": "tigres-uanl-w-atlético-san-luis-w-2489446",
+        "matchUrl": "león-w-américa-w-2489448",
         "sportybetAvailable": true,
         "sportybet": {
-          "home": "CF Tigres UANL",
-          "away": "Atletico San Luis",
+          "home": "Club Leon",
+          "away": "Club America",
           "league": "Mexico - Liga MX, Women",
           "country": "Mexico",
           "womens": true,
           "homeLevel": "",
           "awayLevel": "",
-          "time": "01:06",
+          "time": "00:00",
           "odds": {
-            "1": 1.08,
-            "2": 18,
-            "X": 10.5
+            "1": 9.7,
+            "2": 1.22,
+            "X": 6.4
           }
         },
         "detail": {
           "books": [],
           "previewText": "",
           "form": {
-            "homeForm": "WLWWWW",
-            "awayForm": "WLWWWL",
-            "homeRecently": 83,
-            "awayRecently": 67
+            "homeForm": "LWWLWL",
+            "awayForm": "DWWWWW",
+            "homeRecently": 50,
+            "awayRecently": 83
           },
           "h2h": {
             "wins": {
-              "home": 5,
+              "home": 1,
+              "away": 4
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "match-winner",
+        "pick": "away",
+        "team": "América W",
+        "teamScoreProb": null,
+        "winProb": 66,
+        "mustScore": 91,
+        "mustScoreBreakdown": {
+          "model": 36,
+          "form": 35,
+          "h2h": 20
+        },
+        "locked": true,
+        "estimatedOdd": null,
+        "confidence": 91,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 0.7,
+          "away": 2.87
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 50.3,
+            "estimatedOdd": 1.99
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 94.3,
+            "estimatedOdd": 1.06
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.642,
+          "margin": 0.469,
+          "firstHalfShare": 0.33,
+          "firstHalfExp": 1.18,
+          "secondHalfExp": 2.39,
+          "p1": 0.173,
+          "p2": 0.642,
+          "tie": 0.184,
+          "fitErr": 0.00839,
+          "totalExp": 3.57,
+          "referenceFirstHalfProb": 0.16,
+          "referenceDrawProb": 0.34,
+          "referenceSecondHalfProb": 0.49,
+          "reason": "Expected 3.6 goals, split 1.2 in the 1st half vs 2.4 in the 2nd. The 2nd half wins the half race 64% of the time, 47% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "LWWLWL",
+          "away": "DWWWWW"
+        },
+        "h2h": {
+          "wins": {
+            "home": 1,
+            "away": 4
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "Mexico - Liga MX, Women"
+      },
+      {
+        "matchId": "2554161",
+        "home": "Jamaica",
+        "away": "Honduras",
+        "league": "CNL",
+        "time": "",
+        "probs": {
+          "home": 37,
+          "draw": 42,
+          "away": 21
+        },
+        "predictionText": "X",
+        "avgGoals": 2.21,
+        "avgOdds": {
+          "home": 2.1,
+          "draw": 3.25,
+          "away": 3
+        },
+        "matchUrl": "jamaica-honduras-2554161",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Jamaica",
+          "away": "Honduras",
+          "league": "International - CONCACAF Nations League",
+          "country": null,
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "01:00",
+          "odds": {
+            "1": 2.2,
+            "2": 3.2,
+            "X": 3.4
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "WDDWLW",
+            "awayForm": "LDLWDW",
+            "homeRecently": 50,
+            "awayRecently": 33
+          },
+          "h2h": {
+            "wins": {
+              "home": 4,
               "away": 0
             },
             "meets": 5
@@ -800,62 +802,451 @@
           "expGoals": null
         },
         "market": "team-to-score",
-        "pick": "away",
-        "team": "Atlético San Luis W",
-        "teamScoreProb": 66.7,
+        "pick": "home",
+        "team": "Jamaica",
+        "teamScoreProb": 75.6,
         "winProb": null,
-        "mustScore": 64,
+        "mustScore": 70,
         "mustScoreBreakdown": {
-          "model": 37,
-          "form": 27,
-          "h2h": 0
+          "model": 40,
+          "form": 10,
+          "h2h": 20
         },
         "locked": false,
-        "estimatedOdd": 1.5,
-        "confidence": 67,
+        "estimatedOdd": 1.32,
+        "confidence": 76,
         "edge": null,
         "bestOdds": null,
         "marketPick": null,
         "margin": null,
         "passesGate": true,
         "expGoals": {
-          "home": 2,
-          "away": 1.1
+          "home": 1.41,
+          "away": 0.8
         },
         "teamScoreProps": [
           {
             "market": "team-to-score",
             "side": "home",
             "team": "home",
-            "prob": 86.5,
-            "estimatedOdd": 1.16
+            "prob": 75.6,
+            "estimatedOdd": 1.32
           },
           {
             "market": "team-to-score",
             "side": "away",
             "team": "away",
-            "prob": 66.7,
-            "estimatedOdd": 1.5
+            "prob": 55.1,
+            "estimatedOdd": 1.82
           }
         ],
-        "hsh": null,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.528,
+          "margin": 0.326,
+          "firstHalfShare": 0.35,
+          "firstHalfExp": 0.77,
+          "secondHalfExp": 1.44,
+          "p1": 0.202,
+          "p2": 0.528,
+          "tie": 0.27,
+          "fitErr": 0.00285,
+          "totalExp": 2.21,
+          "referenceFirstHalfProb": 0.28,
+          "referenceDrawProb": 0.52,
+          "referenceSecondHalfProb": 0.2,
+          "reason": "Expected 2.2 goals, split 0.8 in the 1st half vs 1.4 in the 2nd. The 2nd half wins the half race 53% of the time, 33% clear of the other half."
+        },
         "preview": null,
         "form": {
-          "home": "WLWWWW",
-          "away": "WLWWWL"
+          "home": "WDDWLW",
+          "away": "LDLWDW"
         },
         "h2h": {
           "wins": {
-            "home": 5,
+            "home": 4,
             "away": 0
           },
           "meets": 5
         },
-        "sportybetLeague": "Mexico - Liga MX, Women"
+        "sportybetLeague": "International - CONCACAF Nations League"
+      },
+      {
+        "matchId": "2473394",
+        "home": "Deportes Quindío",
+        "away": "Bogotá FC",
+        "league": "Co2",
+        "time": "",
+        "probs": {
+          "home": 38,
+          "draw": 33,
+          "away": 29
+        },
+        "predictionText": "1",
+        "avgGoals": 2.27,
+        "avgOdds": {
+          "home": 1.83,
+          "draw": 3.3,
+          "away": 4.33
+        },
+        "matchUrl": "deportes-quindío-bogotá-fc-2473394",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Deportes Quindio",
+          "away": "Bogota FC",
+          "league": "Colombia - Torneo DIMAYOR",
+          "country": "Colombia",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "00:00",
+          "odds": {
+            "1": 1.9,
+            "2": 4,
+            "X": 3.25
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "LLDDDW",
+            "awayForm": "WDLLWL",
+            "homeRecently": 17,
+            "awayRecently": 33
+          },
+          "h2h": {
+            "wins": {
+              "home": 2,
+              "away": 0
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "home",
+        "team": "Deportes Quindío",
+        "teamScoreProb": 72.5,
+        "winProb": null,
+        "mustScore": 50,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 0,
+          "h2h": 10
+        },
+        "locked": false,
+        "estimatedOdd": 1.38,
+        "confidence": 73,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.29,
+          "away": 0.98
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 72.5,
+            "estimatedOdd": 1.38
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 62.5,
+            "estimatedOdd": 1.6
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.45,
+          "margin": 0.179,
+          "firstHalfShare": 0.42,
+          "firstHalfExp": 0.95,
+          "secondHalfExp": 1.32,
+          "p1": 0.27,
+          "p2": 0.45,
+          "tie": 0.28,
+          "fitErr": 0.01668,
+          "totalExp": 2.27,
+          "referenceFirstHalfProb": 0.39,
+          "referenceDrawProb": 0.49,
+          "referenceSecondHalfProb": 0.12,
+          "reason": "Expected 2.3 goals, split 1.0 in the 1st half vs 1.3 in the 2nd. The 2nd half wins the half race 45% of the time, 18% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "LLDDDW",
+          "away": "WDLLWL"
+        },
+        "h2h": {
+          "wins": {
+            "home": 2,
+            "away": 0
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "Colombia - Torneo DIMAYOR"
+      },
+      {
+        "matchId": "2489570",
+        "home": "Cariari Pococí",
+        "away": "CS Uruguay de Coronado",
+        "league": "Cr2",
+        "time": "",
+        "probs": {
+          "home": 45,
+          "draw": 31,
+          "away": 24
+        },
+        "predictionText": "1",
+        "avgGoals": 3.59,
+        "avgOdds": {
+          "home": 1.65,
+          "draw": 3.6,
+          "away": 4.33
+        },
+        "matchUrl": "cariari-pococí-cs-uruguay-de-coronado-2489570",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "AD Cariari Pococi",
+          "away": "CS Uruguay de Coronado",
+          "league": "Costa Rica - Liga de Ascenso",
+          "country": "Costa Rica",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "02:00",
+          "odds": {
+            "1": 1.72,
+            "2": 4.3,
+            "X": 3.75
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "WLDDDW",
+            "awayForm": "LLWWLL",
+            "homeRecently": 33,
+            "awayRecently": 33
+          },
+          "h2h": {
+            "wins": {
+              "home": 2,
+              "away": 2
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "CS Uruguay de Coronado",
+        "teamScoreProb": 71.3,
+        "winProb": null,
+        "mustScore": 50,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 0,
+          "h2h": 10
+        },
+        "locked": false,
+        "estimatedOdd": 1.4,
+        "confidence": 71,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 2.34,
+          "away": 1.25
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 90.4,
+            "estimatedOdd": 1.11
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 71.3,
+            "estimatedOdd": 1.4
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.753,
+          "margin": 0.653,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.9,
+          "secondHalfExp": 2.69,
+          "p1": 0.1,
+          "p2": 0.753,
+          "tie": 0.147,
+          "fitErr": 0.02271,
+          "totalExp": 3.59,
+          "referenceFirstHalfProb": 0.32,
+          "referenceDrawProb": 0.6,
+          "referenceSecondHalfProb": 0.07,
+          "reason": "Expected 3.6 goals, split 0.9 in the 1st half vs 2.7 in the 2nd. The 2nd half wins the half race 75% of the time, 65% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "WLDDDW",
+          "away": "LLWWLL"
+        },
+        "h2h": {
+          "wins": {
+            "home": 2,
+            "away": 2
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "Costa Rica - Liga de Ascenso"
+      },
+      {
+        "matchId": "2554612",
+        "home": "Madagascar",
+        "away": "Tanzania",
+        "league": "NCQ",
+        "time": "",
+        "probs": {
+          "home": 28,
+          "draw": 42,
+          "away": 30
+        },
+        "predictionText": "X",
+        "avgGoals": 2.23,
+        "avgOdds": {
+          "home": 2.55,
+          "draw": 2.9,
+          "away": 2.8
+        },
+        "matchUrl": "madagascar-tanzania-2554612",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Madagascar",
+          "away": "Tanzania",
+          "league": "International - Africa Cup of Nations Qualification",
+          "country": null,
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "14:00",
+          "odds": {
+            "1": 2.65,
+            "2": 3,
+            "X": 2.95
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "LLWWWL",
+            "awayForm": "LLDDLL",
+            "homeRecently": 50,
+            "awayRecently": 0
+          },
+          "h2h": {
+            "wins": {
+              "home": 1,
+              "away": 2
+            },
+            "meets": 4
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "home",
+        "team": "Madagascar",
+        "teamScoreProb": 66,
+        "winProb": null,
+        "mustScore": 51,
+        "mustScoreBreakdown": {
+          "model": 36,
+          "form": 10,
+          "h2h": 5
+        },
+        "locked": false,
+        "estimatedOdd": 1.51,
+        "confidence": 66,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.08,
+          "away": 1.15
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 66,
+            "estimatedOdd": 1.51
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 68.3,
+            "estimatedOdd": 1.46
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.6,
+          "margin": 0.45,
+          "firstHalfShare": 0.29,
+          "firstHalfExp": 0.65,
+          "secondHalfExp": 1.58,
+          "p1": 0.15,
+          "p2": 0.6,
+          "tie": 0.249,
+          "fitErr": 0.00917,
+          "totalExp": 2.23,
+          "referenceFirstHalfProb": 0.27,
+          "referenceDrawProb": 0.58,
+          "referenceSecondHalfProb": 0.15,
+          "reason": "Expected 2.2 goals, split 0.6 in the 1st half vs 1.6 in the 2nd. The 2nd half wins the half race 60% of the time, 45% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "LLWWWL",
+          "away": "LLDDLL"
+        },
+        "h2h": {
+          "wins": {
+            "home": 1,
+            "away": 2
+          },
+          "meets": 4
+        },
+        "sportybetLeague": "International - Africa Cup of Nations Qualification"
       }
     ]
   },
-  "lastFetch": "2026-09-27T14:22:35.520Z",
+  "lastFetch": "2026-09-28T10:12:18.350Z",
   "meta": {
     "markets": [
       "match-winner",
