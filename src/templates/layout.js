@@ -262,6 +262,37 @@ function shouldShowFeaturedBooks(url) {
 }
 
 
+// Adsterra units. Markup only -- /adsterra.js injects the network
+// scripts lazily once a slot nears the viewport. Ad CSS reserves slot
+// height so the late-arriving creatives don't shift layout.
+const ADS_CSS_LINK = '<link rel="stylesheet" href="/adsterra.css">';
+
+const ADS_SECTION =
+  '<aside class="wft-ads" aria-label="Advertisements">\n' +
+  '  <div class="wft-ad wft-ad-native" data-wft-ad="native">\n' +
+  '    <div id="container-c31a1718b62d775ad47181a89eb1cb93"></div>\n' +
+  '  </div>\n' +
+  '  <div class="wft-ad wft-ad-rect" data-wft-ad="rect"></div>\n' +
+  '</aside>';
+
+const ADS_LOADER = '<script src="/adsterra.js?v=1" defer></script>';
+
+// Utility/legal/payment pages carry no monetisable content and ads here
+// read as deceptive on a privacy or terms screen.
+const ADS_EXCLUDE = new Set([
+  'about', 'account', 'admin', 'app', 'author-bio', 'advertise', 'contact',
+  'login', 'offline', 'policy', 'privacy', 'reset-password', 'signup',
+  'terms', '404'
+]);
+
+function shouldShowAds(url) {
+  if (!url) return false;
+  const last = (url.split('/').pop() || '').replace(/\.html$/, '');
+  const bare = url.replace(/^\/+/, '').replace(/\.html$/, '');
+  if (!last && !bare) return false;
+  return !ADS_EXCLUDE.has(last) && !ADS_EXCLUDE.has(bare);
+}
+
 function applyLayout(html, req) {
   return applyLayoutToHtml(html, (req && req.path) || '/');
 }
@@ -321,6 +352,25 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(footerRe, (m, open, close) => open + FOOTER_HTML + '\n' + close);
   } else {
     html = html.replace(/<\/body>/i, '<footer>' + FOOTER_HTML + '\n</footer>\n</body>');
+  }
+
+  // 3a. Ad slots (content/prediction pages only). Injected before the
+  //     featured-bookmakers carousel so the page still ends on contextual
+  //     editorial content rather than on an ad.
+  if (shouldShowAds(activePath) && !/data-wft-ad="native"/.test(html)) {
+    if (!/adsterra\.css/.test(html)) {
+      html = html.replace(/<\/head>/i, ADS_CSS_LINK + '\n</head>');
+    }
+    if (/<\/main>/i.test(html)) {
+      html = html.replace(/<\/main>/i, ADS_SECTION + '\n</main>');
+    } else if (/<footer[^>]*>/i.test(html)) {
+      html = html.replace(/(<footer[^>]*>)/i, ADS_SECTION + '\n$1');
+    } else if (/<\/body>/i.test(html)) {
+      html = html.replace(/<\/body>/i, ADS_SECTION + '\n</body>');
+    }
+    if (!/adsterra\.js/.test(html)) {
+      html = html.replace(/<\/body>/i, ADS_LOADER + '\n</body>');
+    }
   }
 
   // 3b. Featured Bookmakers carousel (content/prediction pages only).
