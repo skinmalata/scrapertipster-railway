@@ -707,31 +707,45 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
   async function loadData() {
     try {
+      // Kick off every independent load up front. These used to be awaited
+      // one after another, so first paint waited on ~1MB of link maps.
+      var mapsReady = null;
+      if (LINK_ANALYSIS) {
+        mapsReady = (typeof window.ensureAnalysisMaps === 'function')
+          ? window.ensureAnalysisMaps().catch(function () {})
+          : fetch('/data/analysis-links.json')
+              .then(function (r) { return r.ok ? r.json() : {}; })
+              .catch(function () { return {}; });
+      }
+
+      var h2hReady = null;
+      if (IS_UNBEATEN) {
+        h2hReady = fetch('/data/h2h-unbeaten.json')
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .catch(function () { return null; });
+      }
+
       var res = await fetch('/data/predictions.json');
       if (!res.ok) throw new Error('HTTP ' + res.status);
       allData = await res.json();
 
-      if (LINK_ANALYSIS) {
-        try {
-          if (typeof window.ensureAnalysisMaps === 'function') {
-            await window.ensureAnalysisMaps();
-            analysisLinks = (typeof window.getAnalysisRaw === 'function') ? window.getAnalysisRaw() : {};
-          } else {
-            var linksRes = await fetch('/data/analysis-links.json');
-            if (linksRes.ok) analysisLinks = await linksRes.json() || {};
-          }
-        } catch (e) {}
-      }
-
-      if (IS_UNBEATEN) {
-        var h2hRes = await fetch('/data/h2h-unbeaten.json');
-        if (h2hRes.ok) {
-          h2hData = await h2hRes.json();
-        }
-      }
+      if (h2hReady) h2hData = await h2hReady;
 
       initFromUrl();
       renderCurrentView();
+
+      // Analysis links are enhancement only. Attach them in place once the
+      // maps land instead of re-rendering, so scroll position is untouched.
+      if (mapsReady) {
+        mapsReady.then(function () {
+          analysisLinks = (typeof window.getAnalysisRaw === 'function') ? window.getAnalysisRaw() : {};
+          if (typeof window.wrapMatchCards === 'function') {
+            window.wrapMatchCards(document.getElementById('content'));
+          } else {
+            renderCurrentView();
+          }
+        }).catch(function () {});
+      }
     } catch (e) {
       console.error('Load error:', e);
       document.getElementById('content').innerHTML = '<div class="no-matches"><p>Predictions currently unavailable. Check back soon.</p></div>';
