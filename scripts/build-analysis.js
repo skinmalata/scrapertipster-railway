@@ -1059,7 +1059,9 @@ async function main() {
     archive = updateAnalysisArchive(archive, matchups, result);
     try {
       fs.mkdirSync(path.dirname(ARCHIVE_FILE), { recursive: true });
-      fs.writeFileSync(ARCHIVE_FILE, JSON.stringify(archive.matchups, null, 2));
+      const archiveTemp = ARCHIVE_FILE + '.tmp';
+      fs.writeFileSync(archiveTemp, JSON.stringify(archive.matchups, null, 2));
+      fs.renameSync(archiveTemp, ARCHIVE_FILE);
       console.log('[analysis] Updated analysis archive (' + archive.matchups.length + ' entries)');
     } catch (e) {
       console.warn('[analysis] Failed to write analysis archive:', e.message);

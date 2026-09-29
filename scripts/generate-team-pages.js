@@ -32,7 +32,9 @@ function loadTeamRegistry() {
 function saveTeamRegistry(names) {
   try {
     fs.mkdirSync(path.dirname(TEAM_REGISTRY_FILE), { recursive: true });
-    fs.writeFileSync(TEAM_REGISTRY_FILE, JSON.stringify([...new Set(names)].sort(), null, 2));
+    const registryTemp = TEAM_REGISTRY_FILE + '.tmp';
+    fs.writeFileSync(registryTemp, JSON.stringify([...new Set(names)].sort(), null, 2));
+    fs.renameSync(registryTemp, TEAM_REGISTRY_FILE);
   } catch (e) {
     console.warn('[team-pages] Failed to write team registry:', e.message);
   }

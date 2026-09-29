@@ -40,7 +40,9 @@ function saveH2hRegistry(list) {
       seen.add(key);
       out.push({ home: item.home, away: item.away });
     });
-    fs.writeFileSync(H2H_REGISTRY_FILE, JSON.stringify(out, null, 2));
+    const registryTemp = H2H_REGISTRY_FILE + '.tmp';
+    fs.writeFileSync(registryTemp, JSON.stringify(out, null, 2));
+    fs.renameSync(registryTemp, H2H_REGISTRY_FILE);
   } catch (e) {
     console.warn('[h2h-pages] Failed to write H2H registry:', e.message);
   }
