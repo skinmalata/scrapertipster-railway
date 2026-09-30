@@ -62,11 +62,58 @@
     writeLegacyCookie(value);
   }
 
+  var GA_ID = 'G-HMGZMW9EDP';
+
+  // Pages load Google Analytics from their own inline <script>, gated on the
+  // cookie_consent cookie. Those checks run during parse, which is before this
+  // deferred file executes -- so on a visitor's very first page view they saw
+  // no cookie, GA was skipped, and any Accept they clicked afterwards could
+  // not retroactively record that view. The gate also loads GA itself once a
+  // positive decision exists, so first-view reporting is not lost.
+  //
+  // Loading is idempotent and only ever runs on a positive decision: the
+  // existing <script src=...googletagmanager...> check avoids a duplicate tag,
+  // and repeated grants are no-ops.
+  var gaLoaded = false;
+  function loadGoogleAnalyticsOnce() {
+    if (gaLoaded) return;
+    gaLoaded = true;
+
+    try {
+      if (typeof window.gtag !== 'function') {
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function () { window.dataLayer.push(arguments); };
+      }
+      if (!window.dataLayer) window.dataLayer = [];
+
+      if (document.querySelector('script[src*="googletagmanager.com/gtag/js"]')) {
+        // Already on the page from a per-page inline loader.
+        try {
+          window.gtag('js', new Date());
+          window.gtag('config', GA_ID);
+        } catch (e) {}
+        return;
+      }
+
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+      s.onload = function () {
+        try {
+          window.gtag('js', new Date());
+          window.gtag('config', GA_ID);
+        } catch (e) {}
+      };
+      (document.head || document.documentElement).appendChild(s);
+    } catch (e) {}
+  }
+
   function notify() {
     var granted = state === true;
     for (var i = 0; i < listeners.length; i++) {
       try { listeners[i](granted); } catch (e) {}
     }
+    if (granted) loadGoogleAnalyticsOnce();
   }
 
   function hideBanner() {
@@ -166,6 +213,11 @@
   // never delays first paint.
   function init() {
     state = readStored();
+    // A returning visitor with a stored positive decision is trusted as-is, so
+    // decide() is never called for them and notify() never runs. GA still has
+    // to load for this page view, otherwise returning visitors would be dropped
+    // from reporting on any page that does not carry its own inline loader.
+    if (state === true) loadGoogleAnalyticsOnce();
     if (state === null) {
       if (shouldAsk()) {
         // A small delay keeps the banner out of the LCP window entirely.
@@ -204,12 +256,13 @@
       // The legacy cookie would otherwise be read back on the next load and
       // silently reinstate the old decision.
       try { document.cookie = 'cookie_consent=; path=/; max-age=0'; } catch (e) {}
-      state = null;
-      buildBanner();
-      // buildBanner() early-returns when the node already exists, so the
-      // existing banner has to be un-hidden explicitly.
-      var el = document.getElementById(BANNER_ID);
-      if (el) el.hidden = false;
+    state = null;
+    buildBanner();
+    // buildBanner() early-returns when the node already exists, so the
+    // existing banner has to be un-hidden explicitly.
+    var el = document.getElementById(BANNER_ID);
+    if (el) el.hidden = false;
+    gaLoaded = false;
     }
   };
 

@@ -253,10 +253,10 @@ const SKIP_PAGES = new Set(['admin.html', 'app.html', 'offline.html', 'yandex_7d
 
 
 
-// Adsterra units. Markup only -- /adsterra.js injects the network
-// scripts lazily once a slot nears the viewport. Ad CSS reserves slot
-// height so the late-arriving creatives don't shift layout.
-const ADS_CSS_LINK = '<link rel="stylesheet" href="/adsterra.css">';
+// Ad slots. Markup only -- /monetag.js and /adsterra.js inject the network
+// scripts lazily. /ads.css reserves slot height so late-arriving creatives
+// don't shift layout, and is shared by whichever network is enabled.
+const ADS_CSS_LINK = '<link rel="stylesheet" href="/ads.css">';
 
 const ADS_SECTION =
   '<aside class="wft-ads" aria-label="Advertisements">\n' +
@@ -266,12 +266,23 @@ const ADS_SECTION =
   '  <div class="wft-ad wft-ad-rect" data-wft-ad="rect"></div>\n' +
   '</aside>';
 
-const ADS_LOADER = '<script src="/adsterra.js?v=1" defer></script>';
+// Monetag builds its own container, so this slot stays empty and exists only to
+// anchor the lazy load (see loadInPagePush in /monetag.js).
+const MONETAG_SECTION =
+  '<aside class="wft-ads" aria-label="Advertisements">\n' +
+  '  <div class="wft-ad wft-ad-ipp" data-wft-ad="ipp"></div>\n' +
+  '</aside>';
 
-// Adsterra is switched off for now. Flip to true to re-enable. Baked copies of
-// the markup are stripped either way (stripAdsterra) so pages never keep empty
-// reserved boxes, which would otherwise collapse to a gap without adsterra.css.
+const ADS_LOADER = '<script src="/adsterra.js?v=1" defer></script>';
+const MONETAG_LOADER = '<script src="/monetag.js?v=1" defer></script>';
+
+// Adsterra is switched off for now; flip to true to re-enable. Monetag runs
+// In-Page Push + Vignette. Baked copies of the markup are stripped either way
+// (stripAds) so pages never keep empty reserved boxes, which would otherwise
+// collapse to a gap without /ads.css.
 const ADSTERRA_ENABLED = false;
+const MONETAG_ENABLED = true;
+const ADS_ANY_ENABLED = ADSTERRA_ENABLED || MONETAG_ENABLED;
 
 // Site-wide consent gate. Needed by every ad loader before it may request a
 // personalised network. Lives outside ADSTERRA_ENABLED because Monetag uses it
@@ -308,21 +319,26 @@ function stripFeaturedBooks(html) {
     .replace(/[ \t]*<section class="featured-books"[\s\S]*?<\/section>\r?\n?/gi, '');
     }
 
-    // Adsterra is disabled. Remove the loader, the stylesheet that reserves the
-    // slot heights, and any already-baked <aside class="wft-ads"> block.
-    function stripAdsterra(html) {
+    // No ad network enabled. Remove every loader, the stylesheet that reserves
+    // the slot heights, and any already-baked <aside class="wft-ads"> block.
+    function stripAds(html) {
     return html
+    .replace(/[ \t]*<link[^>]*\/ads\.css[^>]*>\r?\n?/gi, '')
     .replace(/[ \t]*<link[^>]*adsterra\.css[^>]*>\r?\n?/gi, '')
     .replace(/[ \t]*<script[^>]*adsterra\.js[^>]*><\/script>\r?\n?/gi, '')
+    .replace(/[ \t]*<script[^>]*monetag\.js[^>]*><\/script>\r?\n?/gi, '')
     .replace(/[ \t]*<aside class="wft-ads"[\s\S]*?<\/aside>\r?\n?/gi, '')
     // Defensive: a partially-baked page could still carry bare slot divs.
-    .replace(/[ \t]*<div class="wft-ad wft-ad-(?:native|rect)"[^>]*>[\s\S]*?<\/div>\r?\n?/gi, '')
-    .replace(/[ \t]*<div class="wft-ad wft-ad-(?:native|rect)"[^>]*\/?>\r?\n?/gi, '');
+    .replace(/[ \t]*<div class="wft-ad wft-ad-(?:native|rect|ipp)"[^>]*>[\s\S]*?<\/div>\r?\n?/gi, '')
+    .replace(/[ \t]*<div class="wft-ad wft-ad-(?:native|rect|ipp)"[^>]*\/?>\r?\n?/gi, '');
     }
 
 function applyLayoutToHtml(html, activePath) {
   html = stripFeaturedBooks(html);
-  if (!ADSTERRA_ENABLED) html = stripAdsterra(html);
+  // Always drop any previously baked ad markup. Whichever network is enabled
+  // re-injects a fresh section in 3a, so Adsterra's baked container must not
+  // survive its own disable, and an excluded page must never keep a stale slot.
+  html = stripAds(html);
 
   const navRe = /(<nav id="nav">)[\s\S]*?(<\/nav>)/;
   const footerRe = /(<footer[^>]*>)[\s\S]*?(<\/footer>)/;
@@ -398,19 +414,23 @@ function applyLayoutToHtml(html, activePath) {
   }
 
   // 3a. Ad slots (content/prediction pages only).
-  if (ADSTERRA_ENABLED && shouldShowAds(activePath) && !/data-wft-ad="native"/.test(html)) {
-    if (!/adsterra\.css/.test(html)) {
+  if (ADS_ANY_ENABLED && shouldShowAds(activePath) && !/data-wft-ad="/.test(html)) {
+    if (!/\/ads\.css/.test(html)) {
       html = html.replace(/<\/head>/i, ADS_CSS_LINK + '\n</head>');
     }
+    const section = ADSTERRA_ENABLED ? ADS_SECTION : MONETAG_SECTION;
     if (/<\/main>/i.test(html)) {
-      html = html.replace(/<\/main>/i, ADS_SECTION + '\n</main>');
+      html = html.replace(/<\/main>/i, section + '\n</main>');
     } else if (/<footer[^>]*>/i.test(html)) {
-      html = html.replace(/(<footer[^>]*>)/i, ADS_SECTION + '\n$1');
+      html = html.replace(/(<footer[^>]*>)/i, section + '\n$1');
     } else if (/<\/body>/i.test(html)) {
-      html = html.replace(/<\/body>/i, ADS_SECTION + '\n</body>');
+      html = html.replace(/<\/body>/i, section + '\n</body>');
     }
-    if (!/adsterra\.js/.test(html)) {
+    if (ADSTERRA_ENABLED && !/adsterra\.js/.test(html)) {
       html = html.replace(/<\/body>/i, ADS_LOADER + '\n</body>');
+    }
+    if (MONETAG_ENABLED && !/monetag\.js/.test(html)) {
+      html = html.replace(/<\/body>/i, MONETAG_LOADER + '\n</body>');
     }
   }
 
