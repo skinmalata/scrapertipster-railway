@@ -369,7 +369,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
       if (window.WFT && window.WFT.apiFetch) {
         data = await window.WFT.apiFetch('/api/author-picks/history?days=3');
       } else {
-        var res = await fetch(API_BASE + '/api/author-picks/history?days=3', { mode: 'cors', cache: 'no-store' });
+        var res = await fetch(API_BASE + '/api/author-picks/history?days=3', { mode: 'cors' });
         data = await res.json();
       }
       renderHistory(data);
@@ -384,7 +384,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
       if (window.WFT && window.WFT.apiFetch) {
         data = await window.WFT.apiFetch('/api/author-picks');
       } else {
-        var res = await fetch(API_BASE + '/api/author-picks', { mode: 'cors', cache: 'no-store' });
+        var res = await fetch(API_BASE + '/api/author-picks', { mode: 'cors' });
         data = await res.json();
       }
       render(data);

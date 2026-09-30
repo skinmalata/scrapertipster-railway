@@ -678,12 +678,18 @@ async function refreshCornersAndCards() {
   }
 }
 
-// Boot: refresh pre-match predictions first, then corners/cards, then build
-// H2H Picks, then start the live scrape loop — never overlapping, so the
-// combined memory of the heavy jobs never sits in the heap at the same time.
-runHeavyExclusive(refreshPreMatchPredictions)
+// Boot: build H2H Picks first, then pre-match predictions, then corners/cards,
+// then start the live scrape loop — never overlapping, so the combined memory
+// of the heavy jobs never sits in the heap at the same time.
+//
+// Author Picks goes first on purpose. It is the slowest single build (up to 60
+// matchDetails fetches plus team-form lookups) and the one visitors notice
+// immediately, so it should not be the job that gets starved by an abort in
+// front of it. When the process died on the 384MB heap it happened before this
+// ran, which left no file on disk and sent every page view into a fresh crawl.
+runHeavyExclusive(refreshAuthorPicks)
+  .then(function () { return runHeavyExclusive(refreshPreMatchPredictions); })
   .then(function () { return runHeavyExclusive(refreshCornersAndCards); })
-  .then(function () { return runHeavyExclusive(refreshAuthorPicks); })
   .then(function () {
     // Warm the booking-code schedule index (287 per-league pages) so the
     // converter's first request does not have to wait for a cold build, and

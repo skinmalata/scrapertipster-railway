@@ -402,6 +402,48 @@ async function enrichFixture(match) {
 
 var buildPromise = null;
 
+// A build that returns nothing is NOT written to disk, which used to mean the
+// very next visitor request kicked off the whole FotMob crawl again: up to
+// MAX_MATCHES matchDetails fetches plus team-form lookups, three at a time.
+// On a cold or rate-limited start that is minutes of work replayed per page
+// view. Remember the attempt and refuse to retry until the backoff expires.
+var BUILD_STATE_FILE = path.join(DATA_DIR, '_build-state.json');
+var lastFailedAttempt = { date: null, at: 0 };
+var BUILD_BACKOFF_MS = parseInt(process.env.AUTHOR_PICKS_BACKOFF_MS, 10) || 30 * 60 * 1000;
+
+// Persisted so the backoff survives a restart. The server has been observed
+// aborting on a 384MB heap, and if it dies before the pool is written the
+// in-memory flag would be lost exactly when the guard matters most — letting
+// every visitor replay the crawl.
+try {
+  var st = JSON.parse(fs.readFileSync(BUILD_STATE_FILE, 'utf8'));
+  if (st && st.date && st.at) lastFailedAttempt = { date: st.date, at: st.at };
+} catch (e) {}
+
+function recordAttempt(date, at) {
+  lastFailedAttempt = { date: date, at: at };
+  try { fs.writeFileSync(BUILD_STATE_FILE, JSON.stringify(lastFailedAttempt), 'utf8'); } catch (e) {}
+}
+
+// Most recent usable pool from any earlier date. Used so the page still renders
+// picks while today's file is still building or after a failed build, instead
+// of showing an empty list.
+function loadLastGoodPool() {
+  try {
+    var names = fs.readdirSync(DATA_DIR)
+      .filter(function (n) { return /^\d{8}\.json$/.test(n); })
+      .sort()
+      .reverse();
+    for (var i = 0; i < names.length; i++) {
+      var parsed = JSON.parse(fs.readFileSync(path.join(DATA_DIR, names[i]), 'utf8'));
+      if (parsed && parsed.matches && parsed.matches.length) {
+        return { pool: parsed, date: names[i].replace('.json', '') };
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+
 async function buildGiantPool() {
   var date = todayStr();
   var filePath = path.join(DATA_DIR, date + '.json');
@@ -423,13 +465,37 @@ async function buildGiantPool() {
     }
   } catch (e) {}
 
+  // Still inside the backoff window from a failed build. Serve the newest pool
+  // we have rather than replaying the whole crawl on this request.
+  if (lastFailedAttempt.date === date && (Date.now() - lastFailedAttempt.at) < BUILD_BACKOFF_MS) {
+    var stale = loadLastGoodPool();
+    console.warn('[author-picks] Build backoff active for', date, '— serving last good pool (' + (stale ? stale.date : 'none') + ')');
+    return stale
+      ? { matches: stale.pool.matches, totalFixtures: stale.pool.totalFixtures || stale.pool.matches.length, analyzedFixtures: stale.pool.matches.length, generatedAt: stale.pool.generatedAt, stale: true, poolDate: stale.date }
+      : { matches: [], totalFixtures: 0, analyzedFixtures: 0, generatedAt: null, stale: true };
+  }
+
   // Share an in-flight build so concurrent visitors don't each trigger the heavy work
   if (buildPromise) {
     console.log('[author-picks] Reusing in-flight build for', date);
     return buildPromise;
   }
 
-  buildPromise = doBuild(date).finally(function () { buildPromise = null; });
+  buildPromise = doBuild(date)
+    .then(function (r) {
+      if (!r || !r.matches || !r.matches.length) recordAttempt(date, Date.now());
+      else recordAttempt(null, 0);
+      return r;
+    })
+    .catch(function (e) {
+      // A build that throws — network error, timeout, FotMob 429 — is the most
+      // common way this fails, and it must arm the backoff too. Recording only
+      // in .then() left the thrown case unguarded, so every subsequent request
+      // replayed the full crawl.
+      recordAttempt(date, Date.now());
+      throw e;
+    })
+    .finally(function () { buildPromise = null; });
   return buildPromise;
 }
 
