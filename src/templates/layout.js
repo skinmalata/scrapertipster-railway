@@ -268,6 +268,17 @@ const ADS_SECTION =
 
 const ADS_LOADER = '<script src="/adsterra.js?v=1" defer></script>';
 
+// Adsterra is switched off for now. Flip to true to re-enable. Baked copies of
+// the markup are stripped either way (stripAdsterra) so pages never keep empty
+// reserved boxes, which would otherwise collapse to a gap without adsterra.css.
+const ADSTERRA_ENABLED = false;
+
+// Site-wide consent gate. Needed by every ad loader before it may request a
+// personalised network. Lives outside ADSTERRA_ENABLED because Monetag uses it
+// regardless of the Adsterra switch.
+const CONSENT_CSS_LINK = '<link rel="stylesheet" href="/consent.css">';
+const CONSENT_JS = '<script src="/consent.js?v=1" defer></script>';
+
 // Utility/legal/payment pages carry no monetisable content and ads here
 // read as deceptive on a privacy or terms screen.
 const ADS_EXCLUDE = new Set([
@@ -295,10 +306,23 @@ function stripFeaturedBooks(html) {
     .replace(/[ \t]*<link[^>]*featured-bookmakers-carousel\.css[^>]*>\r?\n?/gi, '')
     .replace(/[ \t]*<script[^>]*featured-bookmakers-carousel\.js[^>]*><\/script>\r?\n?/gi, '')
     .replace(/[ \t]*<section class="featured-books"[\s\S]*?<\/section>\r?\n?/gi, '');
-}
+    }
+
+    // Adsterra is disabled. Remove the loader, the stylesheet that reserves the
+    // slot heights, and any already-baked <aside class="wft-ads"> block.
+    function stripAdsterra(html) {
+    return html
+    .replace(/[ \t]*<link[^>]*adsterra\.css[^>]*>\r?\n?/gi, '')
+    .replace(/[ \t]*<script[^>]*adsterra\.js[^>]*><\/script>\r?\n?/gi, '')
+    .replace(/[ \t]*<aside class="wft-ads"[\s\S]*?<\/aside>\r?\n?/gi, '')
+    // Defensive: a partially-baked page could still carry bare slot divs.
+    .replace(/[ \t]*<div class="wft-ad wft-ad-(?:native|rect)"[^>]*>[\s\S]*?<\/div>\r?\n?/gi, '')
+    .replace(/[ \t]*<div class="wft-ad wft-ad-(?:native|rect)"[^>]*\/?>\r?\n?/gi, '');
+    }
 
 function applyLayoutToHtml(html, activePath) {
   html = stripFeaturedBooks(html);
+  if (!ADSTERRA_ENABLED) html = stripAdsterra(html);
 
   const navRe = /(<nav id="nav">)[\s\S]*?(<\/nav>)/;
   const footerRe = /(<footer[^>]*>)[\s\S]*?(<\/footer>)/;
@@ -356,6 +380,16 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(/<\/head>/i, '<meta name="monetag" content="63978e270d03ed74967ae29834504e62">\n</head>');
   }
 
+  // 2e. Site-wide consent gate. Injected on every page that goes through the
+  // layout; SKIP_PAGES bypass the layout entirely and so never load ad scripts
+  // either, which means they do not need the gate.
+  if (!/consent\.css/.test(html)) {
+    html = html.replace(/<\/head>/i, CONSENT_CSS_LINK + '\n</head>');
+  }
+  if (!/consent\.js/.test(html)) {
+    html = html.replace(/<\/body>/i, CONSENT_JS + '\n</body>');
+  }
+
   // 3. Footer: replace the existing <footer> or inject one before </body>.
   if (footerRe.test(html)) {
     html = html.replace(footerRe, (m, open, close) => open + FOOTER_HTML + '\n' + close);
@@ -364,7 +398,7 @@ function applyLayoutToHtml(html, activePath) {
   }
 
   // 3a. Ad slots (content/prediction pages only).
-  if (shouldShowAds(activePath) && !/data-wft-ad="native"/.test(html)) {
+  if (ADSTERRA_ENABLED && shouldShowAds(activePath) && !/data-wft-ad="native"/.test(html)) {
     if (!/adsterra\.css/.test(html)) {
       html = html.replace(/<\/head>/i, ADS_CSS_LINK + '\n</head>');
     }

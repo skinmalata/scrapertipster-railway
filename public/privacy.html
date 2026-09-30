@@ -78,16 +78,9 @@ footer { background: #1e2538; border-top: 1px solid rgba(255,255,255,0.06); padd
 .footer-links a { color: #94a3b8; text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s; }
 .footer-links a:hover { color: #ff2448; }
 .footer-copyright { color: #94a3b8; font-size: 13px; }
-.cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; background: #1e2538; border-top: 1px solid rgba(255,255,255,0.06); color: #e8edf5; padding: 24px 32px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; z-index: 9999; }
-.cookie-banner p { margin: 0; font-size: 15px; color: #c8d0db; flex: 1; min-width: 280px; line-height: 1.5; font-weight: 500; }
-.cookie-banner a { color: #ff2448; text-decoration: underline; }
-.cookie-buttons { display: flex; gap: 12px; }
-.cookie-btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-family: inherit; }
-.cookie-accept { background: linear-gradient(135deg, #ff2448, #d41a38); color: white; }
-.cookie-accept:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(255,36,72,0.15); }
-.cookie-reject { background: rgba(255,255,255,0.06); color: #c8d0db; border: 1px solid rgba(255,255,255,0.06); }
-.cookie-reject:hover { background: rgba(255,255,255,0.1); }
-@media (max-width: 640px) { .cookie-banner { padding: 20px; flex-direction: column; text-align: center; } .cookie-banner p { min-width: 100%; } .cookie-buttons { width: 100%; justify-content: center; } }
+.consent-manage { display: inline-block; margin-top: 10px; padding: 10px 20px; border: 1px solid rgba(255,255,255,0.14); border-radius: 8px; background: rgba(255,255,255,0.04); color: #c8d0db; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.consent-manage:hover { background: rgba(255,255,255,0.09); color: #e8edf5; }
+@media (max-width: 640px) { .consent-manage { width: 100%; } }
 @media (max-width: 480px) {
  .header-content { flex-direction: column; gap: 10px; text-align: center; }
  h1 { font-size: 26px; }
@@ -237,21 +230,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
 <body>
 
- <div id="cookie-banner" class="cookie-banner">
-
- <p>We use cookies to analyze traffic and improve your experience. By clicking "Accept", you consent to our use of cookies.</p>
-
- <div class="cookie-buttons">
-
- <button id="cookie-accept" class="cookie-btn cookie-accept">Accept</button>
-
- <button id="cookie-reject" class="cookie-btn cookie-reject">Reject</button>
-
-</div>
-
-</div>
-
- <header>
+  <header>
  <div class="header-content">
  <div class="logo">
  <a href="/"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a>
@@ -314,6 +293,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   <li><strong>Google Analytics</strong> &mdash; for website traffic analysis</li>
 
   <li><strong>Adsterra</strong> &mdash; for displaying advertising on the site. Adsterra and its partners (including <code>profitableratecpmnetwork.com</code> and <code>highrevenueformat.com</code>) may set cookies and collect device, browser and approximate location data in order to serve and measure advertising. Ad units load only when they approach the visible part of the page, and they are presented in clearly marked advertising slots.</li>
+<li><strong>Monetag</strong> &mdash; for displaying advertising on the site. Monetag and its partners may set cookies and collect device, browser and approximate location data in order to serve and measure advertising. Advertising loads only after you accept consent, and ad units are presented in clearly marked advertising slots.</li>
 
   <li><strong>Supabase</strong> &mdash; for account management and data storage where you have registered</li>
 
@@ -322,6 +302,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
  </ul>
 
  <p><strong>Advertising opt-out.</strong> You can opt out of personalised advertising through <a href="https://www.aboutads.info/choices/" rel="noopener nofollow" target="_blank">aboutads.info/choices</a>, or via the "Privacy Choices" link on <a href="https://optout.aboutads.info/" rel="noopener nofollow" target="_blank">optout.aboutads.info</a>. You can also opt out of third-party vendor cookies for participating advertising networks at <a href="https://www.aboutads.info/" rel="noopener nofollow" target="_blank">aboutads.info</a>.</p>
+
+ <p><strong>Change your consent choice.</strong> Advertising is only loaded after you accept. You can review or withdraw your decision at any time using the button below; your choice is stored on this device.</p>
+
+ <button type="button" class="consent-manage" data-wft-consent-reset>Manage cookie &amp; advertising consent</button>
 
  <p>We never sell your personal data to third parties.</p>
 
@@ -511,37 +495,13 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
  }
 
- var consent = getCookie('cookie_consent');
+  // The consent banner itself now comes from /consent.js on every page. This
+  // page only needs to trigger it when the visitor asks to change their mind.
+  var consent = getCookie('cookie_consent');
 
- if (consent === 'accepted') {
-
- loadGoogleAnalytics();
-
- document.getElementById('cookie-banner').style.display = 'none';
-
- } else if (consent === 'rejected') {
-
- document.getElementById('cookie-banner').style.display = 'none';
-
- }
-
- document.getElementById('cookie-accept').addEventListener('click', function() {
-
- document.cookie = 'cookie_consent=accepted; path=/; max-age=31536000';
-
- document.getElementById('cookie-banner').style.display = 'none';
-
- loadGoogleAnalytics();
-
- });
-
- document.getElementById('cookie-reject').addEventListener('click', function() {
-
- document.cookie = 'cookie_consent=rejected; path=/; max-age=31536000';
-
- document.getElementById('cookie-banner').style.display = 'none';
-
- });
+  if (consent === 'accepted') {
+    loadGoogleAnalytics();
+  }
 
 </script>
 

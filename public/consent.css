@@ -1,0 +1,99 @@
+/* Consent banner styling.
+ *
+ * Separate plain stylesheet (same pattern as public/adsterra.css) rather than
+ * the Tailwind build: these are custom properties and a fixed overlay, so they
+ * would be purged from src/styles.css.
+ *
+ * Fixed at the bottom and injected after first paint, so it never contributes
+ * to CLS on the LCP element.
+ */
+
+.wft-consent {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 24px 32px;
+  background: #1e2538;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  color: #e8edf5;
+  font-family: inherit;
+}
+
+.wft-consent[hidden] {
+  display: none;
+}
+
+.wft-consent p {
+  margin: 0;
+  flex: 1;
+  min-width: 280px;
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 500;
+  color: #c8d0db;
+}
+
+.wft-consent a {
+  color: #ff2448;
+  text-decoration: underline;
+}
+
+.wft-consent-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.wft-consent-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wft-consent-accept {
+  background: linear-gradient(135deg, #ff2448, #d41a38);
+  color: #fff;
+}
+
+.wft-consent-accept:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(255, 36, 72, 0.15);
+}
+
+.wft-consent-reject {
+  background: rgba(255, 255, 255, 0.06);
+  color: #c8d0db;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.wft-consent-reject:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 640px) {
+  .wft-consent {
+    padding: 20px;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .wft-consent p {
+    min-width: 100%;
+  }
+
+  .wft-consent-actions {
+    width: 100%;
+    justify-content: center;
+  }
+}
