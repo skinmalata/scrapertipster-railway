@@ -302,7 +302,11 @@ function shouldShowAds(url) {
   if (!url) return false;
   const last = (url.split('/').pop() || '').replace(/\.html$/, '');
   const bare = url.replace(/^\/+/, '').replace(/\.html$/, '');
-  if (!last && !bare) return false;
+  // '/' is the homepage. Both segments are empty, but the page is perfectly
+  // ad-eligible -- rejecting it meant the one page with the most traffic never
+  // carried a slot, for this network and every previous one. Only a genuinely
+  // empty value is rejected here.
+  if (!last && !bare && url !== '/') return false;
   return !ADS_EXCLUDE.has(last) && !ADS_EXCLUDE.has(bare);
 }
 
