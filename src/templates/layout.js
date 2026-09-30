@@ -349,6 +349,13 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(/<\/head>/i, orgSchema + '\n</head>');
   }
 
+  // 2d. Monetag site-verification tag. This only proves ownership to the
+  // Monetag dashboard so the site can be approved -- it does NOT serve ads.
+  // Actual ad serving needs the MultiTag zone script from the dashboard.
+  if (!/name="monetag"/i.test(html)) {
+    html = html.replace(/<\/head>/i, '<meta name="monetag" content="63978e270d03ed74967ae29834504e62">\n</head>');
+  }
+
   // 3. Footer: replace the existing <footer> or inject one before </body>.
   if (footerRe.test(html)) {
     html = html.replace(footerRe, (m, open, close) => open + FOOTER_HTML + '\n' + close);
