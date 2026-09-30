@@ -1,4 +1,4 @@
-/* Lazy loader for the Monetag In-Page Push banner and Vignette.
+/* Lazy loader for the Monetag In-Page Push banner.
  *
  * Monetag's own snippets append a <script> carrying a data-zone attribute,
  * which the network reads back off that element to decide which zone to
@@ -10,7 +10,12 @@
  *    viewport, so ad bandwidth never competes with the LCP element.
  *  - Each network script is injected at most once per page.
  *  - Failures collapse the reserved slot instead of leaving a hole.
- */
+ *
+ * Vignette is disabled. It is a floating overlay that pins itself to the
+ * viewport, which reads as intrusive, and measured across desktop, mobile and
+ * homepage it produced no visible element while still costing ~157 KB on
+ * every pageview. To restore it, put VIGNETTE_ZONE/VIGNETTE_SRC back and call
+ * injectTag() from init() after the page has settled. */
 (function () {
   'use strict';
 
@@ -19,8 +24,6 @@
 
   var IPP_ZONE = '11929270';
   var IPP_SRC = 'https://nap5k.com/tag.min.js';
-  var VIGNETTE_ZONE = '11929272';
-  var VIGNETTE_SRC = 'https://n6wxm.com/vignette.min.js';
 
   var injected = {};
 
@@ -77,19 +80,7 @@
     });
   }
 
-  // Vignette has no in-content anchor -- the network decides where to present.
-  // Load it once, after the page has settled, so it cannot compete with LCP.
-  function loadVignette() {
-    if (window.requestIdleCallback) {
-      window.requestIdleCallback(function () {
-        injectTag(VIGNETTE_SRC, VIGNETTE_ZONE);
-      }, { timeout: 3000 });
-    } else {
-      window.setTimeout(function () {
-        injectTag(VIGNETTE_SRC, VIGNETTE_ZONE);
-      }, 1500);
-    }
-  }
+  // Vignette loader removed with the format itself; nothing else referenced it.
 
   // Additive hook for /pred-ads.js, which creates inline slots after this file
   // has already anchored the page-level one. Monetag keys each request off the
@@ -120,7 +111,7 @@
   function init() {
     whenConsented(function () {
       loadInPagePush();
-      loadVignette();
+      // loadVignette() intentionally not called -- see the file header.
     });
   }
 

@@ -110,8 +110,11 @@
   }
 
   function onlyOurSlots(nodes) {
-    var list = Array.prototype.slice.call(nodes || []);
-    if (!list.length) return false;
+    const list = Array.prototype.slice.call(nodes || []);
+    // An empty list trivially contains nothing but our own slots. Returning
+    // false here made every pure-removal record look like foreign churn, so
+    // collapsing an unfilled slot immediately re-armed sync() to rebuild it:
+    // remove at 8s, re-add, remove at 8s, ad request each cycle.
     return list.every(function (n) {
       return n.nodeType === 1 && n.getAttribute && n.getAttribute('data-wft-pred-ad') === '1';
     });

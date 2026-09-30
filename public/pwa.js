@@ -145,23 +145,31 @@
    banner.id = 'wf-push-banner';
    banner.innerHTML = `
      <style>
-       #wf-push-banner {
-         position: fixed;
-         bottom: 0;
-         left: 0;
-         right: 0;
-         z-index: 9999999;
-         padding: 16px 20px;
-         padding-bottom: calc(16px + env(safe-area-inset-bottom, 0));
-         background: linear-gradient(135deg, #141820 0%, #1a1f30 100%);
-         border-top: 1px solid rgba(255,36,72,0.2);
-         display: flex;
-         align-items: center;
-         gap: 14px;
-         box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
-         animation: pwaSlideUp 0.4s cubic-bezier(0.4,0,0.2,1);
-         font-family: 'Inter', system-ui, -apple-system, sans-serif;
-       }
+        #wf-push-banner {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          z-index: 900;
+          padding: 12px 20px;
+          padding-bottom: calc(12px + env(safe-area-inset-bottom, 0));
+          background: linear-gradient(135deg, #141820 0%, #1a1f30 100%);
+          border-top: 1px solid rgba(255,36,72,0.2);
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
+          animation: pwaSlideUp 0.4s cubic-bezier(0.4,0,0.2,1);
+          font-family: 'Inter', system-ui, -apple-system, sans-serif;
+          transition: opacity 0.35s ease, transform 0.35s ease;
+        }
+        #wf-push-banner .push-icon,
+        #wf-push-banner .push-text { pointer-events: none; }
+        #wf-push-banner.push-hiding {
+          opacity: 0;
+          transform: translateY(100%);
+          pointer-events: none;
+        }
        @keyframes pwaSlideUp {
          from { transform: translateY(100%); opacity: 0; }
          to { transform: translateY(0); opacity: 1; }
@@ -250,18 +258,32 @@
      if (ok) showChatBubble();
    });
 
-   document.getElementById('wf-push-dismiss-btn').addEventListener('click', () => {
-     banner.remove();
-     showChatBubble();
-     markPushDismissed();
-   });
- }
+    document.getElementById('wf-push-dismiss-btn').addEventListener('click', () => {
+      clearTimeout(pushAutoHide);
+      banner.remove();
+      showChatBubble();
+      markPushDismissed();
+    });
 
- // --- Install Prompt Banner ---
- let deferredPrompt = null;
- const DISMISSED_KEY = 'wf_pwa_dismissed';
-  const DISMISSED_DURATION = 24 * 60 * 60 * 1000;
- const isBeforeInstallPromptSupported = 'onbeforeinstallprompt' in window;
+    // Same courtesy rule as the install banner: it must not sit over the
+    // bottom of the page for the whole session.
+    const pushAutoHide = setTimeout(() => {
+      banner.classList.add('push-hiding');
+      setTimeout(() => banner.remove(), 400);
+    }, AUTO_HIDE_MS);
+    ['mouseenter', 'focusin', 'touchstart'].forEach((ev) =>
+      banner.addEventListener(ev, () => clearTimeout(pushAutoHide), { passive: true })
+    );
+  }
+
+  // --- Install Prompt Banner ---
+  let deferredPrompt = null;
+  const DISMISSED_KEY = 'wf_pwa_dismissed';
+   const DISMISSED_DURATION = 24 * 60 * 60 * 1000;
+   // Long enough to read the two lines and decide, short enough that it is not
+   // still covering the fold when the visitor starts scrolling.
+   const AUTO_HIDE_MS = 9000;
+   const isBeforeInstallPromptSupported = 'onbeforeinstallprompt' in window;
 
  function wasDismissed() {
    const val = localStorage.getItem(DISMISSED_KEY);
@@ -301,36 +323,53 @@
    };
  }
 
- function createBanner() {
-   if (isStandalone() || wasDismissed()) return;
+  function createBanner() {
+    if (isStandalone() || wasDismissed()) return;
 
-   hideChatBubble();
+    hideChatBubble();
 
-   const banner = document.createElement('div');
-   banner.id = 'pwa-install-banner';
+    const banner = document.createElement('div');
+    banner.id = 'pwa-install-banner';
+    // Presentation only: never announce a self-dismissing toast to assistive
+    // tech as a dialog the user is expected to answer.
+    banner.setAttribute('role', 'status');
+    banner.setAttribute('aria-live', 'polite');
+    banner.setAttribute('aria-label', 'Install WinFulltime app');
    banner.innerHTML = `
      <style>
-       #pwa-install-banner {
-         position: fixed;
-         bottom: 0;
-         left: 0;
-         right: 0;
-         z-index: 9999999;
-         padding: 16px 20px;
-         padding-bottom: calc(16px + env(safe-area-inset-bottom, 0));
-         background: linear-gradient(135deg, #141820 0%, #1a1f30 100%);
-         border-top: 1px solid rgba(255,36,72,0.2);
-         display: flex;
-         align-items: center;
-         gap: 14px;
-         box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
-         animation: pwaSlideUp 0.4s cubic-bezier(0.4,0,0.2,1);
-         font-family: 'Inter', system-ui, -apple-system, sans-serif;
-       }
-       @keyframes pwaSlideUp {
-         from { transform: translateY(100%); opacity: 0; }
-         to { transform: translateY(0); opacity: 1; }
-       }
+        #pwa-install-banner {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          z-index: 900;
+          padding: 12px 20px;
+          padding-bottom: calc(12px + env(safe-area-inset-bottom, 0));
+          background: linear-gradient(135deg, #141820 0%, #1a1f30 100%);
+          border-top: 1px solid rgba(255,36,72,0.2);
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
+          animation: pwaSlideUp 0.4s cubic-bezier(0.4,0,0.2,1);
+          font-family: 'Inter', system-ui, -apple-system, sans-serif;
+          transition: opacity 0.35s ease, transform 0.35s ease;
+        }
+        /* Leaving only the interactive row clickable lets taps aimed at the
+           content behind an otherwise-empty strip pass through. */
+        #pwa-install-banner .pwa-icon,
+        #pwa-install-banner .pwa-text { pointer-events: none; }
+        /* A prompt that never leaves on its own sits permanently over the
+           bottom of every page. It fades out on its own after a short read. */
+        #pwa-install-banner.pwa-hiding {
+          opacity: 0;
+          transform: translateY(100%);
+          pointer-events: none;
+        }
+        @keyframes pwaSlideUp {
+          from { transform: translateY(100%); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
        #pwa-install-banner .pwa-icon {
          width: 44px;
          height: 44px;
@@ -406,26 +445,48 @@
    `;
    document.body.appendChild(banner);
 
-   document.getElementById('pwa-install-btn').addEventListener('click', async () => {
-     if (deferredPrompt) {
-       deferredPrompt.prompt();
-       const { outcome } = await deferredPrompt.userChoice;
-       deferredPrompt = null;
-       banner.remove();
-       showChatBubble();
-     }
-   });
+    document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        banner.remove();
+        showChatBubble();
+      }
+    });
 
-   document.getElementById('pwa-dismiss-btn').addEventListener('click', () => {
-     banner.remove();
-     showChatBubble();
-     markDismissed();
-   });
+    document.getElementById('pwa-dismiss-btn').addEventListener('click', () => {
+      banner.remove();
+      showChatBubble();
+      markDismissed();
+    });
 
-   if (!isBeforeInstallPromptSupported) {
-     showBannerOnFirefox();
-   }
- }
+    // Self-dismiss. It is a courtesy prompt, not a dialog: leaving it pinned
+    // over the bottom of every page reads as an obstruction, and it was the
+    // most intrusive thing on screen. Auto-expiry deliberately does not write
+    // the dismissed stamp, so someone who ignored it still sees it tomorrow.
+    let autoHideTimer = null;
+    function hide() {
+      clearTimeout(autoHideTimer);
+      banner.classList.add('pwa-hiding');
+      showChatBubble();
+      setTimeout(() => banner.remove(), 400);
+    }
+    autoHideTimer = setTimeout(hide, AUTO_HIDE_MS);
+
+    // Do not count reading time against the visitor: any deliberate
+    // interaction restarts the clock, hovering alone does not.
+    ['mouseenter', 'focusin', 'touchstart'].forEach((ev) =>
+      banner.addEventListener(ev, () => clearTimeout(autoHideTimer), { passive: true })
+    );
+    banner.addEventListener('mouseleave', () => {
+      if (!banner.contains(document.activeElement)) autoHideTimer = setTimeout(hide, 2000);
+    }, { passive: true });
+
+    if (!isBeforeInstallPromptSupported) {
+      showBannerOnFirefox();
+    }
+  }
 
  // Chrome/Edge/Samsung: wait for browser install prompt
  window.addEventListener('beforeinstallprompt', (e) => {

@@ -262,7 +262,7 @@ const SKIP_PAGES = new Set(['admin.html', 'app.html', 'offline.html', 'yandex_7d
 // stylesheet whose URL does not change keeps serving the previous version: the
 // new rules simply never reach visitors. The JS files were unaffected so far
 // only because they are new enough that no stale copy exists yet.
-const ADS_ASSET_VERSION = 2;
+const ADS_ASSET_VERSION = 3;
 const ADS_CSS_LINK = '<link rel="stylesheet" href="/ads.css?v=' + ADS_ASSET_VERSION + '">';
 
 const ADS_SECTION =

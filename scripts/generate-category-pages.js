@@ -800,7 +800,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
   loadData();
 })();
 </script>
-<script src="/pwa.js"></script>
+<script src="/pwa.js?v=2"></script>
 <script src="/1xbet-odds-widget.js" defer></script>
 </body>
 </html>`;
