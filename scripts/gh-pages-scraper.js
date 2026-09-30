@@ -174,47 +174,67 @@ function isSameFixture(a, b) {
 // cancelled or expired matches are not kept alive forever. Mirrors the
 // findMissedMatches/mergeMissedMatches recovery the runtime server performs
 // via fetchPredictions, which the static build bypasses.
-function recoverMissedFixtures(freshData, committed) {
-  if (!committed || !Array.isArray(committed.matches) || committed.matches.length === 0) {
-    return freshData;
-  }
+const RECOVERED_MARKETS = [
+  { key: 'matches', total: 'totalMatches', label: '1X2' },
+  { key: 'over25Matches', total: 'totalOver25', label: 'Over 2.5' },
+  { key: 'over15Matches', total: 'totalOver15', label: 'Over 1.5' },
+  { key: 'under25Matches', total: 'totalUnder25', label: 'Under 2.5' },
+  { key: 'bttsMatches', total: 'totalBtts', label: 'BTTS' }
+];
 
-  const freshMatches = freshData.matches || [];
+function recoverMissedFixtures(freshData, committed) {
+  if (!committed) return freshData;
+
   const hasWindow = Array.isArray(freshData.dates) && freshData.dates.length > 0;
   const window = hasWindow ? new Set(freshData.dates) : null;
-  const missed = (committed.matches || []).filter(m => {
-    if (!m || !m.match) return false;
-    if (window && !window.has(m.date)) return false;
-    return !freshMatches.some(f => f && f.match && isSameFixture(m, f));
-  });
-
-  if (missed.length === 0) return freshData;
-
   const merged = { ...freshData };
-  merged.matches = [...missed, ...(freshData.matches || [])].sort((a, b) => {
-    if (a.date === b.date) return 0;
-    return new Date(a.date) - new Date(b.date);
+  const report = [];
+
+  // Each market is recovered from its own previously committed array. This
+  // previously derived the Over/Under and BTTS picks from committed.matches,
+  // whose rows are 1X2 (tip "1"/"X"/"2") and carry no over/under fields, so
+  // those filters could never match and the markets silently recovered nothing
+  // exactly when they needed it most.
+  RECOVERED_MARKETS.forEach(function (market) {
+    const freshRows = Array.isArray(freshData[market.key]) ? freshData[market.key] : [];
+    const committedRows = Array.isArray(committed[market.key]) ? committed[market.key] : [];
+
+    const missed = committedRows.filter(function (m) {
+      if (!m || !m.match) return false;
+      if (window && !window.has(m.date)) return false;
+      return !freshRows.some(function (f) { return f && f.match && isSameFixture(m, f); });
+    });
+
+    if (missed.length > 0) {
+      merged[market.key] = [...missed, ...freshRows].sort(function (a, b) {
+        if (a.date === b.date) return 0;
+        return new Date(a.date) - new Date(b.date);
+      });
+      report.push({ label: market.label, rows: missed });
+    }
+
+    // Normalise to an array so the total can never describe a different
+    // snapshot than the array it claims to count.
+    if (!Array.isArray(merged[market.key])) merged[market.key] = freshRows;
+    merged[market.total] = merged[market.key].length;
   });
-  merged.totalMatches = merged.matches.length;
-  merged.recoveredMatches = missed.length;
 
-  const missedOver25 = missed.filter(m => m.over25 || (m.tip && m.tip.includes('Over 2.5')));
-  const missedOver15 = missed.filter(m => m.over15 || (m.tip && m.tip.includes('Over 1.5')));
-  const missedUnder25 = missed.filter(m => m.under25 || (m.tip && m.tip.includes('Under 2.5')));
-  const missedBtts = missed.filter(m => m.btts || (m.tip && m.tip.includes('BTTS')));
-  merged.over25Matches = [...missedOver25, ...(freshData.over25Matches || [])];
-  merged.over15Matches = [...missedOver15, ...(freshData.over15Matches || [])];
-  merged.under25Matches = [...missedUnder25, ...(freshData.under25Matches || [])];
-  merged.bttsMatches = [...missedBtts, ...(freshData.bttsMatches || [])];
-  merged.totalOver25 = merged.over25Matches.length;
-  merged.totalOver15 = merged.over15Matches.length;
-  merged.totalUnder25 = merged.under25Matches.length;
-  merged.totalBtts = merged.bttsMatches.length;
+  // Return the normalised copy rather than freshData even with nothing
+  // recovered: the loop above has already repaired the totals, and discarding
+  // that would reintroduce the mismatch this function exists to prevent.
+  if (report.length === 0) return merged;
 
-  console.log(`Recovered ${missed.length} fixture(s) missing from fresh scrape:`);
-  missed.forEach(m => console.log(`  - ${m.match} (${m.date})`));
+  merged.recoveredMatches = report.reduce(function (n, r) { return n + r.rows.length; }, 0);
+  console.log(`Recovered ${merged.recoveredMatches} fixture(s) missing from fresh scrape:`);
+  report.forEach(function (r) {
+    console.log(`  ${r.label}: ${r.rows.length}`);
+    r.rows.forEach(function (m) { console.log(`    - ${m.match} (${m.date})`); });
+  });
 
-  fs.writeFileSync(path.join(process.cwd(), 'predictions-cache.json'), JSON.stringify(merged));
+  // No file write here. This used to persist the merged snapshot to
+  // predictions-cache.json as a side effect, so any caller -- including a test
+  // run -- could blank the committed fallback that every market depends on when
+  // a scrape drops fixtures. The caller owns persistence.
   return merged;
 }
 
@@ -240,7 +260,14 @@ async function main() {
   try {
     const data = await scraper.fetchAndCachePredictions();
     console.log(`Got ${data.totalMatches} matches`);
-    recoverMissedFixtures(data, committedCache);
+
+    // Persist the recovered snapshot here, where the caller owns the file.
+    // The previous side-effecting write inside recoverMissedFixtures could blank
+    // the committed cache if the caller's own write below did not happen.
+    const recovered = recoverMissedFixtures(data, committedCache);
+    if (recovered !== data) {
+      fs.writeFileSync(cacheFile, JSON.stringify(recovered));
+    }
 
     if (fs.existsSync(cacheFile)) {
       const predictions = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));

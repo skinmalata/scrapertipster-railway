@@ -25,6 +25,8 @@
   .hero-subtext { margin-bottom: 8px; }
   .meta-row { display: flex; justify-content: center; gap: 20px; font-size: 13px; color: var(--text-muted); margin-top: 12px; flex-wrap: wrap; }
   .stats-bar { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
+  .stale-notice-wrap { max-width: 900px; margin: 0 auto 20px; }
+  .stale-notice { background: rgba(250,204,21,0.10); border: 1px solid rgba(250,204,21,0.40); color: #facc15; padding: 12px 16px; border-radius: 10px; font-size: 13px; text-align: center; }
   .stat-pill { background: var(--bg-card); border: 1px solid var(--border); padding: 8px 16px; border-radius: 999px; font-size: 12px; color: var(--text-muted); }
   .stat-pill strong { color: var(--text-primary); }
   .perf-section { margin-top: 52px; padding-top: 32px; border-top: 1px solid var(--border); }
@@ -139,6 +141,8 @@
 </div>
 
 <div class="stats-bar" id="statsBar"></div>
+
+<div id="staleBanner" class="stale-notice-wrap" style="display:none"></div>
 
 <div id="content"><div class="loading"><div class="spinner"></div><span class="loading-text">Analyzing today's fixtures across all markets...</span></div></div>
 
@@ -386,6 +390,16 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
       } else {
         var res = await fetch(API_BASE + '/api/author-picks', { mode: 'cors' });
         data = await res.json();
+      }
+      // A pool served from the backoff fallback is an earlier day's picks. The
+      // page used to present those as today's without saying so.
+      if (data && data.stale) {
+        var banner = document.getElementById('staleBanner');
+        var when = data.poolDate ? data.poolDate : 'a previous day';
+        banner.innerHTML = '<div class="stale-notice">Showing picks from ' +
+          String(when).replace(/</g, '&lt;') +
+          '. Today&rsquo;s pool is still being built.</div>';
+        banner.style.display = 'block';
       }
       render(data);
     } catch (e) {

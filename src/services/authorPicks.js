@@ -470,9 +470,12 @@ async function buildGiantPool() {
   if (lastFailedAttempt.date === date && (Date.now() - lastFailedAttempt.at) < BUILD_BACKOFF_MS) {
     var stale = loadLastGoodPool();
     console.warn('[author-picks] Build backoff active for', date, '— serving last good pool (' + (stale ? stale.date : 'none') + ')');
+    // Both branches report stale + poolDate. Without them the response is
+    // indistinguishable from a fresh build, so the client shows "today's"
+    // picks that are actually an older pool.
     return stale
       ? { matches: stale.pool.matches, totalFixtures: stale.pool.totalFixtures || stale.pool.matches.length, analyzedFixtures: stale.pool.matches.length, generatedAt: stale.pool.generatedAt, stale: true, poolDate: stale.date }
-      : { matches: [], totalFixtures: 0, analyzedFixtures: 0, generatedAt: null, stale: true };
+      : { matches: [], totalFixtures: 0, analyzedFixtures: 0, generatedAt: null, stale: true, poolDate: null };
   }
 
   // Share an in-flight build so concurrent visitors don't each trigger the heavy work

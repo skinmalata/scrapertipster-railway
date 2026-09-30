@@ -1394,38 +1394,57 @@ function findMissedMatches(cached, fresh) {
   return missed;
 }
 
+// Each market is recovered from its own cached array. These markets used to be
+// derived from missedMatches, which only ever contains 1X2 rows whose tip is
+// "1"/"X"/"2" and which carry no over/under fields, so those filters could
+// never match and Over/Under/BTTS silently recovered nothing.
+const RECOVERABLE_MARKETS = [
+  { key: 'matches', total: 'totalMatches' },
+  { key: 'over25Matches', total: 'totalOver25' },
+  { key: 'over15Matches', total: 'totalOver15' },
+  { key: 'under25Matches', total: 'totalUnder25' },
+  { key: 'bttsMatches', total: 'totalBtts' },
+  { key: 'bttsNoMatches', total: 'totalBttsNo' },
+  { key: 'htftMatches', total: 'totalHtft' },
+  { key: 'gg2PlusMatches', total: 'totalGg2' }
+];
+
 function mergeMissedMatches(freshData, missedMatches, cached) {
   const merged = { ...freshData };
-  
+  const cache = cached || {};
+
   merged.matches = [...missedMatches, ...freshData.matches].sort((a, b) => {
     if (a.date === b.date) return 0;
     return new Date(a.date) - new Date(b.date);
   });
   merged.totalMatches = merged.matches.length;
-  
-  const missedOver25 = missedMatches.filter(m => m.over25 || (m.tip && m.tip.includes('Over 2.5')));
-  const missedOver15 = missedMatches.filter(m => m.over15 || (m.tip && m.tip.includes('Over 1.5')));
-  const missedUnder25 = missedMatches.filter(m => m.under25 || (m.tip && m.tip.includes('Under 2.5')));
-  const missedBtts = missedMatches.filter(m => m.btts || (m.tip && m.tip.includes('BTTS')));
-  
-  merged.over25Matches = [...missedOver25, ...freshData.over25Matches];
-  merged.over15Matches = [...missedOver15, ...freshData.over15Matches];
-  merged.under25Matches = [...missedUnder25, ...(freshData.under25Matches || [])];
-  merged.bttsMatches = [...missedBtts, ...freshData.bttsMatches];
-  
-  const missedKeys = new Set(missedMatches.map(m => normalizeMatchKey(m.match, m.date)));
-  const missedHtft = (cached.htftMatches || []).filter(m => missedKeys.has(normalizeMatchKey(m.match, m.date)));
-  const missedGg2 = (cached.gg2PlusMatches || []).filter(m => missedKeys.has(normalizeMatchKey(m.match, m.date)));
-  
-  merged.htftMatches = [...missedHtft, ...(freshData.htftMatches || [])];
-  merged.gg2PlusMatches = [...missedGg2, ...(freshData.gg2PlusMatches || [])];
-  
-  merged.totalOver25 = merged.over25Matches.length;
-  merged.totalOver15 = merged.over15Matches.length;
-  merged.totalUnder25 = merged.under25Matches.length;
-  merged.totalBtts = merged.bttsMatches.length;
-  merged.totalHtft = merged.htftMatches.length;
-  merged.totalGg2 = merged.gg2PlusMatches.length;
+
+  RECOVERABLE_MARKETS.forEach(function (market) {
+    if (market.key === 'matches') return;
+    const freshRows = Array.isArray(freshData[market.key]) ? freshData[market.key] : [];
+    const cachedRows = Array.isArray(cache[market.key]) ? cache[market.key] : [];
+
+    const freshKeys = new Set(freshRows.map(function (m) {
+      return normalizeMatchKey(m.match, m.date);
+    }));
+    const missed = cachedRows.filter(function (m) {
+      return m && m.match && !freshKeys.has(normalizeMatchKey(m.match, m.date));
+    });
+
+    if (missed.length > 0) {
+      merged[market.key] = [...missed, ...freshRows].sort(function (a, b) {
+        if (a.date === b.date) return 0;
+        return new Date(a.date) - new Date(b.date);
+      });
+      console.log(`Recovered ${missed.length} ${market.key} row(s) missing from fresh scrape`);
+    }
+
+    // Normalise to an array and always recompute, even when nothing was
+    // recovered: bailing out early left the total describing the previous
+    // snapshot while the array did not.
+    if (!Array.isArray(merged[market.key])) merged[market.key] = freshRows;
+    merged[market.total] = merged[market.key].length;
+  });
   
   merged.lastUpdated = new Date().toISOString();
   merged.recoveredMatches = missedMatches.length;

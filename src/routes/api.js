@@ -2141,12 +2141,17 @@ router.get('/author-picks', optionalAuth, async function (req, res) {
   try {
     var data = await buildGiantPool();
     var matches = data.matches || [];
+    // stale/poolDate come from buildGiantPool's backoff branch. Passing them
+    // through keeps the "these picks are from an earlier day" signal that the
+    // page relies on, instead of dropping it on the way out.
     res.json({
       matches: matches,
       totalFixtures: data.totalFixtures,
       analyzedFixtures: data.analyzedFixtures,
       generatedAt: data.generatedAt,
-      isPro: true
+      isPro: true,
+      stale: !!data.stale,
+      poolDate: data.poolDate === undefined ? null : data.poolDate
     });
   } catch (e) {
     console.error('[author-picks] Error:', e.message);
