@@ -95,7 +95,7 @@
 
     var text = document.createElement('p');
     text.innerHTML = 'We use cookies and advertising partners to analyse traffic and improve our predictions. '
-      + 'Accepting allows personalised ads from Adsterra and Monetag. '
+      + 'Accepting allows personalised ads from Monetag. '
       + 'See our <a href="/privacy.html">Privacy Policy</a>.';
 
     var actions = document.createElement('div');
@@ -120,13 +120,61 @@
     document.body.appendChild(el);
   }
 
+  // Consent is only requested from EU/UK visitors; everyone else is treated as
+  // having consented implicitly so the ad loaders can proceed without a prompt.
+  //
+  // Region is derived from the browser timezone, not a GeoIP lookup. That is a
+  // deliberate trade-off: a GeoIP call would disclose the visitor's IP to a
+  // third party before consent, which is the exact thing this gate exists to
+  // prevent. Timezone is free and needs no request, but it is a proxy, not a
+  // legal determination -- an EU visitor travelling with a device set to a
+  // non-EU zone would be treated as non-EU. The "manage consent" control on
+  // /privacy.html is the manual override for that case.
+  //
+  // Europe/ as a prefix covers the EU/EEA/UK. The denylist removes European
+  // timezones that are not covered by EU data-protection rules, and Asia/Nicosia
+  // is included because Cyprus is an EU member despite its timezone name.
+  var NON_EU_EUROPE = [
+    'Europe/Moscow', 'Europe/Simferopol', 'Europe/Kiev', 'Europe/Kyiv',
+    'Europe/Istanbul', 'Europe/Minsk', 'Europe/Riga', 'Europe/Vilnius',
+    'Europe/Tallinn', 'Europe/Chisinau'
+  ];
+
+  function currentRegion() {
+    // Escape hatch for testing the banner without spoofing a timezone.
+    try {
+      var forced = new URLSearchParams(window.location.search).get('wft-region');
+      if (forced === 'eu' || forced === 'other') return forced;
+    } catch (e) {}
+
+    var tz = '';
+    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+    if (!tz) return 'unknown';
+
+    if (tz === 'Asia/Nicosia' || tz === 'Atlantic/Canary' || tz === 'Atlantic/Reykjavik') return 'eu';
+    if (NON_EU_EUROPE.indexOf(tz) !== -1) return 'other';
+    if (tz.indexOf('Europe/') === 0) return 'eu';
+    return 'other';
+  }
+
+  // Fails toward consent: an undetermined region still gets the banner.
+  function shouldAsk() {
+    return currentRegion() !== 'other';
+  }
+
   // Injected after the DOM is ready and off the critical path, so the banner
   // never delays first paint.
   function init() {
     state = readStored();
     if (state === null) {
-      // A small delay keeps the banner out of the LCP window entirely.
-      window.setTimeout(buildBanner, 600);
+      if (shouldAsk()) {
+        // A small delay keeps the banner out of the LCP window entirely.
+        window.setTimeout(buildBanner, 600);
+      } else {
+        // Outside the consent scope, so nothing is withheld. Recorded so the
+        // banner can still be opened manually if the visitor changes their mind.
+        decide(true);
+      }
     }
     exposeResetTriggers();
   }
@@ -153,8 +201,15 @@
     decide: decide,
     reset: function () {
       try { window.localStorage.removeItem(KEY); } catch (e) {}
+      // The legacy cookie would otherwise be read back on the next load and
+      // silently reinstate the old decision.
+      try { document.cookie = 'cookie_consent=; path=/; max-age=0'; } catch (e) {}
       state = null;
       buildBanner();
+      // buildBanner() early-returns when the node already exists, so the
+      // existing banner has to be un-hidden explicitly.
+      var el = document.getElementById(BANNER_ID);
+      if (el) el.hidden = false;
     }
   };
 
