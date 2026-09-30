@@ -275,6 +275,8 @@ const MONETAG_SECTION =
 
 const ADS_LOADER = '<script src="/adsterra.js?v=1" defer></script>';
 const MONETAG_LOADER = '<script src="/monetag.js?v=1" defer></script>';
+// Runtime helper that slots banners between prediction cards on /predictions/*.
+const PRED_ADS_LOADER = '<script src="/pred-ads.js?v=1" defer></script>';
 
 // Adsterra is switched off for now; flip to true to re-enable. Monetag runs
 // In-Page Push + Vignette. Baked copies of the markup are stripped either way
@@ -435,6 +437,13 @@ function applyLayoutToHtml(html, activePath) {
     }
     if (MONETAG_ENABLED && !/monetag\.js/.test(html)) {
       html = html.replace(/<\/body>/i, MONETAG_LOADER + '\n</body>');
+    }
+    // Market pages render their cards client-side, so the inter-card slots are
+    // injected at runtime by /pred-ads.js rather than baked like the footer
+    // slot above. Scoped to /predictions/* so no other page grows a second and
+    // third banner.
+    if (MONETAG_ENABLED && /^\/predictions\/[^/]+\/?$/.test(activePath) && !/pred-ads\.js/.test(html)) {
+      html = html.replace(/<\/body>/i, PRED_ADS_LOADER + '\n</body>');
     }
   }
 

@@ -46,6 +46,16 @@
   }
 }
 
+/* Inline slots injected between prediction cards by /pred-ads.js. The card grid
+   is a multi-column grid, so an inserted slot would otherwise be squeezed into
+   a single card cell; span the full row instead. Vertical margins are tighter
+   than the page-level slot because these sit inside a dense list. */
+.wft-ads-inline {
+  grid-column: 1 / -1;
+  margin: 20px auto;
+  max-width: 900px;
+}
+
 /* Print stylesheets should not emit empty ad boxes. */
 @media print {
   .wft-ads { display: none !important; }

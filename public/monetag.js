@@ -91,6 +91,32 @@
     }
   }
 
+  // Additive hook for /pred-ads.js, which creates inline slots after this file
+  // has already anchored the page-level one. Monetag keys each request off the
+  // data-zone attribute of the script element, so every inline slot asks for its
+  // own copy instead of assuming one script fills every empty container.
+  //
+  // Deliberately not routed through injectTag(): that dedupes by src to keep the
+  // page-level banner at a single request, which would starve inline slots.
+  function requestInlineIpp(unit) {
+    if (!unit || unit.dataset.wftIpp === '1') return;
+    unit.dataset.wftIpp = '1';
+
+    whenNearViewport(unit, function () {
+      var s = document.createElement('script');
+      // The network reads the zone off this element.
+      s.dataset.zone = IPP_ZONE;
+      s.dataset.wftMonetag = '1';
+      s.src = IPP_SRC;
+      s.async = true;
+      s.onerror = function () { collapse(unit); };
+      (document.body || document.documentElement).appendChild(s);
+    });
+  }
+
+  window.WFT = window.WFT || {};
+  window.WFT.requestInlineIpp = requestInlineIpp;
+
   function init() {
     whenConsented(function () {
       loadInPagePush();
