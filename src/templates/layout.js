@@ -256,7 +256,14 @@ const SKIP_PAGES = new Set(['admin.html', 'app.html', 'offline.html', 'yandex_7d
 // Ad slots. Markup only -- /monetag.js and /adsterra.js inject the network
 // scripts lazily. /ads.css reserves slot height so late-arriving creatives
 // don't shift layout, and is shared by whichever network is enabled.
-const ADS_CSS_LINK = '<link rel="stylesheet" href="/ads.css">';
+//
+// ADS_ASSET_VERSION must be bumped whenever /ads.css, /monetag.js or
+// /pred-ads.js changes. These files are served with a long-lived cache, and a
+// stylesheet whose URL does not change keeps serving the previous version: the
+// new rules simply never reach visitors. The JS files were unaffected so far
+// only because they are new enough that no stale copy exists yet.
+const ADS_ASSET_VERSION = 2;
+const ADS_CSS_LINK = '<link rel="stylesheet" href="/ads.css?v=' + ADS_ASSET_VERSION + '">';
 
 const ADS_SECTION =
   '<aside class="wft-ads" aria-label="Advertisements">\n' +
@@ -273,10 +280,10 @@ const MONETAG_SECTION =
   '  <div class="wft-ad wft-ad-ipp" data-wft-ad="ipp"></div>\n' +
   '</aside>';
 
-const ADS_LOADER = '<script src="/adsterra.js?v=1" defer></script>';
-const MONETAG_LOADER = '<script src="/monetag.js?v=1" defer></script>';
+const ADS_LOADER = '<script src="/adsterra.js?v=' + ADS_ASSET_VERSION + '" defer></script>';
+const MONETAG_LOADER = '<script src="/monetag.js?v=' + ADS_ASSET_VERSION + '" defer></script>';
 // Runtime helper that slots banners between prediction cards on /predictions/*.
-const PRED_ADS_LOADER = '<script src="/pred-ads.js?v=1" defer></script>';
+const PRED_ADS_LOADER = '<script src="/pred-ads.js?v=' + ADS_ASSET_VERSION + '" defer></script>';
 
 // Adsterra is switched off for now; flip to true to re-enable. Monetag runs
 // In-Page Push + Vignette. Baked copies of the markup are stripped either way
