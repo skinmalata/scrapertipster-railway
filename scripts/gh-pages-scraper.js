@@ -182,6 +182,31 @@ const RECOVERED_MARKETS = [
   { key: 'bttsMatches', total: 'totalBtts', label: 'BTTS' }
 ];
 
+// Market pages filter by the selected date and render an empty state when a
+// market has no rows for it. Log that explicitly so an empty page is
+// diagnosable from the build log instead of only from the live site.
+function reportEmptyMarkets(predictions) {
+  const primary = predictions.date;
+  const empty = RECOVERED_MARKETS.filter(function (m) {
+    const rows = Array.isArray(predictions[m.key]) ? predictions[m.key] : [];
+    return !rows.some(function (r) { return r && r.date === primary; });
+  });
+  if (empty.length === 0) return;
+
+  console.warn(`[markets] No rows for ${primary} in: ${empty.map(function (m) { return m.label; }).join(', ')}`);
+  empty.forEach(function (m) {
+    const rows = Array.isArray(predictions[m.key]) ? predictions[m.key] : [];
+    const dates = [...new Set(rows.map(function (r) { return r && r.date; }).filter(Boolean))].sort();
+    console.warn(`  ${m.label}: ${rows.length} row(s) total, dates ${dates.length ? dates.join(', ') : 'none'}`);
+  });
+  const prosoccerOnly = (predictions.matches || []).filter(function (m) {
+    return m && m.source === 'prosoccer';
+  }).length;
+  if (prosoccerOnly > 0) {
+    console.warn(`  ${prosoccerOnly}/${(predictions.matches || []).length} 1X2 rows came from prosoccer, which supplies no Over/Under/BTTS data`);
+  }
+}
+
 function recoverMissedFixtures(freshData, committed) {
   if (!committed) return freshData;
 
@@ -272,6 +297,11 @@ async function main() {
     if (fs.existsSync(cacheFile)) {
       const predictions = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
       predictions.generatedAt = new Date().toISOString();
+
+      // Report markets with no rows for the primary date. When a market page
+      // renders empty this is usually the only clue available, because the
+      // build succeeds and the page shows an empty state rather than an error.
+      reportEmptyMarkets(predictions);
 
       const resultsFile = path.join(process.cwd(), 'results-cache.json');
       if (fs.existsSync(resultsFile)) {
