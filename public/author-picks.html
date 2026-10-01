@@ -383,6 +383,12 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
   }
 
   async function load() {
+    var content = document.getElementById('content');
+    var timeoutMs = 45000;
+    var timeoutId = setTimeout(function() {
+      content.innerHTML = '<div class="empty-state"><h2>Still analyzing...</h2><p>Building the pool takes up to a minute on cold start. <button onclick="load()" style="margin-top:10px;padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer">Retry</button></p></div>';
+    }, timeoutMs);
+
     try {
       var data;
       if (window.WFT && window.WFT.apiFetch) {
@@ -391,6 +397,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
         var res = await fetch(API_BASE + '/api/author-picks', { mode: 'cors' });
         data = await res.json();
       }
+      clearTimeout(timeoutId);
       // A pool served from the backoff fallback is an earlier day's picks. The
       // page used to present those as today's without saying so.
       if (data && data.stale) {
@@ -403,10 +410,12 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
       }
       render(data);
     } catch (e) {
-      document.getElementById('content').innerHTML = '<div class="empty-state"><h2>Failed to load</h2><p>The pool is being built. Check back shortly.</p></div>';
+      clearTimeout(timeoutId);
+      content.innerHTML = '<div class="empty-state"><h2>Failed to load</h2><p>The pool is being built. Check back shortly. <button onclick="load()" style="margin-top:10px;padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer">Retry</button></p></div>';
     }
     loadHistory();
   }
+  window.load = load;
 
   if (window.WFT && window.WFT.onAuthReady) {
     window.WFT.onAuthReady(function() { load(); });
