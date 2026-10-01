@@ -30,6 +30,14 @@
   width: 100%;
 }
 
+/* Mondiad banner: the network picks the size from the zone, so this is a
+   floor only -- a taller creative grows the box (height stays auto) and is
+   never clipped. */
+.wft-ad-banner {
+  min-height: 110px;
+  width: 100%;
+}
+
 /* 300x250 medium rectangle. Exact box, so no shift at all. */
 .wft-ad-rect {
   width: 300px;

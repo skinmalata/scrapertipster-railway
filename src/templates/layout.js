@@ -257,28 +257,59 @@ const SKIP_PAGES = new Set(['admin.html', 'app.html', 'offline.html', 'yandex_7d
 // scripts lazily. /ads.css reserves slot height so late-arriving creatives
 // don't shift layout, and is shared by whichever network is enabled.
 //
-// ADS_ASSET_VERSION must be bumped whenever /ads.css, /monetag.js or
-// /pred-ads.js changes. These files are served with a long-lived cache, and a
-// stylesheet whose URL does not change keeps serving the previous version: the
-// new rules simply never reach visitors. The JS files were unaffected so far
-// only because they are new enough that no stale copy exists yet.
-const ADS_ASSET_VERSION = 3;
+// ADS_ASSET_VERSION must be bumped whenever /ads.css, /monetag.js,
+// /mondiad.js or /pred-ads.js changes. These files are served with a
+// long-lived cache, and a stylesheet whose URL does not change keeps serving
+// the previous version: the new rules simply never reach visitors. The JS files
+// were unaffected so far only because they are new enough that no stale copy
+// exists yet.
+const ADS_ASSET_VERSION = 4;
 const ADS_CSS_LINK = '<link rel="stylesheet" href="/ads.css?v=' + ADS_ASSET_VERSION + '">';
 
-const ADS_SECTION =
-  '<aside class="wft-ads" aria-label="Advertisements">\n' +
+// Adsterra's own units, wrapped by adSection() below.
+const ADSTERRA_UNITS =
   '  <div class="wft-ad wft-ad-native" data-wft-ad="native">\n' +
   '    <div id="container-c31a1718b62d775ad47181a89eb1cb93"></div>\n' +
   '  </div>\n' +
-  '  <div class="wft-ad wft-ad-rect" data-wft-ad="rect"></div>\n' +
-  '</aside>';
+  '  <div class="wft-ad wft-ad-rect" data-wft-ad="rect"></div>\n';
 
-// Monetag builds its own container, so this slot stays empty and exists only to
-// anchor the lazy load (see loadInPagePush in /monetag.js).
-const MONETAG_SECTION =
-  '<aside class="wft-ads" aria-label="Advertisements">\n' +
-  '  <div class="wft-ad wft-ad-ipp" data-wft-ad="ipp"></div>\n' +
-  '</aside>';
+// Mondiad display zones. The network ships one script per format, and each
+// reads its zone id back off the container div, so the divs must be present in
+// the DOM before the script runs. The dashboard hands out a bare
+// <script async src="https://ss.mrmnd.com/{banner,native}.js"> for <head>;
+// that is deliberately NOT what we bake, because it would request a
+// personalised ad from every EU/UK visitor before /consent.js has collected a
+// decision. /mondiad.js owns both script URLs and creates them in <head>
+// itself, but only once consent is granted and the slot is near view.
+// One flat element per zone: it carries both our slot class (so ads.css and
+// stripAds treat it like any other unit) and the network's own zone attribute.
+// Nesting a bare network div inside a wrapper would survive the defensive
+// bare-div strip, which matches only to the first </div>.
+const MONDIAD_BANNER_DIV =
+  '<div class="wft-ad wft-ad-banner" data-wft-ad="mondiad-banner" ' +
+  'data-mndbanid="f2f6108f-b311-432a-b65d-06b00bb8132b"></div>';
+const MONDIAD_NATIVE_DIV =
+  '<div class="wft-ad wft-ad-native" data-wft-ad="mondiad-native" ' +
+  'data-mndazid="147781a6-7f81-43a0-8c85-f9cf3a461f5a"></div>';
+const MONDIAD_LOADER = '<script src="/mondiad.js?v=' + ADS_ASSET_VERSION + '" defer></script>';
+const MONDIAD_BANNER_ENABLED = true;
+const MONDIAD_NATIVE_ENABLED = true;
+
+// Monetag builds its own container, so this unit stays empty and exists only
+// to anchor the lazy load (see loadInPagePush in /monetag.js).
+const MONETAG_UNITS = '  <div class="wft-ad wft-ad-ipp" data-wft-ad="ipp"></div>\n';
+
+// The active container network contributes its units first. Mondiad's display
+// zones are independent of that switch, so they are appended here instead of
+// being baked into one side's markup -- otherwise flipping ADSTERRA_ENABLED
+// would silently take Mondiad down with it.
+function adSection() {
+  const primary = ADSTERRA_ENABLED ? ADSTERRA_UNITS : MONETAG_UNITS;
+  const mnd =
+    (MONDIAD_NATIVE_ENABLED ? '  ' + MONDIAD_NATIVE_DIV + '\n' : '') +
+    (MONDIAD_BANNER_ENABLED ? '  ' + MONDIAD_BANNER_DIV + '\n' : '');
+  return '<aside class="wft-ads" aria-label="Advertisements">\n' + primary + mnd + '</aside>';
+}
 
 const ADS_LOADER = '<script src="/adsterra.js?v=' + ADS_ASSET_VERSION + '" defer></script>';
 const MONETAG_LOADER = '<script src="/monetag.js?v=' + ADS_ASSET_VERSION + '" defer></script>';
@@ -286,12 +317,13 @@ const MONETAG_LOADER = '<script src="/monetag.js?v=' + ADS_ASSET_VERSION + '" de
 const PRED_ADS_LOADER = '<script src="/pred-ads.js?v=' + ADS_ASSET_VERSION + '" defer></script>';
 
 // Adsterra is switched off for now; flip to true to re-enable. Monetag runs
-// In-Page Push + Vignette. Baked copies of the markup are stripped either way
+// In-Page Push. Baked copies of the markup are stripped either way
 // (stripAds) so pages never keep empty reserved boxes, which would otherwise
 // collapse to a gap without /ads.css.
 const ADSTERRA_ENABLED = false;
 const MONETAG_ENABLED = true;
-const ADS_ANY_ENABLED = ADSTERRA_ENABLED || MONETAG_ENABLED;
+const MONDIAD_ENABLED = MONDIAD_BANNER_ENABLED || MONDIAD_NATIVE_ENABLED;
+const ADS_ANY_ENABLED = ADSTERRA_ENABLED || MONETAG_ENABLED || MONDIAD_ENABLED;
 
 // Site-wide consent gate. Needed by every ad loader before it may request a
 // personalised network. Lives outside ADSTERRA_ENABLED because Monetag uses it
@@ -340,10 +372,14 @@ function stripFeaturedBooks(html) {
     .replace(/[ \t]*<link[^>]*adsterra\.css[^>]*>\r?\n?/gi, '')
     .replace(/[ \t]*<script[^>]*adsterra\.js[^>]*><\/script>\r?\n?/gi, '')
     .replace(/[ \t]*<script[^>]*monetag\.js[^>]*><\/script>\r?\n?/gi, '')
+    .replace(/[ \t]*<script[^>]*mondiad\.js[^>]*><\/script>\r?\n?/gi, '')
+    .replace(/[ \t]*<script[^>]*pred-ads\.js[^>]*><\/script>\r?\n?/gi, '')
     .replace(/[ \t]*<aside class="wft-ads"[\s\S]*?<\/aside>\r?\n?/gi, '')
     // Defensive: a partially-baked page could still carry bare slot divs.
-    .replace(/[ \t]*<div class="wft-ad wft-ad-(?:native|rect|ipp)"[^>]*>[\s\S]*?<\/div>\r?\n?/gi, '')
-    .replace(/[ \t]*<div class="wft-ad wft-ad-(?:native|rect|ipp)"[^>]*\/?>\r?\n?/gi, '');
+    .replace(/[ \t]*<div class="wft-ad wft-ad-(?:native|rect|ipp|banner)"[^>]*>[\s\S]*?<\/div>\r?\n?/gi, '')
+    .replace(/[ \t]*<div class="wft-ad wft-ad-(?:native|rect|ipp|banner)"[^>]*\/?>\r?\n?/gi, '')
+    .replace(/[ \t]*<div data-mnd(?:banid|azid)="[^"]*"[^>]*><\/div>\r?\n?/gi, '')
+    .replace(/[ \t]*<div data-mnd(?:banid|azid)="[^"]*"\/>\r?\n?/gi, '');
     }
 
 function applyLayoutToHtml(html, activePath) {
@@ -437,7 +473,7 @@ function applyLayoutToHtml(html, activePath) {
     if (!/\/ads\.css/.test(html)) {
       html = html.replace(/<\/head>/i, ADS_CSS_LINK + '\n</head>');
     }
-    const section = ADSTERRA_ENABLED ? ADS_SECTION : MONETAG_SECTION;
+    const section = adSection();
     if (/<\/main>/i.test(html)) {
       html = html.replace(/<\/main>/i, section + '\n</main>');
     } else if (/<footer[^>]*>/i.test(html)) {
@@ -450,6 +486,13 @@ function applyLayoutToHtml(html, activePath) {
     }
     if (MONETAG_ENABLED && !/monetag\.js/.test(html)) {
       html = html.replace(/<\/body>/i, MONETAG_LOADER + '\n</body>');
+    }
+    // Mondiad's own snippet is a bare <script async> for <head>. It is not
+    // baked: /mondiad.js decides at runtime whether consent has been given,
+    // then creates the script in <head> itself. This loader only marks that
+    // the page carries Mondiad slots.
+    if (MONDIAD_ENABLED && !/mondiad\.js/.test(html)) {
+      html = html.replace(/<\/body>/i, MONDIAD_LOADER + '\n</body>');
     }
     // Market pages render their cards client-side, so the inter-card slots are
     // injected at runtime by /pred-ads.js rather than baked like the footer
