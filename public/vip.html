@@ -396,23 +396,66 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       '</div>';
   }
 
+  var LOAD_TIMEOUT_MS = 15000;
+  var loadGeneration = 0;
+  var loadTimer = null;
+
+  function loadingHtml() {
+    return '<div class="loading">' +
+      '<div class="progress-bar-container"><div class="progress-bar"></div></div>' +
+      '<span class="loading-text">Checking membership...</span>' +
+      '</div>';
+  }
+
+  function showLoadError(gen) {
+    if (gen !== loadGeneration) return;
+    if (loadTimer) { clearTimeout(loadTimer); loadTimer = null; }
+    var content = document.getElementById('content');
+    content.innerHTML = '<div class="paywall">' +
+      '<h2>Could not check your membership</h2>' +
+      '<p>The membership service did not respond in time. Please try again.</p>' +
+      '<a class="cta-btn" href="#" id="vipRetry">Try again</a>' +
+      '</div>';
+    var retry = document.getElementById('vipRetry');
+    if (retry) retry.addEventListener('click', function (e) {
+      e.preventDefault();
+      content.innerHTML = loadingHtml();
+      loadMembers();
+    });
+  }
+
   function loadMembers() {
+    var gen = ++loadGeneration;
+    if (loadTimer) clearTimeout(loadTimer);
+    loadTimer = setTimeout(function () { showLoadError(gen); }, LOAD_TIMEOUT_MS);
+
+    function current() { return gen === loadGeneration; }
+    function stopTimer() { if (loadTimer) { clearTimeout(loadTimer); loadTimer = null; } }
+
+    if (!window.WFT || typeof window.WFT.onAuthReady !== 'function') {
+      showLoadError(gen);
+      return;
+    }
+
     window.WFT.onAuthReady(function (user) {
+      if (!current()) return;
       if (!user) {
+        stopTimer();
         showPaywall(false);
         return;
       }
       window.WFT.apiFetch('/api/vip').then(function (data) {
+        if (!current()) return;
+        stopTimer();
         if (!data || !data.isPro) {
-          if (window.location.hash === '#refresh') showPaywall(true);
-          else showPaywall(true);
+          showPaywall(true);
           return;
         }
         cache = data;
         document.getElementById('statsBar').style.display = '';
         renderContent();
       }).catch(function () {
-        showPaywall(true);
+        showLoadError(gen);
       });
     });
   }
