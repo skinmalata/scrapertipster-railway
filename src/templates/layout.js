@@ -409,7 +409,13 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(/<\/head>/i, '<meta name="monetag" content="63978e270d03ed74967ae29834504e62">\n</head>');
   }
 
-  // 2e. Site-wide consent gate. Injected on every page that goes through the
+  // 2e. Mondiad site-verification tag (mnd-ver). A separate network with its
+  // own token, unrelated to the Monetag tag above. Proof of ownership only.
+  if (!/name="mnd-ver"/i.test(html)) {
+    html = html.replace(/<\/head>/i, '<meta name="mnd-ver" content="was1yaab4qqgw1zewbjw" />\n</head>');
+  }
+
+  // 2f. Site-wide consent gate. Injected on every page that goes through the
   // layout; SKIP_PAGES bypass the layout entirely and so never load ad scripts
   // either, which means they do not need the gate.
   if (!/consent\.css/.test(html)) {
