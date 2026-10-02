@@ -144,7 +144,13 @@ function routeLabel(req) {
     .join('/') || '/';
 }
 
-function trackTraffic(req, res) {
+// Counts requests and their status classes. Must call next(): this is
+// app.use()d ahead of every route, and an Express middleware that never calls
+// next() leaves the request parked forever. Shipping this without a next() (in
+// d1607485, 2026-09-28) hung every request that was not the /api/health probe
+// registered above it -- the socket accepted TLS and then never answered, which
+// reads exactly like a wedged process.
+function trackTraffic(req, res, next) {
   trafficStats.windowRequests += 1;
   const route = routeLabel(req);
   trafficStats.byRoute.set(route, (trafficStats.byRoute.get(route) || 0) + 1);
@@ -153,6 +159,7 @@ function trackTraffic(req, res) {
     const bucket = res.statusCode >= 500 ? '5xx' : res.statusCode >= 400 ? '4xx' : '2xx-3xx';
     trafficStats.byStatusClass.set(bucket, (trafficStats.byStatusClass.get(bucket) || 0) + 1);
   });
+  next();
 }
 
 function logTrafficSummary() {
