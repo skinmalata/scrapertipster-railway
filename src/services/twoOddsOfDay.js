@@ -32,7 +32,6 @@ const MIN_LEGS = 2;
 const MAX_LEGS = 4;
 const MIN_LEG_PROBABILITY = 0.4; // consensus floor: below this a leg is a coin flip
 const MAX_LEGS_PER_LEAGUE = 2; // never stack more than two legs from one competition
-const MAX_LEGS_PER_DAY = 2; // keep the ticket anchored to a day rather than a fortnight
 const CORRELATION_PENALTY = 0.94; // applied per extra leg sharing a league
 const NODE_CAP = 400000;
 
@@ -104,7 +103,7 @@ function searchBest(legs) {
   let best = null;
   let nodes = 0;
 
-  function walk(start, chosen, product, probability, leaguesUsed, daysUsed) {
+  function walk(start, chosen, product, probability, leaguesUsed) {
     if (nodes++ > NODE_CAP) return;
 
     if (chosen.length >= MIN_LEGS) {
@@ -122,8 +121,6 @@ function searchBest(legs) {
 
       const leagueCount = (leaguesUsed.get(leg.league) || 0) + 1;
       if (leagueCount > MAX_LEGS_PER_LEAGUE) continue;
-      const dayCount = (daysUsed.get(leg.day) || 0) + 1;
-      if (dayCount > MAX_LEGS_PER_DAY) continue;
 
       // Optimistic ceiling: even if every remaining leg hit consensus 1.0 with
       // no correlation penalty, this branch cannot beat the incumbent.
@@ -135,15 +132,13 @@ function searchBest(legs) {
 
       chosen.push(leg);
       leaguesUsed.set(leg.league, leagueCount);
-      daysUsed.set(leg.day, dayCount);
-      walk(i + 1, chosen, nextProduct, probability * leg.implied, leaguesUsed, daysUsed);
-      daysUsed.set(leg.day, dayCount - 1);
+      walk(i + 1, chosen, nextProduct, probability * leg.implied, leaguesUsed);
       leaguesUsed.set(leg.league, leagueCount - 1);
       chosen.pop();
     }
   }
 
-  walk(0, [], 1, 1, new Map(), new Map());
+  walk(0, [], 1, 1, new Map());
   return best;
 }
 
@@ -161,8 +156,15 @@ async function buildTwoOddsOfDay(options) {
     pool = { legs: [], sports: 0, errors: [error.message] };
   }
 
+  // Only legs kicking off on the requested WAT day may be used. The provider
+  // pool spans ~72h, so without this the search happily mixes tomorrow and the
+  // day after into a ticket that is labelled with today's date.
   const legs = (pool.legs || []).filter(function(leg) {
-    return leg && leg.price > 1 && leg.implied >= MIN_LEG_PROBABILITY && Number(leg.price) <= TWO_ODDS_MAX;
+    if (!leg || !(leg.price > 1) || !(Number(leg.price) <= TWO_ODDS_MAX)) return false;
+    if (!(leg.implied >= MIN_LEG_PROBABILITY)) return false;
+    if (leg.day !== date) return false;
+    if (leg.kickoffMs && leg.kickoffMs < Date.now()) return false; // already kicked off
+    return true;
   });
 
   if (legs.length < MIN_LEGS) {

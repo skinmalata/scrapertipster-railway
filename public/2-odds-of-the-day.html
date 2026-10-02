@@ -434,7 +434,10 @@ gtag('config', 'G-HMGZMW9EDP');
         if(legs.length){
           body+='<div class="two-legs">';
           legs.forEach(function(leg,i){
-            var leagueLine = (leg.league || leg.time) ? '<div class="two-leg-league">'+(leg.league ? escapeHtml(leg.league) : '')+(leg.time ? ' &bull; '+escapeHtml(leg.time) : '')+'</div>' : '';
+            // The API sends kickoff as an ISO timestamp; legacy payloads used time.
+            var kickoffValue = leg.kickoff || leg.time;
+            var kickoffLabel = kickoffValue ? formatDate(kickoffValue).replace(/ WAT$/, ' WAT') : '';
+            var leagueLine = (leg.league || kickoffLabel) ? '<div class="two-leg-league">'+(leg.league ? escapeHtml(leg.league) : '')+(kickoffLabel ? ' &bull; '+escapeHtml(kickoffLabel) : '')+'</div>' : '';
             var statusLabel = leg.priceStatus==='verified'?'Verified':'Estimated';
             body+='<div class="two-leg"><div class="two-leg-num">'+(i+1)+'</div><div class="two-leg-body"><div class="two-leg-match">'+escapeHtml(leg.match)+'</div>'+leagueLine+'<div class="two-leg-market"><strong>'+escapeHtml(leg.selection)+'</strong> &bull; '+escapeHtml(leg.market)+'</div></div><div class="two-leg-right"><div class="two-leg-price">'+Number(leg.price).toFixed(2)+'</div><div class="two-leg-status '+escapeHtml(leg.priceStatus||'estimated')+'">'+escapeHtml(statusLabel)+(leg.bookmaker?' via '+escapeHtml(leg.bookmaker):'')+'</div></div></div>';
           });
