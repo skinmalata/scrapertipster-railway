@@ -79,7 +79,12 @@ jobs:
       - name: Run scraper
         run: node scripts/gh-pages-scraper.js
 
+      # Best-effort bookkeeping: two runs triggered close together both check
+      # out their own head SHA and both rewrite these three files, so the
+      # second one's pull/push can lose the race. That must never be able to
+      # abort the deploy -- the next run regenerates the same commit anyway.
       - name: Persist analysis archive and generation registries
+        continue-on-error: true
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -89,7 +94,7 @@ jobs:
           else
             git commit -m "chore: update analysis archive and page registries"
             git -c rebase.autostash=true pull --rebase origin main || true
-            git push origin main
+            git push origin main || echo "archive push lost a race with a concurrent run"
           fi
 
       - name: Bake shared nav/footer layout into static pages
