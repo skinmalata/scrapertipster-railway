@@ -26,8 +26,8 @@
   window.__wftMondiadLoaded = true;
 
   var FORMATS = [
-    { src: 'https://ss.mrmnd.com/banner.js', slot: '[data-mndbanid]' },
-    { src: 'https://ss.mrmnd.com/native.js', slot: '[data-mndazid]' }
+    { name: 'banner', src: 'https://ss.mrmnd.com/banner.js', slot: '[data-mndbanid]' },
+    { name: 'native', src: 'https://ss.mrmnd.com/native.js', slot: '[data-mndazid]' }
   ];
 
   var injected = {};
@@ -82,6 +82,27 @@
     if (!slot) return;
     whenNearViewport(slot, function () { injectScript(fmt.src, slot); });
   }
+
+  // Shared entry point for slots that appear later in the page lifetime: the
+  // inline units /pred-ads.js injects between prediction cards cannot be baked,
+  // so they call this instead of re-declaring the script URLs or their own copy
+  // of the "already injected" guard. Consent is re-checked here rather than
+  // trusted from the caller, so the gate remains the single authority on when a
+  // personalised request may go out.
+  function requestFormat(name, slot) {
+    var fmt = null;
+    for (var i = 0; i < FORMATS.length; i++) { if (FORMATS[i].name === name) { fmt = FORMATS[i]; break; } }
+    if (!fmt) return false;
+    if (injected[fmt.src]) return true;
+    var c = consent();
+    if (!c) return false;
+    if (c.isGranted()) { injectScript(fmt.src, slot); return true; }
+    c.whenGranted(function () { injectScript(fmt.src, slot); });
+    return true;
+  }
+
+  window.WFT = window.WFT || {};
+  window.WFT.loadMondiadFormat = requestFormat;
 
   function init() {
     whenConsented(function () {

@@ -5,14 +5,21 @@
  * src/templates/layout.js is. This creates them once the grid exists, and
  * re-syncs whenever the grid is rebuilt (date switch).
  *
+ * Placement: the units sit inside the pick list, directly under the second card,
+ * where a reader is already looking. The page-level <aside class="wft-ads"> that
+ * src/templates/layout.js bakes used to be the only position, but on these pages
+ * it lands ~4,400px down -- below the fold for almost every visit, so it was
+ * never seen. Once the inline slots are in place the baked block is removed from
+ * the page, which also stops the same zones being requested twice per view.
+ *
  * Deliberate constraints:
  *  - Nothing is created before consent is granted, so an EU/UK visitor who has
  *    not decided never receives ad markup at all.
- *  - At most 2 slots, and never above the 4th card, so the strongest picks keep
- *    the top of the list uninterrupted.
- *  - A slot the network does not fill collapses. Monetag serves one banner per
- *    zone request, so an empty container is a legitimate outcome and must not be
- *    left behind as a hole in the list.
+ *  - Only on pages that actually have a card grid, so the utility/legal screens
+ *    that share this template never get an ad injected.
+ *  - A slot the network does not fill collapses. Mondiad returns no creative on
+ *    a zone with no demand, so an empty container is a legitimate outcome and
+ *    must not be left behind as a hole in the list.
  */
 (function () {
   'use strict';
@@ -20,20 +27,19 @@
   if (window.__wftPredAds) return;
   window.__wftPredAds = true;
 
-  var MIN_CARDS = 9;    // shorter lists are not worth interrupting
-  var AFTER = [4, 10];  // 1-based card index each slot follows
+  var MIN_CARDS = 3;    // shorter lists cannot host a slot after the 2nd card
+  var AFTER = [2, 6];   // 1-based card index each slot follows
   var GRACE_MS = 8000;  // how long an empty slot is kept before collapsing
-
-  function onPredictionPage() {
-    return /^\/predictions\/[^/]+\/?$/.test(window.location.pathname);
-  }
+  var FORMAT = 'native'; // in-content format; the page-level slot is removed
 
   function consent() {
     return (window.WFT && window.WFT.consent) || null;
   }
 
+  // Mondiad inserts a *blank* iframe (no src) when a zone returns no creative,
+  // so a bare iframe match is not evidence of a fill -- only a loaded one is.
   function isFilled(slot) {
-    return !!slot.querySelector('iframe, img, video, ins');
+    return !!slot.querySelector('iframe[src], img[src], video[src], ins');
   }
 
   function collapse(node) {
@@ -46,24 +52,31 @@
     aside.setAttribute('aria-label', 'Advertisements');
     aside.setAttribute('data-wft-pred-ad', '1');
     var unit = document.createElement('div');
-    unit.className = 'wft-ad wft-ad-ipp';
-    unit.setAttribute('data-wft-ad', 'ipp');
+    unit.className = 'wft-ad wft-ad-native';
+    unit.setAttribute('data-wft-ad', 'mondiad-native');
+    unit.setAttribute('data-mndazid', '147781a6-7f81-43a0-8c85-f9cf3a461f5a');
     aside.appendChild(unit);
     return aside;
   }
 
-  function askForFill(unit) {
-    if (window.WFT && typeof window.WFT.requestInlineIpp === 'function') {
-      window.WFT.requestInlineIpp(unit);
-      return;
+  // The zone div must be in the DOM before the network script scans for it, and
+  // /mondiad.js owns the script URL and its once-per-page guard. It publishes
+  // the API on DOMContentLoaded; retry briefly rather than dropping the slot if
+  // this file happens to run first. The slot itself is passed down so the
+  // give-up path removes the whole reserved block, not just the inner div.
+  function askForFill(slot, attemptsLeft) {
+    if (window.WFT && typeof window.WFT.loadMondiadFormat === 'function') {
+      if (window.WFT.loadMondiadFormat(FORMAT)) return;
     }
-    // /monetag.js is not on the page (ads disabled): drop the slot rather than
-    // leaving a reserved hole.
-    collapse(unit.parentNode);
+    if (attemptsLeft > 0) {
+      window.setTimeout(function () { askForFill(slot, attemptsLeft - 1); }, 200);
+    } else {
+      collapse(slot);
+    }
   }
 
-  function watch(slot, unit) {
-    askForFill(unit);
+  function watch(slot) {
+    askForFill(slot, 8);
     window.setTimeout(function () {
       if (!isFilled(slot)) collapse(slot);
     }, GRACE_MS);
@@ -82,6 +95,14 @@
     var n = 0;
     for (var i = 0; i < AFTER.length && totalCards >= AFTER[i]; i++) n++;
     return n;
+  }
+
+  // The page-level block is now redundant on any page that hosts inline slots.
+  // Removed only once placement succeeded, so a page that unexpectedly has no
+  // grid keeps its original unit.
+  function dropPageLevelBlock() {
+    var blocks = document.querySelectorAll('aside.wft-ads:not(.wft-ads-inline)');
+    Array.prototype.forEach.call(blocks, collapse);
   }
 
   function sync() {
@@ -105,8 +126,9 @@
       // state.cards is a snapshot, so the element references stay valid across
       // insertions.
       state.grid.insertBefore(slot, state.cards[AFTER[i] - 1].nextSibling);
-      watch(slot, slot.querySelector('[data-wft-ad="ipp"]'));
+      watch(slot);
     }
+    dropPageLevelBlock();
   }
 
   function onlyOurSlots(nodes) {
@@ -150,7 +172,11 @@
   }
 
   function init() {
-    if (!onPredictionPage()) return;
+    // Deliberately not a path allow-list. The homepage and /predictions/* were
+    // the only callers when this was Monetag-only, but the card grid is also
+    // what league, matrix and date-archive pages render. Gating on the grid
+    // itself (gridState) keeps the utility/legal screens -- which share this
+    // template but have no picks -- ad-free without hardcoding every URL.
     var c = consent();
     if (!c) return;
     if (c.isGranted()) {

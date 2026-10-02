@@ -263,7 +263,7 @@ const SKIP_PAGES = new Set(['admin.html', 'app.html', 'offline.html', 'yandex_7d
 // the previous version: the new rules simply never reach visitors. The JS files
 // were unaffected so far only because they are new enough that no stale copy
 // exists yet.
-const ADS_ASSET_VERSION = 4;
+const ADS_ASSET_VERSION = 5;
 const ADS_CSS_LINK = '<link rel="stylesheet" href="/ads.css?v=' + ADS_ASSET_VERSION + '">';
 
 // Adsterra's own units, wrapped by adSection() below.
@@ -316,7 +316,9 @@ function adSection() {
 
 const ADS_LOADER = '<script src="/adsterra.js?v=' + ADS_ASSET_VERSION + '" defer></script>';
 const MONETAG_LOADER = '<script src="/monetag.js?v=' + ADS_ASSET_VERSION + '" defer></script>';
-// Runtime helper that slots banners between prediction cards on /predictions/*.
+// Runtime helper that slots the ad units between prediction cards, under the
+// second card. On any page that renders a card grid it also removes the baked
+// page-level block below, which sits far past the fold on those pages.
 const PRED_ADS_LOADER = '<script src="/pred-ads.js?v=' + ADS_ASSET_VERSION + '" defer></script>';
 
 // Adsterra and Monetag are both switched off; Mondiad (Banner + Native) is the
@@ -325,9 +327,16 @@ const PRED_ADS_LOADER = '<script src="/pred-ads.js?v=' + ADS_ASSET_VERSION + '" 
 // leaves an empty reserved box behind (which would otherwise collapse to a gap
 // without /ads.css).
 //
-// Monetag being off means all three of its entry points go dark together: the
-// /monetag.js loader, its ipp slot, and /pred-ads.js, which fills inter-card
-// slots by calling WFT.requestInlineIpp -- an API only /monetag.js defines.
+// The Mondiad zone below is the page-level fallback for pages with no card grid.
+// Where a grid exists, /pred-ads.js takes over and lifts the same zone inline
+// between the picks, then removes this block, so one view never requests the
+// same zone twice.
+//
+// Monetag being off means both of its entry points go dark together: the
+// /monetag.js loader and its ipp slot. /pred-ads.js used to be a third entry
+// point, filling inter-card slots via WFT.requestInlineIpp -- an API only
+// /monetag.js defines -- and so collapsed every slot it created. It now fills
+// through Mondiad instead.
 const ADSTERRA_ENABLED = false;
 const MONETAG_ENABLED = false;
 const MONDIAD_ENABLED = MONDIAD_BANNER_ENABLED || MONDIAD_NATIVE_ENABLED;
