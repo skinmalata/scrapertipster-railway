@@ -382,25 +382,120 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
     }
   }
 
+  var RETRY_STYLE = 'margin-top:10px;padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer';
+  var PROBE_MS = 8000;
+  var PROGRESS_MS = 15000;
+  var DEADLINE_MS = 90000;
+  var loadGeneration = 0;
+  var content = document.getElementById('content');
+  var phase = 'spinner';
+
+  function stateHtml(title, body, withRetry) {
+    return '<div class="empty-state"><h2>' + title + '</h2><p>' + body +
+      (withRetry ? ' <button onclick="load()" style="' + RETRY_STYLE + '">Retry</button>' : '') +
+      '</p></div>';
+  }
+
+  function loadingHtml() {
+    return '<div class="loading"><div class="spinner"></div>' +
+      '<span class="loading-text">Analyzing today\'s fixtures across all markets...</span></div>';
+  }
+
+  function show(html, next) {
+    phase = next;
+    content.innerHTML = html;
+  }
+
+  var UNREACHABLE = stateHtml('Can&rsquo;t reach the server',
+    'The predictions service did not respond. It may be restarting.', true);
+
+  // Liveness probe. The API is a separate host, so it can be down while this
+  // page loaded perfectly -- and a lone request against it gives no signal
+  // until the browser gives up, which is minutes. Any HTTP exchange resolves
+  // this (no-cors), so CORS config on the API cannot make a healthy host look
+  // dead, and a dead one is reported after PROBE_MS instead of hanging.
+  var probeState = { promise: null, resolvedAt: 0, alive: null };
+
+  function probe(force) {
+    var reusable = probeState.promise && !force &&
+      (probeState.resolvedAt === 0 || Date.now() - probeState.resolvedAt < 15000);
+    if (reusable) return probeState.promise;
+
+    var p = new Promise(function (resolve) {
+      if (typeof AbortController === 'undefined') { resolve(true); return; }
+      var ctrl = new AbortController();
+      var timer = setTimeout(function () { ctrl.abort(); }, PROBE_MS);
+      var settle = function (alive) {
+        clearTimeout(timer);
+        probeState.alive = alive;
+        probeState.resolvedAt = Date.now();
+        resolve(alive);
+      };
+      fetch(API_BASE + '/', { mode: 'no-cors', cache: 'no-store', signal: ctrl.signal })
+        .then(function () { settle(true); }, function () { settle(false); });
+    });
+    probeState.promise = p;
+    probeState.resolvedAt = 0;
+    return p;
+  }
+
+  // Armed at parse time rather than inside load(): load() is gated on auth
+  // readiness, and waiting for that to even learn the host is down is most of
+  // the delay the visitor was complaining about.
+  probe().then(function (alive) {
+    if (!alive && phase !== 'done') show(UNREACHABLE, 'error');
+  });
+
   async function load() {
-    var content = document.getElementById('content');
-    var timeoutMs = 45000;
-    var timeoutId = setTimeout(function() {
-      content.innerHTML = '<div class="empty-state"><h2>Still analyzing...</h2><p>Building the pool takes up to a minute on cold start. <button onclick="load()" style="margin-top:10px;padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer">Retry</button></p></div>';
-    }, timeoutMs);
+    var gen = ++loadGeneration;
+    // Retry re-probes: the host may have come back. The first load reuses the
+    // probe already in flight, so it does not pay for the request twice.
+    show(loadingHtml(), 'spinner');
+
+    var alive;
+    try {
+      alive = await probe(gen > 1);
+    } catch (e) { alive = false; }
+    if (gen !== loadGeneration) return;
+    if (!alive) { show(UNREACHABLE, 'error'); return; }
+
+    // Server is up, so a wait now means the pool is being built. Say so early
+    // enough that it does not read as a frozen page.
+    var progressTimer = setTimeout(function () {
+      if (gen !== loadGeneration || phase !== 'spinner') return;
+      show(stateHtml('Still analyzing&hellip;',
+        'Building today&rsquo;s pool can take a minute or two on the first load of the day.', true), 'progress');
+    }, PROGRESS_MS);
+
+    // Hard ceiling, so a socket that accepts and then never answers still ends
+    // in a message with a way out.
+    var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var deadlineTimer = setTimeout(function () { if (ctrl) ctrl.abort(); }, DEADLINE_MS);
 
     try {
       var data;
       if (window.WFT && window.WFT.apiFetch) {
-        data = await window.WFT.apiFetch('/api/author-picks');
+        data = await window.WFT.apiFetch('/api/author-picks', ctrl ? { signal: ctrl.signal } : {});
       } else {
-        var res = await fetch(API_BASE + '/api/author-picks', { mode: 'cors' });
+        var res = await fetch(API_BASE + '/api/author-picks', { mode: 'cors', signal: ctrl ? ctrl.signal : undefined });
         data = await res.json();
       }
-      clearTimeout(timeoutId);
+      clearTimeout(progressTimer);
+      clearTimeout(deadlineTimer);
+      if (gen !== loadGeneration) return;
+
+      // apiFetch resolves rather than rejects on HTTP errors, so a 5xx body
+      // has to be recognised here or it renders as an empty pool.
+      if (!data || !data.matches || (typeof data.__status === 'number' && data.__status >= 400)) {
+        show(stateHtml('Failed to load', 'The service could not build today&rsquo;s pool.', true), 'error');
+        loadHistory();
+        return;
+      }
+
+      phase = 'done';
       // A pool served from the backoff fallback is an earlier day's picks. The
       // page used to present those as today's without saying so.
-      if (data && data.stale) {
+      if (data.stale) {
         var banner = document.getElementById('staleBanner');
         var when = data.poolDate ? data.poolDate : 'a previous day';
         banner.innerHTML = '<div class="stale-notice">Showing picks from ' +
@@ -410,10 +505,15 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
       }
       render(data);
     } catch (e) {
-      clearTimeout(timeoutId);
-      content.innerHTML = '<div class="empty-state"><h2>Failed to load</h2><p>The pool is being built. Check back shortly. <button onclick="load()" style="margin-top:10px;padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer">Retry</button></p></div>';
+      clearTimeout(progressTimer);
+      clearTimeout(deadlineTimer);
+      if (gen !== loadGeneration) return;
+      var aborted = e && (e.name === 'AbortError' || /abort/i.test(String(e.message || '')));
+      show(aborted
+        ? stateHtml('Took too long', 'The service is not answering. It may be restarting.', true)
+        : stateHtml('Failed to load', 'The connection dropped before the picks arrived.', true), 'error');
     }
-    loadHistory();
+    if (gen === loadGeneration) loadHistory();
   }
   window.load = load;
 
