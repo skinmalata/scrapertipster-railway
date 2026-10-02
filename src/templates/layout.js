@@ -299,16 +299,19 @@ const MONDIAD_NATIVE_ENABLED = true;
 // to anchor the lazy load (see loadInPagePush in /monetag.js).
 const MONETAG_UNITS = '  <div class="wft-ad wft-ad-ipp" data-wft-ad="ipp"></div>\n';
 
-// The active container network contributes its units first. Mondiad's display
-// zones are independent of that switch, so they are appended here instead of
-// being baked into one side's markup -- otherwise flipping ADSTERRA_ENABLED
-// would silently take Mondiad down with it.
+// Mondiad's display zones are always appended when enabled, independently of
+// which container network is on -- otherwise flipping ADSTERRA_ENABLED would
+// silently take Mondiad down with it. Each enabled network contributes only
+// its own units, so turning one off removes its slot rather than leaving an
+// empty reserved box on the page.
 function adSection() {
-  const primary = ADSTERRA_ENABLED ? ADSTERRA_UNITS : MONETAG_UNITS;
-  const mnd =
-    (MONDIAD_NATIVE_ENABLED ? '  ' + MONDIAD_NATIVE_DIV + '\n' : '') +
-    (MONDIAD_BANNER_ENABLED ? '  ' + MONDIAD_BANNER_DIV + '\n' : '');
-  return '<aside class="wft-ads" aria-label="Advertisements">\n' + primary + mnd + '</aside>';
+  const units = [];
+  if (ADSTERRA_ENABLED) units.push(ADSTERRA_UNITS);
+  else if (MONETAG_ENABLED) units.push(MONETAG_UNITS);
+  if (MONDIAD_NATIVE_ENABLED) units.push('  ' + MONDIAD_NATIVE_DIV + '\n');
+  if (MONDIAD_BANNER_ENABLED) units.push('  ' + MONDIAD_BANNER_DIV + '\n');
+  if (!units.length) return '';
+  return '<aside class="wft-ads" aria-label="Advertisements">\n' + units.join('') + '</aside>';
 }
 
 const ADS_LOADER = '<script src="/adsterra.js?v=' + ADS_ASSET_VERSION + '" defer></script>';
@@ -316,20 +319,24 @@ const MONETAG_LOADER = '<script src="/monetag.js?v=' + ADS_ASSET_VERSION + '" de
 // Runtime helper that slots banners between prediction cards on /predictions/*.
 const PRED_ADS_LOADER = '<script src="/pred-ads.js?v=' + ADS_ASSET_VERSION + '" defer></script>';
 
-// Adsterra is switched off for now; flip to true to re-enable. Monetag runs
-// In-Page Push. Baked copies of the markup are stripped either way
-// (stripAds) so pages never keep empty reserved boxes, which would otherwise
-// collapse to a gap without /ads.css.
+// Adsterra and Monetag are both switched off; Mondiad (Banner + Native) is the
+// only network serving. Flip a flag back to true to re-enable it -- stripAds
+// removes every network's baked markup either way, so a disabled network never
+// leaves an empty reserved box behind (which would otherwise collapse to a gap
+// without /ads.css).
+//
+// Monetag being off means all three of its entry points go dark together: the
+// /monetag.js loader, its ipp slot, and /pred-ads.js, which fills inter-card
+// slots by calling WFT.requestInlineIpp -- an API only /monetag.js defines.
 const ADSTERRA_ENABLED = false;
-const MONETAG_ENABLED = true;
+const MONETAG_ENABLED = false;
 const MONDIAD_ENABLED = MONDIAD_BANNER_ENABLED || MONDIAD_NATIVE_ENABLED;
-const ADS_ANY_ENABLED = ADSTERRA_ENABLED || MONETAG_ENABLED || MONDIAD_ENABLED;
 
 // Site-wide consent gate. Needed by every ad loader before it may request a
-// personalised network. Lives outside ADSTERRA_ENABLED because Monetag uses it
-// regardless of the Adsterra switch.
+// personalised network. Lives outside the network flags because Mondiad uses
+// it regardless of which other switches are set.
 const CONSENT_CSS_LINK = '<link rel="stylesheet" href="/consent.css">';
-const CONSENT_JS = '<script src="/consent.js?v=1" defer></script>';
+const CONSENT_JS = '<script src="/consent.js?v=2" defer></script>';
 
 // Utility/legal/payment pages carry no monetisable content and ads here
 // read as deceptive on a privacy or terms screen.
@@ -457,7 +464,12 @@ function applyLayoutToHtml(html, activePath) {
   if (!/consent\.css/.test(html)) {
     html = html.replace(/<\/head>/i, CONSENT_CSS_LINK + '\n</head>');
   }
-  if (!/consent\.js/.test(html)) {
+  // Version-aware: a page that already carries an older consent.js keeps its
+  // stale copy under a plain "is it present" guard, and returning visitors
+  // with consent.js?v=1 cached would never see banner copy changes.
+  if (/consent\.js/.test(html)) {
+    html = html.replace(/consent\.js\?v=\d+/g, 'consent.js?v=2');
+  } else {
     html = html.replace(/<\/body>/i, CONSENT_JS + '\n</body>');
   }
 
@@ -468,12 +480,14 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(/<\/body>/i, '<footer>' + FOOTER_HTML + '\n</footer>\n</body>');
   }
 
-  // 3a. Ad slots (content/prediction pages only).
-  if (ADS_ANY_ENABLED && shouldShowAds(activePath) && !/data-wft-ad="/.test(html)) {
+  // 3a. Ad slots (content/prediction pages only). adSection() returns '' when
+  // every network is off, in which case nothing -- not even the /ads.css link
+  // that only exists to reserve room for slots -- should be injected.
+  const section = adSection();
+  if (section && shouldShowAds(activePath) && !/data-wft-ad="/.test(html)) {
     if (!/\/ads\.css/.test(html)) {
       html = html.replace(/<\/head>/i, ADS_CSS_LINK + '\n</head>');
     }
-    const section = adSection();
     if (/<\/main>/i.test(html)) {
       html = html.replace(/<\/main>/i, section + '\n</main>');
     } else if (/<footer[^>]*>/i.test(html)) {

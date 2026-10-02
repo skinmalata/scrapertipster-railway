@@ -142,7 +142,7 @@
 
     var text = document.createElement('p');
     text.innerHTML = 'We use cookies and advertising partners to analyse traffic and improve our predictions. '
-      + 'Accepting allows personalised ads from Monetag. '
+      + 'Accepting allows personalised ads from Mondiad. '
       + 'See our <a href="/privacy.html">Privacy Policy</a>.';
 
     var actions = document.createElement('div');
