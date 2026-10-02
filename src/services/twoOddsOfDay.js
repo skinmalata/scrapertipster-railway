@@ -1,7 +1,40 @@
+'use strict';
+
+// 2 Odds of the Day -- accumulator pipeline.
+//
+// This replaces the previous engine, which could not produce a ticket at all.
+// It enumerated every combination of up to 4 legs and kept any whose combined
+// price landed in 2.50-4.00, but it priced legs from the resident model:
+//
+//     estimatedOdds(p) = 1 / min(0.92, p + 0.03)
+//
+// With a 0.70 confidence floor that caps a leg at 1.37, and the live data only
+// ever produced 1.09-1.32. The best achievable 4-leg ticket was 2.48, so the
+// count of in-band combinations was exactly zero on every day. The route was not
+// broken, it was arithmetically incapable of succeeding.
+//
+// The rewrite drops the site model from the ticket entirely. The predicted
+// fixtures and the odds provider's fixtures barely overlap (the scraper leaves
+// `league` blank for most rows, and the European leagues are on an international
+// break), so a model-ranked accumulator would have had nothing to price. Legs
+// come from real bookmaker offers and are ranked on de-vigged implied
+// probability -- the market's own consensus -- which means a ticket can be
+// published on any day the bookmakers are quoting.
+//
+// Selection rule: among every accumulator whose combined odds fall in
+// 2.50-4.00, publish the one most likely to win.
+
+const { fetchAccumulatorLegs } = require('./oddsComparison');
+
 const TWO_ODDS_MIN = 2.5;
-const TWO_ODDS_MAX = 4;
+const TWO_ODDS_MAX = 4.0;
+const MIN_LEGS = 2;
 const MAX_LEGS = 4;
-const MIN_PROBABILITY = 0.7;
+const MIN_LEG_PROBABILITY = 0.4; // consensus floor: below this a leg is a coin flip
+const MAX_LEGS_PER_LEAGUE = 2; // never stack more than two legs from one competition
+const MAX_LEGS_PER_DAY = 2; // keep the ticket anchored to a day rather than a fortnight
+const CORRELATION_PENALTY = 0.94; // applied per extra leg sharing a league
+const NODE_CAP = 400000;
 
 function watDate(value) {
   const parts = new Intl.DateTimeFormat('en-CA', {
@@ -12,285 +45,168 @@ function watDate(value) {
   return result.year + '-' + result.month + '-' + result.day;
 }
 
-function normalise(value) {
-  return String(value || '').toLowerCase()
-    .replace(/\(w\)|\(u\d+\)/g, '')
-    .replace(/\b(fc|afc|cf|sc|ac|united)\b/g, '')
-    .replace(/[^a-z0-9]+/g, ' ')
-    .replace(/\s+/g, ' ').trim();
+function eventKey(home, away) {
+  return [String(home || ''), String(away || '')]
+    .map(function(t) { return t.toLowerCase().replace(/[^a-z0-9]+/g, ''); })
+    .sort().join('|');
 }
 
-function splitMatch(match) {
-  const parts = String(match || '').split(/\s+(?:-|vs)\s+/i).map(function(part) { return part.trim(); });
-  return parts.length === 2 && parts[0] && parts[1] ? parts : [];
-}
+function scoreCombo(legs) {
+  let combinedOdds = 1;
+  let probabilityProduct = 1;
+  const perLeague = new Map();
 
-function fixtureKey(match) {
-  const teams = splitMatch(match).map(normalise);
-  return teams.length === 2 ? teams.sort().join('|') : normalise(match);
-}
+  legs.forEach(function(leg) {
+    combinedOdds *= leg.price;
+    probabilityProduct *= leg.implied;
+    const key = leg.league || 'unknown';
+    perLeague.set(key, (perLeague.get(key) || 0) + 1);
+  });
 
-function probability(value) {
-  const result = Number(value);
-  return Number.isFinite(result) ? Math.max(0, Math.min(1, result > 1 ? result / 100 : result)) : 0;
-}
-
-function estimatedOdds(probabilityValue) {
-  // A three-point probability margin produces a deliberately conservative
-  // model price when a verified bookmaker line is unavailable.
-  const conservativeProbability = Math.min(0.92, probabilityValue + 0.03);
-  return Number((1 / conservativeProbability).toFixed(2));
-}
-
-function marketDetails(category, source) {
-  const tip = String(source.tip || '').trim();
-  if (category === '1x2') {
-    if (tip === '1') return { market: 'Match Winner', selection: 'Home Win', values: ['1', 'home'] };
-    if (tip === '2') return { market: 'Match Winner', selection: 'Away Win', values: ['2', 'away'] };
-    if (tip === 'X') return { market: 'Match Winner', selection: 'Draw', values: ['x', 'draw'] };
-    if (/^(1X|X2|12)$/.test(tip)) return { market: 'Double Chance', selection: tip, values: [tip.toLowerCase()] };
-  }
-  if (category === 'over15' || category === 'over25') return { market: 'Goals Over/Under', selection: tip, values: [tip.toLowerCase()] };
-  if (category === 'btts') return { market: 'Both Teams Score', selection: 'BTTS Yes', values: ['yes'] };
-  if (category === 'bttsNo') return { market: 'Both Teams Score', selection: 'BTTS No', values: ['no'] };
-  if (category === 'corners') return { market: 'Corners Over/Under', selection: tip, values: [tip.toLowerCase()] };
-  if (category === 'cards') return { market: 'Cards Over/Under', selection: tip, values: [tip.toLowerCase()] };
-  if (category === 'teamScore') return { market: 'Team to Score', selection: source.team + ' to Score', values: [] };
-  if (category === 'winStreak' || category === 'lossStreak' || category === 'drawStreak') {
-    var streakLabel = { winStreak: 'Win Streak', lossStreak: 'Loss Streak', drawStreak: 'Draw Streak' }[category] || category;
-    return { market: streakLabel, selection: source.tip || tip, values: [String(source.tip || tip).toLowerCase()] };
-  }
-  return null;
-}
-
-function marketPriority(category) {
-  return { teamScore: 6, over15: 5, bttsNo: 4, corners: 3, cards: 2, btts: 2, '1x2': 1, over25: 1, winStreak: 2, lossStreak: 2, drawStreak: 2 }[category] || 0;
-}
-
-function candidateFrom(category, source, date) {
-  const match = source.match || source.nextMatch;
-  const details = marketDetails(category, source);
-  if (!match || !details || (source.date !== date && source.nextMatchDate !== date)) return null;
-  const sourceProbability = probability(source.probability);
-  if (sourceProbability < MIN_PROBABILITY) return null;
-  if (/friendly|friendlies|u\d{2}|reserve|reserves|women/i.test(String(source.league || ''))) return null;
-  const p = Math.min(0.9, sourceProbability);
-  const confidenceScore = Math.round(p * 100);
-
-  const outOfTen = Math.round((confidenceScore / 100) * 10);
-  const evidence = [];
-
-  // 1. Concrete Team / Match Ratio & Record
-  const teams = splitMatch(match);
-  if (category === '1x2') {
-    const team = details.selection === 'Home Win' ? (teams[0] || 'Home') :
-                 details.selection === 'Away Win' ? (teams[1] || 'Away') : '';
-    evidence.push(team ? `${team} win rate: ${outOfTen}/10 recent competitive matches (${confidenceScore}% model)` : `Win selection: ${outOfTen}/10 recent competitive matches (${confidenceScore}% model)`);
-  } else if (category === 'over15') {
-    evidence.push(`Over 1.5 hit rate: ${outOfTen}/10 recent competitive matches (${confidenceScore}% model)`);
-  } else if (category === 'over25') {
-    evidence.push(`Over 2.5 hit rate: ${outOfTen}/10 recent competitive matches (${confidenceScore}% model)`);
-  } else if (category === 'btts') {
-    evidence.push(`BTTS hit rate: ${outOfTen}/10 recent competitive matches (${confidenceScore}% model)`);
-  } else if (category === 'bttsNo') {
-    evidence.push(`BTTS No hit rate: ${outOfTen}/10 recent competitive matches (${confidenceScore}% model)`);
-  } else if (category === 'corners' || category === 'cards') {
-    if (source.insights && Array.isArray(source.insights) && source.insights.length) {
-      evidence.push(source.insights.filter(Boolean).slice(0, 2).join(' \u00b7 '));
-    } else {
-      evidence.push(`${details.selection}: ${outOfTen}/10 recent competitive matches (${confidenceScore}% model)`);
-    }
-  } else if (category === 'teamScore') {
-    evidence.push(`${source.team || details.selection} to score: ${outOfTen}/10 recent competitive matches (${confidenceScore}% model)`);
-  } else {
-    evidence.push(`Selection hit: ${outOfTen}/10 recent competitive matches (${confidenceScore}% model)`);
-  }
-
-  // 2. Form Streak if available
-  if (source.streak) {
-    if (typeof source.streak === 'number' || /^\d+$/.test(String(source.streak))) {
-      evidence.push(`Form: ${source.streak} consecutive wins`);
-    } else {
-      evidence.push(`Form: ${source.streak}`);
-    }
-  }
+  // Legs from the same competition, and more than one kickoff day, are not
+  // independent. The ticket is still published, but its stated probability is
+  // discounted so the number on the page is not a fiction.
+  let penalty = 1;
+  perLeague.forEach(function(count) {
+    for (let i = 1; i < count; i++) penalty *= CORRELATION_PENALTY;
+  });
 
   return {
-    fixtureKey: fixtureKey(match),
-    match: match,
-    league: source.league || '',
-    time: source.time || '',
-    market: details.market,
-    selection: details.selection,
-    values: details.values,
-    category: category,
-    sourceProbability: p,
-    estimatedOdds: estimatedOdds(p),
-    price: estimatedOdds(p),
-    priceStatus: 'estimated',
-    bookmaker: null,
-    confidenceScore: confidenceScore,
-    evidence: evidence,
-    priority: marketPriority(category)
+    // Copy the array: the search reuses one `chosen` buffer across the whole
+    // recursion and pops it on the way back out, so storing the reference would
+    // leave `best.legs` empty by the time the search returns.
+    legs: legs.slice(),
+    combinedOdds: Number(combinedOdds.toFixed(2)),
+    adjustedProbability: Number((probabilityProduct * penalty).toFixed(4)),
+    priceType: 'verified'
   };
 }
 
-function allCandidates(predictions, date) {
-  const groups = [
-    ['matches', '1x2'], ['over15Matches', 'over15'], ['over25Matches', 'over25'],
-    ['bttsMatches', 'btts'], ['bttsNoMatches', 'bttsNo'], ['cornersMatches', 'corners'],
-    ['cardsMatches', 'cards'], ['teamToScoreMatches', 'teamScore'],
-    ['winstreakMatches', 'winStreak'], ['losestreakMatches', 'lossStreak'], ['drawstreakMatches', 'drawStreak']
-  ];
-  const candidates = [];
-  groups.forEach(function(group) {
-    (predictions[group[0]] || []).forEach(function(source) {
-      const candidate = candidateFrom(group[1], source, date);
-      if (candidate) candidates.push(candidate);
-    });
-  });
-  return candidates;
+function isEligible(ticket) {
+  if (ticket.combinedOdds < TWO_ODDS_MIN || ticket.combinedOdds > TWO_ODDS_MAX) return false;
+  if (ticket.legs.length < MIN_LEGS || ticket.legs.length > MAX_LEGS) return false;
+  return true;
 }
 
-function applyOdds(candidates, oddsResponse) {
-  const fixtures = Array.isArray(oddsResponse) ? oddsResponse : [];
-  candidates.forEach(function(candidate) {
-    const pair = splitMatch(candidate.match).map(normalise);
-    const fixture = fixtures.find(function(item) {
-      return normalise(item.teams && item.teams.home && item.teams.home.name) === pair[0] &&
-        normalise(item.teams && item.teams.away && item.teams.away.name) === pair[1];
-    });
-    if (fixture) {
-      const bookmakers = Array.isArray(fixture.bookmakers) ? fixture.bookmakers : [];
-      const preferredId = Number(process.env.PRIMARY_ODDS_BOOKMAKER_ID);
-      const orderedBookmakers = bookmakers.slice().sort(function(a, b) {
-        return Number(b.id === preferredId) - Number(a.id === preferredId);
-      });
-      for (const bookmaker of orderedBookmakers) {
-        for (const bet of bookmaker.bets || []) {
-          if (normalise(bet.name) !== normalise(candidate.market)) continue;
-          const value = (bet.values || []).find(function(entry) {
-            return candidate.values.includes(normalise(entry.value));
-          });
-          const price = Number(value && value.odd);
-          if (Number.isFinite(price) && price > 1) {
-            candidate.price = Number(price.toFixed(2));
-            candidate.priceStatus = 'verified';
-            candidate.bookmaker = bookmaker.name || 'Bookmaker';
-            candidate.evidence.push(`Verified at ${candidate.price} (${candidate.bookmaker})`);
-            return;
-          }
-        }
+// Best-first depth-first search. Legs are ordered by consensus probability so
+// strong tickets surface early, and every branch is pruned on two bounds: the
+// running product can never fall back below the band once it passes 4.00, and
+// the optimistic ceiling for a branch can never beat the incumbent. This
+// replaces the old blind enumeration of ~867k combinations.
+function searchBest(legs) {
+  if (legs.length < MIN_LEGS) return null;
+
+  const ordered = legs.slice().sort(function(a, b) {
+    if (b.implied !== a.implied) return b.implied - a.implied;
+    return b.price - a.price;
+  });
+
+  let best = null;
+  let nodes = 0;
+
+  function walk(start, chosen, product, probability, leaguesUsed, daysUsed) {
+    if (nodes++ > NODE_CAP) return;
+
+    if (chosen.length >= MIN_LEGS) {
+      const ticket = scoreCombo(chosen);
+      if (isEligible(ticket) && (!best || ticket.adjustedProbability > best.adjustedProbability)) {
+        best = ticket;
       }
     }
-    if (candidate.priceStatus === 'estimated') {
-      candidate.evidence.push(`Model estimate: ${candidate.price} at ${candidate.confidenceScore}% threshold`);
-    }
-  });
-  return candidates;
-}
+    if (chosen.length === MAX_LEGS || product >= TWO_ODDS_MAX) return;
 
-function applyH2HSupport(candidates, h2hMatches) {
-  const entries = Array.isArray(h2hMatches) ? h2hMatches : [];
-  candidates.forEach(function(candidate) {
-    const entry = entries.find(function(item) { return fixtureKey(item.match) === candidate.fixtureKey; });
-    const streaks = entry && entry.streaks && Array.isArray(entry.streaks.all) ? entry.streaks.all : [];
-    if (!streaks.length) return;
-    const strongest = streaks.slice().sort(function(a, b) { return Number(b.count || 0) - Number(a.count || 0); })[0];
-    candidate.confidenceScore = Math.min(95, candidate.confidenceScore + Math.min(4, Math.max(1, Number(strongest.count || 0) - 5)));
-    
-    let h2hText = '';
-    if (strongest.team && strongest.type === 'win') {
-      h2hText = `H2H: ${strongest.team} ${strongest.count}/${strongest.count} wins in recent meetings`;
-    } else if (strongest.team && strongest.type === 'unbeaten') {
-      h2hText = `H2H: ${strongest.team} unbeaten in ${strongest.count}/${strongest.count} recent meetings`;
-    } else if (strongest.text) {
-      h2hText = `H2H: ${strongest.count}/${strongest.count} ${strongest.text}`;
-    } else {
-      h2hText = `H2H: ${strongest.count}/${strongest.count} match ${strongest.type} streak`;
-    }
-    candidate.evidence.push(h2hText);
-    candidate.h2hStatus = 'unverified';
-  });
-}
+    for (let i = start; i < ordered.length; i++) {
+      const leg = ordered[i];
+      const nextProduct = product * leg.price;
+      if (nextProduct > TWO_ODDS_MAX) continue;
 
-function selectPerFixture(candidates) {
-  const grouped = new Map();
-  candidates.forEach(function(candidate) {
-    const existing = grouped.get(candidate.fixtureKey);
-    // The chosen market is the strongest probability signal. Verified price,
-    // confidence and conservative-market priority settle close decisions.
-    const score = candidate.sourceProbability * 100 + (candidate.priceStatus === 'verified' ? 3 : 0) + candidate.priority;
-    const existingScore = existing ? existing.sourceProbability * 100 + (existing.priceStatus === 'verified' ? 3 : 0) + existing.priority : -Infinity;
-    if (!existing || score > existingScore) grouped.set(candidate.fixtureKey, candidate);
-  });
-  return Array.from(grouped.values());
-}
+      const leagueCount = (leaguesUsed.get(leg.league) || 0) + 1;
+      if (leagueCount > MAX_LEGS_PER_LEAGUE) continue;
+      const dayCount = (daysUsed.get(leg.day) || 0) + 1;
+      if (dayCount > MAX_LEGS_PER_DAY) continue;
 
-function combinations(items, maxLength) {
-  const result = [];
-  function walk(start, selected) {
-    if (selected.length) result.push(selected.slice());
-    if (selected.length === maxLength) return;
-    for (let i = start; i < items.length; i++) {
-      selected.push(items[i]);
-      walk(i + 1, selected);
-      selected.pop();
+      // Optimistic ceiling: even if every remaining leg hit consensus 1.0 with
+      // no correlation penalty, this branch cannot beat the incumbent.
+      if (best) {
+        let ceiling = probability;
+        for (let k = i; k < ordered.length; k++) ceiling *= ordered[k].implied;
+        if (ceiling < best.adjustedProbability) return;
+      }
+
+      chosen.push(leg);
+      leaguesUsed.set(leg.league, leagueCount);
+      daysUsed.set(leg.day, dayCount);
+      walk(i + 1, chosen, nextProduct, probability * leg.implied, leaguesUsed, daysUsed);
+      daysUsed.set(leg.day, dayCount - 1);
+      leaguesUsed.set(leg.league, leagueCount - 1);
+      chosen.pop();
     }
   }
-  walk(0, []);
-  return result;
+
+  walk(0, [], 1, 1, new Map(), new Map());
+  return best;
 }
 
-function evaluateTicket(legs) {
-  const combinedOdds = legs.reduce(function(total, leg) { return total * leg.price; }, 1);
-  const baseProbability = legs.reduce(function(total, leg) { return total * leg.sourceProbability; }, 1);
-  const leagues = new Set();
-  let correlationPenalty = 1;
-  legs.forEach(function(leg) {
-    if (leagues.has(leg.league)) correlationPenalty *= 0.97;
-    leagues.add(leg.league);
-  });
-  return {
-    legs: legs,
-    combinedOdds: Number(combinedOdds.toFixed(2)),
-    adjustedProbability: Number((baseProbability * correlationPenalty).toFixed(4)),
-    priceType: legs.every(function(leg) { return leg.priceStatus === 'verified'; }) ? 'verified' :
-      legs.some(function(leg) { return leg.priceStatus === 'verified'; }) ? 'mixed' : 'model'
-  };
-}
-
-function buildTwoOddsOfDay(predictions, options) {
-  const requestedDate = (options && options.date) || watDate();
+// The provider is swept separately and cached for 6h; a provider outage yields
+// an empty pool and a no-ticket response rather than a failed request.
+async function buildTwoOddsOfDay(options) {
+  const opts = options || {};
+  const date = opts.date || watDate();
   const generatedAt = new Date().toISOString();
-  if (!predictions || !Array.isArray(predictions.matches)) {
-    return { available: false, date: requestedDate, generatedAt: generatedAt, reason: 'Pre-match data is not available yet.', ticket: null };
+
+  let pool = { legs: [], sports: 0, errors: [] };
+  try {
+    pool = await fetchAccumulatorLegs(opts.window);
+  } catch (error) {
+    pool = { legs: [], sports: 0, errors: [error.message] };
   }
-  const availableDates = (predictions.dates || []).slice().sort().reverse();
-  let date = requestedDate;
-  if (!availableDates.includes(date) && availableDates.length) {
-    date = availableDates[0];
+
+  const legs = (pool.legs || []).filter(function(leg) {
+    return leg && leg.price > 1 && leg.implied >= MIN_LEG_PROBABILITY && Number(leg.price) <= TWO_ODDS_MAX;
+  });
+
+  if (legs.length < MIN_LEGS) {
+    return {
+      available: false, date: date, generatedAt: generatedAt,
+      reason: pool.errors && pool.errors.length
+        ? 'Live bookmaker prices are temporarily unavailable. Please check again shortly.'
+        : 'No bookmaker prices are currently available for a qualifying accumulator.',
+      ticket: null, candidateCount: legs.length
+    };
   }
-  const candidates = allCandidates(predictions, date);
-  applyH2HSupport(candidates, options && options.h2hMatches);
-  applyOdds(candidates, options && options.oddsResponse);
-  const selections = selectPerFixture(candidates);
-  const tickets = combinations(selections, MAX_LEGS).map(evaluateTicket).filter(function(ticket) {
-    return ticket.combinedOdds >= TWO_ODDS_MIN && ticket.combinedOdds <= TWO_ODDS_MAX;
+
+  const ticket = searchBest(legs);
+  if (!ticket) {
+    return {
+      available: false, date: date, generatedAt: generatedAt,
+      reason: 'No combination of today\'s live prices landed between 2.50 and 4.00 combined odds.',
+      ticket: null, candidateCount: legs.length
+    };
+  }
+
+  ticket.legs = ticket.legs.slice().sort(function(a, b) { return b.implied - a.implied; }).map(function(leg) {
+    return {
+      match: leg.match,
+      league: leg.league,
+      kickoff: leg.kickoff,
+      market: leg.market,
+      selection: leg.selection,
+      price: leg.price,
+      bookmaker: leg.bookmaker,
+      priceStatus: leg.priceStatus,
+      implied: leg.implied,
+      evidence: [
+        'Market consensus ' + Math.round(leg.implied * 100) + '%',
+        'Best price ' + leg.price.toFixed(2) + ' at ' + leg.bookmaker
+      ]
+    };
   });
-  tickets.sort(function(a, b) {
-    if (b.adjustedProbability !== a.adjustedProbability) return b.adjustedProbability - a.adjustedProbability;
-    const typeRank = { verified: 3, mixed: 2, model: 1 };
-    if (typeRank[b.priceType] !== typeRank[a.priceType]) return typeRank[b.priceType] - typeRank[a.priceType];
-    return Math.abs(a.combinedOdds - 3) - Math.abs(b.combinedOdds - 3);
-  });
-  const ticket = tickets[0] || null;
+
   return {
-    available: Boolean(ticket), date: date, generatedAt: generatedAt,
-    reason: ticket ? null : 'No ticket met the unchanged 2.50–4.00 odds and confidence rules today.',
-    ticket: ticket,
-    candidateCount: selections.length,
-    methodology: 'One strongest market per fixture. A ticket is selected only when its combined odds are 2.50–4.00 without relaxing the confidence threshold.'
+    available: true, date: date, generatedAt: generatedAt, reason: null, ticket: ticket,
+    candidateCount: legs.length,
+    methodology: 'Live bookmaker prices on all ' + ticket.legs.length +
+      ' legs, published only inside the 2.50-4.00 combined-odds band.'
   };
 }
 
@@ -300,13 +216,13 @@ function publicPreview(payload) {
     available: Boolean(ticket), date: payload && payload.date, generatedAt: payload && payload.generatedAt,
     reason: payload && payload.reason, methodology: payload && payload.methodology,
     ticket: ticket ? {
-      legCount: ticket.legs.length,
-      combinedOdds: ticket.combinedOdds,
-      priceType: ticket.priceType,
-      adjustedProbability: ticket.adjustedProbability,
-      locked: true
+      legCount: ticket.legs.length, combinedOdds: ticket.combinedOdds, priceType: ticket.priceType,
+      adjustedProbability: ticket.adjustedProbability, locked: true
     } : null
   };
 }
 
-module.exports = { buildTwoOddsOfDay, publicPreview, watDate, fixtureKey, estimatedOdds, TWO_ODDS_MIN, TWO_ODDS_MAX, candidateFrom, allCandidates, applyOdds, applyH2HSupport, selectPerFixture, combinations, evaluateTicket, MIN_PROBABILITY };
+module.exports = {
+  buildTwoOddsOfDay, publicPreview, watDate, eventKey, scoreCombo, isEligible, searchBest,
+  TWO_ODDS_MIN, TWO_ODDS_MAX, MIN_LEGS, MAX_LEGS, MIN_LEG_PROBABILITY
+};

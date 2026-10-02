@@ -1,5 +1,8 @@
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
+
 // Live 1X2 odds comparison backed by The Odds API (the-odds-api.com).
 //
 // The analysis pages compare today's match odds across several bookmakers.
@@ -12,7 +15,11 @@
 // so they are not counted against the budget.
 
 const ODDS_API_BASE = 'https://api.the-odds-api.com';
-const ODDS_REGIONS = 'eu,ng'; // eu for global bookmakers, ng for Nigerian bookmakers (Bet9ja, SportyBet, etc.)
+// 'ng' is not a valid region on The Odds API v4: any request carrying it fails
+// with HTTP 422 INVALID_REGION, which is why every call here used to come back
+// empty and the site fell back to "no verified prices". 'eu' is valid and still
+// carries the Nigeria-facing books the audience uses (1xBet, BetOnline/AG).
+const ODDS_REGIONS = 'eu';
 const ODDS_MARKETS = 'h2h';
 const ODDS_FORMAT = 'decimal';
 const DATE_FORMAT = 'iso';
@@ -20,7 +27,11 @@ const DATE_FORMAT = 'iso';
 const SPORTS_CACHE_MS = 12 * 60 * 60 * 1000;
 const ODDS_CACHE_MS = 20 * 60 * 1000;
 const MAX_ODDS_CACHE = 60;
-const DAILY_ODDS_BUDGET = 20;
+// The accumulator sweep (10 sports) plus the analysis pages' per-fixture
+// lookups share this daily cap, so it has to cover a full sweep plus headroom.
+// The real ceiling is the monthly quota: ACCUMULATOR_CACHE_MS of 6h means at
+// most 4 sweeps/day, so ~40 requests/day worst case.
+const DAILY_ODDS_BUDGET = 60;
 
 let sportsListCache = { createdAt: 0, data: null, key: null };
 let oddsCache = new Map();
@@ -265,11 +276,21 @@ function releaseOddsBudget() {
   oddsBudget.used = Math.max(0, oddsBudget.used - 1);
 }
 
+// The Odds API requires commenceTimeFrom/To as YYYY-MM-DDTHH:MM:SSZ. The
+// default toISOString() format carries milliseconds ("...T11:58:14.290Z") and
+// is rejected with HTTP 422 INVALID_COMMENCE_TIME_FROM, so strip them.
+function toApiTime(value) {
+  return new Date(value).toISOString().replace(/\.\d{3}Z$/, 'Z');
+}
+
 // Fetches h2h odds for a sport between industry-standard ISO datetimes.
 // Responses with zero events are free on The Odds API, so the budget slot
 // consumed above is released when nothing comes back.
-async function fetchOddsForSport(sportKey, fromIso, toIso) {
-  var cacheKey = sportKey + '|' + fromIso.slice(0, 10) + '|' + toIso.slice(0, 10);
+async function fetchOddsForSport(sportKey, fromIso, toIso, markets) {
+  var marketList = markets || ODDS_MARKETS;
+  var fromParam = toApiTime(fromIso);
+  var toParam = toApiTime(toIso);
+  var cacheKey = sportKey + '|' + fromParam.slice(0, 10) + '|' + toParam.slice(0, 10) + '|' + marketList;
   var cached = oddsCache.get(cacheKey);
   if (cached && Date.now() - cached.createdAt < ODDS_CACHE_MS) return cached.events;
 
@@ -282,12 +303,12 @@ async function fetchOddsForSport(sportKey, fromIso, toIso) {
   var params = [
     'apiKey=' + encodeURIComponent(apiKey()),
     'regions=' + encodeURIComponent(ODDS_REGIONS),
-    'markets=' + encodeURIComponent(ODDS_MARKETS),
+    'markets=' + encodeURIComponent(marketList),
     'oddsFormat=' + encodeURIComponent(ODDS_FORMAT),
     'dateFormat=' + encodeURIComponent(DATE_FORMAT),
     'includeLinks=true',
-    'commenceTimeFrom=' + encodeURIComponent(fromIso),
-    'commenceTimeTo=' + encodeURIComponent(toIso)
+    'commenceTimeFrom=' + encodeURIComponent(fromParam),
+    'commenceTimeTo=' + encodeURIComponent(toParam)
   ];
 
   var events = [];
@@ -295,11 +316,22 @@ async function fetchOddsForSport(sportKey, fromIso, toIso) {
     var res = await fetch(ODDS_API_BASE + '/v4/sports/' + encodeURIComponent(sportKey) + '/odds/?' + params.join('&'), {
       signal: AbortSignal.timeout(20000)
     });
-    var remaining = Number(res.headers.get('x-requests-remaining'));
-    if (Number.isFinite(remaining)) oddsBudget.remaining = remaining;
+    // A failed response (401/429/5xx) can arrive with no x-requests-remaining
+    // header. Number(null) is 0, which is finite, so reading it unguarded used
+    // to set remaining=0 and permanently exhaust the budget for the process --
+    // one bad response silently killed all later odds lookups for the day.
+    var remainingHeader = res.headers.get('x-requests-remaining');
+    if (remainingHeader !== null && remainingHeader !== '') {
+      var remaining = Number(remainingHeader);
+      if (Number.isFinite(remaining)) oddsBudget.remaining = remaining;
+    }
     if (!res.ok) {
       releaseOddsBudget();
-      throw new Error('odds HTTP ' + res.status);
+      var detail = '';
+      try { detail = (await res.text()).slice(0, 200); } catch (e) { detail = ''; }
+      var httpError = new Error('odds HTTP ' + res.status + (detail ? ' - ' + detail : ''));
+      httpError.status = res.status;
+      throw httpError;
     }
     var body = await res.json();
     if (!Array.isArray(body)) body = [];
@@ -660,4 +692,164 @@ async function getOddsComparison(opts) {
   };
 }
 
-module.exports = { getOddsComparison, normalizeName, resolveSportKey, findEvent, mapBookmakers };
+// ---------------------------------------------------------------------------
+// Market-consensus accumulator pricing (2 Odds of the Day)
+//
+// The site model and the odds provider cover largely different fixtures, so
+// this sweep deliberately does NOT join against predictions. It builds its own
+// leg pool from whatever the bookmakers are actually offering, and ranks on
+// de-vigged implied probability -- the market's own consensus, rather than our
+// own model. That guarantees the accumulator is publishable on any day.
+//
+// Quota discipline: the free tier allows ~500 requests/month and the analysis
+// pages also consume it, so the sweep is capped at ACCUMULATOR_SPORTS entries
+// and cached for ACCUMULATOR_CACHE_MS. At 10 sports every 6h that is ~40
+// requests/day worst case, and usually far less because sports with no events
+// in the window are free and get skipped.
+// ---------------------------------------------------------------------------
+
+const ACCUMULATOR_SPORTS = [
+  'soccer_uefa_nations_league',
+  'soccer_epl',
+  'soccer_spain_la_liga',
+  'soccer_germany_bundesliga',
+  'soccer_italy_serie_a',
+  'soccer_france_ligue_one',
+  'soccer_brazil_campeonato',
+  'soccer_argentina_primera_division',
+  'soccer_usa_mls',
+  'soccer_netherlands_eredivisie'
+];
+
+const ACCUMULATOR_CACHE_MS = 6 * 60 * 60 * 1000;
+const ACCUMULATOR_MARKETS = 'h2h';
+const ACCUMULATOR_MIN_IMPLIED = 0.4; // below this a leg is a coin-flip, not an accumulator building block
+
+let accumulatorCache = { createdAt: 0, from: null, to: null, legs: [], sports: 0, errors: [] };
+const ACCUMULATOR_CACHE_DISK = path.join(__dirname, '..', '..', 'two-odds-legs-cache.json');
+
+function deVig(outcomes) {
+  const raw = outcomes.map(function(o) { return 1 / Number(o.price); });
+  const total = raw.reduce(function(a, b) { return a + b; }, 0);
+  if (!(total > 0)) return [];
+  return raw.map(function(r) { return r / total; });
+}
+
+// Best available price per outcome, carrying the market-consensus probability.
+function consensusForEvent(event) {
+  var best = {};
+  var bookmakers = Array.isArray(event.bookmakers) ? event.bookmakers : [];
+  for (var b = 0; b < bookmakers.length; b++) {
+    var book = bookmakers[b];
+    var markets = Array.isArray(book.markets) ? book.markets : [];
+    for (var m = 0; m < markets.length; m++) {
+      var market = markets[m];
+      if (market.key !== 'h2h') continue;
+      var probs = deVig(Array.isArray(market.outcomes) ? market.outcomes : []);
+      var outcomes = Array.isArray(market.outcomes) ? market.outcomes : [];
+      for (var o = 0; o < outcomes.length; o++) {
+        var outcome = outcomes[o];
+        var price = Number(outcome.price);
+        if (!Number.isFinite(price) || price <= 1) continue;
+        if (!best[outcome.name] || price > best[outcome.name].price) {
+          best[outcome.name] = {
+            price: Number(price.toFixed(2)),
+            implied: probs[o] || 0,
+            bookmaker: book.title || book.key || 'Bookmaker'
+          };
+        }
+      }
+    }
+  }
+  return best;
+}
+
+function loadAccumulatorCache() {
+  if (accumulatorCache.from && Date.now() - accumulatorCache.createdAt < ACCUMULATOR_CACHE_MS) return accumulatorCache;
+  try {
+    if (fs.existsSync(ACCUMULATOR_CACHE_DISK)) {
+      var disk = JSON.parse(fs.readFileSync(ACCUMULATOR_CACHE_DISK, 'utf8'));
+      if (disk && Array.isArray(disk.legs) && Date.now() - (disk.createdAt || 0) < ACCUMULATOR_CACHE_MS) {
+        accumulatorCache = disk;
+        return accumulatorCache;
+      }
+    }
+  } catch (e) {
+    console.warn('[two-odds] Leg cache read failed:', e.message);
+  }
+  return null;
+}
+
+function saveAccumulatorCache(payload) {
+  try {
+    fs.writeFileSync(ACCUMULATOR_CACHE_DISK, JSON.stringify(payload));
+  } catch (e) {
+    console.warn('[two-odds] Leg cache write failed:', e.message);
+  }
+}
+
+// Returns the pooled leg list: { match, league, kickoff, selection, price,
+// implied, bookmaker }. Never throws; a provider outage yields an empty pool
+// and the caller publishes no ticket rather than failing the request.
+async function fetchAccumulatorLegs(windowIso) {
+  var cached = loadAccumulatorCache();
+  if (cached) return cached;
+
+  var from = windowIso && windowIso.from ? windowIso.from : new Date(Date.now() - 6 * 3600 * 1000).toISOString();
+  var to = windowIso && windowIso.to ? windowIso.to : new Date(Date.now() + 72 * 3600 * 1000).toISOString();
+
+  var legs = [];
+  var errors = [];
+  var used = 0;
+
+  for (var i = 0; i < ACCUMULATOR_SPORTS.length; i++) {
+    var sportKey = ACCUMULATOR_SPORTS[i];
+    var events;
+    try {
+      events = await fetchOddsForSport(sportKey, from, to, ACCUMULATOR_MARKETS);
+    } catch (err) {
+      errors.push(sportKey + ': ' + (err.message || 'unavailable'));
+      continue;
+    }
+    used++;
+    for (var e = 0; e < events.length; e++) {
+      var event = events[e];
+      var kickoff = Date.parse(event.commence_time);
+      if (!Number.isFinite(kickoff) || kickoff < Date.now() - 6 * 3600 * 1000) continue;
+      var consensus = consensusForEvent(event);
+      var names = Object.keys(consensus);
+      for (var n = 0; n < names.length; n++) {
+        var pick = consensus[names[n]];
+        if (pick.implied < ACCUMULATOR_MIN_IMPLIED) continue;
+        legs.push({
+          sport: sportKey,
+          league: sportKey.replace(/^soccer_/, '').replace(/_/g, ' '),
+          match: event.home_team + ' v ' + event.away_team,
+          home: event.home_team,
+          away: event.away_team,
+          kickoff: event.commence_time,
+          kickoffMs: kickoff,
+          day: new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Lagos' }).format(new Date(kickoff)),
+          selection: names[n],
+          market: 'Match Winner',
+          price: pick.price,
+          implied: Number(pick.implied.toFixed(4)),
+          bookmaker: pick.bookmaker,
+          priceStatus: 'verified'
+        });
+      }
+    }
+  }
+
+  var payload = { createdAt: Date.now(), from: from, to: to, legs: legs, sports: used, errors: errors };
+  if (legs.length) {
+    accumulatorCache = payload;
+    saveAccumulatorCache(payload);
+    console.log('[two-odds] Refreshed leg pool: ' + legs.length + ' legs across ' + used + ' sports');
+  } else {
+    console.warn('[two-odds] Leg pool empty; keeping any prior cache. errors=' + JSON.stringify(errors));
+  }
+  return accumulatorCache.legs.length ? accumulatorCache : payload;
+}
+
+module.exports = { getOddsComparison, normalizeName, resolveSportKey, findEvent, mapBookmakers, fetchAccumulatorLegs, ACCUMULATOR_SPORTS };

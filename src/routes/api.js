@@ -13,6 +13,9 @@ function getGeneratePostThumbnail() {
 const { asNumber } = require('../services/liveTips');
 const { getCachedLive } = require('../services/scrapeLive');
 const { getSettledTodayTips, getSettledTipsForDate } = require('../services/liveTipHistory');
+// The engine is async because it now prices legs from real bookmaker odds
+// (The Odds API) instead of the resident model. Model-only pricing could never
+// reach the 2.50-4.00 band, so the accumulator is built from verified lines.
 const { buildTwoOddsOfDay, watDate } = require('../services/twoOddsOfDay');
 const { buildTicket } = require('../services/ticketBuilder');
 const { getAvailableMatches } = require('../services/bookingCodes/resolver');
@@ -51,9 +54,11 @@ async function providerForPaymentId(paymentId) {
 }
 
 // API-Football was fully removed: the upstream subscription is suspended, so every
-// call failed and the request path was pure overhead. All pricing now comes from
-// resident model estimates (estimatedOdds), which is what buildTwoOddsOfDay and
-// buildTicket already fall back to when no verified bookmaker line is supplied.
+// call failed and the request path was pure overhead. 2 Odds now prices its legs
+// from live bookmaker odds (The Odds API) rather than resident model estimates --
+// the model could not reach the 2.50-4.00 band at any confidence floor, so the
+// accumulator was previously incapable of producing a ticket. buildTicket still
+// falls back to estimatedOdds when no verified line is supplied.
 let scraperService = null;
 let cornersLastScrape = null;
 const SCRAPE_INTERVAL_MS = 2 * 60 * 60 * 1000;
@@ -944,11 +949,12 @@ router.get('/two-odds/today', async function(req, res) {
     if (predictions && predictions.isStale) {
       triggerTwoOddsBackgroundRefresh();
     }
-    // API-Football was removed. buildTwoOddsOfDay prices legs from the resident
-    // model (estimatedOdds) when no verified bookmaker line is supplied, which is
-    // the same fallback the ticket builder already uses.
-    const h2hMatches = await fetchTodayStreaks();
-    const payload = buildTwoOddsOfDay(predictions, { date: date, oddsResponse: null, h2hMatches: h2hMatches });
+    // The H2H streak lookup used to be awaited here with a 15s axios timeout and
+    // no fast path, which is what pushed /two-odds/today past the Render gateway
+    // timeout and returned 502. The rebuilt accumulator does not use it at all:
+    // legs come from real bookmaker prices and are ranked on market consensus,
+    // so the predicted-fixture feed is not part of the ticket.
+    const payload = await buildTwoOddsOfDay({ date: date });
     if (payload && payload.available) {
       twoOddsCache = { date, createdAt: Date.now(), payload };
       const entry = { date: date, available: true, ticket: payload.ticket, generatedAt: payload.generatedAt, savedAt: new Date().toISOString() };
