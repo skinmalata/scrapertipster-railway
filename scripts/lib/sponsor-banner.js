@@ -1,13 +1,17 @@
 // Reusable sponsored banner slot for WinFulltime prediction grids.
-// Two self-hosted 1win creatives alternate across pages (one per page, picked
-// deterministically by seed so the assignment is stable per URL).
+// Four self-hosted 1win creatives alternate across pages (one per page, picked
+// deterministically by seed so the assignment is stable per URL). Each entry
+// carries its own dimensions so the img width/height attributes always reserve
+// the correct aspect-ratio box, whatever creative is chosen.
 // Output mirrors the client-side renderSponsor() used by the JS-rendered pages
 // (see generate-category-pages.js / index.html / author-picks.html).
 
 const SPONSOR_HREF = 'https://one-vv5314.com/betting?open=register&p=f61e';
 const SPONSOR_BANNERS = [
-  '/img/banners/1win-banner-a.webp',
-  '/img/banners/1win-banner-b.webp'
+  { src: '/img/banners/1win-banner-a.webp', w: 800, h: 800 },
+  { src: '/img/banners/1win-banner-b.webp', w: 800, h: 800 },
+  { src: '/img/banners/1win-banner-c.webp', w: 800, h: 800 },
+  { src: '/img/banners/1win-banner-d.webp', w: 800, h: 800 }
 ];
 
 function pickSponsorIndex(seed) {
@@ -20,10 +24,10 @@ function pickSponsorIndex(seed) {
 }
 
 function renderSponsorBanner(seed) {
-  var idx = pickSponsorIndex(seed);
+  var creative = SPONSOR_BANNERS[pickSponsorIndex(seed)];
   return '<div class="wft-sponsor"><a href="' + SPONSOR_HREF +
     '" target="_blank" rel="noopener nofollow sponsored" title="1Win" aria-label="1Win">' +
-    '<img src="' + SPONSOR_BANNERS[idx] + '" alt="1Win" width="800" height="800" ' +
+    '<img src="' + creative.src + '" alt="1Win" width="' + creative.w + '" height="' + creative.h + '" ' +
     'loading="lazy" decoding="async" style="display:block;width:100%;height:auto;border-radius:12px;">' +
     '</a></div>';
 }

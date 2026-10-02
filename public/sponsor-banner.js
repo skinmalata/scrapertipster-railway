@@ -6,7 +6,12 @@
 // per page load (stable across date-tab re-renders).
 (function () {
   var SPONSOR_HREF = 'https://one-vv5314.com/betting?open=register&p=f61e';
-  var SPONSOR_BANNERS = ['/img/banners/1win-banner-a.webp', '/img/banners/1win-banner-b.webp'];
+  var SPONSOR_BANNERS = [
+    { src: '/img/banners/1win-banner-a.webp', w: 800, h: 800 },
+    { src: '/img/banners/1win-banner-b.webp', w: 800, h: 800 },
+    { src: '/img/banners/1win-banner-c.webp', w: 800, h: 800 },
+    { src: '/img/banners/1win-banner-d.webp', w: 800, h: 800 }
+  ];
 
   function pickSponsorIndex(seed) {
     var s = String(seed == null ? '' : seed);
@@ -25,9 +30,10 @@
     if (first < 0) return gridHtml;
     var second = gridHtml.indexOf(marker, first + marker.length);
     if (second < 0) return gridHtml;
+    var creative = SPONSOR_BANNERS[index];
     var banner = '<div class="wft-sponsor"><a href="' + SPONSOR_HREF +
       '" target="_blank" rel="noopener nofollow sponsored" title="1Win" aria-label="1Win">' +
-      '<img src="' + SPONSOR_BANNERS[index] + '" alt="1Win" width="800" height="800" ' +
+      '<img src="' + creative.src + '" alt="1Win" width="' + creative.w + '" height="' + creative.h + '" ' +
       'loading="lazy" decoding="async" style="display:block;width:100%;height:auto;border-radius:12px;">' +
       '</a></div>';
     var insertAt = second;
