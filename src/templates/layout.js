@@ -518,10 +518,13 @@ function applyLayoutToHtml(html, activePath) {
       html = html.replace(/<\/body>/i, MONDIAD_LOADER + '\n</body>');
     }
     // Market pages render their cards client-side, so the inter-card slots are
-    // injected at runtime by /pred-ads.js rather than baked like the footer
-    // slot above. Scoped to /predictions/* so no other page grows a second and
-    // third banner.
-    if (MONETAG_ENABLED && /^\/predictions\/[^/]+\/?$/.test(activePath) && !/pred-ads\.js/.test(html)) {
+    // injected at runtime by /pred-ads.js rather than baked like the page-level
+    // slot above. It is served on every ad-eligible page and decides for itself
+    // where a card grid exists, so the homepage and the league/matrix/archive
+    // pages are covered while the utility screens, having no grid, stay ad-free.
+    // This was gated on MONETAG_ENABLED, which left the file unreferenced
+    // everywhere once Monetag was switched off.
+    if (MONDIAD_ENABLED && !/pred-ads\.js/.test(html)) {
       html = html.replace(/<\/body>/i, PRED_ADS_LOADER + '\n</body>');
     }
   }
