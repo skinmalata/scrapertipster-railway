@@ -68,6 +68,22 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 app.set('trust proxy', 1);
 
+// Liveness probe for Render (render.yaml -> healthCheckPath). Registered ahead
+// of every other middleware on purpose: it does no disk, network or cache work,
+// so the only way it fails to answer is a blocked event loop -- which is exactly
+// the state Render has to be able to detect. Without this the platform never
+// probes the app at all, so a process that accepts TLS and then hangs stays
+// down until someone notices and restarts it by hand.
+app.get('/api/health', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.json({
+    status: 'ok',
+    uptime: Math.round(process.uptime()),
+    heapMB: Math.round(process.memoryUsage().heapUsed / 1048576),
+    pid: process.pid
+  });
+});
+
 // Visitor Analytics (in-memory storage)
 const visitorData = {
   visits: [],

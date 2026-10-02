@@ -98,6 +98,13 @@ jobs:
       - name: Emit redirect stubs for legacy/missing URLs
         run: node scripts/generate-redirects.js
 
+      # Publish the H2H pool to the same origin as the site. author-picks.html
+      # reads this only when the Render API cannot be reached, so a failure here
+      # must never block the deploy -- the last committed copy stays in place.
+      - name: Prewarm author-picks snapshot for offline fallback
+        continue-on-error: true
+        run: node scripts/prewarm-author-picks.js
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 

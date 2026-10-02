@@ -409,6 +409,72 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
   var UNREACHABLE = stateHtml('Can&rsquo;t reach the server',
     'The predictions service did not respond. It may be restarting.', true);
 
+  // Same-origin snapshot published by CI alongside this page
+  // (scripts/prewarm-author-picks.js). Reached only when the API host cannot be
+  // reached at all, or answers with an error: the pool is built from sources
+  // the same deploy just refreshed, so it is still today's picks -- but it must
+  // be labelled last-published rather than presented as live.
+  var STATIC_POOL = '/data/author-picks.json';
+  var staticPoolPromise = null;
+
+  function staticPool() {
+    if (staticPoolPromise) return staticPoolPromise;
+    staticPoolPromise = fetch(STATIC_POOL, { cache: 'no-cache' })
+      .then(function (res) {
+        return res.ok ? res.json() : Promise.reject(new Error('HTTP ' + res.status));
+      })
+      .then(function (d) {
+        if (!d || !Array.isArray(d.matches) || !d.matches.length) throw new Error('empty pool');
+        return d;
+      })
+      .catch(function (e) {
+        staticPoolPromise = null; // a Retry must still be able to try again
+        throw e;
+      });
+    return staticPoolPromise;
+  }
+
+  function staticBuiltLabel(data) {
+    var built = data.generatedAt || data.publishedAt;
+    if (!built) return '';
+    return String(built).replace(/</g, '&lt;').replace('T', ' ').replace(/\.\d+Z$/, ' UTC').replace(/Z$/, ' UTC');
+  }
+
+  // Returns true when the snapshot rendered, in which case the caller must not
+  // show an error state. `gen` is the caller's loadGeneration so a superseded
+  // load cannot paint over a newer one.
+  async function showStatic(gen) {
+    var data;
+    try { data = await staticPool(); } catch (e) { return false; }
+    if (gen !== loadGeneration) return false;
+    // Another path already rendered this generation -- report success without
+    // painting twice, so concurrent probe and load() callers do not collide.
+    if (phase === 'done') return true;
+
+    phase = 'done';
+    var banner = document.getElementById('staleBanner');
+    if (banner) {
+      var built = staticBuiltLabel(data);
+      banner.innerHTML = '<div class="stale-notice">The live predictions service is unreachable, so these are the last published picks' +
+        (built ? ' (built ' + built + ')' : '') +
+        '. <button onclick="load()" style="' + RETRY_STYLE + '">Try again</button></div>';
+      banner.style.display = 'block';
+    }
+    render(data);
+    // History lives behind the same unreachable host, and apiFetch has no
+    // timeout of its own -- asking for it here would leave "Loading history..."
+    // spinning forever against a socket that never answers. Say so instead; a
+    // successful Retry (which re-probes) still loads it normally at the end of
+    // load().
+    var perfGrid = document.getElementById('perfGrid');
+    if (perfGrid) {
+      perfGrid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><h2>History unavailable</h2></div>';
+    }
+    var perfSummary = document.getElementById('perfSummary');
+    if (perfSummary) perfSummary.innerHTML = '';
+    return true;
+  }
+
   // Liveness probe. The API is a separate host, so it can be down while this
   // page loaded perfectly -- and a lone request against it gives no signal
   // until the browser gives up, which is minutes. Any HTTP exchange resolves
@@ -443,7 +509,12 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
   // readiness, and waiting for that to even learn the host is down is most of
   // the delay the visitor was complaining about.
   probe().then(function (alive) {
-    if (!alive && phase !== 'done') show(UNREACHABLE, 'error');
+    if (alive || phase === 'done') return;
+    // The API host is down and load() may never run (it waits on auth, which
+    // itself needs the API), so the snapshot has to be reachable from here too.
+    showStatic(loadGeneration).then(function (ok) {
+      if (!ok && phase !== 'done' && phase !== 'error') show(UNREACHABLE, 'error');
+    });
   });
 
   async function load() {
@@ -457,7 +528,11 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
       alive = await probe(gen > 1);
     } catch (e) { alive = false; }
     if (gen !== loadGeneration) return;
-    if (!alive) { show(UNREACHABLE, 'error'); return; }
+    if (!alive) {
+      if (await showStatic(gen)) return;
+      show(UNREACHABLE, 'error');
+      return;
+    }
 
     // Server is up, so a wait now means the pool is being built. Say so early
     // enough that it does not read as a frozen page.
@@ -487,6 +562,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
       // apiFetch resolves rather than rejects on HTTP errors, so a 5xx body
       // has to be recognised here or it renders as an empty pool.
       if (!data || !data.matches || (typeof data.__status === 'number' && data.__status >= 400)) {
+        if (await showStatic(gen)) return;
         show(stateHtml('Failed to load', 'The service could not build today&rsquo;s pool.', true), 'error');
         loadHistory();
         return;
@@ -509,6 +585,9 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
       clearTimeout(deadlineTimer);
       if (gen !== loadGeneration) return;
       var aborted = e && (e.name === 'AbortError' || /abort/i.test(String(e.message || '')));
+      // A dropped connection or an expired deadline is the same practical
+      // condition as an unreachable host, so it gets the same way out.
+      if (await showStatic(gen)) return;
       show(aborted
         ? stateHtml('Took too long', 'The service is not answering. It may be restarting.', true)
         : stateHtml('Failed to load', 'The connection dropped before the picks arrived.', true), 'error');

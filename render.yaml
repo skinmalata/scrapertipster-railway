@@ -4,6 +4,10 @@ services:
     runtime: node
     buildCommand: npm ci
     startCommand: npm start
+    # Lets Render detect a process that is alive but not answering (a wedged
+    # event loop still completes TLS, so a plain TCP check passes) and restart it
+    # instead of leaving the API down until someone restarts it manually.
+    healthCheckPath: /api/health
     disk:
       name: live-tip-history
       mountPath: /var/data
