@@ -147,6 +147,32 @@ function generateH2hFaqSchema(home, away) {
   }, null, 2);
 }
 
+function generateH2hBreadcrumbSchema(home, away) {
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://winfulltime.com/'
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Predictions',
+        item: 'https://winfulltime.com/predictions/1x2'
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: `${home} vs ${away} H2H`
+      }
+    ]
+  }, null, 2);
+}
+
 function generateH2hPage(home, away, slug, streaks, league, country, links) {
   links = links || {};
   const canonicalUrl = `https://winfulltime.com/h2h/${slug}/`;
@@ -202,6 +228,9 @@ function generateH2hPage(home, away, slug, streaks, league, country, links) {
 <link rel="stylesheet" href="/app.css">
 <script type="application/ld+json">
 ${generateH2hFaqSchema(home, away)}
+</script>
+<script type="application/ld+json">
+${generateH2hBreadcrumbSchema(home, away)}
 </script>
 <style>
 .crumbs{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);margin:16px 0 24px}
