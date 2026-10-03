@@ -1,4 +1,4 @@
-/* Lazy loader for the Mondiad Banner and Native zones.
+/* Consent gate and slot handling for the Mondiad Banner and Native zones.
  *
  * The dashboard snippet is a bare <script async src=...> for <head> plus a
  * container div carrying the zone id:
@@ -6,16 +6,21 @@
  *   <script async src="https://ss.mrmnd.com/banner.js"></script>
  *   <div data-mndbanid="f2f6108f-b311-432a-b65d-06b00bb8132b"></div>
  *
- * That snippet is deliberately not baked into the page. Baking it would make
- * every EU/UK visitor request a personalised ad before /consent.js has
- * collected a decision, which is the one thing the gate exists to prevent.
- * This file runs after the baked slots are in the DOM, waits for consent, and
- * then appends the same script to <head> -- so the network gets the markup it
- * expects without the gate being bypassed.
+ * Both delivery scripts ARE baked into <head> now. They were not at first, on
+ * the reasoning that a bare tag would request a personalised ad before
+ * /consent.js has collected a decision. That reasoning was wrong in a way that
+ * mattered: Mondiad validates the *static* HTML, so a tag created here at
+ * runtime is invisible to their crawler and the zone read as never implemented.
+ * Their account manager confirmed exactly that and asked for the snippet to be
+ * in <head>.
+ *
+ * So the tag is static, per their instructions, and this file keeps what the
+ * tag cannot do: it exposes loadMondiadFormat() for the runtime slots
+ * /pred-ads.js injects between prediction cards, watches for no-fill so the
+ * reserved space collapses, and retains the consent gate for those late slots.
  *
  * Design constraints, matching public/monetag.js:
- *  - Nothing is requested until consent is granted AND the slot is near the
- *    viewport, so ad bandwidth never competes with the LCP element.
+ *  - Never double-load a network script: if the baked tag is present, it wins.
  *  - Each network script is injected at most once per page, and only when a
  *    matching zone div is actually present on that page.
  *  - Failures collapse the reserved slot instead of leaving a hole. */
@@ -64,10 +69,21 @@
   }
 
   // The network scans the document for its zone attribute when the script
-  // runs. The div is baked and this loader is deferred, so it is already
-  // present. Appending to <head> matches the snippet the dashboard hands out.
+  // runs. Both delivery scripts are now baked into <head> per the dashboard
+  // instructions, because Mondiad's validator reads the static HTML and cannot
+  // see tags created here. So this only injects as a fallback for a page whose
+  // head never got them, and must not double-load: if the network's own tag is
+  // already in the document, that tag wins and this returns.
+  function alreadyBaked(src) {
+    var tags = document.getElementsByTagName('script');
+    for (var i = 0; i < tags.length; i++) {
+      if ((tags[i].src || '').indexOf(src) !== -1) return true;
+    }
+    return false;
+  }
+
   function injectScript(src, slot) {
-    if (injected[src]) return;
+    if (injected[src] || alreadyBaked(src)) return;
     injected[src] = true;
 
     var s = document.createElement('script');

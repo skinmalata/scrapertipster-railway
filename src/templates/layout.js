@@ -275,12 +275,9 @@ const ADSTERRA_UNITS =
 
 // Mondiad display zones. The network ships one script per format, and each
 // reads its zone id back off the container div, so the divs must be present in
-// the DOM before the script runs. The dashboard hands out a bare
-// <script async src="https://ss.mrmnd.com/{banner,native}.js"> for <head>;
-// that is deliberately NOT what we bake, because it would request a
-// personalised ad from every EU/UK visitor before /consent.js has collected a
-// decision. /mondiad.js owns both script URLs and creates them in <head>
-// itself, but only once consent is granted and the slot is near view.
+// the DOM before the script runs. Both delivery scripts are now baked into
+// <head> (see MONDIAD_DELIVERY_SCRIPTS) because Mondiad's validator reads the
+// static HTML. /mondiad.js keeps consent gating and near-viewport behaviour.
 // One flat element per zone: it carries both our slot class (so ads.css and
 // stripAds treat it like any other unit) and the network's own zone attribute.
 // Nesting a bare network div inside a wrapper would survive the defensive
@@ -291,6 +288,16 @@ const MONDIAD_BANNER_DIV =
 const MONDIAD_NATIVE_DIV =
   '<div class="wft-ad wft-ad-native" data-wft-ad="mondiad-native" ' +
   'data-mndazid="147781a6-7f81-43a0-8c85-f9cf3a461f5a"></div>';
+// Mondiad delivery scripts, baked into <head> exactly as the dashboard
+// instructs. Mondiad's crawler validates the *static* HTML, so a script that
+// only ever appears after JS execution reads as "not implemented" to them --
+// which is what their account manager reported. These are `async`, so they do
+// not block rendering. /mondiad.js still runs and owns consent gating and
+// near-viewport injection, but the tag itself is now visible to the validator.
+const MONDIAD_DELIVERY_SCRIPTS =
+  '<script async src="https://ss.mrmnd.com/native.js"></script>\n' +
+  '<script async src="https://ss.mrmnd.com/banner.js"></script>';
+
 const MONDIAD_LOADER = '<script src="/mondiad.js?v=' + ADS_ASSET_VERSION + '" defer></script>';
 const MONDIAD_BANNER_ENABLED = true;
 const MONDIAD_NATIVE_ENABLED = true;
@@ -389,6 +396,12 @@ function stripFeaturedBooks(html) {
     .replace(/[ \t]*<script[^>]*adsterra\.js[^>]*><\/script>\r?\n?/gi, '')
     .replace(/[ \t]*<script[^>]*monetag\.js[^>]*><\/script>\r?\n?/gi, '')
     .replace(/[ \t]*<script[^>]*mondiad\.js[^>]*><\/script>\r?\n?/gi, '')
+    // Mondiad's delivery scripts are baked into <head> (see
+    // MONDIAD_DELIVERY_SCRIPTS), so they must be stripped alongside the other
+    // loaders. Without this, a re-bake kept them while removing ads.css, and
+    // the stylesheet came back after them -- applyLayout is no longer a fixed
+    // point and two bakes produce different head orderings.
+    .replace(/[ \t]*<script[^>]*ss\.mrmnd\.com\/(?:banner|native)\.js[^>]*><\/script>\r?\n?/gi, '')
     .replace(/[ \t]*<script[^>]*pred-ads\.js[^>]*><\/script>\r?\n?/gi, '')
     .replace(/[ \t]*<aside class="wft-ads"[\s\S]*?<\/aside>\r?\n?/gi, '')
     // Defensive: a partially-baked page could still carry bare slot divs.
@@ -510,10 +523,13 @@ function applyLayoutToHtml(html, activePath) {
     if (MONETAG_ENABLED && !/monetag\.js/.test(html)) {
       html = html.replace(/<\/body>/i, MONETAG_LOADER + '\n</body>');
     }
-    // Mondiad's own snippet is a bare <script async> for <head>. It is not
-    // baked: /mondiad.js decides at runtime whether consent has been given,
-    // then creates the script in <head> itself. This loader only marks that
-    // the page carries Mondiad slots.
+    // The delivery scripts must be in <head>, not appended at the end of
+    // <body>: the instructions say "anywhere between <head> and </head>".
+    if (MONDIAD_ENABLED && !/ss\.mrmnd\.com\/native\.js/.test(html)) {
+      html = html.replace(/<\/head>/i, MONDIAD_DELIVERY_SCRIPTS + '\n</head>');
+    }
+    // /mondiad.js stays for consent gating, viewport-triggered injection and
+    // no-fill collapsing. It must not re-inject what is now already in <head>.
     if (MONDIAD_ENABLED && !/mondiad\.js/.test(html)) {
       html = html.replace(/<\/body>/i, MONDIAD_LOADER + '\n</body>');
     }
