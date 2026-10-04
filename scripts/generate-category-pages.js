@@ -606,6 +606,18 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     if (ogUrl) ogUrl.content = 'https://winfulltime.com' + newUrl;
   }
 
+  function applyPredictionGating(list) {
+    if (!list || !list.length) return list;
+    var user = (window.WFT && typeof window.WFT.getUser === "function") ? window.WFT.getUser() : null;
+    if (user && user.isPro) return list;
+    var marketSlug = (typeof CATEGORY_SLUG === "string") ? CATEGORY_SLUG : "";
+    var alwaysFull = { "1x2": 1, "over-1-5": 1, "over-2-5": 1, "under-2-5": 1 };
+    if (alwaysFull[marketSlug]) return list;
+    if (typeof currentDate !== "undefined" && currentDate === "yesterday") return list;
+    var half = Math.ceil(list.length * 0.5);
+    return half < list.length ? list.slice(0, half) : list;
+  }
+
   function renderUnbeaten(matches) {
     var content = document.getElementById('content');
     if (matches.length === 0) {
@@ -613,8 +625,9 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       document.getElementById('totalMatches').textContent = '0';
       return;
     }
-    document.getElementById('totalMatches').textContent = matches.length;
-    var html = matches.map(function(match, i) {
+    var toRenderMatches = applyPredictionGating(matches);
+    document.getElementById('totalMatches').textContent = toRenderMatches.length;
+    var html = toRenderMatches.map(function(match, i) {
       var streaksHtml = (match.streaks || []).map(function(s) {
         var loc = s.location ? ' ' + s.location : '';
         return '<div class="streak-row"><span class="streak-team">' + s.team + '</span><span class="streak-badge">' + s.count + ' unbeaten' + loc + '</span></div>';
@@ -645,8 +658,9 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       return;
     }
 
-    document.getElementById('totalMatches').textContent = filtered.length;
-    var html = filtered.map(function(match, i) {
+    var toRenderMatches = applyPredictionGating(filtered);
+    document.getElementById('totalMatches').textContent = toRenderMatches.length;
+    var html = toRenderMatches.map(function(match, i) {
       var matchStr = (IS_STREAK ? (match.nextMatch || match.match) : (match.match || match.nextMatch)) || '';
       var teams = matchStr.indexOf(' - ') !== -1 ? matchStr.split(' - ') : matchStr.split(' vs ');
       var home = (teams[0] || '').trim();
@@ -798,6 +812,9 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
   }
 
   loadData();
+  document.addEventListener('wft-pro-status', function () {
+    if (typeof renderCurrentView === 'function') renderCurrentView();
+  });
 })();
 </script>
 <script src="/pwa.js?v=2"></script>
