@@ -591,7 +591,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     }
 
     document.getElementById('totalMatches').textContent = filtered.length;
-    var var toRenderMatches = applyPredictionGating(filtered);
+    var toRenderMatches = applyPredictionGating(filtered);
       var html = toRenderMatches.map(function(match, i) {
       var matchStr = (IS_STREAK ? (match.nextMatch || match.match) : (match.match || match.nextMatch)) || '';
       var teams = matchStr.indexOf(' - ') !== -1 ? matchStr.split(' - ') : matchStr.split(' vs ');
