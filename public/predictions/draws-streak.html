@@ -573,7 +573,8 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     }
 
     document.getElementById('totalMatches').textContent = filtered.length;
-    var html = filtered.map(function(match, i) {
+    var var toRenderMatches = applyPredictionGating(filtered);
+      var html = toRenderMatches.map(function(match, i) {
       var matchStr = (IS_STREAK ? (match.nextMatch || match.match) : (match.match || match.nextMatch)) || '';
       var teams = matchStr.indexOf(' - ') !== -1 ? matchStr.split(' - ') : matchStr.split(' vs ');
       var home = (teams[0] || '').trim();
@@ -656,7 +657,9 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     if (IS_UNBEATEN) {
       var dates = h2hData ? (h2hData.dates || {}) : {};
       var dateStr = getSelectedDateStr();
-      renderUnbeaten(dates[dateStr] || []);
+      var unbeatenList = dates[dateStr] || [];
+      var unbeatenToRender = applyPredictionGating(unbeatenList);
+      renderUnbeaten(unbeatenToRender);
     } else if (DATA_KEY && allData && allData[DATA_KEY]) {
       renderMatches(allData[DATA_KEY]);
     } else {
@@ -725,7 +728,14 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
   }
 
   loadData();
-})();
+  if (window.addEventListener) {
+    window.addEventListener('authchange', function () {
+      if (typeof renderCurrentView === 'function') {
+        renderCurrentView();
+      }
+    });
+  }
+
 </script>
 <script src="/pwa.js"></script>
 <script src="/1xbet-odds-widget.js" defer></script>

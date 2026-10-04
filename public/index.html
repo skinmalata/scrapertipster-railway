@@ -924,6 +924,8 @@ gtag('config', 'G-HMGZMW9EDP');
 
 
  function renderMatches() {
+  function applyPredictionGating(list){if(!list||list.length===0)return list;var isPro=false;if(window.WFT&&window.WFT.userState&&window.WFT.userState.user){isPro=!!window.WFT.userState.user.isPro;}var path=window.location.pathname;var marketSlug=(typeof CATEGORY_SLUG==='string')?CATEGORY_SLUG:'';var isYesterday=(typeof currentDate!=='undefined'&&currentDate==='yesterday');var isHomepage=(path==='/'||path==='/index.html');var allowedSlugs=['1x2','over-1-5','over-2-5','under-2-5'];var isAllowedTop=isHomepage||(marketSlug&&allowedSlugs.indexOf(marketSlug)!==-1);var isPredictionPage=path.indexOf('/predictions/')!==-1||path.indexOf('predictions/')===0;if(!isPro&&isPredictionPage&&!isAllowedTop&&!isYesterday&&list.length>0){var half=Math.ceil(list.length*0.5);if(half<list.length)return list.slice(0,half);}return list;}
+
 
  try {
 
@@ -1087,7 +1089,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
  const isTeamToScore = currentCategory === 'teamtoscore2plus' || currentCategory === 'cards';
 
- let displayMatches = filtered;
+ let displayMatches = applyPredictionGating(filtered);
 
 
 
@@ -1523,6 +1525,6 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
 
 <script src="/vip-tab.js" defer></script>
-</body>
+<script>if(window.addEventListener){window.addEventListener("authchange",function(){if(typeof renderMatches==="function") renderMatches();});}</script></body>
 
 </html>
