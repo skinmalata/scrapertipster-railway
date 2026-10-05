@@ -147,13 +147,16 @@ function generateNoscriptFallback(slug, catConfig) {
       const todaysMatches = matches.filter(m => m.date === today);
       const fullAccessCategories = ['1x2', 'over-1-5', 'over-2-5', 'under-2-5'];
       const visibleCount = fullAccessCategories.includes(slug)
-        ? Math.min(todaysMatches.length, 25)
-        : Math.min(Math.floor(todaysMatches.length * 0.5), 25);
-      const todays = todaysMatches.slice(0, visibleCount);
+        ? todaysMatches.length
+        : Math.ceil(todaysMatches.length * 0.5);
+      const todays = todaysMatches.slice(0, 25);
       if (todays.length > 0) {
-        rows = todays.map(m => {
+        rows = todays.map((m, index) => {
           const label = m.tip || (m.streaks && m.streaks.length ? m.streaks[0].count + ' unbeaten' : '');
-          return `<tr><td>${escapeHtml(m.league || '')}</td><td>${escapeHtml(m.match || '')}</td><td>${escapeHtml(m.time || '')}</td><td>${escapeHtml(String(label || ''))}</td>${catConfig.dataKey === 'bttsNoMatches' || !m.probability ? '' : `<td>${escapeHtml(String(m.probability || ''))}%</td>`}</tr>`;
+          const locked = index >= visibleCount;
+          const cell = value => `<span${locked ? ' class="vip-fallback-blur" aria-hidden="true"' : ''}>${value}</span>`;
+          const lockLabel = locked ? '<a class="vip-fallback-lock" href="/pricing.html">&#128274; VIP ONLY &mdash; Upgrade to view</a>' : '';
+          return `<tr${locked ? ' class="vip-locked-fallback"' : ''}><td>${cell(escapeHtml(m.league || ''))}${lockLabel}</td><td>${cell(escapeHtml(m.match || ''))}</td><td>${cell(escapeHtml(m.time || ''))}</td><td>${cell(escapeHtml(String(label || '')))}</td>${catConfig.dataKey === 'bttsNoMatches' || !m.probability ? '' : `<td>${cell(escapeHtml(String(m.probability || '')) + '%')}</td>`}</tr>`;
         }).join('');
       }
     } catch (e) {
@@ -410,6 +413,13 @@ ${generateFaqSchema(FAQ_SCHEMA[slug])}
 .prediction-tools{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:24px 0 8px}
 .prediction-tools a{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:9px 16px;border:1px solid var(--border);border-radius:10px;background:var(--bg-card);color:var(--text-primary);font-size:13px;font-weight:700;text-decoration:none}
 .prediction-tools a:hover{border-color:var(--accent);color:var(--accent)}
+.match-card.vip-locked{position:relative;overflow:hidden}
+.match-card.vip-locked>*:not(.vip-card-lock){filter:blur(5px);opacity:.58;pointer-events:none;user-select:none}
+.vip-card-lock{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:1px solid rgba(255,36,72,.42);border-radius:inherit;background:rgba(9,14,25,.72);color:#fff;text-align:center;text-decoration:none;font-size:13px;font-weight:700}
+.vip-card-lock strong{color:#ff647d;font-size:12px;letter-spacing:.08em}
+.vip-card-lock span{font-size:12px;font-weight:600}
+.noscript-content .vip-fallback-blur{filter:blur(4px);user-select:none}
+.noscript-content .vip-fallback-lock{display:block;margin-top:4px;color:#ff647d;font-size:10px;font-weight:800;text-decoration:none}
 @media(max-width:640px){.telegram-cta h3{font-size:17px}.telegram-cta p{font-size:13px}.telegram-link{width:100%;justify-content:center}}
 ${CHIPS_CSS}
 </style>
@@ -619,15 +629,14 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     if (ogUrl) ogUrl.content = 'https://winfulltime.com' + newUrl;
   }
 
-  function applyPredictionGating(list) {
-    if (!list || !list.length) return list;
+  function freeVisibleCount(list) {
+    if (!list || !list.length) return 0;
     var user = (window.WFT && typeof window.WFT.getUser === "function") ? window.WFT.getUser() : null;
-    if (user && user.isPro) return list;
+    if (user && user.isPro) return list.length;
     var marketSlug = (typeof CATEGORY_SLUG === "string") ? CATEGORY_SLUG : "";
     var alwaysFull = { "1x2": 1, "over-1-5": 1, "over-2-5": 1, "under-2-5": 1 };
-    if (alwaysFull[marketSlug]) return list;
-    var half = Math.floor(list.length * 0.5);
-    return half < list.length ? list.slice(0, half) : list;
+    if (alwaysFull[marketSlug]) return list.length;
+    return Math.ceil(list.length * 0.5);
   }
 
   function renderUnbeaten(matches) {
@@ -637,17 +646,19 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       document.getElementById('totalMatches').textContent = '0';
       return;
     }
-    var toRenderMatches = applyPredictionGating(matches);
-    document.getElementById('totalMatches').textContent = toRenderMatches.length;
-    var html = toRenderMatches.map(function(match, i) {
+    var visibleCount = freeVisibleCount(matches);
+    document.getElementById('totalMatches').textContent = matches.length;
+    var html = matches.map(function(match, i) {
       var streaksHtml = (match.streaks || []).map(function(s) {
         var loc = s.location ? ' ' + s.location : '';
         return '<div class="streak-row"><span class="streak-team">' + s.team + '</span><span class="streak-badge">' + s.count + ' unbeaten' + loc + '</span></div>';
       }).join('');
-      return '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms">' +
-        '<div class="match-header"><span>' + (match.league || '') + '</span><span>' + (match.time || '') + '</span></div>' +
+      var lockedOverlay = i >= visibleCount ? '<a class="vip-card-lock" href="/pricing.html" aria-label="VIP only. Upgrade to view this prediction"><strong>&#128274; VIP ONLY</strong><span>Upgrade to view this pick</span></a>' : '';
+      var lockedContent = i >= visibleCount ? ' aria-hidden="true"' : '';
+      return '<div class="match-card fade-in' + (i >= visibleCount ? ' vip-locked' : '') + '" style="animation-delay:' + (i * 50) + 'ms">' +
+        '<div class="vip-locked-content"' + lockedContent + '><div class="match-header"><span>' + (match.league || '') + '</span><span>' + (match.time || '') + '</span></div>' +
         '<div class="match-teams" style="justify-content:center;"><span class="team team-home" style="text-align:center;width:100%;">' + (match.match || '') + '</span></div>' +
-        '<div class="match-footer" style="flex-direction:column;gap:6px;">' + streaksHtml + '</div></div>';
+        '<div class="match-footer" style="flex-direction:column;gap:6px;">' + streaksHtml + '</div></div>' + lockedOverlay + '</div>';
     }).join('');
     content.innerHTML = '<div class="matches-grid">' + wftSponsor.insertSponsor(html) + '</div>';
   }
@@ -670,9 +681,9 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       return;
     }
 
-    var toRenderMatches = applyPredictionGating(filtered);
-    document.getElementById('totalMatches').textContent = toRenderMatches.length;
-    var html = toRenderMatches.map(function(match, i) {
+    var visibleCount = freeVisibleCount(filtered);
+    document.getElementById('totalMatches').textContent = filtered.length;
+    var html = filtered.map(function(match, i) {
       var matchStr = (IS_STREAK ? (match.nextMatch || match.match) : (match.match || match.nextMatch)) || '';
       var teams = matchStr.indexOf(' - ') !== -1 ? matchStr.split(' - ') : matchStr.split(' vs ');
       var home = (teams[0] || '').trim();
@@ -734,15 +745,18 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
       var matchHead = '<div class="match-header"><span>' + (match.league || '') + '</span><span>' + (IS_STREAK ? (match.nextMatchDate ? formatDateShort(match.nextMatchDate) : (match.time || '')) : (match.time || '')) + '</span></div>';
 
-      var cardHtml = '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms"' +
+      var locked = i >= visibleCount;
+      var lockedOverlay = locked ? '<a class="vip-card-lock" href="/pricing.html" aria-label="VIP only. Upgrade to view this prediction"><strong>&#128274; VIP ONLY</strong><span>Upgrade to view this pick</span></a>' : '';
+      var lockedContent = locked ? ' aria-hidden="true"' : '';
+      var cardHtml = '<div class="match-card fade-in' + (locked ? ' vip-locked' : '') + '" style="animation-delay:' + (i * 50) + 'ms"' +
         (home ? ' data-home="' + escAttr(home) + '"' : '') +
         (away ? ' data-away="' + escAttr(away) + '"' : '') +
         (!IS_STREAK && match.tip ? ' data-tip="' + escAttr(match.tip) + '"' : '') +
-        '>' +
+        '><div class="vip-locked-content"' + lockedContent + '>' +
         (analysisHref
           ? '<a href="' + analysisHref + '" class="match-card-link" style="display:block;text-decoration:none;color:inherit;">' + matchHead + cardContent + '</a>'
           : matchHead + cardContent) +
-        ctaHtml + '</div>';
+        ctaHtml + '</div>' + lockedOverlay + '</div>';
 
       return cardHtml;
     }).join('');

@@ -132,6 +132,11 @@
 .prediction-tools{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:24px 0 8px}
 .prediction-tools a{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:9px 16px;border:1px solid var(--border);border-radius:10px;background:var(--bg-card);color:var(--text-primary);font-size:13px;font-weight:700;text-decoration:none}
 .prediction-tools a:hover{border-color:var(--accent);color:var(--accent)}
+.match-card.vip-locked{position:relative;overflow:hidden}
+.match-card.vip-locked>*:not(.vip-card-lock){filter:blur(5px);opacity:.58;pointer-events:none;user-select:none}
+.vip-card-lock{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:1px solid rgba(255,36,72,.42);border-radius:inherit;background:rgba(9,14,25,.72);color:#fff;text-align:center;text-decoration:none;font-size:13px;font-weight:700}
+.vip-card-lock strong{color:#ff647d;font-size:12px;letter-spacing:.08em}
+.vip-card-lock span{font-size:12px;font-weight:600}
 @media(max-width:640px){.telegram-cta h3{font-size:17px}.telegram-cta p{font-size:13px}.telegram-link{width:100%;justify-content:center}}
 .chips{display:flex;flex-wrap:wrap;gap:10px}
 .chip-link{display:inline-block;padding:9px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:999px;color:var(--text-primary);text-decoration:none;font-size:13px;font-weight:600;transition:all 0.2s}
@@ -517,17 +522,35 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     if (ogUrl) ogUrl.content = 'https://winfulltime.com' + newUrl;
   }
 
+  var freeVisibleCount = 0;
+
   function applyPredictionGating(list) {
-    if (!list || !list.length) return list;
-    var user = (window.WFT && typeof window.WFT.getUser === "function") ? window.WFT.getUser() : null;
-    if (user && user.isPro) return list;
-    var marketSlug = (typeof CATEGORY_SLUG === "string") ? CATEGORY_SLUG : "";
-    var alwaysFull = { "1x2": 1, "over-1-5": 1, "over-2-5": 1, "under-2-5": 1 };
-    if (alwaysFull[marketSlug]) return list;
-    var half = Math.floor(list.length * 0.5);
-    return half < list.length ? list.slice(0, half) : list;
+    if (!list || !list.length) { freeVisibleCount = 0; return list; }
+    var user = (window.WFT && typeof window.WFT.getUser === 'function') ? window.WFT.getUser() : null;
+    var marketSlug = (typeof CATEGORY_SLUG === 'string') ? CATEGORY_SLUG : '';
+    var alwaysFull = { '1x2': 1, 'over-1-5': 1, 'over-2-5': 1, 'under-2-5': 1 };
+    freeVisibleCount = (user && user.isPro) || alwaysFull[marketSlug] ? list.length : Math.ceil(list.length * 0.5);
+    return list;
   }
 
+  function applyVipLocks(container, visibleCount) {
+    var cards = container.querySelectorAll('.match-card');
+    Array.prototype.forEach.call(cards, function(card, index) {
+      if (index < visibleCount) return;
+      card.classList.add('vip-locked');
+      var overlay = document.createElement('a');
+      overlay.className = 'vip-card-lock';
+      overlay.href = '/pricing.html';
+      overlay.setAttribute('aria-label', 'VIP only. Upgrade to view this prediction');
+      overlay.innerHTML = '<strong>&#128274; VIP ONLY</strong><span>Upgrade to view this pick</span>';
+      card.appendChild(overlay);
+      Array.prototype.forEach.call(card.children, function(child) {
+        if (child === overlay) return;
+        child.setAttribute('aria-hidden', 'true');
+        Array.prototype.forEach.call(child.querySelectorAll('a'), function(link) { link.setAttribute('tabindex', '-1'); });
+      });
+    });
+  }
   function renderUnbeaten(matches) {
     var content = document.getElementById('content');
     if (matches.length === 0) {
@@ -548,6 +571,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
         '<div class="match-footer" style="flex-direction:column;gap:6px;">' + streaksHtml + '</div></div>';
     }).join('');
     content.innerHTML = '<div class="matches-grid">' + wftSponsor.insertSponsor(html) + '</div>';
+    applyVipLocks(content, freeVisibleCount);
   }
 
   function renderMatches(matches) {
@@ -646,6 +670,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     }).join('');
 
     content.innerHTML = '<div class="matches-grid">' + wftSponsor.insertSponsor(html) + '</div>';
+    applyVipLocks(content, freeVisibleCount);
   }
 
   function renderCurrentView() {
