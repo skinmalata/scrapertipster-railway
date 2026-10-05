@@ -129,6 +129,9 @@
 .telegram-cta p{margin:0 0 16px;font-size:14px;line-height:1.6;color:var(--text-secondary)}
 .telegram-link{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#1e96c8,#1a7da8);color:#fff;padding:11px 22px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px;transition:transform 0.2s,box-shadow 0.3s}
 .telegram-link:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(30,150,200,0.3)}
+.prediction-tools{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:24px 0 8px}
+.prediction-tools a{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:9px 16px;border:1px solid var(--border);border-radius:10px;background:var(--bg-card);color:var(--text-primary);font-size:13px;font-weight:700;text-decoration:none}
+.prediction-tools a:hover{border-color:var(--accent);color:var(--accent)}
 @media(max-width:640px){.telegram-cta h3{font-size:17px}.telegram-cta p{font-size:13px}.telegram-link{width:100%;justify-content:center}}
 .chips{display:flex;flex-wrap:wrap;gap:10px}
 .chip-link{display:inline-block;padding:9px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:999px;color:var(--text-primary);text-decoration:none;font-size:13px;font-weight:600;transition:all 0.2s}
@@ -214,6 +217,13 @@
   </div>
 </noscript>
 </div>
+
+<nav class="prediction-tools" aria-label="More football tools">
+  <a href="/converter.html">Code Converter</a>
+  <a href="/code-merger.html">Code Merger</a>
+  <a href="/code-splitter.html">Code Splitter</a>
+  <a href="/predictions/in-play">In-Play</a>
+</nav>
 
 <div class="featured-cta">
 <div class="label">Featured Tool</div>
@@ -514,8 +524,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     var marketSlug = (typeof CATEGORY_SLUG === "string") ? CATEGORY_SLUG : "";
     var alwaysFull = { "1x2": 1, "over-1-5": 1, "over-2-5": 1, "under-2-5": 1 };
     if (alwaysFull[marketSlug]) return list;
-    if (typeof currentDate !== "undefined" && currentDate === "yesterday") return list;
-    var half = Math.ceil(list.length * 0.5);
+    var half = Math.floor(list.length * 0.5);
     return half < list.length ? list.slice(0, half) : list;
   }
 
