@@ -144,9 +144,12 @@ function generateNoscriptFallback(slug, catConfig) {
       const key = catConfig.dataKey;
       const matches = (key && data[key]) ? data[key] : [];
       const today = todayStr();
-      const todays = matches
-        .filter(m => m.date === today)
-        .slice(0, 25);
+      const todaysMatches = matches.filter(m => m.date === today);
+      const fullAccessCategories = ['1x2', 'over-1-5', 'over-2-5', 'under-2-5'];
+      const visibleCount = fullAccessCategories.includes(slug)
+        ? Math.min(todaysMatches.length, 25)
+        : Math.min(Math.floor(todaysMatches.length * 0.5), 25);
+      const todays = todaysMatches.slice(0, visibleCount);
       if (todays.length > 0) {
         rows = todays.map(m => {
           const label = m.tip || (m.streaks && m.streaks.length ? m.streaks[0].count + ' unbeaten' : '');
