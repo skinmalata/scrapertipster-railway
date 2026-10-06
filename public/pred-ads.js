@@ -59,14 +59,12 @@
     return aside;
   }
 
-  // The zone div must be in the DOM before the network script scans for it, and
-  // /mondiad.js owns the script URL and its once-per-page guard. It publishes
-  // the API on DOMContentLoaded; retry briefly rather than dropping the slot if
-  // this file happens to run first. The slot itself is passed down so the
-  // give-up path removes the whole reserved block, not just the inner div.
+  // The zone div must be in the DOM before the network script scans for it.
+  // /mondiad.js re-runs the delivery code once after all inline zones exist.
+  // Retry briefly rather than dropping a slot if this file runs too early.
   function askForFill(slot, attemptsLeft) {
     if (window.WFT && typeof window.WFT.loadMondiadFormat === 'function') {
-      if (window.WFT.loadMondiadFormat(FORMAT)) return;
+      if (window.WFT.loadMondiadFormat(FORMAT, slot, true)) return;
     }
     if (attemptsLeft > 0) {
       window.setTimeout(function () { askForFill(slot, attemptsLeft - 1); }, 200);
@@ -76,10 +74,24 @@
   }
 
   function watch(slot) {
-    askForFill(slot, 8);
-    window.setTimeout(function () {
-      if (!isFilled(slot)) collapse(slot);
-    }, GRACE_MS);
+    var c = consent();
+    if (!c) { collapse(slot); return; }
+
+    function requestAndWatch() {
+      askForFill(slot, 8);
+      window.setTimeout(function () {
+        if (!isFilled(slot)) collapse(slot);
+      }, GRACE_MS);
+    }
+
+    if (c.isGranted()) {
+      requestAndWatch();
+    } else {
+      c.whenGranted(function (granted) {
+        if (granted) requestAndWatch();
+        else collapse(slot);
+      });
+    }
   }
 
   function gridState() {
@@ -121,14 +133,17 @@
     });
     if (want === 0) return;
 
+    var slots = [];
     for (var i = 0; i < want; i++) {
       var slot = buildSlot();
       // state.cards is a snapshot, so the element references stay valid across
       // insertions.
       state.grid.insertBefore(slot, state.cards[AFTER[i] - 1].nextSibling);
-      watch(slot);
+      slots.push(slot);
     }
     dropPageLevelBlock();
+    // All zones must exist before the shared delivery script scans the page.
+    Array.prototype.forEach.call(slots, watch);
   }
 
   function onlyOurSlots(nodes) {
@@ -183,7 +198,7 @@
       start();
       return;
     }
-    c.whenGranted(start);
+    c.whenGranted(function (granted) { if (granted) start(); });
   }
 
   if (document.readyState === 'loading') {

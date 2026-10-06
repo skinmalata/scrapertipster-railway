@@ -82,12 +82,14 @@
     return false;
   }
 
-  function injectScript(src, slot) {
-    if (injected[src] || alreadyBaked(src)) return;
+  function injectScript(src, slot, rescanLateSlots) {
+    if (injected[src] || (!rescanLateSlots && alreadyBaked(src))) return;
     injected[src] = true;
 
     var s = document.createElement('script');
-    s.src = src;
+    // Prediction cards and their inline zones are created after the document
+    // delivery tag has run. Re-execute it once after those zones exist.
+    s.src = rescanLateSlots ? src + '?wft-rescan=1' : src;
     s.async = true;
     s.onerror = function () { collapse(slot); };
     (document.head || document.documentElement).appendChild(s);
@@ -105,15 +107,15 @@
   // of the "already injected" guard. Consent is re-checked here rather than
   // trusted from the caller, so the gate remains the single authority on when a
   // personalised request may go out.
-  function requestFormat(name, slot) {
+  function requestFormat(name, slot, rescanLateSlots) {
     var fmt = null;
     for (var i = 0; i < FORMATS.length; i++) { if (FORMATS[i].name === name) { fmt = FORMATS[i]; break; } }
     if (!fmt) return false;
     if (injected[fmt.src]) return true;
     var c = consent();
     if (!c) return false;
-    if (c.isGranted()) { injectScript(fmt.src, slot); return true; }
-    c.whenGranted(function () { injectScript(fmt.src, slot); });
+    if (c.isGranted()) { injectScript(fmt.src, slot, rescanLateSlots); return true; }
+    c.whenGranted(function () { injectScript(fmt.src, slot, rescanLateSlots); });
     return true;
   }
 

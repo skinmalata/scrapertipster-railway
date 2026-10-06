@@ -263,7 +263,7 @@ const SKIP_PAGES = new Set(['admin.html', 'app.html', 'offline.html', 'yandex_7d
 // the previous version: the new rules simply never reach visitors. The JS files
 // were unaffected so far only because they are new enough that no stale copy
 // exists yet.
-const ADS_ASSET_VERSION = 5;
+const ADS_ASSET_VERSION = 6;
 const ADS_CSS_LINK = '<link rel="stylesheet" href="/ads.css?v=' + ADS_ASSET_VERSION + '">';
 
 // Adsterra's own units, wrapped by adSection() below.
@@ -291,12 +291,11 @@ const MONDIAD_NATIVE_DIV =
 // Mondiad delivery scripts, baked into <head> exactly as the dashboard
 // instructs. Mondiad's crawler validates the *static* HTML, so a script that
 // only ever appears after JS execution reads as "not implemented" to them --
-// which is what their account manager reported. These are `async`, so they do
-// not block rendering. /mondiad.js still runs and owns consent gating and
-// near-viewport injection, but the tag itself is now visible to the validator.
+// which is what their account manager reported. `defer` keeps these delivery
+// tags in the head for validation and runs them after the zone markup is parsed.
 const MONDIAD_DELIVERY_SCRIPTS =
-  '<script async src="https://ss.mrmnd.com/native.js"></script>\n' +
-  '<script async src="https://ss.mrmnd.com/banner.js"></script>';
+  '<script defer src="https://ss.mrmnd.com/native.js"></script>\n' +
+  '<script defer src="https://ss.mrmnd.com/banner.js"></script>';
 
 const MONDIAD_LOADER = '<script src="/mondiad.js?v=' + ADS_ASSET_VERSION + '" defer></script>';
 const MONDIAD_BANNER_ENABLED = true;
