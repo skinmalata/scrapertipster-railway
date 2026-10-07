@@ -263,7 +263,7 @@ const SKIP_PAGES = new Set(['admin.html', 'app.html', 'offline.html', 'yandex_7d
 // the previous version: the new rules simply never reach visitors. The JS files
 // were unaffected so far only because they are new enough that no stale copy
 // exists yet.
-const ADS_ASSET_VERSION = 6;
+const ADS_ASSET_VERSION = 7;
 const ADS_CSS_LINK = '<link rel="stylesheet" href="/ads.css?v=' + ADS_ASSET_VERSION + '">';
 
 // Adsterra's own units, wrapped by adSection() below.
