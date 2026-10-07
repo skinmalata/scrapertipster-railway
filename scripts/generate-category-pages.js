@@ -335,6 +335,11 @@ const EXTRA_TABS = [
 // right after Cards, matching the hand-written menus on index/best-picks/
 // author-picks/vip. Never marked active: no generated category IS in-play.
 const INPLAY_TAB = { id: 'in-play', href: '/predictions/in-play', label: 'In-Play' };
+const HIGHEST_SCORING_HALF_TAB = {
+  id: 'highest-scoring-half',
+  href: '/predictions/highest-scoring-half',
+  label: 'Highest Scoring Half'
+};
 
 function generateCategoryPage(slug, catConfig, ctx) {
   const BOOKMAKER_CTA_BODY = renderBookmakerCTABody();
@@ -346,6 +351,8 @@ function generateCategoryPage(slug, catConfig, ctx) {
   });
   baseTabs.splice(allSlugs.indexOf('cards') + 1, 0,
     `<a href="${INPLAY_TAB.href}" id="tab-${INPLAY_TAB.id}" class="tab-btn">${escapeHtml(INPLAY_TAB.label)}</a>`);
+  baseTabs.splice(allSlugs.indexOf('cards') + 1, 0,
+    `<a href="${HIGHEST_SCORING_HALF_TAB.href}" id="tab-${HIGHEST_SCORING_HALF_TAB.id}" class="tab-btn">${escapeHtml(HIGHEST_SCORING_HALF_TAB.label)}</a>`);
   const extraTabsHtml = EXTRA_TABS.map(t =>
     `<a href="${t.href}" id="tab-${t.id}" class="tab-btn">${escapeHtml(t.label)}</a>`
   );
