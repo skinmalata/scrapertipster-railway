@@ -1,6 +1,6 @@
 /* Consent banner styling.
  *
- * Separate plain stylesheet (same pattern as public/adsterra.css) rather than
+ * Separate plain stylesheet rather than
  * the Tailwind build: these are custom properties and a fixed overlay, so they
  * would be purged from src/styles.css.
  *
