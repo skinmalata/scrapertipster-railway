@@ -2,7 +2,7 @@
 
 const { decodeCode } = require('./bookingCodes/converter');
 const { createSportybetCode } = require('./bookingCodes/sportradar');
-const { getAvailableMatches, getEventIndex } = require('./bookingCodes/resolver');
+const { getAvailableMatches, getEventIndex, hasEventIndex } = require('./bookingCodes/resolver');
 const { normaliseName } = require('./h2hWinningStreaks');
 
 const TOLERANCE_LEVELS = ['conservative', 'medium', 'aggressive'];
@@ -11,6 +11,7 @@ const DEFAULT_TOLERANCE = 'medium';
 const MIN_CODE_LEGS = 2;
 const SOON_MS = 3 * 60 * 60 * 1000;
 const INDEX_TIMEOUT_MS = 3500;
+const COLD_INDEX_TIMEOUT_MS = 25000;
 const GEMINI_TIMEOUT_MS = 10000;
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const CACHE_MAX = 200;
@@ -101,8 +102,12 @@ function totalOdds(legs) {
 
 async function buildMatchIndex() {
   try {
+    // Warm index: short race so a background refresh never slows the request.
+    // Cold index (fresh boot / Render free-tier spin-up): give the first build
+    // real time to finish, otherwise match names stay empty on every request.
+    const timeoutMs = hasEventIndex() ? INDEX_TIMEOUT_MS : COLD_INDEX_TIMEOUT_MS;
     const timeout = new Promise(function (resolve, reject) {
-      setTimeout(function () { reject(new Error('INDEX_TIMEOUT')); }, INDEX_TIMEOUT_MS);
+      setTimeout(function () { reject(new Error('INDEX_TIMEOUT')); }, timeoutMs);
     });
     const pair = await Promise.race([
       Promise.all([getEventIndex(), getAvailableMatches()]),

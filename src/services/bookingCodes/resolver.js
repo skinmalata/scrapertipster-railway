@@ -54,7 +54,7 @@ const LEAGUE_REFRESH_MS = 20 * 60 * 1000;
 // That keeps the doubled upstream traffic (~2 requests per league) down to a
 // sustained load close to the original 1X2-only schedule.
 const OU_REFRESH_MS = 60 * 60 * 1000;
-const LEAGUE_CONCURRENCY = 8;
+const LEAGUE_CONCURRENCY = 16;
 const NEAR_DAYS = 3;
 
 let eventIndexCache = null;
@@ -544,4 +544,8 @@ function warmEventIndex() {
   });
 }
 
-module.exports = { resolveLeg, getAvailableMatches, getEventIndex, warmEventIndex };
+function hasEventIndex() {
+  return !!eventIndexCache;
+}
+
+module.exports = { resolveLeg, getAvailableMatches, getEventIndex, warmEventIndex, hasEventIndex };
