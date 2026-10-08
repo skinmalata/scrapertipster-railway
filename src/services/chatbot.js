@@ -19,7 +19,7 @@ const knowledge = {
     free: 'WinFulltime has a Free plan ($0 forever) and paid Pro plans. Subscribe at /pricing.html and pay at /signup.html. After payment is confirmed your Pro access is activated automatically.',
     predictions: 'Daily predictions: the core markets — 1X2 (match result), Over 1.5 Goals, Over 2.5 Goals, Under 2.5, BTTS YES and BTTS NO — are fully free for everyone. The other markets (Winning Streaks, Losing Streaks, Draw Streaks, Team to Score, Corners, Cards, HT/FT, GG2+ and Unbeaten Teams) show a 3-pick free preview each day, with the full list on the Pro plan.',
     bestPicks: 'Daily Best Picks and H2H Picks are curated selections. Free members get a 3-pick preview; the full daily list is a Pro feature — see /author-picks.html and /best-picks.html.',
-    inPlay: 'Live scores are available to everyone. Golden in-play tips and live opportunities are a Pro feature — see /predictions/in-play.',
+    inPlay: 'Live scores are available to everyone. Golden in-play tips and live opportunities are a Pro feature — see /predictions/in-play. To get every in-play alert in realtime, join our Telegram channel at https://t.me/winfulltime, where alerts are posted as they appear.',
     leagues: '50+ leagues: Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, Eredivisie, Primeira Liga, Belgian Pro League, Brazilian Serie A, Argentine League, MLS, Liga MX, Saudi Pro League, Turkish Super Lig, Championship, and 35+ more.',
     sources: 'Statistical analysis combining team form data, head-to-head records, and league-wide performance metrics.',
     accuracy: 'Each prediction shows a confidence percentage (e.g., 72%). Higher confidence typically means lower odds but more consistency.',

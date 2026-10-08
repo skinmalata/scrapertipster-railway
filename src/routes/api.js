@@ -1159,7 +1159,8 @@ router.get('/golden-tips', optionalAuth, async function (req, res) {
 
   // In-play golden tips are a Pro feature. Free users get a small teaser; the
   // rest of the picks never leave the server (placeholder cards are rendered
-  // client-side from lockedTotal).
+  // client-side from lockedTotal). Users who want every alert in realtime can
+  // join the Telegram channel (https://t.me/winfulltime).
   const allOpportunities = Array.isArray(payload.opportunities) ? payload.opportunities : [];
   const isPro = await resolveIsPro(req);
   if (isPro) {
