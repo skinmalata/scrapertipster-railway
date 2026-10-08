@@ -445,7 +445,7 @@ ${generateFaqSchema(FAQ_SCHEMA[slug])}
 .locked-sub{font-size:12px;color:var(--text-secondary)}
 .locked-btn{background:linear-gradient(135deg,#ff2448,#ff647d);color:#fff;padding:9px 26px;border-radius:9px;text-decoration:none;font-weight:700;font-size:13px;margin-top:3px;display:inline-block}
 .locked-btn:hover{opacity:.92}
-.picks-note{max-width:830px;margin:0 auto 24px;padding:12px 16px;border:1px solid rgba(250,204,21,.25);border-radius:12px;background:rgba(250,204,21,.06);color:var(--text-secondary);font-size:13px;line-height:1.6;text-align:center}
+.picks-note{max-width:830px;margin:0 auto 24px;padding:12px 16px;border:1px solid rgba(250,204,21,.4);border-radius:12px;background:rgba(250,204,21,.08);color:var(--text-primary);font-size:14px;font-weight:600;line-height:1.6;text-align:center}
 .picks-note strong{color:#facc15;font-weight:700}
 @media(max-width:640px){.telegram-cta h3{font-size:17px}.telegram-cta p{font-size:13px}.telegram-link{width:100%;justify-content:center}}
 ${CHIPS_CSS}
@@ -488,8 +488,6 @@ ${CHIPS_CSS}
 </div>
 </div>
 
-<p class="picks-note"><strong>Daily picks aren\u2019t final results.</strong> Football is unpredictable &mdash; no tip wins every time. Pick only a few you\u2019re genuinely confident in, and never stake more than you can afford to lose.</p>
-
 <div id="content">
 <div class="loading">
 <div class="progress-bar-container">
@@ -499,6 +497,8 @@ ${CHIPS_CSS}
 </div>
 ${generateNoscriptFallback(slug, catConfig)}
 </div>
+
+<p class="picks-note"><strong>Daily picks aren\u2019t final results.</strong> Football is unpredictable &mdash; no tip wins every time. Pick only a few you\u2019re genuinely confident in, and never stake more than you can afford to lose.</p>
 
 <nav class="streak-buttons prediction-tools" aria-label="More football tools">
   <a class="streak-btn tool-converter" href="/converter.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Code Converter</span></a>
@@ -807,7 +807,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
             : (analysisLinks[(home + '|' + away).toLowerCase()] || ''))
         : '';
 
-      var matchHead = '<div class="match-header"><span>' + (match.league || '') + '</span><span>' + (IS_STREAK ? (match.nextMatchDate ? formatDateShort(match.nextMatchDate) : (match.time || '')) : (match.time || '')) + '</span></div>';
+      var matchHead = '<div class="match-header"><span>' + (match.league || '') + '</span><span>' + (match.time || '') + '</span></div>';
 
       var cardHtml = '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms"' +
         (home ? ' data-home="' + escAttr(home) + '"' : '') +

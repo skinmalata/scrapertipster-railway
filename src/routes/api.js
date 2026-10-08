@@ -2191,14 +2191,20 @@ async function resolveIsPro(req) {
 
 // GET /api/author-picks — all today's fixtures with best tip per match.
 // Pro/VIP get the full pool; free users get a small mid-list sample so the
-// highest-confidence picks stay behind the paywall.
+// highest-confidence picks stay behind the paywall. lockedTotal tells free
+// clients how many placeholder cards to render (the pool itself never leaves
+// the server, matching the other gated markets).
 router.get('/author-picks', optionalAuth, async function (req, res) {
   try {
     var data = await buildGiantPool();
     var matches = data.matches || [];
     var isPro = await resolveIsPro(req);
+    var freeVisible = matches.length;
+    var lockedTotal = 0;
     if (!isPro) {
       var total = matches.length;
+      freeVisible = total > 3 ? 3 : total;
+      lockedTotal = total > 3 ? total - 3 : 0;
       if (total > 3) {
         var start = Math.floor((total - 3) / 2);
         matches = matches.slice(start, start + 3);
@@ -2210,6 +2216,8 @@ router.get('/author-picks', optionalAuth, async function (req, res) {
       analyzedFixtures: data.analyzedFixtures,
       generatedAt: data.generatedAt,
       isPro: isPro,
+      freeVisible: freeVisible,
+      lockedTotal: lockedTotal,
       stale: !!data.stale,
       poolDate: data.poolDate === undefined ? null : data.poolDate
     });
