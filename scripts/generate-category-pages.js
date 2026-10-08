@@ -416,6 +416,11 @@ ${generateFaqSchema(FAQ_SCHEMA[slug])}
 .prediction-tools .tool-merger{background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff}
 .prediction-tools .tool-splitter{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff}
 .prediction-tools .tool-inplay{background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff}
+.match-card.vip-locked{position:relative;overflow:hidden}
+.match-card.vip-locked>*:not(.vip-card-lock){filter:blur(5px);opacity:.58;pointer-events:none;user-select:none}
+.vip-card-lock{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:1px solid rgba(255,36,72,.42);border-radius:inherit;background:rgba(9,14,25,.72);color:#fff;text-align:center;text-decoration:none;font-size:13px;font-weight:700}
+.vip-card-lock strong{color:#ff647d;font-size:12px;letter-spacing:.08em}
+.vip-card-lock span{font-size:12px;font-weight:600}
 @media(max-width:640px){.telegram-cta h3{font-size:17px}.telegram-cta p{font-size:13px}.telegram-link{width:100%;justify-content:center}}
 ${CHIPS_CSS}
 </style>

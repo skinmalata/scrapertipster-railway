@@ -2144,20 +2144,26 @@ async function resolveIsPro(req) {
 }
 
 // GET /api/author-picks — all today's fixtures with best tip per match.
-// Available to all users.
+// Pro/VIP get the full pool; free users get a small mid-list sample so the
+// highest-confidence picks stay behind the paywall.
 router.get('/author-picks', optionalAuth, async function (req, res) {
   try {
     var data = await buildGiantPool();
     var matches = data.matches || [];
-    // stale/poolDate come from buildGiantPool's backoff branch. Passing them
-    // through keeps the "these picks are from an earlier day" signal that the
-    // page relies on, instead of dropping it on the way out.
+    var isPro = await resolveIsPro(req);
+    if (!isPro) {
+      var total = matches.length;
+      if (total > 3) {
+        var start = Math.floor((total - 3) / 2);
+        matches = matches.slice(start, start + 3);
+      }
+    }
     res.json({
       matches: matches,
       totalFixtures: data.totalFixtures,
       analyzedFixtures: data.analyzedFixtures,
       generatedAt: data.generatedAt,
-      isPro: true,
+      isPro: isPro,
       stale: !!data.stale,
       poolDate: data.poolDate === undefined ? null : data.poolDate
     });

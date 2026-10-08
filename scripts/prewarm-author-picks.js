@@ -19,10 +19,21 @@ async function main() {
     throw new Error('buildGiantPool returned no matches');
   }
 
-  // Published verbatim as the API would return it (matches/generatedAt/stale/
-  // poolDate) so the client renders it through the same code path. The client
-  // knows a response came from this file, so no extra flag is needed here.
+  // Published as the API would return it (matches/generatedAt/stale/poolDate)
+  // so the client renders it through the same code path. The client knows a
+  // response came from this file, so no extra flag is needed here.
+  //
+  // This file is served to everyone from GitHub Pages, so it must NOT carry the
+  // full Pro pool: free visitors get the same mid-list sample the API sends
+  // (a handful of picks that skips the top-confidence ones).
+  var matches = pool.matches || [];
+  var FREE_SAMPLE = 3;
+  if (matches.length > FREE_SAMPLE) {
+    var start = Math.floor((matches.length - FREE_SAMPLE) / 2);
+    matches = matches.slice(start, start + FREE_SAMPLE);
+  }
   const payload = Object.assign({}, pool, {
+    matches: matches,
     generatedAt: pool.generatedAt || new Date().toISOString(),
     publishedAt: new Date().toISOString()
   });
@@ -36,7 +47,7 @@ async function main() {
   fs.renameSync(tmp, OUT);
 
   const bytes = fs.statSync(OUT).size;
-  console.log('[prewarm] ' + pool.matches.length + ' matches -> ' +
+  console.log('[prewarm] published ' + matches.length + ' of ' + pool.matches.length + ' picks -> ' +
     path.relative(process.cwd(), OUT) + ' (' + Math.round(bytes / 1024) +
     ' KB, ' + (Date.now() - started) + 'ms)');
 }
