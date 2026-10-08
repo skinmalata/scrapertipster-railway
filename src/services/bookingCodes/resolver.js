@@ -544,4 +544,4 @@ function warmEventIndex() {
   });
 }
 
-module.exports = { resolveLeg, getAvailableMatches, warmEventIndex };
+module.exports = { resolveLeg, getAvailableMatches, getEventIndex, warmEventIndex };

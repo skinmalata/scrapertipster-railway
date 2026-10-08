@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { href: '/converter.html', label: 'Code Converter', match: (p) => p.startsWith('/converter') },
   { href: '/code-splitter.html', label: 'Code Splitter', match: (p) => p.startsWith('/code-splitter') },
   { href: '/code-merger.html', label: 'Code Merger', match: (p) => p.startsWith('/code-merger') },
+  { href: '/code-analyzer.html', label: 'Code Analyzer', match: (p) => p.startsWith('/code-analyzer') },
   { href: '/predictions/in-play', label: 'In-Play', match: (p) => p.startsWith('/predictions/in-play') },
   { href: '/blog/', label: 'Blog', match: (p) => p.startsWith('/blog') }
 ];
@@ -81,6 +82,7 @@ const FOOTER_HTML = `
     <li><a href="/converter.html">Code Converter</a></li>
     <li><a href="/code-splitter.html">Code Splitter</a></li>
     <li><a href="/code-merger.html">Code Merger</a></li>
+    <li><a href="/code-analyzer.html">Code Analyzer</a></li>
    </ul>
   </div>
 

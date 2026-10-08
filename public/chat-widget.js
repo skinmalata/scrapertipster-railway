@@ -42,6 +42,7 @@ var SITE={
     'Unbeaten team streaks (winning/drawing streaks) with a free daily preview',
     'Free Accumulator/Ticket Builder with AI optimization',
     'Free booking code converter (SportyBet, Bet9ja, MSport, Betway, Bangbet, BetKing)',
+    'Free SportyBet code analyzer (scores each selection for risk and removes the risky ones)',
     '350+ educational blog articles on betting strategy',
     '50+ leagues, 750+ teams worldwide',
     'PWA - installable as a mobile app'
@@ -99,6 +100,7 @@ var FAQ=[
 {k:['register','sign up','signup','account','login','create','password','forgot'],r:'Registration is free and optional. Create a free account at '+SITE.url+'/signup.html — no payment needed and no card required. Free accounts get the Free plan by default; you can browse predictions and use the Ticket Builder and Code Converter without paying. Upgrade to Pro anytime at '+SITE.url+'/pricing.html.'},
 {k:['ticket','builder','acca','accumulator','multi','parlay','generate'],r:SITE.ticketBuilder.desc+'\n\nHow to use: '+SITE.ticketBuilder.howto+'\n\nTip: '+SITE.ticketBuilder.tip},
 {k:['converter','convert','booking code','code convert','decode','transfer code','msport','betking','bangbet','bet9ja code','sportybet code'],r:'Free booking code converter for SportyBet, Bet9ja, MSport, Betway, Bangbet and BetKing. Paste a booking code to decode it, preview every selection, market and odds, and generate a fresh code for another site. No sign-up needed. Visit '+SITE.url+'/converter.html'},
+{k:['analyzer','code analyzer','analyze booking code','risk analyzer','risky selections','remove selection','remove risky','code risk','booking code analyzer'],r:'Free SportyBet code analyzer. Paste a booking code to review every selection with a risk score from 1 to 10 (odds, market type, kick-off proximity, head-to-head form, price drift), remove the risky selections, and get a fresh code with the survivors. Original code untouched. Visit '+SITE.url+'/code-analyzer.html'},
 {k:['in play','in-play','inplay','live scores','live betting','golden tip','live opportunities','watch live'],r:'Live scores are available to everyone free of charge. Golden in-play tips and live opportunities are a Pro feature. To receive every in-play alert in realtime, join our Telegram channel at https://t.me/winfulltime. Visit '+SITE.url+'/predictions/in-play'},
 {k:['best picks','h2h','head to head','head-to-head','author pick','2 odds of the day'],r:'Daily Best Picks and H2H (head-to-head) Picks are curated selections based on direct match history. They each show a free 3-pick preview; the full daily list is a Pro feature — see '+SITE.url+'/best-picks.html and '+SITE.url+'/author-picks.html.'},
 {k:['bookmaker','bookmakers','betting site','betting sites','options','affiliate','compare','featured','1win','stake','1x bet','1xbet'],r:'Featured bookmakers: 1xBet, 1win and Stake — compare betting sites, welcome offers and payments at '+SITE.url+'/options.html. Links to bookmakers on the site are affiliate links: WinFulltime may earn a commission if you sign up, at no extra cost to you. 18+.'},

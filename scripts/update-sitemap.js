@@ -122,6 +122,7 @@ function buildSitemap() {
     { loc: 'https://winfulltime.com/converter.html', file: 'converter.html', changefreq: 'weekly', priority: '0.9' },
     { loc: 'https://winfulltime.com/code-splitter.html', file: 'code-splitter.html', changefreq: 'weekly', priority: '0.8' },
     { loc: 'https://winfulltime.com/code-merger.html', file: 'code-merger.html', changefreq: 'weekly', priority: '0.8' },
+    { loc: 'https://winfulltime.com/code-analyzer.html', file: 'code-analyzer.html', changefreq: 'weekly', priority: '0.8' },
     { loc: 'https://winfulltime.com/blog/', file: 'blog/index.html', changefreq: 'weekly', priority: '0.9' }
   ];
   const DAILY_FILES = new Set(coreUrls.slice(0, 16).map(u => u.file));

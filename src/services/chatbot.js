@@ -25,6 +25,7 @@ const knowledge = {
     accuracy: 'Each prediction shows a confidence percentage (e.g., 72%). Higher confidence typically means lower odds but more consistency.',
     ticketBuilder: 'Free accumulator ticket builder — completely free for every user, no sign-up or subscription. Set target odds, min/max leg odds, and markets to generate optimized multi-leg tickets with up to 30 legs and 500 combined odds. Visit /ticket-builder.html',
     converter: 'Free booking code converter for SportyBet, Bet9ja, MSport, Betway, Bangbet and BetKing. Paste a booking code to decode it, preview every selection, market and odds, and convert it into a fresh code for another site. Visit /converter.html',
+    codeAnalyzer: 'Free SportyBet code analyzer. Paste a booking code to review every selection with a risk score from 1 to 10 (odds level, market type, kick-off proximity, head-to-head form, price drift), remove the risky selections, and get a fresh SportyBet code carrying the survivors. Choose a tolerance: conservative, medium or aggressive. The original code is untouched. Visit /code-analyzer.html',
     analysis: 'Match analysis pages include team form, last-10 stats, head-to-head records and a summary for every fixture — plus league and team pages. See /analysis.html.',
     blog: '350+ articles on betting strategies, market guides, league analysis, betting education, and betting site reviews.',
     app: 'WinFulltime is a PWA installable on mobile and desktop for a native-like experience with offline support.'
@@ -63,6 +64,7 @@ const knowledge = {
     },
     ticketBuilder: 'https://winfulltime.com/ticket-builder.html',
     converter: 'https://winfulltime.com/converter.html',
+    codeAnalyzer: 'https://winfulltime.com/code-analyzer.html',
     inPlay: 'https://winfulltime.com/predictions/in-play',
     bestPicks: 'https://winfulltime.com/best-picks.html',
     h2hPicks: 'https://winfulltime.com/author-picks.html',
@@ -91,6 +93,7 @@ const faq = [
   { keywords: ['streak', 'winning', 'losing', 'draw streak', 'form', 'unbeaten'], response: knowledge.bettingMarkets['unbeaten'] + ' ' + knowledge.bettingMarkets['streaks'] },
   { keywords: ['ticket', 'builder', 'acca', 'accumulator', 'multi', 'parlay', 'generate', 'build', 'combined odds', 'leg'], response: knowledge.features.ticketBuilder },
   { keywords: ['converter', 'booking code', 'decode', 'transfer code', 'code convert', 'sportybet code', 'bet9ja code', 'msport', 'betking', 'bangbet', 'betway code'], response: knowledge.features.converter },
+  { keywords: ['analyzer', 'code analyzer', 'analyze booking code', 'risk analyzer', 'risky selections', 'remove selection', 'remove risky', 'code risk', 'check code risky', 'code review', 'booking code analyzer', 'analyze my code'], response: knowledge.features.codeAnalyzer },
   { keywords: ['best picks', 'h2h', 'head to head', 'author picks', '2 odds', 'two odds of the day'], response: 'H2H (head-to-head) picks are selections based on direct match history between two teams. Daily Best Picks and H2H Picks each show a free 3-pick preview; the full daily list is a Pro feature — see /author-picks.html and /best-picks.html.' },
   { keywords: ['in play', 'in-play', 'inplay', 'live', 'golden', 'watch', 'live scores', 'live betting', 'live odds'], response: knowledge.features.inPlay },
   { keywords: ['analysis', 'stats', 'statistics', 'form', 'h2h', 'teams', 'team form', 'predictions analysis', 'match analysis'], response: knowledge.features.analysis },
@@ -101,13 +104,13 @@ const faq = [
   { keywords: ['register', 'sign up', 'signup', 'account', 'create', 'sign in', 'login', 'password', 'forgot'], response: 'Creating an account is free at /signup.html — no payment needed. Login at /login.html (or reset your password if you forgot it). Free accounts get the Free plan by default; upgrade to Pro at any time from /pricing.html or your account page.' },
   { keywords: ['accuracy', 'accurate', 'reliable', 'confidence', 'probability', 'percentage'], response: knowledge.features.accuracy },
   { keywords: ['source', 'data', 'where', 'api', 'method', 'statistical', 'analysis', 'algorithm'], response: knowledge.features.sources },
-  { keywords: ['features', 'offer', 'provide', 'services', 'what can'], response: `WinFulltime offers:\n- Core markets free every day (1X2, Over/Under, BTTS) plus a 3-pick preview of the other markets\n- Match, team and head-to-head analysis (free)\n- Full pick list in every market with Pro (Corners, Cards, streaks, HT/FT, GG2+, Team-to-Score, HSH, In-Play)\n- A free Ticket Builder (up to 30 legs / 500 combined odds)\n- A free booking code converter (SportyBet, Bet9ja, MSport, Betway, Bangbet, BetKing)\n- Daily Best Picks & H2H Picks (3-pick preview free, full list Pro)\n- Golden in-play tips and live opportunities (Pro)\n- Team To Score record-cert tips (Pro)\n- 350+ educational blog articles\n- Betting site comparisons and reviews\n- A PWA app installable on mobile and desktop` },
+  { keywords: ['features', 'offer', 'provide', 'services', 'what can'], response: `WinFulltime offers:\n- Core markets free every day (1X2, Over/Under, BTTS) plus a 3-pick preview of the other markets\n- Match, team and head-to-head analysis (free)\n- Full pick list in every market with Pro (Corners, Cards, streaks, HT/FT, GG2+, Team-to-Score, HSH, In-Play)\n- A free Ticket Builder (up to 30 legs / 500 combined odds)\n- A free booking code converter (SportyBet, Bet9ja, MSport, Betway, Bangbet, BetKing)\n- A free SportyBet code analyzer (scores every selection and removes the risky ones)\n- Daily Best Picks & H2H Picks (3-pick preview free, full list Pro)\n- Golden in-play tips and live opportunities (Pro)\n- Team To Score record-cert tips (Pro)\n- 350+ educational blog articles\n- Betting site comparisons and reviews\n- A PWA app installable on mobile and desktop` },
   { keywords: ['bet9ja', 'sportybet', '1xbet', 'betking', 'betway', 'melbet', '22bet', 'bet365', 'bangbet'], response: `${knowledge.bookmakers.featured}\n\nRead in-depth reviews on the blog, e.g. /blog/1xbet-review.html, /blog/1win-review-nigeria.html and /blog/best-betting-sites-nigeria.html.` },
   { keywords: ['bookmaker', 'bookmakers', 'betting sites', 'compare', 'affiliate', 'featured', 'options', '1win', 'stake', '1x bet'], response: knowledge.bookmakers.featured },
   { keywords: ['what is', 'meaning', 'explain', 'define', 'definition', 'term', 'glossary'], response: 'I can explain betting terms like Asian Handicap, Expected Goals (xG), Kelly Criterion, Poisson Distribution, Value Betting, double chance, booking codes and more. Ask me about any specific term!', explainer: true },
   { keywords: ['premier league', 'epl', 'english'], response: 'Premier League predictions are available daily. Visit the homepage and filter by league, or read the guide at /blog/premier-league-betting-guide.html.' },
   { keywords: ['champions league', 'ucl', 'european cup'], response: 'Champions League predictions are available on matchdays. Visit the homepage and filter by league, or read the guide at /blog/champions-league-betting-guide.html.' },
-  { keywords: ['page', 'pages', 'site map', 'sections', 'navigation', 'where'], response: `WinFulltime main pages:\n- Home: /\n- Predictions: 1X2, Over 2.5, Over 1.5, BTTS, BTTS NO, Corners, Cards, Unbeaten, Winning/Losing/Draw Streaks (/predictions/*)\n- In-Play: ${knowledge.pages.inPlay}\n- Ticket Builder: ${knowledge.pages.ticketBuilder}\n- Code Converter: ${knowledge.pages.converter}\n- Best Picks: ${knowledge.pages.bestPicks}\n- H2H Picks: ${knowledge.pages.h2hPicks}\n- Analysis: ${knowledge.pages.analysis}\n- Pricing: ${knowledge.pages.pricing}\n- Blog: ${knowledge.pages.blog}\n- Betting Sites: ${knowledge.pages.options}\n- About / Contact / Privacy / Terms` }
+  { keywords: ['page', 'pages', 'site map', 'sections', 'navigation', 'where'], response: `WinFulltime main pages:\n- Home: /\n- Predictions: 1X2, Over 2.5, Over 1.5, BTTS, BTTS NO, Corners, Cards, Unbeaten, Winning/Losing/Draw Streaks (/predictions/*)\n- In-Play: ${knowledge.pages.inPlay}\n- Ticket Builder: ${knowledge.pages.ticketBuilder}\n- Code Converter: ${knowledge.pages.converter}\n- Code Analyzer: ${knowledge.pages.codeAnalyzer}\n- Best Picks: ${knowledge.pages.bestPicks}\n- H2H Picks: ${knowledge.pages.h2hPicks}\n- Analysis: ${knowledge.pages.analysis}\n- Pricing: ${knowledge.pages.pricing}\n- Blog: ${knowledge.pages.blog}\n- Betting Sites: ${knowledge.pages.options}\n- About / Contact / Privacy / Terms` }
 ];
 
 function escapeRegex(str) {
@@ -226,7 +229,7 @@ KEY PAGES:
 
 Answer concisely and helpfully. Give specific links to pages when relevant. Always promote responsible gambling. Be friendly and professional. Respond in the same language as the user's question.`;
 
-      const response = await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`, {
+      const response = await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/${process.env.GEMINI_MODEL || 'gemini-3.5-flash'}:generateContent?key=${geminiKey}`, {
         contents: [{ parts: [{ text: `${context}\n\nUser question: ${message}` }] }]
       }, { timeout: 15000, headers: { 'Content-Type': 'application/json' } });
 

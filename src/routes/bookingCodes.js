@@ -5,6 +5,7 @@ const router = express.Router();
 const { decodeCode, convertCode, splitCode, mergeCodes, createCodeFromLegs, providerStatus, getAvailableMatches, BOOKMAKERS, MAX_LEGS, MAX_CODES } = require('../services/bookingCodes/converter');
 const { recordConversion, getRecent } = require('../services/bookingCodes/recentConversions');
 const { announceConversion, announceSplit, announceMerge } = require('../services/codeAnnouncer');
+const { analyzeCode } = require('../services/codeAnalyzer');
 const STATUS_BY_CODE = {
   BAD_REQUEST: 400,
   INVALID_CODE: 404,
@@ -208,6 +209,33 @@ router.post('/converter/create', async function (req, res) {
       bookmakerName: result.bookmakerName,
       code: result.code,
       legCount: result.legCount
+    });
+  } catch (err) {
+    sendError(res, err);
+  }
+});
+
+// AI risk review of a SportyBet booking code: decode, score every selection,
+// drop the risky ones and mint a fresh code from the survivors.
+router.post('/converter/analyze', async function (req, res) {
+  try {
+    const body = req.body || {};
+    const result = await analyzeCode({ code: body.code, tolerance: body.tolerance });
+    res.json({
+      success: true,
+      sourceCode: result.sourceCode,
+      bookmaker: result.bookmaker,
+      bookmakerName: result.bookmakerName,
+      status: result.status,
+      tolerance: result.tolerance,
+      message: result.message,
+      newCode: result.newCode,
+      legCountBefore: result.legCountBefore,
+      legCountAfter: result.legCountAfter,
+      flaggedCount: result.flaggedCount,
+      totalOddsBefore: result.totalOddsBefore,
+      totalOddsAfter: result.totalOddsAfter,
+      verdicts: result.verdicts
     });
   } catch (err) {
     sendError(res, err);

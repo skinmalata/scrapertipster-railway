@@ -67,7 +67,8 @@ const HEAD_BOILERPLATE = `<meta charset="UTF-8">
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/app.css?v=10">
 <link rel="alternate" type="application/rss+xml" title="WinFulltime Football Predictions RSS" href="/feed.xml">
-<script async src="https://news.google.com/swg/js/v1/publisher.js"></script>`;
+<script async src="https://news.google.com/swg/js/v1/publisher.js"></script>
+<script src="/analytics-events.js" defer></script>`;
 
 const HEADER_HTML = `<header>
 <div class="header-content">

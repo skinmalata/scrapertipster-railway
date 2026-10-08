@@ -13,6 +13,7 @@ const STATIC_ASSETS = [
   '/converter.html',
   '/code-splitter.html',
   '/code-merger.html',
+  '/code-analyzer.html',
   '/best-picks.html',
   '/author-picks.html',
   '/2-odds-of-the-day.html',
