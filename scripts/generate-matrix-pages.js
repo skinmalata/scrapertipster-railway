@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { escapeHtml, slugifyTeam, generateFaqSchema, wrapPage } = require('./lib/layout');
 const { spliceSponsorBetweenCards } = require('./lib/sponsor-banner');
+const { PREDICTION_TOOLS_CSS, PREDICTION_TOOLS_NAV } = require('./lib/prediction-tools');
 
 const PREDICTIONS_FILE = path.join(__dirname, '..', 'predictions-cache.json');
 const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions');
@@ -169,7 +170,8 @@ function generateMatrixPage(leagueName, leagueSlug, marketSlug, marketConfig, ma
     }
   ]);
 
-  const pageCss = `.matches-grid{margin-top:24px}`;
+  const pageCss = `.matches-grid{margin-top:24px}
+${PREDICTION_TOOLS_CSS}`;
 
   const body = `
 <div class="hero">
@@ -186,6 +188,8 @@ function generateMatrixPage(leagueName, leagueSlug, marketSlug, marketConfig, ma
   <span style="font-size:13px;font-weight:600;color:var(--text-secondary);align-self:center;">More ${escapeHtml(leagueName)} pages:</span>
   ${relatedLinks.join('\n    ')}
 </div>
+
+${PREDICTION_TOOLS_NAV}
 
 <section class="seo-content">
 <h2>About ${escapeHtml(leagueName)} ${escapeHtml(marketConfig.label)} Predictions</h2>

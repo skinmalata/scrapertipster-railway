@@ -5,6 +5,7 @@ const path = require('path');
 const { CHIPS_CSS, FAQ_CSS, faqsList, chipsSection, renderHead, collectionPageSchema } = require('./lib/seo-blocks');
 const { renderBookmakerCTA } = require('./lib/bookmaker-cta');
 const { spliceSponsorBetweenCards } = require('./lib/sponsor-banner');
+const { PREDICTION_TOOLS_CSS, PREDICTION_TOOLS_NAV } = require('./lib/prediction-tools');
 
 const PREDICTIONS_FILE = path.join(__dirname, '..', 'predictions-cache.json');
 const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions', 'league');
@@ -226,6 +227,7 @@ ${generateLeagueFaqSchema(leagueName)}
 .matches-grid{margin-top:24px}
 .seo-content{margin-top:48px;border-top:1px solid var(--border);padding-top:32px}
 .seo-content h2{font-size:22px;font-weight:700;margin-bottom:16px;color:var(--text-primary)}
+${PREDICTION_TOOLS_CSS}
 ${FAQ_CSS}
 ${CHIPS_CSS}
 </style>
@@ -280,6 +282,8 @@ ${CHIPS_CSS}
 ${truncatedNote}
 
 ${relatedMarketsHtml}
+
+${PREDICTION_TOOLS_NAV}
 
 <section class="seo-content">
 <h2>About ${escapeHtml(leagueName)} Predictions</h2>

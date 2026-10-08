@@ -5,6 +5,7 @@ const path = require('path');
 const { escapeHtml, generateFaqSchema, wrapPage } = require('./lib/layout');
 const { readableLeagueLabel } = require('./league-labels');
 const { CHIPS_CSS, chipsBlock, faqBlock } = require('./lib/seo-blocks');
+const { PREDICTION_TOOLS_CSS, PREDICTION_TOOLS_NAV } = require('./lib/prediction-tools');
 
 const RESULTS_FILE = path.join(__dirname, '..', 'results-cache.json');
 const PREDICTIONS_FILE = path.join(__dirname, '..', 'predictions-cache.json');
@@ -209,6 +210,7 @@ function generateDateArchivePage(dateStr, resultsList, ctx, tipsForDate) {
 .stat-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
 .stat-num{font-size:24px;font-weight:800;color:var(--accent)}
 .stat-txt{font-size:12px;color:var(--text-secondary);margin-top:4px}
+${PREDICTION_TOOLS_CSS}
 ${CHIPS_CSS}`;
 
   const marketChips = MARKET_LINKS.map(l => `<a href="/predictions/${l.slug}" class="chip-link">${escapeHtml(l.label)} Predictions</a>`).join('\n        ');
@@ -258,6 +260,8 @@ ${leagueChips ? chipsBlock({
 </div>
 
 ${relatedLinksHtml}
+
+${PREDICTION_TOOLS_NAV}
 
 <section class="seo-content">
 ${faqBlock({
