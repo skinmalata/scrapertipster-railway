@@ -18,7 +18,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="WinFulltime">
-<title>VIP Pro Tips | WinFulltime</title>
+<title>Team To Score | WinFulltime</title>
 <style>
 .vip-badge{background:linear-gradient(135deg,#ff2448,#ff7e7e);color:#fff;font-weight:800;font-size:12px;letter-spacing:1px;padding:4px 10px;border-radius:20px;text-transform:uppercase}
 .confidence-meter{height:6px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden;width:100%;margin-top:6px}
@@ -38,6 +38,18 @@
 .date-tab:hover{color:var(--text-primary);background:var(--bg-card-hover)}
 .date-tab.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
 @media(max-width:640px){.date-tab{padding:8px 14px;font-size:13px;min-width:80px}}
+.match-card.locked-card{border:1px dashed rgba(255,255,255,.14);background:rgba(255,255,255,.02)}
+.locked-card .locked-bar{display:block;height:12px;border-radius:6px;background:rgba(255,255,255,.09)}
+.locked-card .match-header,.locked-card .match-teams{pointer-events:none}
+.locked-cta{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 0 4px;color:#fff}
+.lock-emoji{font-size:19px;line-height:1}
+.locked-title{font-size:11px;font-weight:800;letter-spacing:.09em;color:#ff647d;text-transform:uppercase}
+.locked-sub{font-size:12px;color:var(--text-secondary)}
+.locked-btn{background:linear-gradient(135deg,#ff2448,#ff647d);color:#fff;padding:9px 26px;border-radius:9px;text-decoration:none;font-weight:700;font-size:13px;margin-top:3px;display:inline-block}
+.locked-btn:hover{opacity:.92}
+.locked-note{max-width:830px;margin:0 auto 24px;padding:14px 18px;border:1px solid rgba(255,36,72,.3);border-radius:12px;background:rgba(255,36,72,.06);color:var(--text-secondary);font-size:14px;line-height:1.6;text-align:center}
+.locked-note a{color:#ff647d;font-weight:700;text-decoration:none}
+.locked-note a:hover{text-decoration:underline}
 </style>
 <link rel="alternate" type="application/rss+xml" title="WinFulltime Football Predictions RSS" href="/feed.xml">
 <script async src="https://news.google.com/swg/js/v1/publisher.js"></script>
@@ -80,7 +92,7 @@
 </header>
 <main class="container">
 <div class="hero">
-<h1 id="pageHeading">VIP Pro Tips<span class="vip-badge" style="margin-left:10px;vertical-align:middle">VIP</span></h1>
+<h1 id="pageHeading">Team To Score<span class="vip-badge" style="margin-left:10px;vertical-align:middle">Pro</span></h1>
 <p class="hero-date" id="currentDate"></p>
 </div>
 
@@ -112,11 +124,11 @@
   <a href="/predictions/winning-streak" id="tab-winning-streak" class="tab-btn">Win Streak</a>
   <a href="/predictions/losing-streak" id="tab-losing-streak" class="tab-btn">Loss Streak</a>
   <a href="/predictions/draws-streak" id="tab-draws-streak" class="tab-btn">Draw Streak</a>
-  <a href="/vip.html" id="tab-vip" class="tab-btn active" style="background:#ff2448;color:#fff">VIP</a>
+  <a href="/vip.html" id="tab-vip" class="tab-btn active" style="background:#ff2448;color:#fff">Team To Score</a>
 </div>
 
 <div class="stats-bar" id="statsBar" style="display:none">
-<div class="stat-item"><div class="stat-value" id="totalMatches">0</div><div class="stat-label">VIP Tips</div></div>
+<div class="stat-item"><div class="stat-value" id="totalMatches">0</div><div class="stat-label">Team To Score</div></div>
 <div class="stat-item"><div class="stat-value" id="avgConfidence">0</div><div class="stat-label">Avg Confidence</div></div>
   <div class="stat-item"><div class="stat-value" id="avgScorePct">0</div><div class="stat-label">Avg Score Pct</div></div>
 </div>
@@ -251,7 +263,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
   function updateDateDisplay() {
     var label = currentDate === 'today' ? 'Predictions For Today' : 'Predictions For Tomorrow';
     var el = document.getElementById('pageHeading');
-    if (el) el.innerHTML = 'VIP Pro Tips <span class="vip-badge" style="margin-left:10px;vertical-align:middle">VIP</span>';
+    if (el) el.innerHTML = 'Team To Score <span class="vip-badge" style="margin-left:10px;vertical-align:middle">Pro</span>';
     var dateEl = document.getElementById('currentDate');
     if (dateEl) dateEl.textContent = label + ' ' + getSelectedDateStr();
   }
@@ -276,12 +288,12 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
   function renderContent() {
     var content = document.getElementById('content');
     if (!cache || !cache.dates) {
-      content.innerHTML = '<div class="no-matches"><p>No VIP picks yet. Picks publish daily.</p></div>';
+      content.innerHTML = '<div class="no-matches"><p>No Team To Score picks yet. Picks publish daily.</p></div>';
       return;
     }
     var dateStr = getSelectedDateStr();
     var matches = cache.dates[dateStr] || [];
-    document.getElementById('totalMatches').textContent = matches.length;
+    document.getElementById('totalMatches').textContent = matches.length + (cache.lockedTotal ? ' + ' + cache.lockedTotal + ' locked' : '');
     var avgConfidence = matches.length ? Math.round(matches.reduce(function(s, m) { return s + (m.confidence || 0); }, 0) / matches.length) : 0;
     var scoreVals = matches.map(function(m) { return m.teamScoreProb; }).filter(function(v) { return v != null; });
     var avgScorePct = scoreVals.length ? Math.round(scoreVals.reduce(function(s, v) { return s + v; }, 0) / scoreVals.length) : 0;
@@ -289,8 +301,27 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     document.getElementById('avgScorePct').textContent = (avgScorePct || 0) + '%';
 
     if (matches.length === 0) {
-      content.innerHTML = '<div class="no-matches"><p>No VIP picks for ' + dateStr + '. Check back after the daily update.</p></div>';
+      content.innerHTML = '<div class="no-matches"><p>No Team To Score picks for ' + dateStr + '. Check back after the daily update.</p></div>';
       return;
+    }
+
+    var lockedTotal = cache.lockedTotal || 0;
+    var lockedCards = '';
+    var lockedNote = '';
+    if (!cache.isPro && lockedTotal > 0) {
+      var shown = matches.length;
+      for (var li = 0; li < 3; li++) {
+        lockedCards += '<article class="match-card locked-card fade-in" style="animation-delay:' + ((shown + li) * 60) + 'ms" aria-label="Locked Team To Score pick, upgrade to view">' +
+          '<div class="match-header"><span class="locked-bar" style="width:38%"></span><span class="locked-bar" style="width:16%"></span></div>' +
+          '<div class="match-teams" style="justify-content:center"><span class="locked-cta">' +
+          '<span class="lock-emoji">&#128274;</span>' +
+          '<span class="locked-title">TEAM TO SCORE LOCKED</span>' +
+          '<span class="locked-sub">' + lockedTotal + ' more picks behind the paywall</span>' +
+          '<a class="locked-btn" href="/pricing.html">Upgrade to View All</a>' +
+          '</span></div></article>';
+      }
+      lockedNote = '<div class="locked-note">Free users see a preview of today&rsquo;s Team To Score picks. There are <strong>' +
+        lockedTotal + ' more picks</strong> behind the paywall — <a href="/pricing.html">upgrade to Pro</a> for the full list.</div>';
     }
 
     var html = matches.map(function(m, i) {
@@ -325,7 +356,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
         '</div></div></div>';
     }).join('');
 
-    content.innerHTML = '<div class="matches-grid">' + (window.wftSponsor ? window.wftSponsor.insertSponsor(html) : html) + '</div>';
+    content.innerHTML = '<div class="matches-grid">' + (window.wftSponsor ? window.wftSponsor.insertSponsor(html) : html) + lockedCards + '</div>' + lockedNote;
   }
 
   function renderPicks() {
@@ -335,11 +366,11 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
   function showPaywall(hasUser) {
     var content = document.getElementById('content');
     var loginPart = hasUser
-      ? '<p>Your account is active but is not on a VIP plan.</p>'
-      : '<p>Please sign in with your account to view your VIP picks.</p>';
+      ? '<p>Your account is active but is not on a Pro plan.</p>'
+      : '<p>Please sign in with your account to view the full Team To Score list.</p>';
     content.innerHTML = '<div class="paywall">' +
-      '<h2>Exclusive VIP Pro Tips</h2>' + loginPart +
-      '<a class="cta-btn" href="/pricing.html">Upgrade to VIP</a>' +
+      '<h2>Team To Score Picks</h2>' + loginPart +
+      '<a class="cta-btn" href="/pricing.html">Upgrade to Pro</a>' +
       '<a class="login-link" href="/login.html">Sign in</a>' +
       '</div>';
   }
@@ -387,23 +418,24 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
     window.WFT.onAuthReady(function (user) {
       if (!current()) return;
-      if (!user) {
-        stopTimer();
-        showPaywall(false);
-        return;
-      }
+      // Free visitors get a 3-pick preview from the API just like logged-in
+      // users. The response's isPro flag decides whether locked placeholders
+      // render; a paywall only appears when the API cannot return picks at all.
       window.WFT.apiFetch('/api/vip').then(function (data) {
         if (!current()) return;
         stopTimer();
-        if (!data || !data.isPro) {
-          showPaywall(true);
+        var hasPicks = data && data.dates && Object.keys(data.dates).length;
+        if (!data || !hasPicks || (typeof data.__status === 'number' && data.__status >= 400)) {
+          showPaywall(!!user);
           return;
         }
         cache = data;
         document.getElementById('statsBar').style.display = '';
         renderContent();
       }).catch(function () {
-        showLoadError(gen);
+        if (!current()) return;
+        stopTimer();
+        showPaywall(!!user);
       });
     });
   }

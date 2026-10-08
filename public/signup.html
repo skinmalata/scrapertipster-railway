@@ -234,7 +234,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
         <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
         <div class="error" id="email-error"></div>
       </div>
-      <button class="btn-primary" id="signup-btn" onclick="handleSignUp()">Pay &amp; Create Account</button>
+      <button class="btn-primary" id="signup-btn" onclick="handleSignUp()">Sign up with Credit Card</button>
       <button class="btn-primary" id="signup-btn-paypal" onclick="handleSignUpPayPal()" style="background:#0070ba;margin-top:8px;display:none">Sign up with PayPal</button>
       <p class="auth-note">No free accounts. Your account is created only after your payment is confirmed.</p>
     </div>
@@ -266,7 +266,7 @@ function setLoading(loading) {
     btn.innerHTML = '<span class="spinner"></span>Creating checkout...';
   } else {
     btn.disabled = false;
-    btn.innerHTML = 'Pay &amp; Create Account';
+    btn.innerHTML = 'Sign up with Credit Card';
   }
 }
 

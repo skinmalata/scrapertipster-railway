@@ -784,12 +784,23 @@ router.get('/h2h-unbeaten', (req, res) => {
   }
 });
 
-// GET /api/vip - Forebet VIP pro tips, served only to active Pro members.
+// GET /api/vip - Forebet Team To Score / match-winner record cert tips.
 // Picks live in a committed forebet-vip-cache.json (scraped daily from a
 // residential IP by scripts/scrape-forebet-vip.ps1; Forebet blocks datacenter
-// IPs). This endpoint is the only way the picks leave the server - they are
-// never placed in the static public/ tree, so non-members cannot fetch them.
+// IPs). Pro members get the full list; free users get a 3-pick preview with a
+// lockedTotal so the page renders placeholder cards. Only the preview picks
+// ever leave the server for free visitors - the rest are never placed in the
+// static public/ tree, so non-members cannot fetch them.
 const pathVipCache = path.join(__dirname, '../../forebet-vip-cache.json');
+
+function vipLagosDateStr(dayOffset) {
+  var parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Lagos', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
+  var v = {};
+  parts.forEach(function (p) { v[p.type] = p.value; });
+  var d = new Date(Date.UTC(Number(v.year), Number(v.month) - 1, Number(v.day)));
+  d.setUTCDate(d.getUTCDate() + (dayOffset || 0));
+  return d.toISOString().slice(0, 10);
+}
 
 // VIP picks are match-winner or team-to-score calls. Odds and any analysis
 // text are NOT part of the tip presentation: strip every price field
@@ -811,37 +822,67 @@ function sanitizeVipPick(p) {
   return copy;
 }
 
-router.get('/vip', requireProMiddleware, function (req, res) {
+router.get('/vip', optionalAuth, async function (req, res) {
   try {
     if (!fs.existsSync(pathVipCache)) {
-      return res.json({ isPro: true, dates: {}, allDates: [], lastFetch: null, message: 'VIP picks publish each morning.' });
+      return res.json({ isPro: true, dates: {}, allDates: [], lastFetch: null, message: 'Team To Score picks publish each morning.' });
     }
     const cache = JSON.parse(fs.readFileSync(pathVipCache, 'utf8'));
-    const dates = {};
-    for (const d of Object.keys(cache.dates || {})) {
-      dates[d] = (cache.dates[d] || []).map(sanitizeVipPick);
-    }
+    const isPro = await resolveIsPro(req);
     const requestedDate = req.query.date;
-    if (requestedDate && dates[requestedDate]) {
+
+    if (isPro) {
+      const dates = {};
+      for (const d of Object.keys(cache.dates || {})) {
+        dates[d] = (cache.dates[d] || []).map(sanitizeVipPick);
+      }
+      if (requestedDate && dates[requestedDate]) {
+        return res.json({
+          isPro: true,
+          lastFetch: cache.lastFetch || null,
+          meta: cache.meta || null,
+          date: requestedDate,
+          picks: dates[requestedDate],
+          allDates: Object.keys(dates)
+        });
+      }
       return res.json({
         isPro: true,
         lastFetch: cache.lastFetch || null,
         meta: cache.meta || null,
-        date: requestedDate,
-        picks: dates[requestedDate],
+        dates,
         allDates: Object.keys(dates)
       });
     }
+
+    // Free preview: the today's-date pool only, trimmed to the middle 3 so the
+    // highest-confidence calls stay behind the paywall, with the full-day count
+    // surfaced as lockedTotal for the placeholder cards.
+    var today = vipLagosDateStr(0);
+    var full = (cache.dates[today] || []).map(sanitizeVipPick);
+    var total = full.length;
+    var freeVisible = Math.min(total, 3);
+    var lockedTotal = Math.max(0, total - 3);
+    var preview = full;
+    if (total > 3) {
+      var start = Math.floor((total - 3) / 2);
+      preview = full.slice(start, start + 3);
+    }
+    var datesOut = {};
+    if (preview.length) datesOut[today] = preview;
     res.json({
-      isPro: true,
+      isPro: false,
       lastFetch: cache.lastFetch || null,
       meta: cache.meta || null,
-      dates,
-      allDates: Object.keys(dates)
+      dates: datesOut,
+      allDates: Object.keys(datesOut),
+      freeVisible: freeVisible,
+      lockedTotal: lockedTotal,
+      date: today
     });
   } catch (e) {
     console.error('[api/vip] Error:', e.message);
-    res.status(500).json({ error: 'Failed to load VIP picks' });
+    res.status(500).json({ error: 'Failed to load Team To Score picks' });
   }
 });
 
