@@ -23,6 +23,7 @@ const { buildGiantPool, getGiantPoolHistory } = require('../services/authorPicks
 const { fetchTodayStreaks } = require('../services/h2hWinningStreaks');
 const { findMatchingResult } = require('../utils/helpers');
 const { lagosDate } = require('../utils/dates');
+const { FREE_LIMITS, applyLimits } = require('../utils/limits');
 const { getOddsComparison } = require('../services/oddsComparison');
 const { optionalAuth, requireAuth, requirePro: requireProMiddleware, requireAdmin, logAdminAction } = require('../middleware/auth');
 const payment = require('../services/payment');
@@ -82,15 +83,6 @@ if (supabaseUrl && supabaseKey) {
     console.log('Supabase not available:', e.message);
   }
 }
-
-const FREE_LIMITS = {
-  btts: 8,
-  winstreak: 2,
-  losestreak: 2,
-  drawstreak: 2,
-  teamtoscore: 4,
-  teamtoscore2plus: 4
-};
 
 const DISPOSABLE_DOMAINS = [
   'mailinator.com', 'guerrillamail.com', '10minutemail.com', 'tempmail.com',
@@ -263,20 +255,6 @@ async function refreshCornersAndCardsIfStale() {
   }
 }
 
-function applyLimits(data, isVip) {
-  if (isVip) {
-    return { ...data, isVip: true, isFreeLimited: false, limit: null, remaining: null };
-  }
-  var limited = { ...data, isVip: false, isFreeLimited: true, limit: FREE_LIMITS };
-  limited.bttsMatches = (data.bttsMatches || []).slice(0, FREE_LIMITS.btts);
-  limited.winstreakMatches = (data.winstreakMatches || []).slice(0, FREE_LIMITS.winstreak);
-  limited.losestreakMatches = (data.losestreakMatches || []).slice(0, FREE_LIMITS.losestreak);
-  limited.drawstreakMatches = (data.drawstreakMatches || []).slice(0, FREE_LIMITS.drawstreak);
-  limited.teamToScoreMatches = (data.teamToScoreMatches || []).slice(0, FREE_LIMITS.teamtoscore);
-  limited.teamToScore2PlusMatches = (data.teamToScore2PlusMatches || []).slice(0, FREE_LIMITS.teamtoscore2plus);
-  return limited;
-}
-
 router.get('/predictions', optionalAuth, async (req, res) => {
   try {
     const isVip = req.user ? await (async function() {
@@ -289,10 +267,28 @@ router.get('/predictions', optionalAuth, async (req, res) => {
     })() : false;
     
     let data;
-    const cached = getScraperService().loadCachedPredictions();
-    
-    // Auto-refresh if cache is stale (older than 12 hours)
-    if (cached && cached.isStale) {
+    // Prefer the daily full snapshot committed by the GitHub Pages build. It is
+    // the freshest complete dataset (every market merged and results-enriched),
+    // and the live scraper cannot fully run on Render (Puppeteer is disabled).
+    // Falls back to the scraper cache, then a live fetch.
+    const snapshotFile = path.join(__dirname, '..', '..', 'data', 'full-predictions.json');
+    let snapshot = null;
+    try {
+      if (fs.existsSync(snapshotFile)) {
+        snapshot = JSON.parse(fs.readFileSync(snapshotFile, 'utf8'));
+      }
+    } catch (e) {
+      console.error('[API] Failed to read full-predictions snapshot:', e.message);
+    }
+
+    const cached = (snapshot && snapshot.matches && snapshot.matches.length)
+      ? null
+      : getScraperService().loadCachedPredictions();
+
+    if (snapshot && snapshot.matches && snapshot.matches.length) {
+      console.log('[API] Serving from full-predictions snapshot');
+      data = snapshot;
+    } else if (cached && cached.isStale) {
       console.log('[API] Cache is stale, triggering background refresh...');
       // Fire and forget - serve stale data but refresh in background
       setImmediate(async () => {
@@ -489,34 +485,40 @@ router.get('/predictions', optionalAuth, async (req, res) => {
       });
     };
     
-    data.matches = enrichWithResults(data.matches);
-    data.over25Matches = enrichWithResults(data.over25Matches);
-    data.over15Matches = enrichWithResults(data.over15Matches);
-    data.under25Matches = enrichWithResults(data.under25Matches);
-    data.bttsMatches = enrichWithResults(data.bttsMatches);
+    // Only re-enrich when the runtime results cache has rows. When it is empty
+    // (fresh deploy) the snapshot already carries baked-in results, and running
+    // enrichWithResults would overwrite those with nulls.
+    if (Object.keys(resultsByDate).length > 0) {
+      data.matches = enrichWithResults(data.matches);
+      data.over25Matches = enrichWithResults(data.over25Matches);
+      data.over15Matches = enrichWithResults(data.over15Matches);
+      data.under25Matches = enrichWithResults(data.under25Matches);
+      data.bttsMatches = enrichWithResults(data.bttsMatches);
+    }
     
-    // Load corners data
+    // Load corners data. The runtime caches may be absent or stale on Render,
+    // so only override the snapshot/loaded arrays when we actually have rows.
     const cornersData = getScraperService().loadCornersCache();
-    if (cornersData) {
-      data.cornersMatches = cornersData.matches || [];
+    if (cornersData && cornersData.matches && cornersData.matches.length) {
+      data.cornersMatches = cornersData.matches;
     } else {
-      data.cornersMatches = [];
+      data.cornersMatches = data.cornersMatches || [];
     }
     
     // Load cards data
     const cardsData = getScraperService().loadCardsCache();
-    if (cardsData) {
-      data.cardsMatches = cardsData.matches || [];
+    if (cardsData && cardsData.matches && cardsData.matches.length) {
+      data.cardsMatches = cardsData.matches;
     } else {
-      data.cardsMatches = [];
+      data.cardsMatches = data.cardsMatches || [];
     }
     
     // Load both halves data (replaces Team to Score 2+)
     const bothHalvesData = getScraperService().loadBothHalvesCache();
-    if (bothHalvesData) {
-      data.teamToScore2PlusMatches = bothHalvesData.matches || [];
+    if (bothHalvesData && bothHalvesData.matches && bothHalvesData.matches.length) {
+      data.teamToScore2PlusMatches = bothHalvesData.matches;
     } else {
-      data.teamToScore2PlusMatches = [];
+      data.teamToScore2PlusMatches = data.teamToScore2PlusMatches || [];
     }
     
     if (!data.over15Matches || data.over15Matches.length === 0) {

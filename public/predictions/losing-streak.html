@@ -114,22 +114,16 @@
 .telegram-link{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#1e96c8,#1a7da8);color:#fff;padding:11px 22px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px;transition:transform 0.2s,box-shadow 0.3s}
 .telegram-link:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(30,150,200,0.3)}
 .prediction-tools{position:relative;display:flex;flex-wrap:wrap;justify-content:center;clear:both;width:100%;max-width:900px;box-sizing:border-box;margin:24px auto 8px;padding:20px 12px;gap:12px;z-index:0}
-.prediction-tools .streak-btn{box-sizing:border-box;min-width:min(180px,100%)}
+.prediction-tools .streak-btn{box-sizing:border-box;min-width:min(180px,100%);}
 .prediction-tools .tool-converter{background:linear-gradient(135deg,#059669,#10b981);color:#fff}
 .prediction-tools .tool-merger{background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff}
 .prediction-tools .tool-splitter{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff}
 .prediction-tools .tool-inplay{background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff}
-.match-card.vip-locked{position:relative;overflow:hidden}
-.match-card.vip-locked>*:not(.vip-card-lock){filter:blur(5px);opacity:.58;pointer-events:none;user-select:none}
-.vip-card-lock{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:1px solid rgba(255,36,72,.42);border-radius:inherit;background:rgba(9,14,25,.72);color:#fff;text-align:center;text-decoration:none;font-size:13px;font-weight:700}
-.vip-card-lock strong{color:#ff647d;font-size:12px;letter-spacing:.08em}
-.vip-card-lock span{font-size:12px;font-weight:600}
 @media(max-width:640px){.telegram-cta h3{font-size:17px}.telegram-cta p{font-size:13px}.telegram-link{width:100%;justify-content:center}}
 .chips{display:flex;flex-wrap:wrap;gap:10px}
 .chip-link{display:inline-block;padding:9px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:999px;color:var(--text-primary);text-decoration:none;font-size:13px;font-weight:600;transition:all 0.2s}
 .chip-link:hover{border-color:var(--accent);color:var(--accent)}
 </style>
-<link rel="stylesheet" href="/consent.css">
 </head>
 <body>
 <div>
@@ -138,17 +132,11 @@
 <div class="logo"><a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a></div>
 <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 <nav id="nav">
- <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/converter.html">Code Converter</a>
- <a href="/code-splitter.html">Code Splitter</a>
- <a href="/code-merger.html">Code Merger</a>
- <a href="/predictions/in-play">In-Play</a>
- <a href="/blog/">Blog</a>
- <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-  <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
-  <a href="/account.html" class="wft-auth-account" style="display:none;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Account</a>
- </span></nav>
+<a href="/">Home</a>
+<a href="/ticket-builder.html">Ticket Builder</a>
+<a href="/blog/">Blog</a>
+<a href="/contact.html">Contact</a>
+</nav>
 </div>
 </header>
 <main class="container">
@@ -177,7 +165,6 @@
             <a href="/predictions/corners" id="tab-corners" class="tab-btn">Corners</a>
             <a href="/predictions/cards" id="tab-cards" class="tab-btn">Cards</a>
             <a href="/predictions/highest-scoring-half" id="tab-highest-scoring-half" class="tab-btn">Highest Scoring Half</a>
-
             <a href="/predictions/in-play" id="tab-in-play" class="tab-btn">In-Play</a>
             <a href="/predictions/winning-streak" id="tab-winning-streak" class="tab-btn">Win Streak</a>
             <a href="/predictions/losing-streak" id="tab-losing-streak" class="tab-btn active">Loss Streak</a>
@@ -319,82 +306,25 @@
 </main>
 </div>
 <footer>
- <div class="footer-grid">
-  <div class="footer-brand">
-   <a href="/" class="footer-brand-link">
-    <img src="/winfulltimelogo.png" alt="WinFulltime" class="footer-logo" width="34" height="34">
-    <span class="footer-brand-name">Win<span>Fulltime</span></span>
-   </a>
-   <p class="footer-about">Data-driven football predictions, in-play alerts and expert analysis — built for smart bettors who want an edge, every single day.</p>
-  </div>
-
-  <div class="footer-col">
-   <h5>Predictions</h5>
-   <ul>
-    <li><a href="/predictions/1x2.html">1X2</a></li>
-     <li><a href="/predictions/over-2-5.html">Over 2.5</a></li>
-     <li><a href="/predictions/over-1-5.html">Over 1.5</a></li>
-     <li><a href="/predictions/under-2-5.html">Under 2.5</a></li>
-     <li><a href="/predictions/highest-scoring-half.html">Highest Scoring Half</a></li>
-    <li><a href="/predictions/btts.html">BTTS Yes</a></li>
-    <li><a href="/predictions/btts-no.html">BTTS No</a></li>
-    <li><a href="/predictions/unbeaten.html">Unbeaten</a></li>
-    <li><a href="/predictions/in-play.html">In-Play</a></li>
-    <li><a href="/predictions/1x2.html">All Predictions</a></li>
-   </ul>
-  </div>
-
-  <div class="footer-col">
-   <h5>Top Leagues</h5>
-   <ul>
-    <li><a href="/predictions/league/premier-league/">Premier League</a></li>
-    <li><a href="/predictions/league/la-liga/">La Liga</a></li>
-    <li><a href="/predictions/league/serie-a/">Serie A</a></li>
-    <li><a href="/predictions/league/ligue-1/">Ligue 1</a></li>
-    <li><a href="/predictions/league/uefa-champions-league/">Champions League</a></li>
-   </ul>
-  </div>
-
-  <div class="footer-col">
-   <h5>Picks &amp; Tools</h5>
-   <ul>
-    <li><a href="/best-picks.html">Best Picks</a></li>
-    <li><a href="/2-odds-of-the-day.html">2 Odds</a></li>
-    <li><a href="/author-picks.html">H2H Picks</a></li>
-    <li><a href="/ticket-builder.html">Ticket Builder</a></li>
-    <li><a href="/converter.html">Code Converter</a></li>
-    <li><a href="/code-splitter.html">Code Splitter</a></li>
-    <li><a href="/code-merger.html">Code Merger</a></li>
-   </ul>
-  </div>
-
-  <div class="footer-col">
-   <h5>Company</h5>
-   <ul>
-    <li><a href="/about.html">About</a></li>
-    <li><a href="/blog/">Blog</a></li>
-    <li><a href="/advertise.html">Advertise</a></li>
-    <li><a href="/contact.html">Contact</a></li>
-   </ul>
-  </div>
- </div>
-
- <div class="footer-bottom">
-  <span>&copy; <span class="js-year">2026</span> <a href="/">WinFulltime</a>. All rights reserved.</span>
-  <span class="footer-bottom-links">
-   <a href="/terms.html">Terms</a>
-   <a href="/privacy.html">Privacy</a>
-   <a href="/policy.html">Editorial Policy</a>
-   <a href="https://t.me/winfulltime" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;background:linear-gradient(135deg,#1e96c8,#1a7da8);color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Telegram Channel</a>
-  </span>
-  <span class="kofi-footer">
-   <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
-   <script type='text/javascript'>kofiwidget2.init('Support us', '#ff2448', 'winfulltime');kofiwidget2.draw();</script>
-  </span>
-   <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">Light</button>
- </div>
- <div style="text-align:center;padding:0 0 8px;"><div google-add-preferred-source-btn data-theme="dark"></div></div>
- </div>
+<div class="footer-content">
+<div style="text-align:center;margin-bottom:24px;">
+<p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Support WinFulltime &mdash; your donations keep all predictions free.</p>
+<a href="https://ko-fi.com/winfulltime" target="_blank" rel="noopener nofollow" style="display:inline-block;background:var(--accent-gradient);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Donate on Ko-fi</a>
+</div>
+<div class="footer-links">
+<a href="/">Home</a>
+<a href="/ticket-builder.html">Ticket Builder</a>
+<a href="/blog/">Blog</a>
+<a href="/advertise.html">Advertise</a>
+<a href="/contact.html">Contact</a>
+<a href="/terms.html">Terms</a>
+<a href="/privacy.html">Privacy</a>
+<a href="/sitemap.xml">Sitemap</a>
+</div>
+<p class="footer-copyright">&copy; 2026 WinFulltime. All rights reserved.</p>
+</div>
+<div style="text-align:center;padding:12px 0;"><button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">Light</button></div>
+<div style="text-align:center;padding:0 0 8px;"><div google-add-preferred-source-btn data-theme="dark"></div></div>
 </footer>
 <script src="/chat-widget.js"></script>
 <script src="/sponsor-banner.js?v=3"></script>
@@ -500,35 +430,16 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     if (ogUrl) ogUrl.content = 'https://winfulltime.com' + newUrl;
   }
 
-  var freeVisibleCount = 0;
-
-  function applyPredictionGating(list) {
-    if (!list || !list.length) { freeVisibleCount = 0; return list; }
-    var user = (window.WFT && typeof window.WFT.getUser === 'function') ? window.WFT.getUser() : null;
-    var marketSlug = (typeof CATEGORY_SLUG === 'string') ? CATEGORY_SLUG : '';
-    var alwaysFull = { '1x2': 1, 'over-1-5': 1, 'over-2-5': 1, 'under-2-5': 1 };
-    freeVisibleCount = (user && user.isPro) || alwaysFull[marketSlug] ? list.length : Math.ceil(list.length * 0.5);
-    return list;
+  function freeVisibleCount(list) {
+    if (!list || !list.length) return 0;
+    var user = (window.WFT && typeof window.WFT.getUser === "function") ? window.WFT.getUser() : null;
+    if (user && user.isPro) return list.length;
+    var marketSlug = (typeof CATEGORY_SLUG === "string") ? CATEGORY_SLUG : "";
+    var alwaysFull = { "1x2": 1, "over-1-5": 1, "over-2-5": 1, "under-2-5": 1 };
+    if (alwaysFull[marketSlug]) return list.length;
+    return Math.ceil(list.length * 0.5);
   }
 
-  function applyVipLocks(container, visibleCount) {
-    var cards = container.querySelectorAll('.match-card');
-    Array.prototype.forEach.call(cards, function(card, index) {
-      if (index < visibleCount) return;
-      card.classList.add('vip-locked');
-      var overlay = document.createElement('a');
-      overlay.className = 'vip-card-lock';
-      overlay.href = '/pricing.html';
-      overlay.setAttribute('aria-label', 'VIP only. Upgrade to view this prediction');
-      overlay.innerHTML = '<strong>&#128274; VIP ONLY</strong><span>Upgrade to view this pick</span>';
-      card.appendChild(overlay);
-      Array.prototype.forEach.call(card.children, function(child) {
-        if (child === overlay) return;
-        child.setAttribute('aria-hidden', 'true');
-        Array.prototype.forEach.call(child.querySelectorAll('a'), function(link) { link.setAttribute('tabindex', '-1'); });
-      });
-    });
-  }
   function renderUnbeaten(matches) {
     var content = document.getElementById('content');
     if (matches.length === 0) {
@@ -536,20 +447,21 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       document.getElementById('totalMatches').textContent = '0';
       return;
     }
-    var toRenderMatches = applyPredictionGating(matches);
-    document.getElementById('totalMatches').textContent = toRenderMatches.length;
-    var html = toRenderMatches.map(function(match, i) {
+    var visibleCount = freeVisibleCount(matches);
+    document.getElementById('totalMatches').textContent = matches.length;
+    var html = matches.map(function(match, i) {
       var streaksHtml = (match.streaks || []).map(function(s) {
         var loc = s.location ? ' ' + s.location : '';
         return '<div class="streak-row"><span class="streak-team">' + s.team + '</span><span class="streak-badge">' + s.count + ' unbeaten' + loc + '</span></div>';
       }).join('');
-      return '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms">' +
-        '<div class="match-header"><span>' + (match.league || '') + '</span><span>' + (match.time || '') + '</span></div>' +
+      var lockedOverlay = i >= visibleCount ? '<a class="vip-card-lock" href="/pricing.html" aria-label="VIP only. Upgrade to view this prediction"><strong>&#128274; VIP ONLY</strong><span>Upgrade to view this pick</span></a>' : '';
+      var lockedContent = i >= visibleCount ? ' aria-hidden="true"' : '';
+      return '<div class="match-card fade-in' + (i >= visibleCount ? ' vip-locked' : '') + '" style="animation-delay:' + (i * 50) + 'ms">' +
+        '<div class="vip-locked-content"' + lockedContent + '><div class="match-header"><span>' + (match.league || '') + '</span><span>' + (match.time || '') + '</span></div>' +
         '<div class="match-teams" style="justify-content:center;"><span class="team team-home" style="text-align:center;width:100%;">' + (match.match || '') + '</span></div>' +
-        '<div class="match-footer" style="flex-direction:column;gap:6px;">' + streaksHtml + '</div></div>';
+        '<div class="match-footer" style="flex-direction:column;gap:6px;">' + streaksHtml + '</div></div>' + lockedOverlay + '</div>';
     }).join('');
     content.innerHTML = '<div class="matches-grid">' + wftSponsor.insertSponsor(html) + '</div>';
-    applyVipLocks(content, freeVisibleCount);
   }
 
   function renderMatches(matches) {
@@ -570,9 +482,8 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       return;
     }
 
-    var toRenderMatches = applyPredictionGating(filtered);
-    document.getElementById('totalMatches').textContent = toRenderMatches.length;
-    var html = toRenderMatches.map(function(match, i) {
+    document.getElementById('totalMatches').textContent = filtered.length;
+    var html = filtered.map(function(match, i) {
       var matchStr = (IS_STREAK ? (match.nextMatch || match.match) : (match.match || match.nextMatch)) || '';
       var teams = matchStr.indexOf(' - ') !== -1 ? matchStr.split(' - ') : matchStr.split(' vs ');
       var home = (teams[0] || '').trim();
@@ -648,7 +559,6 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     }).join('');
 
     content.innerHTML = '<div class="matches-grid">' + wftSponsor.insertSponsor(html) + '</div>';
-    applyVipLocks(content, freeVisibleCount);
   }
 
   function renderCurrentView() {
@@ -697,9 +607,30 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
           .catch(function () { return null; });
       }
 
-      var res = await fetch('/data/predictions.json');
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      allData = await res.json();
+      // Static data is already capped to the free tier at build time (see
+      // scripts/gh-pages-scraper.js), so free and anonymous visitors get the
+      // limited markets straight from /data/predictions.json. Pro/VIP users
+      // fetch the full snapshot from the API instead.
+      var user = (window.WFT && typeof window.WFT.getUser === 'function') ? window.WFT.getUser() : null;
+      var fetchStatic = async function () {
+        var sres = await fetch('/data/predictions.json');
+        if (!sres.ok) throw new Error('HTTP ' + sres.status);
+        allData = await sres.json();
+      };
+      if (user && user.isPro && window.WFT && typeof window.WFT.apiFetch === 'function') {
+        try {
+          var apiOut = await window.WFT.apiFetch('/api/predictions');
+          if (apiOut && apiOut.matches && apiOut.matches.length) {
+            allData = apiOut;
+          } else {
+            await fetchStatic();
+          }
+        } catch (e) {
+          await fetchStatic();
+        }
+      } else {
+        await fetchStatic();
+      }
 
       if (h2hReady) h2hData = await h2hReady;
 
@@ -726,17 +657,23 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
   loadData();
   document.addEventListener('wft-pro-status', function () {
-    if (typeof renderCurrentView === 'function') renderCurrentView();
+    var user = (window.WFT && typeof window.WFT.getUser === 'function') ? window.WFT.getUser() : null;
+    if (user && user.isPro && window.WFT && typeof window.WFT.apiFetch === 'function') {
+      window.WFT.apiFetch('/api/predictions').then(function (apiOut) {
+        if (apiOut && apiOut.matches) {
+          allData = apiOut;
+        }
+        renderCurrentView();
+      }).catch(function () {
+        renderCurrentView();
+      });
+    } else {
+      renderCurrentView();
+    }
   });
 })();
 </script>
 <script src="/pwa.js?v=2"></script>
 <script src="/1xbet-odds-widget.js" defer></script>
-<script src="/consent.js?v=2" defer></script>
-
-<script src="/config.js"></script>
-<script src="/supabase-client.js"></script>
-<script src="/auth.js?v=20260801"></script>
-<script src="/vip-tab.js" defer></script>
 </body>
 </html>

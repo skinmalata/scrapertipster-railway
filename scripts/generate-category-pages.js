@@ -145,18 +145,11 @@ function generateNoscriptFallback(slug, catConfig) {
       const matches = (key && data[key]) ? data[key] : [];
       const today = todayStr();
       const todaysMatches = matches.filter(m => m.date === today);
-      const fullAccessCategories = ['1x2', 'over-1-5', 'over-2-5', 'under-2-5'];
-      const visibleCount = fullAccessCategories.includes(slug)
-        ? todaysMatches.length
-        : Math.ceil(todaysMatches.length * 0.5);
       const todays = todaysMatches.slice(0, 25);
       if (todays.length > 0) {
-        rows = todays.map((m, index) => {
+        rows = todays.map((m) => {
           const label = m.tip || (m.streaks && m.streaks.length ? m.streaks[0].count + ' unbeaten' : '');
-          const locked = index >= visibleCount;
-          const cell = value => `<span${locked ? ' class="vip-fallback-blur" aria-hidden="true"' : ''}>${value}</span>`;
-          const lockLabel = locked ? '<a class="vip-fallback-lock" href="/pricing.html">&#128274; VIP ONLY &mdash; Upgrade to view</a>' : '';
-          return `<tr${locked ? ' class="vip-locked-fallback"' : ''}><td>${cell(escapeHtml(m.league || ''))}${lockLabel}</td><td>${cell(escapeHtml(m.match || ''))}</td><td>${cell(escapeHtml(m.time || ''))}</td><td>${cell(escapeHtml(String(label || '')))}</td>${catConfig.dataKey === 'bttsNoMatches' || !m.probability ? '' : `<td>${cell(escapeHtml(String(m.probability || '')) + '%')}</td>`}</tr>`;
+          return `<tr><td>${escapeHtml(m.league || '')}</td><td>${escapeHtml(m.match || '')}</td><td>${escapeHtml(m.time || '')}</td><td>${escapeHtml(String(label || ''))}</td>${catConfig.dataKey === 'bttsNoMatches' || !m.probability ? '' : `<td>${escapeHtml(String(m.probability || ''))}%</td>`}</tr>`;
         }).join('');
       }
     } catch (e) {
@@ -423,13 +416,6 @@ ${generateFaqSchema(FAQ_SCHEMA[slug])}
 .prediction-tools .tool-merger{background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff}
 .prediction-tools .tool-splitter{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff}
 .prediction-tools .tool-inplay{background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff}
-.match-card.vip-locked{position:relative;overflow:hidden}
-.match-card.vip-locked>*:not(.vip-card-lock){filter:blur(5px);opacity:.58;pointer-events:none;user-select:none}
-.vip-card-lock{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:1px solid rgba(255,36,72,.42);border-radius:inherit;background:rgba(9,14,25,.72);color:#fff;text-align:center;text-decoration:none;font-size:13px;font-weight:700}
-.vip-card-lock strong{color:#ff647d;font-size:12px;letter-spacing:.08em}
-.vip-card-lock span{font-size:12px;font-weight:600}
-.noscript-content .vip-fallback-blur{filter:blur(4px);user-select:none}
-.noscript-content .vip-fallback-lock{display:block;margin-top:4px;color:#ff647d;font-size:10px;font-weight:800;text-decoration:none}
 @media(max-width:640px){.telegram-cta h3{font-size:17px}.telegram-cta p{font-size:13px}.telegram-link{width:100%;justify-content:center}}
 ${CHIPS_CSS}
 </style>
@@ -691,7 +677,6 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       return;
     }
 
-    var visibleCount = freeVisibleCount(filtered);
     document.getElementById('totalMatches').textContent = filtered.length;
     var html = filtered.map(function(match, i) {
       var matchStr = (IS_STREAK ? (match.nextMatch || match.match) : (match.match || match.nextMatch)) || '';
@@ -755,18 +740,15 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
       var matchHead = '<div class="match-header"><span>' + (match.league || '') + '</span><span>' + (IS_STREAK ? (match.nextMatchDate ? formatDateShort(match.nextMatchDate) : (match.time || '')) : (match.time || '')) + '</span></div>';
 
-      var locked = i >= visibleCount;
-      var lockedOverlay = locked ? '<a class="vip-card-lock" href="/pricing.html" aria-label="VIP only. Upgrade to view this prediction"><strong>&#128274; VIP ONLY</strong><span>Upgrade to view this pick</span></a>' : '';
-      var lockedContent = locked ? ' aria-hidden="true"' : '';
-      var cardHtml = '<div class="match-card fade-in' + (locked ? ' vip-locked' : '') + '" style="animation-delay:' + (i * 50) + 'ms"' +
+      var cardHtml = '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms"' +
         (home ? ' data-home="' + escAttr(home) + '"' : '') +
         (away ? ' data-away="' + escAttr(away) + '"' : '') +
         (!IS_STREAK && match.tip ? ' data-tip="' + escAttr(match.tip) + '"' : '') +
-        '><div class="vip-locked-content"' + lockedContent + '>' +
+        '>' +
         (analysisHref
           ? '<a href="' + analysisHref + '" class="match-card-link" style="display:block;text-decoration:none;color:inherit;">' + matchHead + cardContent + '</a>'
           : matchHead + cardContent) +
-        ctaHtml + '</div>' + lockedOverlay + '</div>';
+        ctaHtml + '</div>';
 
       return cardHtml;
     }).join('');
@@ -820,9 +802,30 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
           .catch(function () { return null; });
       }
 
-      var res = await fetch('/data/predictions.json');
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      allData = await res.json();
+      // Static data is already capped to the free tier at build time (see
+      // scripts/gh-pages-scraper.js), so free and anonymous visitors get the
+      // limited markets straight from /data/predictions.json. Pro/VIP users
+      // fetch the full snapshot from the API instead.
+      var user = (window.WFT && typeof window.WFT.getUser === 'function') ? window.WFT.getUser() : null;
+      var fetchStatic = async function () {
+        var sres = await fetch('/data/predictions.json');
+        if (!sres.ok) throw new Error('HTTP ' + sres.status);
+        allData = await sres.json();
+      };
+      if (user && user.isPro && window.WFT && typeof window.WFT.apiFetch === 'function') {
+        try {
+          var apiOut = await window.WFT.apiFetch('/api/predictions');
+          if (apiOut && apiOut.matches && apiOut.matches.length) {
+            allData = apiOut;
+          } else {
+            await fetchStatic();
+          }
+        } catch (e) {
+          await fetchStatic();
+        }
+      } else {
+        await fetchStatic();
+      }
 
       if (h2hReady) h2hData = await h2hReady;
 
@@ -849,7 +852,19 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
   loadData();
   document.addEventListener('wft-pro-status', function () {
-    if (typeof renderCurrentView === 'function') renderCurrentView();
+    var user = (window.WFT && typeof window.WFT.getUser === 'function') ? window.WFT.getUser() : null;
+    if (user && user.isPro && window.WFT && typeof window.WFT.apiFetch === 'function') {
+      window.WFT.apiFetch('/api/predictions').then(function (apiOut) {
+        if (apiOut && apiOut.matches) {
+          allData = apiOut;
+        }
+        renderCurrentView();
+      }).catch(function () {
+        renderCurrentView();
+      });
+    } else {
+      renderCurrentView();
+    }
   });
 })();
 </script>

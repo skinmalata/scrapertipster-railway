@@ -3,6 +3,7 @@ const { scrapeUnbeatenStreaks } = require('./scrape-h2h-unbeaten');
 const { scrapeBttsNo } = require('./scrape-btts-no');
 const { generateAllPages } = require('./generate-category-pages');
 const buildAnalysis = require('./build-analysis');
+const { applyLimits } = require('../src/utils/limits');
 const fs = require('fs');
 const path = require('path');
 
@@ -154,6 +155,29 @@ function enrichPublishedPredictions(dataDir) {
   enrichWithResults(predictions, resultsCache);
   fs.writeFileSync(predictionFile, JSON.stringify(predictions));
   console.log('Enriched all published markets with results');
+  return true;
+}
+
+// Free users get a capped view of the paid markets; Pro/VIP get everything.
+// Enforce the caps at generation time: the full enriched snapshot is written to
+// data/full-predictions.json (outside public/, so GitHub Pages never serves it)
+// for the API to hand to authenticated Pro/VIP clients via /api/predictions,
+// while public/data/predictions.json only ever receives the capped copy.
+function limitStaticForFree(dataDir) {
+  const predFile = path.join(dataDir, 'predictions.json');
+  if (!fs.existsSync(predFile)) return false;
+
+  const full = JSON.parse(fs.readFileSync(predFile, 'utf8'));
+  const snapshotDir = path.join(process.cwd(), 'data');
+  if (!fs.existsSync(snapshotDir)) {
+    fs.mkdirSync(snapshotDir, { recursive: true });
+  }
+  fs.writeFileSync(path.join(snapshotDir, 'full-predictions.json'), JSON.stringify(full));
+  console.log('Saved data/full-predictions.json (VIP/API snapshot)');
+
+  fs.writeFileSync(predFile, JSON.stringify(applyLimits(full, false)));
+  console.log('Limited public predictions.json to free tier limits');
+
   return true;
 }
 
@@ -346,6 +370,7 @@ async function main() {
 
       fs.writeFileSync(path.join(dataDir, 'predictions.json'), JSON.stringify(predictions));
       console.log('Used cached predictions.json');
+      limitStaticForFree(dataDir);
     }
   }
 
@@ -494,6 +519,22 @@ async function main() {
   // AFTER buildAnalysis so they reference the freshly written analysis pages
   // and analysis-links.json instead of the committed stale snapshot.
   console.log('Regenerating linker pages...');
+  limitStaticForFree(dataDir);
+  // The linker regenerators read predictions-cache.json rather than the public
+  // file, so cap it too or those baked pages would leak the full secondary
+  // market picks. The committed cache is only ever touched transiently here and
+  // restored afterwards so fixture recovery and the API fallback keep the full
+  // snapshot (the API re-applies the caps regardless).
+  let preRegenCache = null;
+  if (fs.existsSync(cacheFile)) {
+    try {
+      preRegenCache = fs.readFileSync(cacheFile, 'utf8');
+      fs.writeFileSync(cacheFile, JSON.stringify(applyLimits(JSON.parse(preRegenCache), false)));
+      console.log('Limited predictions-cache.json for linker page regeneration');
+    } catch (e) {
+      console.error('Failed to limit predictions-cache.json:', e.message);
+    }
+  }
   const regenerators = [
     require('./generate-team-pages').main,
     require('./generate-h2h-pages').main,
@@ -513,6 +554,14 @@ async function main() {
       require('./generate-date-archive-pages').main();
     } catch (e) {
       console.error('Date archive regeneration failed:', e.message);
+    }
+  }
+  if (preRegenCache) {
+    try {
+      fs.writeFileSync(cacheFile, preRegenCache);
+      console.log('Restored predictions-cache.json after linker regeneration');
+    } catch (e) {
+      console.error('Failed to restore predictions-cache.json:', e.message);
     }
   }
 
@@ -615,6 +664,7 @@ function rebuildStatic() {
   fs.writeFileSync(path.join(dataDir, 'predictions.json'), JSON.stringify(predictions));
   console.log('Saved predictions.json');
   enrichPublishedPredictions(dataDir);
+  limitStaticForFree(dataDir);
 
   if (fs.existsSync(resultsFile)) {
     fs.copyFileSync(resultsFile, path.join(dataDir, 'results.json'));
