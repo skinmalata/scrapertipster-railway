@@ -428,6 +428,7 @@ ${generateFaqSchema(FAQ_SCHEMA[slug])}
 .prediction-tools .tool-merger{background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff}
 .prediction-tools .tool-splitter{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff}
 .prediction-tools .tool-inplay{background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff}
+.prediction-tools .tool-analyzer{background:linear-gradient(135deg,#d97706,#f59e0b);color:#fff}
 .match-card.vip-locked{position:relative;overflow:hidden}
 .match-card.vip-locked>*:not(.vip-card-lock){filter:blur(5px);opacity:.58;pointer-events:none;user-select:none}
 .vip-card-lock{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:1px solid rgba(255,36,72,.42);border-radius:inherit;background:rgba(9,14,25,.72);color:#fff;text-align:center;text-decoration:none;font-size:13px;font-weight:700}
@@ -505,6 +506,7 @@ ${generateNoscriptFallback(slug, catConfig)}
   <a class="streak-btn tool-merger" href="/code-merger.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Code Merger</span></a>
   <a class="streak-btn tool-splitter" href="/code-splitter.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Code Splitter</span></a>
   <a class="streak-btn tool-inplay" href="/predictions/in-play"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">In-Play</span></a>
+  <a class="streak-btn tool-analyzer" href="/code-analyzer.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Code Analyzer</span></a>
 </nav>
 
 <div class="featured-cta">
