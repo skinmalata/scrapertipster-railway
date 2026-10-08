@@ -149,6 +149,14 @@
 
   .no-data { text-align: center; padding: 40px 20px; color: var(--text-dim); font-size: 14px; }
 
+  .picks-note { max-width: 830px; margin: 0 auto 26px; padding: 12px 16px; border: 1px solid rgba(250,204,21,.25); border-radius: 12px; background: rgba(250,204,21,.06); color: var(--text-dim); font-size: 13px; line-height: 1.6; text-align: center; }
+  .picks-note strong { color: #facc15; font-weight: 700; }
+  .pick-card.locked-card { border-style: dashed; border-color: rgba(255,255,255,.16); background: rgba(255,255,255,.02); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; padding: 22px 16px; min-height: 120px; }
+  .lock-title { font-size: 11px; font-weight: 800; letter-spacing: .09em; color: #ff647d; text-transform: uppercase; }
+  .lock-sub { font-size: 12px; color: var(--text-dim); }
+  .lock-btn { background: linear-gradient(135deg,#ff2448,#ff647d); color: #fff; padding: 9px 26px; border-radius: 9px; text-decoration: none; font-weight: 700; font-size: 13px; display: inline-block; }
+  .lock-btn:hover { opacity: .92; }
+
   .faq-section { margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border); }
   .faq-section h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #fff; }
   .faq-item { border-bottom: 1px solid var(--border); padding: 14px 0; }
@@ -208,6 +216,8 @@
     <h1>Best Pick Per Category</h1>
     <div class="hero-date" id="heroDate"></div>
   </div>
+
+  <p class="picks-note"><strong>Daily picks aren't final results.</strong> Football is unpredictable &mdash; no tip wins every time. Pick only a few you're genuinely confident in, and never stake more than you can afford to lose.</p>
 
   <div class="tabs-container" id="categoryTabs">
     <a href="/predictions/1x2" id="tab-1x2" class="tab-btn">1X2</a>
@@ -346,15 +356,28 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
   function escapeHtml(v) { return String(v ?? '').replace(/[&<>'"]/g, function(c) { return { '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]; }); }
 
-  function buildPicksGrid(picks) {
+  function lockPlaceholder(i) {
+    return '<div class="pick-card locked-card" aria-label="Locked prediction, upgrade to view">' +
+      '<div class="pick-category lock-title">&#128274; VIP ONLY</div>' +
+      '<div class="pick-match lock-sub">Upgrade to view this pick</div>' +
+      '<div><a class="lock-btn" href="/pricing.html">Upgrade</a></div>' +
+      '</div>';
+  }
+
+  function buildPicksGrid(picks, lockedTotal, freeVisible) {
     if (!picks || picks.length === 0) return '<div class="no-data">No picks available for today.</div>';
+    var placeholders = Math.max(0, (lockedTotal || 0) - (freeVisible || 3));
+    var lockedHtml = '';
+    if (placeholders > 0) {
+      for (var i = 0; i < placeholders; i++) lockedHtml += lockPlaceholder(i);
+    }
     return '<div class="picks-grid">' + picks.map(function(p) {
       return '<div class="pick-card">' +
         '<div class="pick-category">' + escapeHtml(p.category) + '</div>' +
         '<div class="pick-match">' + escapeHtml(p.match) + '</div>' +
         '<div><span class="pick-tip">' + escapeHtml(p.tip) + '</span></div>' +
         '</div>';
-    }).join('') + '</div>';
+    }).join('') + lockedHtml + '</div>';
   }
 
   function buildHistory(history) {
@@ -425,7 +448,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
   window.WFT.onAuthReady(function() {
     window.WFT.apiFetch('/api/best-picks').then(function(data) {
       if (data.error) { content.innerHTML = '<div class="no-data">' + escapeHtml(data.error) + '</div>'; return; }
-      var html = buildPicksGrid(data.today);
+      var html = buildPicksGrid(data.today, data.lockedTotal, data.freeVisible);
       html += buildHistory(data.history) + buildPerformance(data.history);
       content.innerHTML = html;
     }).catch(function() {

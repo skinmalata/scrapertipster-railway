@@ -56,6 +56,21 @@ gtag('config', 'G-HMGZMW9EDP');
  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
  <link rel="stylesheet" href="/styles.css">
+ <style>
+ .match-card.locked-card{border:1px dashed rgba(255,255,255,.14);background:rgba(255,255,255,.02)}
+ .locked-card .locked-bar{display:block;height:12px;border-radius:6px;background:rgba(255,255,255,.09)}
+ .locked-card .match-header,.locked-card .match-teams{pointer-events:none}
+ .locked-cta{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 0 4px;color:#fff}
+ .lock-emoji{font-size:19px;line-height:1}
+ .locked-title{font-size:11px;font-weight:800;letter-spacing:.09em;color:#ff647d;text-transform:uppercase}
+ .locked-sub{font-size:12px;color:var(--text-secondary)}
+ .locked-btn{background:linear-gradient(135deg,#ff2448,#ff647d);color:#fff;padding:9px 26px;border-radius:9px;text-decoration:none;font-weight:700;font-size:13px;margin-top:3px;display:inline-block}
+ .locked-btn:hover{opacity:.92}
+ .locked-note{max-width:830px;margin:0 auto 24px;padding:14px 18px;border:1px solid rgba(255,36,72,.3);border-radius:12px;background:rgba(255,36,72,.06);color:var(--text-secondary);font-size:14px;line-height:1.6;text-align:center}
+ .locked-note a{color:#ff647d;font-weight:700;text-decoration:none}
+ .picks-note{max-width:830px;margin:0 auto 24px;padding:12px 16px;border:1px solid rgba(250,204,21,.25);border-radius:12px;background:rgba(250,204,21,.06);color:var(--text-secondary);font-size:13px;line-height:1.6;text-align:center}
+ .picks-note strong{color:#facc15;font-weight:700}
+ </style>
 
  <script type="application/ld+json">
 
@@ -293,6 +308,14 @@ gtag('config', 'G-HMGZMW9EDP');
 
 
 
+ <div class="picks-note">
+
+  <strong>Daily picks aren't final results.</strong> Football is unpredictable — no tip wins every time. Select only a few picks you're genuinely confident in, and never stake more than you can afford to lose.
+
+ </div>
+
+
+
  <div id="content">
 
  <div class="loading">
@@ -495,7 +518,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
  <section class="kofi-section" style="max-width:720px;margin:36px auto;text-align:center;">
   <h2 style="font-size:22px;font-weight:700;margin:0 0 6px;color:#e8edf5;">Support WinFulltime</h2>
-  <p style="font-size:14px;color:rgba(232,237,245,.55);margin:0 0 16px;">Every prediction is free. If our tips have helped your betting, buy us a coffee to keep the site running.</p>
+  <p style="font-size:14px;color:rgba(232,237,245,.55);margin:0 0 16px;">The core forecast markets are always free for everyone, and every pick is backed by full statistical analysis. If our tips have helped your betting, buy us a coffee to keep the site running.</p>
   <a href="https://ko-fi.com/winfulltime" target="_blank" rel="noopener nofollow" style="display:inline-block;background:var(--accent-gradient);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Support us on Ko-fi</a>
  </section>
 
@@ -778,6 +801,23 @@ gtag('config', 'G-HMGZMW9EDP');
 
 
 
+ function wftIsPro() { return !!(window.WFT && window.WFT.userState && window.WFT.userState.user && window.WFT.userState.user.isPro); }
+ function freeTeaserCount() { return (currentData && currentData.freeVisible) ? Number(currentData.freeVisible) : 3; }
+ function lockedCardHtml(i) {
+  return '<div class="match-card locked-card fade-in" style="animation-delay:' + (i * 50) + 'ms" aria-label="Locked prediction, upgrade to view">' +
+   '<div class="match-header"><span class="locked-bar" style="width:38%"></span><span class="locked-bar" style="width:16%"></span></div>' +
+   '<div class="match-teams" style="justify-content:center;"><span class="locked-bar" style="width:32%"></span><span class="vs-score">vs</span><span class="locked-bar" style="width:32%"></span></div>' +
+   '<div class="match-footer locked-cta">' +
+   '<span class="lock-emoji">&#128274;</span>' +
+   '<span class="locked-title">VIP ONLY</span>' +
+   '<span class="locked-sub">Upgrade to view this pick</span>' +
+   '<a class="locked-btn" href="/pricing.html">Upgrade</a>' +
+   '</div></div>';
+ }
+ function lockedNoteHtml(shown, total, label) {
+  return '<div class="locked-note">See all ' + total + ' ' + label.toLowerCase() + ' picks for this date with <a href="/pricing.html">Pro</a> &mdash; here\u2019s a preview of the top ' + shown + '.</div>';
+ }
+
  function renderUnbeaten() {
 
  const content = document.getElementById('content');
@@ -810,12 +850,13 @@ gtag('config', 'G-HMGZMW9EDP');
  if (lastDate && lastDate < dateStr) {
    const fallbackMatches = unbeatenData.dates[lastDate];
    document.getElementById('totalMatches').textContent = fallbackMatches.length;
+   const fbShown = wftIsPro() ? fallbackMatches.length : Math.min(freeTeaserCount(), fallbackMatches.length);
    const notice = `
    <div class="no-matches" style="margin-bottom: 12px;">
    <p><strong>No data for ${dayLabel} yet.</strong> Showing latest available (${lastDate}). Data updates daily at 4:00 AM (WAT).</p>
    </div>
    `;
-   const fallbackHtml = fallbackMatches.map((match, i) => {
+   const fallbackHtml = fallbackMatches.slice(0, fbShown).map((match, i) => {
      const streaksHtml = match.streaks.map(s => {
        const loc = s.location ? ` ${s.location}` : '';
        return `
@@ -840,7 +881,10 @@ gtag('config', 'G-HMGZMW9EDP');
      </div>
      `;
    }).join('');
-   content.innerHTML = notice + `<div class="matches-grid">${wftSponsor.insertSponsor(fallbackHtml)}</div>`;
+   let fbLocked = '';
+   for (let fk = fbShown; fk < fallbackMatches.length; fk++) fbLocked += lockedCardHtml(fk);
+   const fbNote = (fbShown < fallbackMatches.length) ? lockedNoteHtml(fbShown, fallbackMatches.length, 'Unbeaten') : '';
+   content.innerHTML = notice + fbNote + `<div class="matches-grid">${wftSponsor.insertSponsor(fallbackHtml + fbLocked)}</div>`;
    return;
  }
 
@@ -862,7 +906,9 @@ gtag('config', 'G-HMGZMW9EDP');
 
  document.getElementById('totalMatches').textContent = matches.length;
 
- const html = matches.map((match, i) => {
+ const unbeatenShown = wftIsPro() ? matches.length : Math.min(freeTeaserCount(), matches.length);
+
+ const html = matches.slice(0, unbeatenShown).map((match, i) => {
 
  const streaksHtml = match.streaks.map(s => {
 
@@ -904,13 +950,19 @@ gtag('config', 'G-HMGZMW9EDP');
 
 </div>
 
-</div>
+ </div>
 
  `;
 
  }).join('');
 
- content.innerHTML = `<div class="matches-grid">${wftSponsor.insertSponsor(html)}</div>`;
+ let unbeatenLocked = '';
+
+ for (let k = unbeatenShown; k < matches.length; k++) unbeatenLocked += lockedCardHtml(k);
+
+ const unbeatenNote = (unbeatenShown < matches.length) ? lockedNoteHtml(unbeatenShown, matches.length, 'Unbeaten') : '';
+
+ content.innerHTML = unbeatenNote + `<div class="matches-grid">${wftSponsor.insertSponsor(html + unbeatenLocked)}</div>`;
 
  }
 
@@ -927,7 +979,22 @@ gtag('config', 'G-HMGZMW9EDP');
 
 
  function renderMatches() {
-  function applyPredictionGating(list){if(!list||list.length===0)return list;var isPro=false;if(window.WFT&&window.WFT.userState&&window.WFT.userState.user){isPro=!!window.WFT.userState.user.isPro;}var path=window.location.pathname;var marketSlug=(typeof CATEGORY_SLUG==='string')?CATEGORY_SLUG:'';var isYesterday=(typeof currentDate!=='undefined'&&currentDate==='yesterday');var isHomepage=(path==='/'||path==='/index.html');var allowedSlugs=['1x2','over-1-5','over-2-5','under-2-5'];var isAllowedTop=isHomepage||(marketSlug&&allowedSlugs.indexOf(marketSlug)!==-1);var isPredictionPage=path.indexOf('/predictions/')!==-1||path.indexOf('predictions/')===0;if(!isPro&&isPredictionPage&&!isAllowedTop&&!isYesterday&&list.length>0){var half=Math.ceil(list.length*0.5);if(half<list.length)return list.slice(0,half);}return list;}
+  const GATED_KEYS_HOME = { htft: 'htftMatches', gg2: 'gg2PlusMatches', corners: 'cornersMatches', cards: 'cardsMatches', winstreak: 'winstreakMatches', losestreak: 'losestreakMatches', drawstreak: 'drawstreakMatches', teamtoscore2plus: 'teamToScore2PlusMatches' };
+  function isGatedCategory(cat) { return cat === 'unbeaten' || !!GATED_KEYS_HOME[cat]; }
+  function gatedTotalCount(cat, dateStr) {
+   if (!GATED_KEYS_HOME[cat]) return null;
+   const counts = (currentData && currentData.marketCounts && currentData.marketCounts[GATED_KEYS_HOME[cat]]) || {};
+   const v = counts[dateStr];
+   return (typeof v === 'number' && v > 0) ? v : null;
+  }
+  function applyPredictionGating(list) {
+   if (!list || list.length === 0) return list;
+   if (wftIsPro()) return list;
+   if (!isGatedCategory(currentCategory)) return list;
+   var freeVisible = freeTeaserCount();
+   if (freeVisible >= list.length) return list;
+   return list.slice(0, freeVisible);
+  }
 
 
  try {
@@ -1096,7 +1163,15 @@ gtag('config', 'G-HMGZMW9EDP');
 
 
 
- document.getElementById('totalMatches').textContent = filtered.length;
+ const gatedCat = isGatedCategory(currentCategory);
+
+ const limitFree = gatedCat && !wftIsPro();
+
+ const fullCount = gatedCat ? (gatedTotalCount(currentCategory, targetDateStr) || filtered.length) : filtered.length;
+
+ document.getElementById('totalMatches').textContent = fullCount;
+
+ const lockedCount = limitFree ? Math.max(0, fullCount - displayMatches.length) : 0;
 
 
 
@@ -1254,7 +1329,15 @@ gtag('config', 'G-HMGZMW9EDP');
 
 
 
- content.innerHTML = `<div class="matches-grid">${wftSponsor.insertSponsor(html)}</div>`;
+ let lockedHtml = '';
+
+ for (let k = 0; k < lockedCount; k++) lockedHtml += lockedCardHtml(k);
+
+ const note = (lockedCount > 0)
+  ? '<div class="locked-note">See all ' + fullCount + ' ' + getCategoryLabel(currentCategory).toLowerCase() + ' picks for this date with <a href="/pricing.html">Pro</a> \u2014 here\u2019s a preview of the top ' + displayMatches.length + '.</div>'
+  : '';
+
+ content.innerHTML = note + `<div class="matches-grid">${wftSponsor.insertSponsor(html + lockedHtml)}</div>`;
 
 
 

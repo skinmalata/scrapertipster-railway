@@ -23,7 +23,7 @@ const { buildGiantPool, getGiantPoolHistory } = require('../services/authorPicks
 const { fetchTodayStreaks } = require('../services/h2hWinningStreaks');
 const { findMatchingResult } = require('../utils/helpers');
 const { lagosDate } = require('../utils/dates');
-const { FREE_LIMITS, applyLimits } = require('../utils/limits');
+const { FREE_VISIBLE, applyLimits } = require('../utils/limits');
 const { getOddsComparison } = require('../services/oddsComparison');
 const { optionalAuth, requireAuth, requirePro: requireProMiddleware, requireAdmin, logAdminAction } = require('../middleware/auth');
 const payment = require('../services/payment');
@@ -845,35 +845,48 @@ router.get('/vip', requireProMiddleware, function (req, res) {
   }
 });
 
-// GET /api/highest-scoring-half - FREE market, served to everyone. Picks live
-// in the committed highest-scoring-half-cache.json produced by the same daily
-// Forebet scrape. No membership gate and no odds anywhere in the payload; the
-// tab only presents the modelled "which half scores more" call.
+// GET /api/highest-scoring-half — gated market. Free users get a teaser of
+// FREE_VISIBLE picks per date (plus the per-date totals used to render locked
+// placeholder cards); Pro/VIP get the full cache. Picks live in the committed
+// highest-scoring-half-cache.json produced by the same daily Forebet scrape.
 const pathHshCache = path.join(__dirname, '../../highest-scoring-half-cache.json');
 
-router.get('/highest-scoring-half', function (req, res) {
+router.get('/highest-scoring-half', optionalAuth, async function (req, res) {
   try {
     if (!fs.existsSync(pathHshCache)) {
-      return res.json({ free: true, dates: {}, allDates: [], lastFetch: null, message: 'Highest-scoring-half picks publish each morning.' });
+      return res.json({ isPro: false, freeVisible: FREE_VISIBLE, dates: {}, allDates: [], counts: {}, lastFetch: null });
     }
     const cache = JSON.parse(fs.readFileSync(pathHshCache, 'utf8'));
+    const isPro = await resolveIsPro(req);
     const dates = cache.dates || {};
+    const counts = {};
+    Object.keys(dates).forEach(function (d) { counts[d] = Array.isArray(dates[d]) ? dates[d].length : 0; });
     const requestedDate = req.query.date;
     if (requestedDate && dates[requestedDate]) {
+      const arr = Array.isArray(dates[requestedDate]) ? dates[requestedDate] : [];
       return res.json({
-        free: true,
+        isPro,
+        freeVisible: isPro ? null : FREE_VISIBLE,
         lastFetch: cache.lastFetch || null,
         meta: cache.meta || null,
         date: requestedDate,
-        picks: dates[requestedDate],
+        picks: isPro ? arr : arr.slice(0, FREE_VISIBLE),
+        totalPicks: arr.length,
         allDates: Object.keys(dates)
       });
     }
+    const limitedDates = {};
+    Object.keys(dates).forEach(function (d) {
+      const arr = Array.isArray(dates[d]) ? dates[d] : [];
+      limitedDates[d] = isPro ? arr : arr.slice(0, FREE_VISIBLE);
+    });
     res.json({
-      free: true,
+      isPro,
+      freeVisible: isPro ? null : FREE_VISIBLE,
       lastFetch: cache.lastFetch || null,
       meta: cache.meta || null,
-      dates,
+      dates: limitedDates,
+      counts,
       allDates: Object.keys(dates)
     });
   } catch (e) {
@@ -1144,17 +1157,28 @@ router.get('/golden-tips', optionalAuth, async function (req, res) {
     goldenTipsCache = { createdAt: Date.now(), payload };
   }
 
-  // All in-play tips are completely free. Every tip is fully visible with its
-  // market, reason and league/teams — no Pro gating.
+  // In-play golden tips are a Pro feature. Free users get a small teaser; the
+  // rest of the picks never leave the server (placeholder cards are rendered
+  // client-side from lockedTotal).
   const allOpportunities = Array.isArray(payload.opportunities) ? payload.opportunities : [];
-  payload.opportunities = allOpportunities.map(function (o) {
-    if (o.locked) {
-      return Object.assign({}, o, { locked: false });
-    }
-    return o;
-  });
-  payload.isPro = true;
-  payload.lockedCount = 0;
+  const isPro = await resolveIsPro(req);
+  if (isPro) {
+    payload.opportunities = allOpportunities.map(function (o) {
+      if (o.locked) return Object.assign({}, o, { locked: false });
+      return o;
+    });
+    payload.isPro = true;
+    payload.lockedTotal = 0;
+    payload.lockedCount = 0;
+  } else {
+    payload.opportunities = allOpportunities.slice(0, FREE_VISIBLE).map(function (o) {
+      if (o.locked) return Object.assign({}, o, { locked: false });
+      return o;
+    });
+    payload.isPro = false;
+    payload.lockedTotal = allOpportunities.length;
+    payload.lockedCount = Math.max(0, allOpportunities.length - FREE_VISIBLE);
+  }
   res.json(payload);
 });
 
@@ -1668,15 +1692,34 @@ var DATA_ROOT = process.env.RAILWAY_VOLUME_MOUNT_PATH || process.env.RENDER_DISK
 
 router.get('/best-picks', optionalAuth, async function (req, res) {
   try {
+    var BEST_GATED_TYPES = { corners: 1, cards: 1, winStreak: 1, unbeaten: 1, gg2: 1, htft: 1, h2h: 1, teamToScore: 1, teamToScore2Plus: 1, highestScoringHalf: 1 };
+
     function applyTier(payload) {
-      payload.isPro = true;
+      var isPro = payload.isPro === true;
+      var fullToday = Array.isArray(payload.today) ? payload.today : [];
+      var freeRows = fullToday.filter(function (p) { return !BEST_GATED_TYPES[p.type]; });
+      var gatedRows = fullToday.filter(function (p) { return BEST_GATED_TYPES[p.type]; });
+      if (isPro) {
+        payload.isPro = true;
+        payload.lockedTotal = 0;
+        payload.today = fullToday;
+        return payload;
+      }
+      // Free tier: full access to the free markets, plus a small teaser of the
+      // gated markets. Real gated picks never leave the server for free users.
+      payload.isPro = false;
+      payload.freeVisible = FREE_VISIBLE;
+      payload.lockedTotal = gatedRows.length;
+      var teasers = gatedRows.slice(0, FREE_VISIBLE);
+      payload.today = freeRows.concat(teasers);
       return payload;
     }
 
+    var isPro = await resolveIsPro(req);
+
     var CACHE_DIR = path.join(DATA_ROOT, 'best-picks');
     try { fs.mkdirSync(CACHE_DIR, { recursive: true }); } catch (e) {}
-    function lagosYmd(sep) {
-      var parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Lagos', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
+    function lagosYmd(sep) { var parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Lagos', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
       var v = {};
       parts.forEach(function (p) { v[p.type] = p.value; });
       return v.year + sep + v.month + sep + v.day;
@@ -1690,6 +1733,7 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
     try {
       var cached = JSON.parse(fs.readFileSync(CACHE_PATH, 'utf8'));
       if (cached && cached.cacheVersion === CACHE_VERSION && cached.generatedAt && cached.today && cached.today.length > 0) {
+        cached.isPro = isPro;
         return res.json(applyTier(cached));
       }
     } catch (e) {}
@@ -2128,6 +2172,7 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
 
     var payload = { today: todayPicks, history: history, generatedAt: new Date().toISOString(), cacheVersion: CACHE_VERSION };
     try { fs.writeFileSync(CACHE_PATH, JSON.stringify(payload), 'utf8'); } catch (e) {}
+    payload.isPro = isPro;
     res.json(applyTier(payload));
   } catch (e) {
     console.error('[best-picks] Error:', e.message);

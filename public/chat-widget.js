@@ -10,7 +10,7 @@ var SITE={
   url:'https://winfulltime.com',
   tagline:'Free AI Football Predictions',
   email:'officialwinfulltime@gmail.com',
-  desc:'WinFulltime is a freemium football prediction platform providing data-driven betting tips across 50+ global leagues and 750+ teams. Predictions, analysis, blog and free tools (Ticket Builder, Code Converter) are accessible to everyone; an optional Pro subscription unlocks every prediction category, Best Picks, H2H Picks and golden in-play tips.',
+  desc:'WinFulltime provides data-driven football predictions across 50+ global leagues and 750+ teams. The core markets (1X2, Over 1.5/2.5, Under 2.5, BTTS) are free for everyone; Pro unlocks the full daily pick list in every other market. Predictions, analysis, blog and free tools (Ticket Builder, Code Converter) are accessible to everyone.',
   pages:{
     home:{url:'/',title:'Home - Daily Predictions'},
     '1x2':{url:'/predictions/1x2',title:'1X2 Predictions'},
@@ -38,8 +38,8 @@ var SITE={
     'Daily 1X2 (match winner) predictions with confidence percentages',
     'Over 2.5 & Over 1.5 goals predictions',
     'BTTS YES & BTTS NO (Both Teams To Score)',
-    'Corners and Cards predictions',
-    'Unbeaten team streaks (winning/drawing streaks)',
+    'Corners and Cards predictions (free 3-pick preview daily)',
+    'Unbeaten team streaks (winning/drawing streaks) with a free daily preview',
     'Free Accumulator/Ticket Builder with AI optimization',
     'Free booking code converter (SportyBet, Bet9ja, MSport, Betway, Bangbet, BetKing)',
     '350+ educational blog articles on betting strategy',
@@ -79,12 +79,12 @@ function urlOf(slug){return slug?SITE.url+'/blog/'+slug+'.html':''}
 function titleOf(slug){if(!slug)return '';var t=slug.replace(/-/g,' ').replace(/\b\w/g,function(l){return l.toUpperCase()});return t}
 
 var FAQ=[
-{k:['free','cost','price','pricing','pay','payment','subscription','vip','plan','membership','billing','whop','how much','pro monthly','pro yearly'],r:'WinFulltime is freemium:\n\u2022 Free plan — $0, forever. Sample predictions from each category, live scores and basic in-play tips.\n\u2022 Pro Monthly — $20/month. Every prediction category unlocked, daily Best Picks & H2H Picks, golden in-play tips and live opportunities, full win/loss/draw streak analysis, priority support.\n\u2022 Pro Yearly — $100/year (save 58%).\n\nPayments go through Whop or PayPal, subscriptions auto-renew unless cancelled, and all plans have a 7-day money-back guarantee. Create your free account at '+SITE.url+'/signup.html or see '+SITE.url+'/pricing.html.'},
+{k:['free','cost','price','pricing','pay','payment','subscription','vip','plan','membership','billing','whop','how much','pro monthly','pro yearly'],r:'WinFulltime is freemium:\n\u2022 Free plan — $0, forever. Full daily picks in the core markets (1X2, Over 1.5/2.5, Under 2.5, BTTS), a free 3-pick preview of other markets each day, live scores, match analysis and daily results.\n\u2022 Pro Monthly — $20/month. Full daily pick list in every market (Corners, Cards, HT/FT, GG2+, streaks, Team-to-Score, Highest Scoring Half, In-Play), complete Best Picks & H2H Picks, VIP record-cert tips, priority support.\n\u2022 Pro Yearly — $100/year (save 58%).\n\nPayments go through Whop or PayPal, subscriptions auto-renew unless cancelled, and all plans have a 7-day money-back guarantee. Create your free account at '+SITE.url+'/signup.html or see '+SITE.url+'/pricing.html.'},
 {k:['contact','email','reach','message','support'],r:'Contact us at '+SITE.email+' or visit '+SITE.url+'/contact.html'},
 {k:['about','what is winfulltime','who are','tell me about','who is','company','about us','organization'],r:SITE.desc},
 {k:['how','use','works','work','guide','start'],r:'Using WinFulltime:\n1. Visit '+SITE.url+'\n2. Pick a day using the tabs (Today, Tomorrow)\n3. Choose a market: 1X2, Over 2.5, BTTS, etc.\n4. Browse predictions with confidence percentages\n5. Click any match for detailed analysis\n6. Try the Free Ticket Builder to build accumulators'},
 {k:['leagues','competition','tournament'],r:'We cover 50+ leagues: '+SITE.leagues},
-{k:['prediction','tip','pick','bet'],r:'We provide: 1X2, Over 2.5, Over 1.5, BTTS YES, BTTS NO, Corners, Cards, Unbeaten Teams, and Winning/Losing Streak predictions. All with confidence percentages. Daily updates for 50+ leagues.'},
+{k:['prediction','tip','pick','bet'],r:'We provide: 1X2, Over 2.5, Over 1.5, Under 2.5, BTTS YES, BTTS NO — all fully free. Corners, Cards, streaks, HT/FT, GG2+, Unbeaten Teams, Best Picks and H2H Picks show a free 3-pick preview daily, with the full list on Pro. Daily updates for 50+ leagues.'},
   {k:['1x2','1 x 2','match result','home win','away win','draw'],r:'1X2 betting: 1=Home Win, X=Draw, 2=Away Win. Our picks show 65%+ probability. Visit '+SITE.url+'/predictions/1x2 for today\'s predictions.'},
 {k:['over','under','goals','total goals','ou','over under'],r:'Over/Under betting predicts if total goals exceed a threshold. We offer Over 1.5 (80%+ confidence) and Over 2.5 (60%+). Visit our predictions page for today\'s picks.'},
 {k:['btts','both teams','both teams to score','ots','one team'],r:'BTTS = Both Teams To Score. BTTS YES predicts both score; BTTS NO predicts one or neither scores. Popular for attacking vs defensive matchups.'},
@@ -100,7 +100,7 @@ var FAQ=[
 {k:['ticket','builder','acca','accumulator','multi','parlay','generate'],r:SITE.ticketBuilder.desc+'\n\nHow to use: '+SITE.ticketBuilder.howto+'\n\nTip: '+SITE.ticketBuilder.tip},
 {k:['converter','convert','booking code','code convert','decode','transfer code','msport','betking','bangbet','bet9ja code','sportybet code'],r:'Free booking code converter for SportyBet, Bet9ja, MSport, Betway, Bangbet and BetKing. Paste a booking code to decode it, preview every selection, market and odds, and generate a fresh code for another site. No sign-up needed. Visit '+SITE.url+'/converter.html'},
 {k:['in play','in-play','inplay','live scores','live betting','golden tip','live opportunities','watch live'],r:'Live scores are available to everyone free of charge. Golden in-play tips and live opportunities are a Pro feature. Visit '+SITE.url+'/predictions/in-play'},
-{k:['best picks','h2h','head to head','head-to-head','author pick','2 odds of the day'],r:'Daily Best Picks and H2H (head-to-head) Picks are curated selections based on direct match history between two teams. They are available to Pro members — see '+SITE.url+'/best-picks.html and '+SITE.url+'/author-picks.html.'},
+{k:['best picks','h2h','head to head','head-to-head','author pick','2 odds of the day'],r:'Daily Best Picks and H2H (head-to-head) Picks are curated selections based on direct match history. They each show a free 3-pick preview; the full daily list is a Pro feature — see '+SITE.url+'/best-picks.html and '+SITE.url+'/author-picks.html.'},
 {k:['bookmaker','bookmakers','betting site','betting sites','options','affiliate','compare','featured','1win','stake','1x bet','1xbet'],r:'Featured bookmakers: 1xBet, 1win and Stake — compare betting sites, welcome offers and payments at '+SITE.url+'/options.html. Links to bookmakers on the site are affiliate links: WinFulltime may earn a commission if you sign up, at no extra cost to you. 18+.'},
 {k:['app','install','pwa','mobile','home screen'],r:'Install WinFulltime as a mobile app! Open on Chrome/Edge/Samsung Internet and tap "Add to Home Screen" or "Install" when prompted. Our PWA works offline for previously viewed content.'},
 {k:['analysis','analytics','stats','statistics','form','h2h'],r:'Visit our Analysis page for detailed football statistics: '+SITE.url+'/analysis.html'},

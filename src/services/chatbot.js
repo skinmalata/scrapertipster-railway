@@ -2,7 +2,7 @@ const knowledge = {
   business: {
     name: 'WinFulltime',
     tagline: 'AI Football Predictions',
-    description: 'WinFulltime provides data-driven football predictions and expert betting analysis across 50+ global leagues (Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League and more) covering 750+ teams. It is a freemium platform: everyone can create a free account, and a Pro subscription unlocks every prediction category with full analysis.',
+    description: 'WinFulltime provides data-driven football predictions and expert betting analysis across 50+ global leagues (Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League and more) covering 750+ teams. It is a freemium platform: the core markets (1X2, Over/Under, BTTS) are free for everyone, and a Pro subscription unlocks the full pick list in every other category.',
     founded: '2026',
     email: 'officialwinfulltime@gmail.com',
     website: 'https://winfulltime.com',
@@ -10,15 +10,15 @@ const knowledge = {
     youtubeUrl: 'https://www.youtube.com/@winfulltime/videos'
   },
   plans: {
-    free: 'There is a Free plan ($0, forever). Free members get sample predictions from each category, live scores and basic in-play tips, plus daily match results and form stats. Create it free at /signup.html — no payment needed.',
-    proMonthly: 'Pro Monthly is $20/month. It unlocks every prediction category (1X2, Over/Under, BTTS, Corners, Cards, streaks and more), daily Best Picks & H2H Picks, golden in-play tips and live opportunities, full win/loss/draw streak analysis, and priority support.',
+    free: 'There is a Free plan ($0, forever). Free members get the full daily picks in the core markets (1X2, Over 1.5/2.5, Under 2.5, BTTS), a 3-pick preview of the other markets each day, live scores, match analysis and daily match results and form stats. Create it free at /signup.html — no payment needed.',
+    proMonthly: 'Pro Monthly is $20/month. It unlocks the full daily pick list in every other market (Corners, Cards, HT/FT, GG2+, streaks, Team-to-Score, Highest Scoring Half and In-Play tips), complete Daily Best Picks & H2H Picks, golden in-play tips and live opportunities, full win/loss/draw streak analysis, VIP record-cert tips, and priority support.',
     proYearly: 'Pro Yearly is $100/year (save 58%). It includes everything in Pro Monthly.',
     billing: 'Payments are processed securely through Whop. Subscriptions auto-renew unless cancelled. You can upgrade or downgrade at any time (changes apply from the next billing cycle). All plans come with a 7-day money-back guarantee. See /pricing.html.'
   },
   features: {
     free: 'WinFulltime has a Free plan ($0 forever) and paid Pro plans. Subscribe at /pricing.html and pay at /signup.html. After payment is confirmed your Pro access is activated automatically.',
-    predictions: 'Daily predictions: 1X2 (match result), Over 1.5 Goals (80%+ threshold), Over 2.5 Goals (60%+ threshold), BTTS YES, BTTS NO, Winning Streaks, Losing Streaks, Draw Streaks, Team to Score, Corners (Over 9.5), Cards (Over 4.5/8.5), and Unbeaten Teams. Most categories are fully unlocked on the Pro plan.',
-    bestPicks: 'Daily Best Picks and H2H Picks are curated selections available to Pro members. H2H Picks are head-to-head based selections — see /author-picks.html and /best-picks.html.',
+    predictions: 'Daily predictions: the core markets — 1X2 (match result), Over 1.5 Goals, Over 2.5 Goals, Under 2.5, BTTS YES and BTTS NO — are fully free for everyone. The other markets (Winning Streaks, Losing Streaks, Draw Streaks, Team to Score, Corners, Cards, HT/FT, GG2+ and Unbeaten Teams) show a 3-pick free preview each day, with the full list on the Pro plan.',
+    bestPicks: 'Daily Best Picks and H2H Picks are curated selections. Free members get a 3-pick preview; the full daily list is a Pro feature — see /author-picks.html and /best-picks.html.',
     inPlay: 'Live scores are available to everyone. Golden in-play tips and live opportunities are a Pro feature — see /predictions/in-play.',
     leagues: '50+ leagues: Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, Eredivisie, Primeira Liga, Belgian Pro League, Brazilian Serie A, Argentine League, MLS, Liga MX, Saudi Pro League, Turkish Super Lig, Championship, and 35+ more.',
     sources: 'Statistical analysis combining team form data, head-to-head records, and league-wide performance metrics.',
@@ -75,14 +75,14 @@ const knowledge = {
 };
 
 const faq = [
-  { keywords: ['free', 'cost', 'price', 'pricing', 'pay', 'payment', 'vip', 'plan', 'plans', 'how much', 'subscribe', 'billing', 'membership', 'pro monthly', 'pro yearly', 'pro'], response: `WinFulltime is freemium:\n\n- Free plan: $0 forever — sample predictions from each category, live scores and basic in-play tips, daily match results and form stats.\n- Pro Monthly: $20/month — every prediction category unlocked, daily Best Picks & H2H Picks, golden in-play tips and live opportunities, full streak analysis, priority support.\n- Pro Yearly: $100/year (save 58%).\n\nPayments go through Whop, subscriptions auto-renew unless cancelled, and all plans have a 7-day money-back guarantee.\n\n${knowledge.pages.pricing}` },
+  { keywords: ['free', 'cost', 'price', 'pricing', 'pay', 'payment', 'vip', 'plan', 'plans', 'how much', 'subscribe', 'billing', 'membership', 'pro monthly', 'pro yearly', 'pro'], response: `WinFulltime is freemium:\n\n- Free plan: $0 forever — full daily picks in the core markets (1X2, Over 1.5/2.5, Under 2.5, BTTS), a 3-pick preview of the other markets each day, live scores, match analysis and daily results.\n- Pro Monthly: $20/month — the full daily pick list in every market (Corners, Cards, HT/FT, GG2+, streaks, Team-to-Score, Highest Scoring Half, In-Play), complete Best Picks & H2H Picks, VIP record-cert tips, priority support.\n- Pro Yearly: $100/year (save 58%).\n\nPayments go through Whop, subscriptions auto-renew unless cancelled, and all plans have a 7-day money-back guarantee.\n\n${knowledge.pages.pricing}` },
   { keywords: ['refund', 'money back', 'guarantee', 'cancel', 'unsubscribe', 'cancel subscription', 'switch plans', 'upgrade', 'downgrade', 'subscription', 'renew'], response: knowledge.plans.billing },
   { keywords: ['whop', 'checkout', 'payment method', 'payments', 'payment', 'payments work', 'how do payments', 'card payment', 'paystack', 'flutterwave'], response: 'Payments are processed securely through Whop. Subscriptions auto-renew unless cancelled, changes apply from the next billing cycle, and a 7-day money-back guarantee covers all plans. See /pricing.html for details.' },
   { keywords: ['contact', 'email', 'reach', 'message', 'support', 'help'], response: `Contact: ${knowledge.business.email} or visit ${knowledge.pages.contact}` },
   { keywords: ['what is winfulltime', 'who are', 'tell me about', 'company', 'about us', 'organization', 'who is'], response: knowledge.business.description },
   { keywords: ['prediction', 'tip', 'pick', 'bet', 'picks'], response: knowledge.features.predictions },
   { keywords: ['league', 'leagues', 'competition', 'tournament'], response: knowledge.features.leagues },
-  { keywords: ['how', 'use', 'works', 'work', 'guide', 'start', 'get started'], response: `To use WinFulltime:\n1. Visit ${knowledge.pages.home}\n2. Create a free account at ${knowledge.pages.signup} (or browse the Free plan)\n3. Select a day tab (Today, Tomorrow)\n4. Choose a market category\n5. Browse predictions with confidence percentages\n6. Upgrade to Pro at ${knowledge.pages.pricing} to unlock every category\n7. Try the free Ticket Builder for accumulators\n8. Use the free booking code converter at ${knowledge.pages.converter}` },
+  { keywords: ['how', 'use', 'works', 'work', 'guide', 'start', 'get started'], response: `To use WinFulltime:\n1. Visit ${knowledge.pages.home}\n2. Create a free account at ${knowledge.pages.signup} (or browse the Free plan)\n3. Select a day tab (Today, Tomorrow)\n4. Choose a market category\n5. Browse predictions with confidence percentages\n6. Upgrade to Pro at ${knowledge.pages.pricing} to unlock the full pick list in every market\n7. Try the free Ticket Builder for accumulators\n8. Use the free booking code converter at ${knowledge.pages.converter}` },
   { keywords: ['1x2', '1 x 2', 'match result', 'home win', 'draw', 'away win', 'win draw win'], response: knowledge.bettingMarkets['1x2'] },
   { keywords: ['over', 'under', 'goals', 'total goals', 'over under'], response: knowledge.bettingMarkets['over/under'] },
   { keywords: ['btts', 'both teams', 'both teams to score', 'ots', 'one team'], response: knowledge.bettingMarkets['btts'] },
@@ -91,7 +91,7 @@ const faq = [
   { keywords: ['streak', 'winning', 'losing', 'draw streak', 'form', 'unbeaten'], response: knowledge.bettingMarkets['unbeaten'] + ' ' + knowledge.bettingMarkets['streaks'] },
   { keywords: ['ticket', 'builder', 'acca', 'accumulator', 'multi', 'parlay', 'generate', 'build', 'combined odds', 'leg'], response: knowledge.features.ticketBuilder },
   { keywords: ['converter', 'booking code', 'decode', 'transfer code', 'code convert', 'sportybet code', 'bet9ja code', 'msport', 'betking', 'bangbet', 'betway code'], response: knowledge.features.converter },
-  { keywords: ['best picks', 'h2h', 'head to head', 'author picks', '2 odds', 'two odds of the day'], response: 'H2H (head-to-head) picks are selections based on direct match history between two teams. Daily Best Picks and H2H Picks are curated selections available to Pro members — see /author-picks.html and /best-picks.html.' },
+  { keywords: ['best picks', 'h2h', 'head to head', 'author picks', '2 odds', 'two odds of the day'], response: 'H2H (head-to-head) picks are selections based on direct match history between two teams. Daily Best Picks and H2H Picks each show a free 3-pick preview; the full daily list is a Pro feature — see /author-picks.html and /best-picks.html.' },
   { keywords: ['in play', 'in-play', 'inplay', 'live', 'golden', 'watch', 'live scores', 'live betting', 'live odds'], response: knowledge.features.inPlay },
   { keywords: ['analysis', 'stats', 'statistics', 'form', 'h2h', 'teams', 'team form', 'predictions analysis', 'match analysis'], response: knowledge.features.analysis },
   { keywords: ['blog', 'article', 'post', 'guide', 'strategy', 'educational', 'read'], response: knowledge.features.blog + '\n' + knowledge.pages.blog },
@@ -101,7 +101,7 @@ const faq = [
   { keywords: ['register', 'sign up', 'signup', 'account', 'create', 'sign in', 'login', 'password', 'forgot'], response: 'Creating an account is free at /signup.html — no payment needed. Login at /login.html (or reset your password if you forgot it). Free accounts get the Free plan by default; upgrade to Pro at any time from /pricing.html or your account page.' },
   { keywords: ['accuracy', 'accurate', 'reliable', 'confidence', 'probability', 'percentage'], response: knowledge.features.accuracy },
   { keywords: ['source', 'data', 'where', 'api', 'method', 'statistical', 'analysis', 'algorithm'], response: knowledge.features.sources },
-  { keywords: ['features', 'offer', 'provide', 'services', 'what can'], response: `WinFulltime offers:\n- Daily predictions (1X2, Over/Under, BTTS, Corners, Cards, streaks) with confidence scores\n- Match, team and head-to-head analysis\n- A free Ticket Builder (up to 30 legs / 500 combined odds)\n- A free booking code converter (SportyBet, Bet9ja, MSport, Betway, Bangbet, BetKing)\n- Daily Best Picks & H2H Picks (Pro)\n- Golden in-play tips and live opportunities (Pro)\n- 350+ educational blog articles\n- Betting site comparisons and reviews\n- A PWA app installable on mobile and desktop` },
+  { keywords: ['features', 'offer', 'provide', 'services', 'what can'], response: `WinFulltime offers:\n- Core markets free every day (1X2, Over/Under, BTTS) plus a 3-pick preview of the other markets\n- Match, team and head-to-head analysis (free)\n- Full pick list in every market with Pro (Corners, Cards, streaks, HT/FT, GG2+, Team-to-Score, HSH, In-Play)\n- A free Ticket Builder (up to 30 legs / 500 combined odds)\n- A free booking code converter (SportyBet, Bet9ja, MSport, Betway, Bangbet, BetKing)\n- Daily Best Picks & H2H Picks (3-pick preview free, full list Pro)\n- Golden in-play tips and live opportunities (Pro)\n- VIP record-cert tips (Pro)\n- 350+ educational blog articles\n- Betting site comparisons and reviews\n- A PWA app installable on mobile and desktop` },
   { keywords: ['bet9ja', 'sportybet', '1xbet', 'betking', 'betway', 'melbet', '22bet', 'bet365', 'bangbet'], response: `${knowledge.bookmakers.featured}\n\nRead in-depth reviews on the blog, e.g. /blog/1xbet-review.html, /blog/1win-review-nigeria.html and /blog/best-betting-sites-nigeria.html.` },
   { keywords: ['bookmaker', 'bookmakers', 'betting sites', 'compare', 'affiliate', 'featured', 'options', '1win', 'stake', '1x bet'], response: knowledge.bookmakers.featured },
   { keywords: ['what is', 'meaning', 'explain', 'define', 'definition', 'term', 'glossary'], response: 'I can explain betting terms like Asian Handicap, Expected Goals (xG), Kelly Criterion, Poisson Distribution, Value Betting, double chance, booking codes and more. Ask me about any specific term!', explainer: true },
@@ -191,8 +191,8 @@ SITE OVERVIEW:
 - YouTube: @winfulltime
 
 PLANS:
-- Free: $0 forever — sample predictions per category, live scores and basic in-play tips, daily match results and form stats
-- Pro Monthly: $20/month — every prediction category unlocked, daily Best Picks & H2H Picks, golden in-play tips and live opportunities, full win/loss/draw streak analysis, priority support
+- Free: $0 forever — full daily picks in the core markets (1X2, Over 1.5/2.5, Under 2.5, BTTS), a 3-pick preview of the other markets each day, live scores, match analysis and daily match results and form stats
+- Pro Monthly: $20/month — full daily pick list in every market (Corners, Cards, HT/FT, GG2+, streaks, Team-to-Score, Highest Scoring Half, In-Play tips), complete Daily Best Picks & H2H Picks, VIP record-cert tips, priority support
 - Pro Yearly: $100/year (save 58%)
 - Payments via Whop, auto-renew unless cancelled, upgrade/downgrade anytime, 7-day money-back guarantee. See /pricing.html
 
@@ -208,7 +208,7 @@ FREE TOOLS:
 
 FEATURES:
 - 50+ leagues, 750+ teams worldwide
-- Daily Best Picks & H2H Picks (Pro), golden in-play tips (Pro), live scores (free)
+- Daily Best Picks & H2H Picks (free 3-pick preview), golden in-play tips (Pro), live scores (free)
 - Match, team and head-to-head analysis
 - 350+ educational blog articles
 - PWA installable as mobile app

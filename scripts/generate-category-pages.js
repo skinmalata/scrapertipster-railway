@@ -116,10 +116,14 @@ const FAQ_SCHEMA = {
 };
 
 function generateFaqHtml(slug) {
-  const faqs = FAQ_SCHEMA[slug];
+  const cat = CATEGORIES[slug];
+  const faqs = (cat && FAQ_SCHEMA[slug]) ? FAQ_SCHEMA[slug] : null;
   if (!faqs || faqs.length === 0) return '';
+  const intro = (cat && cat.gated)
+    ? `The full daily ${escapeHtml(cat.heading)} list is a Pro feature. Free members get a preview of the top 3 picks each day; subscribe to <a href="/pricing.html">WinFulltime Pro</a> to see every match and tip in this market. The market facts below apply whichever plan you are on.`
+    : null;
   return `<section class="seo-content">
-${faqBlock({ heading: 'About These Predictions', faqs })}
+${faqBlock({ heading: 'About These Predictions', intro, faqs })}
 </section>`;
 }
 
@@ -170,7 +174,7 @@ function generateNoscriptFallback(slug, catConfig) {
   return `<noscript>
   <div class="noscript-content" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:24px;margin:20px 0;line-height:1.7;color:rgba(232,237,245,.9);">
     <h2 style="margin-top:0;font-size:20px;color:#fff;">${escapeHtml(catConfig.heading)} Predictions Today</h2>
-    <p>Free ${escapeHtml(catConfig.heading)} picks for today's football matches.</p>
+    <p>${catConfig.gated ? `Today's full ${escapeHtml(catConfig.heading)} list is available to <a href="/pricing.html">Pro members</a>. Here is a preview of today's picks — upgrade to see every ${escapeHtml(catConfig.heading)} prediction.` : `Free ${escapeHtml(catConfig.heading)} picks for today's football matches.`}</p>
     <table style="width:100%;border-collapse:collapse;font-size:14px;">
       <thead><tr style="text-align:left;color:rgba(232,237,245,.55);">
         <th style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.1);">League</th>
@@ -225,8 +229,9 @@ const CATEGORIES = {
   },
   'ht-ft': {
     dataKey: 'htftMatches',
+    gated: true,
     title: 'Half Time Full Time Predictions Today',
-    description: 'Free Half Time Full Time (HT/FT) football predictions for today. Combined half-time and full-time result tips across 50+ leagues worldwide.',
+    description: 'Half Time Full Time (HT/FT) predictions for today. Combined half-time and full-time result tips across 50+ leagues worldwide. Pro members see the full daily list.',
     keywords: 'HT FT predictions, half time full time tips, HT/FT betting tips, half time full time predictions, football HT FT',
     heading: 'Half Time / Full Time',
     label: 'HT/FT',
@@ -234,8 +239,9 @@ const CATEGORIES = {
   },
   'gg2': {
     dataKey: 'gg2PlusMatches',
+    gated: true,
     title: 'GG2+ Predictions Today (Both Teams 2+ Goals)',
-    description: 'Free GG2+ football predictions for today. Tips for matches where both teams are expected to score 2 or more goals each.',
+    description: 'GG2+ football predictions for today. Tips for matches where both teams are expected to score 2 or more goals each. Pro members see the full daily list.',
     keywords: 'GG2+ predictions, both teams score 2+ goals, GG2+ tips, both teams to score 2, high scoring football tips',
     heading: 'GG2+ (Both Teams 2+ Goals)',
     label: 'GG2+',
@@ -261,16 +267,18 @@ const CATEGORIES = {
   },
   'unbeaten': {
     dataKey: null,
+    gated: true,
     title: 'Unbeaten Streak Predictions Today',
-    description: 'Free unbeaten streak football predictions for today. Teams on long unbeaten runs and their upcoming fixtures.',
+    description: 'Unbeaten streak football predictions for today. Teams on long unbeaten runs and their upcoming fixtures. Pro members see the full daily list.',
     keywords: 'unbeaten streak predictions, football unbeaten runs, teams on winning streak, unbeaten football tips',
     heading: 'Unbeaten Streaks',
     label: 'Unbeaten'
   },
   'corners': {
     dataKey: 'cornersMatches',
+    gated: true,
     title: 'Corner Kick Predictions Today',
-    description: 'Free corner kick predictions for today. Over 8.5 and Over 9.5 corners tips with 80%+ hit rates.',
+    description: 'Corner kick predictions for today. Over 8.5 and Over 9.5 corners tips with 80%+ hit rates. Pro members see the full daily list.',
     keywords: 'corner predictions, corner kick betting, over 8.5 corners tips, over 9.5 corners, football corner tips',
     heading: 'Corner Predictions',
     label: 'Corners',
@@ -278,8 +286,9 @@ const CATEGORIES = {
   },
   'cards': {
     dataKey: 'cardsMatches',
+    gated: true,
     title: 'Cards & Bookings Predictions Today',
-    description: 'Free yellow cards and bookings predictions for today. Tips for matches likely to produce high card counts based on team discipline trends.',
+    description: 'Yellow cards and bookings predictions for today. Tips for matches likely to produce high card counts based on team discipline trends. Pro members see the full daily list.',
     keywords: 'cards predictions, yellow cards tips, bookings predictions, football card betting, over cards tips',
     heading: 'Cards Predictions',
     label: 'Cards',
@@ -287,8 +296,9 @@ const CATEGORIES = {
   },
   'winning-streak': {
     dataKey: 'winstreakMatches',
+    gated: true,
     title: 'Winning Streak Predictions Today',
-    description: 'Teams on long winning runs and their next fixture. Free winning streak football predictions updated daily across 50+ leagues.',
+    description: 'Teams on long winning runs and their next fixture. Winning streak football predictions updated daily across 50+ leagues. Pro members see the full list.',
     keywords: 'winning streak predictions, teams on winning streak, football winning runs, back to back wins tips',
     heading: 'Winning Streaks',
     label: 'Win Streak',
@@ -296,8 +306,9 @@ const CATEGORIES = {
   },
   'losing-streak': {
     dataKey: 'losestreakMatches',
+    gated: true,
     title: 'Losing Streak Predictions Today',
-    description: 'Teams on long losing runs and their next fixture. Free losing streak football predictions to identify vulnerable sides, updated daily.',
+    description: 'Teams on long losing runs and their next fixture. Losing streak football predictions to identify vulnerable sides, updated daily. Pro members see the full list.',
     keywords: 'losing streak predictions, teams on losing streak, football losing runs, back to back losses tips',
     heading: 'Losing Streaks',
     label: 'Loss Streak',
@@ -305,8 +316,9 @@ const CATEGORIES = {
   },
   'draws-streak': {
     dataKey: 'drawstreakMatches',
+    gated: true,
     title: 'Draws Streak Predictions Today',
-    description: 'Teams stuck in long draw runs and their next fixture. Free draws streak football predictions for the draw market, updated daily.',
+    description: 'Teams stuck in long draw runs and their next fixture. Draws streak football predictions for the draw market, updated daily. Pro members see the full list.',
     keywords: 'draws streak predictions, football draw runs, back to back draws tips, draw market predictions',
     heading: 'Draw Streaks',
     label: 'Draw Streak',
@@ -421,6 +433,20 @@ ${generateFaqSchema(FAQ_SCHEMA[slug])}
 .vip-card-lock{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:1px solid rgba(255,36,72,.42);border-radius:inherit;background:rgba(9,14,25,.72);color:#fff;text-align:center;text-decoration:none;font-size:13px;font-weight:700}
 .vip-card-lock strong{color:#ff647d;font-size:12px;letter-spacing:.08em}
 .vip-card-lock span{font-size:12px;font-weight:600}
+.locked-note{max-width:830px;margin:0 auto 24px;padding:14px 18px;border:1px solid rgba(255,36,72,.3);border-radius:12px;background:rgba(255,36,72,.06);color:var(--text-secondary);font-size:14px;line-height:1.6;text-align:center}
+.locked-note a{color:#ff647d;font-weight:700;text-decoration:none}
+.locked-note a:hover{text-decoration:underline}
+.match-card.locked-card{border:1px dashed rgba(255,255,255,.14);background:rgba(255,255,255,.02)}
+.locked-card .locked-bar{display:block;height:12px;border-radius:6px;background:rgba(255,255,255,.09)}
+.locked-card .match-header,.locked-card .match-teams{pointer-events:none}
+.locked-cta{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 0 4px;color:#fff}
+.lock-emoji{font-size:19px;line-height:1}
+.locked-title{font-size:11px;font-weight:800;letter-spacing:.09em;color:#ff647d;text-transform:uppercase}
+.locked-sub{font-size:12px;color:var(--text-secondary)}
+.locked-btn{background:linear-gradient(135deg,#ff2448,#ff647d);color:#fff;padding:9px 26px;border-radius:9px;text-decoration:none;font-weight:700;font-size:13px;margin-top:3px;display:inline-block}
+.locked-btn:hover{opacity:.92}
+.picks-note{max-width:830px;margin:0 auto 24px;padding:12px 16px;border:1px solid rgba(250,204,21,.25);border-radius:12px;background:rgba(250,204,21,.06);color:var(--text-secondary);font-size:13px;line-height:1.6;text-align:center}
+.picks-note strong{color:#facc15;font-weight:700}
 @media(max-width:640px){.telegram-cta h3{font-size:17px}.telegram-cta p{font-size:13px}.telegram-link{width:100%;justify-content:center}}
 ${CHIPS_CSS}
 </style>
@@ -461,6 +487,8 @@ ${CHIPS_CSS}
 <div class="stat-label">Matches</div>
 </div>
 </div>
+
+<p class="picks-note"><strong>Daily picks aren\u2019t final results.</strong> Football is unpredictable &mdash; no tip wins every time. Pick only a few you\u2019re genuinely confident in, and never stake more than you can afford to lose.</p>
 
 <div id="content">
 <div class="loading">
@@ -508,7 +536,7 @@ ${generateFaqHtml(slug)}
 <footer>
 <div class="footer-content">
 <div style="text-align:center;margin-bottom:24px;">
-<p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Support WinFulltime &mdash; your donations keep all predictions free.</p>
+<p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Support WinFulltime &mdash; your donations keep the site running and our free picks open to everyone.</p>
 <a href="https://ko-fi.com/winfulltime" target="_blank" rel="noopener nofollow" style="display:inline-block;background:var(--accent-gradient);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Donate on Ko-fi</a>
 </div>
 <div class="footer-links">
@@ -544,6 +572,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
   var DATA_KEY = ${catConfig.dataKey ? "'" + catConfig.dataKey + "'" : 'null'};
   var IS_STREAK = ${isStreak ? 'true' : 'false'};
   var IS_UNBEATEN = ${isUnbeaten ? 'true' : 'false'};
+  var IS_GATED = ${catConfig.gated ? 'true' : 'false'};
   var LINK_ANALYSIS = ${catConfig.linkAnalysis ? 'true' : 'false'};
   var CATEGORY_HEADING = '${escapeHtml(catConfig.heading)}';
   var BOOKMAKER_CTA_BODY = '${BOOKMAKER_CTA_BODY}';
@@ -630,14 +659,32 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     if (ogUrl) ogUrl.content = 'https://winfulltime.com' + newUrl;
   }
 
-  function freeVisibleCount(list) {
-    if (!list || !list.length) return 0;
+  // Returns null when every pick should render (Pro member or a free market),
+  // otherwise the number of teaser picks a free user may see.
+  function freeVisibleCount() {
+    if (!IS_GATED) return null;
     var user = (window.WFT && typeof window.WFT.getUser === "function") ? window.WFT.getUser() : null;
-    if (user && user.isPro) return list.length;
-    var marketSlug = (typeof CATEGORY_SLUG === "string") ? CATEGORY_SLUG : "";
-    var alwaysFull = { "1x2": 1, "over-1-5": 1, "over-2-5": 1, "under-2-5": 1 };
-    if (alwaysFull[marketSlug]) return list.length;
-    return Math.ceil(list.length * 0.5);
+    if (user && user.isPro) return null;
+    return (allData && allData.freeVisible) ? Number(allData.freeVisible) : 3;
+  }
+
+  function lockedCardHtml(i) {
+    return '<div class="match-card locked-card fade-in" style="animation-delay:' + (i * 50) + 'ms" aria-label="Locked prediction, upgrade to view">' +
+      '<div class="match-header"><span class="locked-bar" style="width:38%"></span><span class="locked-bar" style="width:16%"></span></div>' +
+      '<div class="match-teams" style="justify-content:center;"><span class="locked-bar" style="width:32%"></span><span class="vs-score">vs</span><span class="locked-bar" style="width:32%"></span></div>' +
+      '<div class="match-footer locked-cta">' +
+      '<span class="lock-emoji">&#128274;</span>' +
+      '<span class="locked-title">VIP ONLY</span>' +
+      '<span class="locked-sub">Upgrade to view this pick</span>' +
+      '<a class="locked-btn" href="/pricing.html">Upgrade</a>' +
+      '</div></div>';
+  }
+
+  function peerDateCount() {
+    if (!DATA_KEY || !allData || !allData.marketCounts) return null;
+    var counts = allData.marketCounts[DATA_KEY];
+    if (!counts) return null;
+    return counts[getSelectedDateStr()] || 0;
   }
 
   function renderUnbeaten(matches) {
@@ -647,21 +694,25 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       document.getElementById('totalMatches').textContent = '0';
       return;
     }
-    var visibleCount = freeVisibleCount(matches);
+    var visibleCount = freeVisibleCount();
+    var limitFree = visibleCount != null;
+    var shown = limitFree ? Math.min(visibleCount, matches.length) : matches.length;
     document.getElementById('totalMatches').textContent = matches.length;
     var html = matches.map(function(match, i) {
+      if (limitFree && i >= shown) return lockedCardHtml(matches.length + i);
       var streaksHtml = (match.streaks || []).map(function(s) {
         var loc = s.location ? ' ' + s.location : '';
         return '<div class="streak-row"><span class="streak-team">' + s.team + '</span><span class="streak-badge">' + s.count + ' unbeaten' + loc + '</span></div>';
       }).join('');
-      var lockedOverlay = i >= visibleCount ? '<a class="vip-card-lock" href="/pricing.html" aria-label="VIP only. Upgrade to view this prediction"><strong>&#128274; VIP ONLY</strong><span>Upgrade to view this pick</span></a>' : '';
-      var lockedContent = i >= visibleCount ? ' aria-hidden="true"' : '';
-      return '<div class="match-card fade-in' + (i >= visibleCount ? ' vip-locked' : '') + '" style="animation-delay:' + (i * 50) + 'ms">' +
-        '<div class="vip-locked-content"' + lockedContent + '><div class="match-header"><span>' + (match.league || '') + '</span><span>' + (match.time || '') + '</span></div>' +
+      return '<div class="match-card fade-in" style="animation-delay:' + (i * 50) + 'ms">' +
+        '<div class="vip-locked-content"><div class="match-header"><span>' + (match.league || '') + '</span><span>' + (match.time || '') + '</span></div>' +
         '<div class="match-teams" style="justify-content:center;"><span class="team team-home" style="text-align:center;width:100%;">' + (match.match || '') + '</span></div>' +
-        '<div class="match-footer" style="flex-direction:column;gap:6px;">' + streaksHtml + '</div></div>' + lockedOverlay + '</div>';
+        '<div class="match-footer" style="flex-direction:column;gap:6px;">' + streaksHtml + '</div></div></div>';
     }).join('');
-    content.innerHTML = '<div class="matches-grid">' + wftSponsor.insertSponsor(html) + '</div>';
+    var note = (limitFree && matches.length > shown)
+      ? '<div class="locked-note">See all ' + matches.length + ' unbeaten runs for this date with <a href="/pricing.html">Pro</a> &mdash; here\u2019s a preview of the top ' + shown + '.</div>'
+      : '';
+    content.innerHTML = note + '<div class="matches-grid">' + wftSponsor.insertSponsor(html) + '</div>';
   }
 
   function renderMatches(matches) {
@@ -682,8 +733,21 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       return;
     }
 
-    document.getElementById('totalMatches').textContent = filtered.length;
-    var html = filtered.map(function(match, i) {
+    var visibleCount = freeVisibleCount();
+    var limitFree = visibleCount != null;
+    var shownCount = limitFree ? Math.min(visibleCount, filtered.length) : filtered.length;
+
+    // Reveal the true per-date totals from the public counts map so locked
+    // placeholder cards (and the stat bar) never leak the underlying picks.
+    var fullCount = filtered.length;
+    if (IS_GATED) {
+      var dateCount = peerDateCount();
+      if (dateCount > 0) fullCount = dateCount;
+    }
+    document.getElementById('totalMatches').textContent = fullCount;
+    var lockedCount = limitFree ? Math.max(0, fullCount - shownCount) : 0;
+
+    var html = filtered.slice(0, shownCount).map(function(match, i) {
       var matchStr = (IS_STREAK ? (match.nextMatch || match.match) : (match.match || match.nextMatch)) || '';
       var teams = matchStr.indexOf(' - ') !== -1 ? matchStr.split(' - ') : matchStr.split(' vs ');
       var home = (teams[0] || '').trim();
@@ -758,7 +822,17 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       return cardHtml;
     }).join('');
 
-    content.innerHTML = '<div class="matches-grid">' + wftSponsor.insertSponsor(html) + '</div>';
+    var i = shownCount;
+    while (lockedCount > 0) {
+      html += lockedCardHtml(i);
+      i++;
+      lockedCount--;
+    }
+
+    var note = (limitFree && filtered.length > shownCount)
+      ? '<div class="locked-note">See all ' + fullCount + ' ' + CATEGORY_LABEL.toLowerCase() + ' picks for this date with <a href="/pricing.html">Pro</a> &mdash; here\u2019s a preview of the top ' + shownCount + '.</div>'
+      : '';
+    content.innerHTML = note + '<div class="matches-grid">' + wftSponsor.insertSponsor(html) + '</div>';
   }
 
   function renderCurrentView() {

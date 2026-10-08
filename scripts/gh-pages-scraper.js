@@ -3,7 +3,7 @@ const { scrapeUnbeatenStreaks } = require('./scrape-h2h-unbeaten');
 const { scrapeBttsNo } = require('./scrape-btts-no');
 const { generateAllPages } = require('./generate-category-pages');
 const buildAnalysis = require('./build-analysis');
-const { applyLimits } = require('../src/utils/limits');
+const { applyLimits, FREE_VISIBLE } = require('../src/utils/limits');
 const fs = require('fs');
 const path = require('path');
 
@@ -158,7 +158,7 @@ function enrichPublishedPredictions(dataDir) {
   return true;
 }
 
-// Free users get a capped view of the paid markets; Pro/VIP get everything.
+// Free users get a preview of the gated markets; Pro/VIP get everything.
 // Enforce the caps at generation time: the full enriched snapshot is written to
 // data/full-predictions.json (outside public/, so GitHub Pages never serves it)
 // for the API to hand to authenticated Pro/VIP clients via /api/predictions,
@@ -178,6 +178,32 @@ function limitStaticForFree(dataDir) {
   fs.writeFileSync(predFile, JSON.stringify(applyLimits(full, false)));
   console.log('Limited public predictions.json to free tier limits');
 
+  return true;
+}
+
+// Highest Scoring Half is a gated market under the current monetization model:
+// free users get a FREE_VISIBLE-pick teaser per date (plus the per-date totals
+// used to render locked placeholder cards), Pro/VIP get the full cache via
+// /api/highest-scoring-half.
+function limitHshForFree(hshFile, dataDir) {
+  if (!fs.existsSync(hshFile)) return false;
+  const cache = JSON.parse(fs.readFileSync(hshFile, 'utf8'));
+  const dates = cache.dates || {};
+  const counts = {};
+  const limitedDates = {};
+  Object.keys(dates).forEach(function (d) {
+    const arr = Array.isArray(dates[d]) ? dates[d] : [];
+    counts[d] = arr.length;
+    limitedDates[d] = arr.slice(0, FREE_VISIBLE);
+  });
+  fs.writeFileSync(path.join(dataDir, 'highest-scoring-half.json'), JSON.stringify({
+    ...cache,
+    dates: limitedDates,
+    counts,
+    freeVisible: FREE_VISIBLE,
+    isFreeLimited: true
+  }));
+  console.log('Saved limited highest-scoring-half.json (' + Object.keys(limitedDates).length + ' dates, teaser=' + FREE_VISIBLE + '/date)');
   return true;
 }
 
@@ -392,13 +418,12 @@ async function main() {
     }
   }
 
-  // Highest scoring half (free market): mirror the committed VIP scrape cache
-  // into the static data dir so the free tab works on GitHub Pages without a
-  // live API.
+  // Highest scoring half (gated market): mirror the committed VIP scrape cache
+  // into the static data dir as a limited preview so the tab works on GitHub
+  // Pages without a live API.
   const hshFile = path.join(process.cwd(), 'highest-scoring-half-cache.json');
   if (fs.existsSync(hshFile)) {
-    fs.copyFileSync(hshFile, path.join(dataDir, 'highest-scoring-half.json'));
-    console.log('Saved highest-scoring-half.json');
+    limitHshForFree(hshFile, dataDir);
   }
 
   // BTTS No from h2hstats
@@ -677,13 +702,13 @@ function rebuildStatic() {
     console.log('Saved h2h-unbeaten.json');
   }
 
-  // Free highest-scoring-half picks come from the same committed VIP scrape
-  // cache; the static page reads this file so the market works on GitHub Pages
-  // without any live API.
+  // Highest-scoring-half is a gated market: the committed VIP scrape cache is
+  // mirrored as a limited preview; the static page reads this file so the market
+  // works on GitHub Pages without any live API (Pro fetches the full list from
+  // /api/highest-scoring-half).
   const hshFile = path.join(process.cwd(), 'highest-scoring-half-cache.json');
   if (fs.existsSync(hshFile)) {
-    fs.copyFileSync(hshFile, path.join(dataDir, 'highest-scoring-half.json'));
-    console.log('Saved highest-scoring-half.json');
+    limitHshForFree(hshFile, dataDir);
   }
 
   // Generate static category pages

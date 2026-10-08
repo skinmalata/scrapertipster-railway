@@ -20,17 +20,17 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="WinFulltime">
 <title>Highest Scoring Half Predictions Today | WinFulltime</title>
-<meta name="description" content="Free highest scoring half predictions for today. Which half will produce more goals? Data-driven 1st Half vs 2nd Half tips from Poisson goal-race modelling.">
+<meta name="description" content="Highest scoring half football predictions for today. See a free preview of the day's 1st half vs 2nd half tips - the full daily list is a Pro feature.">
 <meta name="keywords" content="highest scoring half predictions, first half tips, second half tips, which half will score more, half goals prediction">
 <meta property="og:title" content="Highest Scoring Half Predictions Today | WinFulltime">
 <meta property="og:url" content="https://winfulltime.com/predictions/highest-scoring-half">
-<meta property="og:description" content="Free highest scoring half predictions for today. Which half will produce more goals? Data-driven 1st Half vs 2nd Half tips from Poisson goal-race modelling.">
+<meta property="og:description" content="Highest scoring half football predictions for today. See a free preview of the day's 1st half vs 2nd half tips - the full daily list is a Pro feature.">
 <meta property="og:image" content="https://winfulltime.com/winfulltimelogo.png">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 
 <meta name="twitter:title" content="Highest Scoring Half Predictions Today | WinFulltime">
-<meta name="twitter:description" content="Free highest scoring half predictions for today. Which half will produce more goals? Data-driven 1st Half vs 2nd Half tips from Poisson goal-race modelling.">
+<meta name="twitter:description" content="Highest scoring half football predictions for today. See a free preview of the day's 1st half vs 2nd half tips - the full daily list is a Pro feature.">
 <meta name="twitter:image" content="https://winfulltime.com/winfulltimelogo.png">
 <link rel="canonical" href="https://winfulltime.com/predictions/highest-scoring-half">
 
@@ -39,7 +39,7 @@
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   "name": "Highest Scoring Half Predictions Today",
-  "description": "Free highest scoring half predictions for today. Which half will produce more goals? Data-driven 1st Half vs 2nd Half tips from Poisson goal-race modelling.",
+  "description": "Highest scoring half football predictions for today. See a free preview of the day's 1st half vs 2nd half tips - the full daily list is a Pro feature.",
   "url": "https://winfulltime.com/predictions/highest-scoring-half",
   "publisher": {
     "@type": "Organization",
@@ -133,6 +133,20 @@
 .hsh-split-label .first{color:#34d399}
 .hsh-split-label .second{color:#fbbf24}
 .match-reason{font-size:13px;color:#fff;margin-top:8px;line-height:1.5;text-align:center;max-width:100%;opacity:0.85}
+.locked-note{max-width:830px;margin:0 auto 24px;padding:14px 18px;border:1px solid rgba(255,36,72,.3);border-radius:12px;background:rgba(255,36,72,.06);color:var(--text-secondary);font-size:14px;line-height:1.6;text-align:center}
+.locked-note a{color:#ff647d;font-weight:700;text-decoration:none}
+.locked-note a:hover{text-decoration:underline}
+.match-card.locked-card{border:1px dashed rgba(255,255,255,.14);background:rgba(255,255,255,.02)}
+.locked-card .locked-bar{display:block;height:12px;border-radius:6px;background:rgba(255,255,255,.09)}
+.locked-card .match-header,.locked-card .match-teams{pointer-events:none}
+.locked-cta{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 0 4px;color:#fff}
+.lock-emoji{font-size:19px;line-height:1}
+.locked-title{font-size:11px;font-weight:800;letter-spacing:.09em;color:#ff647d;text-transform:uppercase}
+.locked-sub{font-size:12px;color:var(--text-secondary)}
+.locked-btn{background:linear-gradient(135deg,#ff2448,#ff647d);color:#fff;padding:9px 26px;border-radius:9px;text-decoration:none;font-weight:700;font-size:13px;margin-top:3px;display:inline-block}
+.locked-btn:hover{opacity:.92}
+.picks-note{max-width:830px;margin:0 auto 24px;padding:12px 16px;border:1px solid rgba(250,204,21,.25);border-radius:12px;background:rgba(250,204,21,.06);color:var(--text-secondary);font-size:13px;line-height:1.6;text-align:center}
+.picks-note strong{color:#facc15;font-weight:700}
 @media(max-width:640px){.seo-content h2{font-size:18px}.faq-item summary{padding:14px 16px;font-size:14px}.faq-item p{padding:0 16px 14px;font-size:13px}.date-tab{padding:8px 14px;font-size:13px;min-width:80px}.match-reason{font-size:12px;max-width:100%;word-break:break-word;margin-top:6px}}
 </style>
 <link rel="stylesheet" href="/consent.css">
@@ -194,6 +208,8 @@
 <div class="stat-label">Matches</div>
 </div>
 </div>
+
+<p class="picks-note"><strong>Daily picks aren't final results.</strong> Football is unpredictable &mdash; no tip wins every time. Pick only a few you're genuinely confident in, and never stake more than you can afford to lose.</p>
 
 <div id="content">
 <div class="loading">
@@ -463,15 +479,27 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     if (ogUrl) ogUrl.content = 'https://winfulltime.com' + newUrl;
   }
 
-  function render(picks) {
+  function lockedCardHtml(i) {
+    return '<div class="match-card locked-card fade-in" style="animation-delay:' + (i * 50) + 'ms" aria-label="Locked prediction, upgrade to view">' +
+      '<div class="match-header"><span class="locked-bar" style="width:38%"></span><span class="locked-bar" style="width:16%"></span></div>' +
+      '<div class="match-teams" style="justify-content:center;"><span class="locked-bar" style="width:32%"></span><span class="vs-score">vs</span><span class="locked-bar" style="width:32%"></span></div>' +
+      '<div class="match-footer locked-cta">' +
+      '<span class="lock-emoji">&#128274;</span>' +
+      '<span class="locked-title">VIP ONLY</span>' +
+      '<span class="locked-sub">Upgrade to view this pick</span>' +
+      '<a class="locked-btn" href="/pricing.html">Upgrade</a>' +
+      '</div></div>';
+  }
+
+  function render(picks, total) {
     var content = document.getElementById('content');
     if (!picks || picks.length === 0) {
       var dayLabel = currentDate === 'today' ? 'today' : currentDate;
       content.innerHTML = '<div class="no-matches"><p>No highest-scoring-half picks for ' + dayLabel + '.</p><p style="margin-top:12px;font-size:14px;color:var(--text-muted);">Too many tight fixtures or low-scoring games means we leave the market alone. Check back soon or explore other markets below.</p></div>';
-      document.getElementById('totalMatches').textContent = '0';
+      document.getElementById('totalMatches').textContent = String(total || 0);
       return;
     }
-    document.getElementById('totalMatches').textContent = picks.length;
+    document.getElementById('totalMatches').textContent = String(total || picks.length);
     var html = picks.map(function(p, i) {
       var h = p.hsh || {};
       var pickKey = h.pick === '1H' ? '1H' : '2H';
@@ -495,7 +523,14 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
         '<div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;">' + label + ' &middot; ' + marginPct + '% clear</div>' +
         '</div></div></div>';
     }).join('');
-    var grid = '<div class="matches-grid">' +
+    var i;
+    for (i = picks.length; (total || 0) > picks.length && i < total; i++) {
+      html += lockedCardHtml(i);
+    }
+    var note = ((total || 0) > picks.length)
+      ? '<div class="locked-note">See all ' + total + ' highest scoring half picks for this date with <a href="/pricing.html">Pro</a> &mdash; here\u2019s a preview of the top ' + picks.length + '.</div>'
+      : '';
+    var grid = note + '<div class="matches-grid">' +
       (window.wftSponsor && window.wftSponsor.insertSponsor ? window.wftSponsor.insertSponsor(html) : html) +
       '</div>';
     content.innerHTML = grid;
@@ -513,8 +548,48 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     fetch('/data/highest-scoring-half.json', controller ? { signal: controller.signal } : {})
       .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(function(payload) {
-        var dates = (payload && payload.dates) || {};
-        render(dates[dateStr] || []);
+        renderFromPayload(payload);
+      })
+      .catch(function(e) {
+        if (e && e.name === 'AbortError') return;
+        content.innerHTML = '<div class="no-matches"><p>Predictions currently unavailable. Check back soon.</p></div>';
+      });
+  }
+
+  function renderFromPayload(payload, dstr) {
+    var dates = (payload && payload.dates) || {};
+    var counts = (payload && payload.counts) || {};
+    var pickArr = dates[dstr] || [];
+    // The committed/limited static file only exposes the free teaser; Pro
+    // members fetch the full list from the API instead (rendered via the same
+    // renderFromPayload path below).
+    render(pickArr, counts[dstr] != null ? counts[dstr] : pickArr.length);
+  }
+
+  function renderCurrentView() {
+    updateDateDisplay();
+    var dateStr = getSelectedDateStr();
+    var content = document.getElementById('content');
+    content.innerHTML = '<div class="loading"><div class="progress-bar-container"><div class="progress-bar"></div></div><span class="loading-text">Loading predictions...</span></div>';
+    var reqKey = dateStr;
+    if (lastRequests[reqKey]) { lastRequests[reqKey].abort(); }
+    var controller = (typeof AbortController === 'function') ? new AbortController() : null;
+    if (controller) lastRequests[reqKey] = controller;
+    var user = (window.WFT && typeof window.WFT.getUser === 'function') ? window.WFT.getUser() : null;
+    if (user && user.isPro && window.WFT && typeof window.WFT.apiFetch === 'function') {
+      window.WFT.apiFetch('/api/highest-scoring-half')
+        .then(function(payload) {
+          renderFromPayload(payload, dateStr);
+        })
+        .catch(function() {
+          content.innerHTML = '<div class="no-matches"><p>Predictions currently unavailable. Check back soon.</p></div>';
+        });
+      return;
+    }
+    fetch('/data/highest-scoring-half.json', controller ? { signal: controller.signal } : {})
+      .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function(payload) {
+        renderFromPayload(payload, dateStr);
       })
       .catch(function(e) {
         if (e && e.name === 'AbortError') return;
