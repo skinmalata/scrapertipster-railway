@@ -1195,7 +1195,7 @@ router.get('/golden-tips', optionalAuth, async function (req, res) {
     };
 
     console.log('[golden-tips] matches=' + liveData.matchCount + ' opportunities=' + opportunities.length);
-    goldenTipsCache = { createdAt: Date.now(), payload };
+    goldenTipsCache = { createdAt: Date.now(), payload: { ...payload } };
   }
 
   // In-play golden tips are a Pro feature. Free users get a small teaser; the
@@ -1218,6 +1218,7 @@ router.get('/golden-tips', optionalAuth, async function (req, res) {
       return o;
     });
     payload.isPro = false;
+    payload.freeVisible = FREE_VISIBLE;
     payload.lockedTotal = allOpportunities.length;
     payload.lockedCount = Math.max(0, allOpportunities.length - FREE_VISIBLE);
   }

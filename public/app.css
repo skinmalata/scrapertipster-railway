@@ -1461,3 +1461,35 @@ Transparent bar holding the "BET ON" text label and the bookmaker logo
     max-height: 32px;
   }
 }
+
+/* Winning Tools dropdown */
+nav .nav-dropdown { position: relative; }
+nav .nav-dropdown > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-weight: 500; font-size: 14px; padding: 4px 0; transition: color 0.2s; }
+nav .nav-dropdown > summary::-webkit-details-marker { display: none; }
+nav .nav-dropdown > summary::marker { content: ''; }
+nav .nav-dropdown > summary:hover,
+nav .nav-dropdown > summary.active,
+nav .nav-dropdown[open] > summary { color: var(--text-primary); }
+nav .nav-caret { width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 5px solid currentColor; margin-top: 1px; transition: transform 0.2s; }
+nav .nav-dropdown[open] .nav-caret { transform: rotate(180deg); }
+nav .nav-dropdown-menu { position: absolute; top: calc(100% + 12px); left: 0; min-width: 210px; display: flex; flex-direction: column; gap: 2px; padding: 8px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 18px 40px rgba(0,0,0,0.45); z-index: 1200; }
+nav .nav-dropdown-menu a { display: block; padding: 9px 12px; border-radius: 8px; white-space: nowrap; font-size: 14px; }
+nav .nav-dropdown-menu a:hover,
+nav .nav-dropdown-menu a.active { background: rgba(255,255,255,0.06); color: var(--text-primary); }
+nav .nav-dropdown-menu a.active::after { display: none; }
+
+/* Shared prediction tools row (homepage + tool pages) */
+.prediction-tools { position: relative; display: flex; flex-wrap: wrap; justify-content: center; clear: both; width: 100%; max-width: 900px; box-sizing: border-box; margin: 24px auto 8px; padding: 20px 12px; gap: 12px; z-index: 0; }
+.prediction-tools .streak-btn { box-sizing: border-box; min-width: min(180px, 100%); }
+.prediction-tools .tool-converter { background: linear-gradient(135deg, #059669, #10b981); color: #fff; }
+.prediction-tools .tool-merger { background: linear-gradient(135deg, #2563eb, #3b82f6); color: #fff; }
+.prediction-tools .tool-splitter { background: linear-gradient(135deg, #7c3aed, #a855f7); color: #fff; }
+.prediction-tools .tool-inplay { background: linear-gradient(135deg, #dc2626, #ef4444); color: #fff; }
+.prediction-tools .tool-ticket { background: linear-gradient(135deg, #0891b2, #22d3ee); color: #fff; }
+.prediction-tools .tool-analyzer { background: linear-gradient(135deg, #d97706, #f59e0b); color: #fff; }
+
+@media (max-width: 640px) {
+  nav .nav-dropdown { width: 100%; }
+  nav .nav-dropdown > summary { font-size: 15px; padding: 12px 0; min-height: 44px; }
+  nav .nav-dropdown-menu { position: static; width: 100%; min-width: 0; box-shadow: none; border: 0; padding: 4px 0 4px 12px; margin-top: 4px; background: transparent; }
+}

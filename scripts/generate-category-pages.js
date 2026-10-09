@@ -447,8 +447,8 @@ ${generateFaqSchema(FAQ_SCHEMA[slug])}
 .locked-sub{font-size:12px;color:var(--text-secondary)}
 .locked-btn{background:linear-gradient(135deg,#ff2448,#ff647d);color:#fff;padding:9px 26px;border-radius:9px;text-decoration:none;font-weight:700;font-size:13px;margin-top:3px;display:inline-block}
 .locked-btn:hover{opacity:.92}
-.picks-note{max-width:830px;margin:0 auto 24px;padding:12px 16px;border:1px solid rgba(250,204,21,.4);border-radius:12px;background:rgba(250,204,21,.08);color:var(--text-primary);font-size:14px;font-weight:600;line-height:1.6;text-align:center}
-.picks-note strong{color:#facc15;font-weight:700}
+.picks-note{max-width:830px;margin:0 auto 24px;padding:12px 16px;border:1px solid rgba(250,204,21,.4);border-radius:12px;background:rgba(250,204,21,.08);color:var(--text-muted,#94a3b8);font-size:14px;font-weight:600;line-height:1.6;text-align:center}
+.picks-note strong{color:var(--text-muted,#94a3b8);font-weight:700}
 @media(max-width:640px){.telegram-cta h3{font-size:17px}.telegram-cta p{font-size:13px}.telegram-link{width:100%;justify-content:center}}
 ${CHIPS_CSS}
 </style>

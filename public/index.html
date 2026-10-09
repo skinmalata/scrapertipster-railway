@@ -70,8 +70,8 @@ gtag('config', 'G-HMGZMW9EDP');
  .locked-btn:hover{opacity:.92}
  .locked-note{max-width:830px;margin:0 auto 24px;padding:14px 18px;border:1px solid rgba(255,36,72,.3);border-radius:12px;background:rgba(255,36,72,.06);color:var(--text-secondary);font-size:14px;line-height:1.6;text-align:center}
  .locked-note a{color:#ff647d;font-weight:700;text-decoration:none}
- .picks-note{max-width:830px;margin:0 auto 24px;padding:12px 16px;border:1px solid rgba(250,204,21,.4);border-radius:12px;background:rgba(250,204,21,.08);color:var(--text-primary);font-size:14px;font-weight:600;line-height:1.6;text-align:center}
- .picks-note strong{color:#facc15;font-weight:700}
+ .picks-note{max-width:830px;margin:0 auto 24px;padding:12px 16px;border:1px solid rgba(250,204,21,.4);border-radius:12px;background:rgba(250,204,21,.08);color:var(--text-muted,#94a3b8);font-size:14px;font-weight:600;line-height:1.6;text-align:center}
+ .picks-note strong{color:var(--text-muted,#94a3b8);font-weight:700}
  </style>
 
  <script type="application/ld+json">
@@ -149,7 +149,7 @@ gtag('config', 'G-HMGZMW9EDP');
  }
  </script>
 
- <link rel="stylesheet" href="/app.css?v=10">
+ <link rel="stylesheet" href="/app.css?v=11">
 <script type="application/ld+json">
  {
  "@context": "https://schema.org",
@@ -240,12 +240,17 @@ gtag('config', 'G-HMGZMW9EDP');
 
  <nav id="nav">
  <a href="/" class="active">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/converter.html">Code Converter</a>
- <a href="/code-splitter.html">Code Splitter</a>
- <a href="/code-merger.html">Code Merger</a>
- <a href="/code-analyzer.html">Code Analyzer</a>
- <a href="/predictions/in-play">In-Play</a>
+ <details class="nav-dropdown">
+  <summary>Winning Tools<span class="nav-caret" aria-hidden="true"></span></summary>
+  <div class="nav-dropdown-menu">
+   <a href="/converter.html">Code Converter</a>
+   <a href="/code-merger.html">Code Merger</a>
+   <a href="/code-splitter.html">Code Splitter</a>
+   <a href="/predictions/in-play">In-Play</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/code-analyzer.html">Code Analyzer</a>
+  </div>
+ </details>
  <a href="/blog/">Blog</a>
  <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
   <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>

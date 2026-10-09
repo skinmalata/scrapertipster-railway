@@ -102,7 +102,7 @@
         "name": "Are the live betting tips free?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Free members see a live preview of the day's in-play tips. The full in-play signal list - every live match opportunity with its market, signal strength and reason - is a WinFulltime Pro feature. For every alert in realtime, join our Telegram channel (https://t.me/winfulltime) where in-play betting alerts are posted as they appear."
+          "text": "Free members get 3 live in-play tips at a time. When more than 3 tips are live at once, the first 3 are shown and the rest are locked. To get every live tip notification for free, join our Telegram channel (https://t.me/winfulltime) where in-play betting alerts are posted as they appear. Pro members can also unlock the full list on this page."
         }
       }
     ]
@@ -115,7 +115,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="stylesheet" href="/app.css?v=10">
+  <link rel="stylesheet" href="/app.css?v=11">
   <style>
     .live-hero { text-align:center; padding:42px 16px 26px; }
     .live-pill { display:inline-flex; align-items:center; gap:8px; padding:7px 12px; border:1px solid rgba(74,222,128,.35); border-radius:999px; color:#56e69c; font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; }
@@ -143,8 +143,8 @@
     .empty h2 { margin:12px 0 8px; font-size:21px; }
     .empty p { color:var(--text-secondary); margin:0; line-height:1.65; }
     .empty-icon { font-size:32px; }
-    .picks-note { max-width:830px; margin:0 auto 26px; padding:12px 16px; border:1px solid rgba(250,204,21,.4); border-radius:12px; background:rgba(250,204,21,.08); color:var(--text-primary); font-size:14px; font-weight:600; line-height:1.6; text-align:center; }
-    .picks-note strong { color:#facc15; font-weight:700; }
+    .picks-note { max-width:830px; margin:0 auto 26px; padding:12px 16px; border:1px solid rgba(250,204,21,.4); border-radius:12px; background:rgba(250,204,21,.08); color:var(--text-muted,#94a3b8); font-size:14px; font-weight:600; line-height:1.6; text-align:center; }
+    .picks-note strong { color:var(--text-muted,#94a3b8); font-weight:700; }
     .tg-banner { max-width:830px; margin:0 auto 26px; padding:13px 18px; border:1px solid rgba(63,179,229,.35); border-radius:12px; background:rgba(30,150,200,.08); color:var(--text-secondary); font-size:14px; line-height:1.6; text-align:center; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:6px; }
     .tg-banner a { background:linear-gradient(135deg,#1e96c8,#1a7da8); color:#fff; padding:8px 18px; border-radius:8px; text-decoration:none; font-weight:700; font-size:13px; font-family:'Inter',sans-serif; }
     .tg-banner a:hover { opacity:.92; }
@@ -201,12 +201,17 @@
       <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
       <nav id="nav">
  <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
- <a href="/converter.html">Code Converter</a>
- <a href="/code-splitter.html">Code Splitter</a>
- <a href="/code-merger.html">Code Merger</a>
- <a href="/code-analyzer.html">Code Analyzer</a>
- <a href="/predictions/in-play" class="active">In-Play</a>
+ <details class="nav-dropdown">
+  <summary class="active">Winning Tools<span class="nav-caret" aria-hidden="true"></span></summary>
+  <div class="nav-dropdown-menu">
+   <a href="/converter.html">Code Converter</a>
+   <a href="/code-merger.html">Code Merger</a>
+   <a href="/code-splitter.html">Code Splitter</a>
+   <a href="/predictions/in-play" class="active">In-Play</a>
+   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/code-analyzer.html">Code Analyzer</a>
+  </div>
+ </details>
  <a href="/blog/">Blog</a>
  <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
   <a href="/login.html" class="wft-auth-login" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;">Login</a>
@@ -240,7 +245,7 @@
   </div>
 
   <div class="tg-banner">
-    Want every in-play alert the moment it appears? &nbsp;<a href="https://t.me/winfulltime" target="_blank" rel="noopener">Join our Telegram channel</a> for real-time in-play betting alerts.
+    Get all live tips free on Telegram &mdash;&nbsp;<a href="https://t.me/winfulltime" target="_blank" rel="noopener">Join our Telegram channel</a> for every in-play alert the moment it appears.
   </div>
 
     <section id="tips" class="tip-grid" aria-live="polite">
@@ -277,7 +282,7 @@
         <details class="faq-item"><summary>Why are there no live betting tips right now?</summary><p>Live betting tips only appear when a strategy rule qualifies during an in-progress match. During off-peak hours, early match stages, or when matches don't generate enough attacking pressure, the page will correctly show no opportunities. No tip is not a missing prediction — it means no edge was found.</p></details>
 
         <details class="faq-item"><summary>What is the difference between in-play tips and pre-match predictions?</summary><p>Pre-match predictions are generated before kick-off using historical data, team form and pre-match odds. In-play betting tips use live match statistics from the ongoing game, such as real-time shots, corners and possession, to identify betting opportunities that only exist during the match.</p></details>
-        <details class="faq-item"><summary>Are the live betting tips free?</summary><p>Free members see a live preview of the day's in-play tips. The full in-play signal list &mdash; every live match opportunity with its market, signal strength and reason &mdash; is a <a href="/pricing.html">WinFulltime Pro</a> feature. To receive every in-play alert in realtime, <a href="https://t.me/winfulltime" target="_blank" rel="noopener">join our Telegram channel</a> — alerts are posted the moment they appear.</p></details>
+        <details class="faq-item"><summary>Are the live betting tips free?</summary><p>Yes &mdash; free members get <strong>3 live in-play tips at a time</strong>. When more than 3 tips are live at once, the first 3 are shown and the rest are locked. To get <strong>every live tip notification for free</strong>, <a href="https://t.me/winfulltime" target="_blank" rel="noopener">join our Telegram channel</a> &mdash; alerts are posted the moment they appear. <a href="/pricing.html">WinFulltime Pro</a> members can also unlock the full list on this page.</p></details>
       </div>
     </section>
 
@@ -387,14 +392,17 @@
         if (window.WFT && window.WFT.apiFetch) return window.WFT.apiFetch(path);
         return fetch(API_BASE + path, { mode: 'cors', cache: 'no-store' }).then(function(r) { return r.json(); });
       }
-      function lockedTipCard(i) {
-        return '<article class="tip-card locked-card" aria-label="Locked live tip, join Telegram for realtime alerts or upgrade to view">' +
+      function lockedTipCard(count, freeVisible) {
+        var more = Number(count || 0);
+        var sub = 'Free members see ' + freeVisible + ' live tips at a time.';
+        if (more > 0) sub += ' ' + more + ' more live tip' + (more === 1 ? '' : 's') + ' locked right now.';
+        return '<article class="tip-card locked-card" aria-label="Locked live tips. Join Telegram to get all live tips free.">' +
           '<div class="tip-top"><span class="locked-bar" style="width:34%"></span><span class="locked-bar" style="width:14%"></span></div>' +
           '<div class="tip-body locked-cta">' +
           '<span class="lock-emoji">&#128274;</span>' +
-          '<span class="locked-title">LIVE TIP</span>' +
-          '<span class="locked-sub">Get every in-play alert in realtime</span>' +
-          '<a class="locked-btn telegram" href="https://t.me/winfulltime" target="_blank" rel="noopener">Join Telegram Channel</a>' +
+          '<span class="locked-title">' + more + ' LIVE TIP' + (more === 1 ? '' : 'S') + ' LOCKED</span>' +
+          '<span class="locked-sub">' + escapeHtml(sub) + ' Get every live tip notification free on Telegram.</span>' +
+          '<a class="locked-btn telegram" href="https://t.me/winfulltime" target="_blank" rel="noopener">Get all live tips free on Telegram</a>' +
           '<span class="locked-sub" style="font-size:12px;">or <a href="/pricing.html" style="color:#ff647d;font-weight:700;text-decoration:none;">upgrade to Pro</a> to unlock the full list here</span>' +
           '</div></article>';
       }
@@ -405,7 +413,7 @@
         }
         var lockedHtml = '';
         if (!data.isPro && Number(data.lockedCount || 0) > 0) {
-          for (var k = 0; k < Number(data.lockedCount); k++) lockedHtml += lockedTipCard(k);
+          lockedHtml = lockedTipCard(Number(data.lockedCount), Number(data.freeVisible || 3));
         }
         container.innerHTML = data.opportunities.map(function(o) {
           var minute = o.minute ? o.minute + '\'' : 'Live';

@@ -8,12 +8,17 @@ const path = require('path');
 
 const NAV_LINKS = [
   { href: '/', label: 'Home', match: (p) => p === '/' || p === '/index.html' },
-  { href: '/ticket-builder.html', label: 'Ticket Builder', match: (p) => p.startsWith('/ticket-builder') },
-  { href: '/converter.html', label: 'Code Converter', match: (p) => p.startsWith('/converter') },
-  { href: '/code-splitter.html', label: 'Code Splitter', match: (p) => p.startsWith('/code-splitter') },
-  { href: '/code-merger.html', label: 'Code Merger', match: (p) => p.startsWith('/code-merger') },
-  { href: '/code-analyzer.html', label: 'Code Analyzer', match: (p) => p.startsWith('/code-analyzer') },
-  { href: '/predictions/in-play', label: 'In-Play', match: (p) => p.startsWith('/predictions/in-play') },
+  {
+    label: 'Winning Tools',
+    children: [
+      { href: '/converter.html', label: 'Code Converter', match: (p) => p.startsWith('/converter') },
+      { href: '/code-merger.html', label: 'Code Merger', match: (p) => p.startsWith('/code-merger') },
+      { href: '/code-splitter.html', label: 'Code Splitter', match: (p) => p.startsWith('/code-splitter') },
+      { href: '/predictions/in-play', label: 'In-Play', match: (p) => p.startsWith('/predictions/in-play') },
+      { href: '/ticket-builder.html', label: 'Ticket Builder', match: (p) => p.startsWith('/ticket-builder') },
+      { href: '/code-analyzer.html', label: 'Code Analyzer', match: (p) => p.startsWith('/code-analyzer') }
+    ]
+  },
   { href: '/blog/', label: 'Blog', match: (p) => p.startsWith('/blog') }
 ];
 
@@ -24,8 +29,18 @@ const TELEGRAM_BTN_STYLE = 'display:inline-flex;align-items:center;background:li
 function navLinksHtml(activePath) {
   let html = '';
   for (const link of NAV_LINKS) {
-    const active = link.match(activePath) ? ' class="active"' : '';
-    html += `\n <a href="${link.href}"${active}>${link.label}</a>`;
+    if (link.children) {
+      const anyActive = link.children.some((c) => c.match(activePath));
+      let sub = '';
+      for (const child of link.children) {
+        const cActive = child.match(activePath) ? ' class="active"' : '';
+        sub += `\n   <a href="${child.href}"${cActive}>${child.label}</a>`;
+      }
+      html += `\n <details class="nav-dropdown">\n  <summary${anyActive ? ' class="active"' : ''}>${link.label}<span class="nav-caret" aria-hidden="true"></span></summary>\n  <div class="nav-dropdown-menu">${sub}\n  </div>\n </details>`;
+    } else {
+      const active = link.match(activePath) ? ' class="active"' : '';
+      html += `\n <a href="${link.href}"${active}>${link.label}</a>`;
+    }
   }
 
   html += '\n <span class="nav-auth" style="margin-left:auto;display:flex;align-items:center;gap:10px;">';
@@ -210,6 +225,58 @@ body > header nav a {
 }
 body > header nav a:hover,
 body > header nav a.active { color: var(--text-primary, #e8edf5); }
+body > header nav .nav-dropdown { position: relative; }
+body > header nav .nav-dropdown > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted, #94a3b8);
+  font-weight: 500;
+  font-size: 14px;
+  padding: 4px 0;
+  transition: color 0.2s;
+}
+body > header nav .nav-dropdown > summary::-webkit-details-marker { display: none; }
+body > header nav .nav-dropdown > summary::marker { content: ''; }
+body > header nav .nav-dropdown > summary:hover,
+body > header nav .nav-dropdown > summary.active,
+body > header nav .nav-dropdown[open] > summary { color: var(--text-primary, #e8edf5); }
+body > header nav .nav-caret {
+  width: 0; height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid currentColor;
+  margin-top: 1px;
+  transition: transform 0.2s;
+}
+body > header nav .nav-dropdown[open] .nav-caret { transform: rotate(180deg); }
+body > header nav .nav-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 0;
+  min-width: 210px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  background: var(--bg-primary, #181e30);
+  border: 1px solid var(--border, rgba(255,255,255,0.08));
+  border-radius: 12px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+  z-index: 1200;
+}
+body > header nav .nav-dropdown-menu a {
+  display: block;
+  padding: 9px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+  font-size: 14px;
+}
+body > header nav .nav-dropdown-menu a:hover,
+body > header nav .nav-dropdown-menu a.active { background: rgba(255,255,255,0.06); color: var(--text-primary, #e8edf5); }
+body > header nav .nav-dropdown-menu a.active::after { display: none; }
 body > header nav .wft-auth-login,
 body > header nav .wft-auth-account { display: inline-block; }
 body > header nav .wft-auth-login:hover,
@@ -247,6 +314,9 @@ body > header .hamburger { display: block; }
     z-index: 1000;
   }
   body > header nav.open { display: flex !important; }
+  body > header nav .nav-dropdown { width: 100%; }
+  body > header nav .nav-dropdown > summary { font-size: 15px; padding: 12px 0; min-height: 44px; }
+  body > header nav .nav-dropdown-menu { position: static; width: 100%; min-width: 0; box-shadow: none; border: 0; padding: 4px 0 4px 12px; margin-top: 4px; background: transparent; }
 }
 </style>`;
 
