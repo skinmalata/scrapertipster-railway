@@ -774,11 +774,29 @@ gtag('config', 'G-HMGZMW9EDP');
 
  try {
 
+ const u = (window.WFT && typeof window.WFT.getUser === 'function') ? window.WFT.getUser() : null;
+
+ if (u && u.isPro && window.WFT && typeof window.WFT.apiFetch === 'function') {
+
+ try {
+
+ const apiOut = await window.WFT.apiFetch('/api/h2h-unbeaten');
+
+ if (apiOut && apiOut.dates) unbeatenData = apiOut;
+
+ } catch (e) { console.warn('Pro unbeaten fetch failed, using static:', e); }
+
+ }
+
+ if (!unbeatenData) {
+
  const res = await fetch('/data/h2h-unbeaten.json');
 
  if (!res.ok) throw new Error('HTTP ' + res.status);
 
  unbeatenData = await res.json();
+
+ }
 
  } catch (e) {
 
@@ -794,7 +812,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
 
 
- function wftIsPro() { return !!(window.WFT && window.WFT.userState && window.WFT.userState.user && window.WFT.userState.user.isPro); }
+ function wftIsPro() { return !!(window.WFT && typeof window.WFT.getUser === 'function' && window.WFT.getUser() && window.WFT.getUser().isPro); }
  function freeTeaserCount() { return (currentData && currentData.freeVisible) ? Number(currentData.freeVisible) : 3; }
  function lockedCardHtml(i) {
   return '<div class="match-card locked-card fade-in" style="animation-delay:' + (i * 50) + 'ms" aria-label="Locked prediction, upgrade to view">' +
@@ -1390,20 +1408,27 @@ gtag('config', 'G-HMGZMW9EDP');
 
   console.log('Fetching predictions...');
 
-  const [response, linksData] = await Promise.all([
-   fetch('/data/predictions.json'),
+  async function fetchPredictionsData() {
+   const u = (window.WFT && typeof window.WFT.getUser === 'function') ? window.WFT.getUser() : null;
+   if (u && u.isPro && window.WFT && typeof window.WFT.apiFetch === 'function') {
+    try {
+     const apiOut = await window.WFT.apiFetch('/api/predictions');
+     if (apiOut && apiOut.matches && apiOut.matches.length) return apiOut;
+    } catch (e) { console.warn('Pro predictions fetch failed, using static:', e); }
+   }
+   const r = await fetch('/data/predictions.json');
+   if (!r.ok) throw new Error(`HTTP error: ${r.status}`);
+   return r.json();
+  }
+
+  const [predData, linksData] = await Promise.all([
+   fetchPredictionsData(),
    fetch('/data/analysis-links.json').then(r => r.ok ? r.json() : {}).catch(() => ({}))
   ]);
 
-  if (!response.ok) {
-
-  throw new Error(`HTTP error: ${response.status}`);
-
-  }
-
   analysisLinks = linksData || {};
 
-  currentData = await response.json();
+  currentData = predData;
 
   if (typeof window.ensureAnalysisMaps === 'function') { await window.ensureAnalysisMaps(); }
 
@@ -1453,11 +1478,19 @@ gtag('config', 'G-HMGZMW9EDP');
 
 
 
-renderDayTabs();
+ renderDayTabs();
 
  loadPredictions();
 
  loadUnbeatenData();
+
+ document.addEventListener('wft-pro-status', function () {
+
+ const u = (window.WFT && typeof window.WFT.getUser === 'function') ? window.WFT.getUser() : null;
+
+ if (u && u.isPro) { loadPredictions(); loadUnbeatenData(); }
+
+ });
 
  console.log('loadPredictions called, waiting...');
 
