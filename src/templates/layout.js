@@ -90,6 +90,9 @@ const FOOTER_HTML = `
    <h5>Company</h5>
    <ul>
     <li><a href="/about.html">About</a></li>
+    <li><a href="/pricing.html">Pricing</a></li>
+    <li><a href="/login.html">Login</a></li>
+    <li><a href="/signup.html">Sign up</a></li>
     <li><a href="/blog/">Blog</a></li>
     <li><a href="/advertise.html">Advertise</a></li>
     <li><a href="/contact.html">Contact</a></li>
