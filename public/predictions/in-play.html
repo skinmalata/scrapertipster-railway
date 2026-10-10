@@ -411,8 +411,12 @@
           container.innerHTML = empty('No in-play betting tips currently', 'Tips appear when live match data meets our strategy rules. Bet Responsibly.');
           return;
         }
+        // Trust the client's Pro/Admin status too, so a request that raced
+        // before the auth token was attached never shows locks to a Pro user.
+        var clientUser = (window.WFT && typeof window.WFT.getUser === 'function') ? window.WFT.getUser() : null;
+        var isPro = !!(data.isPro || (clientUser && clientUser.isPro));
         var lockedHtml = '';
-        if (!data.isPro && Number(data.lockedCount || 0) > 0) {
+        if (!isPro && Number(data.lockedCount || 0) > 0) {
           lockedHtml = lockedTipCard(Number(data.lockedCount), Number(data.freeVisible || 3));
         }
         container.innerHTML = data.opportunities.map(function(o) {
@@ -460,6 +464,12 @@
           if (liveTimer) clearTimeout(liveTimer);
           loadLive();
         }
+      });
+
+      // Refetch once auth resolves so an admin/VIP gets the full (unlocked)
+      // list even if the first request went out before Pro status was known.
+      document.addEventListener('wft-pro-status', function () {
+        loadLive();
       });
 
       if (window.WFT && window.WFT.onAuthReady) {

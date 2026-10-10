@@ -551,37 +551,20 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
         '<div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;">' + label + ' &middot; ' + marginPct + '% clear</div>' +
         '</div></div></div>';
     }).join('');
+    var pro = !!(window.WFT && typeof window.WFT.getUser === 'function' && window.WFT.getUser() && window.WFT.getUser().isPro);
     var i;
-    for (i = picks.length; (total || 0) > picks.length && i < total; i++) {
-      html += lockedCardHtml(i);
+    if (!pro) {
+      for (i = picks.length; (total || 0) > picks.length && i < total; i++) {
+        html += lockedCardHtml(i);
+      }
     }
-    var note = ((total || 0) > picks.length)
+    var note = (!pro && (total || 0) > picks.length)
       ? '<div class="locked-note">See all ' + total + ' highest scoring half picks for this date with <a href="/pricing.html">Pro</a> &mdash; here\u2019s a preview of the top ' + picks.length + '.</div>'
       : '';
     var grid = note + '<div class="matches-grid">' +
       (window.wftSponsor && window.wftSponsor.insertSponsor ? window.wftSponsor.insertSponsor(html) : html) +
       '</div>';
     content.innerHTML = grid;
-  }
-
-  function renderCurrentView() {
-    updateDateDisplay();
-    var dateStr = getSelectedDateStr();
-    var content = document.getElementById('content');
-    content.innerHTML = '<div class="loading"><div class="progress-bar-container"><div class="progress-bar"></div></div><span class="loading-text">Loading predictions...</span></div>';
-    var reqKey = dateStr;
-    if (lastRequests[reqKey]) { lastRequests[reqKey].abort(); }
-    var controller = (typeof AbortController === 'function') ? new AbortController() : null;
-    if (controller) lastRequests[reqKey] = controller;
-    fetch('/data/highest-scoring-half.json', controller ? { signal: controller.signal } : {})
-      .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-      .then(function(payload) {
-        renderFromPayload(payload);
-      })
-      .catch(function(e) {
-        if (e && e.name === 'AbortError') return;
-        content.innerHTML = '<div class="no-matches"><p>Predictions currently unavailable. Check back soon.</p></div>';
-      });
   }
 
   function renderFromPayload(payload, dstr) {
@@ -604,16 +587,9 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     var controller = (typeof AbortController === 'function') ? new AbortController() : null;
     if (controller) lastRequests[reqKey] = controller;
     var user = (window.WFT && typeof window.WFT.getUser === 'function') ? window.WFT.getUser() : null;
-    if (user && user.isPro && window.WFT && typeof window.WFT.apiFetch === 'function') {
-      window.WFT.apiFetch('/api/highest-scoring-half')
-        .then(function(payload) {
-          renderFromPayload(payload, dateStr);
-        })
-        .catch(function() {
-          content.innerHTML = '<div class="no-matches"><p>Predictions currently unavailable. Check back soon.</p></div>';
-        });
-      return;
-    }
+    // Render the static snapshot immediately (fast, CDN-backed); Pro members
+    // upgrade to the full API list in the background. The API can take ~1 min
+    // to wake on the free tier, so it must never block first paint.
     fetch('/data/highest-scoring-half.json', controller ? { signal: controller.signal } : {})
       .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(function(payload) {
@@ -623,6 +599,13 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
         if (e && e.name === 'AbortError') return;
         content.innerHTML = '<div class="no-matches"><p>Predictions currently unavailable. Check back soon.</p></div>';
       });
+    if (user && user.isPro && window.WFT && typeof window.WFT.apiFetch === 'function') {
+      window.WFT.apiFetch('/api/highest-scoring-half')
+        .then(function(payload) {
+          renderFromPayload(payload, dateStr);
+        })
+        .catch(function() {});
+    }
   }
 
   window.switchDate = function(date) {
