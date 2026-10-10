@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="/app.css?v=11">
 <link rel="alternate" type="application/rss+xml" title="WinFulltime Football Predictions RSS" href="/feed.xml">
 <script async src="https://news.google.com/swg/js/v1/publisher.js"></script>
+<script src="/analytics-events.js" defer></script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="WinFulltime">
@@ -236,19 +237,9 @@
 </div>
 <noscript>
   <div class="noscript-content" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:24px;margin:20px 0;line-height:1.7;color:rgba(232,237,245,.9);">
-    <h2 style="margin-top:0;font-size:20px;color:#fff;">GG2+ (Both Teams 2+ Goals) Predictions Today</h2>
-    <p>Today's full GG2+ (Both Teams 2+ Goals) list is available to <a href="/pricing.html">Pro members</a>. Here is a preview of today's picks — upgrade to see every GG2+ (Both Teams 2+ Goals) prediction.</p>
-    <table style="width:100%;border-collapse:collapse;font-size:14px;">
-      <thead><tr style="text-align:left;color:rgba(232,237,245,.55);">
-        <th style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.1);">League</th>
-        <th style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.1);">Match</th>
-        <th style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.1);">Kick-off</th>
-        <th style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.1);">Tip</th>
-        <th style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.1);">Confidence</th>
-      </tr></thead>
-      <tbody><tr><td>Urvalsdeild</td><td>Hiroshima - Iwaki FC</td><td>05:30</td><td>GG2+</td><td>25%</td></tr><tr><td></td><td>C-Osaka - Kagoshima United</td><td>05:30</td><td>GG2+</td><td>23%</td></tr></tbody>
-    </table>
-    <p style="margin-top:16px;font-size:13px;">Views are updated when JavaScript is enabled. Football predictions can lose &mdash; bet responsibly.</p>
+    <h2 style="margin-top:0;font-size:20px;color:#fff;">GG2+ Predictions</h2>
+    <p>WinFulltime publishes GG2+ predictions every day. Browse today's picks for this market, explore other <a href="/predictions/1x2">betting markets</a> such as <a href="/predictions/over-1-5">Over 1.5</a>, <a href="/predictions/over-2-5">Over 2.5</a> and <a href="/predictions/btts">BTTS</a>, or jump to a specific <a href="/predictions/league/premier-league/">league</a>.</p>
+    <p>Predictions are derived from statistical analysis of form, head-to-head records and league trends. Football predictions can lose &mdash; bet responsibly.</p>
   </div>
 </noscript>
 </div>
@@ -260,7 +251,7 @@
   <a class="streak-btn tool-merger" href="/code-merger.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Code Merger</span></a>
   <a class="streak-btn tool-splitter" href="/code-splitter.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Code Splitter</span></a>
   <a class="streak-btn tool-inplay" href="/predictions/in-play"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">In-Play</span></a>
-<a class="streak-btn tool-ticket" href="/ticket-builder.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Ticket Builder</span></a>
+  <a class="streak-btn tool-ticket" href="/ticket-builder.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Ticket Builder</span></a>
   <a class="streak-btn tool-analyzer" href="/code-analyzer.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Code Analyzer</span></a>
 </nav>
 
@@ -782,27 +773,24 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
       // Static data is already capped to the free tier at build time (see
       // scripts/gh-pages-scraper.js), so free and anonymous visitors get the
-      // limited markets straight from /data/predictions.json. Pro/VIP users
-      // fetch the full snapshot from the API instead.
+      // limited markets straight from /data/predictions.json. Render that
+      // immediately, then upgrade Pro/VIP users to the full API snapshot in
+      // the background. The API can take ~1 min to wake on the free tier, so
+      // first paint and the Pro unlock must never block on it.
       var user = (window.WFT && typeof window.WFT.getUser === 'function') ? window.WFT.getUser() : null;
       var fetchStatic = async function () {
         var sres = await fetch('/data/predictions.json');
         if (!sres.ok) throw new Error('HTTP ' + sres.status);
         allData = await sres.json();
       };
+      await fetchStatic();
       if (user && user.isPro && window.WFT && typeof window.WFT.apiFetch === 'function') {
-        try {
-          var apiOut = await window.WFT.apiFetch('/api/predictions');
+        window.WFT.apiFetch('/api/predictions').then(function (apiOut) {
           if (apiOut && apiOut.matches && apiOut.matches.length) {
             allData = apiOut;
-          } else {
-            await fetchStatic();
+            renderCurrentView();
           }
-        } catch (e) {
-          await fetchStatic();
-        }
-      } else {
-        await fetchStatic();
+        }).catch(function () {});
       }
 
       if (h2hReady) h2hData = await h2hReady;
@@ -831,17 +819,19 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
   loadData();
   document.addEventListener('wft-pro-status', function () {
     var user = (window.WFT && typeof window.WFT.getUser === 'function') ? window.WFT.getUser() : null;
+    // Unlock (or relock) immediately with the data we already have. The
+    // unbeaten view renders from the full static h2h snapshot, so Pro access
+    // must not wait on the API, which can take ~1 min to wake on the free tier.
+    if ((allData && DATA_KEY && allData[DATA_KEY]) || (IS_UNBEATEN && h2hData)) {
+      renderCurrentView();
+    }
     if (user && user.isPro && window.WFT && typeof window.WFT.apiFetch === 'function') {
       window.WFT.apiFetch('/api/predictions').then(function (apiOut) {
-        if (apiOut && apiOut.matches) {
+        if (apiOut && apiOut.matches && apiOut.matches.length) {
           allData = apiOut;
+          renderCurrentView();
         }
-        renderCurrentView();
-      }).catch(function () {
-        renderCurrentView();
-      });
-    } else {
-      renderCurrentView();
+      }).catch(function () {});
     }
   });
 })();
