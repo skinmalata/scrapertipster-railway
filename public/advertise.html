@@ -774,6 +774,146 @@ main { max-width: 860px; }
 
 
 
+ <h2 id="placement-guide">Where Your Ads Appear</h2>
+
+ <p>Here is every display position mapped to the real WinFulltime layout &#8212; the same header, prediction grid, side rail and sticky bar that run across the homepage, market pages and betting tools: desktop in the mockup on the left, mobile (92% of our audience) in the mockup on the right. Numbers match the rate table above.</p>
+
+ <style>
+  .placement-guide { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 32px 0; }
+  .placement-guide h3 { margin-top: 0; margin-bottom: 4px; color: #e8edf5; }
+  .placement-guide .pg-sub { font-size: 13px; color: #94a3b8; margin: 0 0 16px; }
+  .mock-desktop { background: rgba(13,17,32,0.95); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 18px; }
+  .mock-mobile { background: rgba(13,17,32,0.95); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; align-items: center; }
+  .mock-screen-wrap { overflow-x: auto; }
+  .mock-screen { width: 680px; margin: 0 auto; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .mock-phone { width: 300px; border: 2px solid rgba(255,255,255,0.22); border-radius: 28px; padding: 12px 10px 14px; background: #0b0f1c; display: flex; flex-direction: column; gap: 8px; position: relative; }
+  .mock-phone::before { content: 'WF'; position:absolute; top: -1px; left: 50%; transform: translateX(-50%); background:#0b0f1c; color:#94a3b8; font-size:10px; font-weight:700; letter-spacing:1px; padding: 0 6px; border-radius:0 0 6px 6px; }
+  .mock-bar { font-size: 10px; color: #e8edf5; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 3px 6px; letter-spacing: 0.5px; }
+  .mock-header { display: flex; justify-content: space-between; align-items: center; color: #e8edf5; font-size: 12px; font-weight: 700; letter-spacing: 0; }
+  .mock-leader { border: 1px dashed rgba(255,255,255,0.35); border-radius: 6px; height: 62px; display: flex; align-items: center; justify-content: center; color: #e8edf5; font-size: 12px; font-weight: 700; position: relative; background: rgba(126,162,255,0.05); }
+  .mock-layout { display: flex; gap: 10px; margin-top: 2px; }
+  .mock-main { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .mock-side { width: 110px; display: flex; flex-direction: column; gap: 8px; }
+  .mock-side .mock-rect { border: 1px dashed rgba(255,255,255,0.35); border-radius: 6px; height: 96px; display: flex; align-items: center; justify-content: center; color: #e8edf5; font-size: 11px; font-weight: 700; text-align: center; position: relative; background: rgba(74,222,128,0.04); }
+  .mock-side .mock-skyscraper { border: 1px dashed rgba(255,255,255,0.35); border-radius: 6px; flex: 1; min-height: 150px; display: flex; align-items: center; justify-content: center; color: #e8edf5; font-size: 11px; font-weight: 700; text-align: center; position: relative; background: rgba(250,204,21,0.04); }
+  .mock-carousel { border: 1px solid rgba(255,255,255,0.10); border-radius: 8px; background: rgba(255,255,255,0.03); padding: 8px; position: relative; }
+  .mock-carousel-label { font-size: 10px; color: #ff2448; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
+  .mock-cards { display: flex; gap: 6px; }
+  .mock-cards span { font-size: 9px; color: #c8d0db; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 8px 4px; flex: 1; text-align: center; font-weight: 700; background: rgba(255,255,255,0.03); }
+  .mock-cards .open { border: 1px dashed rgba(126,162,255,0.6); color: #ff2448; background: rgba(126,162,255,0.06); }
+  .mock-featured { border: 1px dashed rgba(255,255,255,0.35); border-radius: 6px; height: 56px; display: flex; align-items: center; justify-content: center; color: #e8edf5; font-size: 11px; font-weight: 700; position: relative; background: rgba(255,36,72,0.05); }
+  .mock-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .mock-card-grid { border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; background: rgba(255,255,255,0.02); height: 52px; }
+  .mock-incontent { border: 1px dashed rgba(255,255,255,0.35); border-radius: 6px; height: 56px; grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; color: #e8edf5; font-size: 11px; font-weight: 700; position: relative; background: rgba(148,163,184,0.05); }
+  .mock-sticky { border: 1px dashed rgba(255,255,255,0.35); border-radius: 6px; height: 40px; display: flex; align-items: center; justify-content: center; color: #e8edf5; font-size: 11px; font-weight: 700; position: relative; background: rgba(255,36,72,0.05); }
+  .mock-phone .mock-leader { height: 48px; font-size: 10px; }
+  .mock-phone .mock-featured { height: 40px; font-size: 10px; }
+  .mock-phone .mock-carousel { padding: 6px; }
+  .mock-phone .mock-cards span { padding: 6px 2px; font-size: 8px; }
+  .mock-phone .mock-incontent { height: 44px; font-size: 10px; }
+  .mock-phone .mock-sticky { height: 34px; font-size: 10px; }
+  .mock-phone .mock-grid { grid-template-columns: repeat(2, 1fr); }
+  .mock-phone .mock-card-grid { height: 40px; }
+  .pf-badge { position: absolute; top: -8px; left: -4px; background: linear-gradient(135deg, #ff2448, #d41a38); color: #fff; font-size: 10px; font-weight: 800; border-radius: 20px; padding: 2px 8px; line-height: 1.4; z-index: 2; white-space: nowrap; }
+  .mock-legend { margin: 24px 0 0; }
+  .mock-legend table { width: 100%; border-collapse: collapse; }
+  .mock-legend th, .mock-legend td { padding: 8px 10px; font-size: 13px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .mock-legend th { color: #94a3b8; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; }
+  .mock-legend td:first-child { color: #ff2448; font-weight: 800; width: 34px; }
+  .mock-legend td:nth-child(2) { color: #e8edf5; font-weight: 700; }
+  .mock-legend td:last-child { color: #c8d0db; }
+  @media (max-width: 860px) { .placement-guide { grid-template-columns: 1fr; } }
+  @media (max-width: 480px) { .mock-phone { width: 260px; } .mock-screen { width: 560px; } }
+ </style>
+
+ <div class="placement-guide">
+
+  <div>
+   <h3>Desktop &#183; Homepage &amp; Prediction Pages</h3>
+   <p class="pg-sub">Wide layout used on desktop and tablet. The leaderboard spans below the sticky header; the skyscraper rides the left rail and the rectangle sits in the right sidebar; the carousel and featured banner sit above today&#8217;s predictions; in-content injects between match cards; sticky banner pins to the bottom of the viewport.</p>
+   <div class="mock-desktop mock-screen-wrap">
+    <div class="mock-screen">
+     <div class="mock-bar mock-header">
+      <span>WinFulltime — Football Predictions</span>
+      <span>Predictions · Converter · Blog</span>
+     </div>
+     <div style="margin-top:8px;"></div>
+     <div class="mock-leader">
+      <span class="pf-badge">#1 Global Leaderboard · 728×90</span>
+      BELOW HEADER — ALL PAGES
+     </div>
+     <div class="mock-layout">
+      <div class="mock-side">
+       <div class="mock-skyscraper"><span class="pf-badge">#3 Skyscraper<br>160×600</span>SIDE RAIL<br>ALL PAGES</div>
+       <div class="mock-rect"><span class="pf-badge">#2 Rectangle<br>300×250</span>SIDEBAR<br>ALL PAGES</div>
+      </div>
+      <div class="mock-main">
+       <div class="mock-carousel">
+        <span class="pf-badge">#7 Carousel Slot</span>
+        <div class="mock-carousel-label">Homepage Bookmaker Carousel — rotates every visit</div>
+        <div class="mock-cards"><span>1xBet</span><span>1win</span><span>Stake</span><span class="open">YOUR CARD<br>OPEN SLOT</span></div>
+       </div>
+       <div class="mock-featured"><span class="pf-badge">#6 Homepage Featured · 728×90</span>ABOVE PREDICTIONS — HOMEPAGE ONLY</div>
+       <div class="mock-grid">
+        <div class="mock-card-grid"></div>
+        <div class="mock-card-grid"></div>
+        <div class="mock-card-grid"></div>
+        <div class="mock-incontent"><span class="pf-badge">#5 In-Content · 728×90</span>BETWEEN MATCH CARDS — PREDICTIONS GRID</div>
+        <div class="mock-card-grid"></div>
+        <div class="mock-card-grid"></div>
+        <div class="mock-card-grid"></div>
+       </div>
+      </div>
+     </div>
+     <div style="margin-top:8px;"></div>
+     <div class="mock-sticky"><span class="pf-badge">#8 Sticky Banner · full-width</span>FIXED BOTTOM BAR — ALL DEVICES</div>
+    </div>
+   </div>
+  </div>
+
+  <div>
+   <h3>Mobile &#183; 320px &#8212; 92% of our audience</h3>
+   <p class="pg-sub">Single column: the leaderboard runs below the sticky header, the carousel and featured banner stack above the predictions, in-content appears between match cards, and the mobile banner (or full-width sticky) pins to the bottom of the screen while scrolling.</p>
+   <div class="mock-mobile">
+    <div class="mock-phone">
+     <div class="mock-bar mock-header"><span>WinFulltime</span><span>&#9776;</span></div>
+     <div class="mock-leader"><span class="pf-badge">#1 Leaderboard</span>BELOW HEADER</div>
+     <div class="mock-carousel">
+      <span class="pf-badge">#7 Carousel Slot</span>
+      <div class="mock-carousel-label">Featured Bookmakers</div>
+      <div class="mock-cards"><span>1xBet</span><span>1win</span><span class="open">YOUR CARD</span></div>
+     </div>
+     <div class="mock-featured"><span class="pf-badge">#6 Featured</span>ABOVE PREDICTIONS</div>
+     <div class="mock-grid">
+      <div class="mock-card-grid"></div>
+      <div class="mock-card-grid"></div>
+      <div class="mock-incontent"><span class="pf-badge">#5 In-Content</span>BETWEEN MATCH CARDS</div>
+      <div class="mock-card-grid"></div>
+      <div class="mock-card-grid"></div>
+     </div>
+     <div class="mock-sticky"><span class="pf-badge">#4 Mobile Banner · 320×100</span>STICKY BOTTOM — MOBILE (or #8 full-width) </div>
+    </div>
+   </div>
+  </div>
+
+ </div>
+
+ <div class="mock-legend">
+  <table>
+   <tr><th>#</th><th>Placement</th><th>Where it lives</th></tr>
+   <tr><td>1</td><td>Global Leaderboard</td><td>Below header on all pages</td></tr>
+   <tr><td>2</td><td>Global Rectangle</td><td>Sidebar on all pages</td></tr>
+   <tr><td>3</td><td>Global Skyscraper</td><td>Side rail on all pages</td></tr>
+   <tr><td>4</td><td>Mobile Banner</td><td>Sticky bottom on mobile</td></tr>
+   <tr><td>5</td><td>In-Content</td><td>Between predictions grid</td></tr>
+   <tr><td>6</td><td>Homepage Featured</td><td>Above predictions on homepage</td></tr>
+   <tr><td>7</td><td>Homepage Carousel Slot</td><td>Featured bookmaker card in homepage carousel</td></tr>
+   <tr><td>8</td><td>Sticky Banner</td><td>Fixed bottom bar (all devices)</td></tr>
+  </table>
+ </div>
+
+
+
  <h2 id="editorial-sponsored-posts">Editorial Sponsored Posts</h2>
 
 <p>Tell your story to our audience with a clearly disclosed, editorially reviewed feature article. Every sponsored post is written or edited by our editorial team, clearly labelled as sponsored content, and every link to your site uses <code>rel="nofollow sponsored"</code>. Advertisers set the brief, never the verdict: we do not sell links, paid reviews, or placements that influence our independent predictions.</p>
