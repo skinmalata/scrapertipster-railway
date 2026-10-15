@@ -758,9 +758,25 @@ main { max-width: 860px; }
 
  <td>40,000</td>
 
- <td>~$12.5</td>
+  <td>~$12.5</td>
 
- <td><strong>$499</strong></td>
+  <td><strong>$499</strong></td>
+
+</tr>
+
+  <tr>
+
+ <td>Sponsored Match Card</td>
+
+ <td>In-feed sponsored creative placed between the 1st and 2nd prediction cards (homepage, prediction grids, author picks) &#8212; labelled &quot;sponsored&quot;, own link and creative</td>
+
+ <td>800 x 800 (full grid width, responsive)</td>
+
+ <td>35,000</td>
+
+ <td>~$12.8</td>
+
+ <td><strong>Sold &#8212; 1win (waitlist)</strong></td>
 
 </tr>
 
@@ -805,6 +821,7 @@ main { max-width: 860px; }
   .mock-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
   .mock-card-grid { border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; background: rgba(255,255,255,0.02); height: 52px; }
   .mock-incontent { border: 1px dashed rgba(255,255,255,0.35); border-radius: 6px; height: 56px; grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; color: #e8edf5; font-size: 11px; font-weight: 700; position: relative; background: rgba(148,163,184,0.05); }
+  .mock-sponsor { border: 1px dashed rgba(126,162,255,0.55); border-radius: 6px; height: 56px; grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; color: #e8edf5; font-size: 11px; font-weight: 700; text-align: center; position: relative; background: rgba(126,162,255,0.07); }
   .mock-sticky { border: 1px dashed rgba(255,255,255,0.35); border-radius: 6px; height: 40px; display: flex; align-items: center; justify-content: center; color: #e8edf5; font-size: 11px; font-weight: 700; position: relative; background: rgba(255,36,72,0.05); }
   .mock-phone .mock-leader { height: 48px; font-size: 10px; }
   .mock-phone .mock-featured { height: 40px; font-size: 10px; }
@@ -830,7 +847,7 @@ main { max-width: 860px; }
 
   <div>
    <h3>Desktop &#183; Homepage &amp; Prediction Pages</h3>
-   <p class="pg-sub">Wide layout used on desktop and tablet. The leaderboard spans below the sticky header; the skyscraper rides the left rail and the rectangle sits in the right sidebar; the carousel and featured banner sit above today&#8217;s predictions; in-content injects between match cards; sticky banner pins to the bottom of the viewport.</p>
+   <p class="pg-sub">Wide layout used on desktop and tablet. The leaderboard spans below the sticky header; the skyscraper rides the left rail and the rectangle sits in the right sidebar; the carousel and featured banner sit above today&#8217;s predictions; in-content injects between match cards; the sponsored match card (#9, currently 1win) sits in-feed between the first two cards; sticky banner pins to the bottom of the viewport.</p>
    <div class="mock-desktop mock-screen-wrap">
     <div class="mock-screen">
      <div class="mock-bar mock-header">
@@ -861,7 +878,7 @@ main { max-width: 860px; }
         <div class="mock-incontent"><span class="pf-badge">#5 In-Content · 728×90</span>BETWEEN MATCH CARDS — PREDICTIONS GRID</div>
         <div class="mock-card-grid"></div>
         <div class="mock-card-grid"></div>
-        <div class="mock-card-grid"></div>
+        <div class="mock-sponsor"><span class="pf-badge">#9 Sponsored Match Card · 800×800</span>IN-FEED BETWEEN CARDS — 1WIN LIVE</div>
        </div>
       </div>
      </div>
@@ -873,7 +890,7 @@ main { max-width: 860px; }
 
   <div>
    <h3>Mobile &#183; 320px &#8212; 92% of our audience</h3>
-   <p class="pg-sub">Single column: the leaderboard runs below the sticky header, the carousel and featured banner stack above the predictions, in-content appears between match cards, and the mobile banner (or full-width sticky) pins to the bottom of the screen while scrolling.</p>
+   <p class="pg-sub">Single column: the leaderboard runs below the sticky header, the carousel and featured banner stack above the predictions, in-content appears between match cards, the sponsored match card (#9, currently 1win) sits in-feed between the first two cards, and the mobile banner (or full-width sticky) pins to the bottom of the screen while scrolling.</p>
    <div class="mock-mobile">
     <div class="mock-phone">
      <div class="mock-bar mock-header"><span>WinFulltime</span><span>&#9776;</span></div>
@@ -889,6 +906,7 @@ main { max-width: 860px; }
       <div class="mock-card-grid"></div>
       <div class="mock-incontent"><span class="pf-badge">#5 In-Content</span>BETWEEN MATCH CARDS</div>
       <div class="mock-card-grid"></div>
+      <div class="mock-sponsor"><span class="pf-badge">#9 Sponsored Match Card</span>IN-FEED — 1WIN</div>
       <div class="mock-card-grid"></div>
      </div>
      <div class="mock-sticky"><span class="pf-badge">#4 Mobile Banner · 320×100</span>STICKY BOTTOM — MOBILE (or #8 full-width) </div>

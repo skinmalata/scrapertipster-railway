@@ -25,7 +25,7 @@ function pickSponsorIndex(seed) {
 
 function renderSponsorBanner(seed) {
   var creative = SPONSOR_BANNERS[pickSponsorIndex(seed)];
-  return '<div class="wft-sponsor"><a href="' + SPONSOR_HREF +
+  return '<div class="wft-sponsor" data-ad-position="sponsored_match_card"><a href="' + SPONSOR_HREF +
     '" target="_blank" rel="noopener nofollow sponsored" title="1Win" aria-label="1Win">' +
     '<img src="' + creative.src + '" alt="1Win" width="' + creative.w + '" height="' + creative.h + '" ' +
     'loading="lazy" decoding="async" style="display:block;width:100%;height:auto;border-radius:12px;">' +

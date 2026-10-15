@@ -90,6 +90,18 @@ tbody tr:last-child td { border-bottom: none; }
 }
 
 .hidden { display: none !important; }
+
+.tabs-row { display: flex; gap: 8px; margin-bottom: 20px; }
+.adm-tab { padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: #fff; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; transition: background 0.2s; }
+.adm-tab:hover { background: rgba(255,255,255,0.08); }
+.adm-tab.active { background: linear-gradient(135deg,#ff2448,#d41a38); border-color: transparent; }
+textarea.edit-input { resize: vertical; font-family: 'Inter', sans-serif; min-height: 44px; }
+.creative-thumb { width: 72px; height: 44px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); display: block; }
+.ad-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.ad-actions button { padding: 6px 10px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600; }
+.ad-actions .a-edit { background: rgba(56,189,248,0.18); color: #7dd3fc; }
+.ad-actions .a-toggle { background: rgba(74,222,128,0.16); color: #4ade80; }
+.ad-actions .a-del { background: rgba(255,36,72,0.16); color: #ff6b8a; }
 </style>
 </head>
 <body>
@@ -126,6 +138,12 @@ tbody tr:last-child td { border-bottom: none; }
 </div>
 
 <div id="mainContent">
+<div class="tabs-row" id="adminTabs">
+<button class="adm-tab active" id="tabUsers" onclick="showTab('users')">Users</button>
+<button class="adm-tab" id="tabAds" onclick="showTab('ads')">Advertisements</button>
+</div>
+
+<div id="usersSection">
 <div class="search-bar">
 <input type="text" id="searchInput" placeholder="Search by email..." onkeydown="if(event.key==='Enter'){loadUsers(1);}">
 <button onclick="loadUsers(1)">Search</button>
@@ -205,6 +223,59 @@ tbody tr:last-child td { border-bottom: none; }
 </div>
 </div>
 </div>
+
+<div id="adsSection" class="hidden">
+<div class="search-bar">
+<select id="adsPositionFilter" class="edit-input" onchange="loadAds(1)" style="max-width:280px;flex:0 1 280px;">
+<option value="">All positions</option>
+</select>
+<select id="adsStatusFilter" class="edit-input" onchange="loadAds(1)" style="max-width:160px;flex:0 1 160px;">
+<option value="">All statuses</option>
+<option value="active">Active</option>
+<option value="paused">Paused</option>
+<option value="archived">Archived</option>
+</select>
+<button onclick="openAdCreate()" style="background:linear-gradient(135deg,#4ade80,#22c55e);color:#0a0e17;">+ Add Advertisement</button>
+</div>
+
+<div id="adFormPanel" class="edit-panel hidden">
+<h3 style="margin:0 0 12px;font-size:16px;" id="adFormTitle">New Advertisement</h3>
+<div class="detail-grid">
+<div class="detail-field"><div class="field-label">Position</div><select id="adPosition" class="edit-input"></select></div>
+<div class="detail-field"><div class="field-label">Advertiser / Brand</div><input type="text" id="adAdvertiser" class="edit-input" placeholder="e.g. 1win"></div>
+<div class="detail-field"><div class="field-label">Headline</div><input type="text" id="adHeadline" class="edit-input" placeholder="Shown when no image is set"></div>
+<div class="detail-field"><div class="field-label">Call To Action</div><input type="text" id="adCta" class="edit-input" placeholder="e.g. Claim offer"></div>
+<div class="detail-field"><div class="field-label">Image URL (creative)</div><input type="text" id="adImage" class="edit-input" placeholder="https://... or /img/banners/ad.webp"></div>
+<div class="detail-field"><div class="field-label">Link URL (landing page)</div><input type="text" id="adLink" class="edit-input" placeholder="https://..."></div>
+<div class="detail-field"><div class="field-label">Weight (rotation)</div><input type="number" id="adWeight" class="edit-input" value="1" min="1" max="100"></div>
+<div class="detail-field"><div class="field-label">Status</div><select id="adStatus" class="edit-input"><option value="active">Active</option><option value="paused">Paused</option><option value="archived">Archived</option></select></div>
+<div class="detail-field"><div class="field-label">Starts At (optional)</div><input type="datetime-local" id="adStarts" class="edit-input"></div>
+<div class="detail-field"><div class="field-label">Ends At (optional)</div><input type="datetime-local" id="adEnds" class="edit-input"></div>
+<div class="detail-field" style="grid-column:1/-1;"><div class="field-label">Body / Offer Text (optional)</div><textarea id="adBody" class="edit-input" rows="2" placeholder="Short supporting copy"></textarea></div>
+</div>
+<input type="hidden" id="adId">
+<div class="action-bar" style="border-top:none;margin-top:12px;padding-top:0;">
+<button class="action-btn action-pro" onclick="saveAd()">Save Advertisement</button>
+<button class="action-btn action-default" onclick="closeAdForm()" style="background:rgba(255,255,255,0.06);color:#e2e8f0;">Cancel</button>
+</div>
+</div>
+
+<div class="table-wrap">
+<table>
+<thead><tr>
+<th>Position</th><th>Advertiser</th><th>Creative</th><th>Status</th><th>Schedule</th><th>Impr.</th><th>Clicks</th><th>Actions</th>
+</tr></thead>
+<tbody id="adsBody"><tr><td colspan="8" style="text-align:center;padding:40px;color:rgba(232,237,245,0.3);">Loading...</td></tr></tbody>
+</table>
+</div>
+
+<div class="pagination">
+<button id="adsPrev" onclick="loadAds(adsPage-1)" disabled>Previous</button>
+<span class="page-info" id="adsPageInfo"></span>
+<button id="adsNext" onclick="loadAds(adsPage+1)">Next</button>
+</div>
+</div>
+</div>
 </main>
 
 <script>
@@ -213,6 +284,9 @@ var WFT = window.WFT;
 var curPage = 1;
 var selectedUserId = null;
 var selectedSelfId = null;
+var adsPage = 1;
+var adsById = {};
+var adPositions = [];
 
 function showError(msg) {
   var el = document.getElementById('errorBox');
@@ -454,6 +528,200 @@ function createUser() {
   }).catch(function() { showError('Failed to create user'); });
 }
 
+function openAdCreate() {
+  document.getElementById('adFormTitle').textContent = 'New Advertisement';
+  document.getElementById('adId').value = '';
+  document.getElementById('adPosition').value = (adPositions[0] && adPositions[0].key) || '';
+  document.getElementById('adAdvertiser').value = '';
+  document.getElementById('adHeadline').value = '';
+  document.getElementById('adBody').value = '';
+  document.getElementById('adImage').value = '';
+  document.getElementById('adLink').value = '';
+  document.getElementById('adCta').value = '';
+  document.getElementById('adWeight').value = '1';
+  document.getElementById('adStatus').value = 'active';
+  document.getElementById('adStarts').value = '';
+  document.getElementById('adEnds').value = '';
+  document.getElementById('adFormPanel').classList.remove('hidden');
+}
+
+function closeAdForm() {
+  document.getElementById('adFormPanel').classList.add('hidden');
+}
+
+function toLocalInput(iso) {
+  if (!iso) return '';
+  var d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  var pad = function(n) { return (n < 10 ? '0' : '') + n; };
+  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+
+function editAd(id) {
+  var a = adsById[id];
+  if (!a) return;
+  document.getElementById('adFormTitle').textContent = 'Edit Advertisement';
+  document.getElementById('adId').value = a.id;
+  document.getElementById('adPosition').value = a.position;
+  document.getElementById('adAdvertiser').value = a.advertiser || '';
+  document.getElementById('adHeadline').value = a.headline || '';
+  document.getElementById('adBody').value = a.body || '';
+  document.getElementById('adImage').value = a.imageUrl || '';
+  document.getElementById('adLink').value = a.linkUrl || '';
+  document.getElementById('adCta').value = a.ctaText || '';
+  document.getElementById('adWeight').value = a.weight || 1;
+  document.getElementById('adStatus').value = a.status;
+  document.getElementById('adStarts').value = toLocalInput(a.startsAt);
+  document.getElementById('adEnds').value = toLocalInput(a.endsAt);
+  document.getElementById('adFormPanel').classList.remove('hidden');
+  document.getElementById('adFormPanel').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function saveAd() {
+  var id = document.getElementById('adId').value;
+  var position = document.getElementById('adPosition').value;
+  if (!position) { showError('Select an ad position.'); return; }
+
+  var imageUrl = document.getElementById('adImage').value.trim();
+  var headline = document.getElementById('adHeadline').value.trim();
+  var body = document.getElementById('adBody').value.trim();
+  if (!imageUrl && !headline && !body) { showError('Provide an image URL or some headline/body text.'); return; }
+
+  var payload = {
+    position: position,
+    advertiser: document.getElementById('adAdvertiser').value.trim(),
+    headline: headline,
+    body: body,
+    imageUrl: imageUrl,
+    linkUrl: document.getElementById('adLink').value.trim(),
+    ctaText: document.getElementById('adCta').value.trim(),
+    weight: parseInt(document.getElementById('adWeight').value, 10) || 1,
+    status: document.getElementById('adStatus').value,
+    startsAt: document.getElementById('adStarts').value ? new Date(document.getElementById('adStarts').value).toISOString() : null,
+    endsAt: document.getElementById('adEnds').value ? new Date(document.getElementById('adEnds').value).toISOString() : null
+  };
+
+  var url = id ? ('/api/admin/ads/' + id) : '/api/admin/ads';
+  WFT.apiFetch(url, {
+    method: id ? 'PATCH' : 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(function(data) {
+    if (data.error) { showError(data.error); return; }
+    showSuccess(id ? 'Advertisement updated.' : 'Advertisement created.');
+    closeAdForm();
+    loadAds(adsPage);
+  }).catch(function() { showError('Failed to save advertisement'); });
+}
+
+function toggleAd(id) {
+  var a = adsById[id];
+  if (!a) return;
+  var next = a.status === 'active' ? 'paused' : 'active';
+  WFT.apiFetch('/api/admin/ads/' + id, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status: next })
+  }).then(function(data) {
+    if (data.error) { showError(data.error); return; }
+    showSuccess('Advertisement ' + next + '.');
+    loadAds(adsPage);
+  }).catch(function() { showError('Failed to update advertisement'); });
+}
+
+function deleteAd(id) {
+  if (!confirm('Delete this advertisement permanently?')) return;
+  WFT.apiFetch('/api/admin/ads/' + id, { method: 'DELETE' }).then(function(data) {
+    if (data.error) { showError(data.error); return; }
+    showSuccess('Advertisement deleted.');
+    loadAds(adsPage);
+  }).catch(function() { showError('Failed to delete advertisement'); });
+}
+
+function showTab(tab) {
+  document.getElementById('tabUsers').classList.toggle('active', tab === 'users');
+  document.getElementById('tabAds').classList.toggle('active', tab === 'ads');
+  document.getElementById('usersSection').classList.toggle('hidden', tab !== 'users');
+  document.getElementById('adsSection').classList.toggle('hidden', tab !== 'ads');
+  if (tab === 'ads') {
+    loadAdPositions().then(function() { loadAds(1); });
+  }
+}
+
+function loadAdPositions() {
+  if (adPositions.length) return Promise.resolve(adPositions);
+  return WFT.apiFetch('/api/admin/ad-positions').then(function(data) {
+    adPositions = (data && data.positions) || [];
+    var filter = document.getElementById('adsPositionFilter');
+    var form = document.getElementById('adPosition');
+    filter.innerHTML = '<option value="">All positions</option>' + adPositions.map(function(p) {
+      return '<option value="' + p.key + '">' + escapeHtml(p.label) + ' (' + (p.active || 0) + ' active)</option>';
+    }).join('');
+    form.innerHTML = adPositions.map(function(p) {
+      var dim = p.width ? ' (' + p.width + 'x' + p.height + ')' : '';
+      return '<option value="' + p.key + '">' + escapeHtml(p.label) + dim + '</option>';
+    }).join('');
+    return adPositions;
+  }).catch(function() { adPositions = []; return []; });
+}
+
+function loadAds(page) {
+  adsPage = page;
+  window.adsPage = page;
+  var pos = document.getElementById('adsPositionFilter').value;
+  var status = document.getElementById('adsStatusFilter').value;
+  var url = '/api/admin/ads?page=' + page + '&perPage=20';
+  if (pos) url += '&position=' + encodeURIComponent(pos);
+  if (status) url += '&status=' + encodeURIComponent(status);
+
+  var tbody = document.getElementById('adsBody');
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:rgba(232,237,245,0.3);"><div class="spinner"></div></td></tr>';
+
+  WFT.apiFetch(url).then(function(data) {
+    if (data.error) { showError(data.error); return; }
+    if (!data.ads || !data.ads.length) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:rgba(232,237,245,0.3);">No advertisements yet. Click “Add Advertisement” to create one.</td></tr>';
+      document.getElementById('adsPrev').disabled = true;
+      document.getElementById('adsNext').disabled = true;
+      document.getElementById('adsPageInfo').textContent = '';
+      return;
+    }
+
+    adsById = {};
+    tbody.innerHTML = data.ads.map(function(a) {
+      adsById[a.id] = a;
+      var creative = a.imageUrl
+        ? '<img class="creative-thumb" src="' + escapeHtml(a.imageUrl) + '" alt="">'
+        : '<span style="font-size:12px;color:rgba(255,255,255,0.5);">Text ad</span>';
+      var sched = (a.startsAt ? new Date(a.startsAt).toLocaleDateString() : '—') + ' → ' + (a.endsAt ? new Date(a.endsAt).toLocaleDateString() : '∞');
+      var statusBadge = a.status === 'active'
+        ? '<span class="badge badge-vip">Active</span>'
+        : a.status === 'paused'
+          ? '<span class="badge badge-free">Paused</span>'
+          : '<span class="badge badge-expired">Archived</span>';
+      var toggleLabel = a.status === 'active' ? 'Pause' : 'Activate';
+      return '<tr>' +
+        '<td>' + escapeHtml(a.position) + '</td>' +
+        '<td>' + escapeHtml(a.advertiser || '—') + '</td>' +
+        '<td>' + creative + '</td>' +
+        '<td>' + statusBadge + '</td>' +
+        '<td style="font-size:13px;white-space:nowrap;">' + sched + '</td>' +
+        '<td>' + (a.impressions || 0) + '</td>' +
+        '<td>' + (a.clicks || 0) + '</td>' +
+        '<td><div class="ad-actions">' +
+          '<button class="a-edit" onclick="editAd(\'' + a.id + '\')">Edit</button>' +
+          '<button class="a-toggle" onclick="toggleAd(\'' + a.id + '\')">' + toggleLabel + '</button>' +
+          '<button class="a-del" onclick="deleteAd(\'' + a.id + '\')">Delete</button>' +
+        '</div></td></tr>';
+    }).join('');
+
+    var totalPages = Math.ceil(data.total / data.perPage) || 1;
+    document.getElementById('adsPrev').disabled = page <= 1;
+    document.getElementById('adsNext').disabled = page >= totalPages;
+    document.getElementById('adsPageInfo').textContent = 'Page ' + page + ' of ' + totalPages + ' (' + data.total + ' ads)';
+  }).catch(function() { showError('Failed to load advertisements'); });
+}
+
 window.selectUser = selectUser;
 window.loadUsers = loadUsers;
 window.setVip = setVip;
@@ -469,6 +737,16 @@ window.openCreate = openCreate;
 window.closeCreate = closeCreate;
 window.createUser = createUser;
 window.curPage = 1;
+
+window.showTab = showTab;
+window.loadAds = loadAds;
+window.adsPage = 1;
+window.openAdCreate = openAdCreate;
+window.closeAdForm = closeAdForm;
+window.editAd = editAd;
+window.saveAd = saveAd;
+window.toggleAd = toggleAd;
+window.deleteAd = deleteAd;
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>'"]/g, function(ch) {

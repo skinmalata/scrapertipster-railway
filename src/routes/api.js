@@ -2401,6 +2401,124 @@ router.post('/validate-email', async function (req, res) {
   }
 });
 
+// ===== ADVERTISEMENTS =====
+
+// Canonical catalogue of ad positions. Mirrors the rows seeded into
+// public.ad_positions and the keys embedded by public/ads.js. Kept in code so
+// the public endpoint and admin validation work without an extra round-trip.
+const AD_POSITIONS = [
+  { key: 'global_leaderboard', label: 'Global Leaderboard', description: 'Below header on all pages', width: 728, height: 90, pages: 'all' },
+  { key: 'global_rectangle', label: 'Global Rectangle', description: 'Sidebar on all pages', width: 300, height: 250, pages: 'all' },
+  { key: 'global_skyscraper', label: 'Global Skyscraper', description: 'Side rail on all pages', width: 160, height: 600, pages: 'all' },
+  { key: 'mobile_banner', label: 'Mobile Banner', description: 'Sticky bottom on mobile', width: 320, height: 100, pages: 'all' },
+  { key: 'in_content', label: 'In-Content', description: 'Between prediction cards', width: 728, height: 90, pages: 'predictions' },
+  { key: 'homepage_featured', label: 'Homepage Featured', description: 'Above predictions on homepage', width: 728, height: 90, pages: 'homepage' },
+  { key: 'carousel_slot', label: 'Homepage Carousel Slot', description: 'Featured bookmaker card in homepage carousel', width: null, height: null, pages: 'homepage' },
+  { key: 'sticky_banner', label: 'Sticky Banner', description: 'Fixed bottom bar (all devices)', width: null, height: null, pages: 'all' },
+  { key: 'sponsored_match_card', label: 'Sponsored Match Card', description: 'In-feed sponsored creative between match cards', width: 800, height: 800, pages: 'predictions' }
+];
+const AD_POSITION_KEYS = AD_POSITIONS.map(function (p) { return p.key; });
+const AD_POSITION_MAP = AD_POSITIONS.reduce(function (acc, p) { acc[p.key] = p; return acc; }, {});
+const AD_STATUSES = ['active', 'paused', 'archived'];
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isSafeAdUrl(url) {
+  if (!url) return true;
+  var value = String(url).trim();
+  if (!value) return true;
+  if (value.charAt(0) === '/') return !/^\/\//.test(value);
+  return /^https?:\/\//i.test(value);
+}
+
+function mapAdCreative(row) {
+  var pos = AD_POSITION_MAP[row.position_key] || {};
+  return {
+    id: row.id,
+    position: row.position_key,
+    advertiser: row.advertiser || null,
+    headline: row.headline || null,
+    body: row.body || null,
+    imageUrl: row.image_url || null,
+    linkUrl: row.link_url || null,
+    ctaText: row.cta_text || null,
+    weight: row.weight || 1,
+    status: row.status,
+    startsAt: row.starts_at || null,
+    endsAt: row.ends_at || null,
+    impressions: row.impressions || 0,
+    clicks: row.clicks || 0,
+    width: pos.width || null,
+    height: pos.height || null,
+    createdAt: row.created_at || null,
+    updatedAt: row.updated_at || null
+  };
+}
+
+// GET /api/ads — active, in-schedule creatives grouped by position (public).
+router.get('/ads', async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable', positions: {} });
+
+    var result = await supabase.from('ad_creatives')
+      .select('id, position_key, advertiser, headline, body, image_url, link_url, cta_text, weight, status, starts_at, ends_at')
+      .eq('status', 'active')
+      .order('created_at', { ascending: true });
+
+    if (result.error) return res.status(500).json({ error: result.error.message });
+
+    var now = Date.now();
+    var positions = {};
+    (result.data || []).forEach(function (row) {
+      if (row.starts_at && new Date(row.starts_at).getTime() > now) return;
+      if (row.ends_at && new Date(row.ends_at).getTime() <= now) return;
+      if (!positions[row.position_key]) positions[row.position_key] = [];
+      positions[row.position_key].push(mapAdCreative(row));
+    });
+
+    res.set('Cache-Control', 'public, max-age=60');
+    res.json({ positions: positions });
+  } catch (e) {
+    console.error('[ads] Error:', e.message);
+    res.status(500).json({ error: 'Failed to load ads' });
+  }
+});
+
+// POST /api/ads/impression — batched impression counter (fire-and-forget).
+router.post('/ads/impression', async function (req, res) {
+  try {
+    if (!supabase) return res.status(204).end();
+    var ids = Array.isArray(req.body && req.body.ids) ? req.body.ids : [];
+    ids = ids.filter(function (id) { return UUID_RE.test(String(id)); }).slice(0, 25);
+    for (var i = 0; i < ids.length; i++) {
+      await supabase.rpc('increment_ad_impression', { ad_id: ids[i] });
+    }
+    res.status(204).end();
+  } catch (e) {
+    res.status(204).end();
+  }
+});
+
+// GET /api/ads/click/:id — record a click then redirect to the target.
+router.get('/ads/click/:id', async function (req, res) {
+  try {
+    var id = req.params.id;
+    if (!UUID_RE.test(String(id))) return res.redirect(302, '/advertise.html');
+
+    if (supabase) {
+      var row = await supabase.from('ad_creatives').select('link_url').eq('id', id).maybeSingle();
+      if (row.data) {
+        await supabase.rpc('increment_ad_click', { ad_id: id });
+        var target = row.data.link_url || '/advertise.html';
+        return res.redirect(302, target);
+      }
+    }
+    res.redirect(302, '/advertise.html');
+  } catch (e) {
+    res.redirect(302, '/advertise.html');
+  }
+});
+
 // ===== ADMIN ROUTES =====
 
 // GET /api/admin/users — list users with search + pagination
@@ -2889,6 +3007,187 @@ router.get('/admin/stats', requireAdmin, async function (req, res) {
   } catch (e) {
     console.error('[admin/stats] Error:', e.message);
     res.status(500).json({ error: 'Failed to fetch stats' });
+  }
+});
+
+// GET /api/admin/ad-positions — position catalogue with ad counts
+router.get('/admin/ad-positions', requireAdmin, async function (req, res) {
+  try {
+    var counts = {};
+    if (supabase) {
+      var result = await supabase.from('ad_creatives').select('position_key, status');
+      if (!result.error) {
+        (result.data || []).forEach(function (row) {
+          if (!counts[row.position_key]) counts[row.position_key] = { total: 0, active: 0 };
+          counts[row.position_key].total++;
+          if (row.status === 'active') counts[row.position_key].active++;
+        });
+      }
+    }
+    var positions = AD_POSITIONS.map(function (p) {
+      var c = counts[p.key] || { total: 0, active: 0 };
+      return Object.assign({}, p, { total: c.total, active: c.active });
+    });
+    res.json({ positions: positions });
+  } catch (e) {
+    console.error('[admin/ad-positions] Error:', e.message);
+    res.status(500).json({ error: 'Failed to fetch ad positions' });
+  }
+});
+
+// GET /api/admin/ads — list creatives with filters + pagination
+router.get('/admin/ads', requireAdmin, async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+    var page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    var perPage = Math.min(100, Math.max(1, parseInt(req.query.perPage, 10) || 20));
+    var position = String(req.query.position || '').trim();
+    var status = String(req.query.status || '').trim();
+
+    var fromRow = (page - 1) * perPage;
+    var toRow = fromRow + perPage - 1;
+
+    var query = supabase.from('ad_creatives')
+      .select('*', { count: 'exact' })
+      .order('created_at', { ascending: false });
+
+    if (position && AD_POSITION_KEYS.indexOf(position) !== -1) query = query.eq('position_key', position);
+    if (status && AD_STATUSES.indexOf(status) !== -1) query = query.eq('status', status);
+
+    var result = await query.range(fromRow, toRow);
+    if (result.error) return res.status(500).json({ error: result.error.message });
+
+    res.json({
+      ads: (result.data || []).map(mapAdCreative),
+      total: result.count || 0,
+      page: page,
+      perPage: perPage
+    });
+  } catch (e) {
+    console.error('[admin/ads] Error:', e.message);
+    res.status(500).json({ error: 'Failed to fetch ads' });
+  }
+});
+
+// POST /api/admin/ads — create an advertisement for a position
+router.post('/admin/ads', requireAdmin, async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+    var positionKey = String(req.body.position || '').trim();
+    if (AD_POSITION_KEYS.indexOf(positionKey) === -1) {
+      return res.status(400).json({ error: 'Unknown ad position' });
+    }
+
+    var status = String(req.body.status || 'active');
+    if (AD_STATUSES.indexOf(status) === -1) return res.status(400).json({ error: 'Invalid status' });
+
+    var imageUrl = req.body.imageUrl ? String(req.body.imageUrl).trim() : null;
+    var linkUrl = req.body.linkUrl ? String(req.body.linkUrl).trim() : null;
+    if (!isSafeAdUrl(imageUrl)) return res.status(400).json({ error: 'Image URL must be http(s) or a site-relative path' });
+    if (!isSafeAdUrl(linkUrl)) return res.status(400).json({ error: 'Link URL must be http(s) or a site-relative path' });
+
+    var headline = req.body.headline ? String(req.body.headline).trim() : null;
+    if (!imageUrl && !headline && !req.body.body) {
+      return res.status(400).json({ error: 'Provide an image URL or headline text for the creative' });
+    }
+
+    var payload = {
+      position_key: positionKey,
+      advertiser: req.body.advertiser ? String(req.body.advertiser).trim() : null,
+      headline: headline,
+      body: req.body.body ? String(req.body.body).trim() : null,
+      image_url: imageUrl,
+      link_url: linkUrl,
+      cta_text: req.body.ctaText ? String(req.body.ctaText).trim() : null,
+      weight: Math.max(1, Math.min(100, parseInt(req.body.weight, 10) || 1)),
+      status: status,
+      starts_at: req.body.startsAt ? new Date(req.body.startsAt).toISOString() : null,
+      ends_at: req.body.endsAt ? new Date(req.body.endsAt).toISOString() : null
+    };
+
+    var insert = await supabase.from('ad_creatives').insert(payload).select('*').single();
+    if (insert.error) return res.status(500).json({ error: insert.error.message });
+
+    logAdminAction(req.user, 'create_ad', null, null, { position: positionKey, advertiser: payload.advertiser });
+
+    res.json({ success: true, ad: mapAdCreative(insert.data) });
+  } catch (e) {
+    console.error('[admin/ads/create] Error:', e.message);
+    res.status(500).json({ error: 'Failed to create ad' });
+  }
+});
+
+// PATCH /api/admin/ads/:id — update an advertisement
+router.patch('/admin/ads/:id', requireAdmin, async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+    var id = req.params.id;
+    if (!UUID_RE.test(String(id))) return res.status(400).json({ error: 'Invalid ad id' });
+
+    var patch = {};
+    if (req.body.position !== undefined) {
+      var pk = String(req.body.position).trim();
+      if (AD_POSITION_KEYS.indexOf(pk) === -1) return res.status(400).json({ error: 'Unknown ad position' });
+      patch.position_key = pk;
+    }
+    if (req.body.status !== undefined) {
+      if (AD_STATUSES.indexOf(String(req.body.status)) === -1) return res.status(400).json({ error: 'Invalid status' });
+      patch.status = String(req.body.status);
+    }
+    if (req.body.advertiser !== undefined) patch.advertiser = req.body.advertiser ? String(req.body.advertiser).trim() : null;
+    if (req.body.headline !== undefined) patch.headline = req.body.headline ? String(req.body.headline).trim() : null;
+    if (req.body.body !== undefined) patch.body = req.body.body ? String(req.body.body).trim() : null;
+    if (req.body.ctaText !== undefined) patch.cta_text = req.body.ctaText ? String(req.body.ctaText).trim() : null;
+    if (req.body.imageUrl !== undefined) {
+      var img = req.body.imageUrl ? String(req.body.imageUrl).trim() : null;
+      if (!isSafeAdUrl(img)) return res.status(400).json({ error: 'Image URL must be http(s) or a site-relative path' });
+      patch.image_url = img;
+    }
+    if (req.body.linkUrl !== undefined) {
+      var link = req.body.linkUrl ? String(req.body.linkUrl).trim() : null;
+      if (!isSafeAdUrl(link)) return res.status(400).json({ error: 'Link URL must be http(s) or a site-relative path' });
+      patch.link_url = link;
+    }
+    if (req.body.weight !== undefined) patch.weight = Math.max(1, Math.min(100, parseInt(req.body.weight, 10) || 1));
+    if (req.body.startsAt !== undefined) patch.starts_at = req.body.startsAt ? new Date(req.body.startsAt).toISOString() : null;
+    if (req.body.endsAt !== undefined) patch.ends_at = req.body.endsAt ? new Date(req.body.endsAt).toISOString() : null;
+
+    if (!Object.keys(patch).length) return res.status(400).json({ error: 'No changes supplied' });
+    patch.updated_at = new Date().toISOString();
+
+    var update = await supabase.from('ad_creatives').update(patch).eq('id', id).select('*').maybeSingle();
+    if (update.error) return res.status(500).json({ error: update.error.message });
+    if (!update.data) return res.status(404).json({ error: 'Ad not found' });
+
+    logAdminAction(req.user, 'update_ad', null, null, { adId: id, changes: Object.keys(patch) });
+
+    res.json({ success: true, ad: mapAdCreative(update.data) });
+  } catch (e) {
+    console.error('[admin/ads/update] Error:', e.message);
+    res.status(500).json({ error: 'Failed to update ad' });
+  }
+});
+
+// DELETE /api/admin/ads/:id — remove an advertisement
+router.delete('/admin/ads/:id', requireAdmin, async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+    var id = req.params.id;
+    if (!UUID_RE.test(String(id))) return res.status(400).json({ error: 'Invalid ad id' });
+
+    var del = await supabase.from('ad_creatives').delete().eq('id', id);
+    if (del.error) return res.status(500).json({ error: del.error.message });
+
+    logAdminAction(req.user, 'delete_ad', null, null, { adId: id });
+
+    res.json({ success: true });
+  } catch (e) {
+    console.error('[admin/ads/delete] Error:', e.message);
+    res.status(500).json({ error: 'Failed to delete ad' });
   }
 });
 

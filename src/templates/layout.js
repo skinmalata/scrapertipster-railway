@@ -357,6 +357,19 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(/<body([^>]*)>/i, (m, attrs) => `<body${attrs}>` + headerHtml(activePath));
   }
 
+  // 1b. Advert slots. The global leaderboard sits directly below the header on
+  //     every page; the sticky banner is a fixed bottom bar. Both are filled by
+  //     /ads.js (placeholder until a creative is assigned in the admin).
+  if (!/data-ad-position="global_leaderboard"/.test(html) && /<\/header>/i.test(html)) {
+    html = html.replace(/<\/header>/i, '</header>\n<div class="wft-ad-slot" data-ad-position="global_leaderboard" aria-label="Advertisement"></div>');
+  }
+  if (!/data-ad-position="sticky_banner"/.test(html)) {
+    html = html.replace(/<\/body>/i, '<div class="wft-ad-slot wft-ad-slot--sticky" data-ad-position="sticky_banner" aria-label="Advertisement"></div>\n</body>');
+  }
+  if (!/data-ad-position="mobile_banner"/.test(html)) {
+    html = html.replace(/<\/body>/i, '<div class="wft-ad-slot" data-ad-position="mobile_banner" aria-label="Advertisement"></div>\n</body>');
+  }
+
   // 2. Pages that don't load app.css need the header/theme styles so the
   //    injected header + theme toggle render like the rest of the site.
   if (!/app\.css/.test(html) && !/wf-layout-styles/.test(html)) {
@@ -408,12 +421,14 @@ function applyLayoutToHtml(html, activePath) {
   const needsAuth = !/auth\.js/.test(html);
   const needsHamburger = !/getElementById\(['"]hamburger['"]\)/.test(html);
   const needsVipTab = !/vip-tab\.js/.test(html) && /id="categoryLinks"|id="categoryTabs"/.test(html);
-  if (needsTheme || needsAuth || needsConfig || needsSupabase || needsHamburger || needsVipTab) {
+  const needsAds = !/ads\.js/.test(html);
+  if (needsTheme || needsAuth || needsConfig || needsSupabase || needsHamburger || needsVipTab || needsAds) {
     let block = '\n';
     if (needsConfig) block += '<script src="/config.js"></script>\n';
     if (needsSupabase) block += '<script src="/supabase-client.js"></script>\n';
     if (needsAuth) block += '<script src="/auth.js?v=20260801"></script>\n';
     if (needsVipTab) block += '<script src="/vip-tab.js?v=20261008" defer></script>\n';
+    if (needsAds) block += '<script src="/ads.js" defer></script>\n';
     if (needsTheme) {
       block += `<script>
 (function() {

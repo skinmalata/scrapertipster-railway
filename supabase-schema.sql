@@ -247,6 +247,91 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO an
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO authenticated;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO service_role;
 
+-- 10. Advertisement management: position registry + creatives.
+-- ad_positions is the canonical catalogue of ad slots (keys match
+-- data-ad-position attributes and public/ads.js / src/routes/api.js).
+CREATE TABLE IF NOT EXISTS public.ad_positions (
+  key TEXT PRIMARY KEY,
+  label TEXT NOT NULL,
+  description TEXT,
+  width INTEGER,
+  height INTEGER,
+  pages TEXT DEFAULT 'all',
+  sort_order INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ad_creatives holds every advertisement sold/placed by admin. A position can
+-- have several active creatives; the client rotates between them by weight.
+CREATE TABLE IF NOT EXISTS public.ad_creatives (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  position_key TEXT NOT NULL REFERENCES public.ad_positions(key) ON DELETE CASCADE,
+  advertiser TEXT,
+  headline TEXT,
+  body TEXT,
+  image_url TEXT,
+  link_url TEXT,
+  cta_text TEXT,
+  weight INTEGER DEFAULT 1,
+  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'paused', 'archived')),
+  starts_at TIMESTAMP WITH TIME ZONE,
+  ends_at TIMESTAMP WITH TIME ZONE,
+  impressions BIGINT DEFAULT 0,
+  clicks BIGINT DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_ad_creatives_position ON public.ad_creatives(position_key);
+CREATE INDEX IF NOT EXISTS idx_ad_creatives_status ON public.ad_creatives(status);
+
+-- Seed the display positions advertised on /advertise.html.
+INSERT INTO public.ad_positions (key, label, description, width, height, pages, sort_order) VALUES
+  ('global_leaderboard',    'Global Leaderboard',   'Below header on all pages',                728, 90,  'all',           1),
+  ('global_rectangle',      'Global Rectangle',     'Sidebar on all pages',                     300, 250, 'all',           2),
+  ('global_skyscraper',     'Global Skyscraper',    'Side rail on all pages',                   160, 600, 'all',           3),
+  ('mobile_banner',         'Mobile Banner',        'Sticky bottom on mobile',                  320, 100, 'all',           4),
+  ('in_content',            'In-Content',           'Between prediction cards',                 728, 90,  'predictions',   5),
+  ('homepage_featured',     'Homepage Featured',    'Above predictions on homepage',            728, 90,  'homepage',      6),
+  ('carousel_slot',         'Homepage Carousel Slot','Featured bookmaker card in homepage carousel', NULL, NULL, 'homepage',   7),
+  ('sticky_banner',         'Sticky Banner',        'Fixed bottom bar (all devices)',           NULL, NULL, 'all',           8),
+  ('sponsored_match_card',  'Sponsored Match Card', 'In-feed sponsored creative between match cards', 800, 800, 'predictions', 9)
+ON CONFLICT (key) DO NOTHING;
+
+-- Seed the live 1win sponsored match-card creatives so the existing in-feed
+-- banner becomes admin-managed. Only runs when the position has no ads yet.
+INSERT INTO public.ad_creatives (position_key, advertiser, headline, image_url, link_url, cta_text, weight, status)
+SELECT v.position_key, v.advertiser, v.headline, v.image_url, v.link_url, v.cta_text, v.weight, 'active'
+FROM (VALUES
+  ('sponsored_match_card', '1win', 'Bet on football with 1win', '/img/banners/1win-banner-a.webp', 'https://one-vv5314.com/betting?open=register&p=f61e', 'Claim offer', 1),
+  ('sponsored_match_card', '1win', 'Bet on football with 1win', '/img/banners/1win-banner-b.webp', 'https://one-vv5314.com/betting?open=register&p=f61e', 'Claim offer', 1),
+  ('sponsored_match_card', '1win', 'Bet on football with 1win', '/img/banners/1win-banner-c.webp', 'https://one-vv5314.com/betting?open=register&p=f61e', 'Claim offer', 1),
+  ('sponsored_match_card', '1win', 'Bet on football with 1win', '/img/banners/1win-banner-d.webp', 'https://one-vv5314.com/betting?open=register&p=f61e', 'Claim offer', 1)
+) AS v(position_key, advertiser, headline, image_url, link_url, cta_text, weight)
+WHERE NOT EXISTS (
+  SELECT 1 FROM public.ad_creatives c WHERE c.position_key = 'sponsored_match_card'
+);
+
+ALTER TABLE public.ad_positions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.ad_creatives ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can read ad_positions" ON public.ad_positions;
+CREATE POLICY "Public can read ad_positions" ON public.ad_positions
+  FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public can read active ads" ON public.ad_creatives;
+CREATE POLICY "Public can read active ads" ON public.ad_creatives
+  FOR SELECT USING (status = 'active');
+
+GRANT SELECT ON public.ad_positions TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.ad_positions TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.ad_positions TO service_role;
+
+GRANT SELECT ON public.ad_creatives TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.ad_creatives TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.ad_creatives TO service_role;
+
 -- === FUNCTIONS ===
 
 -- Auto-create profile on signup. No free trial is granted: accounts created
@@ -318,5 +403,21 @@ BEGIN
   END IF;
 
   RETURN QUERY SELECT GREATEST(p_max_daily - v_count, 0)::INTEGER AS remaining;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Ad impression counter (service/endpoint only, atomic increment).
+CREATE OR REPLACE FUNCTION public.increment_ad_impression(ad_id UUID)
+RETURNS VOID AS $$
+BEGIN
+  UPDATE public.ad_creatives SET impressions = impressions + 1 WHERE id = ad_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Ad click counter (service/endpoint only, atomic increment).
+CREATE OR REPLACE FUNCTION public.increment_ad_click(ad_id UUID)
+RETURNS VOID AS $$
+BEGIN
+  UPDATE public.ad_creatives SET clicks = clicks + 1 WHERE id = ad_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
