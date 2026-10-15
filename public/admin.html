@@ -97,6 +97,15 @@ tbody tr:last-child td { border-bottom: none; }
 .adm-tab.active { background: linear-gradient(135deg,#ff2448,#d41a38); border-color: transparent; }
 textarea.edit-input { resize: vertical; font-family: 'Inter', sans-serif; min-height: 44px; }
 .creative-thumb { width: 72px; height: 44px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); display: block; }
+.ad-upload { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.ad-file-btn { position: relative; overflow: hidden; display: inline-block; cursor: pointer; background: rgba(255,255,255,0.08); color: #e2e8f0; padding: 7px 13px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+.ad-file-btn:hover { background: rgba(255,255,255,0.14); }
+.ad-file-btn input { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.ad-upload-status { font-size: 12px; color: rgba(232,237,245,0.6); }
+.ad-upload-status.err { color: #f87171; }
+.ad-upload-status.ok { color: #4ade80; }
+.ad-remove { color: #f87171; font-size: 12px; text-decoration: underline; cursor: pointer; }
+.ad-image-preview { margin-top: 8px; max-width: 220px; max-height: 140px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); object-fit: contain; background: #0b0f1c; }
 .ad-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 .ad-actions button { padding: 6px 10px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600; }
 .ad-actions .a-edit { background: rgba(56,189,248,0.18); color: #7dd3fc; }
@@ -245,7 +254,16 @@ textarea.edit-input { resize: vertical; font-family: 'Inter', sans-serif; min-he
 <div class="detail-field"><div class="field-label">Advertiser / Brand</div><input type="text" id="adAdvertiser" class="edit-input" placeholder="e.g. 1win"></div>
 <div class="detail-field"><div class="field-label">Headline</div><input type="text" id="adHeadline" class="edit-input" placeholder="Shown when no image is set"></div>
 <div class="detail-field"><div class="field-label">Call To Action</div><input type="text" id="adCta" class="edit-input" placeholder="e.g. Claim offer"></div>
-<div class="detail-field"><div class="field-label">Image URL (creative)</div><input type="text" id="adImage" class="edit-input" placeholder="https://... or /img/banners/ad.webp"></div>
+<div class="detail-field" style="grid-column:1/-1;"><div class="field-label">Creative Image</div>
+<div class="ad-upload">
+<label class="ad-file-btn">Upload image<input type="file" id="adImageFile" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" onchange="uploadAdImage(this)"></label>
+<span id="adImageStatus" class="ad-upload-status"></span>
+<a href="#" id="adImageRemove" class="ad-remove hidden" onclick="removeAdImage();return false;">Remove</a>
+</div>
+<input type="hidden" id="adImage">
+<input type="text" id="adImageUrl" class="edit-input" placeholder="...or paste an image URL (/img/banners/ad.webp)" oninput="onAdImageUrlInput(this)">
+<div id="adImagePreviewWrap" class="hidden"><img id="adImagePreview" class="ad-image-preview" alt="Creative preview"></div>
+</div>
 <div class="detail-field"><div class="field-label">Link URL (landing page)</div><input type="text" id="adLink" class="edit-input" placeholder="https://..."></div>
 <div class="detail-field"><div class="field-label">Weight (rotation)</div><input type="number" id="adWeight" class="edit-input" value="1" min="1" max="100"></div>
 <div class="detail-field"><div class="field-label">Status</div><select id="adStatus" class="edit-input"><option value="active">Active</option><option value="paused">Paused</option><option value="archived">Archived</option></select></div>
@@ -528,6 +546,53 @@ function createUser() {
   }).catch(function() { showError('Failed to create user'); });
 }
 
+function setAdImage(url, statusText, statusClass) {
+  document.getElementById('adImage').value = url || '';
+  var wrap = document.getElementById('adImagePreviewWrap');
+  var img = document.getElementById('adImagePreview');
+  if (url) {
+    img.src = url;
+    wrap.classList.remove('hidden');
+  } else {
+    img.removeAttribute('src');
+    wrap.classList.add('hidden');
+  }
+  document.getElementById('adImageRemove').classList.toggle('hidden', !url);
+  var st = document.getElementById('adImageStatus');
+  st.textContent = statusText || '';
+  st.className = 'ad-upload-status' + (statusClass ? ' ' + statusClass : '');
+}
+
+function uploadAdImage(input) {
+  var file = input.files && input.files[0];
+  if (!file) return;
+  var st = document.getElementById('adImageStatus');
+  st.textContent = 'Uploading...';
+  st.className = 'ad-upload-status';
+  var fd = new FormData();
+  fd.append('file', file);
+  WFT.apiFetch('/api/admin/ads/upload', { method: 'POST', body: fd }).then(function(data) {
+    input.value = '';
+    if (data.error) { setAdImage('', data.error, 'err'); return; }
+    document.getElementById('adImageUrl').value = '';
+    setAdImage(data.url, 'Uploaded', 'ok');
+  }).catch(function() {
+    input.value = '';
+    setAdImage('', 'Upload failed', 'err');
+  });
+}
+
+function onAdImageUrlInput(input) {
+  var v = input.value.trim();
+  setAdImage(v, '', '');
+}
+
+function removeAdImage() {
+  document.getElementById('adImageFile').value = '';
+  document.getElementById('adImageUrl').value = '';
+  setAdImage('', '', '');
+}
+
 function openAdCreate() {
   document.getElementById('adFormTitle').textContent = 'New Advertisement';
   document.getElementById('adId').value = '';
@@ -536,6 +601,9 @@ function openAdCreate() {
   document.getElementById('adHeadline').value = '';
   document.getElementById('adBody').value = '';
   document.getElementById('adImage').value = '';
+  document.getElementById('adImageFile').value = '';
+  document.getElementById('adImageUrl').value = '';
+  setAdImage('', '', '');
   document.getElementById('adLink').value = '';
   document.getElementById('adCta').value = '';
   document.getElementById('adWeight').value = '1';
@@ -566,7 +634,9 @@ function editAd(id) {
   document.getElementById('adAdvertiser').value = a.advertiser || '';
   document.getElementById('adHeadline').value = a.headline || '';
   document.getElementById('adBody').value = a.body || '';
-  document.getElementById('adImage').value = a.imageUrl || '';
+  document.getElementById('adImageFile').value = '';
+  document.getElementById('adImageUrl').value = '';
+  setAdImage(a.imageUrl || '', '', '');
   document.getElementById('adLink').value = a.linkUrl || '';
   document.getElementById('adCta').value = a.ctaText || '';
   document.getElementById('adWeight').value = a.weight || 1;
@@ -585,7 +655,7 @@ function saveAd() {
   var imageUrl = document.getElementById('adImage').value.trim();
   var headline = document.getElementById('adHeadline').value.trim();
   var body = document.getElementById('adBody').value.trim();
-  if (!imageUrl && !headline && !body) { showError('Provide an image URL or some headline/body text.'); return; }
+  if (!imageUrl && !headline && !body) { showError('Provide a creative image or some headline/body text.'); return; }
 
   var payload = {
     position: position,

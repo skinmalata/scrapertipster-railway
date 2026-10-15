@@ -3,6 +3,7 @@ const router = express.Router();
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const multer = require('multer');
 let generatePostThumbnail;
 function getGeneratePostThumbnail() {
   if (!generatePostThumbnail) {
@@ -2431,6 +2432,33 @@ function isSafeAdUrl(url) {
   return /^https?:\/\//i.test(value);
 }
 
+// Creative image uploads land in a public Supabase Storage bucket. The service
+// role client (module scope) owns the bucket, so no storage RLS policy is
+// needed for writes; the bucket being public serves reads over the CDN URL.
+const AD_BUCKET = 'ad-creatives';
+const AD_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+const AD_IMAGE_MIME = /^image\/(png|jpe?g|webp|gif|avif)$/i;
+
+const adUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: AD_IMAGE_MAX_BYTES, files: 1 },
+  fileFilter: function (req, file, cb) {
+    if (AD_IMAGE_MIME.test(file.mimetype || '')) return cb(null, true);
+    var err = new Error('Unsupported image type. Use PNG, JPG, WebP, GIF or AVIF.');
+    err.code = 'UNSUPPORTED_TYPE';
+    cb(err);
+  }
+});
+
+async function ensureAdBucket() {
+  if (!supabase || !supabase.storage) return;
+  try {
+    await supabase.storage.createBucket(AD_BUCKET, { public: true });
+  } catch (e) {
+    // Bucket already exists (or a race to create it) — safe to ignore.
+  }
+}
+
 function mapAdCreative(row) {
   var pos = AD_POSITION_MAP[row.position_key] || {};
   return {
@@ -3068,6 +3096,51 @@ router.get('/admin/ads', requireAdmin, async function (req, res) {
     console.error('[admin/ads] Error:', e.message);
     res.status(500).json({ error: 'Failed to fetch ads' });
   }
+});
+
+// POST /api/admin/ads/upload — upload a creative image to storage, returns URL
+router.post('/admin/ads/upload', requireAdmin, function (req, res) {
+  adUpload.single('file')(req, res, async function (err) {
+    if (err) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(413).json({ error: 'Image must be 5 MB or smaller' });
+      }
+      return res.status(400).json({ error: err.message || 'Upload failed' });
+    }
+    try {
+      if (!supabase || !supabase.storage) return res.status(503).json({ error: 'Service unavailable' });
+      if (!req.file || !req.file.buffer || !req.file.buffer.length) {
+        return res.status(400).json({ error: 'No image file provided' });
+      }
+
+      var sharp = require('sharp');
+      var processed = await sharp(req.file.buffer, { failOn: 'none' })
+        .rotate()
+        .resize(1600, 1600, { fit: 'inside', withoutEnlargement: true })
+        .webp({ quality: 86 })
+        .toBuffer();
+
+      await ensureAdBucket();
+
+      var name = 'ads/' + Date.now().toString(36) + '-' + crypto.randomBytes(6).toString('hex') + '.webp';
+      var up = await supabase.storage.from(AD_BUCKET).upload(name, processed, {
+        contentType: 'image/webp',
+        cacheControl: '31536000',
+        upsert: false
+      });
+      if (up.error) return res.status(500).json({ error: up.error.message });
+
+      var pub = supabase.storage.from(AD_BUCKET).getPublicUrl(name);
+      var url = pub && pub.data ? pub.data.publicUrl : null;
+      if (!url) return res.status(500).json({ error: 'Failed to resolve public URL' });
+
+      logAdminAction(req.user, 'upload_ad_creative', null, null, { path: name, bytes: processed.length });
+      res.json({ success: true, url: url, path: name });
+    } catch (e) {
+      console.error('[admin/ads/upload] Error:', e.message);
+      res.status(500).json({ error: 'Upload failed' });
+    }
+  });
 });
 
 // POST /api/admin/ads — create an advertisement for a position
