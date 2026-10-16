@@ -363,9 +363,6 @@ function applyLayoutToHtml(html, activePath) {
   if (!/data-ad-position="global_leaderboard"/.test(html) && /<\/header>/i.test(html)) {
     html = html.replace(/<\/header>/i, '</header>\n<div class="wft-ad-slot" data-ad-position="global_leaderboard" aria-label="Advertisement"></div>');
   }
-  if (!/data-ad-position="sticky_banner"/.test(html)) {
-    html = html.replace(/<\/body>/i, '<div class="wft-ad-slot wft-ad-slot--sticky" data-ad-position="sticky_banner" aria-label="Advertisement"></div>\n</body>');
-  }
   if (!/data-ad-position="mobile_banner"/.test(html)) {
     html = html.replace(/<\/body>/i, '<div class="wft-ad-slot" data-ad-position="mobile_banner" aria-label="Advertisement"></div>\n</body>');
   }

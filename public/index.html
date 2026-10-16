@@ -534,28 +534,6 @@ gtag('config', 'G-HMGZMW9EDP');
 
  console.log('Script starting...');
 
- window.insertHomeAdSlot = function (html) {
-
- var marker = '<div class="match-card fade-in"';
-
- var first = html.indexOf(marker);
-
- if (first < 0) return html;
-
- var second = html.indexOf(marker, first + marker.length);
-
- if (second < 0) return html;
-
- var slot = '<div class="wft-ad-slot" data-ad-position="in_content" aria-label="Advertisement"></div>';
-
- var at = second;
-
- while (at > 0 && (html[at - 1] === '\n' || html[at - 1] === ' ')) at--;
-
- return html.slice(0, at) + '\n\n' + slot + '\n\n  ' + html.slice(second);
-
- };
-
  try {
 
  let currentData = null;
@@ -923,7 +901,7 @@ gtag('config', 'G-HMGZMW9EDP');
    let fbLocked = '';
    for (let fk = fbShown; fk < fallbackMatches.length; fk++) fbLocked += lockedCardHtml(fk);
    const fbNote = (fbShown < fallbackMatches.length) ? lockedNoteHtml(fbShown, fallbackMatches.length, 'Unbeaten') : '';
-   content.innerHTML = notice + fbNote + `<div class="matches-grid">${insertHomeAdSlot(fallbackHtml + fbLocked)}</div>`;
+   content.innerHTML = notice + fbNote + `<div class="matches-grid">${fallbackHtml + fbLocked}</div>`;
    return;
  }
 
@@ -1001,7 +979,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
  const unbeatenNote = (unbeatenShown < matches.length) ? lockedNoteHtml(unbeatenShown, matches.length, 'Unbeaten') : '';
 
- content.innerHTML = unbeatenNote + `<div class="matches-grid">${insertHomeAdSlot(html + unbeatenLocked)}</div>`;
+ content.innerHTML = unbeatenNote + `<div class="matches-grid">${html + unbeatenLocked}</div>`;
 
  }
 
@@ -1376,7 +1354,7 @@ gtag('config', 'G-HMGZMW9EDP');
   ? '<div class="locked-note">See all ' + fullCount + ' ' + getCategoryLabel(currentCategory).toLowerCase() + ' picks for this date with <a href="/pricing.html">Pro</a> \u2014 here\u2019s a preview of the top ' + displayMatches.length + '.</div>'
   : '';
 
- content.innerHTML = note + `<div class="matches-grid">${insertHomeAdSlot(html + lockedHtml)}</div>`;
+ content.innerHTML = note + `<div class="matches-grid">${html + lockedHtml}</div>`;
 
 
 
