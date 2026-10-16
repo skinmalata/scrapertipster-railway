@@ -16,7 +16,7 @@
   if (window.__WF_ADS) return;
   window.__WF_ADS = true;
 
-  var API = window.WFT_API || '';
+  var API = (window.WFT_API || 'https://winfulltime-api.onrender.com') + '/api';
   var ADVERTISE_URL = '/advertise.html';
 
   var POSITIONS = {
