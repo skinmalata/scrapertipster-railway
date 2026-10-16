@@ -21,6 +21,7 @@
 
   var POSITIONS = {
     global_leaderboard: { label: 'Global Leaderboard', w: 728, h: 90 },
+    end_of_content: { label: 'End of Content Leaderboard', w: 728, h: 90 },
     global_rectangle: { label: 'Global Rectangle', w: 300, h: 250 },
     global_skyscraper: { label: 'Global Skyscraper', w: 160, h: 600 },
     mobile_banner: { label: 'Mobile Banner', w: 320, h: 100 },

@@ -296,7 +296,8 @@ INSERT INTO public.ad_positions (key, label, description, width, height, pages, 
   ('homepage_featured',     'Homepage Featured',    'Above predictions on homepage',            728, 90,  'homepage',      6),
   ('carousel_slot',         'Homepage Carousel Slot','Featured bookmaker card in homepage carousel', NULL, NULL, 'homepage',   7),
   ('sticky_banner',         'Sticky Banner',        'Fixed bottom bar (all devices)',           NULL, NULL, 'all',           8),
-  ('sponsored_match_card',  'Sponsored Match Card', 'In-feed sponsored creative between match cards', 800, 800, 'predictions', 9)
+  ('sponsored_match_card',  'Sponsored Match Card', 'In-feed sponsored creative between match cards', 800, 800, 'predictions', 9),
+  ('end_of_content',        'End of Content Leaderboard', 'Above the footer at the end of page content', 728, 90, 'all', 10)
 ON CONFLICT (key) DO NOTHING;
 
 -- Seed the live 1win sponsored match-card creatives so the existing in-feed

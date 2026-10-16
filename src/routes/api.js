@@ -2409,6 +2409,7 @@ router.post('/validate-email', async function (req, res) {
 // the public endpoint and admin validation work without an extra round-trip.
 const AD_POSITIONS = [
   { key: 'global_leaderboard', label: 'Global Leaderboard', description: 'Below header on all pages', width: 728, height: 90, pages: 'all' },
+  { key: 'end_of_content', label: 'End of Content Leaderboard', description: 'Above the footer at the end of page content', width: 728, height: 90, pages: 'all' },
   { key: 'global_rectangle', label: 'Global Rectangle', description: 'Sidebar on all pages', width: 300, height: 250, pages: 'all' },
   { key: 'global_skyscraper', label: 'Global Skyscraper', description: 'Side rail on all pages', width: 160, height: 600, pages: 'all' },
   { key: 'mobile_banner', label: 'Mobile Banner', description: 'Sticky bottom on mobile', width: 320, height: 100, pages: 'all' },

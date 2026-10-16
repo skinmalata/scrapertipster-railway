@@ -413,6 +413,12 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(/<\/body>/i, '<footer>' + FOOTER_HTML + '\n</footer>\n</body>');
   }
 
+  // 3b. End-of-content leaderboard: a full-width slot sitting directly above
+  //     the footer, mirroring the header leaderboard. Filled by /ads.js.
+  if (!/data-ad-position="end_of_content"/.test(html) && /<footer[^>]*>/i.test(html)) {
+    html = html.replace(/<footer[^>]*>/i, (m) => '<div class="wft-ad-slot" data-ad-position="end_of_content" aria-label="Advertisement"></div>\n' + m);
+  }
+
   // 4. Ensure the auth stack + theme/hamburger scripts are present so the
   //    auth-driven nav links and theme toggle work on every page.
   const needsTheme = !/wf-theme/.test(html);
