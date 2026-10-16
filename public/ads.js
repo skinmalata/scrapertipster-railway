@@ -59,6 +59,9 @@
       '.wft-ad-ph-cta:hover{background:rgba(255,36,72,0.12);}',
       '.wft-ad-fill{display:block;text-decoration:none;color:inherit;}',
       '.wft-ad-img{display:block;width:100%;height:auto;border-radius:12px;}',
+      '.wft-ad-slot[data-ad-ratio] .wft-ad-ph{aspect-ratio:var(--wft-ad-ratio);min-height:0;box-sizing:border-box;}',
+      '.wft-ad-slot[data-ad-ratio] .wft-ad-fill{aspect-ratio:var(--wft-ad-ratio);}',
+      '.wft-ad-slot[data-ad-ratio] .wft-ad-img{height:100%;object-fit:contain;}',
       '.wft-ad-text{display:flex;flex-direction:column;gap:4px;padding:16px;border-radius:12px;',
       ' background:linear-gradient(135deg,rgba(37,46,64,0.9),rgba(21,26,44,0.9));border:1px solid rgba(255,255,255,0.10);}',
       '.wft-ad-brand{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#7ea2ff;}',
@@ -113,8 +116,9 @@
     var title = escapeHtml(ad.advertiser || 'Advertisement');
     var inner;
     if (ad.imageUrl) {
-      inner = '<img class="wft-ad-img" src="' + escapeHtml(ad.imageUrl) + '" alt="' + title +
-        '" loading="lazy" decoding="async">';
+      var dim = (ad.width && ad.height) ? ' width="' + ad.width + '" height="' + ad.height + '"' : '';
+      inner = '<img class="wft-ad-img" src="' + escapeHtml(ad.imageUrl) + '" alt="' + title + '"' + dim +
+        ' loading="lazy" decoding="async">';
     } else {
       inner = '<span class="wft-ad-text">' +
         '<span class="wft-ad-brand">' + escapeHtml(ad.advertiser || 'Sponsored') + '</span>' +
@@ -159,6 +163,12 @@
     if (!key) return;
     el.classList.add('wft-ad-slot');
     if (key === 'sticky_banner') el.classList.add('wft-ad-slot--sticky');
+
+    var pos = POSITIONS[key] || {};
+    if (pos.w && pos.h) {
+      el.setAttribute('data-ad-ratio', '');
+      el.style.setProperty('--wft-ad-ratio', pos.w + '/' + pos.h);
+    }
 
     var list = cached && cached[key];
     if (list && list.length) {
