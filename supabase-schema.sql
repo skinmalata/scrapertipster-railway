@@ -314,6 +314,13 @@ WHERE NOT EXISTS (
   SELECT 1 FROM public.ad_creatives c WHERE c.position_key = 'sponsored_match_card'
 );
 
+-- Seed the 1xbet global leaderboard creative (admin-managed).
+INSERT INTO public.ad_creatives (position_key, advertiser, headline, image_url, link_url, cta_text, weight, status)
+SELECT 'global_leaderboard', '1xbet', 'Bet on football with 1xbet', '/img/banners/1xbet-leaderboard.webp', 'https://reffpa.com/L?tag=d_6034393m_97c_&site=6034393&ad=97', 'Join Now', 1, 'active'
+WHERE NOT EXISTS (
+  SELECT 1 FROM public.ad_creatives c WHERE c.position_key = 'global_leaderboard' AND c.advertiser = '1xbet'
+);
+
 ALTER TABLE public.ad_positions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ad_creatives ENABLE ROW LEVEL SECURITY;
 
