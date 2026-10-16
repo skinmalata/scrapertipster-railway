@@ -76,15 +76,7 @@
       '.wft-ad-slot[data-ad-position="mobile_banner"] .wft-ad-img{border-radius:0;max-height:100px;object-fit:contain;background:#0b0f1c;}',
       '@media (max-width:768px){.wft-ad-ph{min-height:90px;}.wft-ad-slot{padding:0 8px;}',
       ' .wft-ad-slot[data-ad-position="mobile_banner"]{display:block;}',
-      ' .wft-ad-slot[data-ad-position="sticky_banner"]{display:none;}}',
-      '.wft-ad-layout{display:block;}',
-      '.wft-ad-sidebar{display:none;}',
-      '@media (min-width:1024px){',
-      ' .wft-ad-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start;}',
-      ' .wft-ad-main{min-width:0;}',
-      ' .wft-ad-sidebar{display:block;position:sticky;top:16px;}',
-      ' .wft-ad-sidebar .wft-ad-slot{max-width:100%;margin:0 0 16px;padding:0;}',
-      '}'
+      ' .wft-ad-slot[data-ad-position="sticky_banner"]{display:none;}}'
     ].join('\n');
     document.head.appendChild(style);
   }
