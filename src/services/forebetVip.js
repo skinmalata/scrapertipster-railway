@@ -177,6 +177,37 @@ const HSH_SHARE_MAX = envNumber('HSH_SHARE_MAX', 0.65, 0.1, 0.9);
 // with a razor-thin edge, or from a low-scoring fixture, is off the board.
 const HSH_MARGIN_MIN = envNumber('HSH_MARGIN_MIN', 0.05, 0.01, 0.5);
 const HSH_MIN_GOALS = envNumber('HSH_MIN_GOALS', 2.2, 0.5, 8);
+// The free highest-scoring-half tab is curated to the top two divisions of the
+// major football nations, so it never fills up with lower-league fixtures.
+// Forebet tags each fixture with a country and a league code whose trailing
+// digit is the division tier (Fr2 = France Ligue 2, Ru4 = Russia 4th tier);
+// youth/cup/women competitions carry no tier digit and are always excluded.
+// Override the country list with HSH_MAJOR_COUNTRIES (comma-separated).
+const HSH_MAJOR_COUNTRIES = new Set(
+  (process.env.HSH_MAJOR_COUNTRIES ||
+    'england,scotland,spain,italy,germany,france,netherlands,portugal,belgium,' +
+    'turkey,turkiye,russia,ukraine,greece,austria,switzerland,denmark,sweden,' +
+    'norway,poland,czech republic,croatia,serbia,romania,brazil,argentina,mexico,' +
+    'usa,colombia,chile,uruguay,peru,japan,south korea,china,australia,saudi arabia,egypt'
+  ).split(',').map((s) => s.trim().toLowerCase()).filter(Boolean)
+);
+
+function normalizeCountryName(name) {
+  return String(name || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .trim();
+}
+
+// True when a fixture belongs to the top one or two divisions of a major
+// football nation. Requires both a recognised country and a 1/2 tier digit, so
+// a lower division (Ru4) or a cup/youth/women competition (RuY, CLW) fails.
+function isMajorTopTierLeague(match) {
+  if (!match) return false;
+  const country = normalizeCountryName(match.country);
+  if (!country || !HSH_MAJOR_COUNTRIES.has(country)) return false;
+  return /[12]$/.test(String(match.league || '').trim());
+}
 // Team-to-score is a VIP market. A team's scoring probability must clear
 // this floor to be published as a VIP tip (default 62% - quality over
 // quantity: the feed prefers fewer, stronger calls).
@@ -452,7 +483,8 @@ function parseHtList(html) {
 function selectHshPicks(matches, limit) {
   const max = limit || HSH_MAX_PICKS;
   return (matches || [])
-    .filter((m) => m.hsh && m.hsh.prob >= HSH_MIN_PROB &&
+    .filter((m) => isMajorTopTierLeague(m) &&
+      m.hsh && m.hsh.prob >= HSH_MIN_PROB &&
       m.hsh.margin >= HSH_MARGIN_MIN &&
       Number(m.avgGoals) >= HSH_MIN_GOALS)
     .sort((a, b) => (b.hsh.margin - a.hsh.margin) || (b.hsh.prob - a.hsh.prob))
@@ -462,6 +494,8 @@ function selectHshPicks(matches, limit) {
       home: m.home,
       away: m.away,
       league: m.league,
+      leagueName: m.leagueName,
+      country: m.country,
       time: m.time,
       probs: m.probs,
       avgGoals: m.avgGoals,
@@ -895,6 +929,13 @@ function parseMatchList(html) {
     };
 
     const league = ($row.find('.shortTag').text() || '').trim();
+    // The league flag image carries the country and full league name in its
+    // getstag onclick (e.g. getstag(this,ID,'France','Ligue 2','slug','fr')).
+    // The country is what the highest-scoring-half curation keys on.
+    const stagOnclick = $row.find('img[onclick^="getstag"]').attr('onclick') || '';
+    const stagMatch = stagOnclick.match(/getstag\([^,]+,[^,]+,'([^']*)','([^']*)'/);
+    const country = stagMatch ? stagMatch[1].trim() : '';
+    const leagueName = stagMatch ? stagMatch[2].trim() : '';
     const favEl = $row.find('.nofav, .fav_icon');
     const matchId = favEl.attr('id') || '';
     const matchUrl = parseMatchUrl($row.find('.tnmscn').attr('href') || '');
@@ -906,6 +947,8 @@ function parseMatchList(html) {
       home,
       away,
       league,
+      leagueName,
+      country,
       time: timeText,
       probs,
       predictionText,
