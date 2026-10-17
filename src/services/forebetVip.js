@@ -26,8 +26,6 @@
 //      (35%) so the model never firmly expects the side to lose.
 //   2. Team to score: otherwise the strongest "must score" call publishes
 //      only when all of the following hold:
-//      - the fair price from the Poisson split is STRICTLY above
-//        MIN_TEAM_SCORE_ODD (default 1.25), and
 //      - the model's scoring probability is >= TTS_MIN_PROB (62%), and
 //      - the must-score composite clears MUST_SCORE_MIN: history
 //        (expected-goal scoring model, max 40) + recent form win rate
@@ -36,8 +34,10 @@
 //        TTS_NO_DETAIL_PROB (75%), and
 //      - form/H2H lock: the same near-perfect records as the cert (form >=
 //        80% and unbeaten, H2H win share >= 80% over >= 3 meetings) may
-//        publish under the relaxed floors TTS_LOCK_MIN_PROB /
-//        TTS_LOCK_MIN_ODD instead of the bars above.
+//        publish under the relaxed TTS_LOCK_MIN_PROB floor instead of the
+//        bars above.
+//      There is no minimum-price filter: a near-certain scorer is a valid
+//      pick however short its fair price.
 // No analysis text ships with tips: members see the pick, its probability and
 // the form/H2H record rows. The API strips every price field before the
 // payload reaches a member.
@@ -177,6 +177,10 @@ const HSH_SHARE_MAX = envNumber('HSH_SHARE_MAX', 0.65, 0.1, 0.9);
 // with a razor-thin edge, or from a low-scoring fixture, is off the board.
 const HSH_MARGIN_MIN = envNumber('HSH_MARGIN_MIN', 0.05, 0.01, 0.5);
 const HSH_MIN_GOALS = envNumber('HSH_MIN_GOALS', 2.2, 0.5, 8);
+// Minimum share of the free tab reserved for European fixtures (when enough
+// qualify), so a South-American-heavy fixture slate can never push the European
+// leagues off the list entirely. 0 disables the reservation.
+const HSH_EUROPEAN_SHARE = envNumber('HSH_EUROPEAN_SHARE', 0.5, 0, 1);
 // The free highest-scoring-half tab is curated to the top two divisions of the
 // major football nations, so it never fills up with lower-league fixtures.
 // Forebet tags each fixture with a country and a league code whose trailing
@@ -208,13 +212,52 @@ function isMajorTopTierLeague(match) {
   if (!country || !HSH_MAJOR_COUNTRIES.has(country)) return false;
   return /[12]$/.test(String(match.league || '').trim());
 }
+// The European subset of the curated nations. The public tabs reserve a share
+// of their slots for these leagues so a South-American-heavy fixture slate can
+// never push the Old Continent off the board entirely. Override with
+// HSH_EUROPEAN_COUNTRIES (comma-separated).
+const HSH_EUROPEAN_COUNTRIES = new Set(
+  (process.env.HSH_EUROPEAN_COUNTRIES ||
+    'england,scotland,spain,italy,germany,france,netherlands,portugal,belgium,' +
+    'turkey,turkiye,russia,ukraine,greece,austria,switzerland,denmark,sweden,' +
+    'norway,poland,czech republic,croatia,serbia,romania'
+  ).split(',').map((s) => s.trim().toLowerCase()).filter(Boolean)
+);
+
+// True when a fixture is a major top-two-tier league from a European nation.
+function isEuropeanLeague(match) {
+  return isMajorTopTierLeague(match) &&
+    HSH_EUROPEAN_COUNTRIES.has(normalizeCountryName(match && match.country));
+}
+
+function matchKey(m) {
+  if (!m) return '';
+  return m.matchId != null ? String(m.matchId) : (String(m.home) + '|' + String(m.away));
+}
+
+// Take the best `max` rows from an already-sorted list, but guarantee that up
+// to `europeShare` of the slots go to European fixtures first. Non-European
+// days are unaffected; on mixed days the European leagues keep a presence
+// instead of being crowded out by a continent with larger edges. The returned
+// rows keep their original (sorted) order.
+function selectWithEuropeanReserve(sorted, max, europeShare) {
+  if (!Array.isArray(sorted) || max <= 0) return [];
+  const europe = sorted.filter((m) => isEuropeanLeague(m));
+  const reserve = Math.min(europe.length, Math.ceil(max * europeShare));
+  const selected = new Set(europe.slice(0, reserve).map(matchKey));
+  for (const m of sorted) {
+    if (selected.size >= max) break;
+    selected.add(matchKey(m));
+  }
+  return sorted.filter((m) => selected.has(matchKey(m)));
+}
 // Team-to-score is a VIP market. A team's scoring probability must clear
 // this floor to be published as a VIP tip (default 62% - quality over
 // quantity: the feed prefers fewer, stronger calls).
 const TTS_MIN_PROB = envNumber('TTS_MIN_PROB', 0.62, 0.05, 0.95);
-// The fair price of a team-to-score call must be STRICTLY above this floor
-// (default 1.25). Below it the pick is an uninteresting ultra-short price that
-// pays next to nothing for a near-certainty.
+// Deprecated: team-to-score selection no longer applies a minimum-price filter,
+// so a near-certain scorer publishes however short its fair price. Kept only so
+// the TTS_MIN_ODD env var stays parsed for backwards compatibility.
 const MIN_TEAM_SCORE_ODD = envNumber('TTS_MIN_ODD', 1.25, 1.05, 10);
 // Composite "must score" gate (0-100). Three signals feed it: the
 // history-backed expected-goals scoring probability (max 40), the picked
@@ -252,6 +295,10 @@ const TTS_WIN_CERT_MIN_PROB = envNumber('TTS_WIN_CERT_MIN_PROB', 0.35, 0.1, 0.95
 // and stores only the top VIP_MAX_TIPS per date. HSH picks are selected from
 // the full fixture list separately, so this cap never starves the free market.
 const VIP_MAX_TIPS = envNumber('VIP_MAX_TIPS', 15, 1, 200);
+// Minimum share of the per-day VIP slots reserved for European fixtures (when
+// enough qualify), so a South-American-heavy slate cannot push the European
+// leagues off the VIP feed. 0 disables the reservation.
+const VIP_EUROPEAN_SHARE = envNumber('VIP_EUROPEAN_SHARE', 0.5, 0, 1);
 const SCRAPE_TIMEOUT_MS = 25000;
 // Per-fixture detail pages add the form/H2H records the must-score gate now
 // needs, but cost one browser navigation each, which is slow against Forebet's
@@ -482,13 +529,13 @@ function parseHtList(html) {
 // by margin (the most decisive call first), capped per day.
 function selectHshPicks(matches, limit) {
   const max = limit || HSH_MAX_PICKS;
-  return (matches || [])
+  const qualifying = (matches || [])
     .filter((m) => isMajorTopTierLeague(m) &&
       m.hsh && m.hsh.prob >= HSH_MIN_PROB &&
       m.hsh.margin >= HSH_MARGIN_MIN &&
       Number(m.avgGoals) >= HSH_MIN_GOALS)
-    .sort((a, b) => (b.hsh.margin - a.hsh.margin) || (b.hsh.prob - a.hsh.prob))
-    .slice(0, max)
+    .sort((a, b) => (b.hsh.margin - a.hsh.margin) || (b.hsh.prob - a.hsh.prob));
+  return selectWithEuropeanReserve(qualifying, max, HSH_EUROPEAN_SHARE)
     .map((m) => ({
       matchId: m.matchId,
       home: m.home,
@@ -503,11 +550,9 @@ function selectHshPicks(matches, limit) {
     }));
 }
 
-// Estimate team-to-score props from expected goals. Props are generated down to
-// TTS_LOCK_MIN_ODD so a form/H2H lock can still surface a near-certain scorer;
-// the normal path re-applies the stricter MIN_TEAM_SCORE_ODD floor in
-// selectTeamScoreTip, so the field never includes ultra-short or meaningless
-// prices for ordinary picks.
+// Estimate team-to-score props from expected goals. Props are generated for
+// every side so selection can consider the strongest must-score call; there is
+// no minimum-price filter, so a near-certain scorer is a valid pick.
 function estimateTeamScoreProps({ expHome, expAway }) {
   const props = [];
   const push = (side, team, lambda) => {
@@ -611,7 +656,6 @@ function selectTeamScoreTip({ home, away, teamScoreProps, form, h2h }) {
   let best = null;
   for (const p of props) {
     const prob = (Number(p.prob) || 0) / 100;
-    if (!(p.estimatedOdd > TTS_LOCK_MIN_ODD)) continue;
     const sidePct = p.side === 'home'
       ? (form && typeof form.homeRecently === 'number' ? form.homeRecently : null)
       : (form && typeof form.awayRecently === 'number' ? form.awayRecently : null);
@@ -627,9 +671,8 @@ function selectTeamScoreTip({ home, away, teamScoreProps, form, h2h }) {
       sidePct >= TTS_PERFECT_FORM_PCT && wins >= meets * TTS_PERFECT_H2H_PCT;
     if (locked) {
       if (prob < TTS_LOCK_MIN_PROB) continue;
-    } else {
-      if (!(p.estimatedOdd > MIN_TEAM_SCORE_ODD)) continue;
-      if (prob < TTS_MIN_PROB) continue;
+    } else if (prob < TTS_MIN_PROB) {
+      continue;
     }
     const { score, modelPts, formPts, h2hPts } = mustScoreFor({ prob, formPct: sidePct, h2h: wins });
     if (!best || score > best.score) {
@@ -1379,7 +1422,11 @@ module.exports = {
   HSH_SHARE_MAX,
   HSH_MARGIN_MIN,
   HSH_MIN_GOALS,
-  isMajorTopTierLeague
+  HSH_EUROPEAN_SHARE,
+  VIP_EUROPEAN_SHARE,
+  isMajorTopTierLeague,
+  isEuropeanLeague,
+  selectWithEuropeanReserve
 };
 
 if (require.main === module) {

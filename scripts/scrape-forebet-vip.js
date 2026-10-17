@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { scrapeVip, closeVipBrowser, selectHshPicks, HSH_MIN_PROB, HSH_MAX_PICKS, HSH_MARGIN_MIN, HSH_MIN_GOALS, HSH_SHARE_PRIOR, HSH_SHARE_REG, TTS_MIN_PROB, MUST_SCORE_MIN, TTS_WIN_CERT_MIN_PROB, VIP_MAX_TIPS, TTS_PERFECT_FORM_PCT, TTS_PERFECT_H2H_PCT } = require('../src/services/forebetVip');
+const { scrapeVip, closeVipBrowser, selectHshPicks, selectWithEuropeanReserve, HSH_MIN_PROB, HSH_MAX_PICKS, HSH_MARGIN_MIN, HSH_MIN_GOALS, HSH_SHARE_PRIOR, HSH_SHARE_REG, TTS_MIN_PROB, MUST_SCORE_MIN, TTS_WIN_CERT_MIN_PROB, VIP_MAX_TIPS, VIP_EUROPEAN_SHARE, TTS_PERFECT_FORM_PCT, TTS_PERFECT_H2H_PCT } = require('../src/services/forebetVip');
 const { lagosDate } = require('../src/utils/dates');
 
 const CACHE_FILE = path.join(process.cwd(), 'forebet-vip-cache.json');
@@ -74,7 +74,7 @@ async function main() {
         ((b.locked ? 1 : 0) - (a.locked ? 1 : 0)) ||
         (b.confidence - a.confidence) ||
         (b.mustScore - a.mustScore));
-    const gated = qualified.slice(0, VIP_MAX_TIPS);
+    const gated = selectWithEuropeanReserve(qualified, VIP_MAX_TIPS, VIP_EUROPEAN_SHARE);
     const hshPicks = selectHshPicks(matches);
     const bettable = matches.filter(m => m.sportybetAvailable !== false).length;
     console.log(date + ': ' + matches.length + ' fixtures, ' + bettable + ' on SportyBet, ' + qualified.length + ' pass the confidence gate' +
