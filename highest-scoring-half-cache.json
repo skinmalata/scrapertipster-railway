@@ -169,6 +169,72 @@
     ],
     "2026-10-17": [
       {
+        "matchId": "2485671",
+        "home": "Gloria Popesti",
+        "away": "CS Afumati",
+        "league": "Ro2",
+        "leagueName": "Liga 2",
+        "country": "Romania",
+        "time": "",
+        "probs": {
+          "home": 23,
+          "draw": 36,
+          "away": 41
+        },
+        "avgGoals": 4.02,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.776,
+          "margin": 0.682,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 1,
+          "secondHalfExp": 3.01,
+          "p1": 0.094,
+          "p2": 0.776,
+          "tie": 0.13,
+          "fitErr": 0.00617,
+          "totalExp": 4.02,
+          "referenceFirstHalfProb": 0.14,
+          "referenceDrawProb": 0.52,
+          "referenceSecondHalfProb": 0.34,
+          "reason": "Expected 4.0 goals, split 1.0 in the 1st half vs 3.0 in the 2nd. The 2nd half wins the half race 78% of the time, 68% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2468161",
+        "home": "Club Necaxa",
+        "away": "Club Atlas",
+        "league": "Mx1",
+        "leagueName": "Liga MX",
+        "country": "Mexico",
+        "time": "",
+        "probs": {
+          "home": 24,
+          "draw": 26,
+          "away": 50
+        },
+        "avgGoals": 3.75,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.762,
+          "margin": 0.664,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.94,
+          "secondHalfExp": 2.81,
+          "p1": 0.098,
+          "p2": 0.762,
+          "tie": 0.141,
+          "fitErr": 0.02044,
+          "totalExp": 3.75,
+          "referenceFirstHalfProb": 0.22,
+          "referenceDrawProb": 0.52,
+          "referenceSecondHalfProb": 0.26,
+          "reason": "Expected 3.8 goals, split 0.9 in the 1st half vs 2.8 in the 2nd. The 2nd half wins the half race 76% of the time, 66% clear of the other half."
+        }
+      },
+      {
         "matchId": "2431265",
         "home": "Daegu FC",
         "away": "Cheongju FC",
@@ -265,6 +331,72 @@
           "referenceDrawProb": 0.58,
           "referenceSecondHalfProb": 0.17,
           "reason": "Expected 2.7 goals, split 0.7 in the 1st half vs 2.0 in the 2nd. The 2nd half wins the half race 69% of the time, 58% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2475293",
+        "home": "Viktoriya Mykolaivka",
+        "away": "Chernihiv",
+        "league": "Ua2",
+        "leagueName": "Persha Liga",
+        "country": "Ukraine",
+        "time": "",
+        "probs": {
+          "home": 71,
+          "draw": 16,
+          "away": 13
+        },
+        "avgGoals": 2.6,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.682,
+          "margin": 0.567,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.65,
+          "secondHalfExp": 1.95,
+          "p1": 0.115,
+          "p2": 0.682,
+          "tie": 0.203,
+          "fitErr": 0.01432,
+          "totalExp": 2.6,
+          "referenceFirstHalfProb": 0.3,
+          "referenceDrawProb": 0.57,
+          "referenceSecondHalfProb": 0.13,
+          "reason": "Expected 2.6 goals, split 0.7 in the 1st half vs 2.0 in the 2nd. The 2nd half wins the half race 68% of the time, 57% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2461703",
+        "home": "Atletico Rafaela",
+        "away": "Quilmes AC",
+        "league": "Ar2",
+        "leagueName": "Nacional B",
+        "country": "Argentina",
+        "time": "",
+        "probs": {
+          "home": 40,
+          "draw": 39,
+          "away": 22
+        },
+        "avgGoals": 3.08,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.642,
+          "margin": 0.483,
+          "firstHalfShare": 0.31,
+          "firstHalfExp": 0.95,
+          "secondHalfExp": 2.13,
+          "p1": 0.159,
+          "p2": 0.642,
+          "tie": 0.199,
+          "fitErr": 0.00137,
+          "totalExp": 3.08,
+          "referenceFirstHalfProb": 0.34,
+          "referenceDrawProb": 0.46,
+          "referenceSecondHalfProb": 0.2,
+          "reason": "Expected 3.1 goals, split 1.0 in the 1st half vs 2.1 in the 2nd. The 2nd half wins the half race 64% of the time, 48% clear of the other half."
         }
       },
       {
@@ -431,43 +563,10 @@
           "referenceSecondHalfProb": 0.31,
           "reason": "Expected 2.7 goals, split 0.9 in the 1st half vs 1.8 in the 2nd. The 2nd half wins the half race 58% of the time, 38% clear of the other half."
         }
-      },
-      {
-        "matchId": "2559709",
-        "home": "Auckland",
-        "away": "Melbourne City",
-        "league": "Au1",
-        "leagueName": "A-League",
-        "country": "Australia",
-        "time": "",
-        "probs": {
-          "home": 36,
-          "draw": 38,
-          "away": 26
-        },
-        "avgGoals": 2.82,
-        "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.572,
-          "margin": 0.372,
-          "firstHalfShare": 0.65,
-          "firstHalfExp": 1.83,
-          "secondHalfExp": 0.99,
-          "p1": 0.572,
-          "p2": 0.201,
-          "tie": 0.227,
-          "fitErr": 0.00614,
-          "totalExp": 2.82,
-          "referenceFirstHalfProb": 0.47,
-          "referenceDrawProb": 0.26,
-          "referenceSecondHalfProb": 0.27,
-          "reason": "Expected 2.8 goals, split 1.8 in the 1st half vs 1.0 in the 2nd. The 1st half wins the half race 57% of the time, 37% clear of the other half."
-        }
       }
     ]
   },
-  "lastFetch": "2026-10-17T05:44:38.110Z",
+  "lastFetch": "2026-10-17T06:12:59.399Z",
   "meta": {
     "minProb": 0.55,
     "maxPicks": 12,

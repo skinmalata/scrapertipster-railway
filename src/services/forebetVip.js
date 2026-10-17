@@ -1213,31 +1213,55 @@ async function scrapeDay(dateStr, options) {
   // behaviour, because the alternative - publishing nothing - is worse.
   const schedule = options && options.schedule ? options.schedule : null;
   const sportyOnly = !!schedule;
-  let url = FOREBET_DATE_URL + dateStr;
   // "Today" is the current date in Africa/Lagos, not UTC - toISOString() flips
   // the day between 23:00 and 00:00 UTC and previously mis-selected the URL.
   const isToday = dateStr === lagosDate(0);
-  if (isToday) url = FOREBET_TODAY_URL;
+  // The "today" landing page and the per-date predictions page carry different
+  // slices of the day's fixtures (the landing page rotates with kickoff time,
+  // so an early scrape can be almost entirely one region). For the current date
+  // fetch BOTH and merge, so no single region crowds out the rest of the slate.
+  const listUrls = isToday
+    ? [FOREBET_TODAY_URL, FOREBET_DATE_URL + dateStr]
+    : [FOREBET_DATE_URL + dateStr];
 
-  console.log('[forebetVip] Scraping ' + dateStr + ' (' + url + ')');
-  const html = await fetchUrl(url, { waitRows: true });
-  const raw = parseMatchList(html);
+  let raw = [];
+  for (const url of listUrls) {
+    try {
+      console.log('[forebetVip] Scraping ' + dateStr + ' (' + url + ')');
+      const html = await fetchUrl(url, { waitRows: true });
+      raw = raw.concat(parseMatchList(html));
+    } catch (e) {
+      console.warn('[forebetVip] List fetch failed for ' + dateStr + ' (' + url + '): ' + e.message);
+    }
+  }
+  // De-duplicate fixtures that appear on both pages.
+  const seenFixtures = new Map();
+  for (const m of raw) {
+    const key = m.matchId || (m.home + '|' + m.away);
+    if (!seenFixtures.has(key)) seenFixtures.set(key, m);
+  }
+  raw = Array.from(seenFixtures.values());
   if (raw.length === 0) {
     console.warn('[forebetVip] No matches parsed for ' + dateStr + ' (structure may have changed)');
     return [];
   }
 
   // Half-time probabilities feed the free highest-scoring-half market. This is
-  // best-effort: a failure here must never affect the VIP run.
+  // best-effort: a failure here must never affect the VIP run. Mirror the list
+  // URLs so the merged fixtures all resolve to a half-time split.
   let htMap = {};
-  try {
-    const htUrl = isToday ? FOREBET_HT_TODAY_URL : FOREBET_HT_DATE_URL + dateStr;
-    const htHtml = await fetchUrl(htUrl, { waitRows: true });
-    htMap = parseHtList(htHtml);
-    console.log('[forebetVip] Parsed HT probabilities for ' + Object.keys(htMap).length + ' fixtures on ' + dateStr);
-  } catch (e) {
-    console.warn('[forebetVip] HT scrape failed for ' + dateStr + ': ' + e.message);
+  const htUrls = isToday
+    ? [FOREBET_HT_TODAY_URL, FOREBET_HT_DATE_URL + dateStr]
+    : [FOREBET_HT_DATE_URL + dateStr];
+  for (const htUrl of htUrls) {
+    try {
+      const htHtml = await fetchUrl(htUrl, { waitRows: true });
+      Object.assign(htMap, parseHtList(htHtml));
+    } catch (e) {
+      console.warn('[forebetVip] HT scrape failed for ' + dateStr + ' (' + htUrl + '): ' + e.message);
+    }
   }
+  console.log('[forebetVip] Parsed HT probabilities for ' + Object.keys(htMap).length + ' fixtures on ' + dateStr);
 
   // Resolve every fixture against the bookmaker before any browser work, so
   // the schedule is downloaded once and the answer reused.
