@@ -358,181 +358,183 @@
     ],
     "2026-10-17": [
       {
-        "matchId": "2485681",
-        "home": "Dumbravita",
-        "away": "Bihor Oradea",
-        "league": "Ro2",
-        "leagueName": "Liga 2",
-        "country": "Romania",
+        "matchId": "2470863",
+        "home": "FK Yenisey",
+        "away": "Torpedo Moscow",
+        "league": "Ru2",
+        "leagueName": "1. Division",
+        "country": "Russia",
         "time": "",
         "probs": {
-          "home": 31,
-          "draw": 22,
-          "away": 47
+          "home": 18,
+          "draw": 33,
+          "away": 49
         },
         "predictionText": "2",
-        "avgGoals": 3.38,
+        "avgGoals": 2.18,
         "avgOdds": {
-          "home": 5.75,
-          "draw": 4.33,
-          "away": 1.38
+          "home": 3.66,
+          "draw": 3.24,
+          "away": 2.16
         },
-        "matchUrl": "dumbravita-bihor-oradea-2485681",
+        "matchUrl": "fk-yenisey-torpedo-moscow-2470863",
         "sportybetAvailable": true,
         "sportybet": {
-          "home": "CSC Dumbravita",
-          "away": "FC Bihor Oradea",
-          "league": "Romania - Liga 2",
-          "country": "Romania",
+          "home": "FC Yenisey Krasnoyarsk",
+          "away": "Torpedo Moscow",
+          "league": "Russia - 1. Liga",
+          "country": "Russia",
           "womens": false,
           "homeLevel": "",
           "awayLevel": "",
-          "time": "09:00",
+          "time": "09:30",
           "odds": {
-            "1": 6,
-            "2": 1.41,
-            "X": 4.4
+            "1": 3.4,
+            "2": 2.15,
+            "X": 3.25
           }
         },
         "detail": {
           "books": [],
           "previewText": "",
           "form": {
-            "homeForm": "LLLLLD",
-            "awayForm": "WLWLDW",
-            "homeRecently": 0,
-            "awayRecently": 50
+            "homeForm": "WLDWLD",
+            "awayForm": "WDDLLW",
+            "homeRecently": 33,
+            "awayRecently": 33
           },
           "h2h": {
             "wins": {
-              "home": 2,
-              "away": 2
+              "home": 1,
+              "away": 4
             },
-            "meets": 4
+            "meets": 5
           },
           "expGoals": null
         },
         "market": "team-to-score",
         "pick": "away",
-        "team": "Bihor Oradea",
-        "teamScoreProb": 87,
+        "team": "Torpedo Moscow",
+        "teamScoreProb": 79.6,
         "winProb": null,
         "mustScore": 60,
         "mustScoreBreakdown": {
           "model": 40,
-          "form": 10,
-          "h2h": 10
+          "form": 0,
+          "h2h": 20
         },
         "locked": false,
-        "estimatedOdd": 1.15,
-        "confidence": 87,
+        "estimatedOdd": 1.26,
+        "confidence": 80,
         "edge": null,
         "bestOdds": null,
         "marketPick": null,
         "margin": null,
         "passesGate": true,
         "expGoals": {
-          "home": 1.34,
-          "away": 2.04
+          "home": 0.59,
+          "away": 1.59
         },
         "teamScoreProps": [
           {
             "market": "team-to-score",
             "side": "home",
             "team": "home",
-            "prob": 73.8,
-            "estimatedOdd": 1.35
+            "prob": 44.6,
+            "estimatedOdd": 2.24
           },
           {
             "market": "team-to-score",
             "side": "away",
             "team": "away",
-            "prob": 87,
-            "estimatedOdd": 1.15
+            "prob": 79.6,
+            "estimatedOdd": 1.26
           }
         ],
         "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.531,
-          "margin": 0.277,
-          "firstHalfShare": 0.6,
-          "firstHalfExp": 2.03,
-          "secondHalfExp": 1.35,
-          "p1": 0.531,
-          "p2": 0.254,
-          "tie": 0.215,
-          "fitErr": 0.00391,
-          "totalExp": 3.38,
-          "referenceFirstHalfProb": 0.19,
-          "referenceDrawProb": 0.31,
-          "referenceSecondHalfProb": 0.49,
-          "reason": "Expected 3.4 goals, split 2.0 in the 1st half vs 1.4 in the 2nd. The 1st half wins the half race 53% of the time, 28% clear of the other half."
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.561,
+          "margin": 0.385,
+          "firstHalfShare": 0.32,
+          "firstHalfExp": 0.7,
+          "secondHalfExp": 1.48,
+          "p1": 0.175,
+          "p2": 0.561,
+          "tie": 0.264,
+          "fitErr": 0.00104,
+          "totalExp": 2.18,
+          "referenceFirstHalfProb": 0.08,
+          "referenceDrawProb": 0.55,
+          "referenceSecondHalfProb": 0.36,
+          "reason": "Expected 2.2 goals, split 0.7 in the 1st half vs 1.5 in the 2nd. The 2nd half wins the half race 56% of the time, 39% clear of the other half."
         },
         "preview": null,
         "form": {
-          "home": "LLLLLD",
-          "away": "WLWLDW"
+          "home": "WLDWLD",
+          "away": "WDDLLW"
         },
         "h2h": {
           "wins": {
-            "home": 2,
-            "away": 2
+            "home": 1,
+            "away": 4
           },
-          "meets": 4
+          "meets": 5
         },
-        "sportybetLeague": "Romania - Liga 2"
-      },
+        "sportybetLeague": "Russia - 1. Liga"
+      }
+    ],
+    "2026-10-18": [
       {
-        "matchId": "2485679",
-        "home": "CSA Steaua",
-        "away": "CS Metaloglobus",
-        "league": "Ro2",
-        "leagueName": "Liga 2",
-        "country": "Romania",
+        "matchId": "2426949",
+        "home": "Orlando City SC",
+        "away": "DC United",
+        "league": "Us1",
+        "leagueName": "Major League Soccer",
+        "country": "USA",
         "time": "",
         "probs": {
-          "home": 37,
-          "draw": 38,
-          "away": 24
+          "home": 41,
+          "draw": 35,
+          "away": 25
         },
-        "predictionText": "X",
-        "avgGoals": 2.98,
+        "predictionText": "1",
+        "avgGoals": 4.17,
         "avgOdds": {
-          "home": 2,
-          "draw": 3.3,
-          "away": 3.25
+          "home": 1.66,
+          "draw": 4.2,
+          "away": 4.5
         },
-        "matchUrl": "csa-steaua-cs-metaloglobus-2485679",
+        "matchUrl": "orlando-city-sc-dc-united-2426949",
         "sportybetAvailable": true,
         "sportybet": {
-          "home": "Csa Steaua Bucuresti",
-          "away": "Metaloglobus Bucuresti",
-          "league": "Romania - Liga 2",
-          "country": "Romania",
+          "home": "Orlando City SC",
+          "away": "DC United",
+          "league": "USA - MLS",
+          "country": "USA",
           "womens": false,
           "homeLevel": "",
           "awayLevel": "",
-          "time": "09:00",
+          "time": "00:30",
           "odds": {
-            "1": 1.98,
-            "2": 3.2,
-            "X": 3.5
+            "1": 1.7,
+            "2": 4.53,
+            "X": 4.55
           }
         },
         "detail": {
           "books": [],
           "previewText": "",
           "form": {
-            "homeForm": "DWLDLD",
-            "awayForm": "LWDLLW",
-            "homeRecently": 17,
+            "homeForm": "DWLLLW",
+            "awayForm": "WLDLDW",
+            "homeRecently": 33,
             "awayRecently": 33
           },
           "h2h": {
             "wins": {
-              "home": 2,
-              "away": 0
+              "home": 3,
+              "away": 1
             },
             "meets": 5
           },
@@ -540,8 +542,134 @@
         },
         "market": "team-to-score",
         "pick": "home",
-        "team": "CSA Steaua",
-        "teamScoreProb": 83.6,
+        "team": "Orlando City SC",
+        "teamScoreProb": 92.5,
+        "winProb": null,
+        "mustScore": 55,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 0,
+          "h2h": 15
+        },
+        "locked": false,
+        "estimatedOdd": 1.08,
+        "confidence": 93,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 2.59,
+          "away": 1.58
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 92.5,
+            "estimatedOdd": 1.08
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 79.4,
+            "estimatedOdd": 1.26
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.431,
+          "margin": 0.063,
+          "firstHalfShare": 0.48,
+          "firstHalfExp": 2,
+          "secondHalfExp": 2.17,
+          "p1": 0.368,
+          "p2": 0.431,
+          "tie": 0.202,
+          "fitErr": 0.01155,
+          "totalExp": 4.17,
+          "referenceFirstHalfProb": 0.42,
+          "referenceDrawProb": 0.26,
+          "referenceSecondHalfProb": 0.31,
+          "reason": "Expected 4.2 goals, split 2.0 in the 1st half vs 2.2 in the 2nd. The 2nd half wins the half race 43% of the time, 6% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "DWLLLW",
+          "away": "WLDLDW"
+        },
+        "h2h": {
+          "wins": {
+            "home": 3,
+            "away": 1
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "USA - MLS"
+      },
+      {
+        "matchId": "2426948",
+        "home": "Atlanta United",
+        "away": "Inter Miami CF",
+        "league": "Us1",
+        "leagueName": "Major League Soccer",
+        "country": "USA",
+        "time": "",
+        "probs": {
+          "home": 22,
+          "draw": 25,
+          "away": 53
+        },
+        "predictionText": "2",
+        "avgGoals": 3.41,
+        "avgOdds": {
+          "home": 3.4,
+          "draw": 4.1,
+          "away": 1.9
+        },
+        "matchUrl": "atlanta-united-inter-miami-cf-2426948",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Atlanta United FC",
+          "away": "Inter Miami CF",
+          "league": "USA - MLS",
+          "country": "USA",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "00:30",
+          "odds": {
+            "1": 3.38,
+            "2": 1.99,
+            "X": 4.29
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "WLDWDL",
+            "awayForm": "WWLDDD",
+            "homeRecently": 33,
+            "awayRecently": 33
+          },
+          "h2h": {
+            "wins": {
+              "home": 2,
+              "away": 2
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "Inter Miami CF",
+        "teamScoreProb": 91,
         "winProb": null,
         "mustScore": 50,
         "mustScoreBreakdown": {
@@ -550,233 +678,376 @@
           "h2h": 10
         },
         "locked": false,
-        "estimatedOdd": 1.2,
-        "confidence": 84,
+        "estimatedOdd": 1.1,
+        "confidence": 91,
         "edge": null,
         "bestOdds": null,
         "marketPick": null,
         "margin": null,
         "passesGate": true,
         "expGoals": {
-          "home": 1.81,
-          "away": 1.17
+          "home": 1,
+          "away": 2.41
         },
         "teamScoreProps": [
           {
             "market": "team-to-score",
             "side": "home",
             "team": "home",
-            "prob": 83.6,
-            "estimatedOdd": 1.2
+            "prob": 63.2,
+            "estimatedOdd": 1.58
           },
           {
             "market": "team-to-score",
             "side": "away",
             "team": "away",
-            "prob": 69,
-            "estimatedOdd": 1.45
+            "prob": 91,
+            "estimatedOdd": 1.1
           }
         ],
-        "hsh": null,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.729,
+          "margin": 0.618,
+          "firstHalfShare": 0.26,
+          "firstHalfExp": 0.89,
+          "secondHalfExp": 2.52,
+          "p1": 0.111,
+          "p2": 0.729,
+          "tie": 0.16,
+          "fitErr": 0.00967,
+          "totalExp": 3.41,
+          "referenceFirstHalfProb": 0.21,
+          "referenceDrawProb": 0.46,
+          "referenceSecondHalfProb": 0.33,
+          "reason": "Expected 3.4 goals, split 0.9 in the 1st half vs 2.5 in the 2nd. The 2nd half wins the half race 73% of the time, 62% clear of the other half."
+        },
         "preview": null,
         "form": {
-          "home": "DWLDLD",
-          "away": "LWDLLW"
+          "home": "WLDWDL",
+          "away": "WWLDDD"
         },
         "h2h": {
           "wins": {
             "home": 2,
-            "away": 0
+            "away": 2
           },
           "meets": 5
         },
-        "sportybetLeague": "Romania - Liga 2"
+        "sportybetLeague": "USA - MLS"
       },
       {
-        "matchId": "2493587",
-        "home": "Mito HollyHock",
-        "away": "Urawa Red Diamonds",
-        "league": "Jp1",
-        "leagueName": "J1 League",
-        "country": "Japan",
+        "matchId": "2417544",
+        "home": "Atlético Tucumán",
+        "away": "Rosario Central",
+        "league": "Ar1",
+        "leagueName": "Liga Profesional",
+        "country": "Argentina",
         "time": "",
         "probs": {
-          "home": 24,
-          "draw": 26,
-          "away": 49
+          "home": 15,
+          "draw": 37,
+          "away": 48
         },
         "predictionText": "2",
-        "avgGoals": 2.67,
+        "avgGoals": 2.74,
         "avgOdds": {
-          "home": 3.3,
-          "draw": 3.5,
-          "away": 2
+          "home": 3.1,
+          "draw": 2.9,
+          "away": 2.6
         },
-        "matchUrl": "mito-hollyhock-urawa-red-diamonds-2493587",
+        "matchUrl": "atlético-tucumán-rosario-central-2417544",
         "sportybetAvailable": true,
         "sportybet": {
-          "home": "Mito Hollyhock",
-          "away": "Urawa Red Diamonds",
-          "league": "Japan - J1 League",
-          "country": "Japan",
+          "home": "Atletico Tucuman",
+          "away": "CA Rosario Central",
+          "league": "Argentina - Primera LPF",
+          "country": "Argentina",
           "womens": false,
           "homeLevel": "",
           "awayLevel": "",
-          "time": "08:00",
+          "time": "00:00",
           "odds": {
-            "1": 3.65,
-            "2": 2.12,
-            "X": 3.52
+            "1": 3.33,
+            "2": 2.3,
+            "X": 3
           }
         },
         "detail": {
           "books": [],
           "previewText": "",
           "form": {
-            "homeForm": "WLWLLD",
-            "awayForm": "WLWWLW",
-            "homeRecently": 33,
-            "awayRecently": 67
+            "homeForm": "DLLDLW",
+            "awayForm": "WDWWDL",
+            "homeRecently": 17,
+            "awayRecently": 50
           },
           "h2h": {
             "wins": {
               "home": 0,
               "away": 3
             },
-            "meets": 3
+            "meets": 5
           },
           "expGoals": null
         },
         "market": "team-to-score",
         "pick": "away",
-        "team": "Urawa Red Diamonds",
-        "teamScoreProb": 83.3,
+        "team": "Rosario Central",
+        "teamScoreProb": 87.6,
         "winProb": null,
-        "mustScore": 82,
+        "mustScore": 65,
         "mustScoreBreakdown": {
           "model": 40,
-          "form": 27,
+          "form": 10,
           "h2h": 15
         },
         "locked": false,
-        "estimatedOdd": 1.2,
-        "confidence": 83,
+        "estimatedOdd": 1.14,
+        "confidence": 88,
         "edge": null,
         "bestOdds": null,
         "marketPick": null,
         "margin": null,
         "passesGate": true,
         "expGoals": {
-          "home": 0.88,
-          "away": 1.79
+          "home": 0.65,
+          "away": 2.09
         },
         "teamScoreProps": [
           {
             "market": "team-to-score",
             "side": "home",
             "team": "home",
-            "prob": 58.5,
-            "estimatedOdd": 1.71
+            "prob": 47.8,
+            "estimatedOdd": 2.09
           },
           {
             "market": "team-to-score",
             "side": "away",
             "team": "away",
-            "prob": 83.3,
-            "estimatedOdd": 1.2
+            "prob": 87.6,
+            "estimatedOdd": 1.14
           }
         ],
         "hsh": {
           "pick": "2H",
           "label": "2nd Half",
-          "prob": 0.575,
-          "margin": 0.384,
-          "firstHalfShare": 0.34,
-          "firstHalfExp": 0.91,
-          "secondHalfExp": 1.76,
-          "p1": 0.192,
-          "p2": 0.575,
-          "tie": 0.233,
-          "fitErr": 0.01113,
-          "totalExp": 2.67,
-          "referenceFirstHalfProb": 0.24,
-          "referenceDrawProb": 0.46,
-          "referenceSecondHalfProb": 0.31,
-          "reason": "Expected 2.7 goals, split 0.9 in the 1st half vs 1.8 in the 2nd. The 2nd half wins the half race 58% of the time, 38% clear of the other half."
+          "prob": 0.554,
+          "margin": 0.343,
+          "firstHalfShare": 0.36,
+          "firstHalfExp": 0.99,
+          "secondHalfExp": 1.75,
+          "p1": 0.211,
+          "p2": 0.554,
+          "tie": 0.235,
+          "fitErr": 0.01832,
+          "totalExp": 2.74,
+          "referenceFirstHalfProb": 0.22,
+          "referenceDrawProb": 0.4,
+          "referenceSecondHalfProb": 0.39,
+          "reason": "Expected 2.7 goals, split 1.0 in the 1st half vs 1.8 in the 2nd. The 2nd half wins the half race 55% of the time, 34% clear of the other half."
         },
         "preview": null,
         "form": {
-          "home": "WLWLLD",
-          "away": "WLWWLW"
+          "home": "DLLDLW",
+          "away": "WDWWDL"
         },
         "h2h": {
           "wins": {
             "home": 0,
             "away": 3
           },
-          "meets": 3
+          "meets": 5
         },
-        "sportybetLeague": "Japan - J1 League"
+        "sportybetLeague": "Argentina - Primera LPF"
       },
       {
-        "matchId": "2485675",
-        "home": "CSM Slatina",
-        "away": "Unirea Slobozia",
-        "league": "Ro2",
-        "leagueName": "Liga 2",
-        "country": "Romania",
+        "matchId": "2426951",
+        "home": "New York Red Bulls",
+        "away": "Toronto FC",
+        "league": "Us1",
+        "leagueName": "Major League Soccer",
+        "country": "USA",
         "time": "",
         "probs": {
-          "home": 65,
-          "draw": 21,
-          "away": 14
+          "home": 44,
+          "draw": 34,
+          "away": 22
         },
         "predictionText": "1",
-        "avgGoals": 2.13,
+        "avgGoals": 3.19,
         "avgOdds": {
-          "home": 1.65,
-          "draw": 3.6,
-          "away": 4.2
+          "home": 2,
+          "draw": 4,
+          "away": 3.25
         },
-        "matchUrl": "csm-slatina-unirea-slobozia-2485675",
+        "matchUrl": "new-york-red-bulls-toronto-fc-2426951",
         "sportybetAvailable": true,
         "sportybet": {
-          "home": "CSM Slatina",
-          "away": "AFC Unirea 04 Slobozia",
-          "league": "Romania - Liga 2",
-          "country": "Romania",
+          "home": "New York Red Bulls",
+          "away": "Toronto FC",
+          "league": "USA - MLS",
+          "country": "USA",
           "womens": false,
           "homeLevel": "",
           "awayLevel": "",
-          "time": "09:00",
+          "time": "00:30",
           "odds": {
-            "1": 1.69,
-            "2": 4.25,
-            "X": 3.7
+            "1": 1.92,
+            "2": 3.6,
+            "X": 4.32
           }
         },
         "detail": {
           "books": [],
           "previewText": "",
           "form": {
-            "homeForm": "LWWWDW",
-            "awayForm": "WLLWLL",
-            "homeRecently": 67,
+            "homeForm": "LWLWWL",
+            "awayForm": "DWLLLW",
+            "homeRecently": 50,
             "awayRecently": 33
           },
           "h2h": {
             "wins": {
-              "home": 2,
+              "home": 3,
               "away": 0
             },
-            "meets": 4
+            "meets": 5
           },
           "expGoals": null
         },
         "market": "team-to-score",
         "pick": "home",
-        "team": "CSM Slatina",
-        "teamScoreProb": 82.6,
+        "team": "New York Red Bulls",
+        "teamScoreProb": 88.1,
+        "winProb": null,
+        "mustScore": 65,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 10,
+          "h2h": 15
+        },
+        "locked": false,
+        "estimatedOdd": 1.13,
+        "confidence": 88,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 2.13,
+          "away": 1.06
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 88.1,
+            "estimatedOdd": 1.13
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 65.4,
+            "estimatedOdd": 1.53
+          }
+        ],
+        "hsh": {
+          "pick": "1H",
+          "label": "1st Half",
+          "prob": 0.438,
+          "margin": 0.109,
+          "firstHalfShare": 0.54,
+          "firstHalfExp": 1.72,
+          "secondHalfExp": 1.47,
+          "p1": 0.438,
+          "p2": 0.329,
+          "tie": 0.233,
+          "fitErr": 0.00172,
+          "totalExp": 3.19,
+          "referenceFirstHalfProb": 0.52,
+          "referenceDrawProb": 0.33,
+          "referenceSecondHalfProb": 0.15,
+          "reason": "Expected 3.2 goals, split 1.7 in the 1st half vs 1.5 in the 2nd. The 1st half wins the half race 44% of the time, 11% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "LWLWWL",
+          "away": "DWLLLW"
+        },
+        "h2h": {
+          "wins": {
+            "home": 3,
+            "away": 0
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "USA - MLS"
+      },
+      {
+        "matchId": "2468164",
+        "home": "Santos Laguna",
+        "away": "Querétaro FC",
+        "league": "Mx1",
+        "leagueName": "Liga MX",
+        "country": "Mexico",
+        "time": "",
+        "probs": {
+          "home": 19,
+          "draw": 26,
+          "away": 55
+        },
+        "predictionText": "2",
+        "avgGoals": 2.26,
+        "avgOdds": {
+          "home": 2.35,
+          "draw": 3.6,
+          "away": 2.9
+        },
+        "matchUrl": "santos-laguna-querétaro-fc-2468164",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Club Santos Laguna",
+          "away": "Queretaro FC",
+          "league": "Mexico - Liga MX",
+          "country": "Mexico",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "00:00",
+          "odds": {
+            "1": 2.15,
+            "2": 3.2,
+            "X": 3.6
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "WWWWLD",
+            "awayForm": "WWDWWL",
+            "homeRecently": 67,
+            "awayRecently": 67
+          },
+          "h2h": {
+            "wins": {
+              "home": 2,
+              "away": 2
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "Querétaro FC",
+        "teamScoreProb": 81.4,
         "winProb": null,
         "mustScore": 77,
         "mustScoreBreakdown": {
@@ -785,51 +1056,698 @@
           "h2h": 10
         },
         "locked": false,
-        "estimatedOdd": 1.21,
-        "confidence": 83,
+        "estimatedOdd": 1.23,
+        "confidence": 81,
         "edge": null,
         "bestOdds": null,
         "marketPick": null,
         "margin": null,
         "passesGate": true,
         "expGoals": {
-          "home": 1.75,
-          "away": 0.38
+          "home": 0.58,
+          "away": 1.68
         },
         "teamScoreProps": [
           {
             "market": "team-to-score",
             "side": "home",
             "team": "home",
-            "prob": 82.6,
-            "estimatedOdd": 1.21
+            "prob": 44,
+            "estimatedOdd": 2.27
           },
           {
             "market": "team-to-score",
             "side": "away",
             "team": "away",
-            "prob": 31.6,
-            "estimatedOdd": 3.16
+            "prob": 81.4,
+            "estimatedOdd": 1.23
           }
         ],
-        "hsh": null,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.532,
+          "margin": 0.33,
+          "firstHalfShare": 0.35,
+          "firstHalfExp": 0.79,
+          "secondHalfExp": 1.47,
+          "p1": 0.202,
+          "p2": 0.532,
+          "tie": 0.266,
+          "fitErr": 0.00652,
+          "totalExp": 2.26,
+          "referenceFirstHalfProb": 0.17,
+          "referenceDrawProb": 0.48,
+          "referenceSecondHalfProb": 0.34,
+          "reason": "Expected 2.3 goals, split 0.8 in the 1st half vs 1.5 in the 2nd. The 2nd half wins the half race 53% of the time, 33% clear of the other half."
+        },
         "preview": null,
         "form": {
-          "home": "LWWWDW",
-          "away": "WLLWLL"
+          "home": "WWWWLD",
+          "away": "WWDWWL"
         },
         "h2h": {
           "wins": {
             "home": 2,
-            "away": 0
+            "away": 2
           },
-          "meets": 4
+          "meets": 5
         },
-        "sportybetLeague": "Romania - Liga 2"
+        "sportybetLeague": "Mexico - Liga MX"
+      },
+      {
+        "matchId": "2426950",
+        "home": "New England Revolution",
+        "away": "Chicago Fire",
+        "league": "Us1",
+        "leagueName": "Major League Soccer",
+        "country": "USA",
+        "time": "",
+        "probs": {
+          "home": 36,
+          "draw": 33,
+          "away": 31
+        },
+        "predictionText": "1",
+        "avgGoals": 3.09,
+        "avgOdds": {
+          "home": 2.37,
+          "draw": 3.8,
+          "away": 2.7
+        },
+        "matchUrl": "new-england-revolution-chicago-fire-2426950",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "New England Revolution",
+          "away": "Chicago Fire",
+          "league": "USA - MLS",
+          "country": "USA",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "00:30",
+          "odds": {
+            "1": 2.43,
+            "2": 2.76,
+            "X": 3.91
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "WLLWWW",
+            "awayForm": "LWWWLL",
+            "homeRecently": 67,
+            "awayRecently": 50
+          },
+          "h2h": {
+            "wins": {
+              "home": 2,
+              "away": 2
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "home",
+        "team": "New England Revolution",
+        "teamScoreProb": 81,
+        "winProb": null,
+        "mustScore": 77,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 27,
+          "h2h": 10
+        },
+        "locked": false,
+        "estimatedOdd": 1.23,
+        "confidence": 81,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.66,
+          "away": 1.43
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 81,
+            "estimatedOdd": 1.23
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 76.1,
+            "estimatedOdd": 1.31
+          }
+        ],
+        "hsh": {
+          "pick": "1H",
+          "label": "1st Half",
+          "prob": 0.561,
+          "margin": 0.34,
+          "firstHalfShare": 0.63,
+          "firstHalfExp": 1.95,
+          "secondHalfExp": 1.14,
+          "p1": 0.561,
+          "p2": 0.22,
+          "tie": 0.219,
+          "fitErr": 0.00957,
+          "totalExp": 3.09,
+          "referenceFirstHalfProb": 0.32,
+          "referenceDrawProb": 0.3,
+          "referenceSecondHalfProb": 0.38,
+          "reason": "Expected 3.1 goals, split 1.9 in the 1st half vs 1.1 in the 2nd. The 1st half wins the half race 56% of the time, 34% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "WLLWWW",
+          "away": "LWWWLL"
+        },
+        "h2h": {
+          "wins": {
+            "home": 2,
+            "away": 2
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "USA - MLS"
+      },
+      {
+        "matchId": "2436508",
+        "home": "Tampa Bay Rowdies",
+        "away": "Detroit City FC",
+        "league": "Us2",
+        "leagueName": "USL Championship",
+        "country": "USA",
+        "time": "",
+        "probs": {
+          "home": 33,
+          "draw": 27,
+          "away": 40
+        },
+        "predictionText": "2",
+        "avgGoals": 2.9,
+        "avgOdds": {
+          "home": 1.75,
+          "draw": 3.3,
+          "away": 4.1
+        },
+        "matchUrl": "tampa-bay-rowdies-detroit-city-fc-2436508",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Tampa Bay Rowdies",
+          "away": "Detroit City FC",
+          "league": "USA - USL Championship",
+          "country": "USA",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "00:30",
+          "odds": {
+            "1": 1.84,
+            "2": 4.2,
+            "X": 3.4
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "WLDWLW",
+            "awayForm": "WWWDWL",
+            "homeRecently": 50,
+            "awayRecently": 67
+          },
+          "h2h": {
+            "wins": {
+              "home": 0,
+              "away": 3
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "Detroit City FC",
+        "teamScoreProb": 79.6,
+        "winProb": null,
+        "mustScore": 82,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 27,
+          "h2h": 15
+        },
+        "locked": false,
+        "estimatedOdd": 1.26,
+        "confidence": 80,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.31,
+          "away": 1.59
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 73,
+            "estimatedOdd": 1.37
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 79.6,
+            "estimatedOdd": 1.26
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.669,
+          "margin": 0.534,
+          "firstHalfShare": 0.28,
+          "firstHalfExp": 0.81,
+          "secondHalfExp": 2.09,
+          "p1": 0.135,
+          "p2": 0.669,
+          "tie": 0.196,
+          "fitErr": 0.00808,
+          "totalExp": 2.9,
+          "referenceFirstHalfProb": 0.28,
+          "referenceDrawProb": 0.51,
+          "referenceSecondHalfProb": 0.21,
+          "reason": "Expected 2.9 goals, split 0.8 in the 1st half vs 2.1 in the 2nd. The 2nd half wins the half race 67% of the time, 53% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "WLDWLW",
+          "away": "WWWDWL"
+        },
+        "h2h": {
+          "wins": {
+            "home": 0,
+            "away": 3
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "USA - USL Championship"
+      },
+      {
+        "matchId": "2436505",
+        "home": "Louisville City",
+        "away": "Indy Eleven",
+        "league": "Us2",
+        "leagueName": "USL Championship",
+        "country": "USA",
+        "time": "",
+        "probs": {
+          "home": 50,
+          "draw": 28,
+          "away": 23
+        },
+        "predictionText": "1",
+        "avgGoals": 2.17,
+        "avgOdds": {
+          "home": 1.65,
+          "draw": 3.7,
+          "away": 4.2
+        },
+        "matchUrl": "louisville-city-indy-eleven-2436505",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Louisville City FC",
+          "away": "Indy Eleven",
+          "league": "USA - USL Championship",
+          "country": "USA",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "00:00",
+          "odds": {
+            "1": 1.7,
+            "2": 4.2,
+            "X": 3.9
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "WDWLDD",
+            "awayForm": "LDLLLW",
+            "homeRecently": 33,
+            "awayRecently": 17
+          },
+          "h2h": {
+            "wins": {
+              "home": 3,
+              "away": 1
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "home",
+        "team": "Louisville City",
+        "teamScoreProb": 77.5,
+        "winProb": null,
+        "mustScore": 55,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 0,
+          "h2h": 15
+        },
+        "locked": false,
+        "estimatedOdd": 1.29,
+        "confidence": 78,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.49,
+          "away": 0.68
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 77.5,
+            "estimatedOdd": 1.29
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 49.3,
+            "estimatedOdd": 2.03
+          }
+        ],
+        "hsh": {
+          "pick": "1H",
+          "label": "1st Half",
+          "prob": 0.525,
+          "margin": 0.323,
+          "firstHalfShare": 0.65,
+          "firstHalfExp": 1.41,
+          "secondHalfExp": 0.76,
+          "p1": 0.525,
+          "p2": 0.202,
+          "tie": 0.273,
+          "fitErr": 0.02015,
+          "totalExp": 2.17,
+          "referenceFirstHalfProb": 0.41,
+          "referenceDrawProb": 0.31,
+          "referenceSecondHalfProb": 0.28,
+          "reason": "Expected 2.2 goals, split 1.4 in the 1st half vs 0.8 in the 2nd. The 1st half wins the half race 52% of the time, 32% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "WDWLDD",
+          "away": "LDLLLW"
+        },
+        "h2h": {
+          "wins": {
+            "home": 3,
+            "away": 1
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "USA - USL Championship"
+      },
+      {
+        "matchId": "2468572",
+        "home": "FBC Melgar",
+        "away": "Deportivo Garcilaso",
+        "league": "Pe1",
+        "leagueName": "Primera División",
+        "country": "Peru",
+        "time": "",
+        "probs": {
+          "home": 32,
+          "draw": 33,
+          "away": 36
+        },
+        "predictionText": "2",
+        "avgGoals": 2.57,
+        "avgOdds": {
+          "home": 1.65,
+          "draw": 3.8,
+          "away": 4.5
+        },
+        "matchUrl": "fbc-melgar-deportivo-garcilaso-2468572",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "FBC Melgar",
+          "away": "Deportivo Garcilaso",
+          "league": "Peru - Liga 1",
+          "country": "Peru",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "00:00",
+          "odds": {
+            "1": 1.5,
+            "2": 5.75,
+            "X": 4.4
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "DDWWLD",
+            "awayForm": "LWLWWW",
+            "homeRecently": 33,
+            "awayRecently": 67
+          },
+          "h2h": {
+            "wins": {
+              "home": 1,
+              "away": 2
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "Deportivo Garcilaso",
+        "teamScoreProb": 74.3,
+        "winProb": null,
+        "mustScore": 77,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 27,
+          "h2h": 10
+        },
+        "locked": false,
+        "estimatedOdd": 1.35,
+        "confidence": 74,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.21,
+          "away": 1.36
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 70.2,
+            "estimatedOdd": 1.42
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 74.3,
+            "estimatedOdd": 1.35
+          }
+        ],
+        "hsh": {
+          "pick": "1H",
+          "label": "1st Half",
+          "prob": 0.379,
+          "margin": 0.024,
+          "firstHalfShare": 0.51,
+          "firstHalfExp": 1.31,
+          "secondHalfExp": 1.26,
+          "p1": 0.379,
+          "p2": 0.355,
+          "tie": 0.266,
+          "fitErr": 0.00141,
+          "totalExp": 2.57,
+          "referenceFirstHalfProb": 0.25,
+          "referenceDrawProb": 0.4,
+          "referenceSecondHalfProb": 0.35,
+          "reason": "Expected 2.6 goals, split 1.3 in the 1st half vs 1.3 in the 2nd. The 1st half wins the half race 38% of the time, 2% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "DDWWLD",
+          "away": "LWLWWW"
+        },
+        "h2h": {
+          "wins": {
+            "home": 1,
+            "away": 2
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "Peru - Liga 1"
+      },
+      {
+        "matchId": "2418201",
+        "home": "São Paulo",
+        "away": "Vasco da Gama",
+        "league": "Br1",
+        "leagueName": "Brasileiro Serie A",
+        "country": "Brazil",
+        "time": "",
+        "probs": {
+          "home": 40,
+          "draw": 34,
+          "away": 27
+        },
+        "predictionText": "1",
+        "avgGoals": 2.75,
+        "avgOdds": {
+          "home": 2.05,
+          "draw": 3.4,
+          "away": 3.7
+        },
+        "matchUrl": "são-paulo-vasco-da-gama-2418201",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Sao Paulo FC SP",
+          "away": "CR Vasco da Gama RJ",
+          "league": "Brazil - Brasileiro Serie A",
+          "country": "Brazil",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "01:00",
+          "odds": {
+            "1": 2.15,
+            "2": 3.5,
+            "X": 3.4
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "WLLWDL",
+            "awayForm": "WDWWWW",
+            "homeRecently": 33,
+            "awayRecently": 83
+          },
+          "h2h": {
+            "wins": {
+              "home": 2,
+              "away": 3
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "Vasco da Gama",
+        "teamScoreProb": 67,
+        "winProb": null,
+        "mustScore": 87,
+        "mustScoreBreakdown": {
+          "model": 37,
+          "form": 35,
+          "h2h": 15
+        },
+        "locked": false,
+        "estimatedOdd": 1.49,
+        "confidence": 67,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.64,
+          "away": 1.11
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 80.6,
+            "estimatedOdd": 1.24
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 67,
+            "estimatedOdd": 1.49
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.41,
+          "margin": 0.075,
+          "firstHalfShare": 0.47,
+          "firstHalfExp": 1.29,
+          "secondHalfExp": 1.46,
+          "p1": 0.335,
+          "p2": 0.41,
+          "tie": 0.254,
+          "fitErr": 0.00102,
+          "totalExp": 2.75,
+          "referenceFirstHalfProb": 0.36,
+          "referenceDrawProb": 0.39,
+          "referenceSecondHalfProb": 0.25,
+          "reason": "Expected 2.8 goals, split 1.3 in the 1st half vs 1.5 in the 2nd. The 2nd half wins the half race 41% of the time, 8% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "WLLWDL",
+          "away": "WDWWWW"
+        },
+        "h2h": {
+          "wins": {
+            "home": 2,
+            "away": 3
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "Brazil - Brasileiro Serie A"
       }
     ]
   },
-  "lastFetch": "2026-10-17T06:12:59.392Z",
+  "lastFetch": "2026-10-17T08:03:23.007Z",
   "meta": {
     "markets": [
       "match-winner",
