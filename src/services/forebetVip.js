@@ -206,11 +206,20 @@ function normalizeCountryName(name) {
 // True when a fixture belongs to the top one or two divisions of a major
 // football nation. Requires both a recognised country and a 1/2 tier digit, so
 // a lower division (Ru4) or a cup/youth/women competition (RuY, CLW) fails.
+// A few major leagues use a non-numeric Forebet code instead of a tier digit -
+// England's Premier League is "EPL" and its second tier is "CH" - so those are
+// admitted explicitly per country.
+const MAJOR_LEAGUE_CODE_OVERRIDES = {
+  england: /^(?:EPL|CH)$/
+};
 function isMajorTopTierLeague(match) {
   if (!match) return false;
   const country = normalizeCountryName(match.country);
   if (!country || !HSH_MAJOR_COUNTRIES.has(country)) return false;
-  return /[12]$/.test(String(match.league || '').trim());
+  const league = String(match.league || '').trim();
+  if (/[12]$/.test(league)) return true;
+  const override = MAJOR_LEAGUE_CODE_OVERRIDES[country];
+  return !!(override && override.test(league));
 }
 // The European subset of the curated nations. The public tabs reserve a share
 // of their slots for these leagues so a South-American-heavy fixture slate can
@@ -1220,9 +1229,13 @@ async function scrapeDay(dateStr, options) {
   // slices of the day's fixtures (the landing page rotates with kickoff time,
   // so an early scrape can be almost entirely one region). For the current date
   // fetch BOTH and merge, so no single region crowds out the rest of the slate.
+  // The by-league view of the same date returns a further curated slice built
+  // from the major leagues (England, Spain, Germany, Italy, ...) that the plain
+  // pages leave out entirely, so it is merged in on every date too.
+  const byLeagueListUrl = FOREBET_DATE_URL + dateStr + '/by-league';
   const listUrls = isToday
-    ? [FOREBET_TODAY_URL, FOREBET_DATE_URL + dateStr]
-    : [FOREBET_DATE_URL + dateStr];
+    ? [FOREBET_TODAY_URL, FOREBET_DATE_URL + dateStr, byLeagueListUrl]
+    : [FOREBET_DATE_URL + dateStr, byLeagueListUrl];
 
   let raw = [];
   for (const url of listUrls) {
@@ -1250,9 +1263,10 @@ async function scrapeDay(dateStr, options) {
   // best-effort: a failure here must never affect the VIP run. Mirror the list
   // URLs so the merged fixtures all resolve to a half-time split.
   let htMap = {};
+  const byLeagueHtUrl = FOREBET_HT_DATE_URL + dateStr + '/by-league';
   const htUrls = isToday
-    ? [FOREBET_HT_TODAY_URL, FOREBET_HT_DATE_URL + dateStr]
-    : [FOREBET_HT_DATE_URL + dateStr];
+    ? [FOREBET_HT_TODAY_URL, FOREBET_HT_DATE_URL + dateStr, byLeagueHtUrl]
+    : [FOREBET_HT_DATE_URL + dateStr, byLeagueHtUrl];
   for (const htUrl of htUrls) {
     try {
       const htHtml = await fetchUrl(htUrl, { waitRows: true });
