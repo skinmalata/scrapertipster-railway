@@ -1258,7 +1258,12 @@ async function scrapeDay(dateStr, options) {
     // team-to-score market. A fixture the bookmaker does not list gets no tip
     // at all - the highest-scoring-half call is still computed, since that
     // market is free and needs only list-page data.
-    const publishable = worthDetail(m);
+    //
+    // The whole VIP feed (record cert AND team-to-score) is curated to the top
+    // two divisions of the major football nations - the same rule the free
+    // highest-scoring-half tab uses - so no lower-league, cup or youth fixture
+    // ever publishes a tip.
+    const publishable = worthDetail(m) && isMajorTopTierLeague(m);
     const cert = publishable ? selectMatchWinnerCert({ home: m.home, away: m.away, probs: m.probs, form, h2h }) : null;
     const tip = publishable
       ? (cert || selectTeamScoreTip({ home: m.home, away: m.away, teamScoreProps, form, h2h }))
@@ -1373,7 +1378,8 @@ module.exports = {
   HSH_SHARE_MIN,
   HSH_SHARE_MAX,
   HSH_MARGIN_MIN,
-  HSH_MIN_GOALS
+  HSH_MIN_GOALS,
+  isMajorTopTierLeague
 };
 
 if (require.main === module) {

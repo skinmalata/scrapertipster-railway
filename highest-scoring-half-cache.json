@@ -399,9 +399,308 @@
           "reason": "Expected 2.9 goals, split 1.1 in the 1st half vs 1.8 in the 2nd. The 2nd half wins the half race 55% of the time, 33% clear of the other half."
         }
       }
+    ],
+    "2026-10-15": [
+      {
+        "matchId": "2436494",
+        "home": "Sporting JAX",
+        "away": "Birmingham Legion",
+        "league": "Us2",
+        "leagueName": "USL Championship",
+        "country": "USA",
+        "time": "",
+        "probs": {
+          "home": 49,
+          "draw": 24,
+          "away": 27
+        },
+        "avgGoals": 3.75,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.762,
+          "margin": 0.664,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.94,
+          "secondHalfExp": 2.81,
+          "p1": 0.098,
+          "p2": 0.762,
+          "tie": 0.141,
+          "fitErr": 0.00896,
+          "totalExp": 3.75,
+          "referenceFirstHalfProb": 0.28,
+          "referenceDrawProb": 0.5,
+          "referenceSecondHalfProb": 0.22,
+          "reason": "Expected 3.8 goals, split 0.9 in the 1st half vs 2.8 in the 2nd. The 2nd half wins the half race 76% of the time, 66% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2436485",
+        "home": "Hartford Athletic",
+        "away": "Charleston Battery",
+        "league": "Us2",
+        "leagueName": "USL Championship",
+        "country": "USA",
+        "time": "",
+        "probs": {
+          "home": 33,
+          "draw": 24,
+          "away": 43
+        },
+        "avgGoals": 3.44,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.744,
+          "margin": 0.641,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.86,
+          "secondHalfExp": 2.58,
+          "p1": 0.102,
+          "p2": 0.744,
+          "tie": 0.154,
+          "fitErr": 0.00474,
+          "totalExp": 3.44,
+          "referenceFirstHalfProb": 0.2,
+          "referenceDrawProb": 0.56,
+          "referenceSecondHalfProb": 0.25,
+          "reason": "Expected 3.4 goals, split 0.9 in the 1st half vs 2.6 in the 2nd. The 2nd half wins the half race 74% of the time, 64% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2426932",
+        "home": "Inter Miami CF",
+        "away": "New York City FC",
+        "league": "Us1",
+        "leagueName": "Major League Soccer",
+        "country": "USA",
+        "time": "",
+        "probs": {
+          "home": 45,
+          "draw": 32,
+          "away": 23
+        },
+        "avgGoals": 3.35,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.738,
+          "margin": 0.634,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.84,
+          "secondHalfExp": 2.51,
+          "p1": 0.104,
+          "p2": 0.738,
+          "tie": 0.158,
+          "fitErr": 0.03468,
+          "totalExp": 3.35,
+          "referenceFirstHalfProb": 0.24,
+          "referenceDrawProb": 0.46,
+          "referenceSecondHalfProb": 0.3,
+          "reason": "Expected 3.4 goals, split 0.8 in the 1st half vs 2.5 in the 2nd. The 2nd half wins the half race 74% of the time, 63% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2426938",
+        "home": "Saint Louis City",
+        "away": "Vancouver Whitecaps",
+        "league": "Us1",
+        "leagueName": "Major League Soccer",
+        "country": "USA",
+        "time": "",
+        "probs": {
+          "home": 36,
+          "draw": 26,
+          "away": 39
+        },
+        "avgGoals": 4.25,
+        "hsh": {
+          "pick": "1H",
+          "label": "1st Half",
+          "prob": 0.643,
+          "margin": 0.455,
+          "firstHalfShare": 0.65,
+          "firstHalfExp": 2.76,
+          "secondHalfExp": 1.49,
+          "p1": 0.643,
+          "p2": 0.188,
+          "tie": 0.169,
+          "fitErr": 0.01074,
+          "totalExp": 4.25,
+          "referenceFirstHalfProb": 0.43,
+          "referenceDrawProb": 0.23,
+          "referenceSecondHalfProb": 0.34,
+          "reason": "Expected 4.3 goals, split 2.8 in the 1st half vs 1.5 in the 2nd. The 1st half wins the half race 64% of the time, 46% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2426934",
+        "home": "FC Cincinnati",
+        "away": "New England Revolution",
+        "league": "Us1",
+        "leagueName": "Major League Soccer",
+        "country": "USA",
+        "time": "",
+        "probs": {
+          "home": 35,
+          "draw": 27,
+          "away": 38
+        },
+        "avgGoals": 3.64,
+        "hsh": {
+          "pick": "1H",
+          "label": "1st Half",
+          "prob": 0.617,
+          "margin": 0.422,
+          "firstHalfShare": 0.65,
+          "firstHalfExp": 2.37,
+          "secondHalfExp": 1.27,
+          "p1": 0.617,
+          "p2": 0.194,
+          "tie": 0.189,
+          "fitErr": 0.00708,
+          "totalExp": 3.64,
+          "referenceFirstHalfProb": 0.37,
+          "referenceDrawProb": 0.21,
+          "referenceSecondHalfProb": 0.42,
+          "reason": "Expected 3.6 goals, split 2.4 in the 1st half vs 1.3 in the 2nd. The 1st half wins the half race 62% of the time, 42% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2426936",
+        "home": "Columbus Crew",
+        "away": "Charlotte FC",
+        "league": "Us1",
+        "leagueName": "Major League Soccer",
+        "country": "USA",
+        "time": "",
+        "probs": {
+          "home": 25,
+          "draw": 26,
+          "away": 49
+        },
+        "avgGoals": 3.4,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.605,
+          "margin": 0.409,
+          "firstHalfShare": 0.35,
+          "firstHalfExp": 1.19,
+          "secondHalfExp": 2.21,
+          "p1": 0.196,
+          "p2": 0.605,
+          "tie": 0.199,
+          "fitErr": 0.0284,
+          "totalExp": 3.4,
+          "referenceFirstHalfProb": 0.31,
+          "referenceDrawProb": 0.36,
+          "referenceSecondHalfProb": 0.33,
+          "reason": "Expected 3.4 goals, split 1.2 in the 1st half vs 2.2 in the 2nd. The 2nd half wins the half race 60% of the time, 41% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2426944",
+        "home": "San Diego",
+        "away": "Houston Dynamo",
+        "league": "Us1",
+        "leagueName": "Major League Soccer",
+        "country": "USA",
+        "time": "",
+        "probs": {
+          "home": 38,
+          "draw": 23,
+          "away": 39
+        },
+        "avgGoals": 4,
+        "hsh": {
+          "pick": "1H",
+          "label": "1st Half",
+          "prob": 0.602,
+          "margin": 0.388,
+          "firstHalfShare": 0.63,
+          "firstHalfExp": 2.52,
+          "secondHalfExp": 1.48,
+          "p1": 0.602,
+          "p2": 0.214,
+          "tie": 0.184,
+          "fitErr": 0.01844,
+          "totalExp": 4,
+          "referenceFirstHalfProb": 0.26,
+          "referenceDrawProb": 0.27,
+          "referenceSecondHalfProb": 0.47,
+          "reason": "Expected 4.0 goals, split 2.5 in the 1st half vs 1.5 in the 2nd. The 1st half wins the half race 60% of the time, 39% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2426941",
+        "home": "Real Salt Lake",
+        "away": "San Jose Earthquakes",
+        "league": "Us1",
+        "leagueName": "Major League Soccer",
+        "country": "USA",
+        "time": "",
+        "probs": {
+          "home": 29,
+          "draw": 28,
+          "away": 43
+        },
+        "avgGoals": 2.69,
+        "hsh": {
+          "pick": "1H",
+          "label": "1st Half",
+          "prob": 0.551,
+          "margin": 0.34,
+          "firstHalfShare": 0.64,
+          "firstHalfExp": 1.72,
+          "secondHalfExp": 0.97,
+          "p1": 0.551,
+          "p2": 0.211,
+          "tie": 0.238,
+          "fitErr": 0.0013,
+          "totalExp": 2.69,
+          "referenceFirstHalfProb": 0.27,
+          "referenceDrawProb": 0.32,
+          "referenceSecondHalfProb": 0.41,
+          "reason": "Expected 2.7 goals, split 1.7 in the 1st half vs 1.0 in the 2nd. The 1st half wins the half race 55% of the time, 34% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2426931",
+        "home": "Toronto FC",
+        "away": "Orlando City SC",
+        "league": "Us1",
+        "leagueName": "Major League Soccer",
+        "country": "USA",
+        "time": "",
+        "probs": {
+          "home": 36,
+          "draw": 27,
+          "away": 37
+        },
+        "avgGoals": 4.1,
+        "hsh": {
+          "pick": "1H",
+          "label": "1st Half",
+          "prob": 0.558,
+          "margin": 0.306,
+          "firstHalfShare": 0.6,
+          "firstHalfExp": 2.46,
+          "secondHalfExp": 1.64,
+          "p1": 0.558,
+          "p2": 0.252,
+          "tie": 0.19,
+          "fitErr": 0.00346,
+          "totalExp": 4.1,
+          "referenceFirstHalfProb": 0.31,
+          "referenceDrawProb": 0.27,
+          "referenceSecondHalfProb": 0.41,
+          "reason": "Expected 4.1 goals, split 2.5 in the 1st half vs 1.6 in the 2nd. The 1st half wins the half race 56% of the time, 31% clear of the other half."
+        }
+      }
     ]
   },
-  "lastFetch": "2026-10-16T15:39:58.642Z",
+  "lastFetch": "2026-10-16T16:53:23.073Z",
   "meta": {
     "minProb": 0.55,
     "maxPicks": 12,
