@@ -2416,7 +2416,6 @@ const AD_POSITIONS = [
   { key: 'in_content', label: 'In-Content', description: 'Between prediction cards', width: 728, height: 90, pages: 'predictions' },
   { key: 'homepage_featured', label: 'Homepage Featured', description: 'Above predictions on homepage', width: 728, height: 90, pages: 'homepage' },
   { key: 'carousel_slot', label: 'Homepage Carousel Slot', description: 'Featured bookmaker card in homepage carousel', width: null, height: null, pages: 'homepage' },
-  { key: 'sticky_banner', label: 'Sticky Banner', description: 'Fixed bottom bar (all devices)', width: null, height: null, pages: 'all' },
   { key: 'sponsored_match_card', label: 'Sponsored Match Card', description: 'In-feed sponsored creative between match cards', width: 800, height: 800, pages: 'predictions' }
 ];
 const AD_POSITION_KEYS = AD_POSITIONS.map(function (p) { return p.key; });

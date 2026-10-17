@@ -28,7 +28,6 @@
     in_content: { label: 'In-Content', w: 728, h: 90 },
     homepage_featured: { label: 'Homepage Featured', w: 728, h: 90 },
     carousel_slot: { label: 'Homepage Carousel Slot', w: null, h: null },
-    sticky_banner: { label: 'Sticky Banner', w: null, h: null },
     sponsored_match_card: { label: 'Sponsored Match Card', w: 800, h: 800 }
   };
 
@@ -69,18 +68,14 @@
       '.wft-ad-body{font-size:13px;color:#cbd5e1;line-height:1.5;}',
       '.wft-ad-cta{align-self:flex-start;margin-top:6px;font-size:12px;font-weight:700;color:#fff;',
       ' background:linear-gradient(135deg,#ff2448,#d41a38);padding:8px 16px;border-radius:8px;}',
-      '.wft-ad-slot--sticky{position:fixed;left:0;right:0;bottom:0;z-index:900;max-width:100%;margin:0;padding:0;',
-      ' background:rgba(11,15,28,0.96);border-top:1px solid rgba(255,255,255,0.08);}',
-      '.wft-ad-slot--sticky .wft-ad-ph{min-height:50px;border:0;border-radius:0;background:transparent;}',
-      '.wft-ad-slot--sticky .wft-ad-img{border-radius:0;max-height:110px;object-fit:cover;}',
+      '.wft-ad-slot[data-ad-position="sticky_banner"]{display:none!important;}',
       '.wft-ad-close{position:absolute;top:2px;right:6px;background:none;border:0;color:#94a3b8;font-size:18px;line-height:1;cursor:pointer;z-index:2;}',
       '.wft-ad-slot[data-ad-position="mobile_banner"]{display:none;position:fixed;left:0;right:0;bottom:0;z-index:900;max-width:100%;margin:0;padding:0;',
       ' background:rgba(11,15,28,0.96);border-top:1px solid rgba(255,255,255,0.08);}',
       '.wft-ad-slot[data-ad-position="mobile_banner"] .wft-ad-ph{min-height:50px;border:0;border-radius:0;background:transparent;}',
       '.wft-ad-slot[data-ad-position="mobile_banner"] .wft-ad-img{border-radius:0;max-height:100px;object-fit:contain;background:#0b0f1c;}',
       '@media (max-width:768px){.wft-ad-ph{min-height:90px;}.wft-ad-slot{padding:0 8px;}',
-      ' .wft-ad-slot[data-ad-position="mobile_banner"]{display:block;}',
-      ' .wft-ad-slot[data-ad-position="sticky_banner"]{display:none;}}'
+      ' .wft-ad-slot[data-ad-position="mobile_banner"]{display:block;}}'
     ].join('\n');
     document.head.appendChild(style);
   }
@@ -89,7 +84,7 @@
     var p = POSITIONS[key] || {};
     var dim = (p.w && p.h) ? ' &middot; ' + p.w + '&times;' + p.h : '';
     var min = p.h ? Math.min(p.h, 260) : 120;
-    if (key === 'sticky_banner' || key === 'mobile_banner') min = 50;
+    if (key === 'mobile_banner') min = 50;
     if (key === 'sponsored_match_card') min = 260;
     return '<div class="wft-ad-ph" style="--wft-ad-min:' + min + 'px">' +
       '<span class="wft-ad-ph-label">Ad space &middot; ' + escapeHtml(p.label || key) + dim + '</span>' +
@@ -147,7 +142,7 @@
 
   function addStickyClose(el) {
     var key = el.getAttribute('data-ad-position');
-    if (key !== 'sticky_banner' && key !== 'mobile_banner') return;
+    if (key !== 'mobile_banner') return;
     if (el.querySelector('.wft-ad-close')) return;
     var btn = document.createElement('button');
     btn.className = 'wft-ad-close';
@@ -162,7 +157,6 @@
     var key = el.getAttribute('data-ad-position');
     if (!key) return;
     el.classList.add('wft-ad-slot');
-    if (key === 'sticky_banner') el.classList.add('wft-ad-slot--sticky');
 
     var pos = POSITIONS[key] || {};
     if (pos.w && pos.h) {
