@@ -20,16 +20,16 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="WinFulltime">
 <title>Player Shots Tips Today | WinFulltime</title>
-<meta name="description" content="Daily player shots tips for the Premier League. See which players take the most shots each match - powered by FootyStats, refreshed every day.">
-<meta name="keywords" content="player shots tips, premier league shots, player shots predictions, most shots premier league, football player stats">
+<meta name="description" content="Daily player shots tips for today's matches across the Premier League, La Liga, Serie A, Bundesliga and Ligue 1. High-volume shooters mapped to over shots lines - powered by Understat, refreshed every day.">
+<meta name="keywords" content="player shots tips, shots betting tips, over 2.5 shots, premier league shots, la liga shots, player shots predictions">
 <meta property="og:title" content="Player Shots Tips Today | WinFulltime">
 <meta property="og:url" content="https://winfulltime.com/predictions/player-shots">
-<meta property="og:description" content="Daily player shots tips for the Premier League. See which players take the most shots each match - powered by FootyStats, refreshed every day.">
+<meta property="og:description" content="Daily player shots tips for today's matches across Europe's top 5 leagues. High-volume shooters mapped to over shots lines - powered by Understat.">
 <meta property="og:image" content="https://winfulltime.com/winfulltimelogo.png">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Player Shots Tips Today | WinFulltime">
-<meta name="twitter:description" content="Daily player shots tips for the Premier League. See which players take the most shots each match - powered by FootyStats, refreshed every day.">
+<meta name="twitter:description" content="Daily player shots tips for today's matches across Europe's top 5 leagues. Powered by Understat.">
 <meta name="twitter:image" content="https://winfulltime.com/winfulltimelogo.png">
 <link rel="canonical" href="https://winfulltime.com/predictions/player-shots">
 
@@ -38,7 +38,7 @@
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   "name": "Player Shots Tips Today",
-  "description": "Daily player shots tips for the Premier League. See which players take the most shots each match - powered by FootyStats, refreshed every day.",
+  "description": "Daily player shots tips for today's matches across the Premier League, La Liga, Serie A, Bundesliga and Ligue 1.",
   "url": "https://winfulltime.com/predictions/player-shots",
   "publisher": {
     "@type": "Organization",
@@ -57,7 +57,7 @@
       "name": "What is a player shots tip?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "A player shots tip highlights the players who take the most total shots in the league. Players who consistently shoot a lot are strong candidates for 'player to have 1+ shots' or 'over 0.5 shots' betting markets."
+        "text": "A player shots tip takes the players who shoot the most in the league, checks who is playing today, and maps their shots-per-game average to an over/under shots line. For example, a striker averaging 3.8 shots per game gets a tip of Over 3.5 shots in today's match."
       }
     },
     {
@@ -65,7 +65,7 @@
       "name": "How are player shots tips calculated?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "We pull the latest total shots data from FootyStats for every Premier League player each day. Players are ranked by total shots taken this season. Shots per match (Shots/MP) helps compare players who have played different numbers of games."
+        "text": "We pull season shot totals for every player in Europe's top 5 leagues from Understat each day. For each of today's matches we rank both squads by shots per game (minimum 3 appearances and 1.5 shots per game), then suggest the highest whole-and-a-half shots line that sits below each player's average."
       }
     },
     {
@@ -73,7 +73,7 @@
       "name": "How often is this page updated?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "The data is refreshed once every day, right after the latest round of matches. Each entry shows the date it was last updated so you always know how current the numbers are."
+        "text": "The data is refreshed once every day. Each entry shows the date it was last updated so you always know how current the numbers are."
       }
     }
   ]
@@ -109,16 +109,18 @@
 <main class="container">
 <div class="hero">
   <h1 id="pageHeading">Player Shots Tips</h1>
-  <p class="hero-sub">Daily Premier League player shots leaderboard - refreshed from FootyStats every day. Use these to spot the players most likely to register 1+ shots in their next match.</p>
+  <p class="hero-sub">Today's player shots tips across Europe's top 5 leagues. We take the biggest shooters in each squad playing today and map them to over shots lines - refreshed from Understat every day.</p>
   <div class="meta-row" style="display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:10px">
     <span class="edge-chip" id="updatedAtChip" style="background:rgba(255,152,0,.15);color:#ffb300">Loading…</span>
+    <span class="edge-chip" id="nextMatchdayChip" style="display:none;background:rgba(33,150,243,.15);color:#64b5f6"></span>
   </div>
 </div>
 
 <div id="categoryTabs" style="display:flex;justify-content:center;gap:8px;margin-bottom:24px;flex-wrap:wrap"></div>
 
 <div class="date-tabs" role="tablist">
-  <button class="date-tab active" data-tab="top" role="tab">Top 20 Overall</button>
+  <button class="date-tab active" data-tab="tips" role="tab">Today's Tips</button>
+  <button class="date-tab" data-tab="top" role="tab">Top 20 Overall</button>
   <button class="date-tab" data-tab="per-match" role="tab">Top 20 per Match</button>
 </div>
 
@@ -130,31 +132,36 @@
   <p style="color:var(--text-secondary)">Player shots data is unavailable right now. Please check back later.</p>
 </section>
 
+<section id="tipsWrap" style="display:none">
+  <div id="tipsBody"></div>
+  <p style="margin-top:14px;font-size:12px;color:var(--text-secondary);text-align:center">Lines are set just under each player's shots-per-game average. Always confirm the player starts before kick-off.</p>
+</section>
+
 <section id="tableWrap" style="display:none">
   <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-    <table id="shotsTable" style="width:100%;border-collapse:collapse;font-size:14px;min-width:520px">
+    <table id="shotsTable" style="width:100%;border-collapse:collapse;font-size:14px;min-width:560px">
       <thead>
         <tr style="text-align:left;border-bottom:2px solid var(--border)">
           <th style="padding:10px 8px">#</th>
           <th style="padding:10px 8px">Player</th>
+          <th style="padding:10px 8px">Team</th>
           <th style="padding:10px 8px;text-align:right">Shots</th>
           <th style="padding:10px 8px;text-align:right">MP</th>
           <th style="padding:10px 8px;text-align:right">Shots/MP</th>
           <th style="padding:10px 8px;text-align:right">Goals</th>
-          <th style="padding:10px 8px;text-align:right">On Target</th>
-          <th style="padding:10px 8px;text-align:right">Conv %</th>
+          <th style="padding:10px 8px;text-align:right">xG</th>
         </tr>
       </thead>
       <tbody id="shotsBody"></tbody>
     </table>
   </div>
-  <p style="margin-top:14px;font-size:12px;color:var(--text-secondary);text-align:center">Data source: FootyStats.org · Updated once daily</p>
+  <p style="margin-top:14px;font-size:12px;color:var(--text-secondary);text-align:center">Data source: Understat.com · Top 5 European leagues · Updated once daily</p>
 </section>
 
 <section class="note-box" style="max-width:830px;margin:24px auto">
   <h3 style="margin-top:0;color:#fff">How to use player shots tips</h3>
-  <p>Players near the top of this list take a high volume of shots every match. They are strong candidates for the <strong>player to have 1+ shots</strong> or <strong>over 0.5 shots</strong> markets on your bookmaker. Cross-check the Shots/MP column to compare players fairly even if they have played a different number of matches.</p>
-  <p style="margin-bottom:0">Always confirm the player is likely to start before placing a bet - rotation and injuries can change lineups on matchday.</p>
+  <p>Each tip takes a player who shoots a high volume every match, checks that his team plays today, and suggests the strongest <strong>over shots line</strong> his average supports. A player averaging 2.8 shots per game gets Over 2.5 shots - not a fixed line for everyone.</p>
+  <p style="margin-bottom:0">Always confirm the player is likely to start before placing a bet - rotation and injuries can change lineups on matchday. The Top 20 tables below the tips let you dig deeper into any league.</p>
 </section>
 
 </main>
@@ -164,51 +171,89 @@
 <script>
 (function () {
   var DATA_URL = '/data/player-shots.json';
-  var state = { players: [], date: null, tab: 'top' };
+  var state = { data: null, players: [], fixtures: [], tab: 'tips' };
 
-  function render() {
-    var body = document.getElementById('shotsBody');
-    var tableWrap = document.getElementById('tableWrap');
-    var loading = document.getElementById('loadingState');
-    var error = document.getElementById('errorState');
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
 
-    if (!state.players.length) {
-      loading.style.display = 'none';
-      error.style.display = 'block';
+  function renderTips() {
+    var wrap = document.getElementById('tipsWrap');
+    var body = document.getElementById('tipsBody');
+    var fixtures = state.fixtures;
+    if (!fixtures.length) {
+      body.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:30px 0">No player shots tips scheduled right now. Check back on the next matchday.</p>';
+      wrap.style.display = 'block';
       return;
     }
+    var html = '';
+    for (var i = 0; i < fixtures.length; i++) {
+      var fx = fixtures[i];
+      html += '<div style="background:var(--card-bg, #1a1a2e);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:14px">' +
+        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">' +
+          '<span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#ffb300">' + esc(fx.league) + '</span>' +
+          '<span style="font-size:12px;color:var(--text-secondary)">' + esc(fx.time) + '</span>' +
+          '<span style="font-weight:700;font-size:15px">' + esc(fx.match) + '</span>' +
+        '</div>';
+      for (var j = 0; j < fx.tips.length; j++) {
+        var t = fx.tips[j];
+        html += '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;' + (j ? 'border-top:1px solid var(--border);' : '') + '">' +
+          '<span style="font-size:11px;font-weight:700;color:var(--text-secondary);min-width:42px;text-transform:uppercase">' + esc(t.side) + '</span>' +
+          '<span style="font-weight:600;flex:1">' + esc(t.player) + ' <span style="font-weight:400;font-size:12px;color:var(--text-secondary)">(' + esc(t.team) + ')</span></span>' +
+          '<span style="font-size:12px;color:var(--text-secondary);white-space:nowrap">' + t.spg.toFixed(2) + '/game</span>' +
+          '<span style="background:rgba(76,175,80,.15);color:#81c784;font-weight:700;font-size:13px;padding:4px 10px;border-radius:6px;white-space:nowrap">' + esc(t.tip) + '</span>' +
+          '</div>';
+      }
+      html += '</div>';
+    }
+    body.innerHTML = html;
+    wrap.style.display = 'block';
+  }
 
+  function renderTable() {
+    var body = document.getElementById('shotsBody');
+    var tableWrap = document.getElementById('tableWrap');
     var list = state.players.slice();
     if (state.tab === 'per-match') {
-      list.sort(function (a, b) {
-        var ap = a.mp > 0 ? a.shots / a.mp : 0;
-        var bp = b.mp > 0 ? b.shots / b.mp : 0;
-        return bp - ap;
-      });
+      list.sort(function (a, b) { return b.spg - a.spg; });
     } else {
       list.sort(function (a, b) { return b.shots - a.shots; });
     }
-
     var top = list.slice(0, 20);
     var rows = '';
     for (var i = 0; i < top.length; i++) {
       var p = top[i];
-      var perMatch = p.mp > 0 ? (p.shots / p.mp) : 0;
       rows += '<tr style="border-bottom:1px solid var(--border)">' +
         '<td style="padding:10px 8px;color:var(--text-secondary)">' + (i + 1) + '</td>' +
-        '<td style="padding:10px 8px;font-weight:600">' + p.name + '</td>' +
+        '<td style="padding:10px 8px;font-weight:600">' + esc(p.name) + '</td>' +
+        '<td style="padding:10px 8px;font-size:12px;color:var(--text-secondary)">' + esc(p.team) + '</td>' +
         '<td style="padding:10px 8px;text-align:right;font-weight:700;color:#ffb300">' + p.shots + '</td>' +
-        '<td style="padding:10px 8px;text-align:right;color:var(--text-secondary)">' + p.mp + '</td>' +
-        '<td style="padding:10px 8px;text-align:right">' + perMatch.toFixed(2) + '</td>' +
+        '<td style="padding:10px 8px;text-align:right;color:var(--text-secondary)">' + p.games + '</td>' +
+        '<td style="padding:10px 8px;text-align:right">' + p.spg.toFixed(2) + '</td>' +
         '<td style="padding:10px 8px;text-align:right">' + p.goals + '</td>' +
-        '<td style="padding:10px 8px;text-align:right">' + p.onTarget + '</td>' +
-        '<td style="padding:10px 8px;text-align:right;color:var(--text-secondary)">' + p.conv.toFixed(1) + '</td>' +
+        '<td style="padding:10px 8px;text-align:right;color:var(--text-secondary)">' + p.xg.toFixed(1) + '</td>' +
         '</tr>';
     }
     body.innerHTML = rows;
+    tableWrap.style.display = 'block';
+  }
+
+  function render() {
+    var loading = document.getElementById('loadingState');
+    var error = document.getElementById('errorState');
+    var tipsWrap = document.getElementById('tipsWrap');
+    var tableWrap = document.getElementById('tableWrap');
+    tipsWrap.style.display = 'none';
+    tableWrap.style.display = 'none';
+    if (!state.data) {
+      loading.style.display = 'none';
+      error.style.display = 'block';
+      return;
+    }
     loading.style.display = 'none';
     error.style.display = 'none';
-    tableWrap.style.display = 'block';
+    if (state.tab === 'tips') renderTips();
+    else renderTable();
   }
 
   fetch(DATA_URL, { cache: 'no-cache' })
@@ -217,12 +262,18 @@
       return r.json();
     })
     .then(function (data) {
+      state.data = data;
       state.players = data.players || [];
-      state.date = data.date || null;
+      state.fixtures = data.fixtures || [];
       var chip = document.getElementById('updatedAtChip');
-      if (chip) {
-        chip.textContent = state.date ? ('Updated ' + state.date) : 'Updated daily';
+      if (chip) chip.textContent = data.date ? ('Updated ' + data.date) : 'Updated daily';
+      var nextChip = document.getElementById('nextMatchdayChip');
+      if (nextChip && data.isNextMatchday) {
+        nextChip.textContent = 'Next matchday';
+        nextChip.style.display = 'inline-block';
       }
+      var heading = document.getElementById('pageHeading');
+      if (heading && data.date) heading.textContent = 'Player Shots Tips - ' + data.date;
       render();
     })
     .catch(function (err) {

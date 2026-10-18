@@ -35,7 +35,7 @@ $cacheFiles = @(
   'btts-no-cache.json',
   'forebet-vip-cache.json',
   'highest-scoring-half-cache.json',
-  'data/player-shots/epl.json'
+  'data/player-shots/understat.json'
 )
 
 function Park-Caches {
@@ -103,8 +103,8 @@ Write-Output '=== scrape-forebet-vip ==='
 & $node 'scripts/scrape-forebet-vip.js'
 if ($LASTEXITCODE -ne 0) { Write-Warning "forebet-vip scraper failed (exit $LASTEXITCODE)"; $failed += 'forebet-vip' }
 
-# 4) Player Shots (FootyStats, headed Chrome to pass CF challenge). Writes
-#    data/player-shots/epl.json (season totals: player, shots, mp, goals, onTarget).
+# 4) Player Shots (Understat JSON API; plain HTTPS, no browser). Writes
+#    data/player-shots/understat.json (players + today's fixtures + shot tips).
 Write-Output '=== scrape-player-shots ==='
 & $node 'scripts/scrape-player-shots.js'
 if ($LASTEXITCODE -ne 0) { Write-Warning "player-shots scraper failed (exit $LASTEXITCODE)"; $failed += 'player-shots' }
