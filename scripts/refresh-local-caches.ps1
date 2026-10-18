@@ -34,7 +34,8 @@ $cacheFiles = @(
   'h2h-unbeaten-cache.json',
   'btts-no-cache.json',
   'forebet-vip-cache.json',
-  'highest-scoring-half-cache.json'
+  'highest-scoring-half-cache.json',
+  'data/player-shots/epl.json'
 )
 
 function Park-Caches {
@@ -101,6 +102,12 @@ if ($LASTEXITCODE -ne 0) { Write-Warning "btts-no scraper failed (exit $LASTEXIT
 Write-Output '=== scrape-forebet-vip ==='
 & $node 'scripts/scrape-forebet-vip.js'
 if ($LASTEXITCODE -ne 0) { Write-Warning "forebet-vip scraper failed (exit $LASTEXITCODE)"; $failed += 'forebet-vip' }
+
+# 4) Player Shots (FootyStats, headed Chrome to pass CF challenge). Writes
+#    data/player-shots/epl.json (season totals: player, shots, mp, goals, onTarget).
+Write-Output '=== scrape-player-shots ==='
+& $node 'scripts/scrape-player-shots.js'
+if ($LASTEXITCODE -ne 0) { Write-Warning "player-shots scraper failed (exit $LASTEXITCODE)"; $failed += 'player-shots' }
 
 # Re-verify git state after scraping (a manual rebase may have started meanwhile).
 & powershell -NoProfile -ExecutionPolicy Bypass -File "$PSScriptRoot\check-git-state.ps1" 2>$null

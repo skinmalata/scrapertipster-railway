@@ -17,6 +17,8 @@ on:
       - 'btts-no-cache.json'
       - 'forebet-vip-cache.json'
       - 'highest-scoring-half-cache.json'
+      - 'data/player-shots/**'
+      - 'public/data/player-shots.json'
       - '.github/workflows/*.yml'
   schedule:
     # 09:00 UTC (10:00 WAT) daily, once per day

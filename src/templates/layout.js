@@ -424,13 +424,15 @@ function applyLayoutToHtml(html, activePath) {
   const needsAuth = !/auth\.js/.test(html);
   const needsHamburger = !/getElementById\(['"]hamburger['"]\)/.test(html);
   const needsVipTab = !/vip-tab\.js/.test(html) && /id="categoryLinks"|id="categoryTabs"/.test(html);
+  const needsPlayerShotsTab = !/player-shots-tab\.js/.test(html) && /id="categoryLinks"|id="categoryTabs"/.test(html);
   const needsAds = !/ads\.js/.test(html);
-  if (needsTheme || needsAuth || needsConfig || needsSupabase || needsHamburger || needsVipTab || needsAds) {
+  if (needsTheme || needsAuth || needsConfig || needsSupabase || needsHamburger || needsVipTab || needsPlayerShotsTab || needsAds) {
     let block = '\n';
     if (needsConfig) block += '<script src="/config.js"></script>\n';
     if (needsSupabase) block += '<script src="/supabase-client.js"></script>\n';
     if (needsAuth) block += '<script src="/auth.js?v=20260801"></script>\n';
     if (needsVipTab) block += '<script src="/vip-tab.js?v=20261008" defer></script>\n';
+    if (needsPlayerShotsTab) block += '<script src="/player-shots-tab.js?v=20261018" defer></script>\n';
     if (needsAds) block += '<script src="/ads.js?v=20261017a" defer></script>\n';
     if (needsTheme) {
       block += `<script>
