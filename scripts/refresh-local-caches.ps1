@@ -35,7 +35,10 @@ $cacheFiles = @(
   'btts-no-cache.json',
   'forebet-vip-cache.json',
   'highest-scoring-half-cache.json',
-  'data/player-shots/understat.json'
+  'data/player-shots/understat.json',
+  # Tracked despite the public/data/ ignore rule (force-added); without it in
+  # this list the daily job never stages the static mirror the site reads.
+  'public/data/player-shots.json'
 )
 
 function Park-Caches {
