@@ -130,8 +130,13 @@ if ($LASTEXITCODE -eq 1) {
 # rebase and silently drop the day's push.
 $ErrorActionPreference = 'Continue'
 
-git add $cacheFiles 2>$null
+# public/data/player-shots.json matches the public/data/ ignore rule: plain
+# git add exits non-zero on it even though it's tracked, so exclude it here
+# and force-stage it separately below.
+git add ($cacheFiles | Where-Object { $_ -ne 'public/data/player-shots.json' }) 2>$null
 if ($LASTEXITCODE -ne 0) { Write-Output "git add failed (exit $LASTEXITCODE)"; Stop-Transcript | Out-Null; exit 1 }
+git add -f 'public/data/player-shots.json' 2>$null
+if ($LASTEXITCODE -ne 0) { Write-Output "git add -f player-shots mirror failed (exit $LASTEXITCODE)"; Stop-Transcript | Out-Null; exit 1 }
 
 $cachedChanges = git diff --cached --name-only 2>$null
 if (-not $cachedChanges) {
