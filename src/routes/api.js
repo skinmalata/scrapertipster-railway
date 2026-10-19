@@ -2412,7 +2412,6 @@ const AD_POSITIONS = [
   { key: 'end_of_content', label: 'End of Content Leaderboard', description: 'Above the footer at the end of page content', width: 728, height: 90, pages: 'all' },
   { key: 'global_rectangle', label: 'Global Rectangle', description: 'Sidebar on all pages', width: 300, height: 250, pages: 'all' },
   { key: 'global_skyscraper', label: 'Global Skyscraper', description: 'Side rail on all pages', width: 160, height: 600, pages: 'all' },
-  { key: 'mobile_banner', label: 'Mobile Banner', description: 'Sticky bottom on mobile', width: 320, height: 100, pages: 'all' },
   { key: 'in_content', label: 'In-Content', description: 'Between prediction cards', width: 728, height: 90, pages: 'predictions' },
   { key: 'homepage_featured', label: 'Homepage Featured', description: 'Above predictions on homepage', width: 728, height: 90, pages: 'homepage' },
   { key: 'carousel_slot', label: 'Homepage Carousel Slot', description: 'Featured bookmaker card in homepage carousel', width: null, height: null, pages: 'homepage' },

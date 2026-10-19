@@ -40,6 +40,18 @@
   "name": "Player Shots Tips Today",
   "description": "Daily player shots tips for today's matches across the Premier League, La Liga, Serie A, Bundesliga and Ligue 1.",
   "url": "https://winfulltime.com/predictions/player-shots",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "WinFulltime",
+    "url": "https://winfulltime.com"
+  },
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://winfulltime.com" },
+      { "@type": "ListItem", "position": 2, "name": "Player Shots Tips", "item": "https://winfulltime.com/predictions/player-shots" }
+    ]
+  },
   "publisher": {
     "@type": "Organization",
     "name": "WinFulltime",
@@ -66,6 +78,30 @@
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "We pull season shot totals for every player in Europe's top 5 leagues from Understat each day. For each of today's matches we rank both squads by shots per game (minimum 3 appearances and 1.5 shots per game), then suggest the highest whole-and-a-half shots line that sits below each player's average."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is the shots line the same for every player?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. The line is set just under each player's own shots-per-game average - for example, a player averaging 2.8 shots per game gets Over 2.5 shots. There is no fixed line for everyone."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need to check the lineup before betting?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Always confirm the player is likely to start before placing a bet - rotation and injuries can change lineups on matchday."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What do the Top 20 tables show?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Two views of Europe's top 5 leagues: Top 20 Overall ranks players by total shots, and Top 20 per Match ranks them by shots per match, with matches played, goals and xG for each player."
       }
     },
     {
@@ -158,10 +194,16 @@
   <p style="margin-top:14px;font-size:12px;color:var(--text-secondary);text-align:center">Data source: Understat.com · Top 5 European leagues · Updated once daily</p>
 </section>
 
-<section class="note-box" style="max-width:830px;margin:24px auto">
-  <h3 style="margin-top:0;color:#fff">How to use player shots tips</h3>
-  <p>Each tip takes a player who shoots a high volume every match, checks that his team plays today, and suggests the strongest <strong>over shots line</strong> his average supports. A player averaging 2.8 shots per game gets Over 2.5 shots - not a fixed line for everyone.</p>
-  <p style="margin-bottom:0">Always confirm the player is likely to start before placing a bet - rotation and injuries can change lineups on matchday. The Top 20 tables below the tips let you dig deeper into any league.</p>
+<section class="faq-section" aria-label="Frequently asked questions" style="max-width:830px;margin:32px auto 0">
+  <h2>Frequently Asked Questions</h2>
+  <div class="faq-list">
+    <details class="faq-item" open><summary>What is a player shots tip?</summary><p>A player shots tip takes the players who shoot the most in the league, checks who is playing today, and maps their shots-per-game average to an over/under shots line. For example, a striker averaging 3.8 shots per game gets a tip of Over 3.5 shots in today's match.</p></details>
+    <details class="faq-item"><summary>How are player shots tips calculated?</summary><p>We pull season shot totals for every player in Europe's top 5 leagues from Understat each day. For each of today's matches we rank both squads by shots per game (minimum 3 appearances and 1.5 shots per game), then suggest the highest whole-and-a-half shots line that sits below each player's average.</p></details>
+    <details class="faq-item"><summary>Is the shots line the same for every player?</summary><p>No. The line is set just under each player's own shots-per-game average - for example, a player averaging 2.8 shots per game gets Over 2.5 shots. There is no fixed line for everyone.</p></details>
+    <details class="faq-item"><summary>Do I need to check the lineup before betting?</summary><p>Yes. Always confirm the player is likely to start before placing a bet - rotation and injuries can change lineups on matchday.</p></details>
+    <details class="faq-item"><summary>What do the Top 20 tables show?</summary><p>Two views of Europe's top 5 leagues: Top 20 Overall ranks players by total shots, and Top 20 per Match ranks them by shots per match, with matches played, goals and xG for each player.</p></details>
+    <details class="faq-item"><summary>How often is this page updated?</summary><p>The data is refreshed once every day. Each entry shows the date it was last updated so you always know how current the numbers are.</p></details>
+  </div>
 </section>
 
 </main>
@@ -298,7 +340,7 @@
 <script src="/auth.js?v=20260801"></script>
 <script src="/vip-tab.js?v=20261008" defer></script>
 <script src="/player-shots-tab.js?v=20261018" defer></script>
-<script src="/ads.js?v=20261017a" defer></script>
+<script src="/ads.js?v=20261019" defer></script>
 <script>
 document.getElementById('hamburger')?.addEventListener('click', function() {
   this.classList.toggle('active');

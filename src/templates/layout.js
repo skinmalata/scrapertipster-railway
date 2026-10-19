@@ -357,14 +357,11 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(/<body([^>]*)>/i, (m, attrs) => `<body${attrs}>` + headerHtml(activePath));
   }
 
-  // 1b. Advert slots. The global leaderboard sits directly below the header on
-  //     every page; the sticky banner is a fixed bottom bar. Both are filled by
-  //     /ads.js (placeholder until a creative is assigned in the admin).
+  // 1b. Advert slot. The global leaderboard sits directly below the header on
+  //     every page; it is filled by /ads.js (placeholder until a creative is
+  //     assigned in the admin).
   if (!/data-ad-position="global_leaderboard"/.test(html) && /<\/header>/i.test(html)) {
     html = html.replace(/<\/header>/i, '</header>\n<div class="wft-ad-slot" data-ad-position="global_leaderboard" aria-label="Advertisement"></div>');
-  }
-  if (!/data-ad-position="mobile_banner"/.test(html)) {
-    html = html.replace(/<\/body>/i, '<div class="wft-ad-slot" data-ad-position="mobile_banner" aria-label="Advertisement"></div>\n</body>');
   }
 
   // 2. Pages that don't load app.css need the header/theme styles so the
@@ -433,7 +430,7 @@ function applyLayoutToHtml(html, activePath) {
     if (needsAuth) block += '<script src="/auth.js?v=20260801"></script>\n';
     if (needsVipTab) block += '<script src="/vip-tab.js?v=20261008" defer></script>\n';
     if (needsPlayerShotsTab) block += '<script src="/player-shots-tab.js?v=20261018" defer></script>\n';
-    if (needsAds) block += '<script src="/ads.js?v=20261017a" defer></script>\n';
+    if (needsAds) block += '<script src="/ads.js?v=20261019" defer></script>\n';
     if (needsTheme) {
       block += `<script>
 (function() {

@@ -24,7 +24,6 @@
     end_of_content: { label: 'End of Content Leaderboard', w: 728, h: 90 },
     global_rectangle: { label: 'Global Rectangle', w: 300, h: 250 },
     global_skyscraper: { label: 'Global Skyscraper', w: 160, h: 600 },
-    mobile_banner: { label: 'Mobile Banner', w: 320, h: 100 },
     in_content: { label: 'In-Content', w: 728, h: 90 },
     homepage_featured: { label: 'Homepage Featured', w: 728, h: 90 },
     carousel_slot: { label: 'Homepage Carousel Slot', w: null, h: null },
@@ -69,13 +68,7 @@
       '.wft-ad-cta{align-self:flex-start;margin-top:6px;font-size:12px;font-weight:700;color:#fff;',
       ' background:linear-gradient(135deg,#ff2448,#d41a38);padding:8px 16px;border-radius:8px;}',
       '.wft-ad-slot[data-ad-position="sticky_banner"]{display:none!important;}',
-      '.wft-ad-close{position:absolute;top:2px;right:6px;background:none;border:0;color:#94a3b8;font-size:18px;line-height:1;cursor:pointer;z-index:2;}',
-      '.wft-ad-slot[data-ad-position="mobile_banner"]{display:none;position:fixed;left:0;right:0;bottom:0;z-index:900;max-width:100%;margin:0;padding:0;',
-      ' background:rgba(11,15,28,0.96);border-top:1px solid rgba(255,255,255,0.08);}',
-      '.wft-ad-slot[data-ad-position="mobile_banner"] .wft-ad-ph{min-height:50px;border:0;border-radius:0;background:transparent;}',
-      '.wft-ad-slot[data-ad-position="mobile_banner"] .wft-ad-img{border-radius:0;max-height:100px;object-fit:contain;background:#0b0f1c;}',
-      '@media (max-width:768px){.wft-ad-ph{min-height:90px;}.wft-ad-slot{padding:0 8px;}',
-      ' .wft-ad-slot[data-ad-position="mobile_banner"]{display:block;}}'
+      '@media (max-width:768px){.wft-ad-ph{min-height:90px;}.wft-ad-slot{padding:0 8px;}}'
     ].join('\n');
     document.head.appendChild(style);
   }
@@ -84,7 +77,6 @@
     var p = POSITIONS[key] || {};
     var dim = (p.w && p.h) ? ' &middot; ' + p.w + '&times;' + p.h : '';
     var min = p.h ? Math.min(p.h, 260) : 120;
-    if (key === 'mobile_banner') min = 50;
     if (key === 'sponsored_match_card') min = 260;
     return '<div class="wft-ad-ph" style="--wft-ad-min:' + min + 'px">' +
       '<span class="wft-ad-ph-label">Ad space &middot; ' + escapeHtml(p.label || key) + dim + '</span>' +
@@ -140,19 +132,6 @@
     } catch (e) {}
   }
 
-  function addStickyClose(el) {
-    var key = el.getAttribute('data-ad-position');
-    if (key !== 'mobile_banner') return;
-    if (el.querySelector('.wft-ad-close')) return;
-    var btn = document.createElement('button');
-    btn.className = 'wft-ad-close';
-    btn.type = 'button';
-    btn.setAttribute('aria-label', 'Close advertisement');
-    btn.textContent = '\u00d7';
-    btn.addEventListener('click', function () { el.style.display = 'none'; });
-    el.appendChild(btn);
-  }
-
   function processNode(el, impressions) {
     var key = el.getAttribute('data-ad-position');
     if (!key) return;
@@ -169,14 +148,12 @@
       var ad = pickCreative(key, list);
       el.innerHTML = creativeHTML(ad);
       if (impressions && ad && ad.id) impressions.push(ad.id);
-      addStickyClose(el);
       return;
     }
 
     // No creative: draw the placeholder only when the slot is empty so any
     // baked fallback (e.g. the 1win banner) stays visible.
     if (!el.innerHTML.trim()) el.innerHTML = placeholderHTML(key);
-    addStickyClose(el);
   }
 
   function processAll(root) {
