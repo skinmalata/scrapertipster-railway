@@ -152,7 +152,7 @@ if (require.main === module) {
   if (args.length > 0) {
     dates = args;
   } else {
-    dates = [getDateStr(0), getDateStr(1)];
+    dates = [getDateStr(0), getDateStr(1), getDateStr(2)];
   }
   scrapeUnbeatenStreaks(dates)
     .then(cache => {

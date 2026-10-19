@@ -36,7 +36,7 @@ async function main() {
   if (args.length > 0) {
     dates = args;
   } else {
-    dates = [lagosDate(0), lagosDate(1)];
+    dates = [lagosDate(0), lagosDate(1), lagosDate(2)];
   }
   console.log('Scraping Forebet VIP for dates: ' + dates.join(', '));
 

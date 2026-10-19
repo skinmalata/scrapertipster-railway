@@ -145,7 +145,7 @@
 <main class="container">
 <div class="hero">
   <h1 id="pageHeading">Player Shots Tips</h1>
-  <p class="hero-sub">Today's player shots tips across Europe's top 5 leagues. We take the biggest shooters in each squad playing today and map them to over shots lines - refreshed from Understat every day.</p>
+  <p class="hero-sub">Player shots rankings across Europe's top 5 leagues - refreshed from Understat every day.</p>
   <div class="meta-row" style="display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:10px">
     <span class="edge-chip" id="updatedAtChip" style="background:rgba(255,152,0,.15);color:#ffb300">Loading…</span>
     <span class="edge-chip" id="nextMatchdayChip" style="display:none;background:rgba(33,150,243,.15);color:#64b5f6"></span>
@@ -154,10 +154,10 @@
 
 <div id="categoryTabs" style="display:flex;justify-content:center;gap:8px;margin-bottom:24px;flex-wrap:wrap"></div>
 
-<div class="date-tabs" role="tablist">
-  <button class="date-tab active" data-tab="tips" role="tab">Today's Tips</button>
-  <button class="date-tab" data-tab="top" role="tab">Top 20 Overall</button>
-  <button class="date-tab" data-tab="per-match" role="tab">Top 20 per Match</button>
+<div class="date-tabs" id="dateTabs">
+  <button class="date-tab" data-date="yesterday" onclick="switchDate('yesterday')">Yesterday</button>
+  <button class="date-tab active" data-date="today" onclick="switchDate('today')">Today</button>
+  <button class="date-tab" data-date="tomorrow" onclick="switchDate('tomorrow')">Tomorrow</button>
 </div>
 
 <section id="loadingState" style="text-align:center;padding:40px 0;color:var(--text-secondary)">

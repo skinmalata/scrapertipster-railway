@@ -103,7 +103,7 @@ if ($LASTEXITCODE -ne 0) { Write-Warning "btts-no scraper failed (exit $LASTEXIT
 
 # 3) Forebet VIP (1X2) + free highest-scoring-half. Uses the Lagos 2-day horizon.
 Write-Output '=== scrape-forebet-vip ==='
-& $node 'scripts/scrape-forebet-vip.js'
+& $node 'scripts/scrape-forebet-vip.js' $dates
 if ($LASTEXITCODE -ne 0) { Write-Warning "forebet-vip scraper failed (exit $LASTEXITCODE)"; $failed += 'forebet-vip' }
 
 # 4) Player Shots (Understat JSON API; plain HTTPS, no browser). Writes

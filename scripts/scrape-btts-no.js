@@ -119,7 +119,7 @@ async function scrapeBttsNo(dates) {
 
 if (require.main === module) {
   const args = process.argv.slice(2);
-  const dates = args.length > 0 ? args : [getDateStr(0), getDateStr(1)];
+  const dates = args.length > 0 ? args : [getDateStr(0), getDateStr(1), getDateStr(2)];
   scrapeBttsNo(dates)
     .then(r => {
       console.log(`\n=== BTTS NO MATCHES: ${r.totalMatches} ===`);

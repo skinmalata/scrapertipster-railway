@@ -1468,7 +1468,7 @@ module.exports = {
 };
 
 if (require.main === module) {
-  const dates = process.argv.slice(2).length ? process.argv.slice(2) : [lagosDate(0), lagosDate(1)];
+  const dates = process.argv.slice(2).length ? process.argv.slice(2) : [lagosDate(0), lagosDate(1), lagosDate(2)];
   scrapeVip(dates).then((byDate) => {
     for (const [date, matches] of Object.entries(byDate)) {
       console.log('\n=== ' + date + ' (' + matches.length + ' fixtures) ===');

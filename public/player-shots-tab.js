@@ -16,7 +16,7 @@
       link.id = 'tab-player-shots';
       link.className = 'tab-btn' + (isActive ? ' active' : '');
       link.textContent = 'Player Shots';
-      link.setAttribute('style', 'background:linear-gradient(135deg,#ff9800,#ffb300);color:#fff');
+      link.setAttribute('style', 'background:var(--tab-bg,var(--bg-card-2));color:var(--text-secondary);border:1px solid var(--border)');
       container.appendChild(link);
     });
   }
