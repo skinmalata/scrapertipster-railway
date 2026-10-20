@@ -139,26 +139,29 @@ function verifyIpn(rawBody) {
 // Process a verified IPN. Same completion paths as the webhook: regToken →
 // create account, userId → record payment. Route-level payment_events dedupe
 // keyed on txn_id prevents PayPal's IPN retries from double-processing.
+// Validation rejections return { skipped: true } so the route can ack with 200
+// (no retry); processing failures reject or return handled:false without
+// skipped so PayPal's retry can succeed later.
 function handleIpn(params) {
   params = params || {};
   if ((params.payment_status || '') !== 'Completed') {
-    return Promise.resolve({ handled: false, reason: 'payment_status ' + (params.payment_status || 'missing') });
+    return Promise.resolve({ handled: false, skipped: true, reason: 'payment_status ' + (params.payment_status || 'missing') });
   }
   if ((params.mc_currency || '') !== 'USD') {
-    return Promise.resolve({ handled: false, reason: 'currency ' + (params.mc_currency || 'missing') });
+    return Promise.resolve({ handled: false, skipped: true, reason: 'currency ' + (params.mc_currency || 'missing') });
   }
   var txnId = params.txn_id || '';
-  if (!txnId) return Promise.resolve({ handled: false, reason: 'missing txn_id' });
+  if (!txnId) return Promise.resolve({ handled: false, skipped: true, reason: 'missing txn_id' });
   var meta = parseCustomId(params.custom);
-  if (!meta) return Promise.resolve({ handled: false, reason: 'no custom_id' });
+  if (!meta) return Promise.resolve({ handled: false, skipped: true, reason: 'no custom_id' });
   var plan = PLANS[meta.planType];
-  if (!plan) return Promise.resolve({ handled: false, reason: 'unknown plan ' + meta.planType });
+  if (!plan) return Promise.resolve({ handled: false, skipped: true, reason: 'unknown plan ' + meta.planType });
   if (Math.abs(parseFloat(params.mc_gross || '0') - parseFloat(plan.price)) > 0.01) {
-    return Promise.resolve({ handled: false, reason: 'amount mismatch ' + params.mc_gross });
+    return Promise.resolve({ handled: false, skipped: true, reason: 'amount mismatch ' + params.mc_gross });
   }
   var wantReceiver = process.env.PAYPAL_RECEIVER_EMAIL;
   if (wantReceiver && String(params.receiver_email || '').toLowerCase() !== wantReceiver.toLowerCase()) {
-    return Promise.resolve({ handled: false, reason: 'receiver_email mismatch' });
+    return Promise.resolve({ handled: false, skipped: true, reason: 'receiver_email mismatch' });
   }
   var email = params.payer_email || '';
   if (meta.regToken) {
@@ -240,8 +243,12 @@ function computeExpiry(planType, fromDate) {
   return d;
 }
 
+// Records the payment, activates the subscription and grants VIP. Rejects on
+// any Supabase error so callers (webhook/IPN) can fail the event and let
+// PayPal retry — a silently swallowed error here previously caused paying
+// users to never receive Pro.
 function recordPayment(userId, email, planType, providerId, expiresAt, amount) {
-  if (!supabase) return Promise.resolve({ error: 'No database' });
+  if (!supabase) return Promise.reject(new Error('No database'));
 
   return supabase.from('payments').insert({
     user_id: userId,
@@ -251,7 +258,8 @@ function recordPayment(userId, email, planType, providerId, expiresAt, amount) {
     currency: 'USD',
     status: 'completed',
     payment_details: { provider: 'paypal', providerId: providerId, planType: planType, email: email }
-  }).then(function () {
+  }).then(function (ins) {
+    if (ins.error) throw new Error('payments insert failed: ' + ins.error.message);
     return supabase.from('subscriptions').upsert({
       user_id: userId,
       plan_type: planType,
@@ -261,12 +269,14 @@ function recordPayment(userId, email, planType, providerId, expiresAt, amount) {
       currency: 'USD',
       expires_at: expiresAt.toISOString()
     }, { onConflict: 'payment_id' });
-  }).then(function () {
+  }).then(function (up) {
+    if (up.error) throw new Error('subscriptions upsert failed: ' + up.error.message);
     return supabase.rpc('set_vip_status', {
       user_uuid: userId,
       vip_expires: expiresAt.toISOString()
     });
-  }).then(function () {
+  }).then(function (rpc) {
+    if (rpc.error) throw new Error('set_vip_status failed: ' + rpc.error.message);
     return { handled: true, reference: providerId, userId: userId, planType: planType, expiresAt: expiresAt };
   });
 }
@@ -323,13 +333,43 @@ function attachRegistration(reg, userId, planType, providerId, expiresAt, amount
       return supabase.from('pending_registrations')
         .update({ status: 'completed', completed_at: new Date().toISOString() })
         .eq('reg_token', reg.reg_token)
-        .then(function () {
-          return { handled: true, registration: true, userId: userId, planType: planType, providerId: providerId };
+        .then(function (upd) {
+          if (upd.error) {
+            // Payment + VIP already granted; a failed status update must not
+            // fail the event (the webhook would retry and double-record).
+            console.warn('[paypal] Failed to mark registration completed:', upd.error.message);
+          }
+          // Best-effort: email the buyer a one-time login link. The account is
+          // passwordless, and without this the user never learns how to sign in.
+          return sendLoginLinkEmail(reg.email).then(function (sent) {
+            return { handled: true, registration: true, userId: userId, planType: planType, providerId: providerId, loginEmailSent: sent };
+          });
         });
     })
     .catch(function (err) {
       return { handled: false, reason: 'Payment recording failed: ' + err.message };
     });
+}
+
+// Emails a one-time Supabase magic link so a passwordless (paywall-created)
+// account can sign in. Best-effort: failure is logged but never fails the
+// payment event.
+function sendLoginLinkEmail(email) {
+  if (!supabase || !email) return Promise.resolve(false);
+  return supabase.auth.signInWithOtp({
+    email: email,
+    options: { shouldCreateUser: false }
+  }).then(function (result) {
+    if (result.error) {
+      console.warn('[paypal] Login-link email failed for ' + email + ':', result.error.message);
+      return false;
+    }
+    console.log('[paypal] Login-link email sent to ' + email);
+    return true;
+  }).catch(function (e) {
+    console.warn('[paypal] Login-link email failed for ' + email + ':', e.message);
+    return false;
+  });
 }
 
 // PayPal one-time payments have no portal and nothing to cancel — they simply

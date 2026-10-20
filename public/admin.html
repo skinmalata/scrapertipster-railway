@@ -157,6 +157,20 @@ textarea.edit-input { resize: vertical; font-family: 'Inter', sans-serif; min-he
 <input type="text" id="searchInput" placeholder="Search by email..." onkeydown="if(event.key==='Enter'){loadUsers(1);}">
 <button onclick="loadUsers(1)">Search</button>
 <button onclick="openCreate()" style="background:linear-gradient(135deg,#4ade80,#22c55e);color:#0a0e17;">+ Add User</button>
+<button onclick="toggleRegistrations()" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#0a0e17;">Registrations</button>
+</div>
+
+<div id="regsPanel" class="edit-panel hidden">
+<h3 style="margin:0 0 12px;font-size:16px;">Pending Registrations <small style="font-weight:400;color:#94a3b8;font-size:12px;">(paid signups the webhook may have missed)</small></h3>
+<div class="table-wrap" style="margin-bottom:8px;">
+<table>
+<thead><tr><th>Email</th><th>Name</th><th>Plan</th><th>Status</th><th>Created</th><th></th></tr></thead>
+<tbody id="regsBody"><tr><td colspan="6" style="text-align:center;padding:20px;color:rgba(232,237,245,0.3);">Loading...</td></tr></tbody>
+</table>
+</div>
+<div class="action-bar" style="border-top:none;margin-top:4px;padding-top:0;">
+<button class="action-btn action-default" onclick="closeRegistrations()" style="background:rgba(255,255,255,0.06);color:#e2e8f0;">Close</button>
+</div>
 </div>
 
 <div id="createPanel" class="edit-panel hidden">
@@ -216,6 +230,7 @@ textarea.edit-input { resize: vertical; font-family: 'Inter', sans-serif; min-he
             <button id="btnSetAdmin" class="action-btn action-pro" onclick="setAdmin()" style="background:linear-gradient(135deg,#a855f7,#7c3aed);">Set Admin</button>
             <button id="btnRevokeAdmin" class="action-btn action-revoke" onclick="revokeAdmin()">Revoke Admin</button>
             <button id="btnEdit" class="action-btn action-extend" onclick="openEdit()" style="background:linear-gradient(135deg,#38bdf8,#0284c7);">Edit User</button>
+            <button id="btnResetPassword" class="action-btn action-extend" onclick="openResetPassword()" style="background:linear-gradient(135deg,#f472b6,#db2777);">Reset Password</button>
             <button id="btnDelete" class="action-btn action-revoke" onclick="deleteUser()">Delete User</button>
 </div>
 
@@ -228,6 +243,18 @@ textarea.edit-input { resize: vertical; font-family: 'Inter', sans-serif; min-he
 <div class="action-bar" style="border-top:none;margin-top:12px;padding-top:0;">
 <button class="action-btn action-pro" onclick="saveEdit()">Save Changes</button>
 <button class="action-btn action-default" onclick="closeEdit()" style="background:rgba(255,255,255,0.06);color:#e2e8f0;">Cancel</button>
+</div>
+</div>
+
+<div id="resetPanel" class="edit-panel hidden">
+<h3 style="margin:0 0 12px;font-size:16px;">Reset Password <small id="resetEmailLabel" style="font-weight:400;color:#94a3b8;font-size:12px;"></small></h3>
+<p style="font-size:13px;color:#94a3b8;margin:0 0 12px;">Sets a new password immediately. The user is not emailed — share the new password with them securely. They can change it later from Account.</p>
+<div class="detail-grid">
+<div class="detail-field"><div class="field-label">New Password</div><input type="text" id="resetPassword" class="edit-input" placeholder="Min 6 characters"></div>
+</div>
+<div class="action-bar" style="border-top:none;margin-top:12px;padding-top:0;">
+<button class="action-btn action-pro" onclick="saveResetPassword()">Set Password</button>
+<button class="action-btn action-default" onclick="closeResetPassword()" style="background:rgba(255,255,255,0.06);color:#e2e8f0;">Cancel</button>
 </div>
 </div>
 </div>
@@ -510,6 +537,90 @@ function deleteUser() {
     selectedUserId = null;
     loadUsers(curPage);
   }).catch(function() { showError('Failed to delete user'); });
+}
+
+function openResetPassword() {
+  if (!selectedUserId) return;
+  document.getElementById('resetPassword').value = '';
+  document.getElementById('resetEmailLabel').textContent = document.getElementById('detEmail').textContent || '';
+  document.getElementById('resetPanel').classList.remove('hidden');
+}
+
+function closeResetPassword() {
+  document.getElementById('resetPanel').classList.add('hidden');
+}
+
+function saveResetPassword() {
+  if (!selectedUserId) return;
+  var password = document.getElementById('resetPassword').value;
+  if (password.length < 6) { showError('Password must be at least 6 characters.'); return; }
+  if (!confirm('Set this new password for ' + (document.getElementById('detEmail').textContent || 'this user') + '?')) return;
+  WFT.apiFetch('/api/admin/users/' + selectedUserId + '/reset-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: password })
+  }).then(function(data) {
+    if (data.error) { showError(data.error); return; }
+    showSuccess('Password updated. Share it with the user securely.');
+    closeResetPassword();
+  }).catch(function() { showError('Failed to reset password'); });
+}
+
+function toggleRegistrations() {
+  var panel = document.getElementById('regsPanel');
+  if (panel.classList.contains('hidden')) {
+    panel.classList.remove('hidden');
+    loadRegistrations();
+  } else {
+    panel.classList.add('hidden');
+  }
+}
+
+function closeRegistrations() {
+  document.getElementById('regsPanel').classList.add('hidden');
+}
+
+function loadRegistrations() {
+  var body = document.getElementById('regsBody');
+  body.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:rgba(232,237,245,0.3);">Loading...</td></tr>';
+  WFT.apiFetch('/api/admin/pending-registrations?status=all&perPage=100').then(function(data) {
+    if (data.error) { showError(data.error); return; }
+    var rows = data.registrations || [];
+    if (!rows.length) {
+      body.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:rgba(232,237,245,0.3);">No registrations found</td></tr>';
+      return;
+    }
+    body.innerHTML = rows.map(function(r) {
+      var statusColor = r.status === 'completed' ? '#4ade80' : (r.status === 'expired' ? '#94a3b8' : '#fbbf24');
+      var action = r.status === 'pending'
+        ? '<button class="action-btn action-pro" style="padding:4px 10px;font-size:12px;" onclick="completeRegistration(\'' + r.reg_token + '\', \'' + (r.email || '').replace(/'/g, '') + '\')">Complete</button>'
+        : '-';
+      return '<tr>' +
+        '<td>' + (r.email || '-') + '</td>' +
+        '<td>' + (r.full_name || '-') + '</td>' +
+        '<td>' + (r.plan_type || '-') + '</td>' +
+        '<td style="color:' + statusColor + '">' + r.status + '</td>' +
+        '<td>' + (r.created_at ? new Date(r.created_at).toLocaleString() : '-') + '</td>' +
+        '<td>' + action + '</td>' +
+        '</tr>';
+    }).join('');
+  }).catch(function() { showError('Failed to load registrations'); });
+}
+
+function completeRegistration(regToken, email) {
+  if (!confirm('Complete registration for ' + email + '? This creates the account (if missing), activates Pro, and emails a login link.')) return;
+  WFT.apiFetch('/api/admin/pending-registrations/' + regToken + '/complete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({})
+  }).then(function(data) {
+    if (data.error) { showError(data.error); return; }
+    var msg = data.message + ' (expires ' + new Date(data.expiresAt).toLocaleDateString() + ')';
+    if (data.loginEmailSent) msg += '. Login link emailed.';
+    showSuccess(msg);
+    loadRegistrations();
+    loadUsers(curPage);
+  }).catch(function() { showError('Failed to complete registration'); });
 }
 
 function openCreate() {

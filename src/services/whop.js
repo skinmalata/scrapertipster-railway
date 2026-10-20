@@ -282,13 +282,43 @@ function attachRegistration(reg, userId, planType, providerId, expiresAt, amount
       return supabase.from('pending_registrations')
         .update({ status: 'completed', completed_at: new Date().toISOString() })
         .eq('reg_token', reg.reg_token)
-        .then(function () {
-          return { handled: true, registration: true, userId: userId, planType: planType, providerId: providerId };
+        .then(function (upd) {
+          if (upd.error) {
+            // Payment + VIP already granted; a failed status update must not
+            // fail the event (the webhook would retry and double-record).
+            console.warn('[whop] Failed to mark registration completed:', upd.error.message);
+          }
+          // Best-effort: email the buyer a one-time login link. The account is
+          // passwordless, and without this the user never learns how to sign in.
+          return sendLoginLinkEmail(regEmail).then(function (sent) {
+            return { handled: true, registration: true, userId: userId, planType: planType, providerId: providerId, loginEmailSent: sent };
+          });
         });
     })
     .catch(function (err) {
       return { handled: false, reason: 'Payment recording failed: ' + err.message };
     });
+}
+
+// Emails a one-time Supabase magic link so a passwordless (paywall-created)
+// account can sign in. Best-effort: failure is logged but never fails the
+// payment event.
+function sendLoginLinkEmail(email) {
+  if (!supabase || !email) return Promise.resolve(false);
+  return supabase.auth.signInWithOtp({
+    email: email,
+    options: { shouldCreateUser: false }
+  }).then(function (result) {
+    if (result.error) {
+      console.warn('[whop] Login-link email failed for ' + email + ':', result.error.message);
+      return false;
+    }
+    console.log('[whop] Login-link email sent to ' + email);
+    return true;
+  }).catch(function (e) {
+    console.warn('[whop] Login-link email failed for ' + email + ':', e.message);
+    return false;
+  });
 }
 
 function onMembershipDeactivated(data, event) {
@@ -319,8 +349,12 @@ function onMembershipDeactivated(data, event) {
   return action.then(function () { return { handled: true, eventName: 'membership.deactivated' }; });
 }
 
+// Records the payment, activates the subscription and grants VIP. Rejects on
+// any Supabase error so callers (webhook) can fail the event and let the
+// provider retry — a silently swallowed error here previously caused paying
+// users to never receive Pro.
 function recordPayment(userId, email, planType, providerId, expiresAt, amount) {
-  if (!supabase) return Promise.resolve({ error: 'No database' });
+  if (!supabase) return Promise.reject(new Error('No database'));
 
   return supabase.from('payments').insert({
     user_id: userId,
@@ -330,7 +364,8 @@ function recordPayment(userId, email, planType, providerId, expiresAt, amount) {
     currency: 'USD',
     status: 'completed',
     payment_details: { provider: 'whop', providerId: providerId, planType: planType, email: email }
-  }).then(function () {
+  }).then(function (ins) {
+    if (ins.error) throw new Error('payments insert failed: ' + ins.error.message);
     return supabase.from('subscriptions').upsert({
       user_id: userId,
       plan_type: planType,
@@ -340,12 +375,14 @@ function recordPayment(userId, email, planType, providerId, expiresAt, amount) {
       currency: 'USD',
       expires_at: expiresAt.toISOString()
     }, { onConflict: 'payment_id' });
-  }).then(function () {
+  }).then(function (up) {
+    if (up.error) throw new Error('subscriptions upsert failed: ' + up.error.message);
     return supabase.rpc('set_vip_status', {
       user_uuid: userId,
       vip_expires: expiresAt.toISOString()
     });
-  }).then(function () {
+  }).then(function (rpc) {
+    if (rpc.error) throw new Error('set_vip_status failed: ' + rpc.error.message);
     return { handled: true, reference: providerId, userId: userId, planType: planType, expiresAt: expiresAt };
   });
 }

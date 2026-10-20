@@ -1431,10 +1431,26 @@ router.post('/webhook/paypal', function (req, res) {
           return res.json({ received: true, duplicate: true });
         }
 
+        // Claim first, remove the claim on processing failure so PayPal's
+        // retry can deliver the event again (mirrors the Whop webhook).
         return supabase.from('payment_events').insert({ provider: 'paypal', event_id: eventId }).then(function () {
           return paypal.handleEvent(event).then(function (result) {
             console.log('[paypal-webhook] Processed event:', eventName, JSON.stringify(result));
-            res.json({ received: true, handled: true });
+            if (result && result.handled === false && result.reason) {
+              return supabase.from('payment_events').delete()
+                .eq('provider', 'paypal').eq('event_id', eventId)
+                .then(function () {
+                  res.status(502).json({ received: true, handled: false, error: result.reason });
+                });
+            }
+            res.json({ received: true, handled: true, result: result });
+          }).catch(function (err) {
+            console.error('[paypal-webhook] Processing error:', err.message);
+            return supabase.from('payment_events').delete()
+              .eq('provider', 'paypal').eq('event_id', eventId)
+              .then(function () {
+                res.status(500).json({ error: 'Webhook processing failed' });
+              });
           });
         });
       }).catch(function (err) {
@@ -1470,16 +1486,35 @@ router.post('/webhook/paypal-ipn', express.raw({ type: 'application/x-www-form-u
       .then(function (existing) {
         if (existing.data) {
           console.log('[paypal-ipn] Duplicate IPN ignored:', txnId);
-          return;
+          return res.sendStatus(200);
         }
+        // Claim first; on processing failure remove the claim and respond
+        // non-2xx so PayPal's IPN retry can deliver it again.
         return supabase.from('payment_events').insert({ provider: 'paypal', event_id: eventId }).then(function () {
           return paypal.handleIpn(params).then(function (result) {
             console.log('[paypal-ipn] Processed:', JSON.stringify(result));
+            if (result && result.handled === false && result.reason && !result.skipped) {
+              return supabase.from('payment_events').delete()
+                .eq('provider', 'paypal').eq('event_id', eventId)
+                .then(function () {
+                  res.status(502).send('Processing failed');
+                });
+            }
+            res.sendStatus(200);
+          }).catch(function (err) {
+            console.error('[paypal-ipn] Processing error:', err.message);
+            return supabase.from('payment_events').delete()
+              .eq('provider', 'paypal').eq('event_id', eventId)
+              .then(function () {
+                res.status(500).send('Processing failed');
+              });
           });
         });
       })
-      .catch(function (err) { console.error('[paypal-ipn] Error:', err.message); })
-      .then(function () { res.sendStatus(200); });
+      .catch(function (err) {
+        console.error('[paypal-ipn] Error:', err.message);
+        res.sendStatus(500);
+      });
   }).catch(function (err) {
     console.error('[paypal-ipn] Verification error:', err && err.message);
     res.sendStatus(200);
@@ -1578,10 +1613,28 @@ router.post('/webhook/whop', function (req, res) {
           return res.json({ received: true, duplicate: true });
         }
 
+        // Claim the event first (unique per provider+event_id) to block
+        // concurrent duplicates, then process. If processing fails, remove the
+        // claim so Whop's retry can deliver the event again — previously the
+        // claim was permanent, swallowing payments that failed mid-processing.
         return supabase.from('payment_events').insert({ provider: 'whop', event_id: eventId }).then(function () {
           return whop.handleEvent(event).then(function (result) {
             console.log('[whop-webhook] Processed event:', eventName, JSON.stringify(result));
-            res.json({ received: true, handled: true });
+            if (result && result.handled === false && result.reason) {
+              return supabase.from('payment_events').delete()
+                .eq('provider', 'whop').eq('event_id', eventId)
+                .then(function () {
+                  res.status(502).json({ received: true, handled: false, error: result.reason });
+                });
+            }
+            res.json({ received: true, handled: true, result: result });
+          }).catch(function (err) {
+            console.error('[whop-webhook] Processing error:', err.message);
+            return supabase.from('payment_events').delete()
+              .eq('provider', 'whop').eq('event_id', eventId)
+              .then(function () {
+                res.status(500).json({ error: 'Webhook processing failed' });
+              });
           });
         });
       }).catch(function (err) {
@@ -3010,6 +3063,170 @@ router.delete('/admin/users/:id', requireAdmin, async function (req, res) {
   } catch (e) {
     console.error('[admin/delete-user] Error:', e.message);
     res.status(500).json({ error: 'Failed to delete user' });
+  }
+});
+
+// POST /api/admin/users/:id/reset-password — set a new password for a user
+// (Supabase admin API; the user is not emailed — share the password securely).
+router.post('/admin/users/:id/reset-password', requireAdmin, async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+    var userId = req.params.id;
+    var password = req.body && req.body.password ? String(req.body.password) : '';
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    var targetProfile = await supabase.from('profiles').select('email').eq('id', userId).single();
+    if (targetProfile.error) return res.status(404).json({ error: 'User not found' });
+
+    var authRes = await supabase.auth.admin.updateUserById(userId, { password: password });
+    if (authRes.error) {
+      return res.status(500).json({ error: 'Failed to reset password: ' + authRes.error.message });
+    }
+
+    logAdminAction(req.user, 'reset_password', userId, targetProfile.data.email);
+
+    res.json({ success: true, message: 'Password updated' });
+  } catch (e) {
+    console.error('[admin/reset-password] Error:', e.message);
+    res.status(500).json({ error: 'Failed to reset password' });
+  }
+});
+
+// GET /api/admin/pending-registrations — list paywall-first signups so stuck
+// registrations (paid, but the webhook never created the account / granted Pro)
+// can be found and completed manually.
+router.get('/admin/pending-registrations', requireAdmin, async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+    var status = String(req.query.status || 'pending');
+    if (['pending', 'completed', 'expired', 'all'].indexOf(status) === -1) status = 'pending';
+    var page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    var perPage = Math.min(100, Math.max(1, parseInt(req.query.perPage, 10) || 50));
+
+    var query = supabase.from('pending_registrations')
+      .select('*', { count: 'exact' })
+      .order('created_at', { ascending: false });
+    if (status !== 'all') query = query.eq('status', status);
+
+    var result = await query.range((page - 1) * perPage, page * perPage - 1);
+    if (result.error) return res.status(500).json({ error: result.error.message });
+
+    res.json({
+      registrations: result.data || [],
+      total: result.count || 0,
+      page: page,
+      perPage: perPage,
+      status: status
+    });
+  } catch (e) {
+    console.error('[admin/pending-registrations] Error:', e.message);
+    res.status(500).json({ error: 'Failed to fetch pending registrations' });
+  }
+});
+
+// POST /api/admin/pending-registrations/:regToken/complete — manually finish a
+// stuck registration: create the account (optionally with a password), grant
+// the paid plan, and email a one-time login link when no password was set.
+router.post('/admin/pending-registrations/:regToken/complete', requireAdmin, async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+    var regToken = req.params.regToken;
+    var password = req.body && req.body.password ? String(req.body.password) : '';
+    if (password && password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    var regRes = await supabase.from('pending_registrations').select('*').eq('reg_token', regToken).single();
+    if (regRes.error || !regRes.data) return res.status(404).json({ error: 'Pending registration not found' });
+    var reg = regRes.data;
+    if (reg.status === 'completed') {
+      return res.status(409).json({ error: 'Registration already completed', code: 'ALREADY_COMPLETED' });
+    }
+
+    var planType = reg.plan_type;
+    if (['monthly', 'yearly', 'lifetime'].indexOf(planType) === -1) {
+      return res.status(400).json({ error: 'Unsupported plan type on this registration: ' + planType });
+    }
+
+    // Find or create the account for the registration email.
+    var userId = null;
+    var created = false;
+    var profile = await supabase.from('profiles').select('id').eq('email', reg.email).maybeSingle();
+    if (profile.error) return res.status(500).json({ error: 'Profile lookup failed: ' + profile.error.message });
+    if (profile.data) {
+      userId = profile.data.id;
+    } else {
+      var createArgs = { email: reg.email, email_confirm: true, user_metadata: { full_name: reg.full_name || '' } };
+      if (password) createArgs.password = password;
+      var createRes = await supabase.auth.admin.createUser(createArgs);
+      if (createRes.error) return res.status(500).json({ error: 'Failed to create account: ' + createRes.error.message });
+      userId = createRes.data && createRes.data.user && createRes.data.user.id;
+      if (!userId) return res.status(500).json({ error: 'Account created without a user id' });
+      created = true;
+    }
+
+    // Grant the paid plan (same provisioning as create-user / set-vip).
+    var expiryDate = new Date();
+    if (planType === 'yearly') expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+    else if (planType === 'lifetime') expiryDate.setFullYear(expiryDate.getFullYear() + 99);
+    else expiryDate.setMonth(expiryDate.getMonth() + 1);
+
+    await supabase.from('subscriptions').upsert({
+      user_id: userId,
+      plan_type: planType,
+      payment_id: 'manual_' + userId + '_' + Date.now(),
+      payment_status: 'active',
+      amount: 0,
+      currency: 'USD',
+      expires_at: expiryDate.toISOString()
+    }, { onConflict: 'payment_id' });
+
+    var rpcResult = await supabase.rpc('set_vip_status', {
+      user_uuid: userId,
+      vip_expires: expiryDate.toISOString()
+    });
+    if (rpcResult.error) return res.status(500).json({ error: 'VIP grant failed: ' + rpcResult.error.message });
+
+    var upd = await supabase.from('pending_registrations')
+      .update({ status: 'completed', completed_at: new Date().toISOString() })
+      .eq('reg_token', regToken);
+    if (upd.error) console.warn('[admin/complete-registration] Failed to mark completed:', upd.error.message);
+
+    // Without a password, email the user a one-time login link.
+    var loginEmailSent = false;
+    if (!password) {
+      var otp = await supabase.auth.signInWithOtp({ email: reg.email, options: { shouldCreateUser: false } });
+      loginEmailSent = !otp.error;
+      if (otp.error) console.warn('[admin/complete-registration] Login-link email failed:', otp.error.message);
+    }
+
+    logAdminAction(req.user, 'complete_registration', userId, reg.email, {
+      planType: planType,
+      regToken: regToken,
+      accountCreated: created,
+      passwordSet: !!password,
+      loginEmailSent: loginEmailSent
+    });
+
+    res.json({
+      success: true,
+      userId: userId,
+      email: reg.email,
+      planType: planType,
+      expiresAt: expiryDate.toISOString(),
+      accountCreated: created,
+      loginEmailSent: loginEmailSent,
+      message: created ? 'Account created and Pro activated' : 'Pro activated on existing account'
+    });
+  } catch (e) {
+    console.error('[admin/complete-registration] Error:', e.message);
+    res.status(500).json({ error: 'Failed to complete registration' });
   }
 });
 
