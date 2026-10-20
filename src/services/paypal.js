@@ -15,6 +15,7 @@ var PAYPAL_API = PAYPAL_MODE === 'sandbox' ? 'https://api-m.sandbox.paypal.com' 
 var PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
 var PAYPAL_SECRET = process.env.PAYPAL_SECRET || process.env.PAYPAL_CLIENT_SECRET;
 var PAYPAL_WEBHOOK_ID = process.env.PAYPAL_WEBHOOK_ID;
+var welcomeEmail = require('./welcomeEmail');
 
 var PLANS = {
   monthly: { name: 'Pro Monthly', price: '20', interval: 'monthly' },
@@ -37,6 +38,13 @@ var supabase = null;
 
 function isConfigured() {
   return !!(PAYPAL_CLIENT_ID && PAYPAL_SECRET);
+}
+
+// Kill switch: PayPal checkout is opt-in via PAYPAL_ENABLED=true. Configured
+// credentials alone are not enough — webhooks/IPN still process if a payment
+// somehow completes, and the customer portal endpoints stay available.
+function isEnabled() {
+  return isConfigured() && process.env.PAYPAL_ENABLED === 'true';
 }
 
 function getAccessToken() {
@@ -302,9 +310,13 @@ function completeRegistration(_a) {
       var regName = reg.full_name || fullName;
       if (!regEmail) return { handled: false, reason: 'Pending registration has no email' };
 
+      // A generated password is set at creation so the welcome email can
+      // include credentials; the buyer can change it from the emailed link.
+      var generatedPassword = welcomeEmail.generatePassword();
       return supabase.auth.admin.createUser({
         email: regEmail,
         email_confirm: true,
+        password: generatedPassword,
         user_metadata: { full_name: regName }
       }).then(function (createResult) {
         if (createResult.error) {
@@ -314,19 +326,19 @@ function completeRegistration(_a) {
                 if (profileResult.error || !profileResult.data) {
                   return { handled: false, reason: 'User exists but profile not found: ' + regEmail };
                 }
-                return attachRegistration(reg, profileResult.data.id, planType, providerId, expiresAt, amount);
+                return attachRegistration(reg, profileResult.data.id, planType, providerId, expiresAt, amount, null);
               });
           }
           return { handled: false, reason: 'Account creation failed: ' + createResult.error.message };
         }
         var userId = createResult.data && createResult.data.user && createResult.data.user.id;
         if (!userId) return { handled: false, reason: 'Account created without a user id' };
-        return attachRegistration(reg, userId, planType, providerId, expiresAt, amount);
+        return attachRegistration(reg, userId, planType, providerId, expiresAt, amount, generatedPassword);
       });
     });
 }
 
-function attachRegistration(reg, userId, planType, providerId, expiresAt, amount) {
+function attachRegistration(reg, userId, planType, providerId, expiresAt, amount, password) {
   var cleanExpiry = expiresAt instanceof Date ? expiresAt : computeExpiry(planType);
   return recordPayment(userId, reg.email, planType, providerId, cleanExpiry, amount)
     .then(function () {
@@ -339,37 +351,20 @@ function attachRegistration(reg, userId, planType, providerId, expiresAt, amount
             // fail the event (the webhook would retry and double-record).
             console.warn('[paypal] Failed to mark registration completed:', upd.error.message);
           }
-          // Best-effort: email the buyer a one-time login link. The account is
-          // passwordless, and without this the user never learns how to sign in.
-          return sendLoginLinkEmail(reg.email).then(function (sent) {
-            return { handled: true, registration: true, userId: userId, planType: planType, providerId: providerId, loginEmailSent: sent };
+          // Best-effort: email the buyer their login credentials and a
+          // set-your-own-password link (magic-link-only when no password).
+          return welcomeEmail.sendWelcomeEmail(supabase, {
+            email: reg.email,
+            password: password,
+            logPrefix: '[paypal]'
+          }).then(function (welcome) {
+            return { handled: true, registration: true, userId: userId, planType: planType, providerId: providerId, loginEmailSent: welcome.sent };
           });
         });
     })
     .catch(function (err) {
       return { handled: false, reason: 'Payment recording failed: ' + err.message };
     });
-}
-
-// Emails a one-time Supabase magic link so a passwordless (paywall-created)
-// account can sign in. Best-effort: failure is logged but never fails the
-// payment event.
-function sendLoginLinkEmail(email) {
-  if (!supabase || !email) return Promise.resolve(false);
-  return supabase.auth.signInWithOtp({
-    email: email,
-    options: { shouldCreateUser: false }
-  }).then(function (result) {
-    if (result.error) {
-      console.warn('[paypal] Login-link email failed for ' + email + ':', result.error.message);
-      return false;
-    }
-    console.log('[paypal] Login-link email sent to ' + email);
-    return true;
-  }).catch(function (e) {
-    console.warn('[paypal] Login-link email failed for ' + email + ':', e.message);
-    return false;
-  });
 }
 
 // PayPal one-time payments have no portal and nothing to cancel — they simply
@@ -386,5 +381,5 @@ function cancelSubscription() {
 module.exports = {
   createCheckout, verifyWebhook, handleEvent,
   createCustomerPortal, cancelSubscription,
-  PLANS, isConfigured, PAYPAL_MODE, parseCustomId, verifyIpn, handleIpn
+  PLANS, isConfigured, isEnabled, PAYPAL_MODE, parseCustomId, verifyIpn, handleIpn
 };
