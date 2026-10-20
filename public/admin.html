@@ -231,6 +231,7 @@ textarea.edit-input { resize: vertical; font-family: 'Inter', sans-serif; min-he
             <button id="btnRevokeAdmin" class="action-btn action-revoke" onclick="revokeAdmin()">Revoke Admin</button>
             <button id="btnEdit" class="action-btn action-extend" onclick="openEdit()" style="background:linear-gradient(135deg,#38bdf8,#0284c7);">Edit User</button>
             <button id="btnResetPassword" class="action-btn action-extend" onclick="openResetPassword()" style="background:linear-gradient(135deg,#f472b6,#db2777);">Reset Password</button>
+            <button id="btnSendLoginLink" class="action-btn action-extend" onclick="sendLoginLink()" style="background:linear-gradient(135deg,#34d399,#059669);">Send Login Link</button>
             <button id="btnDelete" class="action-btn action-revoke" onclick="deleteUser()">Delete User</button>
 </div>
 
@@ -566,6 +567,18 @@ function saveResetPassword() {
   }).catch(function() { showError('Failed to reset password'); });
 }
 
+function sendLoginLink() {
+  if (!selectedUserId) return;
+  var email = document.getElementById('detEmail').textContent || 'this user';
+  if (!confirm('Send a magic login link to ' + email + '?')) return;
+  WFT.apiFetch('/api/admin/users/' + selectedUserId + '/send-login-link', {
+    method: 'POST'
+  }).then(function(data) {
+    if (data.error) { showError(data.error); return; }
+    showSuccess('Login link sent to ' + (data.email || email) + '. Ask them to check inbox and spam.');
+  }).catch(function() { showError('Failed to send login link'); });
+}
+
 function toggleRegistrations() {
   var panel = document.getElementById('regsPanel');
   if (panel.classList.contains('hidden')) {
@@ -608,7 +621,7 @@ function loadRegistrations() {
 }
 
 function completeRegistration(regToken, email) {
-  if (!confirm('Complete registration for ' + email + '? This creates the account (if missing), activates Pro, and emails a login link.')) return;
+  if (!confirm('Complete registration for ' + email + '? This creates the account (if missing), activates Pro, and emails the buyer their login credentials.')) return;
   WFT.apiFetch('/api/admin/pending-registrations/' + regToken + '/complete', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -616,7 +629,7 @@ function completeRegistration(regToken, email) {
   }).then(function(data) {
     if (data.error) { showError(data.error); return; }
     var msg = data.message + ' (expires ' + new Date(data.expiresAt).toLocaleDateString() + ')';
-    if (data.loginEmailSent) msg += '. Login link emailed.';
+    if (data.loginEmailSent) msg += '. Welcome email sent.';
     showSuccess(msg);
     loadRegistrations();
     loadUsers(curPage);

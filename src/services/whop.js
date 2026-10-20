@@ -1,4 +1,5 @@
 var crypto = require('crypto');
+var welcomeEmail = require('./welcomeEmail');
 
 // Parallel Whop integration — mirrors the payment.js (Lemon Squeezy) interface so the
 // two providers can be A/B tested before switching over. Nothing here touches the
@@ -248,33 +249,37 @@ function completeRegistration(_a) {
       if (!regEmail) return { handled: false, reason: 'Pending registration has no email' };
 
       // Create the Supabase account (confirmed) now that payment succeeded.
+      // A generated password is set at creation so the welcome email can
+      // include credentials; the buyer can change it from the emailed link.
+      var generatedPassword = welcomeEmail.generatePassword();
       return supabase.auth.admin.createUser({
         email: regEmail,
         email_confirm: true,
+        password: generatedPassword,
         user_metadata: { full_name: regName }
       }).then(function (createResult) {
         if (createResult.error) {
           // User may already exist from a prior flow; attach the payment to the
-          // existing account in that case.
+          // existing account in that case (no password is set — magic-link only).
           if (createResult.error.message && /already/i.test(createResult.error.message)) {
             return supabase.from('profiles').select('id').eq('email', regEmail).maybeSingle()
               .then(function (profileResult) {
                 if (profileResult.error || !profileResult.data) {
                   return { handled: false, reason: 'User exists but profile not found: ' + regEmail };
                 }
-                return attachRegistration(reg, profileResult.data.id, planType, providerId, expiresAt, amount);
+                return attachRegistration(reg, profileResult.data.id, planType, providerId, expiresAt, amount, null);
               });
           }
           return { handled: false, reason: 'Account creation failed: ' + createResult.error.message };
         }
         var userId = createResult.data && createResult.data.user && createResult.data.user.id;
         if (!userId) return { handled: false, reason: 'Account created without a user id' };
-        return attachRegistration(reg, userId, planType, providerId, expiresAt, amount);
+        return attachRegistration(reg, userId, planType, providerId, expiresAt, amount, generatedPassword);
       });
     });
 }
 
-function attachRegistration(reg, userId, planType, providerId, expiresAt, amount) {
+function attachRegistration(reg, userId, planType, providerId, expiresAt, amount, password) {
   var regEmail = reg.email;
   var cleanExpiry = expiresAt instanceof Date ? expiresAt : computeExpiry(planType);
   return recordPayment(userId, regEmail, planType, providerId, cleanExpiry, amount)
@@ -288,37 +293,20 @@ function attachRegistration(reg, userId, planType, providerId, expiresAt, amount
             // fail the event (the webhook would retry and double-record).
             console.warn('[whop] Failed to mark registration completed:', upd.error.message);
           }
-          // Best-effort: email the buyer a one-time login link. The account is
-          // passwordless, and without this the user never learns how to sign in.
-          return sendLoginLinkEmail(regEmail).then(function (sent) {
-            return { handled: true, registration: true, userId: userId, planType: planType, providerId: providerId, loginEmailSent: sent };
+          // Best-effort: email the buyer their login credentials and a
+          // set-your-own-password link (magic-link-only when no password).
+          return welcomeEmail.sendWelcomeEmail(supabase, {
+            email: regEmail,
+            password: password,
+            logPrefix: '[whop]'
+          }).then(function (welcome) {
+            return { handled: true, registration: true, userId: userId, planType: planType, providerId: providerId, loginEmailSent: welcome.sent };
           });
         });
     })
     .catch(function (err) {
       return { handled: false, reason: 'Payment recording failed: ' + err.message };
     });
-}
-
-// Emails a one-time Supabase magic link so a passwordless (paywall-created)
-// account can sign in. Best-effort: failure is logged but never fails the
-// payment event.
-function sendLoginLinkEmail(email) {
-  if (!supabase || !email) return Promise.resolve(false);
-  return supabase.auth.signInWithOtp({
-    email: email,
-    options: { shouldCreateUser: false }
-  }).then(function (result) {
-    if (result.error) {
-      console.warn('[whop] Login-link email failed for ' + email + ':', result.error.message);
-      return false;
-    }
-    console.log('[whop] Login-link email sent to ' + email);
-    return true;
-  }).catch(function (e) {
-    console.warn('[whop] Login-link email failed for ' + email + ':', e.message);
-    return false;
-  });
 }
 
 function onMembershipDeactivated(data, event) {

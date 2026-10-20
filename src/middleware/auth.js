@@ -18,7 +18,8 @@ var REQUIRED_ENV = ['SUPABASE_URL', 'SUPABASE_SERVICE_KEY', 'SUPABASE_ANON_KEY',
 async function logAdminAction(adminUser, action, targetUserId, targetEmail, details) {
   if (!supabase) return;
   try {
-    await supabase.from('admin_audit_log').insert({
+    // PostgREST errors resolve rather than throw — inspect .error explicitly.
+    var result = await supabase.from('admin_audit_log').insert({
       admin_id: adminUser.id,
       admin_email: adminUser.email,
       action: action,
@@ -26,6 +27,9 @@ async function logAdminAction(adminUser, action, targetUserId, targetEmail, deta
       target_email: targetEmail || null,
       details: details || null
     });
+    if (result && result.error) {
+      console.warn('[audit] Failed to log admin action:', result.error.message);
+    }
   } catch (e) {
     console.warn('[audit] Failed to log admin action:', e.message);
   }

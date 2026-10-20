@@ -30,6 +30,7 @@ const { optionalAuth, requireAuth, requirePro: requireProMiddleware, requireAdmi
 const payment = require('../services/payment');
 const whop = require('../services/whop');
 const paypal = require('../services/paypal');
+const welcomeEmail = require('../services/welcomeEmail');
 
 // Active payment provider: set PAYMENT_PROVIDER=whop to route the existing
 // /api/checkout, /api/portal and /api/subscription/cancel endpoints to Whop
@@ -1299,6 +1300,9 @@ router.post('/register-checkout', async function (req, res) {
 // the account after payment succeeds.
 router.post('/paypal/register-checkout', async function (req, res) {
   try {
+    if (!paypal.isEnabled()) {
+      return res.status(503).json({ error: 'PayPal payments are temporarily unavailable. Please use another payment method.', code: 'PAYPAL_DISABLED' });
+    }
     var email = String(req.body.email || '').trim().toLowerCase();
     var fullName = String(req.body.fullName || '').trim();
     var planType = req.body.planType;
@@ -1378,7 +1382,7 @@ router.post('/checkout', requireAuth, async function (req, res) {
 // GET /api/paypal/config — public PayPal SDK settings (client id only, no secrets)
 router.get('/paypal/config', function (req, res) {
   res.json({
-    enabled: paypal.isConfigured(),
+    enabled: paypal.isEnabled(),
     clientId: process.env.PAYPAL_CLIENT_ID || null,
     mode: process.env.PAYPAL_MODE === 'sandbox' ? 'sandbox' : 'live'
   });
@@ -1387,6 +1391,9 @@ router.get('/paypal/config', function (req, res) {
 // POST /api/paypal/checkout — create a PayPal order for the signed-in user
 router.post('/paypal/checkout', requireAuth, async function (req, res) {
   try {
+    if (!paypal.isEnabled()) {
+      return res.status(503).json({ error: 'PayPal payments are temporarily unavailable. Please use another payment method.', code: 'PAYPAL_DISABLED' });
+    }
     var planType = req.body.planType;
     var returnUrl = req.body.returnUrl || 'https://winfulltime.com/account.html';
     if (!paypal.PLANS[planType]) {
@@ -3096,6 +3103,39 @@ router.post('/admin/users/:id/reset-password', requireAdmin, async function (req
   }
 });
 
+// POST /api/admin/users/:id/send-login-link — email a one-time Supabase magic
+// link to the user (works for passwordless paywall-created accounts). Supabase
+// rate-limits to one email per 60s per address; the message is surfaced to the
+// admin so they can simply retry.
+router.post('/admin/users/:id/send-login-link', requireAdmin, async function (req, res) {
+  try {
+    if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
+
+    var userId = req.params.id;
+    var authUser = await supabase.auth.admin.getUserById(userId);
+    if (authUser.error || !authUser.data || !authUser.data.user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    var email = authUser.data.user.email;
+    if (!email) return res.status(400).json({ error: 'User has no email address' });
+
+    var otpRes = await supabase.auth.signInWithOtp({
+      email: email,
+      options: { shouldCreateUser: false }
+    });
+    if (otpRes.error) {
+      return res.status(400).json({ error: 'Failed to send login link: ' + otpRes.error.message });
+    }
+
+    logAdminAction(req.user, 'send_login_link', userId, email);
+
+    res.json({ success: true, message: 'Login link sent to ' + email, email: email });
+  } catch (e) {
+    console.error('[admin/send-login-link] Error:', e.message);
+    res.status(500).json({ error: 'Failed to send login link' });
+  }
+});
+
 // GET /api/admin/pending-registrations — list paywall-first signups so stuck
 // registrations (paid, but the webhook never created the account / granted Pro)
 // can be found and completed manually.
@@ -3130,8 +3170,10 @@ router.get('/admin/pending-registrations', requireAdmin, async function (req, re
 });
 
 // POST /api/admin/pending-registrations/:regToken/complete — manually finish a
-// stuck registration: create the account (optionally with a password), grant
-// the paid plan, and email a one-time login link when no password was set.
+// stuck registration: create the account (with an admin-chosen or generated
+// password), grant the paid plan, and email the buyer their credentials plus
+// a set-your-own-password link (magic-link-only when attaching to an
+// existing account).
 router.post('/admin/pending-registrations/:regToken/complete', requireAdmin, async function (req, res) {
   try {
     if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
@@ -3154,16 +3196,19 @@ router.post('/admin/pending-registrations/:regToken/complete', requireAdmin, asy
       return res.status(400).json({ error: 'Unsupported plan type on this registration: ' + planType });
     }
 
-    // Find or create the account for the registration email.
+    // Find or create the account for the registration email. New accounts
+    // always get a password (admin-supplied or generated) so the welcome
+    // email can include credentials.
     var userId = null;
     var created = false;
+    var accountPassword = password;
     var profile = await supabase.from('profiles').select('id').eq('email', reg.email).maybeSingle();
     if (profile.error) return res.status(500).json({ error: 'Profile lookup failed: ' + profile.error.message });
     if (profile.data) {
       userId = profile.data.id;
     } else {
-      var createArgs = { email: reg.email, email_confirm: true, user_metadata: { full_name: reg.full_name || '' } };
-      if (password) createArgs.password = password;
+      if (!accountPassword) accountPassword = welcomeEmail.generatePassword();
+      var createArgs = { email: reg.email, email_confirm: true, password: accountPassword, user_metadata: { full_name: reg.full_name || '' } };
       var createRes = await supabase.auth.admin.createUser(createArgs);
       if (createRes.error) return res.status(500).json({ error: 'Failed to create account: ' + createRes.error.message });
       userId = createRes.data && createRes.data.user && createRes.data.user.id;
@@ -3198,20 +3243,21 @@ router.post('/admin/pending-registrations/:regToken/complete', requireAdmin, asy
       .eq('reg_token', regToken);
     if (upd.error) console.warn('[admin/complete-registration] Failed to mark completed:', upd.error.message);
 
-    // Without a password, email the user a one-time login link.
-    var loginEmailSent = false;
-    if (!password) {
-      var otp = await supabase.auth.signInWithOtp({ email: reg.email, options: { shouldCreateUser: false } });
-      loginEmailSent = !otp.error;
-      if (otp.error) console.warn('[admin/complete-registration] Login-link email failed:', otp.error.message);
-    }
+    // Email the buyer their credentials + a set-your-own-password link
+    // (magic-link-only when attaching to an existing account).
+    var welcome = await welcomeEmail.sendWelcomeEmail(supabase, {
+      email: reg.email,
+      password: created ? accountPassword : null,
+      logPrefix: '[admin/complete-registration]'
+    });
 
     logAdminAction(req.user, 'complete_registration', userId, reg.email, {
       planType: planType,
       regToken: regToken,
       accountCreated: created,
       passwordSet: !!password,
-      loginEmailSent: loginEmailSent
+      welcomeEmailSent: welcome.sent,
+      welcomeRetryScheduled: !!welcome.retryScheduled
     });
 
     res.json({
@@ -3221,8 +3267,8 @@ router.post('/admin/pending-registrations/:regToken/complete', requireAdmin, asy
       planType: planType,
       expiresAt: expiryDate.toISOString(),
       accountCreated: created,
-      loginEmailSent: loginEmailSent,
-      message: created ? 'Account created and Pro activated' : 'Pro activated on existing account'
+      loginEmailSent: welcome.sent,
+      message: created ? 'Account created, Pro activated, and welcome email sent' : (welcome.sent ? 'Pro activated on existing account; sign-in email sent' : 'Pro activated on existing account')
     });
   } catch (e) {
     console.error('[admin/complete-registration] Error:', e.message);

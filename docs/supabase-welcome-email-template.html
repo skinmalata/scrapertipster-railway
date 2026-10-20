@@ -1,0 +1,81 @@
+<!--
+  WinFulltime welcome-email template for Supabase Auth.
+
+  MANUAL STEP (one time, by the site owner):
+  1. Supabase Dashboard -> your project -> Authentication -> Email Templates
+  2. Select the "Magic Link" template on the left.
+  3. Replace the ENTIRE contents with the HTML below (everything between the
+     BEGIN and END markers, not including the marker comments themselves).
+  4. Click Save.
+
+  What it does:
+  - For paywall-created accounts the API attaches data to the magic-link
+    send; when {{ .Data.password }} is present the email shows the buyer
+    their generated credentials and a "set your own password" button
+    ({{ .Data.set_password_url }}).
+  - For every other magic-link send (login page "email me a link", password
+    resets, admin resend) the data is absent and the conditionals render
+    nothing — the email is a normal sign-in link.
+
+  Until this template is saved, welcome emails still work but contain only
+  the magic link (Supabase's default template).
+-->
+<!-- BEGIN: paste from here -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your WinFulltime login</title>
+</head>
+<body style="margin:0;padding:0;background:#0e1117;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0e1117;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" style="max-width:520px;background:#151a2c;border-radius:16px;border:1px solid rgba(255,255,255,0.08);overflow:hidden;">
+          <tr>
+            <td style="padding:28px 32px 8px;">
+              <h1 style="margin:0;font-size:20px;font-weight:700;color:#e8edf5;">Welcome to WinFulltime Pro</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:8px 32px 20px;">
+              {{ if .Data.password }}
+              <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:rgba(232,237,245,0.75);">Your payment is confirmed and your Pro account is active. Here are your login credentials:</p>
+              <table role="presentation" width="100%" style="background:#0e1117;border:1px solid rgba(255,255,255,0.1);border-radius:10px;margin:0 0 20px;">
+                <tr>
+                  <td style="padding:14px 18px;">
+                    <p style="margin:0 0 4px;font-size:12px;color:rgba(232,237,245,0.5);">Email</p>
+                    <p style="margin:0 0 12px;font-size:14px;color:#e8edf5;font-family:monospace;">{{ .Email }}</p>
+                    <p style="margin:0 0 4px;font-size:12px;color:rgba(232,237,245,0.5);">Password</p>
+                    <p style="margin:0;font-size:16px;color:#e8edf5;font-family:monospace;font-weight:700;letter-spacing:1px;">{{ .Data.password }}</p>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin:0 0 16px;font-size:13px;line-height:1.6;color:rgba(232,237,245,0.6);">Sign in with these at <a href="https://winfulltime.com/login.html" style="color:#ff2448;">winfulltime.com/login.html</a> (choose "Sign in with password").</p>
+              {{ end }}
+              {{ if .Data.set_password_url }}
+              <p style="margin:0 0 12px;font-size:13px;line-height:1.6;color:rgba(232,237,245,0.6);">For security we recommend setting your own password right away:</p>
+              <p style="margin:0 0 20px;">
+                <a href="{{ .Data.set_password_url }}" style="display:inline-block;background:linear-gradient(135deg,#1e96c8,#1a7da8);color:#fff;padding:12px 28px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;">Set your password</a>
+              </p>
+              {{ end }}
+              <p style="margin:0 0 20px;font-size:13px;line-height:1.6;color:rgba(232,237,245,0.6);">Or sign in instantly with this one-time link (no password needed):</p>
+              <p style="margin:0 0 8px;">
+                <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;padding:12px 28px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;">Sign in to WinFulltime</a>
+              </p>
+              <p style="margin:16px 0 0;font-size:12px;color:rgba(232,237,245,0.4);">This link is single-use and expires shortly. If you didn't create this account, you can ignore this email.</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:16px 32px 28px;border-top:1px solid rgba(255,255,255,0.06);">
+              <p style="margin:0;font-size:12px;color:rgba(232,237,245,0.4);">WinFulltime &mdash; data-driven football predictions. <a href="https://winfulltime.com" style="color:rgba(232,237,245,0.6);">winfulltime.com</a></p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+<!-- END: paste -->
