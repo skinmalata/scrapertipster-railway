@@ -1,5 +1,7 @@
 var crypto = require('crypto');
 var welcomeEmail = require('./welcomeEmail');
+var paymentValidation = require('./paymentValidation');
+var adminNotification = require('./adminNotification');
 
 // Parallel Whop integration — mirrors the payment.js (Lemon Squeezy) interface so the
 // two providers can be A/B tested before switching over. Nothing here touches the
@@ -14,8 +16,8 @@ var WHOP_WEBHOOK_SECRET = process.env.WHOP_WEBHOOK_SECRET;
 // IDs. variantId is kept for interface parity with payment.js and filled after checkout.
 // Each plan references the product created in the Whop dashboard (WHOP_PRODUCT_* env vars).
 var PLANS = {
-  monthly: { name: 'Pro Monthly', price: '20', productId: 'prod_nefnMoSf6OLTC', interval: 'monthly' },
-  yearly: { name: 'Pro Yearly', price: '100', productId: 'prod_gfimWW2Emb3OA', interval: 'yearly' }
+  monthly: { name: 'Pro Monthly', price: String(paymentValidation.PLAN_PRICES.monthly), productId: 'prod_nefnMoSf6OLTC', interval: 'monthly' },
+  yearly: { name: 'Pro Yearly', price: String(paymentValidation.PLAN_PRICES.yearly), productId: 'prod_gfimWW2Emb3OA', interval: 'yearly' }
 };
 
 var VARIANT_IDS = {}; // populated at runtime by createCheckout
@@ -45,7 +47,9 @@ function createCheckout(_a) {
   };
   if (plan.interval) {
     planBody.renewal_price = Number(plan.price);
-    planBody.initial_price = 0;
+    // The first period is charged like every later one. Leaving this at 0
+    // let a subscription start without a charge while still granting Pro.
+    planBody.initial_price = Number(plan.price);
     if (plan.interval === 'monthly') planBody.billing_period = 30;
     if (plan.interval === 'yearly') planBody.billing_period = 365;
   } else {
@@ -162,26 +166,153 @@ function extractMeta(data, event) {
 }
 
 function computeExpiry(planType, fromDate) {
-  var d = new Date(fromDate || Date.now());
-  if (planType === 'yearly') d.setFullYear(d.getFullYear() + 1);
-  else if (planType === 'lifetime') d.setFullYear(d.getFullYear() + 99);
-  else d.setMonth(d.getMonth() + 1);
-  return d;
+  return paymentValidation.computeExpiry(planType, fromDate);
 }
 
-function amountOf(data, planType, fallback) {
-  var amt = (data && (data.amount || data.total)) || (data && data.amount_after_fees);
-  if (amt != null && isNaN(Number(amt)) === false) return Number(amt).toFixed(2);
-  return fallback || (PLANS[planType] ? PLANS[planType].price : null);
+// The product ids a plan may legitimately be sold under: the one the code
+// creates checkouts with, plus the dashboard override when it is set.
+function acceptableProductIds(planType) {
+  var ids = [];
+  var plan = PLANS[planType];
+  if (plan && plan.productId) ids.push(plan.productId);
+  var envId = planType === 'monthly' ? process.env.WHOP_PRODUCT_MONTHLY
+    : planType === 'yearly' ? process.env.WHOP_PRODUCT_YEARLY : null;
+  if (envId && ids.indexOf(envId) === -1) ids.push(envId);
+  return ids;
+}
+
+// Whop reports a payment's price under several fields that differ by taxes
+// and fees: "total" excludes buyer fees, "settlement_amount" is what the
+// customer was charged. The largest reported figure is the closest to what
+// was collected, and a buyer can only ever pay less than the plan price,
+// never more.
+function collectedAmount(data) {
+  var fields = [data && data.total, data && data.settlement_amount];
+  var candidates = [];
+  for (var i = 0; i < fields.length; i++) {
+    var parsed = paymentValidation.parseAmount(fields[i]);
+    if (parsed !== null) candidates.push(parsed);
+  }
+  if (!candidates.length) return null;
+  return Math.max.apply(null, candidates);
+}
+
+// The product Whop charged for decides which plan was bought. The checkout
+// metadata is only consulted when Whop did not name the product, so a
+// buyer cannot claim a longer plan than the one that was paid for.
+function planForProduct(productId) {
+  if (!productId) return null;
+  for (var planType in PLANS) {
+    if (!Object.prototype.hasOwnProperty.call(PLANS, planType)) continue;
+    if (acceptableProductIds(planType).indexOf(productId) !== -1) return planType;
+  }
+  return null;
+}
+
+// Whop's derived payment status values that mean the money never reached the
+// account: refunded, blocked, only authorised, and so on.
+var NOT_COLLECTED = {
+  failed: true,
+  blocked: true,
+  canceled: true,
+  refunded: true,
+  auto_refunded: true,
+  partially_refunded: true,
+  uncollectible: true,
+  void: true,
+  requires_capture: true,
+  drafted: true,
+  incomplete: true,
+  unresolved: true,
+  price_too_low: true
+};
+
+// A Whop payment grants Pro only when it actually collected money: it has to
+// be in a paid state, in USD, for one of our products, and for at least the
+// price of the plan.
+function validatePayment(data, planType) {
+  var status = String((data && data.status) || '').toLowerCase();
+  var substatus = String((data && data.substatus) || '').toLowerCase();
+  // A known status that is not "paid" is never a collected payment, and a
+  // derived status only stands in when the payment carries no status at all.
+  if (status) {
+    if (status !== 'paid') {
+      return { valid: false, reason: 'Payment status "' + status + '" is not a collected payment' };
+    }
+  } else if (substatus !== 'succeeded') {
+    return { valid: false, reason: 'Payment status missing and substatus is "' + substatus + '"' };
+  }
+  // A payment that was refunded, blocked or only authorised never collected.
+  if (NOT_COLLECTED[substatus]) {
+    return { valid: false, reason: 'Payment substatus "' + substatus + '" is not a collected payment' };
+  }
+  var amount = collectedAmount(data);
+  if (amount === null) return { valid: false, reason: 'Payment amount missing' };
+  return paymentValidation.validatePayment({
+    planType: planType,
+    amount: amount,
+    currency: (data && data.currency) || null
+  });
+}
+
+// A membership grants Pro only when it is active, for one of our products
+// and when the price the member paid covers the plan. Whop reports that
+// price as a formatted string ("$20.00") and the recurring price as
+// "$20.00 / month".
+function validateMembership(data, planType) {
+  var status = String((data && data.status) || '').toLowerCase();
+  if (!status) return { valid: false, reason: 'Membership status missing' };
+  if (status !== 'active') {
+    return { valid: false, reason: 'Membership status "' + status + '" is not an active membership' };
+  }
+  var amount = paymentValidation.parseAmount(data && data.initial_price_paid);
+  if (amount === null) amount = paymentValidation.parseAmount(data && data.formatted_renewal_price);
+  if (amount === null) return { valid: false, reason: 'Membership price missing' };
+  return paymentValidation.validatePayment({
+    planType: planType,
+    amount: amount,
+    currency: (data && data.currency) || null
+  });
+}
+
+// The end of the paid period as Whop reports it on the membership.
+function membershipExpiry(data, planType) {
+  var periodEnd = data && data.renewal_period_end;
+  if (periodEnd) {
+    var fromUnix = new Date(Number(periodEnd) * 1000);
+    if (!isNaN(fromUnix.getTime()) && fromUnix.getTime() > Date.now()) return fromUnix;
+  }
+  var legacy = data && (data.expires_at || data.expires || data.end_at);
+  if (legacy) {
+    var legacyDate = new Date(legacy);
+    if (!isNaN(legacyDate.getTime()) && legacyDate.getTime() > Date.now()) return legacyDate;
+  }
+  return computeExpiry(planType);
 }
 
 function onPaymentSucceeded(data, event) {
   var meta = extractMeta(data, event) || {};
   var userId = meta.user_id;
-  var planType = meta.plan_type || 'monthly';
   var email = meta.email || (data && data.email) || (data && data.member && data.member.email) || '';
   var paymentId = String(data.id || '');
-  if (!paymentId) return Promise.resolve({ handled: false, reason: 'Missing payment id' });
+  if (!paymentId) return Promise.resolve({ handled: false, skipped: true, reason: 'Missing payment id' });
+
+  // The plan comes from the product Whop charged for. The checkout metadata
+  // is only a fallback for payloads that do not name the product.
+  var productId = data && data.product && data.product.id ? String(data.product.id) : '';
+  var planType = planForProduct(productId);
+  if (productId && !planType) {
+    return Promise.resolve({ handled: false, skipped: true, reason: 'Unknown Whop product ' + productId });
+  }
+  if (!planType) planType = meta.plan_type || 'monthly';
+
+  // Validate before anything is created: an unpaid or short payment must
+  // not create an account or send login credentials.
+  var check = validatePayment(data, planType);
+  if (!check.valid) {
+    console.warn('[whop] Payment rejected:', check.reason);
+    return Promise.resolve({ handled: false, skipped: true, reason: check.reason });
+  }
 
   // Paywall-first signup: no account exists yet. Create it after payment.
   if (!userId && meta.reg_token) {
@@ -192,22 +323,35 @@ function onPaymentSucceeded(data, event) {
       planType: planType,
       providerId: paymentId,
       expiresAt: computeExpiry(planType),
-      amount: amountOf(data, planType)
+      amount: check.amount
     });
   }
 
-  if (!userId) return Promise.resolve({ handled: false, reason: 'Missing user_id or reg_token' });
-  var amount = amountOf(data, planType);
-  return recordPayment(userId, email, planType, paymentId, computeExpiry(planType), amount);
+  if (!userId) return Promise.resolve({ handled: false, skipped: true, reason: 'Missing user_id or reg_token' });
+  return recordPayment(userId, email, planType, paymentId, computeExpiry(planType), check.amount);
 }
 
 function onMembershipActivated(data, event) {
   var meta = extractMeta(data, event) || {};
   var userId = meta.user_id || (data && ((data.user && data.user.id) || (data.member && data.member.id) || data.user_id));
-  var planType = meta.plan_type || (data && data.plan && data.plan.plan_type) || 'monthly';
   var email = meta.email || (data && ((data.user && data.user.email) || (data.member && data.member.email) || data.email)) || '';
   var membershipId = String(data.id || '');
-  if (!membershipId) return Promise.resolve({ handled: false, reason: 'Missing membership id' });
+  if (!membershipId) return Promise.resolve({ handled: false, skipped: true, reason: 'Missing membership id' });
+
+  var productId = data && data.product && data.product.id ? String(data.product.id) : '';
+  var planType = planForProduct(productId);
+  if (productId && !planType) {
+    return Promise.resolve({ handled: false, skipped: true, reason: 'Unknown Whop product ' + productId });
+  }
+  if (!planType) planType = meta.plan_type || (data && data.plan && data.plan.plan_type) || 'monthly';
+
+  var check = validateMembership(data, planType);
+  if (!check.valid) {
+    console.warn('[whop] Membership rejected:', check.reason);
+    return Promise.resolve({ handled: false, skipped: true, reason: check.reason });
+  }
+
+  var expiresAt = membershipExpiry(data, planType);
 
   // Paywall-first signup: no account exists yet. Create it after payment.
   if (!userId && meta.reg_token) {
@@ -217,17 +361,13 @@ function onMembershipActivated(data, event) {
       fullName: meta.full_name || '',
       planType: planType,
       providerId: membershipId,
-      expiresAt: data.expires_at || data.expires || data.end_at ? (new Date(data.expires_at || data.expires || data.end_at)) : computeExpiry(planType),
-      amount: amountOf(data, planType)
+      expiresAt: expiresAt,
+      amount: check.amount
     });
   }
 
-  if (!userId) return Promise.resolve({ handled: false, reason: 'Missing user_id or reg_token' });
-  var expiresAt = data.expires_at || data.expires || data.end_at;
-  if (!expiresAt) expiresAt = computeExpiry(planType);
-  else expiresAt = new Date(expiresAt);
-  var amount = amountOf(data, planType);
-  return recordPayment(userId, email, planType, membershipId, expiresAt, amount);
+  if (!userId) return Promise.resolve({ handled: false, skipped: true, reason: 'Missing user_id or reg_token' });
+  return recordPayment(userId, email, planType, membershipId, expiresAt, check.amount);
 }
 
 function completeRegistration(_a) {
@@ -282,7 +422,7 @@ function completeRegistration(_a) {
 function attachRegistration(reg, userId, planType, providerId, expiresAt, amount, password) {
   var regEmail = reg.email;
   var cleanExpiry = expiresAt instanceof Date ? expiresAt : computeExpiry(planType);
-  return recordPayment(userId, regEmail, planType, providerId, cleanExpiry, amount)
+  return recordPayment(userId, regEmail, planType, providerId, cleanExpiry, amount, { registration: true })
     .then(function (paymentResult) {
       return supabase.from('pending_registrations')
         .update({ status: 'completed', completed_at: new Date().toISOString() })
@@ -337,41 +477,79 @@ function onMembershipDeactivated(data, event) {
   return action.then(function () { return { handled: true, eventName: 'membership.deactivated' }; });
 }
 
+// A second event for the same purchase (the payment webhook and the
+// membership webhook) and a renewal that arrives before the current period
+// ends must never shorten an entitlement that is already in place.
+function resolveVipExpiry(userId, baseExpiry) {
+  if (!supabase || !userId) return Promise.resolve(baseExpiry);
+  return supabase.from('subscriptions')
+    .select('expires_at')
+    .eq('user_id', userId)
+    .eq('payment_status', 'active')
+    .gt('expires_at', new Date().toISOString())
+    .order('expires_at', { ascending: false })
+    .limit(1)
+    .then(function (res) {
+      if (res.error || !res.data || !res.data.length) return baseExpiry;
+      return paymentValidation.latestExpiry(baseExpiry, res.data[0].expires_at);
+    })
+    .catch(function () { return baseExpiry; });
+}
+
 // Records the payment, activates the subscription and grants VIP. Rejects on
 // any Supabase error so callers (webhook) can fail the event and let the
 // provider retry — a silently swallowed error here previously caused paying
 // users to never receive Pro.
-function recordPayment(userId, email, planType, providerId, expiresAt, amount) {
+function recordPayment(userId, email, planType, providerId, expiresAt, amount, opts) {
   if (!supabase) return Promise.reject(new Error('No database'));
+  var periodEnd = expiresAt instanceof Date ? expiresAt : computeExpiry(planType);
+  var options = opts || {};
 
-  return supabase.from('payments').insert({
-    user_id: userId,
-    payment_method: 'whop',
-    provider_payment_id: providerId,
-    amount: amount,
-    currency: 'USD',
-    status: 'completed',
-    payment_details: { provider: 'whop', providerId: providerId, planType: planType, email: email }
-  }).then(function (ins) {
-    if (ins.error) throw new Error('payments insert failed: ' + ins.error.message);
-    return supabase.from('subscriptions').upsert({
+  return resolveVipExpiry(userId, periodEnd).then(function (vipExpiry) {
+    return supabase.from('payments').insert({
       user_id: userId,
-      plan_type: planType,
-      payment_id: providerId,
-      payment_status: 'active',
+      payment_method: 'whop',
+      provider_payment_id: providerId,
       amount: amount,
       currency: 'USD',
-      expires_at: expiresAt.toISOString()
-    }, { onConflict: 'payment_id' });
-  }).then(function (up) {
-    if (up.error) throw new Error('subscriptions upsert failed: ' + up.error.message);
-    return supabase.rpc('set_vip_status', {
-      user_uuid: userId,
-      vip_expires: expiresAt.toISOString()
+      status: 'completed',
+      payment_details: { provider: 'whop', providerId: providerId, planType: planType, email: email }
+    }).then(function (ins) {
+      if (ins.error) throw new Error('payments insert failed: ' + ins.error.message);
+      return supabase.from('subscriptions').upsert({
+        user_id: userId,
+        plan_type: planType,
+        payment_id: providerId,
+        payment_status: 'active',
+        amount: amount,
+        currency: 'USD',
+        expires_at: periodEnd.toISOString()
+      }, { onConflict: 'payment_id' });
+    }).then(function (up) {
+      if (up.error) throw new Error('subscriptions upsert failed: ' + up.error.message);
+      return supabase.rpc('set_vip_status', {
+        user_uuid: userId,
+        vip_expires: vipExpiry.toISOString()
+      });
+    }).then(function (rpc) {
+      if (rpc.error) throw new Error('set_vip_status failed: ' + rpc.error.message);
+      // Tell the owner about the payment. Best-effort: a failed notification
+      // must not fail the payment itself.
+      return adminNotification.notifyPayment({
+        client: supabase,
+        provider: 'whop',
+        providerPaymentId: providerId,
+        planType: planType,
+        amount: amount,
+        currency: 'USD',
+        email: email,
+        userId: userId,
+        expiresAt: vipExpiry.toISOString(),
+        registration: !!options.registration
+      }).then(function () {
+        return { handled: true, reference: providerId, userId: userId, planType: planType, expiresAt: vipExpiry };
+      });
     });
-  }).then(function (rpc) {
-    if (rpc.error) throw new Error('set_vip_status failed: ' + rpc.error.message);
-    return { handled: true, reference: providerId, userId: userId, planType: planType, expiresAt: expiresAt };
   });
 }
 

@@ -51,3 +51,11 @@ services:
         sync: false
       - key: WHOP_PRODUCT_LIFETIME
         sync: false
+      # Payment notification email to the site owner (Resend HTTP API).
+      - key: RESEND_API_KEY
+        sync: false
+      - key: ADMIN_NOTIFICATION_FROM
+        sync: false
+      # Optional: overrides the auto-detected admin account address.
+      - key: ADMIN_NOTIFICATION_EMAIL
+        sync: false
