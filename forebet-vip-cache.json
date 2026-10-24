@@ -1841,9 +1841,9 @@
         "predictionText": "1",
         "avgGoals": 3.45,
         "avgOdds": {
-          "home": 1.8,
-          "draw": 3.9,
-          "away": 4.1
+          "home": 1.7,
+          "draw": 4,
+          "away": 4.5
         },
         "matchUrl": "chelsea-tottenham-2495623",
         "sportybetAvailable": true,
@@ -1858,7 +1858,7 @@
           "time": "17:30",
           "odds": {
             "1": 1.99,
-            "2": 3.7,
+            "2": 3.69,
             "X": 4.05
           }
         },
@@ -1967,9 +1967,9 @@
         "predictionText": "1",
         "avgGoals": 3.75,
         "avgOdds": {
-          "home": 1.5,
+          "home": 1.48,
           "draw": 5,
-          "away": 5.5
+          "away": 5.75
         },
         "matchUrl": "borussia-dortmund-eintracht-frankfurt-2523610",
         "sportybetAvailable": true,
@@ -2311,9 +2311,9 @@
         "predictionText": "2",
         "avgGoals": 3.03,
         "avgOdds": {
-          "home": 2.1,
+          "home": 2.15,
           "draw": 3.6,
-          "away": 3.2
+          "away": 3.1
         },
         "matchUrl": "córdoba-eibar-2509404",
         "sportybetAvailable": true,
@@ -2327,9 +2327,9 @@
           "awayLevel": "",
           "time": "13:00",
           "odds": {
-            "1": 2,
+            "1": 1.97,
             "2": 3.5,
-            "X": 3.6
+            "X": 3.7
           }
         },
         "detail": {
@@ -2436,9 +2436,9 @@
           "awayLevel": "",
           "time": "09:00",
           "odds": {
-            "1": 3.2,
-            "2": 2.1,
-            "X": 3.25
+            "1": 3.4,
+            "2": 1.96,
+            "X": 3.33
           }
         },
         "detail": {
@@ -2546,8 +2546,8 @@
         "predictionText": "1",
         "avgGoals": 2.8,
         "avgOdds": {
-          "home": 1.75,
-          "draw": 3.7,
+          "home": 1.8,
+          "draw": 3.6,
           "away": 4.33
         },
         "matchUrl": "sheffield-united-derby-county-2507146",
@@ -2672,9 +2672,9 @@
         "predictionText": "2",
         "avgGoals": 2.94,
         "avgOdds": {
-          "home": 2.8,
+          "home": 2.7,
           "draw": 3.6,
-          "away": 2.3
+          "away": 2.45
         },
         "matchUrl": "cardiff-city-birmingham-city-2507155",
         "sportybetAvailable": true,
@@ -2892,6 +2892,115 @@
         "sportybetLeague": "Spain - LaLiga 2"
       },
       {
+        "matchId": "2521354",
+        "home": "FC Südtirol",
+        "away": "Sampdoria",
+        "league": "It2",
+        "leagueName": "Serie B",
+        "country": "Italy",
+        "time": "",
+        "probs": {
+          "home": 65,
+          "draw": 22,
+          "away": 13
+        },
+        "predictionText": "1",
+        "avgGoals": 2.27,
+        "avgOdds": {
+          "home": 2.8,
+          "draw": 3.2,
+          "away": 2.55
+        },
+        "matchUrl": "fc-südtirol-sampdoria-2521354",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "FC Sudtirol Bolzano",
+          "away": "Sampdoria Genoa",
+          "league": "Italy - Serie B",
+          "country": "Italy",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "14:00",
+          "odds": {
+            "1": 2.85,
+            "2": 2.65,
+            "X": 3
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "LDWLDW",
+            "awayForm": "LLWLLL",
+            "homeRecently": 33,
+            "awayRecently": 17
+          },
+          "h2h": {
+            "wins": {
+              "home": 3,
+              "away": 2
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "home",
+        "team": "FC Südtirol",
+        "teamScoreProb": 84.9,
+        "winProb": null,
+        "mustScore": 55,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 0,
+          "h2h": 15
+        },
+        "locked": false,
+        "estimatedOdd": 1.18,
+        "confidence": 85,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.89,
+          "away": 0.38
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 84.9,
+            "estimatedOdd": 1.18
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 31.6,
+            "estimatedOdd": 3.16
+          }
+        ],
+        "hsh": null,
+        "preview": null,
+        "form": {
+          "home": "LDWLDW",
+          "away": "LLWLLL"
+        },
+        "h2h": {
+          "wins": {
+            "home": 3,
+            "away": 2
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "Italy - Serie B"
+      },
+      {
         "matchId": "2507151",
         "home": "Stoke City",
         "away": "Bristol City",
@@ -2907,9 +3016,9 @@
         "predictionText": "1",
         "avgGoals": 2.88,
         "avgOdds": {
-          "home": 2.45,
+          "home": 2.3,
           "draw": 3.3,
-          "away": 2.87
+          "away": 3
         },
         "matchUrl": "stoke-city-bristol-city-2507151",
         "sportybetAvailable": true,
@@ -3411,9 +3520,9 @@
         "predictionText": "2",
         "avgGoals": 2.17,
         "avgOdds": {
-          "home": 3.6,
-          "draw": 3.5,
-          "away": 2
+          "home": 3.8,
+          "draw": 3.6,
+          "away": 1.9
         },
         "matchUrl": "preston-north-end-west-bromwich-2507153",
         "sportybetAvailable": true,
@@ -3520,132 +3629,6 @@
           "meets": 5
         },
         "sportybetLeague": "England - Championship"
-      },
-      {
-        "matchId": "2495256",
-        "home": "Valencia",
-        "away": "Villarreal",
-        "league": "Es1",
-        "leagueName": "La Liga",
-        "country": "Spain",
-        "time": "",
-        "probs": {
-          "home": 27,
-          "draw": 33,
-          "away": 41
-        },
-        "predictionText": "2",
-        "avgGoals": 2.58,
-        "avgOdds": {
-          "home": 3.2,
-          "draw": 3.5,
-          "away": 2.2
-        },
-        "matchUrl": "valencia-villarreal-2495256",
-        "sportybetAvailable": true,
-        "sportybet": {
-          "home": "Valencia",
-          "away": "Villarreal",
-          "league": "Spain - LaLiga",
-          "country": "Spain",
-          "womens": false,
-          "homeLevel": "",
-          "awayLevel": "",
-          "time": "17:30",
-          "odds": {
-            "1": 3.53,
-            "2": 2.15,
-            "X": 3.68
-          }
-        },
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "DDLWLL",
-            "awayForm": "LDWLWW",
-            "homeRecently": 17,
-            "awayRecently": 50
-          },
-          "h2h": {
-            "wins": {
-              "home": 0,
-              "away": 3
-            },
-            "meets": 5
-          },
-          "expGoals": null
-        },
-        "market": "team-to-score",
-        "pick": "away",
-        "team": "Villarreal",
-        "teamScoreProb": 79,
-        "winProb": null,
-        "mustScore": 65,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 10,
-          "h2h": 15
-        },
-        "locked": false,
-        "estimatedOdd": 1.27,
-        "confidence": 79,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 1.02,
-          "away": 1.56
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 63.9,
-            "estimatedOdd": 1.56
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 79,
-            "estimatedOdd": 1.27
-          }
-        ],
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.68,
-          "margin": 0.565,
-          "firstHalfShare": 0.25,
-          "firstHalfExp": 0.65,
-          "secondHalfExp": 1.94,
-          "p1": 0.115,
-          "p2": 0.68,
-          "tie": 0.204,
-          "fitErr": 0.00001,
-          "totalExp": 2.58,
-          "referenceFirstHalfProb": 0.16,
-          "referenceDrawProb": 0.58,
-          "referenceSecondHalfProb": 0.26,
-          "reason": "Expected 2.6 goals, split 0.6 in the 1st half vs 1.9 in the 2nd. The 2nd half wins the half race 68% of the time, 57% clear of the other half."
-        },
-        "preview": null,
-        "form": {
-          "home": "DDLWLL",
-          "away": "LDWLWW"
-        },
-        "h2h": {
-          "wins": {
-            "home": 0,
-            "away": 3
-          },
-          "meets": 5
-        },
-        "sportybetLeague": "Spain - LaLiga"
       }
     ],
     "2026-10-25": [
@@ -3791,9 +3774,9 @@
         "predictionText": "1",
         "avgGoals": 3.98,
         "avgOdds": {
-          "home": 1.36,
+          "home": 1.33,
           "draw": 5.25,
-          "away": 8
+          "away": 9
         },
         "matchUrl": "inter-fiorentina-2496563",
         "sportybetAvailable": true,
@@ -3812,34 +3795,18 @@
             "X": 5.9
           }
         },
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "WWLWDW",
-            "awayForm": "LLDWWL",
-            "homeRecently": 67,
-            "awayRecently": 33
-          },
-          "h2h": {
-            "wins": {
-              "home": 3,
-              "away": 1
-            },
-            "meets": 5
-          },
-          "expGoals": null
-        },
+        "detail": null,
+        "detailOverBudget": true,
         "market": "team-to-score",
         "pick": "home",
         "team": "Inter",
         "teamScoreProb": 96.6,
         "winProb": null,
-        "mustScore": 82,
+        "mustScore": 40,
         "mustScoreBreakdown": {
           "model": 40,
-          "form": 27,
-          "h2h": 15
+          "form": 0,
+          "h2h": 0
         },
         "locked": false,
         "estimatedOdd": 1.04,
@@ -3888,17 +3855,8 @@
           "reason": "Expected 4.0 goals, split 1.2 in the 1st half vs 2.7 in the 2nd. The 2nd half wins the half race 69% of the time, 54% clear of the other half."
         },
         "preview": null,
-        "form": {
-          "home": "WWLWDW",
-          "away": "LLDWWL"
-        },
-        "h2h": {
-          "wins": {
-            "home": 3,
-            "away": 1
-          },
-          "meets": 5
-        },
+        "form": null,
+        "h2h": null,
         "sportybetLeague": "Italy - Serie A"
       },
       {
@@ -4047,34 +4005,18 @@
             "X": 4.73
           }
         },
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "LWLWLL",
-            "awayForm": "LLLDLD",
-            "homeRecently": 33,
-            "awayRecently": 0
-          },
-          "h2h": {
-            "wins": {
-              "home": 5,
-              "away": 0
-            },
-            "meets": 5
-          },
-          "expGoals": null
-        },
+        "detail": null,
+        "detailOverBudget": true,
         "market": "team-to-score",
         "pick": "home",
         "team": "Olympique Marseille",
         "teamScoreProb": 93.4,
         "winProb": null,
-        "mustScore": 65,
+        "mustScore": 40,
         "mustScoreBreakdown": {
           "model": 40,
           "form": 0,
-          "h2h": 25
+          "h2h": 0
         },
         "locked": false,
         "estimatedOdd": 1.07,
@@ -4123,17 +4065,8 @@
           "reason": "Expected 3.3 goals, split 0.8 in the 1st half vs 2.4 in the 2nd. The 2nd half wins the half race 73% of the time, 63% clear of the other half."
         },
         "preview": null,
-        "form": {
-          "home": "LWLWLL",
-          "away": "LLLDLD"
-        },
-        "h2h": {
-          "wins": {
-            "home": 5,
-            "away": 0
-          },
-          "meets": 5
-        },
+        "form": null,
+        "h2h": null,
         "sportybetLeague": "France - Ligue 1"
       },
       {
@@ -4154,7 +4087,7 @@
         "avgOdds": {
           "home": 1.61,
           "draw": 5.75,
-          "away": 4
+          "away": 3.9
         },
         "matchUrl": "barcelona-real-madrid-2495261",
         "sportybetAvailable": true,
@@ -4404,9 +4337,9 @@
         "predictionText": "2",
         "avgGoals": 2.67,
         "avgOdds": {
-          "home": 5.5,
+          "home": 5.25,
           "draw": 3.7,
-          "away": 1.66
+          "away": 1.7
         },
         "matchUrl": "udinese-milan-2496558",
         "sportybetAvailable": true,
@@ -4425,34 +4358,18 @@
             "X": 4.01
           }
         },
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "LLLLLW",
-            "awayForm": "LWWDWL",
-            "homeRecently": 17,
-            "awayRecently": 50
-          },
-          "h2h": {
-            "wins": {
-              "home": 1,
-              "away": 4
-            },
-            "meets": 5
-          },
-          "expGoals": null
-        },
+        "detail": null,
+        "detailOverBudget": true,
         "market": "team-to-score",
         "pick": "away",
         "team": "Milan",
         "teamScoreProb": 88.8,
         "winProb": null,
-        "mustScore": 70,
+        "mustScore": 40,
         "mustScoreBreakdown": {
           "model": 40,
-          "form": 10,
-          "h2h": 20
+          "form": 0,
+          "h2h": 0
         },
         "locked": false,
         "estimatedOdd": 1.13,
@@ -4501,17 +4418,8 @@
           "reason": "Expected 2.7 goals, split 0.7 in the 1st half vs 2.0 in the 2nd. The 2nd half wins the half race 69% of the time, 57% clear of the other half."
         },
         "preview": null,
-        "form": {
-          "home": "LLLLLW",
-          "away": "LWWDWL"
-        },
-        "h2h": {
-          "wins": {
-            "home": 1,
-            "away": 4
-          },
-          "meets": 5
-        },
+        "form": null,
+        "h2h": null,
         "sportybetLeague": "Italy - Serie A"
       },
       {
@@ -4530,7 +4438,7 @@
         "predictionText": "1",
         "avgGoals": 2.88,
         "avgOdds": {
-          "home": 1.75,
+          "home": 1.72,
           "draw": 4.5,
           "away": 4
         },
@@ -4551,34 +4459,18 @@
             "X": 4.39
           }
         },
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "DLWWLD",
-            "awayForm": "LLLDWW",
-            "homeRecently": 33,
-            "awayRecently": 33
-          },
-          "h2h": {
-            "wins": {
-              "home": 3,
-              "away": 2
-            },
-            "meets": 5
-          },
-          "expGoals": null
-        },
+        "detail": null,
+        "detailOverBudget": true,
         "market": "team-to-score",
         "pick": "home",
         "team": "Rennes",
         "teamScoreProb": 89,
         "winProb": null,
-        "mustScore": 55,
+        "mustScore": 40,
         "mustScoreBreakdown": {
           "model": 40,
           "form": 0,
-          "h2h": 15
+          "h2h": 0
         },
         "locked": false,
         "estimatedOdd": 1.12,
@@ -4627,17 +4519,8 @@
           "reason": "Expected 2.9 goals, split 1.1 in the 1st half vs 1.8 in the 2nd. The 2nd half wins the half race 55% of the time, 33% clear of the other half."
         },
         "preview": null,
-        "form": {
-          "home": "DLWWLD",
-          "away": "LLLDWW"
-        },
-        "h2h": {
-          "wins": {
-            "home": 3,
-            "away": 2
-          },
-          "meets": 5
-        },
+        "form": null,
+        "h2h": null,
         "sportybetLeague": "France - Ligue 1"
       },
       {
@@ -4677,34 +4560,18 @@
             "X": 4.7
           }
         },
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "WLLWLL",
-            "awayForm": "DLWDWW",
-            "homeRecently": 33,
-            "awayRecently": 50
-          },
-          "h2h": {
-            "wins": {
-              "home": 0,
-              "away": 3
-            },
-            "meets": 5
-          },
-          "expGoals": null
-        },
+        "detail": null,
+        "detailOverBudget": true,
         "market": "team-to-score",
         "pick": "away",
         "team": "Juventus",
         "teamScoreProb": 88.4,
         "winProb": null,
-        "mustScore": 65,
+        "mustScore": 40,
         "mustScoreBreakdown": {
           "model": 40,
-          "form": 10,
-          "h2h": 15
+          "form": 0,
+          "h2h": 0
         },
         "locked": false,
         "estimatedOdd": 1.13,
@@ -4753,17 +4620,8 @@
           "reason": "Expected 3.3 goals, split 1.4 in the 1st half vs 1.9 in the 2nd. The 2nd half wins the half race 50% of the time, 22% clear of the other half."
         },
         "preview": null,
-        "form": {
-          "home": "WLLWLL",
-          "away": "DLWDWW"
-        },
-        "h2h": {
-          "wins": {
-            "home": 0,
-            "away": 3
-          },
-          "meets": 5
-        },
+        "form": null,
+        "h2h": null,
         "sportybetLeague": "Italy - Serie A"
       },
       {
@@ -4782,9 +4640,9 @@
         "predictionText": "2",
         "avgGoals": 3.1,
         "avgOdds": {
-          "home": 3,
+          "home": 3.1,
           "draw": 3.3,
-          "away": 2.4
+          "away": 2.35
         },
         "matchUrl": "angers-lorient-2496252",
         "sportybetAvailable": true,
@@ -4803,34 +4661,18 @@
             "X": 3.42
           }
         },
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "LLWDLW",
-            "awayForm": "WWLDWL",
-            "homeRecently": 33,
-            "awayRecently": 50
-          },
-          "h2h": {
-            "wins": {
-              "home": 1,
-              "away": 2
-            },
-            "meets": 5
-          },
-          "expGoals": null
-        },
+        "detail": null,
+        "detailOverBudget": true,
         "market": "team-to-score",
         "pick": "away",
         "team": "Lorient",
         "teamScoreProb": 87.9,
         "winProb": null,
-        "mustScore": 60,
+        "mustScore": 40,
         "mustScoreBreakdown": {
           "model": 40,
-          "form": 10,
-          "h2h": 10
+          "form": 0,
+          "h2h": 0
         },
         "locked": false,
         "estimatedOdd": 1.14,
@@ -4879,17 +4721,8 @@
           "reason": "Expected 3.1 goals, split 0.9 in the 1st half vs 2.2 in the 2nd. The 2nd half wins the half race 66% of the time, 51% clear of the other half."
         },
         "preview": null,
-        "form": {
-          "home": "LLWDLW",
-          "away": "WWLDWL"
-        },
-        "h2h": {
-          "wins": {
-            "home": 1,
-            "away": 2
-          },
-          "meets": 5
-        },
+        "form": null,
+        "h2h": null,
         "sportybetLeague": "France - Ligue 1"
       },
       {
@@ -5055,34 +4888,18 @@
             "X": 4.42
           }
         },
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "WDWDLD",
-            "awayForm": "LLLLLW",
-            "homeRecently": 33,
-            "awayRecently": 17
-          },
-          "h2h": {
-            "wins": {
-              "home": 3,
-              "away": 0
-            },
-            "meets": 5
-          },
-          "expGoals": null
-        },
+        "detail": null,
+        "detailOverBudget": true,
         "market": "team-to-score",
         "pick": "home",
         "team": "Toulouse",
         "teamScoreProb": 85.5,
         "winProb": null,
-        "mustScore": 55,
+        "mustScore": 40,
         "mustScoreBreakdown": {
           "model": 40,
           "form": 0,
-          "h2h": 15
+          "h2h": 0
         },
         "locked": false,
         "estimatedOdd": 1.17,
@@ -5131,17 +4948,8 @@
           "reason": "Expected 2.7 goals, split 1.2 in the 1st half vs 1.5 in the 2nd. The 2nd half wins the half race 45% of the time, 15% clear of the other half."
         },
         "preview": null,
-        "form": {
-          "home": "WDWDLD",
-          "away": "LLLLLW"
-        },
-        "h2h": {
-          "wins": {
-            "home": 3,
-            "away": 0
-          },
-          "meets": 5
-        },
+        "form": null,
+        "h2h": null,
         "sportybetLeague": "France - Ligue 1"
       },
       {
@@ -5160,9 +4968,9 @@
         "predictionText": "2",
         "avgGoals": 2.95,
         "avgOdds": {
-          "home": 2.1,
+          "home": 2.15,
           "draw": 3.6,
-          "away": 3.4
+          "away": 3.25
         },
         "matchUrl": "liverpool-brighton-2495618",
         "sportybetAvailable": true,
@@ -5287,8 +5095,8 @@
         "avgGoals": 2.58,
         "avgOdds": {
           "home": 2.05,
-          "draw": 3.6,
-          "away": 3.4
+          "draw": 3.4,
+          "away": 3.7
         },
         "matchUrl": "auxerre-le-mans-fc-2496251",
         "sportybetAvailable": true,
@@ -5307,34 +5115,18 @@
             "X": 3.7
           }
         },
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "WLWWLL",
-            "awayForm": "LLWDDL",
-            "homeRecently": 50,
-            "awayRecently": 17
-          },
-          "h2h": {
-            "wins": {
-              "home": 3,
-              "away": 1
-            },
-            "meets": 5
-          },
-          "expGoals": null
-        },
+        "detail": null,
+        "detailOverBudget": true,
         "market": "team-to-score",
         "pick": "home",
         "team": "Auxerre",
         "teamScoreProb": 84.1,
         "winProb": null,
-        "mustScore": 65,
+        "mustScore": 40,
         "mustScoreBreakdown": {
           "model": 40,
-          "form": 10,
-          "h2h": 15
+          "form": 0,
+          "h2h": 0
         },
         "locked": false,
         "estimatedOdd": 1.19,
@@ -5383,17 +5175,8 @@
           "reason": "Expected 2.6 goals, split 1.0 in the 1st half vs 1.6 in the 2nd. The 2nd half wins the half race 53% of the time, 31% clear of the other half."
         },
         "preview": null,
-        "form": {
-          "home": "WLWWLL",
-          "away": "LLWDDL"
-        },
-        "h2h": {
-          "wins": {
-            "home": 3,
-            "away": 1
-          },
-          "meets": 5
-        },
+        "form": null,
+        "h2h": null,
         "sportybetLeague": "France - Ligue 1"
       },
       {
@@ -5412,9 +5195,9 @@
         "predictionText": "1",
         "avgGoals": 2.81,
         "avgOdds": {
-          "home": 1.6,
-          "draw": 4.5,
-          "away": 4.75
+          "home": 1.65,
+          "draw": 3.9,
+          "away": 5.25
         },
         "matchUrl": "real-sociedad-levante-2495258",
         "sportybetAvailable": true,
@@ -5524,7 +5307,7 @@
       }
     ]
   },
-  "lastFetch": "2026-10-24T07:39:55.982Z",
+  "lastFetch": "2026-10-24T07:48:59.552Z",
   "meta": {
     "markets": [
       "match-winner",
