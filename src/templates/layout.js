@@ -341,8 +341,33 @@ function stripFeaturedBooks(html) {
     .replace(/[ \t]*<section class="featured-books"[\s\S]*?<\/section>\r?\n?/gi, '');
     }
 
+// Every page used to carry its own inline Google Analytics loader, so GA
+// fired while the document was still parsing. The loader is now owned by
+// /consent.js, which requests it for every visitor regardless of the consent
+// decision.
+//
+// Stripping happens here rather than in each page because this function runs
+// over every file in public/ during the CI bake, so the generated pages are
+// covered by the same rule as the hand-written ones.
+function stripInlineAnalytics(html) {
+  html = html.replace(/[ \t]*<!--\s*Google tag \(gtag\.js\)\s*-->\r?\n?/gi, '');
+  html = html.replace(/[ \t]*<script[^>]*src=["'][^"']*googletagmanager\.com\/gtag\/js[^"']*["'][^>]*>\s*<\/script>\r?\n?/gi, '');
+  return html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, function (block) {
+    // Only the block that configures the property is dropped; any other
+    // script on the page is left untouched.
+    if (/gtag\(\s*['"]config['"]/i.test(block) && /G-HMGZMW9EDP/.test(block)) return '';
+    return block;
+  });
+}
+
 function applyLayoutToHtml(html, activePath) {
   html = stripFeaturedBooks(html);
+  html = stripInlineAnalytics(html);
+
+  // Bump the gate's cache-busting version on every bake so a changed
+  // /consent.js is picked up immediately instead of sitting behind the
+  // four-hour edge cache GitHub Pages sets on static assets.
+  html = html.replace(/(<script[^>]*src=["'][^"']*\/consent\.js)(?:\?v=\d+)?(["'][^>]*>)/gi, '$1?v=3$2');
 
   const navRe = /(<nav id="nav">)[\s\S]*?(<\/nav>)/;
   const footerRe = /(<footer[^>]*>)[\s\S]*?(<\/footer>)/;
@@ -378,6 +403,13 @@ function applyLayoutToHtml(html, activePath) {
   // 2c. Inject Preferred Sources script into <head>
   if (!/news\.google\.com\/swg\/js\/v1\/publisher\.js/.test(html)) {
     html = html.replace(/<\/head>/i, '<script async src="https://news.google.com/swg/js/v1/publisher.js"></script>\n</head>');
+  }
+
+  // 2d. The consent banner is styled by its own stylesheet. The generated
+  //     pages load the gate but never linked the sheet, so the banner
+  //     appeared unstyled there.
+  if (!/consent\.css/.test(html)) {
+    html = html.replace(/<\/head>/i, '<link rel="stylesheet" href="/consent.css?v=2">\n</head>');
   }
 
   // 2c. Inject Organization (brand entity) schema unless the page already carries it.
@@ -423,7 +455,10 @@ function applyLayoutToHtml(html, activePath) {
   const needsVipTab = !/vip-tab\.js/.test(html) && /id="categoryLinks"|id="categoryTabs"/.test(html);
   const needsPlayerShotsTab = !/player-shots-tab\.js/.test(html) && /id="categoryLinks"|id="categoryTabs"/.test(html);
   const needsAds = !/ads\.js/.test(html);
-  if (needsTheme || needsAuth || needsConfig || needsSupabase || needsHamburger || needsVipTab || needsPlayerShotsTab || needsAds) {
+  // The consent gate is what decides whether Google Analytics may run, so
+  // every page needs it. The generated pages used to ship without it.
+  const needsConsent = !/consent\.js/.test(html);
+  if (needsTheme || needsAuth || needsConfig || needsSupabase || needsHamburger || needsVipTab || needsPlayerShotsTab || needsAds || needsConsent) {
     let block = '\n';
     if (needsConfig) block += '<script src="/config.js"></script>\n';
     if (needsSupabase) block += '<script src="/supabase-client.js"></script>\n';
@@ -431,6 +466,7 @@ function applyLayoutToHtml(html, activePath) {
     if (needsVipTab) block += '<script src="/vip-tab.js?v=20261008" defer></script>\n';
     if (needsPlayerShotsTab) block += '<script src="/player-shots-tab.js?v=20261018" defer></script>\n';
     if (needsAds) block += '<script src="/ads.js?v=20261019" defer></script>\n';
+    if (needsConsent) block += '<script src="/consent.js?v=3" defer></script>\n';
     if (needsTheme) {
       block += `<script>
 (function() {
@@ -501,10 +537,12 @@ function staticWithLayout(req, res, next, publicDir) {
 
   try {
     const html = fs.readFileSync(filePath, 'utf8');
+    // HTML is rebuilt per request, so it must always be revalidated.
+    res.setHeader('Cache-Control', 'no-cache');
     return res.type('html').send(applyLayout(html, req));
   } catch (err) {
     return next(err);
   }
 }
 
-module.exports = { applyLayout, applyLayoutToHtml, staticWithLayout, SKIP_PAGES };
+module.exports = { applyLayout, applyLayoutToHtml, staticWithLayout, stripInlineAnalytics, SKIP_PAGES };
