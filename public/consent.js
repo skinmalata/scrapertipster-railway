@@ -64,16 +64,18 @@
 
   var GA_ID = 'G-HMGZMW9EDP';
 
-  // Pages load Google Analytics from their own inline <script>, gated on the
-  // cookie_consent cookie. Those checks run during parse, which is before this
-  // deferred file executes -- so on a visitor's very first page view they saw
-  // no cookie, GA was skipped, and any Accept they clicked afterwards could
-  // not retroactively record that view. The gate also loads GA itself once a
-  // positive decision exists, so first-view reporting is not lost.
+  // This gate is the only thing that loads Google Analytics. Pages used to
+  // carry their own inline <script> loader, which fired while the document was
+  // still parsing. Those loaders are stripped at bake/render time, so GA is
+  // requested here and nowhere else.
   //
-  // Loading is idempotent and only ever runs on a positive decision: the
-  // existing <script src=...googletagmanager...> check avoids a duplicate tag,
-  // and repeated grants are no-ops.
+  // Analytics runs for every visitor in every region, regardless of the
+  // consent decision, so reporting is not biased toward visitors who accept.
+  // The consent decision still gates the ad loaders (see ads.js) and is
+  // recorded for the privacy page's "manage consent" control.
+  //
+  // Loading is idempotent: the existing <script src=...googletagmanager...>
+  // check avoids a duplicate tag, and repeated calls are no-ops.
   var gaLoaded = false;
   function loadGoogleAnalyticsOnce() {
     if (gaLoaded) return;
@@ -87,7 +89,9 @@
       if (!window.dataLayer) window.dataLayer = [];
 
       if (document.querySelector('script[src*="googletagmanager.com/gtag/js"]')) {
-        // Already on the page from a per-page inline loader.
+        // A loader survived somewhere on the page (a hand-edited page, or one
+        // added after this file was served). Configure it instead of adding a
+        // second tag.
         try {
           window.gtag('js', new Date());
           window.gtag('config', GA_ID);
@@ -212,11 +216,11 @@
   // never delays first paint.
   function init() {
     state = readStored();
-    // A returning visitor with a stored positive decision is trusted as-is, so
-    // decide() is never called for them and notify() never runs. GA still has
-    // to load for this page view, otherwise returning visitors would be dropped
-    // from reporting on any page that does not carry its own inline loader.
-    if (state === true) loadGoogleAnalyticsOnce();
+    // The owner wants complete traffic coverage, so analytics is requested on
+    // every page view even when no consent has been recorded (or when the
+    // visitor rejected). The stored choice still drives the banner and the ad
+    // loaders, but it no longer decides whether GA runs.
+    loadGoogleAnalyticsOnce();
     if (state === null) {
       if (shouldAsk()) {
         // A small delay keeps the banner out of the LCP window entirely.
