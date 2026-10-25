@@ -373,6 +373,10 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
   var PROBE_MS = 8000;
   var PROGRESS_MS = 15000;
   var DEADLINE_MS = 90000;
+  var RECOVERY_MS = 20000;
+  var MAX_RECOVERIES = 4;
+  var recoveryAttempts = 0;
+  var recoveryTimer = null;
   var loadGeneration = 0;
   var content = document.getElementById('content');
   var phase = 'spinner';
@@ -459,6 +463,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
     }
     var perfSummary = document.getElementById('perfSummary');
     if (perfSummary) perfSummary.innerHTML = '';
+    scheduleRecovery(gen);
     return true;
   }
 
@@ -492,6 +497,29 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
     return p;
   }
 
+  // While the snapshot is on screen, quietly keep checking whether the API has
+  // come back (a Render restart usually takes well under a minute). Without
+  // this the "unreachable" banner stayed up until the visitor clicked Retry,
+  // even though the service had recovered.
+  function scheduleRecovery(gen) {
+    if (recoveryTimer || recoveryAttempts >= MAX_RECOVERIES) return;
+    recoveryTimer = setTimeout(function () {
+      recoveryTimer = null;
+      if (gen !== loadGeneration || phase !== 'done') return;
+      recoveryAttempts++;
+      probe(true).then(function (alive) {
+        if (gen !== loadGeneration || phase !== 'done') return;
+        if (!alive) {
+          scheduleRecovery(gen);
+          return;
+        }
+        function go() { if (gen === loadGeneration) load(); }
+        if (window.WFT && window.WFT.onAuthReady) window.WFT.onAuthReady(go);
+        else go();
+      });
+    }, RECOVERY_MS);
+  }
+
   // Armed at parse time rather than inside load(): load() is gated on auth
   // readiness, and waiting for that to even learn the host is down is most of
   // the delay the visitor was complaining about.
@@ -506,8 +534,13 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
 
   async function load() {
     var gen = ++loadGeneration;
+    if (recoveryTimer) { clearTimeout(recoveryTimer); recoveryTimer = null; }
     // Retry re-probes: the host may have come back. The first load reuses the
     // probe already in flight, so it does not pay for the request twice.
+    // Hide any "unreachable" banner from a previous fallback: if this attempt
+    // succeeds the snapshot is no longer what is on screen.
+    var staleBanner = document.getElementById('staleBanner');
+    if (staleBanner) { staleBanner.style.display = 'none'; staleBanner.innerHTML = ''; }
     show(loadingHtml(), 'spinner');
 
     var alive;
@@ -556,6 +589,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
       }
 
       phase = 'done';
+      recoveryAttempts = 0;
       // A pool served from the backoff fallback is an earlier day's picks. The
       // page used to present those as today's without saying so.
       if (data.stale) {
