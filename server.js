@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const compression = require('compression');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const fs = require('fs');
@@ -287,12 +288,44 @@ app.use((req, res, next) => {
   res.setHeader('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: https://www.googletagmanager.com https://www.google-analytics.com https://unpkg.com https://app.lemonsqueezy.com https://js.whop.com; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https: https://i.ytimg.com https://yt3.ggpht.com; connect-src 'self' https: http://localhost http://127.0.0.1 ws://localhost ws://127.0.0.1 https://www.google-analytics.com https://www.googletagmanager.com https://xogkqpjtxfemcxzsuwke.supabase.co https://api.lemonsqueezy.com https://api.whop.com https://js.whop.com; frame-src https://www.youtube.com https://youtube.com https://app.lemonsqueezy.com https://www.highrevenueformat.com https://ss.mrmnd.com https://*.mrmnd.com;");
   next();
 });
+// Compress text responses (HTML, JSON, CSS, JS). Images and other already
+// compressed types are skipped by the middleware itself.
+app.use(compression({ threshold: 1024 }));
+// The rate limiter runs before any body is read so a flood of requests is
+// rejected without the server first buffering their payloads.
+app.use(rateLimiter);
+// Webhook payloads are a single payment object, so they are small. The reader
+// used to buffer the whole body with no ceiling, which let one oversized POST
+// pin the instance's memory; anything past the cap is rejected with 413.
+const MAX_WEBHOOK_BYTES = 256 * 1024;
 app.use(function (req, res, next) {
   if (req.path === '/api/webhook/payment' || req.path === '/api/webhook/whop' || req.path === '/api/webhook/paypal') {
+    var declared = Number(req.headers['content-length']);
+    if (isFinite(declared) && declared > MAX_WEBHOOK_BYTES) {
+      return res.status(413).json({ error: 'Payload too large' });
+    }
     req._body = true;
     var chunks = [];
-    req.on('data', function (chunk) { chunks.push(chunk); });
+    var size = 0;
+    var rejected = false;
+    req.on('data', function (chunk) {
+      if (rejected) return;
+      size += chunk.length;
+      if (size > MAX_WEBHOOK_BYTES) {
+        rejected = true;
+        chunks = null;
+        req.pause();
+        res.setHeader('Connection', 'close');
+        res.status(413).json({ error: 'Payload too large' });
+        // Close the socket once the response is out so the rest of the body
+        // is never transferred.
+        res.on('finish', function () { req.destroy(); });
+        return;
+      }
+      chunks.push(chunk);
+    });
     req.on('end', function () {
+      if (rejected) return;
       req.rawBody = Buffer.concat(chunks).toString('utf8');
       try { req.body = JSON.parse(req.rawBody); } catch (e) { req.body = {}; }
       next();
@@ -302,7 +335,6 @@ app.use(function (req, res, next) {
   }
 });
 app.use(express.json({ limit: '10kb' }));
-app.use(rateLimiter);
 app.use(trackVisit);
 
 // Stricter rate limits for API endpoints
@@ -370,7 +402,7 @@ function serveBlogPost(req, res, next) {
     const enhancedHtml = html.includes('/article-tools-cta.js')
       ? html
       : html.replace(/<\/body>/i, '<script src="/article-tools-cta.js" defer></script></body>');
-    return res.type('html').send(applyLayout(enhancedHtml, req));
+    return res.set('Cache-Control', 'no-cache').type('html').send(applyLayout(enhancedHtml, req));
   } catch (error) {
     return next(error);
   }
@@ -396,12 +428,33 @@ app.get('/blog/:slug', (req, res, next) => {
 // assets (css/js/images) fall through to express.static below.
 app.use((req, res, next) => staticWithLayout(req, res, next, path.join(__dirname, 'public')));
 
+// Static assets keep validators (ETag/Last-Modified) so browsers can
+// revalidate with a cheap 304. CSS/JS are unversioned, so they get a short
+// freshness window instead of a week; changing them must not leave returning
+// visitors on stale code. Images and fonts rarely change and get the longer
+// lifetime. HTML is rebuilt per request from the templates, so it always
+// revalidates.
+const STATIC_ASSET_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 app.use(express.static('public', {
-  maxAge: 0,
-  etag: false,
-  lastModified: false,
-  extensions: ['html']
+  maxAge: STATIC_ASSET_MAX_AGE,
+  etag: true,
+  lastModified: true,
+  extensions: ['html'],
+  setHeaders: function (res, filePath) {
+    const ext = path.extname(filePath).toLowerCase();
+    if (ext === '.html') {
+      res.setHeader('Cache-Control', 'no-cache');
+    } else if (ext === '.css' || ext === '.js') {
+      res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+    }
+  }
 }));
+
+// API responses are live data and must never be cached.
+app.use('/api', function (req, res, next) {
+  res.setHeader('Cache-Control', 'no-store');
+  next();
+});
 
 // API Routes (optional local/dev API — production site is GitHub Pages)
 app.use('/api', apiRoutes);
