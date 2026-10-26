@@ -79,7 +79,7 @@ async function main() {
     const bettable = matches.filter(m => m.sportybetAvailable !== false).length;
     console.log(date + ': ' + matches.length + ' fixtures, ' + bettable + ' on SportyBet, ' + qualified.length + ' pass the confidence gate' +
       (qualified.length > VIP_MAX_TIPS ? ' (capped to top ' + VIP_MAX_TIPS + ')' : '') +
-      ', ' + hshPicks.length + ' highest-scoring-half picks');
+      ', ' + hshPicks.length + ' 2nd-half picks');
     // On a successful (non-empty) scrape the result is authoritative: an empty
     // selection legitimately means "no picks today", for both markets.
     cache.dates[date] = gated;
@@ -115,7 +115,8 @@ async function main() {
     minGoals: HSH_MIN_GOALS,
     sharePrior: HSH_SHARE_PRIOR,
     shareReg: HSH_SHARE_REG,
-    free: true
+    free: true,
+    secondHalfOnly: true
   };
   fs.writeFileSync(HSH_CACHE_FILE, JSON.stringify(hshCache, null, 2));
   console.log('Saved ' + HSH_CACHE_FILE);
@@ -134,8 +135,8 @@ async function main() {
   }
 
   const totalHsh = Object.values(hshCache.dates || {}).reduce((s, m) => s + m.length, 0);
-  console.log('\n=== HIGHEST-SCORING-HALF PICKS (free, prob >= ' + HSH_MIN_PROB + ', margin >= ' + HSH_MARGIN_MIN + ', max ' + HSH_MAX_PICKS + '/day) ===');
-  console.log('Total HSH picks cached: ' + totalHsh);
+  console.log('\n=== 2ND-HALF PICKS (free, prob >= ' + HSH_MIN_PROB + ', margin >= ' + HSH_MARGIN_MIN + ', max ' + HSH_MAX_PICKS + '/day) ===');
+  console.log('Total 2nd-half picks cached: ' + totalHsh);
   for (const [date, picks] of Object.entries(hshCache.dates || {})) {
     console.log('\n--- ' + date + ' (' + picks.length + ') ---');
     picks.forEach(p => {

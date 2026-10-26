@@ -411,7 +411,8 @@ function poissonAtLeastOne(lambda) {
 //   lambdaHome1 = f * expHome, lambdaAway1 = f * expAway
 // Then lambda1 = f * total, lambda2 = (1 - f) * total, and two independent
 // Poisson distributions give P(1st > 2nd), P(2nd > 1st) and the tie. The
-// strongest call is published when it clears HSH_MIN_PROB. Always free.
+// market only publishes second-half calls, so first-half-favoured fixtures
+// are excluded by selectHshPicks. Always free.
 const POISSON_K = 10;
 const _factorial = [1];
 for (let i = 1; i <= POISSON_K + 1; i++) _factorial[i] = _factorial[i - 1] * i;
@@ -533,14 +534,17 @@ function parseHtList(html) {
   return map;
 }
 
-// Best-only selection for the public tab: strongest calls that clear the
+// Best-only selection for the public tab: second-half calls that clear the
 // probability floor, the race margin and the expected-goals floor, then ranked
-// by margin (the most decisive call first), capped per day.
+// by margin (the most decisive call first), capped per day. Fixtures whose
+// model favours the first half are deliberately excluded: the market is a
+// 2nd-half-only product.
 function selectHshPicks(matches, limit) {
   const max = limit || HSH_MAX_PICKS;
   const qualifying = (matches || [])
     .filter((m) => isMajorTopTierLeague(m) &&
-      m.hsh && m.hsh.prob >= HSH_MIN_PROB &&
+      m.hsh && m.hsh.pick === '2H' &&
+      m.hsh.prob >= HSH_MIN_PROB &&
       m.hsh.margin >= HSH_MARGIN_MIN &&
       Number(m.avgGoals) >= HSH_MIN_GOALS)
     .sort((a, b) => (b.hsh.margin - a.hsh.margin) || (b.hsh.prob - a.hsh.prob));

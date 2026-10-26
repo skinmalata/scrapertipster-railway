@@ -184,7 +184,8 @@ function limitStaticForFree(dataDir) {
 // Highest Scoring Half is a gated market under the current monetization model:
 // free users get a FREE_VISIBLE-pick teaser per date (plus the per-date totals
 // used to render locked placeholder cards), Pro/VIP get the full cache via
-// /api/highest-scoring-half.
+// /api/highest-scoring-half. Only second-half calls are exposed; the cache is
+// filtered here as a safety net for older scrapes.
 function limitHshForFree(hshFile, dataDir) {
   if (!fs.existsSync(hshFile)) return false;
   const cache = JSON.parse(fs.readFileSync(hshFile, 'utf8'));
@@ -192,7 +193,8 @@ function limitHshForFree(hshFile, dataDir) {
   const counts = {};
   const limitedDates = {};
   Object.keys(dates).forEach(function (d) {
-    const arr = Array.isArray(dates[d]) ? dates[d] : [];
+    const arr = (Array.isArray(dates[d]) ? dates[d] : [])
+      .filter(function (p) { return p && p.hsh && p.hsh.pick === '2H'; });
     counts[d] = arr.length;
     limitedDates[d] = arr.slice(0, FREE_VISIBLE);
   });
