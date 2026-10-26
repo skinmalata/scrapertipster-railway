@@ -107,6 +107,12 @@ jobs:
       - name: Emit redirect stubs for legacy/missing URLs
         run: node scripts/generate-redirects.js
 
+      # Redirect stubs can add noindex pages after the scraper already wrote the
+      # sitemap. Rebuild it from the final on-disk tree so stubs and missing
+      # pages are never submitted.
+      - name: Refresh sitemap after redirect stubs
+        run: node scripts/update-sitemap.js
+
       # Publish the H2H pool to the same origin as the site. author-picks.html
       # reads this only when the Render API cannot be reached, so a failure here
       # must never block the deploy -- the last committed copy stays in place.
