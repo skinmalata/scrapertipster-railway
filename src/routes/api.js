@@ -2625,18 +2625,33 @@ router.get('/admin/users', requireAdmin, async function (req, res) {
     if (result.error) return res.status(500).json({ error: result.error.message });
 
     var userIds = (result.data || []).map(function(u) { return u.id; });
-    var subs = [];
-    if (userIds.length) {
-      var subRes = await supabase.from('subscriptions')
-        .select('user_id, plan_type, payment_status, expires_at, created_at')
-        .in('user_id', userIds)
-        .order('created_at', { ascending: false });
-      if (!subRes.error) subs = subRes.data || [];
-    }
+
+    // last_sign_in_at lives on auth.users, so ask the Auth admin API for the
+    // users on this page (in parallel) while subscriptions are loading.
+    var subPromise = userIds.length
+      ? supabase.from('subscriptions')
+          .select('user_id, plan_type, payment_status, expires_at, created_at')
+          .in('user_id', userIds)
+          .order('created_at', { ascending: false })
+      : Promise.resolve({ data: [] });
+    var authPromise = Promise.all(userIds.map(function(id) {
+      return supabase.auth.admin.getUserById(id).then(function(r) {
+        return r && r.data && r.data.user ? (r.data.user.last_sign_in_at || null) : null;
+      }).catch(function() { return null; });
+    }));
+
+    var combined = await Promise.all([subPromise, authPromise]);
+    var subRes = combined[0];
+    var lastSignIns = combined[1];
+    var subs = subRes && !subRes.error ? (subRes.data || []) : [];
 
     var subMap = {};
     subs.forEach(function(s) {
       if (!subMap[s.user_id]) subMap[s.user_id] = s;
+    });
+    var lastSignInMap = {};
+    userIds.forEach(function(id, i) {
+      lastSignInMap[id] = lastSignIns[i] || null;
     });
 
     var users = (result.data || []).map(function(u) {
@@ -2648,6 +2663,7 @@ router.get('/admin/users', requireAdmin, async function (req, res) {
         vipStatus: u.vip_status,
         vipExpiresAt: u.vip_expires_at,
         joinedAt: u.created_at,
+        lastSignInAt: lastSignInMap[u.id] || null,
         plan: sub ? sub.plan_type : null,
         paymentStatus: sub ? sub.payment_status : null,
         expiresAt: sub ? sub.expires_at : null

@@ -199,9 +199,9 @@ textarea.edit-input { resize: vertical; font-family: 'Inter', sans-serif; min-he
 <div class="table-wrap">
 <table>
 <thead><tr>
-<th>Email</th><th>Name</th><th>Status</th><th>Plan</th><th>Expires</th><th>Joined</th>
+<th>Email</th><th>Name</th><th>Status</th><th>Plan</th><th>Expires</th><th>Joined</th><th>Last Login</th>
 </tr></thead>
-<tbody id="userBody"><tr><td colspan="6" style="text-align:center;padding:40px;color:rgba(232,237,245,0.3);">Loading...</td></tr></tbody>
+<tbody id="userBody"><tr><td colspan="7" style="text-align:center;padding:40px;color:rgba(232,237,245,0.3);">Loading...</td></tr></tbody>
 </table>
 </div>
 
@@ -220,6 +220,7 @@ textarea.edit-input { resize: vertical; font-family: 'Inter', sans-serif; min-he
 <div class="detail-field"><div class="field-label">Plan</div><div class="field-value" id="detPlan">-</div></div>
 <div class="detail-field"><div class="field-label">VIP Expires</div><div class="field-value" id="detExpires">-</div></div>
 <div class="detail-field"><div class="field-label">Joined</div><div class="field-value" id="detJoined">-</div></div>
+<div class="detail-field"><div class="field-label">Last Login</div><div class="field-value" id="detLastLogin">-</div></div>
 </div>
 
 <div class="action-bar">
@@ -373,13 +374,13 @@ function loadUsers(page) {
   var url = '/api/admin/users?page=' + page + '&perPage=20';
   if (search) url += '&search=' + encodeURIComponent(search);
 
-  document.getElementById('userBody').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:rgba(232,237,245,0.3);"><div class="spinner"></div></td></tr>';
+  document.getElementById('userBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:rgba(232,237,245,0.3);"><div class="spinner"></div></td></tr>';
 
   WFT.apiFetch(url).then(function(data) {
     if (data.error) { showError(data.error); return; }
     var tbody = document.getElementById('userBody');
     if (!data.users || !data.users.length) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:rgba(232,237,245,0.3);">No users found.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:rgba(232,237,245,0.3);">No users found.</td></tr>';
       document.getElementById('prevPage').disabled = true;
       document.getElementById('nextPage').disabled = true;
       document.getElementById('pageInfo').textContent = '';
@@ -396,15 +397,17 @@ function loadUsers(page) {
 
       var expires = u.vipExpiresAt ? new Date(u.vipExpiresAt).toLocaleDateString() : '-';
       var joined = u.joinedAt ? new Date(u.joinedAt).toLocaleDateString() : '-';
+      var lastLogin = u.lastSignInAt ? new Date(u.lastSignInAt).toLocaleString() : '-';
       var plan = u.plan || '-';
 
-      return '<tr onclick="selectUser(\'' + u.id + '\',\'' + escapeHtml(u.email) + '\',\'' + escapeHtml(u.fullName || '') + '\',\'' + u.vipStatus + '\',\'' + (u.vipExpiresAt || '') + '\',\'' + (u.joinedAt || '') + '\',\'' + plan + '\')">' +
+      return '<tr onclick="selectUser(\'' + u.id + '\',\'' + escapeHtml(u.email) + '\',\'' + escapeHtml(u.fullName || '') + '\',\'' + u.vipStatus + '\',\'' + (u.vipExpiresAt || '') + '\',\'' + (u.joinedAt || '') + '\',\'' + plan + '\',\'' + (u.lastSignInAt || '') + '\')">' +
         '<td>' + escapeHtml(u.email) + '</td>' +
         '<td>' + escapeHtml(u.fullName || '-') + '</td>' +
         '<td>' + badge + '</td>' +
         '<td>' + plan + '</td>' +
         '<td>' + expires + '</td>' +
-        '<td>' + joined + '</td></tr>';
+        '<td>' + joined + '</td>' +
+        '<td>' + lastLogin + '</td></tr>';
     }).join('');
 
     var totalPages = Math.ceil(data.total / data.perPage);
@@ -414,7 +417,7 @@ function loadUsers(page) {
   }).catch(function() { showError('Failed to load users'); });
 }
 
-function selectUser(id, email, name, status, expires, joined, plan) {
+function selectUser(id, email, name, status, expires, joined, plan, lastLogin) {
   selectedUserId = id;
   document.getElementById('detailPanel').classList.remove('hidden');
   document.getElementById('detailTitle').textContent = 'User: ' + email;
@@ -424,6 +427,7 @@ function selectUser(id, email, name, status, expires, joined, plan) {
   document.getElementById('detPlan').textContent = plan || '-';
   document.getElementById('detExpires').textContent = expires ? new Date(expires).toLocaleString() : '-';
   document.getElementById('detJoined').textContent = joined ? new Date(joined).toLocaleString() : '-';
+  document.getElementById('detLastLogin').textContent = lastLogin ? new Date(lastLogin).toLocaleString() : '-';
 
   var isAdmin = status === 'admin';
   ['btnSetMonthly', 'btnSetYearly', 'btnSetLifetime', 'btnExtend', 'btnRevokeVip', 'btnDelete'].forEach(function(btnId) {
