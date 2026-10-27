@@ -132,6 +132,20 @@ const FOOTER_HTML = `
  <div style="text-align:center;padding:0 0 8px;"><div google-add-preferred-source-btn data-theme="dark"></div></div>
  </div>`;
 
+function applyFooterToHtml(html) {
+  const footerRe = /<footer\b[^>]*>[\s\S]*?<\/footer>/i;
+  if (footerRe.test(html)) {
+    html = html.replace(footerRe, '<footer>' + FOOTER_HTML + '\n</footer>');
+  } else if (/<\/body>/i.test(html)) {
+    html = html.replace(/<\/body>/i, '<footer>' + FOOTER_HTML + '\n</footer>\n</body>');
+  }
+
+  if (!/href=["'][^"']*\/footer\.css(?:\?[^"']*)?["']/i.test(html)) {
+    html = html.replace(/<\/head>/i, '<link rel="stylesheet" href="/footer.css?v=1">\n</head>');
+  }
+  return html;
+}
+
 function headerHtml(activePath) {
   return `
 <header>
@@ -370,8 +384,6 @@ function applyLayoutToHtml(html, activePath) {
   html = html.replace(/(<script[^>]*src=["'][^"']*\/consent\.js)(?:\?v=\d+)?(["'][^>]*>)/gi, '$1?v=3$2');
 
   const navRe = /(<nav id="nav">)[\s\S]*?(<\/nav>)/;
-  const footerRe = /(<footer[^>]*>)[\s\S]*?(<\/footer>)/;
-
   // 1. Nav: replace the inner content of an existing <nav id="nav">, or inject
   //    the full shared header when the page has none.
   if (navRe.test(html)) {
@@ -433,11 +445,7 @@ function applyLayoutToHtml(html, activePath) {
   }
 
   // 3. Footer: replace the existing <footer> or inject one before </body>.
-  if (footerRe.test(html)) {
-    html = html.replace(footerRe, (m, open, close) => open + FOOTER_HTML + '\n' + close);
-  } else {
-    html = html.replace(/<\/body>/i, '<footer>' + FOOTER_HTML + '\n</footer>\n</body>');
-  }
+  html = applyFooterToHtml(html);
 
   // 3b. End-of-content leaderboard: a full-width slot sitting directly above
   //     the footer, mirroring the header leaderboard. Filled by /ads.js.
@@ -545,4 +553,4 @@ function staticWithLayout(req, res, next, publicDir) {
   }
 }
 
-module.exports = { applyLayout, applyLayoutToHtml, staticWithLayout, stripInlineAnalytics, SKIP_PAGES };
+module.exports = { applyLayout, applyLayoutToHtml, applyFooterToHtml, staticWithLayout, stripInlineAnalytics, SKIP_PAGES, FOOTER_HTML };
