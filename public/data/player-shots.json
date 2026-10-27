@@ -1,11 +1,11 @@
 {
   "success": true,
-  "date": "2026-10-26",
-  "updatedAt": "2026-10-26T09:30:17.513Z",
+  "date": "2026-10-27",
+  "updatedAt": "2026-10-27T08:54:14.576Z",
   "source": "understat.com",
   "season": "2026/2027",
   "isNextMatchday": true,
-  "totalFixtures": 14,
+  "totalFixtures": 15,
   "totalPlayers": 500,
   "fixtures": [
     {
@@ -493,50 +493,63 @@
     },
     {
       "league": "La Liga",
-      "date": "2026-10-26",
-      "time": "20:00",
-      "home": "Sevilla",
-      "away": "Osasuna",
-      "match": "Sevilla vs Osasuna",
+      "date": "2026-10-10",
+      "time": "12:00",
+      "home": "Rayo Vallecano",
+      "away": "Athletic Club",
+      "match": "Rayo Vallecano vs Athletic Club",
       "tips": [
         {
-          "player": "Lucas Stassin",
-          "team": "Sevilla",
+          "player": "Sergio Camello",
+          "team": "Rayo Vallecano",
           "side": "home",
-          "position": "F S",
-          "games": 4,
-          "shots": 7,
-          "goals": 1,
-          "xg": 0.9,
-          "spg": 1.75,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Youssouf Fofana",
-          "team": "Sevilla",
-          "side": "home",
-          "position": "M S",
-          "games": 6,
-          "shots": 10,
-          "goals": 1,
-          "xg": 1.7,
-          "spg": 1.67,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Ante Budimir",
-          "team": "Osasuna",
-          "side": "away",
-          "position": "F S",
+          "position": "F M S",
           "games": 9,
-          "shots": 24,
+          "shots": 23,
           "goals": 7,
-          "xg": 5.9,
-          "spg": 2.67,
+          "xg": 3.5,
+          "spg": 2.56,
           "line": 2.5,
           "tip": "Over 2.5 shots"
+        },
+        {
+          "player": "Pedro Díaz",
+          "team": "Rayo Vallecano",
+          "side": "home",
+          "position": "M S",
+          "games": 8,
+          "shots": 20,
+          "goals": 0,
+          "xg": 0.7,
+          "spg": 2.5,
+          "line": 2.5,
+          "tip": "Over 2.5 shots"
+        },
+        {
+          "player": "Oihan Sancet",
+          "team": "Athletic Club",
+          "side": "away",
+          "position": "M",
+          "games": 6,
+          "shots": 17,
+          "goals": 1,
+          "xg": 2.7,
+          "spg": 2.83,
+          "line": 2.5,
+          "tip": "Over 2.5 shots"
+        },
+        {
+          "player": "Yuri",
+          "team": "Athletic Club",
+          "side": "away",
+          "position": "D",
+          "games": 7,
+          "shots": 15,
+          "goals": 1,
+          "xg": 0.4,
+          "spg": 2.14,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
         }
       ]
     },
@@ -790,37 +803,99 @@
     },
     {
       "league": "Ligue 1",
-      "date": "2026-10-25",
-      "time": "19:45",
-      "home": "Paris Saint Germain",
-      "away": "Lyon",
-      "match": "Paris Saint Germain vs Lyon",
+      "date": "2026-10-30",
+      "time": "18:00",
+      "home": "Le Havre",
+      "away": "Paris Saint Germain",
+      "match": "Le Havre vs Paris Saint Germain",
       "tips": [
         {
-          "player": "Loïs Openda",
-          "team": "Lyon",
+          "player": "Mbwana Samatta",
+          "team": "Le Havre",
+          "side": "home",
+          "position": "F M",
+          "games": 8,
+          "shots": 32,
+          "goals": 2,
+          "xg": 2.7,
+          "spg": 4,
+          "line": 3.5,
+          "tip": "Over 3.5 shots"
+        },
+        {
+          "player": "Rayan Fofana",
+          "team": "Le Havre",
+          "side": "home",
+          "position": "F M S",
+          "games": 6,
+          "shots": 12,
+          "goals": 2,
+          "xg": 2.3,
+          "spg": 2,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
+        }
+      ]
+    },
+    {
+      "league": "Ligue 1",
+      "date": "2026-10-30",
+      "time": "20:05",
+      "home": "Lille",
+      "away": "Lens",
+      "match": "Lille vs Lens",
+      "tips": [
+        {
+          "player": "Ayase Ueda",
+          "team": "Lille",
+          "side": "home",
+          "position": "F S",
+          "games": 4,
+          "shots": 9,
+          "goals": 2,
+          "xg": 2.3,
+          "spg": 2.25,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
+        },
+        {
+          "player": "Ethan Mbappé",
+          "team": "Lille",
+          "side": "home",
+          "position": "F M S",
+          "games": 7,
+          "shots": 11,
+          "goals": 2,
+          "xg": 2,
+          "spg": 1.57,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
+        },
+        {
+          "player": "Florian Thauvin",
+          "team": "Lens",
           "side": "away",
-          "position": "F",
-          "games": 5,
-          "shots": 17,
-          "goals": 1,
-          "xg": 2.9,
-          "spg": 3.4,
+          "position": "M",
+          "games": 8,
+          "shots": 20,
+          "goals": 4,
+          "xg": 4.1,
+          "spg": 2.5,
           "line": 2.5,
           "tip": "Over 2.5 shots"
         },
         {
-          "player": "Ernest Nuamah",
-          "team": "Lyon",
+          "player": "Florian Sotoca",
+          "team": "Lens",
           "side": "away",
-          "position": "F M",
+          "position": "M S",
           "games": 5,
-          "shots": 14,
-          "goals": 3,
-          "xg": 2.4,
-          "spg": 2.8,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
+          "shots": 9,
+          "goals": 1,
+          "xg": 0.8,
+          "spg": 1.8,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
         }
       ]
     }
@@ -1971,6 +2046,17 @@
       "spg": 3.56
     },
     {
+      "name": "Ante Budimir",
+      "team": "Osasuna",
+      "league": "La Liga",
+      "position": "F S",
+      "games": 10,
+      "shots": 27,
+      "goals": 7,
+      "xg": 6.1,
+      "spg": 2.7
+    },
+    {
       "name": "Lee Kang-In",
       "team": "Atletico Madrid",
       "league": "La Liga",
@@ -1991,17 +2077,6 @@
       "goals": 1,
       "xg": 2.2,
       "spg": 2.27
-    },
-    {
-      "name": "Ante Budimir",
-      "team": "Osasuna",
-      "league": "La Liga",
-      "position": "F S",
-      "games": 9,
-      "shots": 24,
-      "goals": 7,
-      "xg": 5.9,
-      "spg": 2.67
     },
     {
       "name": "Georges Mikautadze",
@@ -2466,6 +2541,17 @@
       "spg": 2.14
     },
     {
+      "name": "Raul García",
+      "team": "Osasuna",
+      "league": "La Liga",
+      "position": "F M S",
+      "games": 10,
+      "shots": 15,
+      "goals": 1,
+      "xg": 1.7,
+      "spg": 1.5
+    },
+    {
       "name": "Nico Williams",
       "team": "Athletic Club",
       "league": "La Liga",
@@ -2587,6 +2673,17 @@
       "spg": 1.56
     },
     {
+      "name": "Robbie Ure",
+      "team": "Sevilla",
+      "league": "La Liga",
+      "position": "F S",
+      "games": 10,
+      "shots": 14,
+      "goals": 1,
+      "xg": 2.2,
+      "spg": 1.4
+    },
+    {
       "name": "Ángel Pérez",
       "team": "Alaves",
       "league": "La Liga",
@@ -2653,17 +2750,6 @@
       "spg": 1.63
     },
     {
-      "name": "Raul García",
-      "team": "Osasuna",
-      "league": "La Liga",
-      "position": "F M S",
-      "games": 9,
-      "shots": 13,
-      "goals": 1,
-      "xg": 1.6,
-      "spg": 1.44
-    },
-    {
       "name": "Mario Soriano",
       "team": "Deportivo La Coruna",
       "league": "La Liga",
@@ -2694,17 +2780,6 @@
       "shots": 13,
       "goals": 1,
       "xg": 1.7,
-      "spg": 1.44
-    },
-    {
-      "name": "Robbie Ure",
-      "team": "Sevilla",
-      "league": "La Liga",
-      "position": "F S",
-      "games": 9,
-      "shots": 13,
-      "goals": 1,
-      "xg": 2.2,
       "spg": 1.44
     },
     {
@@ -2818,6 +2893,17 @@
       "spg": 1.57
     },
     {
+      "name": "Youssouf Fofana",
+      "team": "Sevilla",
+      "league": "La Liga",
+      "position": "M S",
+      "games": 7,
+      "shots": 11,
+      "goals": 1,
+      "xg": 1.8,
+      "spg": 1.57
+    },
+    {
       "name": "Hugo Gonzalez",
       "team": "Celta Vigo",
       "league": "La Liga",
@@ -2873,17 +2959,6 @@
       "spg": 1
     },
     {
-      "name": "Youssouf Fofana",
-      "team": "Sevilla",
-      "league": "La Liga",
-      "position": "M S",
-      "games": 6,
-      "shots": 10,
-      "goals": 1,
-      "xg": 1.7,
-      "spg": 1.67
-    },
-    {
       "name": "Jon Ander Olasagasti",
       "team": "Levante",
       "league": "La Liga",
@@ -2932,11 +3007,11 @@
       "team": "Osasuna",
       "league": "La Liga",
       "position": "F M S",
-      "games": 9,
+      "games": 10,
       "shots": 10,
       "goals": 0,
       "xg": 0.5,
-      "spg": 1.11
+      "spg": 1
     },
     {
       "name": "Unai López",
@@ -2983,6 +3058,28 @@
       "spg": 1.67
     },
     {
+      "name": "Jonathan Dubasin",
+      "team": "Osasuna",
+      "league": "La Liga",
+      "position": "F M S",
+      "games": 10,
+      "shots": 10,
+      "goals": 0,
+      "xg": 2.1,
+      "spg": 1
+    },
+    {
+      "name": "Isaac Romero",
+      "team": "Sevilla",
+      "league": "La Liga",
+      "position": "F S",
+      "games": 8,
+      "shots": 9,
+      "goals": 3,
+      "xg": 0.5,
+      "spg": 1.13
+    },
+    {
       "name": "Pablo Martínez",
       "team": "Malaga",
       "league": "La Liga",
@@ -3003,28 +3100,6 @@
       "goals": 1,
       "xg": 0.7,
       "spg": 1.5
-    },
-    {
-      "name": "Yeremay Hernández",
-      "team": "Deportivo La Coruna",
-      "league": "La Liga",
-      "position": "F M S",
-      "games": 10,
-      "shots": 9,
-      "goals": 1,
-      "xg": 1.3,
-      "spg": 0.9
-    },
-    {
-      "name": "Nemanja Gudelj",
-      "team": "Getafe",
-      "league": "La Liga",
-      "position": "D M S",
-      "games": 8,
-      "shots": 9,
-      "goals": 0,
-      "xg": 0.3,
-      "spg": 1.13
     },
     {
       "name": "Nico Paz",
@@ -5260,6 +5335,17 @@
       "spg": 3.25
     },
     {
+      "name": "Désiré Doué",
+      "team": "Paris Saint Germain,Rennes",
+      "league": "Ligue 1",
+      "position": "F S",
+      "games": 8,
+      "shots": 24,
+      "goals": 1,
+      "xg": 2.1,
+      "spg": 3
+    },
+    {
       "name": "Casper Tengstedt",
       "team": "Toulouse",
       "league": "Ligue 1",
@@ -5313,17 +5399,6 @@
       "goals": 1,
       "xg": 3.1,
       "spg": 4
-    },
-    {
-      "name": "Désiré Doué",
-      "team": "Paris Saint Germain,Rennes",
-      "league": "Ligue 1",
-      "position": "F S",
-      "games": 7,
-      "shots": 20,
-      "goals": 1,
-      "xg": 1.9,
-      "spg": 2.86
     },
     {
       "name": "Paris Brunner",
@@ -5414,6 +5489,17 @@
       "spg": 3.4
     },
     {
+      "name": "Ferrán Torres",
+      "team": "Paris Saint Germain,Rennes",
+      "league": "Ligue 1",
+      "position": "F S",
+      "games": 8,
+      "shots": 16,
+      "goals": 4,
+      "xg": 2.4,
+      "spg": 2
+    },
+    {
       "name": "Kamory Doumbia",
       "team": "Brest",
       "league": "Ligue 1",
@@ -5423,6 +5509,17 @@
       "goals": 4,
       "xg": 4.7,
       "spg": 2
+    },
+    {
+      "name": "Ernest Nuamah",
+      "team": "Lyon",
+      "league": "Ligue 1",
+      "position": "F M",
+      "games": 6,
+      "shots": 16,
+      "goals": 3,
+      "xg": 2.4,
+      "spg": 2.67
     },
     {
       "name": "Luca Koleosho",
@@ -5513,17 +5610,6 @@
       "spg": 2.33
     },
     {
-      "name": "Ernest Nuamah",
-      "team": "Lyon",
-      "league": "Ligue 1",
-      "position": "F M",
-      "games": 5,
-      "shots": 14,
-      "goals": 3,
-      "xg": 2.4,
-      "spg": 2.8
-    },
-    {
       "name": "Romain Faivre",
       "team": "Auxerre",
       "league": "Ligue 1",
@@ -5555,6 +5641,17 @@
       "goals": 1,
       "xg": 1.1,
       "spg": 2.33
+    },
+    {
+      "name": "Vitinha",
+      "team": "Paris Saint Germain,Rennes",
+      "league": "Ligue 1",
+      "position": "M S",
+      "games": 8,
+      "shots": 14,
+      "goals": 1,
+      "xg": 0.6,
+      "spg": 1.75
     },
     {
       "name": "Ludovic Blas",
@@ -5590,37 +5687,15 @@
       "spg": 1.63
     },
     {
-      "name": "Vitinha",
-      "team": "Paris Saint Germain,Rennes",
-      "league": "Ligue 1",
-      "position": "M S",
-      "games": 7,
-      "shots": 13,
-      "goals": 1,
-      "xg": 0.6,
-      "spg": 1.86
-    },
-    {
       "name": "Achraf Hakimi",
       "team": "Paris Saint Germain,Rennes",
       "league": "Ligue 1",
       "position": "D S",
-      "games": 6,
+      "games": 7,
       "shots": 13,
       "goals": 0,
       "xg": 1.1,
-      "spg": 2.17
-    },
-    {
-      "name": "Ferrán Torres",
-      "team": "Paris Saint Germain,Rennes",
-      "league": "Ligue 1",
-      "position": "F S",
-      "games": 7,
-      "shots": 12,
-      "goals": 4,
-      "xg": 2.1,
-      "spg": 1.71
+      "spg": 1.86
     },
     {
       "name": "Sepe Elye Wahi",
@@ -5733,6 +5808,17 @@
       "spg": 1.5
     },
     {
+      "name": "João Neves",
+      "team": "Paris Saint Germain,Rennes",
+      "league": "Ligue 1",
+      "position": "M",
+      "games": 7,
+      "shots": 12,
+      "goals": 0,
+      "xg": 1.5,
+      "spg": 1.71
+    },
+    {
       "name": "Ethan Mbappé",
       "team": "Lille",
       "league": "Ligue 1",
@@ -5788,17 +5874,6 @@
       "spg": 1.38
     },
     {
-      "name": "João Neves",
-      "team": "Paris Saint Germain,Rennes",
-      "league": "Ligue 1",
-      "position": "M",
-      "games": 6,
-      "shots": 11,
-      "goals": 0,
-      "xg": 1.4,
-      "spg": 1.83
-    },
-    {
       "name": "Mama Baldé",
       "team": "Brest",
       "league": "Ligue 1",
@@ -5830,6 +5905,17 @@
       "goals": 1,
       "xg": 1.8,
       "spg": 1.25
+    },
+    {
+      "name": "Fabián",
+      "team": "Paris Saint Germain,Rennes",
+      "league": "Ligue 1",
+      "position": "M S",
+      "games": 7,
+      "shots": 10,
+      "goals": 0,
+      "xg": 0.4,
+      "spg": 1.43
     },
     {
       "name": "Rassoul Ndiaye",
@@ -5918,6 +6004,17 @@
       "goals": 1,
       "xg": 0.8,
       "spg": 1.8
+    },
+    {
+      "name": "Maghnes Akliouche",
+      "team": "Paris Saint Germain,Rennes",
+      "league": "Ligue 1",
+      "position": "F M S",
+      "games": 8,
+      "shots": 9,
+      "goals": 1,
+      "xg": 2,
+      "spg": 1.13
     },
     {
       "name": "Abdallah Sima",
@@ -6173,17 +6270,6 @@
       "spg": 1
     },
     {
-      "name": "Fabián",
-      "team": "Paris Saint Germain,Rennes",
-      "league": "Ligue 1",
-      "position": "M S",
-      "games": 6,
-      "shots": 8,
-      "goals": 0,
-      "xg": 0.3,
-      "spg": 1.33
-    },
-    {
       "name": "Mahdi Camara",
       "team": "Rennes",
       "league": "Ligue 1",
@@ -6221,11 +6307,11 @@
       "team": "Lyon",
       "league": "Ligue 1",
       "position": "F M S",
-      "games": 7,
+      "games": 8,
       "shots": 8,
       "goals": 0,
       "xg": 1.4,
-      "spg": 1.14
+      "spg": 1
     },
     {
       "name": "Mouhamed Diop",
@@ -6298,11 +6384,11 @@
       "team": "Lyon",
       "league": "Ligue 1",
       "position": "M S",
-      "games": 7,
+      "games": 8,
       "shots": 7,
       "goals": 1,
       "xg": 1,
-      "spg": 1
+      "spg": 0.88
     },
     {
       "name": "Ruben Aguilar",
@@ -6313,17 +6399,6 @@
       "shots": 7,
       "goals": 1,
       "xg": 0.9,
-      "spg": 1
-    },
-    {
-      "name": "Timothy Weah",
-      "team": "Marseille",
-      "league": "Ligue 1",
-      "position": "D",
-      "games": 7,
-      "shots": 7,
-      "goals": 1,
-      "xg": 0.6,
       "spg": 1
     }
   ]
