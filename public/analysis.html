@@ -319,21 +319,9 @@ footer { background: #1e2538; border-top: 1px solid rgba(255,255,255,0.06); padd
 
  <script type="application/ld+json" id="seoJsonLd"></script>
 
- <!-- Google tag (gtag.js) -->
 
- <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>
 
- <script>
-
- window.dataLayer = window.dataLayer || [];
-
- function gtag(){dataLayer.push(arguments);}
-
- gtag('js', new Date());
-
- gtag('config', 'G-HMGZMW9EDP');
-
-</script>
+ 
 
 <!-- wf-layout-styles -->
 <style>
@@ -451,6 +439,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 <link rel="alternate" type="application/rss+xml" title="WinFulltime Football Predictions RSS" href="/feed.xml">
 <script async src="https://news.google.com/swg/js/v1/publisher.js"></script>
 <link rel="stylesheet" href="/consent.css">
+<link rel="stylesheet" href="/footer.css?v=1">
 </head>
 
 <body>
@@ -617,14 +606,14 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
  async function loadPlayerScoringThreats(analysis) {
   const target = document.getElementById('playerNewsDetails');
   if (!target) return;
-  const unavailable = '<p class="player-note">No current source-matched player scoring data is available for this exact fixture and date. Injury and suspension status is not provided by this player feed, so no absence claims are made.</p>';
+  const unavailable = '<p class="player-note">No current player scoring data is available for this exact fixture and date. Injury and suspension status is not verified, so no absence claims are made.</p>';
   if (!analysis.matchDate) { target.innerHTML = unavailable; return; }
   try {
    const response = await fetch('/data/player-shots.json', { cache: 'no-store' });
    if (!response.ok) { target.innerHTML = unavailable; return; }
    const data = await response.json();
    const updatedAt = Date.parse(data.updatedAt || '');
-   if (data.success !== true || data.source !== 'understat.com' || !Array.isArray(data.fixtures) ||
+   if (data.success !== true || data.source !== 'player-scoring-v1' || !Array.isArray(data.fixtures) ||
        !Number.isFinite(updatedAt) || updatedAt > Date.now() + 5 * 60 * 1000 || Date.now() - updatedAt > 48 * 60 * 60 * 1000) { target.innerHTML = unavailable; return; }
    const homeKey = normalizeTeamForPlayerData(analysis.homeTeam || homeTeam);
    const awayKey = normalizeTeamForPlayerData(analysis.awayTeam || awayTeam);
@@ -645,7 +634,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
     }).join('')}</ul>`;
    }).join('');
    if (!groups) { target.innerHTML = unavailable; return; }
-   target.innerHTML = groups + `<p class="player-note" style="margin-top:12px;">Season-to-date scoring indicators, not confirmed starters or a guarantee to score. Source: <a href="https://understat.com" target="_blank" rel="noopener noreferrer" style="color:#cbd5e1;text-decoration:underline;">Understat</a> · updated ${escapeHtml(data.updatedAt)}. This source does not provide verified injury or suspension status.</p>`;
+   target.innerHTML = groups + `<p class="player-note" style="margin-top:12px;">Season-to-date scoring indicators, not confirmed starters or a guarantee to score. Updated ${escapeHtml(data.updatedAt)}. Injury or suspension status is not verified.</p>`;
   } catch (error) {
    console.warn('Player scoring data unavailable:', error);
    target.innerHTML = unavailable;
@@ -692,6 +681,22 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   return (s.wins || 0) + (s.draws || 0) + (s.losses || 0) > 0 || Number(s.avgScored || 0) > 0;
  }
 
+ function renderLeagueTable(team, table) {
+  const position = Number(table && table.position);
+  const lastTwo = position % 100;
+  const suffix = lastTwo >= 11 && lastTwo <= 13 ? 'th' : position % 10 === 1 ? 'st' : position % 10 === 2 ? 'nd' : position % 10 === 3 ? 'rd' : 'th';
+  const gd = Number(table && table.goalDifference);
+  return `<div class="analysis-card"><h4>${escapeHtml(team)}</h4>
+   <p style="margin:0 0 10px;color:#cbd5e1;font-size:13px;">${escapeHtml(table.competition || 'League')}</p>
+   <div class="stats-grid">
+    <div class="stat-item"><div class="stat-label">Position</div><div class="stat-value">${position ? position + suffix : '—'}</div></div>
+    <div class="stat-item"><div class="stat-label">Played</div><div class="stat-value">${Number(table.played) || 0}</div></div>
+    <div class="stat-item"><div class="stat-label">Points</div><div class="stat-value">${Number(table.points) || 0}</div></div>
+    <div class="stat-item"><div class="stat-label">W-D-L</div><div class="stat-value">${Number(table.wins) || 0}-${Number(table.draws) || 0}-${Number(table.losses) || 0}</div></div>
+    <div class="stat-item"><div class="stat-label">Goal difference</div><div class="stat-value">${gd > 0 ? '+' : ''}${gd}</div></div>
+   </div></div>`;
+ }
+
  function renderUnavailable() {
   document.getElementById('content').innerHTML = `
   <div class="analysis-section" style="background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.2);">
@@ -714,21 +719,19 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   const h2h = analysis.h2h || [];
   const summary = analysis.summary || '';
   const insights = analysis.insights || {};
-  const providerUrls = { Statarea: 'https://www.statarea.com', FotMob: 'https://www.fotmob.com' };
-  const sourceProvider = analysis.sourceProvider;
-  const sourceLabel = providerUrls[sourceProvider]
-   ? `Form and H2H source: <a href="${providerUrls[sourceProvider]}" target="_blank" rel="noopener noreferrer" style="color:#cbd5e1;text-decoration:underline;">${escapeHtml(sourceProvider)}</a>`
-   : 'Form and H2H source details are not available for this cached record.';
+  const homeTable = analysis.homeLeagueTable;
+  const awayTable = analysis.awayLeagueTable;
+  const hasTable = !!((homeTable && homeTable.position) || (awayTable && awayTable.position));
   const generatedLabel = datasetGeneratedAt ? `Dataset generated ${escapeHtml(datasetGeneratedAt)}` : '';
 
-  if (!hasForm && !hasStat && h2h.length === 0 && !summary) {
+  if (!hasForm && !hasStat && h2h.length === 0 && !summary && !hasTable) {
    renderUnavailable();
    return;
   }
 
   document.getElementById('content').innerHTML = `
   <div class="analysis-section" style="padding:12px 20px;">
-   <p style="margin:0;color:#94a3b8;font-size:13px;line-height:1.6;">${sourceLabel}${generatedLabel ? ` &middot; ${generatedLabel}` : ''}</p>
+   <p style="margin:0;color:#94a3b8;font-size:13px;line-height:1.6;">${generatedLabel || 'Match data refreshed regularly'}</p>
   </div>
   ${hasForm ? `
   <div class="analysis-section">
@@ -744,6 +747,14 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <div class="analysis-grid">
     ${renderStats(analysis.homeTeam || homeTeam, analysis.homeLast10)}
     ${renderStats(analysis.awayTeam || awayTeam, analysis.awayLast10)}
+   </div>
+  </div>` : ''}
+  ${hasTable ? `
+  <div class="analysis-section">
+   <h3>League Table</h3>
+   <div class="analysis-grid">
+    ${homeTable && homeTable.position ? renderLeagueTable(analysis.homeTeam || homeTeam, homeTable) : ''}
+    ${awayTable && awayTable.position ? renderLeagueTable(analysis.awayTeam || awayTeam, awayTable) : ''}
    </div>
   </div>` : ''}
   ${h2h.length > 0 ? `
@@ -768,6 +779,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   ${insights.whatToExpect && insights.whatToExpect.length ? `
   <div class="analysis-section">
    <h3>What to Expect</h3>
+   <h4 class="insight-subhead">Matchup outlook</h4>
    <ul class="insight-list">${insights.whatToExpect.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
   </div>` : ''}
   ${insights.evidenceFor && insights.evidenceFor.length || insights.counterpoints && insights.counterpoints.length || insights.cautions && insights.cautions.length ? `
