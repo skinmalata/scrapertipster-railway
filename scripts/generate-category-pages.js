@@ -821,7 +821,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
         (analysisHref
           ? '<a href="' + analysisHref + '" class="match-card-link" style="display:block;text-decoration:none;color:inherit;">' + matchHead + cardContent + '</a>'
           : matchHead + cardContent) +
-        (analysisHref ? '<div style="text-align:center;margin-top:8px;padding:0 4px;"><a href="' + analysisHref + '" class="analysis-btn" style="display:inline-flex;align-items:center;justify-content:center;min-height:40px;max-width:100%;box-sizing:border-box;padding:8px 14px;color:var(--accent);font-size:12px;font-weight:700;text-align:center;text-decoration:none;">View Analysis &rarr;</a></div>' : '') +
+        (analysisHref ? '<div style="text-align:center;margin-top:8px;padding:0 4px;"><a href="' + analysisHref + '" class="analysis-btn" style="display:inline-flex;align-items:center;justify-content:center;min-height:44px;max-width:100%;box-sizing:border-box;padding:12px 20px;border-radius:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:700;line-height:1.2;text-align:center;text-decoration:none;">View Analysis &rarr;</a></div>' : '') +
         ctaHtml + '</div>';
 
       return cardHtml;
