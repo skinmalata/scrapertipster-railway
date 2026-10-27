@@ -1415,29 +1415,17 @@ gtag('config', 'G-HMGZMW9EDP');
 
   console.log('Fetching predictions...');
 
-  async function fetchPredictionsData() {
-   const u = (window.WFT && typeof window.WFT.getUser === 'function') ? window.WFT.getUser() : null;
-   if (u && u.isPro && window.WFT && typeof window.WFT.apiFetch === 'function') {
-    try {
-     const apiOut = await window.WFT.apiFetch('/api/predictions');
-     if (apiOut && apiOut.matches && apiOut.matches.length) return apiOut;
-    } catch (e) { console.warn('Pro predictions fetch failed, using static:', e); }
-   }
-   const r = await fetch('/data/predictions.json');
-   if (!r.ok) throw new Error(`HTTP error: ${r.status}`);
-   return r.json();
-  }
+  // Render the static snapshot first. Analysis maps and the Pro API are
+  // enhancements and must not keep the homepage in its loading state.
+  const mapsReady = (typeof window.ensureAnalysisMaps === 'function'
+   ? window.ensureAnalysisMaps().then(function () {
+      return typeof window.getAnalysisRaw === 'function' ? window.getAnalysisRaw() : {};
+     }).catch(() => ({}))
+   : fetch('/data/analysis-links.json').then(r => r.ok ? r.json() : {}).catch(() => ({})));
 
-  const [predData, linksData] = await Promise.all([
-   fetchPredictionsData(),
-   fetch('/data/analysis-links.json').then(r => r.ok ? r.json() : {}).catch(() => ({}))
-  ]);
-
-  analysisLinks = linksData || {};
-
-  currentData = predData;
-
-  if (typeof window.ensureAnalysisMaps === 'function') { await window.ensureAnalysisMaps(); }
+  const r = await fetch('/data/predictions.json');
+  if (!r.ok) throw new Error(`HTTP error: ${r.status}`);
+  currentData = await r.json();
 
  renderDayTabs();
 
@@ -1460,6 +1448,25 @@ gtag('config', 'G-HMGZMW9EDP');
  renderMatches();
 
  console.log('renderMatches completed');
+
+  // Add analysis buttons after the maps arrive. This runs independently of
+  // the initial prediction render, so a slow map download cannot delay cards.
+  mapsReady.then(function (links) {
+   analysisLinks = links || {};
+   renderMatches();
+  });
+
+  // Pro users can receive the full snapshot in the background. The static
+  // snapshot remains visible while the API responds, including on cold starts.
+  const u = (window.WFT && typeof window.WFT.getUser === 'function') ? window.WFT.getUser() : null;
+  if (u && u.isPro && window.WFT && typeof window.WFT.apiFetch === 'function') {
+   window.WFT.apiFetch('/api/predictions').then(function (apiOut) {
+    if (apiOut && apiOut.matches && apiOut.matches.length) {
+     currentData = apiOut;
+     renderMatches();
+    }
+   }).catch(function (e) { console.warn('Pro predictions fetch failed:', e); });
+  }
 
  } catch (error) {
 
