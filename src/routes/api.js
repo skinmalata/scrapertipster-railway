@@ -2348,32 +2348,25 @@ router.get('/me/subscription', requireAuth, async function (req, res) {
   try {
     if (!supabase) return res.json({ isPro: false, error: 'Service unavailable' });
 
-    var prof = await supabase.from('profiles').select('vip_status, vip_expires_at, created_at').eq('id', req.user.id).single();
-    var sub = await supabase.from('subscriptions').select('plan_type, payment_status, expires_at, started_at, payment_id')
-      .eq('user_id', req.user.id).order('created_at', { ascending: false }).limit(1).maybeSingle();
-
-    var profile = prof.data;
-    var subscription = sub.data;
+    // Profile and subscription are independent reads: run them in parallel
+    // instead of serialising two Supabase round trips. The caller's email
+    // confirmation status already came from requireAuth/optionalAuth, so no
+    // third Supabase Auth request is needed here.
+    var results = await Promise.all([
+      supabase.from('profiles').select('vip_status, vip_expires_at, created_at').eq('id', req.user.id).single(),
+      supabase.from('subscriptions').select('plan_type, payment_status, expires_at, started_at, payment_id')
+        .eq('user_id', req.user.id).order('created_at', { ascending: false }).limit(1).maybeSingle()
+    ]);
+    var profile = results[0].data;
+    var subscription = results[1].data;
     var isAdmin = profile && profile.vip_status === 'admin';
     var isPro = isAdmin || (profile && profile.vip_status === 'vip' && (!profile.vip_expires_at || new Date(profile.vip_expires_at) > new Date()));
-
-    var emailConfirmed = false;
-    var header = String(req.headers.authorization || '');
-    var tokenMatch = header.match(/^Bearer\s+(.+)$/i);
-    if (tokenMatch && supabase) {
-      try {
-        var userResult = await supabase.auth.getUser(tokenMatch[1]);
-        if (userResult.data && userResult.data.user) {
-          emailConfirmed = !!userResult.data.user.email_confirmed_at;
-        }
-      } catch (e) {}
-    }
 
     res.json({
       isPro: isPro,
       isAdmin: isAdmin,
       email: req.user.email,
-      emailConfirmed: emailConfirmed,
+      emailConfirmed: !!req.user.emailConfirmed,
       plan: isAdmin ? 'admin' : (subscription ? subscription.plan_type : null),
       status: subscription ? subscription.payment_status : null,
       expiresAt: subscription && subscription.expires_at ? subscription.expires_at : null,

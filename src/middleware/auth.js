@@ -35,6 +35,61 @@ async function logAdminAction(adminUser, action, targetUserId, targetEmail, deta
   }
 }
 
+// Verifying a Supabase access token is a network round trip. Pages commonly
+// fire several authenticated API calls at once, so cache successful lookups
+// briefly and de-duplicate concurrent checks for the same token. Only valid
+// users are cached; an invalid/expired token is retried on the next request.
+var AUTH_CACHE_TTL_MS = 30 * 1000;
+var AUTH_CACHE_MAX = 2000;
+var authCache = new Map();
+var authInflight = new Map();
+
+function cachedAuthUser(token) {
+  var hit = authCache.get(token);
+  if (!hit) return undefined;
+  if (hit.expiresAt <= Date.now()) {
+    authCache.delete(token);
+    return undefined;
+  }
+  return hit.user;
+}
+
+function cacheAuthUser(token, user) {
+  if (!user) return;
+  if (authCache.size >= AUTH_CACHE_MAX) {
+    var oldest = authCache.keys().next().value;
+    if (oldest !== undefined) authCache.delete(oldest);
+  }
+  authCache.set(token, { user: user, expiresAt: Date.now() + AUTH_CACHE_TTL_MS });
+}
+
+function verifyToken(token) {
+  var cached = cachedAuthUser(token);
+  if (cached !== undefined) return Promise.resolve(cached);
+  if (authInflight.has(token)) return authInflight.get(token);
+
+  var pending = supabase.auth.getUser(token).then(function (result) {
+    if (result.data && result.data.user) {
+      var user = {
+        id: result.data.user.id,
+        email: result.data.user.email || '',
+        emailConfirmed: !!result.data.user.email_confirmed_at
+      };
+      cacheAuthUser(token, user);
+      return user;
+    }
+    return null;
+  }).catch(function () {
+    return null;
+  }).then(function (user) {
+    authInflight.delete(token);
+    return user;
+  });
+
+  authInflight.set(token, pending);
+  return pending;
+}
+
 function optionalAuth(req, res, next) {
   if (!supabase) { req.user = null; return next(); }
 
@@ -42,12 +97,8 @@ function optionalAuth(req, res, next) {
   var match = header.match(/^Bearer\s+(.+)$/i);
   if (!match) { req.user = null; return next(); }
 
-  supabase.auth.getUser(match[1]).then(function (result) {
-    if (result.data && result.data.user) {
-      req.user = { id: result.data.user.id, email: result.data.user.email || '' };
-    } else {
-      req.user = null;
-    }
+  verifyToken(match[1]).then(function (user) {
+    req.user = user;
     next();
   }).catch(function () {
     req.user = null;
@@ -68,47 +119,38 @@ function requirePro(req, res, next) {
   requireAuth(req, res, function () {
     if (!supabase) return res.status(503).json({ error: 'Auth service unavailable' });
 
-    // Check email confirmation
-    var header = String(req.headers.authorization || '');
-    var match = header.match(/^Bearer\s+(.+)$/i);
-    if (match) {
-      supabase.auth.getUser(match[1]).then(function (userResult) {
-        if (userResult.data && userResult.data.user && !userResult.data.user.email_confirmed_at) {
-          return res.status(403).json({ error: 'Please verify your email before accessing Pro features', code: 'EMAIL_NOT_CONFIRMED', isPro: false });
+    // optionalAuth already verified the token and captured email_confirmed_at,
+    // so do not make a second Supabase Auth round trip here.
+    if (req.user.emailConfirmed === false) {
+      return res.status(403).json({ error: 'Please verify your email before accessing Pro features', code: 'EMAIL_NOT_CONFIRMED', isPro: false });
+    }
+
+    supabase.from('profiles')
+      .select('vip_status, vip_expires_at')
+      .eq('id', req.user.id)
+      .single()
+      .then(function (result) {
+        if (result.error) return res.status(500).json({ error: 'Failed to check membership' });
+
+        var profile = result.data;
+        var isVip = profile && (profile.vip_status === 'vip' || profile.vip_status === 'admin');
+        if (!isVip) {
+          return res.status(403).json({ error: 'Pro membership required', code: 'PRO_REQUIRED', isPro: false });
         }
 
-        supabase.from('profiles')
-          .select('vip_status, vip_expires_at')
-          .eq('id', req.user.id)
-          .single()
-          .then(function (result) {
-            if (result.error) return res.status(500).json({ error: 'Failed to check membership' });
+        if (profile.vip_status !== 'admin' && profile.vip_expires_at) {
+          var expiresAt = new Date(profile.vip_expires_at);
+          if (expiresAt <= new Date()) {
+            return res.status(403).json({ error: 'Pro membership has expired', code: 'PRO_EXPIRED', isPro: false });
+          }
+        }
 
-            var profile = result.data;
-            var isVip = profile && (profile.vip_status === 'vip' || profile.vip_status === 'admin');
-            if (!isVip) {
-              return res.status(403).json({ error: 'Pro membership required', code: 'PRO_REQUIRED', isPro: false });
-            }
-
-            if (profile.vip_status !== 'admin' && profile.vip_expires_at) {
-              var expiresAt = new Date(profile.vip_expires_at);
-              if (expiresAt <= new Date()) {
-                return res.status(403).json({ error: 'Pro membership has expired', code: 'PRO_EXPIRED', isPro: false });
-              }
-            }
-
-            req.profile = profile;
-            req.isPro = true;
-            next();
-          }).catch(function (err) {
-            res.status(500).json({ error: 'Failed to check membership' });
-          });
+        req.profile = profile;
+        req.isPro = true;
+        next();
       }).catch(function () {
-        res.status(500).json({ error: 'Failed to verify authentication' });
+        res.status(500).json({ error: 'Failed to check membership' });
       });
-    } else {
-      res.status(401).json({ error: 'Authentication required' });
-    }
   });
 }
 

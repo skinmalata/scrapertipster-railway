@@ -34,8 +34,7 @@
   function onAuthChange(event, session) {
     if (session) {
       var user = session.user;
-      var tok = session.access_token;
-      console.log('[auth] onAuthChange event:', event, 'token first 20:', tok ? tok.substring(0, 20) : 'MISSING', 'token length:', tok ? tok.length : 0);
+      console.log('[auth] onAuthChange event:', event);
       userState.user = {
         id: user.id,
         email: user.email,
@@ -43,6 +42,9 @@
       };
       userState.session = session;
       userState.loading = false;
+      // Show account/logout immediately; the Pro badge fills in when the
+      // membership check below finishes.
+      updateUI(userState.user);
       scheduleProFetch();
     } else {
       userState.user = null;
@@ -52,108 +54,127 @@
     }
   }
 
+  var _lastProFetchAt = 0;
+
   function scheduleProFetch() {
     if (_proFetchScheduled) return;
+    // The initial getSession() and the first SIGNED_IN auth event can both fire
+    // on page load. Collapse those into one membership check.
+    if (Date.now() - _lastProFetchAt < 2000) return;
     _proFetchScheduled = true;
-    setTimeout(function() {
-      var sb = window.WFT.supabase;
-      if (!sb || !userState.user) {
-        console.log('[scheduleProFetch] No supabase or user');
-        _proFetchScheduled = false;
-        document.dispatchEvent(new CustomEvent('wft-pro-status'));
-        return;
+    _lastProFetchAt = Date.now();
+
+    function finish() {
+      console.log('[scheduleProFetch] Dispatching wft-pro-status, isPro:', userState.user ? userState.user.isPro : 'no user');
+      document.dispatchEvent(new CustomEvent('wft-pro-status'));
+      _proFetchScheduled = false;
+    }
+
+    var user = userState.user;
+    var session = userState.session;
+    var tok = session && session.access_token;
+    if (!tok || !user) {
+      console.log('[scheduleProFetch] No token');
+      if (user) {
+        user.isPro = false;
+        user.isAdmin = false;
+        updateUI(user);
       }
-      sb.auth.getSession().then(function(s) {
-        var tok = s.data.session?.access_token;
-        if (!tok) {
-          console.log('[scheduleProFetch] No token');
-          _proFetchScheduled = false;
-          if (userState.user) {
-            userState.user.isPro = false;
-            userState.user.isAdmin = false;
+      finish();
+      return;
+    }
+
+    var SUPABASE_URL = 'https://xogkqpjtxfemcxzsuwke.supabase.co';
+    var ANON_KEY = 'sb_publishable_VydS1cmw7_OhFa7e-xUOqQ_tcVRUQoy';
+    var headers = { 'Authorization': 'Bearer ' + tok, 'apikey': ANON_KEY };
+
+    // Backend is authoritative and catches profile rows that lag behind a
+    // subscription webhook. Start it immediately, in parallel with the direct
+    // profile read, instead of waiting for the profile to say "not Pro".
+    var profileConfirmedPro = false;
+    function verifyWithBackend() {
+      var wasPro = !!(userState.user && userState.user.isPro);
+      return WFT.apiFetch('/api/me/subscription').then(function(d) {
+        if (userState.user && d && d.isPro) {
+          userState.user.isPro = true;
+          userState.user.isAdmin = !!(d.isAdmin);
+          if (d.expiresAt) userState.user.expiresAt = d.expiresAt;
+          if (d.plan) userState.user.plan = d.plan;
+          updateUI(userState.user);
+          console.log('[scheduleProFetch] Backend confirmed Pro:', d.isPro, d.plan);
+        } else {
+          // apiFetch mirrors isPro onto the user object. A failed/free fallback
+          // must never downgrade a Pro profile read that already succeeded.
+          if (userState.user && (wasPro || profileConfirmedPro) && !userState.user.isPro) {
+            userState.user.isPro = true;
             updateUI(userState.user);
           }
-          document.dispatchEvent(new CustomEvent('wft-pro-status'));
-          return;
+          console.log('[scheduleProFetch] Backend also says not Pro:', d && d.isPro);
         }
-        var SUPABASE_URL = 'https://xogkqpjtxfemcxzsuwke.supabase.co';
-        var ANON_KEY = 'sb_publishable_VydS1cmw7_OhFa7e-xUOqQ_tcVRUQoy';
-        var headers = { 'Authorization': 'Bearer ' + tok, 'apikey': ANON_KEY };
+      }).catch(function(e) {
+        if (userState.user && (wasPro || profileConfirmedPro) && !userState.user.isPro) {
+          userState.user.isPro = true;
+          updateUI(userState.user);
+        }
+        console.warn('[scheduleProFetch] Backend fallback failed:', e);
+      });
+    }
 
-        function verifyWithBackend() {
-          return WFT.apiFetch('/api/me/subscription').then(function(d) {
-            if (userState.user && d && d.isPro) {
-              userState.user.isPro = true;
-              userState.user.isAdmin = !!(d.isAdmin);
-              if (d.expiresAt) userState.user.expiresAt = d.expiresAt;
-              if (d.plan) userState.user.plan = d.plan;
-              console.log('[scheduleProFetch] Backend confirmed Pro:', d.isPro, d.plan);
-            } else {
-              console.log('[scheduleProFetch] Backend also says not Pro:', d && d.isPro);
+    console.log('[scheduleProFetch] Fetching profile for', user.id);
+    var profilePromise = fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.' + user.id + '&select=vip_status,vip_expires_at', {
+      headers: headers
+    }).then(function(r) {
+      if (!r.ok) throw new Error('Profile fetch failed: ' + r.status);
+      return r.json();
+    }).then(function(rows) {
+      console.log('[scheduleProFetch] Profile result:', JSON.stringify(rows));
+      if (!userState.user) return;
+      if (rows && rows[0]) {
+        var p = rows[0];
+        var isAdmin = p.vip_status === 'admin';
+        var isVip = p.vip_status === 'vip' && (!p.vip_expires_at || new Date(p.vip_expires_at) > new Date());
+        profileConfirmedPro = isAdmin || isVip;
+        // Do not overwrite a Pro result the backend may have confirmed first.
+        if (isAdmin || isVip || !userState.user.isPro) {
+          userState.user.isPro = isAdmin || isVip;
+        }
+        userState.user.isAdmin = isAdmin || userState.user.isAdmin;
+        userState.user.expiresAt = p.vip_expires_at || null;
+        console.log('[scheduleProFetch] isVip:', isVip, 'isAdmin:', isAdmin);
+        updateUI(userState.user);
+        if (isVip) {
+          fetch(SUPABASE_URL + '/rest/v1/subscriptions?user_id=eq.' + userState.user.id + '&select=plan_type&order=created_at.desc&limit=1', {
+            headers: headers
+          }).then(function(r2) {
+            if (!r2.ok) return;
+            return r2.json();
+          }).then(function(subs) {
+            if (subs && subs[0]) {
+              userState.user.plan = subs[0].plan_type;
+              console.log('[scheduleProFetch] Plan:', subs[0].plan_type);
             }
-          }).catch(function(e) {
-            console.warn('[scheduleProFetch] Backend fallback failed:', e);
+          }).catch(function(e2) {
+            console.warn('[scheduleProFetch] Subscription fetch failed:', e2);
           });
         }
+      } else {
+        console.log('[scheduleProFetch] No profile found, setting isPro=false');
+        if (!userState.user.isPro) {
+          userState.user.isPro = false;
+          userState.user.isAdmin = false;
+          updateUI(userState.user);
+        }
+      }
+    }).catch(function(e) {
+      console.warn('[scheduleProFetch] Error:', e);
+      if (userState.user && !userState.user.isPro) {
+        userState.user.isPro = false;
+        userState.user.isAdmin = false;
+        updateUI(userState.user);
+      }
+    });
 
-        console.log('[scheduleProFetch] Fetching profile for', userState.user.id);
-        fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.' + userState.user.id + '&select=vip_status,vip_expires_at', {
-          headers: headers
-        }).then(function(r) {
-          if (!r.ok) throw new Error('Profile fetch failed: ' + r.status);
-          return r.json();
-        }).then(function(rows) {
-          console.log('[scheduleProFetch] Profile result:', JSON.stringify(rows));
-          if (rows && rows[0]) {
-            var p = rows[0];
-            var isAdmin = p.vip_status === 'admin';
-            var isVip = p.vip_status === 'vip' && (!p.vip_expires_at || new Date(p.vip_expires_at) > new Date());
-            userState.user.isPro = isAdmin || isVip;
-            userState.user.isAdmin = isAdmin;
-            userState.user.expiresAt = p.vip_expires_at || null;
-            console.log('[scheduleProFetch] isVip:', isVip, 'isAdmin:', isAdmin);
-            updateUI(userState.user);
-            if (isVip) {
-              fetch(SUPABASE_URL + '/rest/v1/subscriptions?user_id=eq.' + userState.user.id + '&select=plan_type&order=created_at.desc&limit=1', {
-                headers: headers
-              }).then(function(r2) {
-                if (!r2.ok) return;
-                return r2.json();
-              }).then(function(subs) {
-                if (subs && subs[0]) {
-                  userState.user.plan = subs[0].plan_type;
-                  console.log('[scheduleProFetch] Plan:', subs[0].plan_type);
-                }
-              }).catch(function(e2) {
-                console.warn('[scheduleProFetch] Subscription fetch failed:', e2);
-              });
-            }
-          } else {
-            console.log('[scheduleProFetch] No profile found, setting isPro=false');
-            if (userState.user) {
-              userState.user.isPro = false;
-              userState.user.isAdmin = false;
-              updateUI(userState.user);
-            }
-          }
-          if (userState.user && !userState.user.isPro) {
-            return verifyWithBackend();
-          }
-        }).catch(function(e) {
-          console.warn('[scheduleProFetch] Error:', e);
-          if (userState.user) {
-            userState.user.isPro = false;
-            userState.user.isAdmin = false;
-            updateUI(userState.user);
-          }
-          return verifyWithBackend();
-        }).finally(function() {
-          console.log('[scheduleProFetch] Dispatching wft-pro-status, isPro:', userState.user ? userState.user.isPro : 'no user');
-          document.dispatchEvent(new CustomEvent('wft-pro-status'));
-          _proFetchScheduled = false;
-        });
-      });
-    }, 1000);
+    Promise.all([profilePromise, verifyWithBackend()]).then(finish);
   }
 
   function tagStatus(data, status) {

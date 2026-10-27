@@ -18,7 +18,11 @@
       link.id = 'tab-vip';
       link.className = 'tab-btn' + (isActive ? ' active' : '');
       link.textContent = 'Team To Score';
-      link.setAttribute('style', 'background:linear-gradient(135deg,#ff2448,#ff7e7e);color:#fff');
+      // Keep the red VIP treatment only on the Team To Score page itself.
+      // Applying it everywhere made the tab look permanently selected.
+      if (isActive) {
+        link.setAttribute('style', 'background:linear-gradient(135deg,#ff2448,#ff7e7e);color:#fff');
+      }
       container.appendChild(link);
     });
   }
