@@ -80,6 +80,14 @@ jobs:
         env:
           PUPPETEER_SKIP_DOWNLOAD: false
 
+      # Refresh the Understat season goals/xG feed before build-analysis reads
+      # it. The analysis renderer only joins exact team/date fixtures and hides
+      # this section when the source data is stale or unavailable.
+      - name: Refresh player scoring data
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        continue-on-error: true
+        run: node scripts/scrape-player-shots.js
+
       - name: Run scraper
         run: node scripts/gh-pages-scraper.js
 

@@ -99,6 +99,11 @@ h3 { font-size: 18px; margin-bottom: 16px; font-weight: 700; border-bottom: 1px 
 .summary-section h3 { font-size: 18px; margin-bottom: 16px; border-bottom: 2px solid #ff2448; padding-bottom: 10px; }
 .summary-text { line-height: 1.8; color: #c8d0db; font-size: 15px; }
 .summary-text p { margin-bottom: 0; color: #c8d0db; }
+.insight-list { margin: 0; padding-left: 20px; color: #c8d0db; line-height: 1.7; }
+.insight-list li { margin: 0 0 10px; }
+.insight-list li:last-child { margin-bottom: 0; }
+.insight-subhead { margin: 14px 0 8px; color: #e2e8f0; font-size: 14px; }
+.player-note { margin: 0; color: #c8d0db; font-size: 14px; line-height: 1.7; }
 .loading { display: flex; justify-content: center; padding: 40px; }
 .spinner { width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.06); border-top-color: #ff2448; border-radius: 50%; animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -604,6 +609,49 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   return String(name || '').split('(')[0].trim();
  }
 
+ function normalizeTeamForPlayerData(name) {
+  return cleanTeamName(name).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+   .replace(/\b(fc|afc|cf|sc|ac|club)\b/g, '').replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+ }
+
+ async function loadPlayerScoringThreats(analysis) {
+  const target = document.getElementById('playerNewsDetails');
+  if (!target) return;
+  const unavailable = '<p class="player-note">No current source-matched player scoring data is available for this exact fixture and date. Injury and suspension status is not provided by this player feed, so no absence claims are made.</p>';
+  if (!analysis.matchDate) { target.innerHTML = unavailable; return; }
+  try {
+   const response = await fetch('/data/player-shots.json', { cache: 'no-store' });
+   if (!response.ok) { target.innerHTML = unavailable; return; }
+   const data = await response.json();
+   const updatedAt = Date.parse(data.updatedAt || '');
+   if (data.success !== true || data.source !== 'understat.com' || !Array.isArray(data.fixtures) ||
+       !Number.isFinite(updatedAt) || updatedAt > Date.now() + 5 * 60 * 1000 || Date.now() - updatedAt > 48 * 60 * 60 * 1000) { target.innerHTML = unavailable; return; }
+   const homeKey = normalizeTeamForPlayerData(analysis.homeTeam || homeTeam);
+   const awayKey = normalizeTeamForPlayerData(analysis.awayTeam || awayTeam);
+   const fixtures = data.fixtures.filter(function (f) {
+    return f.date === analysis.matchDate && normalizeTeamForPlayerData(f.home) === homeKey && normalizeTeamForPlayerData(f.away) === awayKey;
+   });
+   if (fixtures.length !== 1) { target.innerHTML = unavailable; return; }
+   const fixture = fixtures[0];
+   const people = (fixture.tips || []).filter(function (p) {
+    return p && p.player && p.goals != null && p.xg != null && Number(p.games) >= 3 && Number.isFinite(Number(p.goals)) && Number.isFinite(Number(p.xg));
+   });
+   const groups = [fixture.home, fixture.away].map(function (team) {
+    const teamPeople = people.filter(function (p) { return normalizeTeamForPlayerData(p.team) === normalizeTeamForPlayerData(team); })
+     .sort(function (a, b) { return Number(b.xg) - Number(a.xg) || Number(b.goals) - Number(a.goals); }).slice(0, 2);
+    if (!teamPeople.length) return '';
+    return `<h4 class="insight-subhead">${escapeHtml(team)}</h4><ul class="insight-list">${teamPeople.map(function (p) {
+     return `<li><strong>${escapeHtml(p.player)}</strong>: ${Number(p.goals)} goals and ${Number(p.xg).toFixed(1)} xG in ${Number(p.games)} appearances this season.</li>`;
+    }).join('')}</ul>`;
+   }).join('');
+   if (!groups) { target.innerHTML = unavailable; return; }
+   target.innerHTML = groups + `<p class="player-note" style="margin-top:12px;">Season-to-date scoring indicators, not confirmed starters or a guarantee to score. Source: <a href="https://understat.com" target="_blank" rel="noopener noreferrer" style="color:#cbd5e1;text-decoration:underline;">Understat</a> · updated ${escapeHtml(data.updatedAt)}. This source does not provide verified injury or suspension status.</p>`;
+  } catch (error) {
+   console.warn('Player scoring data unavailable:', error);
+   target.innerHTML = unavailable;
+  }
+ }
+
  function slugifyTeam(name) {
   return String(name || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
  }
@@ -657,13 +705,21 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <p><strong>18+ Only</strong></p>
    <p>Predictions are for informational purposes only. Gambling involves financial risk and may lead to addiction. Please play responsibly.</p>
   </div>`;
+  loadPlayerScoringThreats(analysis);
  }
 
- function renderAnalysis(analysis) {
+ function renderAnalysis(analysis, datasetGeneratedAt) {
   const hasForm = (analysis.homeForm || '') && (analysis.awayForm || '');
   const hasStat = hasStats(analysis.homeLast10) || hasStats(analysis.awayLast10);
   const h2h = analysis.h2h || [];
   const summary = analysis.summary || '';
+  const insights = analysis.insights || {};
+  const providerUrls = { Statarea: 'https://www.statarea.com', FotMob: 'https://www.fotmob.com' };
+  const sourceProvider = analysis.sourceProvider;
+  const sourceLabel = providerUrls[sourceProvider]
+   ? `Form and H2H source: <a href="${providerUrls[sourceProvider]}" target="_blank" rel="noopener noreferrer" style="color:#cbd5e1;text-decoration:underline;">${escapeHtml(sourceProvider)}</a>`
+   : 'Form and H2H source details are not available for this cached record.';
+  const generatedLabel = datasetGeneratedAt ? `Dataset generated ${escapeHtml(datasetGeneratedAt)}` : '';
 
   if (!hasForm && !hasStat && h2h.length === 0 && !summary) {
    renderUnavailable();
@@ -671,6 +727,9 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   }
 
   document.getElementById('content').innerHTML = `
+  <div class="analysis-section" style="padding:12px 20px;">
+   <p style="margin:0;color:#94a3b8;font-size:13px;line-height:1.6;">${sourceLabel}${generatedLabel ? ` &middot; ${generatedLabel}` : ''}</p>
+  </div>
   ${hasForm ? `
   <div class="analysis-section">
    <h3>Recent Form</h3>
@@ -706,6 +765,22 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
     <p>${escapeHtml(summary)}</p>
    </div>
   </div>` : ''}
+  ${insights.whatToExpect && insights.whatToExpect.length ? `
+  <div class="analysis-section">
+   <h3>What to Expect</h3>
+   <ul class="insight-list">${insights.whatToExpect.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+  </div>` : ''}
+  ${insights.evidenceFor && insights.evidenceFor.length || insights.counterpoints && insights.counterpoints.length || insights.cautions && insights.cautions.length ? `
+  <div class="analysis-section">
+   <h3>Evidence and Caveats</h3>
+   ${insights.evidenceFor && insights.evidenceFor.length ? `<h4 class="insight-subhead">What supports the read</h4><ul class="insight-list">${insights.evidenceFor.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : ''}
+   ${insights.counterpoints && insights.counterpoints.length ? `<h4 class="insight-subhead">What challenges the read</h4><ul class="insight-list">${insights.counterpoints.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : ''}
+   ${insights.cautions && insights.cautions.length ? `<h4 class="insight-subhead">What could change it</h4><ul class="insight-list">${insights.cautions.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : ''}
+  </div>` : ''}
+  <div class="analysis-section">
+   <h3>Players to Watch and Team News</h3>
+   <div id="playerNewsDetails"><p class="player-note">Checking current player scoring data for this exact fixture. Injury and suspension updates are not included unless verified by a separate source.</p></div>
+  </div>
   <div class="disclaimer">
    <p><strong>18+ Only</strong></p>
    <p>Predictions are for informational purposes only. Gambling involves financial risk and may lead to addiction. Please play responsibly.</p>
@@ -734,7 +809,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
     analysis = match ? mups[match] : null;
    }
    if (analysis) {
-    renderAnalysis(analysis);
+    renderAnalysis(analysis, data.generatedAt);
    } else {
     renderUnavailable();
    }

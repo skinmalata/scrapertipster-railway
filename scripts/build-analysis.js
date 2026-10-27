@@ -22,6 +22,7 @@ const PRERENDER_DIR = path.join(process.cwd(), 'public', 'analysis');
 const TEAMS_OUTPUT_DIR = path.join(process.cwd(), 'public', 'teams');
 const H2H_OUTPUT_DIR = path.join(process.cwd(), 'public', 'h2h');
 const ANALYSIS_TEMPLATE_FILE = path.join(process.cwd(), 'public', 'analysis.html');
+const PLAYER_SHOTS_FILE = path.join(process.cwd(), 'public', 'data', 'player-shots.json');
 const SITE_URL = 'https://winfulltime.com';
 const AFFILIATE_URL = 'https://one-vv6198.com/betting?open=register&p=f61e';
 
@@ -238,54 +239,144 @@ function generateSummary(analysis) {
 
   const homeWins = (hf.match(/W/g) || []).length;
   const awayWins = (af.match(/W/g) || []).length;
-  const homeAvgScored = h10.avgScored != null ? h10.avgScored : 0;
-  const homeAvgConceded = h10.avgConceded != null ? h10.avgConceded : 0;
-  const awayAvgScored = a10.avgScored != null ? a10.avgScored : 0;
-  const awayAvgConceded = a10.avgConceded != null ? a10.avgConceded : 0;
+  const homeAvgScored = Number(h10.avgScored || 0);
+  const homeAvgConceded = Number(h10.avgConceded || 0);
+  const awayAvgScored = Number(a10.avgScored || 0);
+  const awayAvgConceded = Number(a10.avgConceded || 0);
 
   const homeHasForm = sideHasTeamData(hf, h10);
   const awayHasForm = sideHasTeamData(af, a10);
 
-  let parts = [];
+  const parts = [];
+  if (hf.length) parts.push(homeClean + ' have ' + homeWins + ' wins in ' + hf.length + ' listed recent results' + (homeAvgScored > 0 ? ' and average ' + homeAvgScored.toFixed(1) + ' goals scored across the available recent sample.' : '.'));
+  else if (homeHasForm && homeAvgScored > 0) parts.push(homeClean + ' average ' + homeAvgScored.toFixed(1) + ' goals scored across the available recent sample.');
+  if (af.length) parts.push(awayClean + ' have ' + awayWins + ' wins in ' + af.length + ' listed recent results' + (awayAvgScored > 0 ? ' and average ' + awayAvgScored.toFixed(1) + ' goals scored across the available recent sample.' : '.'));
+  else if (awayHasForm && awayAvgScored > 0) parts.push(awayClean + ' average ' + awayAvgScored.toFixed(1) + ' goals scored across the available recent sample.');
+  if (homeHasForm && awayHasForm && [homeAvgScored, homeAvgConceded, awayAvgScored, awayAvgConceded].every(Number.isFinite) && homeAvgScored > 0 && awayAvgScored > 0) {
+    parts.push('Across the available recent sample, they have conceded ' + homeAvgConceded.toFixed(1) + ' and ' + awayAvgConceded.toFixed(1) + ' goals per game respectively. These are descriptive averages, not a score forecast.');
+  }
+  const h2h = analysis.h2h || [];
+  if (h2h.length) parts.push('The data includes ' + h2h.length + ' head-to-head meeting' + (h2h.length === 1 ? '' : 's') + '; results can be affected by how long ago those matches took place.');
+  return parts.join(' ').replace(/\s+/g, ' ').trim();
+}
 
-  if (homeHasForm && awayHasForm) {
-    if (homeWins > awayWins + 1) {
-      parts.push(homeClean + ' comes into this match in excellent form with ' + homeWins + ' wins from their last 5 matches, recently averaging ' + homeAvgScored + ' goals scored per game.');
-    } else if (awayWins > homeWins + 1) {
-      parts.push(awayClean + ' enters this fixture in superior condition, winning ' + awayWins + ' of their last 5 games and averaging ' + awayAvgScored + ' goals scored per game.');
-    } else if (homeWins === awayWins && homeWins > 0) {
-      parts.push('Both teams arrive with identical recent records, each winning ' + homeWins + ' of their last 5 matches, setting up what promises to be a closely contested encounter.');
-    } else {
-      parts.push('Both teams show similar recent form with ' + homeWins + ' wins for ' + homeClean + ' and ' + awayWins + ' for ' + awayClean + ', making this a difficult match to predict confidently.');
+function buildMatchInsights(analysis) {
+  const homeName = cleanTeamName(analysis.homeTeam || 'Home team');
+  const awayName = cleanTeamName(analysis.awayTeam || 'Away team');
+  const home = analysis.homeLast10 || {};
+  const away = analysis.awayLast10 || {};
+  const homeForm = analysis.homeForm || '';
+  const awayForm = analysis.awayForm || '';
+  const homeAvailable = sideHasTeamData(homeForm, home);
+  const awayAvailable = sideHasTeamData(awayForm, away);
+  const expectations = [];
+  const evidenceFor = [];
+  const counterpoints = [];
+  const cautions = [];
+
+  if (homeAvailable && awayAvailable) {
+    const homeWins = (homeForm.match(/W/g) || []).length;
+    const awayWins = (awayForm.match(/W/g) || []).length;
+    if (homeForm.length && awayForm.length && homeWins !== awayWins) {
+      const leader = homeWins > awayWins ? homeName : awayName;
+      const leaderStats = homeWins > awayWins ? home : away;
+      const otherStats = homeWins > awayWins ? away : home;
+      const leaderGoals = Number(leaderStats.avgScored);
+      const otherGoals = Number(otherStats.avgScored);
+      evidenceFor.push(leader + ' has more wins in the listed recent form (' + Math.max(homeWins, awayWins) + ' vs ' + Math.min(homeWins, awayWins) + ').');
+      if (Number.isFinite(leaderGoals) && Number.isFinite(otherGoals) && leaderGoals < otherGoals) {
+        counterpoints.push('The team with fewer recent wins has the higher goals-scored average (' + otherGoals.toFixed(1) + ' vs ' + leaderGoals.toFixed(1) + '), so the form edge does not also show a scoring edge.');
+      }
+    } else if (homeForm.length && awayForm.length) {
+      evidenceFor.push('Win counts in the listed recent-form sequences are level (' + homeWins + ' each).');
+    } else if (home.wins != null && away.wins != null) {
+      const homeSample = Number(home.wins || 0) + Number(home.draws || 0) + Number(home.losses || 0);
+      const awaySample = Number(away.wins || 0) + Number(away.draws || 0) + Number(away.losses || 0);
+      evidenceFor.push('The recorded recent sample contains ' + Number(home.wins || 0) + ' wins for ' + homeName + ' (' + homeSample + ' matches) and ' + Number(away.wins || 0) + ' for ' + awayName + ' (' + awaySample + ' matches).');
     }
-    parts.push('Defensively, ' + homeClean + ' has conceded an average of ' + homeAvgConceded + ' goals per game while ' + awayClean + ' has shipped ' + awayAvgConceded + ', keeping things competitive at both ends.');
-  } else if (homeHasForm) {
-    parts.push(homeClean + ' come into this match with ' + homeWins + ' wins from their last 5 matches, averaging ' + homeAvgScored + ' goals scored per game.');
-  } else if (awayHasForm) {
-    parts.push(awayClean + ' come into this match with ' + awayWins + ' wins from their last 5 games, averaging ' + awayAvgScored + ' goals scored per game.');
+
+    const haveBaseline = [home.avgScored, away.avgConceded, away.avgScored, home.avgConceded].every(function (value) { return value != null && Number.isFinite(Number(value)); });
+    const homeGoalBaseline = (Number(home.avgScored || 0) + Number(away.avgConceded || 0)) / 2;
+    const awayGoalBaseline = (Number(away.avgScored || 0) + Number(home.avgConceded || 0)) / 2;
+    if (haveBaseline) {
+      expectations.push('A simple reference from each team’s recent scoring and conceding averages is about ' + homeGoalBaseline.toFixed(1) + ' goals for ' + homeName + ' and ' + awayGoalBaseline.toFixed(1) + ' for ' + awayName + '. This is a descriptive baseline, not a probability or score prediction.');
+    }
+
+    if (home.avgScored != null && away.avgScored != null && Number(home.avgScored) >= 1.3 && Number(away.avgScored) >= 1.3) {
+      expectations.push('Both teams have averaged at least 1.3 goals scored per match in the available recent sample, so each has shown recent scoring output. That alone does not establish that both will score here.');
+    } else if (home.avgScored != null && away.avgScored != null && Number(home.avgScored) < 1 && Number(away.avgScored) < 1) {
+      expectations.push('Both teams have averaged fewer than one goal scored per match in the available recent sample, which points to limited recent scoring output.');
+    } else {
+      expectations.push('Recent scoring output is mixed, so the available numbers do not support a strong goals-only conclusion.');
+    }
+  } else {
+    cautions.push('Recent team data is incomplete for this fixture; the available sample is not enough for a balanced matchup read.');
+  }
+
+  if (homeAvailable && awayAvailable) {
+    const homeConceded = Number(home.avgConceded || 0);
+    const awayConceded = Number(away.avgConceded || 0);
+    if (homeConceded >= 1.5 || awayConceded >= 1.5) {
+      const sides = [];
+      if (homeConceded >= 1.5) sides.push(homeName);
+      if (awayConceded >= 1.5) sides.push(awayName);
+      evidenceFor.push(sides.join(' and ') + ' have conceded at least 1.5 goals per match in the recent sample, a defensive concern to weigh against their scoring numbers.');
+    }
+    if (homeForm.length < 5 || awayForm.length < 5) cautions.push('At least one recent-form sequence contains fewer than five results.');
   }
 
   const h2h = analysis.h2h || [];
-  if (h2h.length > 0) {
-    const homeH2HWins = h2h.filter(h => h.homeGoals > h.awayGoals).length;
-    const awayH2HWins = h2h.filter(h => h.awayGoals > h.homeGoals).length;
-    const draws = h2h.length - homeH2HWins - awayH2HWins;
-    parts.push('Their head-to-head history shows ' + homeClean + ' winning ' + homeH2HWins + ', ' + awayClean + ' winning ' + awayH2HWins + ', and ' + draws + ' draws in their last ' + h2h.length + ' meetings.');
-  }
+  if (h2h.length > 0 && h2h.length < 3) cautions.push('Only ' + h2h.length + ' head-to-head meeting' + (h2h.length === 1 ? '' : 's') + ' is available, so this history should carry little weight.');
+  if (!h2h.length) cautions.push('No head-to-head record is available in this analysis.');
+  cautions.push('Recent form and past meetings describe what happened; they do not account for confirmed lineups, injuries, venue conditions, or tactical changes.');
 
-  if (homeHasForm && awayHasForm) {
-    if (homeWins > awayWins && homeAvgScored > awayAvgConceded) {
-      parts.push(homeClean + ' appears better positioned for a positive result.');
-    } else if (awayWins > homeWins && awayAvgScored > homeAvgConceded) {
-      parts.push(awayClean + ' looks better placed to take something from this match.');
-    } else {
-      parts.push('Expect a competitive match with the potential for a share of the spoils.');
-    }
-  } else if (h2h.length > 0) {
-    parts.push('Historical meetings suggest this fixture could produce a competitive contest.');
-  }
+  return { whatToExpect: expectations, evidenceFor: evidenceFor, counterpoints: counterpoints, cautions: cautions };
+}
 
-  return parts.join(' ').replace(/\s+/g, ' ').trim();
+let playerShotsCache;
+function getVerifiedPlayerShotFixture(home, away, dateStr) {
+  if (playerShotsCache === undefined) {
+    try { playerShotsCache = JSON.parse(fs.readFileSync(PLAYER_SHOTS_FILE, 'utf8')); }
+    catch (e) { playerShotsCache = null; }
+  }
+  const data = playerShotsCache;
+  if (!data || data.success !== true || data.source !== 'understat.com' || !Array.isArray(data.fixtures)) return null;
+  const updatedAt = Date.parse(data.updatedAt || '');
+  if (!Number.isFinite(updatedAt) || updatedAt > Date.now() + 5 * 60 * 1000 || Date.now() - updatedAt > 48 * 60 * 60 * 1000) return null;
+  const normalize = function (name) { return normalizeTeam(name).replace(/\s+/g, ' ').trim(); };
+  const homeKey = normalize(home), awayKey = normalize(away);
+  if (!homeKey || !awayKey || !validDateStr(dateStr)) return null;
+  const matches = data.fixtures.filter(function (fixture) {
+    return fixture.date === dateStr && normalize(fixture.home) === homeKey && normalize(fixture.away) === awayKey;
+  });
+  if (matches.length !== 1) return null;
+  return { data: data, fixture: matches[0] };
+}
+
+function renderPlayerWatchHtml(home, away, dateStr) {
+  const found = getVerifiedPlayerShotFixture(home, away, dateStr);
+  if (!found) {
+    return '<p class="player-note">No current Understat player scoring data is available for this exact fixture and date. Injury and suspension status is not included in this feed, so no absence claims are made.</p>';
+  }
+  const fixture = found.fixture;
+  const normalize = function (name) { return normalizeTeam(name).replace(/\s+/g, ' ').trim(); };
+  const candidates = (fixture.tips || []).filter(function (p) {
+    return p && p.player && p.team && Number(p.games) >= 3 && p.goals != null && p.xg != null &&
+      (normalize(p.team) === normalize(fixture.home) || normalize(p.team) === normalize(fixture.away));
+  });
+  if (!candidates.length) {
+    return '<p class="player-note">Understat has no player sample meeting our minimum of three appearances for this fixture. No scorer candidates are shown. Injury and suspension status is not included in this feed.</p>';
+  }
+  const teams = [fixture.home, fixture.away];
+  const rows = teams.map(function (team) {
+    const teamCandidates = candidates.filter(function (p) { return normalize(p.team) === normalize(team); })
+      .sort(function (a, b) { return Number(b.xg) - Number(a.xg) || Number(b.goals) - Number(a.goals); }).slice(0, 2);
+    if (!teamCandidates.length) return '';
+    return '<h4 class="insight-subhead">' + escapeHtml(team) + '</h4><ul class="insight-list">' + teamCandidates.map(function (p) {
+      return '<li><strong>' + escapeHtml(p.player) + '</strong>: ' + Number(p.goals) + ' goals and ' + Number(p.xg).toFixed(1) + ' xG in ' + Number(p.games) + ' appearances this season.</li>';
+    }).join('') + '</ul>';
+  }).join('');
+  return rows + '<p class="player-note" style="margin-top:12px;">Season-to-date scoring indicators, not confirmed starters or a guarantee to score. Data: <a href="https://understat.com" target="_blank" rel="noopener noreferrer" style="color:#cbd5e1;text-decoration:underline;">Understat</a> · updated ' + escapeHtml(found.data.updatedAt) + '. This feed does not provide verified injury or suspension status.</p>';
 }
 
 function sideHasTeamData(form, last10) {
@@ -454,9 +545,13 @@ function buildContentHtml(analysis, home, away, matchup, dateStr, ctx) {
   if (matchup && matchup.league) infoBits.push(escapeHtml(matchup.league));
   if (matchup && matchup.country) infoBits.push(escapeHtml(matchup.country));
   if (matchup && matchup.time) infoBits.push('KO ' + escapeHtml(matchup.time));
+  const providerLinks = { Statarea: 'https://www.statarea.com', FotMob: 'https://www.fotmob.com' };
+  const dataProvider = analysis.sourceProvider;
+  if (dataProvider && providerLinks[dataProvider]) infoBits.push('Form and H2H source: <a href="' + providerLinks[dataProvider] + '" target="_blank" rel="noopener noreferrer" style="color:#cbd5e1;text-decoration:underline;">' + escapeHtml(dataProvider) + '</a>');
+  if (analysis.analysisGeneratedAt) infoBits.push('Dataset generated ' + escapeHtml(analysis.analysisGeneratedAt));
   if (infoBits.length) {
     html += '<div class="analysis-section" style="padding:12px 20px;"><p style="margin:0;color:#94a3b8;font-size:13px;line-height:1.6;">' +
-      infoBits.join(' &middot; ') + ' &middot; Updated ' + escapeHtml(today) + '</p></div>';
+      infoBits.join(' &middot; ') + ' &middot; Page generated ' + escapeHtml(today) + '</p></div>';
   }
 
   const homeHref = teamStatsHref(ctx, home);
@@ -507,6 +602,21 @@ function buildContentHtml(analysis, home, away, matchup, dateStr, ctx) {
     html += '<div class="summary-section"><h3>Match Summary</h3><div class="summary-text"><p>' + escapeHtml(summary) + '</p></div></div>';
   }
 
+  const insights = analysis.insights || buildMatchInsights(analysis);
+  if (insights.whatToExpect && insights.whatToExpect.length) {
+    html += '<div class="analysis-section"><h3>What to Expect</h3><ul class="insight-list">' +
+      insights.whatToExpect.map(function (item) { return '<li>' + escapeHtml(item) + '</li>'; }).join('') +
+      '</ul></div>';
+  }
+  if (insights.evidenceFor && insights.evidenceFor.length || insights.counterpoints && insights.counterpoints.length || insights.cautions && insights.cautions.length) {
+    html += '<div class="analysis-section"><h3>Evidence and Caveats</h3>' +
+      (insights.evidenceFor && insights.evidenceFor.length ? '<h4 class="insight-subhead">What supports the read</h4><ul class="insight-list">' + insights.evidenceFor.map(function (item) { return '<li>' + escapeHtml(item) + '</li>'; }).join('') + '</ul>' : '') +
+      (insights.counterpoints && insights.counterpoints.length ? '<h4 class="insight-subhead">What challenges the read</h4><ul class="insight-list">' + insights.counterpoints.map(function (item) { return '<li>' + escapeHtml(item) + '</li>'; }).join('') + '</ul>' : '') +
+      (insights.cautions && insights.cautions.length ? '<h4 class="insight-subhead">What could change it</h4><ul class="insight-list">' + insights.cautions.map(function (item) { return '<li>' + escapeHtml(item) + '</li>'; }).join('') + '</ul>' : '') +
+      '</div>';
+  }
+  html += '<div class="analysis-section"><h3>Players to Watch and Team News</h3>' + renderPlayerWatchHtml(home, away, dateStr) + '</div>';
+
   html += '<div class="wft-1xbet-wrap" style="margin:4px 0;text-align:center;">' +
     renderBookmakerCTA({
       home: homeName,
@@ -517,31 +627,6 @@ function buildContentHtml(analysis, home, away, matchup, dateStr, ctx) {
     }) +
     '<p style="color:#94a3b8;font-size:12px;text-align:center;margin:6px 0 6px;">18+ | T&amp;Cs apply | Gamble responsibly | Includes affiliate commission disclosure</p>' +
     '</div>';
-
-  const watch = [];
-  const homeWins = (analysis.homeForm || '').match(/W/g) || [];
-  const awayWins = (analysis.awayForm || '').match(/W/g) || [];
-  if (homeHasForm && awayHasForm && homeWins.length !== awayWins.length) {
-    const leader = homeWins.length > awayWins.length ? cleanTeamName(homeName) : cleanTeamName(awayName);
-    watch.push(leader + ' arrive with stronger recent form (' + Math.max(homeWins.length, awayWins.length) + ' wins in their last five against ' + Math.min(homeWins.length, awayWins.length) + ' for the opposition).');
-  }
-  const homeScored = Number((analysis.homeLast10 || {}).avgScored || 0);
-  const awayScored = Number((analysis.awayLast10 || {}).avgScored || 0);
-  if (homeScored + awayScored > 0) {
-    const combined = (homeScored + awayScored).toFixed(1);
-    watch.push('The sides average a combined ' + combined + ' goals scored per game over their last 10 outings, pointing to ' + (combined >= 2.5 ? 'an open contest with goals likely at both ends.' : 'a tighter, lower-scoring affair.'));
-  }
-  const homeH2HWins = h2h.filter(function (h) { return h.homeGoals > h.awayGoals; }).length;
-  const awayH2HWins = h2h.filter(function (h) { return h.awayGoals > h.homeGoals; }).length;
-  if (h2h.length > 0 && (homeH2HWins || awayH2HWins)) {
-    const dominant = homeH2HWins > awayH2HWins ? cleanTeamName(homeName) : cleanTeamName(awayName);
-    watch.push('Head-to-head history favours ' + dominant + ' with ' + Math.max(homeH2HWins, awayH2HWins) + ' wins in the last ' + h2h.length + ' meetings.');
-  }
-  if (watch.length) {
-    html += '<div class="analysis-section"><h3>What to Watch</h3><ul class="watch-list">' +
-      watch.map(function (w) { return '<li>' + escapeHtml(w) + '</li>'; }).join('') +
-      '</ul></div>';
-  }
 
   html += '<div class="cta-links">' +
     '<a href="/" class="cta-link">Today\'s Predictions</a>' +
@@ -1014,19 +1099,25 @@ async function main() {
     const cached = statareaCache[key] || statareaCache[reverseKey];
     if (cached && !isEmptyAnalysis(cached)) {
       console.log('[analysis] statarea: ' + m.home + ' vs ' + m.away);
-      return { key: key, value: cached };
+      return { key: key, value: cached, sourceProvider: 'Statarea', matchup: m };
     }
     const value = await analyzeWithRetry(m, fixturesCache);
     if (value) {
       console.log('[analysis] fotmob: ' + m.home + ' vs ' + m.away);
-      return { key: key, value: value };
+      return { key: key, value: value, sourceProvider: 'FotMob', matchup: m };
     }
     console.log('[analysis] unavailable: ' + m.home + ' vs ' + m.away);
     return null;
   });
 
   analyzed.forEach(entry => {
-    if (entry) result[entry.key] = entry.value;
+    if (entry) {
+      entry.value.summary = generateSummary(entry.value);
+      entry.value.insights = buildMatchInsights(entry.value);
+      entry.value.sourceProvider = entry.sourceProvider;
+      entry.value.matchDate = validDateStr(entry.matchup && entry.matchup.date);
+      result[entry.key] = entry.value;
+    }
   });
 
   // Include cached analyses for matchups beyond the per-run processing cap so
@@ -1036,10 +1127,18 @@ async function main() {
     if (result[key]) return;
     const reverseKey = m.away.toLowerCase() + '|' + m.home.toLowerCase();
     const cached = statareaCache[key] || statareaCache[reverseKey];
-    if (cached && !isEmptyAnalysis(cached)) result[key] = cached;
+    if (cached && !isEmptyAnalysis(cached)) {
+      cached.summary = generateSummary(cached);
+      cached.insights = buildMatchInsights(cached);
+      cached.sourceProvider = 'Statarea';
+      cached.matchDate = validDateStr(m.date);
+      result[key] = cached;
+    }
   });
 
-  const out = { generatedAt: new Date().toISOString(), matchups: result };
+  const generatedAt = new Date().toISOString();
+  Object.keys(result).forEach(function (key) { result[key].analysisGeneratedAt = generatedAt; });
+  const out = { generatedAt: generatedAt, matchups: result };
   fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
   fs.writeFileSync(OUTPUT_FILE, JSON.stringify(out));
   console.log('[analysis] Saved', OUTPUT_FILE, 'with', Object.keys(result).length, 'matchups');
@@ -1084,6 +1183,9 @@ module.exports = {
   collectMatchups,
   buildFotMobAnalysis,
   generateSummary,
+  buildMatchInsights,
+  getVerifiedPlayerShotFixture,
+  renderPlayerWatchHtml,
   isEmptyAnalysis,
   extractTeamStats,
   extractH2HList,
