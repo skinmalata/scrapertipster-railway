@@ -170,8 +170,8 @@ function renderMatchCard(m, analysisUrls) {
         ${prob ? `<div class="probability">${prob}%</div>` : ''}
       </div>
     </div>
-    ${analysisUrl ? `<div style="text-align:center;margin-top:6px;"><a href="${analysisUrl}" class="analysis-btn" style="color:var(--accent);font-size:12px;font-weight:600;text-decoration:none;">View Analysis &rarr;</a></div>` : ''}
-    ${renderBookmakerCTA({ home: homeRaw, away: awayRaw, tip: m.tip, date: dateStr, league: m.country || m.league })}
+    ${analysisUrl ? `<div style="text-align:center;margin-top:6px;"><a href="${analysisUrl}" class="analysis-btn" style="display:inline-flex;align-items:center;justify-content:center;min-height:44px;max-width:100%;box-sizing:border-box;padding:12px 20px;border-radius:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:700;line-height:1.2;text-align:center;text-decoration:none;">View Analysis &rarr;</a></div>` : ''}
+    ${renderBookmakerCTA({ home: homeRaw, away: awayRaw, tip: m.tip, date: dateStr, league: m.country || m.league, excludeKeys: ['oneWin'] })}
   </div>`;
 }
 

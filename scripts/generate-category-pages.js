@@ -347,7 +347,7 @@ const HIGHEST_SCORING_HALF_TAB = {
 };
 
 function generateCategoryPage(slug, catConfig, ctx) {
-  const BOOKMAKER_CTA_BODY = renderBookmakerCTABody();
+  const BOOKMAKER_CTA_BODY = renderBookmakerCTABody({ excludeKeys: ['oneWin'] });
   const allSlugs = Object.keys(CATEGORIES);
   const baseTabs = allSlugs.map(s => {
     const c = CATEGORIES[s];

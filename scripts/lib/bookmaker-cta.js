@@ -92,8 +92,10 @@ function renderBookmakerBox(book) {
  * client-side card builders (see generate-category-pages.js).
  * @returns {string} server-rendered HTML string ('' if no bookmaker has a URL).
  */
-function renderBookmakerCTABody() {
-  var boxes = BOOKMAKERS.map(renderBookmakerBox).join('');
+function renderBookmakerCTABody(options) {
+  options = options || {};
+  var excludedKeys = new Set(options.excludeKeys || []);
+  var boxes = BOOKMAKERS.filter(function (book) { return !excludedKeys.has(book.key); }).map(renderBookmakerBox).join('');
   if (!boxes) return ''; // no real bookmaker URLs configured yet
 
   return '' +
@@ -113,7 +115,7 @@ function renderBookmakerCTABody() {
  */
 function renderBookmakerCTA(opts) {
   opts = opts || {};
-  var body = renderBookmakerCTABody();
+  var body = renderBookmakerCTABody(opts);
   if (!body) return ''; // no real bookmaker URLs configured yet
 
   // data-* attributes are used by the 1xbet-odds widget to enrich the 1xBet box.
