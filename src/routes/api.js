@@ -31,6 +31,85 @@ const payment = require('../services/payment');
 const whop = require('../services/whop');
 const paypal = require('../services/paypal');
 const welcomeEmail = require('../services/welcomeEmail');
+const { sendSiteEnquiry } = require('../services/siteEnquiryEmail');
+const enquiryRateLimit = require('express-rate-limit');
+
+const siteEnquiryLimiter = enquiryRateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many messages sent. Please try again later.' }
+});
+
+function enquiryValue(body, key, maxLength) {
+  var value = String((body && body[key]) || '').trim();
+  return value.length <= maxLength ? value : null;
+}
+
+function isValidEnquiryEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) && value.length <= 254;
+}
+
+router.post('/contact/enquiry', siteEnquiryLimiter, async function (req, res) {
+  var body = req.body || {};
+  if (String(body.website || '').trim()) return res.json({ success: true });
+  var name = enquiryValue(body, 'name', 120);
+  var email = enquiryValue(body, 'email', 254);
+  var subject = enquiryValue(body, 'subject', 180);
+  var message = enquiryValue(body, 'message', 5000);
+  if (name === null || email === null || subject === null || message === null) {
+    return res.status(400).json({ error: 'One or more fields are too long.' });
+  }
+  if (!name || !email || !subject || !message || !isValidEnquiryEmail(email)) {
+    return res.status(400).json({ error: 'Please provide your name, a valid email, subject, and message.' });
+  }
+  var result = await sendSiteEnquiry({
+    title: 'New WinFulltime contact message',
+    subject: 'WinFulltime contact: ' + subject,
+    replyTo: email,
+    fields: [
+      { label: 'Name', value: name },
+      { label: 'Email', value: email },
+      { label: 'Subject', value: subject },
+      { label: 'Message', value: message }
+    ]
+  });
+  if (!result.sent) return res.status(result.status || 502).json({ error: result.error });
+  return res.json({ success: true });
+});
+
+router.post('/advertise/enquiry', siteEnquiryLimiter, async function (req, res) {
+  var body = req.body || {};
+  if (String(body.websiteTrap || '').trim()) return res.json({ success: true });
+  var labels = [
+    ['fullName', 'Contact person', 120, true], ['email', 'Email', 254, true],
+    ['phone', 'Phone', 80, false], ['company', 'Company / brand', 160, true],
+    ['websiteUrl', 'Website', 500, true], ['placement', 'Desired placement', 160, true],
+    ['duration', 'Campaign duration', 120, true], ['budget', 'Approximate budget', 120, true],
+    ['startDate', 'Preferred start date', 40, false], ['audience', 'Target audience / geography', 300, false],
+    ['offerUrl', 'Landing page / offer', 500, false], ['campaignDetails', 'Campaign details', 5000, true]
+  ];
+  var fields = [];
+  var values = {};
+  for (var i = 0; i < labels.length; i++) {
+    var item = labels[i];
+    var value = enquiryValue(body, item[0], item[2]);
+    if (value === null) return res.status(400).json({ error: 'One or more fields are too long.' });
+    if (item[3] && !value) return res.status(400).json({ error: 'Please complete all required fields.' });
+    values[item[0]] = value;
+    fields.push({ label: item[1], value: value });
+  }
+  if (!isValidEnquiryEmail(values.email)) return res.status(400).json({ error: 'Please provide a valid email address.' });
+  var result = await sendSiteEnquiry({
+    title: 'New WinFulltime advertising enquiry',
+    subject: 'WinFulltime advertising enquiry: ' + values.company,
+    replyTo: values.email,
+    fields: fields
+  });
+  if (!result.sent) return res.status(result.status || 502).json({ error: result.error });
+  return res.json({ success: true });
+});
 
 // Active payment provider: set PAYMENT_PROVIDER=whop to route the existing
 // /api/checkout, /api/portal and /api/subscription/cancel endpoints to Whop

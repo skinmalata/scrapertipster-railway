@@ -96,7 +96,10 @@
     <p class="subtitle">Tell us about your campaign and preferred ad placement. We'll review your enquiry and get back to you with availability, rates and next steps within 24-48 hours.</p>
 
     <div class="form-card">
-      <form action="mailto:officialwinfulltime@gmail.com" method="post" enctype="text/plain">
+      <form id="advertiseForm">
+        <div style="position:absolute;left:-9999px;top:-9999px;opacity:0;" aria-hidden="true">
+          <input type="text" name="websiteTrap" tabindex="-1" autocomplete="off">
+        </div>
         <div class="form-grid">
           <div class="form-group">
             <label for="fullName">Full Name / Contact Person <span class="required">*</span></label>
@@ -173,8 +176,59 @@
           <p class="form-note">By submitting this form, you agree to be contacted by the WinFulltime advertising team regarding your enquiry.</p>
         </div>
       </form>
+      <div id="advertiseFormStatus" role="status" aria-live="polite" style="margin-top:12px;text-align:center;color:#94a3b8;"></div>
     </div>
   </main>
+
+  <script>
+  (function () {
+    var form = document.getElementById('advertiseForm');
+    if (!form) return;
+    var button = form.querySelector('button[type="submit"]');
+    var status = document.getElementById('advertiseFormStatus');
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      button.disabled = true;
+      status.textContent = 'Sending your enquiry...';
+      var formData = new FormData(form);
+      var payload = {
+        fullName: formData.get('Full Name'),
+        email: formData.get('Email'),
+        phone: formData.get('Phone'),
+        company: formData.get('Company'),
+        websiteUrl: formData.get('Website'),
+        placement: formData.get('Ad Placement'),
+        duration: formData.get('Campaign Duration'),
+        budget: formData.get('Budget'),
+        startDate: formData.get('Preferred Start Date'),
+        audience: formData.get('Target Audience'),
+        offerUrl: formData.get('Landing Page/Offer'),
+        campaignDetails: formData.get('Campaign Details'),
+        websiteTrap: formData.get('websiteTrap')
+      };
+      var apiBase = window.WFT_API || 'https://winfulltime-api.onrender.com';
+      fetch(apiBase + '/api/advertise/enquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function (response) {
+        return response.json().then(function (data) {
+          if (!response.ok) throw new Error(data.error || 'Submission failed');
+          return data;
+        });
+      }).then(function () {
+        status.textContent = 'Enquiry sent. We will reply within 24-48 hours.';
+        status.style.color = '#68d391';
+        form.reset();
+      }).catch(function (error) {
+        status.textContent = 'Could not send: ' + (error.message || 'Please try again later.');
+        status.style.color = '#ff7b8e';
+      }).finally(function () {
+        button.disabled = false;
+      });
+    });
+  })();
+  </script>
 
   <footer>
     <div class="footer-content">

@@ -506,7 +506,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 <input type="hidden" name="_blacklist" value="casino,viagra,cialis,lottery,bitcoin,forex,binary options,make money,free bonus,click here,earn cash,work from home,side hustle">
 
 <div style="position:absolute;left:-9999px;top:-9999px;opacity:0;" aria-hidden="true">
-  <input type="text" name="_honey" tabindex="-1" autocomplete="off">
+  <input type="text" name="website" tabindex="-1" autocomplete="off">
 </div>
 
 </form>
@@ -543,14 +543,23 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
      e.preventDefault();
      btn.disabled = true;
      setStatus('Sending...', '');
-     var endpoint = 'https://formsubmit.co/officialwinfulltime@gmail.com';
-     var data = new URLSearchParams(new FormData(form)).toString();
-     fetch(endpoint, { method: 'POST', body: data, headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' } })
-       .then(function (resp) {
-         if (resp.ok) { setStatus('Message sent! We will reply within 24-48 hours.', 'ok'); form.reset(); }
-         else { return resp.json().then(function (j) { throw (j.message || 'Submission failed'); }); }
+     var apiBase = window.WFT_API || 'https://winfulltime-api.onrender.com';
+     var payload = {};
+     new FormData(form).forEach(function (value, key) { payload[key] = value; });
+     fetch(apiBase + '/api/contact/enquiry', {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify(payload)
+     }).then(function (resp) {
+         return resp.json().then(function (data) {
+           if (!resp.ok) throw new Error(data.error || 'Submission failed');
+           return data;
+         });
+       }).then(function () {
+         setStatus('Message sent! We will reply within 24-48 hours.', 'ok');
+         form.reset();
        })
-       .catch(function (err) { setStatus('Could not send: ' + (err.message || err), 'err'); })
+       .catch(function (err) { setStatus('Could not send: ' + (err.message || 'Please try again later.'), 'err'); })
        .finally(function () { btn.disabled = false; });
    });
  })();
