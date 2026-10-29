@@ -203,6 +203,8 @@ router.post('/converter/create', async function (req, res) {
   try {
     const body = req.body || {};
     const result = await createCodeFromLegs({ bookmaker: body.bookmaker, legs: body.legs });
+    const { announceCreate } = require('../services/codeAnnouncer');
+    announceCreate({ ...result, legs: body.legs, country: normalizeCountry(body.country) }).catch(noop);
     res.json({
       success: true,
       bookmaker: result.bookmaker,

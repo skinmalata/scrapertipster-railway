@@ -2402,11 +2402,16 @@ nav.open { display: flex !important; }
     display.style.display = 'block';
     display.innerHTML = '<span class="cd-label">Generating booking codes...</span>';
 
+    var countryEl = document.getElementById('tbCountry') || document.getElementById('cvCountry') || document.querySelector('[name="country"]');
+    var country = countryEl ? countryEl.value.trim() : '';
+
     var pending = providers.map(function(bm) {
+      var payload = { bookmaker: bm, legs: legs };
+      if (country) payload.country = country;
       return fetch(api, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookmaker: bm, legs: legs })
+        body: JSON.stringify(payload)
       }).then(function(r) {
         return r.json().then(function(body) { return { ok: r.ok, body: body }; });
       }).then(function(res) {

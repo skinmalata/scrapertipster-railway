@@ -118,4 +118,27 @@ async function announceMerge(conv) {
   return deliver(text, 'merge from ' + country + ' (' + (conv.sourceCount || 0) + ' codes)');
 }
 
-module.exports = { announceConversion, announceSplit, announceMerge };
+async function announceCreate(conv) {
+  if (!conv || !conv.code) return undefined;
+  const country = normalizeCountry(conv.country);
+  if (!country) return undefined;
+
+  const bookLabel = conv.bookmakerName || conv.bookmaker || 'Bookmaker';
+  const legCount = Number(conv.legCount) || (Array.isArray(conv.legs) ? conv.legs.length : 0);
+
+  const text = [
+    '\uD83C\uDFAB BOOKING CODE GENERATED',
+    '\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501',
+    '\uD83C\uDF0D A user from ' + country + ' generated a booking code.',
+    '\uD83C\uDFEA Bookmaker: ' + bookLabel,
+    '\uD83E\uDDFE ' + legCount + ' selections',
+    '\u00A0',
+    '\uD83D\uDD11 Code: ' + conv.code,
+    '\u00A0',
+    '\uD83D\uDD17 winfulltime.com/ticket-builder.html'
+  ].join('\n');
+
+  return deliver(text, 'generated code from ' + country + ' (' + bookLabel + ')');
+}
+
+module.exports = { announceConversion, announceSplit, announceMerge, announceCreate };
