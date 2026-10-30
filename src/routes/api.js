@@ -1738,17 +1738,18 @@ router.get('/whop/portal', requireAuth, function (req, res) {
   if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
 
   supabase.from('subscriptions')
-    .select('payment_id')
+    .select('payment_id,provider_subscription_id,payment_method')
     .eq('user_id', req.user.id)
     .eq('payment_status', 'active')
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
     .then(function (sub) {
-      if (!sub.data || !sub.data.payment_id) {
+      var membershipId = sub.data && (sub.data.provider_subscription_id || sub.data.payment_id);
+      if (!membershipId) {
         return res.json({ error: 'No active subscription found' });
       }
-      return whop.createCustomerPortal({ subscriptionId: sub.data.payment_id }).then(function (result) {
+      return whop.createCustomerPortal({ subscriptionId: membershipId }).then(function (result) {
         res.json(result);
       });
     })
@@ -1763,17 +1764,19 @@ router.post('/whop/cancel', requireAuth, function (req, res) {
   if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
 
   supabase.from('subscriptions')
-    .select('payment_id')
+    .select('payment_id,provider_subscription_id,payment_method')
     .eq('user_id', req.user.id)
     .eq('payment_status', 'active')
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
     .then(function (sub) {
-      if (!sub.data || !sub.data.payment_id) {
+      var membershipId = sub.data && (sub.data.provider_subscription_id || sub.data.payment_id);
+      if (!membershipId) {
         return res.json({ error: 'No active subscription found' });
       }
-      return whop.cancelSubscription(sub.data.payment_id).then(function () {
+      return whop.cancelSubscription(membershipId).then(function (result) {
+        if (result && result.error) return res.status(502).json({ error: result.error });
         res.json({ ok: true });
       });
     })
@@ -2463,18 +2466,21 @@ router.get('/portal', requireAuth, function (req, res) {
   if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
 
   supabase.from('subscriptions')
-    .select('payment_id')
+    .select('payment_id,provider_subscription_id,payment_method')
     .eq('user_id', req.user.id)
     .eq('payment_status', 'active')
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
     .then(function (sub) {
-      if (!sub.data || !sub.data.payment_id) {
+      var paymentId = sub.data && (sub.data.provider_subscription_id || sub.data.payment_id);
+      if (!paymentId) {
         return res.json({ error: 'No active subscription' });
       }
-      return providerForPaymentId(sub.data.payment_id).then(function (provider) {
-        return provider.createCustomerPortal({ subscriptionId: sub.data.payment_id });
+      var providerPromise = sub.data.payment_method === 'whop' || sub.data.provider_subscription_id
+        ? Promise.resolve(whop) : providerForPaymentId(paymentId);
+      return providerPromise.then(function (provider) {
+        return provider.createCustomerPortal({ subscriptionId: paymentId });
       }).then(function (result) {
         if (result.error) return res.json({ error: result.error });
         res.json({ url: result.url });
@@ -2490,19 +2496,23 @@ router.post('/subscription/cancel', requireAuth, function (req, res) {
   if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
 
   supabase.from('subscriptions')
-    .select('payment_id')
+    .select('payment_id,provider_subscription_id,payment_method')
     .eq('user_id', req.user.id)
     .eq('payment_status', 'active')
     .order('created_at', { ascending: false })
     .limit(1)
     .single()
     .then(function (sub) {
-      if (!sub.data || !sub.data.payment_id) {
+      var paymentId = sub.data && (sub.data.provider_subscription_id || sub.data.payment_id);
+      if (!paymentId) {
         return res.json({ error: 'No active subscription found' });
       }
-      return providerForPaymentId(sub.data.payment_id).then(function (provider) {
-        return provider.cancelSubscription(sub.data.payment_id);
-      }).then(function () {
+      var providerPromise = sub.data.payment_method === 'whop' || sub.data.provider_subscription_id
+        ? Promise.resolve(whop) : providerForPaymentId(paymentId);
+      return providerPromise.then(function (provider) {
+        return provider.cancelSubscription(paymentId);
+      }).then(function (result) {
+        if (result && result.error) return res.status(502).json({ error: result.error });
         res.json({ message: 'Subscription cancelled' });
       });
     }).catch(function (err) {

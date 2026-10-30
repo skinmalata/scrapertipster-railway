@@ -142,6 +142,8 @@ function handleEvent(event) {
       return onMembershipActivated(data, event);
     case 'membership.deactivated':
       return onMembershipDeactivated(data, event);
+    case 'refund.created':
+      return onRefundCreated(data, event);
     default:
       return Promise.resolve({ handled: false, eventName: eventName });
   }
@@ -295,6 +297,7 @@ function onPaymentSucceeded(data, event) {
   var userId = meta.user_id;
   var email = meta.email || (data && data.email) || (data && data.member && data.member.email) || '';
   var paymentId = String(data.id || '');
+  var membershipId = String(data.membership_id || (data.membership && data.membership.id) || '');
   if (!paymentId) return Promise.resolve({ handled: false, skipped: true, reason: 'Missing payment id' });
 
   // The plan comes from the product Whop charged for. The checkout metadata
@@ -321,14 +324,15 @@ function onPaymentSucceeded(data, event) {
       email: email || '',
       fullName: meta.full_name || '',
       planType: planType,
-      providerId: paymentId,
+      paymentId: paymentId,
+      membershipId: membershipId,
       expiresAt: computeExpiry(planType),
       amount: check.amount
     });
   }
 
   if (!userId) return Promise.resolve({ handled: false, skipped: true, reason: 'Missing user_id or reg_token' });
-  return recordPayment(userId, email, planType, paymentId, computeExpiry(planType), check.amount);
+  return recordPayment(userId, email, planType, paymentId, computeExpiry(planType), check.amount, { membershipId: membershipId });
 }
 
 function onMembershipActivated(data, event) {
@@ -336,6 +340,7 @@ function onMembershipActivated(data, event) {
   var userId = meta.user_id || (data && ((data.user && data.user.id) || (data.member && data.member.id) || data.user_id));
   var email = meta.email || (data && ((data.user && data.user.email) || (data.member && data.member.email) || data.email)) || '';
   var membershipId = String(data.id || '');
+  var paymentId = String(data.payment_id || (data.payment && data.payment.id) || '');
   if (!membershipId) return Promise.resolve({ handled: false, skipped: true, reason: 'Missing membership id' });
 
   var productId = data && data.product && data.product.id ? String(data.product.id) : '';
@@ -360,18 +365,19 @@ function onMembershipActivated(data, event) {
       email: email || '',
       fullName: meta.full_name || '',
       planType: planType,
-      providerId: membershipId,
+      paymentId: paymentId,
+      membershipId: membershipId,
       expiresAt: expiresAt,
       amount: check.amount
     });
   }
 
   if (!userId) return Promise.resolve({ handled: false, skipped: true, reason: 'Missing user_id or reg_token' });
-  return recordPayment(userId, email, planType, membershipId, expiresAt, check.amount);
+  return recordMembership(userId, email, planType, membershipId, paymentId, expiresAt, check.amount);
 }
 
 function completeRegistration(_a) {
-  var regToken = _a.regToken, email = _a.email, fullName = _a.fullName, planType = _a.planType, providerId = _a.providerId, expiresAt = _a.expiresAt, amount = _a.amount;
+  var regToken = _a.regToken, email = _a.email, fullName = _a.fullName, planType = _a.planType, paymentId = _a.paymentId, membershipId = _a.membershipId, expiresAt = _a.expiresAt, amount = _a.amount;
   if (!supabase) return Promise.resolve({ handled: false, reason: 'No database' });
   if (!regToken) return Promise.resolve({ handled: false, reason: 'Missing reg_token' });
 
@@ -407,22 +413,25 @@ function completeRegistration(_a) {
                 if (profileResult.error || !profileResult.data) {
                   return { handled: false, reason: 'User exists but profile not found: ' + regEmail };
                 }
-                return attachRegistration(reg, profileResult.data.id, planType, providerId, expiresAt, amount, null);
+                return attachRegistration(reg, profileResult.data.id, planType, paymentId, membershipId, expiresAt, amount, null);
               });
           }
           return { handled: false, reason: 'Account creation failed: ' + createResult.error.message };
         }
         var userId = createResult.data && createResult.data.user && createResult.data.user.id;
         if (!userId) return { handled: false, reason: 'Account created without a user id' };
-        return attachRegistration(reg, userId, planType, providerId, expiresAt, amount, generatedPassword);
+        return attachRegistration(reg, userId, planType, paymentId, membershipId, expiresAt, amount, generatedPassword);
       });
     });
 }
 
-function attachRegistration(reg, userId, planType, providerId, expiresAt, amount, password) {
+function attachRegistration(reg, userId, planType, paymentId, membershipId, expiresAt, amount, password) {
   var regEmail = reg.email;
   var cleanExpiry = expiresAt instanceof Date ? expiresAt : computeExpiry(planType);
-  return recordPayment(userId, regEmail, planType, providerId, cleanExpiry, amount, { registration: true })
+  var recording = paymentId
+    ? recordPayment(userId, regEmail, planType, paymentId, cleanExpiry, amount, { registration: true, membershipId: membershipId })
+    : recordMembership(userId, regEmail, planType, membershipId, '', cleanExpiry, amount);
+  return recording
     .then(function (paymentResult) {
       return supabase.from('pending_registrations')
         .update({ status: 'completed', completed_at: new Date().toISOString() })
@@ -440,7 +449,7 @@ function attachRegistration(reg, userId, planType, providerId, expiresAt, amount
             password: password,
             logPrefix: '[whop]'
           }).then(function (welcome) {
-            return { handled: true, registration: true, userId: userId, planType: planType, providerId: providerId, loginEmailSent: welcome.sent };
+            return { handled: true, registration: true, userId: userId, planType: planType, providerId: paymentId || membershipId, loginEmailSent: welcome.sent };
           });
         });
     })
@@ -456,25 +465,54 @@ function onMembershipDeactivated(data, event) {
   var meta = extractMeta(data, event) || {};
   var planType = meta.plan_type || (data && data.plan && data.plan.plan_type) || 'monthly';
 
-  var action = supabase.from('subscriptions')
+  return supabase.from('subscriptions')
     .update({ payment_status: 'cancelled', cancelled_at: new Date().toISOString() })
-    .eq('payment_id', membershipId)
+    .eq('payment_method', 'whop')
+    .eq('provider_subscription_id', membershipId)
     .select('user_id')
-    .single();
+    .then(function (result) {
+      if (result.error) throw new Error('subscription deactivation failed: ' + result.error.message);
+      if (result.data && result.data.length) return syncVipStatus(result.data[0].user_id);
+      // Old webhook handlers stored the membership ID in payment_id.
+      return supabase.from('subscriptions').update({ payment_status: 'cancelled', cancelled_at: new Date().toISOString() })
+        .eq('payment_id', membershipId).select('user_id').then(function (legacy) {
+          if (legacy.error) throw new Error('legacy subscription deactivation failed: ' + legacy.error.message);
+          var uid = (legacy.data && legacy.data[0] && legacy.data[0].user_id) || meta.user_id;
+          return uid ? syncVipStatus(uid) : null;
+        });
+    }).then(function () { return { handled: true, eventName: 'membership.deactivated' }; });
+}
 
-  if (meta.user_id) {
-    action = action.then(function (result) {
-      var uid = (result.data && result.data.user_id) || meta.user_id;
-      return supabase.rpc('revoke_vip_status', { user_uuid: uid });
+function onRefundCreated(data) {
+  if (!supabase) return Promise.resolve({ handled: false, reason: 'No database' });
+  var payment = data && data.payment;
+  var paymentId = String((data && data.payment_id) || (payment && payment.id) || '');
+  if (!paymentId) return Promise.resolve({ handled: false, reason: 'Refund payload missing payment id' });
+  return supabase.from('payments').select('user_id,payment_details').eq('payment_method', 'whop').eq('provider_payment_id', paymentId).maybeSingle()
+    .then(function (found) {
+      if (found.error) throw new Error('refund payment lookup failed: ' + found.error.message);
+      if (!found.data) return { handled: false, reason: 'Refunded Whop payment not found: ' + paymentId };
+      return supabase.from('payments').update({ status: 'refunded' }).eq('payment_method', 'whop').eq('provider_payment_id', paymentId)
+        .then(function (updated) {
+          if (updated.error) throw new Error('refund payment update failed: ' + updated.error.message);
+          var details = found.data.payment_details || {};
+          var membershipId = String(details.membershipId || (data && data.membership_id) || (payment && payment.membership_id) || '');
+          var update = supabase.from('subscriptions').update({ payment_status: 'cancelled', cancelled_at: new Date().toISOString() }).eq('payment_method', 'whop');
+          update = membershipId ? update.eq('provider_subscription_id', membershipId) : update.eq('user_id', found.data.user_id).eq('payment_status', 'active');
+          return update.select('user_id').then(function (subs) {
+            if (subs.error) throw new Error('refund subscription update failed: ' + subs.error.message);
+            var uid = (subs.data && subs.data[0] && subs.data[0].user_id) || found.data.user_id;
+            // Whop refunds do not automatically cancel access or renewal.
+            if (membershipId && WHOP_API_KEY) {
+              return cancelSubscription(membershipId).then(function (cancelled) {
+                if (cancelled && cancelled.error) throw new Error('Whop membership cancellation failed: ' + cancelled.error);
+                return syncVipStatus(uid);
+              });
+            }
+            return syncVipStatus(uid);
+          });
+        }).then(function () { return { handled: true, eventName: 'refund.created', paymentId: paymentId }; });
     });
-  } else {
-    action = action.then(function (result) {
-      if (result.data && result.data.user_id) {
-        return supabase.rpc('revoke_vip_status', { user_uuid: result.data.user_id });
-      }
-    });
-  }
-  return action.then(function () { return { handled: true, eventName: 'membership.deactivated' }; });
 }
 
 // A second event for the same purchase (the payment webhook and the
@@ -496,6 +534,18 @@ function resolveVipExpiry(userId, baseExpiry) {
     .catch(function () { return baseExpiry; });
 }
 
+function syncVipStatus(userId) {
+  return supabase.from('subscriptions').select('expires_at').eq('user_id', userId).eq('payment_status', 'active')
+    .gt('expires_at', new Date().toISOString()).order('expires_at', { ascending: false }).limit(1)
+    .then(function (res) {
+      if (res.error) throw new Error('active subscription lookup failed: ' + res.error.message);
+      if (res.data && res.data.length) return supabase.rpc('set_vip_status', { user_uuid: userId, vip_expires: res.data[0].expires_at });
+      return supabase.rpc('revoke_vip_status', { user_uuid: userId });
+    }).then(function (rpc) {
+      if (rpc && rpc.error) throw new Error('VIP status update failed: ' + rpc.error.message);
+    });
+}
+
 // Records the payment, activates the subscription and grants VIP. Rejects on
 // any Supabase error so callers (webhook) can fail the event and let the
 // provider retry — a silently swallowed error here previously caused paying
@@ -506,20 +556,25 @@ function recordPayment(userId, email, planType, providerId, expiresAt, amount, o
   var options = opts || {};
 
   return resolveVipExpiry(userId, periodEnd).then(function (vipExpiry) {
-    return supabase.from('payments').insert({
+    return supabase.from('payments').select('user_id,payment_method').eq('provider_payment_id', providerId).maybeSingle().then(function (existing) {
+      if (existing.error) throw new Error('payment lookup failed: ' + existing.error.message);
+      if (existing.data && (existing.data.user_id !== userId || existing.data.payment_method !== 'whop')) throw new Error('Payment ID is already linked to another account');
+      return supabase.from('payments').upsert({
       user_id: userId,
       payment_method: 'whop',
       provider_payment_id: providerId,
       amount: amount,
       currency: 'USD',
       status: 'completed',
-      payment_details: { provider: 'whop', providerId: providerId, planType: planType, email: email }
-    }).then(function (ins) {
-      if (ins.error) throw new Error('payments insert failed: ' + ins.error.message);
+      payment_details: { provider: 'whop', providerId: providerId, planType: planType, email: email, membershipId: options.membershipId || null }
+      }, { onConflict: 'provider_payment_id' }).then(function (ins) {
+      if (ins.error) throw new Error('payments upsert failed: ' + ins.error.message);
       return supabase.from('subscriptions').upsert({
         user_id: userId,
         plan_type: planType,
         payment_id: providerId,
+        payment_method: 'whop',
+        provider_subscription_id: options.membershipId || null,
         payment_status: 'active',
         amount: amount,
         currency: 'USD',
@@ -549,7 +604,33 @@ function recordPayment(userId, email, planType, providerId, expiresAt, amount, o
       }).then(function () {
         return { handled: true, reference: providerId, userId: userId, planType: planType, expiresAt: vipExpiry };
       });
+      });
     });
+  });
+}
+
+function recordMembership(userId, email, planType, membershipId, paymentId, expiresAt, amount) {
+  if (!supabase) return Promise.reject(new Error('No database'));
+  if (!membershipId) return Promise.reject(new Error('Missing Whop membership id'));
+  var periodEnd = expiresAt instanceof Date ? expiresAt : computeExpiry(planType);
+  var savePaymentLink = paymentId
+    ? supabase.from('payments').update({ payment_details: { provider: 'whop', providerId: paymentId, planType: planType, email: email, membershipId: membershipId } }).eq('payment_method', 'whop').eq('provider_payment_id', paymentId)
+    : Promise.resolve({ error: null });
+  return savePaymentLink.then(function (paymentUpdate) {
+    if (paymentUpdate.error) throw new Error('payment membership link update failed: ' + paymentUpdate.error.message);
+    return supabase.from('subscriptions').upsert({
+    user_id: userId, plan_type: planType, payment_id: paymentId || null,
+    payment_method: 'whop', provider_subscription_id: membershipId,
+    payment_status: 'active', amount: amount, currency: 'USD', expires_at: periodEnd.toISOString()
+  }, { onConflict: 'payment_method,provider_subscription_id' }).then(function (up) {
+    if (up.error) throw new Error('membership upsert failed: ' + up.error.message);
+    return resolveVipExpiry(userId, periodEnd);
+  }).then(function (vipExpiry) {
+    return supabase.rpc('set_vip_status', { user_uuid: userId, vip_expires: vipExpiry.toISOString() });
+  }).then(function (rpc) {
+    if (rpc.error) throw new Error('set_vip_status failed: ' + rpc.error.message);
+    return { handled: true, reference: membershipId, userId: userId, planType: planType };
+  });
   });
 }
 
@@ -570,16 +651,26 @@ function cancelSubscription(subscriptionId) {
   return fetch(WHOP_API + '/memberships/' + encodeURIComponent(subscriptionId) + '/cancel', {
     method: 'POST',
     headers: whopHeaders()
-  }).catch(function () { return null; }).then(function () {
+  }).then(function (response) {
+    if (!response.ok) return response.text().then(function (body) { throw new Error('Whop cancellation failed (' + response.status + '): ' + body.slice(0, 300)); });
     return supabase.from('subscriptions')
       .update({ payment_status: 'cancelled', cancelled_at: new Date().toISOString() })
-      .eq('payment_id', subscriptionId)
-      .select('user_id')
-      .single();
+      .eq('payment_method', 'whop')
+      .eq('provider_subscription_id', subscriptionId)
+      .select('user_id');
   }).then(function (result) {
-    if (result && result.data && result.data.user_id) {
-      return supabase.rpc('revoke_vip_status', { user_uuid: result.data.user_id });
-    }
+    if (result.error) throw new Error('Local cancellation update failed: ' + result.error.message);
+    if (result.data && result.data.length) return syncVipStatus(result.data[0].user_id);
+    // Backward compatibility for subscriptions written before membership IDs
+    // had their own column. New rows never use this path.
+    return supabase.from('subscriptions').update({ payment_status: 'cancelled', cancelled_at: new Date().toISOString(), payment_method: 'whop', provider_subscription_id: subscriptionId })
+      .eq('payment_id', subscriptionId).select('user_id').then(function (legacy) {
+        if (legacy.error) throw new Error('Legacy cancellation update failed: ' + legacy.error.message);
+        if (!legacy.data || !legacy.data.length) throw new Error('Whop membership is not linked to a local subscription');
+        return syncVipStatus(legacy.data[0].user_id);
+      });
+  }).then(function () {
+    return { cancelled: true };
   });
 }
 

@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS public.subscriptions (
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   plan_type TEXT NOT NULL CHECK (plan_type IN ('monthly', 'yearly', 'lifetime')),
   payment_id TEXT UNIQUE,
+  payment_method TEXT,
+  provider_subscription_id TEXT,
   payment_status TEXT DEFAULT 'pending' CHECK (payment_status IN ('pending', 'active', 'completed', 'failed', 'cancelled', 'expired')),
   amount DECIMAL(10,2),
   currency TEXT DEFAULT 'USD',
@@ -26,6 +28,12 @@ CREATE TABLE IF NOT EXISTS public.subscriptions (
   cancelled_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+ALTER TABLE public.subscriptions ADD COLUMN IF NOT EXISTS payment_method TEXT;
+ALTER TABLE public.subscriptions ADD COLUMN IF NOT EXISTS provider_subscription_id TEXT;
+CREATE UNIQUE INDEX IF NOT EXISTS subscriptions_provider_membership_unique
+  ON public.subscriptions (payment_method, provider_subscription_id)
+  WHERE provider_subscription_id IS NOT NULL;
 
 -- 3. Payments table
 CREATE TABLE IF NOT EXISTS public.payments (
