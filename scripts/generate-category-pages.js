@@ -560,6 +560,7 @@ ${generateFaqHtml(slug)}
 </footer>
 <script src="/chat-widget.js"></script>
 <script src="/sponsor-banner.js?v=3"></script>
+${slug === 'under-2-5' ? '<script src="/config.js"></script>' : ''}
 <script>
 (function(){const s=localStorage.getItem("wf-theme");const t=s||"dark";document.documentElement.setAttribute("data-theme",t==="dark"?"":"light");const b=document.getElementById("themeToggle");if(b)b.textContent=t==="dark"?"Light":"Dark";})();
 document.addEventListener("DOMContentLoaded",function(){const b=document.getElementById("themeToggle");if(!b)return;b.addEventListener("click",function(){const h=document.documentElement;const l=h.getAttribute("data-theme")==="light";if(l){h.removeAttribute("data-theme");b.textContent="Light";localStorage.setItem("wf-theme","dark")}else{h.setAttribute("data-theme","light");b.textContent="Dark";localStorage.setItem("wf-theme","light")}});});
@@ -894,7 +895,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       // first paint and the Pro unlock must never block on it.
       var user = (window.WFT && typeof window.WFT.getUser === 'function') ? window.WFT.getUser() : null;
       var fetchStatic = async function () {
-        var sres = await fetch('/data/predictions.json');
+        var sres = await fetch('/data/predictions.json'${slug === 'under-2-5' ? ", { cache: 'no-store' }" : ''});
         if (!sres.ok) throw new Error('HTTP ' + sres.status);
         allData = await sres.json();
       };
@@ -912,6 +913,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
       initFromUrl();
       renderCurrentView();
+${slug === 'under-2-5' ? '      refreshUnder25FromApi();' : ''}
 
       // Analysis links are enhancement only. Attach them in place once the
       // maps land instead of re-rendering, so scroll position is untouched.
@@ -931,6 +933,30 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
     }
   }
 
+${slug === 'under-2-5' ? `  // Static Pages can briefly serve an older snapshot while the daily scrape
+  // and deployment finish. Under 2.5 is public, so refresh it for every visitor.
+  function refreshUnder25FromApi() {
+    if (DATA_KEY !== 'under25Matches' || !window.WFT_API || !allData) return;
+    var selectedDate = getSelectedDateStr();
+    var rows = Array.isArray(allData[DATA_KEY]) ? allData[DATA_KEY] : [];
+    var hasSelectedDate = rows.some(function (match) { return match && match.date === selectedDate; });
+    if (hasSelectedDate && (!allData.date || allData.date >= selectedDate)) return;
+
+    fetch(window.WFT_API + '/api/predictions', { cache: 'no-store' })
+      .then(function (response) {
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        return response.json();
+      }).then(function (apiOut) {
+        var apiRows = apiOut && Array.isArray(apiOut[DATA_KEY]) ? apiOut[DATA_KEY] : [];
+        if (apiRows.some(function (match) { return match && match.date === selectedDate; })) {
+          allData = apiOut;
+          renderCurrentView();
+        }
+      }).catch(function (e) {
+        console.warn('[under-2-5] Live predictions refresh failed:', e.message);
+      });
+  }` : ''}
+
   loadData();
   document.addEventListener('wft-pro-status', function () {
     var user = (window.WFT && typeof window.WFT.getUser === 'function') ? window.WFT.getUser() : null;
@@ -948,6 +974,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
         }
       }).catch(function () {});
     }
+${slug === 'under-2-5' ? '    refreshUnder25FromApi();' : ''}
   });
 })();
 </script>

@@ -7,6 +7,7 @@ var CATEGORY_MAP = {
   '1x2': '1x2',
   'over15': 'over15',
   'over25': 'over25',
+  'under25': 'under25',
   'btts': 'btts',
   'bttsNo': 'bttsNo',
   'corners': 'corners',

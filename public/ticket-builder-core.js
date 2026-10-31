@@ -223,6 +223,7 @@
     addPicks('1x2', predictions.matches);
     addPicks('over15', predictions.over15Matches);
     addPicks('over25', predictions.over25Matches);
+    addPicks('under25', predictions.under25Matches);
     addPicks('btts', predictions.bttsMatches);
     addPicks('bttsNo', predictions.bttsNoMatches);
     addPicks('corners', predictions.cornersMatches);

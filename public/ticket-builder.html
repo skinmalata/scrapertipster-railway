@@ -432,7 +432,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <details class="faq-item"><summary>Is the accumulator ticket builder free?</summary><p>Yes - the WinFulltime accumulator ticket builder is 100% free to use. No sign-ups, no subscriptions and no hidden fees. Build unlimited accumulator tickets every day.</p></details>
 
-  <details class="faq-item"><summary>What markets are included in the accumulator builder?</summary><p>The builder covers 1X2 (match result), Over 1.5 goals, Over 2.5 goals, BTTS Yes, BTTS No, and Double Chance selections derived from unbeaten streak analysis. All predictions are based on statistical analysis of team form, head-to-head records, and models.</p></details>
+  <details class="faq-item"><summary>What markets are included in the accumulator builder?</summary><p>The builder covers 1X2 (match result), Over 1.5 goals, Over 2.5 goals, Under 2.5 goals, BTTS Yes, BTTS No, and Double Chance selections derived from unbeaten streak analysis. All predictions are based on statistical analysis of team form, head-to-head records, and models.</p></details>
 
   <details class="faq-item"><summary>Can I filter accumulator tickets by odds range?</summary><p>Yes. Set a target total odds, a minimum odds per leg, and a maximum odds per leg. The builder then finds the optimal combination of selections within your specified range.</p></details>
 
@@ -2110,7 +2110,7 @@ nav.open { display: flex !important; }
   }
 
   function getSelectedMarkets() {
-    return ['1x2', 'over15', 'over25', 'btts', 'bttsNo', 'corners', 'teamScore', 'winStreak', 'unbeaten'];
+    return ['1x2', 'over15', 'over25', 'under25', 'btts', 'bttsNo', 'corners', 'teamScore', 'winStreak', 'unbeaten'];
   }
 
     function escapeHtml(value) {
@@ -2262,6 +2262,21 @@ nav.open { display: flex !important; }
       if (!pred || !Array.isArray(pred.matches)) {
         results.innerHTML = '<div class="no-matches"><p>Pre-match data is not available yet. Please try again shortly.</p></div>';
         return;
+      }
+
+      // Static Pages can briefly serve yesterday's committed snapshot while the
+      // daily scrape is running. Refresh stale data from the live predictions API.
+      var hasToday = (pred.dates || []).indexOf(date) !== -1 || (pred.matches || []).some(function (m) { return m && m.date === date; });
+      var hasTodayUnder25 = Array.isArray(pred.under25Matches) && pred.under25Matches.some(function (m) { return m && m.date === date; });
+      if (!hasToday || !hasTodayUnder25) {
+        try {
+          var livePredictions = await fetchJson((window.WFT_API || 'https://winfulltime-api.onrender.com') + '/api/predictions', 65000);
+          if (livePredictions && Array.isArray(livePredictions.matches) && ((livePredictions.dates || []).indexOf(date) !== -1 || livePredictions.matches.some(function (m) { return m && m.date === date; }))) {
+            pred = livePredictions;
+          }
+        } catch (e) {
+          console.warn('[ticket-builder] Live predictions unavailable; using static snapshot:', e.message);
+        }
       }
 
       var oddsResult = await Promise.allSettled([

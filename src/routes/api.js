@@ -1786,43 +1786,18 @@ router.post('/whop/cancel', requireAuth, function (req, res) {
     });
 });
 
-// POST /api/ticket-builder/generate — Pro members only
+// POST /api/ticket-builder/generate — free for all visitors
 router.post('/ticket-builder/generate', optionalAuth, async function (req, res) {
   try {
-    var isLifetime = false;
-    var isVip = false;
-
-    if (req.user) {
-      if (!supabase) return res.status(503).json({ error: 'Service unavailable' });
-      try {
-        var prof = await supabase.from('profiles').select('vip_status, vip_expires_at').eq('id', req.user.id).single();
-        isVip = prof.data && (prof.data.vip_status === 'vip' || prof.data.vip_status === 'admin') && (!prof.data.vip_expires_at || new Date(prof.data.vip_expires_at) > new Date());
-      } catch (e) {}
-      if (isVip) {
-        try {
-          var sub = await supabase.from('subscriptions').select('plan_type').eq('user_id', req.user.id).order('created_at', { ascending: false }).limit(1).maybeSingle();
-          isLifetime = sub.data && sub.data.plan_type === 'lifetime';
-        } catch (e) {}
-      }
-    }
-
-    if (!isVip) {
-      return res.status(403).json({
-        error: 'The Accumulator Ticket Builder is available to Pro members only. Upgrade to Pro to unlock it.',
-        isPro: false,
-        upgradeUrl: '/pricing.html'
-      });
-    }
-
-    var PRO_MAX_LEGS = 30;
-    var PRO_MAX_ODDS = 500;
+    var FREE_MAX_LEGS = 30;
+    var FREE_MAX_ODDS = 500;
 
     var body = req.body || {};
     var requestedLegs = parseInt(body.numLegs, 10) || 3;
-    var requestedMaxOdds = parseFloat(body.maxOdds) || PRO_MAX_ODDS;
+    var requestedMaxOdds = parseFloat(body.maxOdds) || FREE_MAX_ODDS;
 
-    var clampedLegs = Math.min(requestedLegs, PRO_MAX_LEGS);
-    var clampedMaxOdds = Math.min(requestedMaxOdds, PRO_MAX_ODDS);
+    var clampedLegs = Math.min(requestedLegs, FREE_MAX_LEGS);
+    var clampedMaxOdds = Math.min(requestedMaxOdds, FREE_MAX_ODDS);
 
     var date = watDate();
     var predictions = vipPredictionData();
@@ -1858,13 +1833,13 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
     var payload = buildTicket(predictions, buildOpts);
     res.json({
       ...payload,
-      tier: isLifetime ? 'lifetime' : 'pro',
-      isPro: true,
-      isLifetime: isLifetime,
+      tier: 'free',
+      isPro: false,
+      isLifetime: false,
       limit: null,
       remaining: null,
-      maxLegs: PRO_MAX_LEGS,
-      maxOdds: PRO_MAX_ODDS
+      maxLegs: FREE_MAX_LEGS,
+      maxOdds: FREE_MAX_ODDS
     });
   } catch (e) {
     console.error('[ticket-builder] Error:', e.message);
