@@ -352,7 +352,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
 
   <div class="toggle-row">
-   <span>Build SportyBet codes from 1X2, Double Chance, Over 1.5, and Over 2.5 picks (up to 30 matches).</span>
+   <span>Build SportyBet codes from 1X2, Over 1.5/2.5, and recommended H2H win picks (up to 30 matches).</span>
   </div>
 
   <div class="form-row">
@@ -408,7 +408,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <details class="faq-item"><summary>Is the accumulator ticket builder free?</summary><p>Yes - the WinFulltime accumulator ticket builder is 100% free to use. No sign-ups, no subscriptions and no hidden fees. Build unlimited accumulator tickets every day.</p></details>
 
-  <details class="faq-item"><summary>Which picks can generate a SportyBet code?</summary><p>SportyBet codes can include 1X2, Double Chance, Over 1.5, and Over 2.5 picks when the fixture and market are available. The builder uses these supported markets so each generated ticket can be converted into one SportyBet code.</p></details>
+  <details class="faq-item"><summary>Which picks can generate a SportyBet code?</summary><p>The builder combines the website's 1X2 predictions, Over 1.5 and Over 2.5 picks, and recommended H2H home/away wins. It can use multiple fixtures to reach the selected target odds, up to 500.</p></details>
 
   <details class="faq-item"><summary>Can I filter accumulator tickets by odds range?</summary><p>Yes. Set a target total odds, a minimum odds per leg, and a maximum odds per leg. The builder then finds the optimal combination of selections within your specified range.</p></details>
 
@@ -2175,8 +2175,7 @@ nav.open { display: flex !important; }
     var selectedMarkets = getSelectedMarkets();
     var results = document.getElementById('ticketResults');
 
-    // Search every supported prediction feed. Booking codes are attempted only
-    // when the selected ticket is a plain 1X2 accumulator.
+    // Search only the markets supported by SportyBet code creation.
     if (bookingCodeMode) {
       selectedMarkets = ['1x2', 'over15', 'over25'];
     }
