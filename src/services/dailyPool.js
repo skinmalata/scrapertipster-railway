@@ -182,7 +182,18 @@ function buildPool(predictions, options) {
       if (timeWindowHours > 0 && !withinTimeWindow(pickDate, sourceTime, timeWindowHours)) return;
 
       var key = pickKey(matchName, tip, pickDate);
-      if (seen.has(key)) return;
+      if (seen.has(key)) {
+        if (source.h2hPick) {
+          var existingH2HPick = pool.find(function (p) {
+            return p.fixtureKey === fixtureKey(matchName) && String(p.tip).trim().toLowerCase() === String(tip).trim().toLowerCase();
+          });
+          if (existingH2HPick) {
+            existingH2HPick.h2hRecommendation = true;
+            existingH2HPick.evidence.push('Recommended H2H win');
+          }
+        }
+        return;
+      }
       seen.add(key);
 
       var p = Math.min(0.92, prob);
@@ -204,7 +215,8 @@ function buildPool(predictions, options) {
         streak: source.streak || null,
         oddsSource: 'estimated',
         bookmaker: '',
-        evidence: []
+        evidence: source.h2hPick ? ['Recommended H2H win'] : [],
+        h2hRecommendation: source.h2hPick === true
       });
     });
   }

@@ -219,7 +219,18 @@
         if (timeWindowHours > 0 && !withinTimeWindow(pickDate, sourceTime, timeWindowHours)) return;
 
         var key = pickKey(matchName, tip, pickDate);
-        if (seen.has(key)) return;
+        if (seen.has(key)) {
+          if (source.h2hPick) {
+            var existingH2HPick = pool.find(function (p) {
+              return p.fixtureKey === fixtureKey(matchName) && String(p.tip).trim().toLowerCase() === String(tip).trim().toLowerCase();
+            });
+            if (existingH2HPick) {
+              existingH2HPick.h2hRecommendation = true;
+              existingH2HPick.evidence.push('Recommended H2H win');
+            }
+          }
+          return;
+        }
         seen.add(key);
 
         var p = Math.min(0.92, prob);
@@ -241,7 +252,8 @@
           streak: source.streak || null,
           oddsSource: 'estimated',
           bookmaker: '',
-          evidence: []
+          evidence: source.h2hPick ? ['Recommended H2H win'] : [],
+          h2hRecommendation: source.h2hPick === true
         });
       });
     }
@@ -295,14 +307,23 @@
       var pickDate = pick.date || date;
       if (!withinTimeWindow(pickDate, pick.time, 24)) return;
       var key = pickKey(matchName, pick.tip, pickDate);
-      if (seen.has(key)) return;
+      if (seen.has(key)) {
+        var existingH2HPick = pool.find(function (p) {
+          return p.fixtureKey === fixtureKey(matchName) && String(p.tip).trim().toLowerCase() === String(pick.tip).trim().toLowerCase();
+        });
+        if (existingH2HPick) {
+          existingH2HPick.h2hRecommendation = true;
+          existingH2HPick.evidence.push('Recommended H2H win');
+        }
+        return;
+      }
       seen.add(key);
       var odds = estimatedOdds(Math.min(0.92, prob));
       if (odds < minOdds || odds > maxOdds) return;
       pool.push({ match: matchName, tip: pick.tip, odds: odds, probability: Math.round(prob * 100), date: pickDate,
         time: pick.time, league: pick.league || '', category: category, sourceProbability: prob,
         fixtureKey: fixtureKey(matchName), streak: pick.streak || null, oddsSource: 'estimated', bookmaker: '',
-        evidence: ['Curated H2H pick'] });
+        evidence: ['Curated H2H pick'], h2hRecommendation: pick.h2hRecommendation === true });
     });
 
     if (unbeatenData && Array.isArray(unbeatenData)) {
@@ -495,7 +516,8 @@
     // outcomes rather than every marginal pick above the probability floor.
     if (options.topPicksInWindow > 0 && poolForCombos.length > options.topPicksInWindow) {
       var bestInWindow = poolForCombos.slice().sort(function (a, b) {
-        return (b.sourceProbability || 0) - (a.sourceProbability || 0);
+        return Number(b.h2hRecommendation === true) - Number(a.h2hRecommendation === true) ||
+          (b.sourceProbability || 0) - (a.sourceProbability || 0);
       }).slice(0, Math.max(options.topPicksInWindow * 2, 40));
       if (bestInWindow.length >= 2) poolForCombos = bestInWindow;
     }
@@ -554,13 +576,16 @@
         if (!seenKeys.has(key)) {
           seenKeys.add(key);
           var avgProb = 0;
+          var h2hCount = 0;
           for (var si = 0; si < current.length; si++) avgProb += current[si].sourceProbability;
+          for (var hi = 0; hi < current.length; hi++) if (current[hi].h2hRecommendation) h2hCount++;
           avgProb = avgProb / current.length;
           tickets.push({
             selections: current.slice(),
             totalOdds: Number(product.toFixed(2)),
             diff: Math.abs(product - targetOdds),
-            avgProb: avgProb
+            avgProb: avgProb,
+            h2hCount: h2hCount
           });
         }
       }
@@ -596,8 +621,8 @@
     // Prefer tickets that land closest to the target odds; when two are equally
     // close, favor the one with the higher average implied confidence.
     tickets.sort(function (a, b) {
-      var scoreA = (a.avgProb || 0) - a.diff * 0.002;
-      var scoreB = (b.avgProb || 0) - b.diff * 0.002;
+      var scoreA = (a.h2hCount || 0) * 0.15 + (a.avgProb || 0) - a.diff * 0.002;
+      var scoreB = (b.h2hCount || 0) * 0.15 + (b.avgProb || 0) - b.diff * 0.002;
       return scoreB - scoreA;
     });
 
@@ -617,7 +642,7 @@
           if (pairs.some(function (pair) { return usedPairs.has(pair); })) continue;
           if (pass === 0 && matchIds.some(function (matchId) { return usedMatchIds.has(matchId); })) continue;
           var freshCount = matchIds.filter(function (mId) { return !usedMatchIds.has(mId); }).length;
-          var sc = freshCount * 100000 + (tickets[ti].avgProb || 0) * 1000 - tickets[ti].diff;
+          var sc = freshCount * 100000 + (tickets[ti].h2hCount || 0) * 25000 + (tickets[ti].avgProb || 0) * 1000 - tickets[ti].diff;
           if (sc > bestScore) { bestScore = sc; bestIdx = ti; }
         }
       }

@@ -2057,7 +2057,7 @@ nav.open { display: flex !important; }
 <script src="/supabase-client.js"></script>
 
 <script src="/auth.js?v=20260801"></script>
-<script src="/ticket-builder-core.js?v=20261102a"></script>
+<script src="/ticket-builder-core.js?v=20261102b"></script>
 
   <script>
   (function() { var WFT = window.WFT;
@@ -2251,16 +2251,26 @@ nav.open { display: flex !important; }
       }
       if (dataResults[2].status === 'fulfilled' && dataResults[2].value && Array.isArray(dataResults[2].value.matches)) {
         h2hPicks = dataResults[2].value.matches.map(function (pick) {
+          if (!pick) return null;
+          var recommendation = pick.tip && typeof pick.tip === 'object' ? pick.tip : {};
+          var tip = String(recommendation.tip || recommendation.selection || pick.tip || '').trim();
+          if (/^home win$/i.test(tip)) tip = '1';
+          if (/^away win$/i.test(tip)) tip = '2';
+          var market = String(recommendation.market || pick.market || pick.category || '').toLowerCase();
+          var typeName = String(pick.type || market).toLowerCase();
+          var type = ({ '1x2': '1x2', 'match winner': '1x2', 'over 1.5': 'over15', 'over 2.5': 'over25' }[typeName]);
+          // The SportyBet ticket flow uses only recommended home/away H2H wins.
+          if (type !== '1x2' || (tip !== '1' && tip !== '2')) return null;
           var kickoff = pick.kickoff ? new Date(pick.kickoff) : null;
           var parts = kickoff && !isNaN(kickoff.getTime()) ? new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Lagos', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(kickoff) : [];
           var part = function (type) { var x = parts.find(function (p) { return p.type === type; }); return x ? x.value : ''; };
           var matchName = pick.home && pick.away ? pick.home + ' - ' + pick.away : pick.match;
           var timeMatch = String(pick.time || '').match(/\d{1,2}:\d{2}/);
-          var type = pick.type || ({ '1X2': '1x2', 'Over 1.5': 'over15', 'Over 2.5': 'over25', 'Under 2.5': 'under25', 'BTTS Yes': 'btts', 'BTTS No': 'bttsNo', Corners: 'corners', Cards: 'cards' }[pick.category]);
-          return { match: matchName, type: type, tip: pick.tip, probability: pick.probability,
+          return { match: matchName, type: type, tip: tip, probability: recommendation.confidence || pick.probability,
             league: pick.league, date: parts.length ? part('year') + '-' + part('month') + '-' + part('day') : date,
-            time: parts.length ? (part('hour') === '24' ? '00' : part('hour')) + ':' + part('minute') : (timeMatch ? timeMatch[0] : '') };
-        });
+            time: parts.length ? (part('hour') === '24' ? '00' : part('hour')) + ':' + part('minute') : (timeMatch ? timeMatch[0] : ''),
+            h2hRecommendation: true };
+        }).filter(Boolean);
       }
 
       if (!pred || !Array.isArray(pred.matches)) {
@@ -2300,8 +2310,10 @@ nav.open { display: flex !important; }
         availableMatches = null;
       }
 
-      var targetSteps = [target, target * 0.75, target * 0.5, target * 0.35, 5, 3]
-        .filter(function (value, index, all) { return Number.isFinite(value) && value > 1 && all.indexOf(value) === index; });
+      var targetSteps = [target, target * 0.8, target * 0.6, target * 0.4, target * 0.2,
+        target * 0.1, Math.min(target, 10), Math.min(target, 5), Math.min(target, 3)]
+        .filter(function (value, index, all) { return Number.isFinite(value) && value > 1 && all.indexOf(value) === index; })
+        .sort(function (a, b) { return b - a; });
       var res = null;
       var effectiveTarget = target;
       for (var ti = 0; ti < targetSteps.length; ti++) {
