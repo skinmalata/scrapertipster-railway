@@ -144,8 +144,9 @@ function buildTicket(predictions, options) {
     };
   }
 
-  var minTicketOdds = targetOdds * 0.8;
-  var maxTicketOdds = targetOdds * 1.2;
+  var band = targetOdds >= 20 ? 0.45 : targetOdds >= 15 ? 0.4 : targetOdds >= 12 ? 0.38 : targetOdds >= 8 ? 0.32 : targetOdds >= 5 ? 0.28 : 0.22;
+  var minTicketOdds = targetOdds * (1 - band);
+  var maxTicketOdds = targetOdds * (1 + band);
   if (maxOdds && maxTicketOdds > maxOdds) maxTicketOdds = maxOdds;
 
   var usedPerFixture = new Map();
@@ -163,9 +164,9 @@ function buildTicket(predictions, options) {
   // When a kickoff time window is active, combine only the highest-confidence
   // picks from that window so the ticket is built from the best winning
   // outcomes rather than every marginal pick above the probability floor.
-  var TOP_PICKS_IN_WINDOW = 15;
-  if (timeWindowHours > 0 && poolForCombos.length > TOP_PICKS_IN_WINDOW) {
-    var bestInWindow = poolForCombos.slice().sort(function(a, b) { return b.sourceProbability - a.sourceProbability; }).slice(0, TOP_PICKS_IN_WINDOW);
+  if (timeWindowHours > 0 && poolForCombos.length > 20) {
+    var topCount = targetOdds >= 10 ? 40 : 30;
+    var bestInWindow = poolForCombos.slice().sort(function(a, b) { return b.sourceProbability - a.sourceProbability; }).slice(0, topCount);
     if (bestInWindow.length >= 2) poolForCombos = bestInWindow;
   }
 

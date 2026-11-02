@@ -1,0 +1,17 @@
+import (
+    cli,
+    io,
+)
+
+#[extern("./client.js", "chat", "abort")]
+fn chat(prompt: String) Task[String]
+
+pub async fn main() {
+    let args = cli.args()
+    let prompt = if array.length(args) == 0 {
+        "Introduce yourself."
+    } else {
+        args[0]
+    }
+    io.print(chat(prompt).await)
+}

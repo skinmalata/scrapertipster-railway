@@ -425,8 +425,9 @@
     var maxOdds = options.maxOdds || 500;
     var maxTickets = options.maxTickets || 8;
 
-    var minTicketOdds = targetOdds * 0.8;
-    var maxTicketOdds = targetOdds * 1.2;
+    var band = targetOdds >= 20 ? 0.45 : targetOdds >= 15 ? 0.4 : targetOdds >= 12 ? 0.38 : targetOdds >= 8 ? 0.32 : targetOdds >= 5 ? 0.28 : 0.22;
+    var minTicketOdds = targetOdds * (1 - band);
+    var maxTicketOdds = targetOdds * (1 + band);
     if (maxOdds && maxTicketOdds > maxOdds) maxTicketOdds = maxOdds;
 
     // When preferIdealOdds is set (schedule fallback), keep per fixture the
@@ -462,21 +463,23 @@
     if (options.topPicksInWindow > 0 && poolForCombos.length > options.topPicksInWindow) {
       var bestInWindow = poolForCombos.slice().sort(function (a, b) {
         return (b.sourceProbability || 0) - (a.sourceProbability || 0);
-      }).slice(0, options.topPicksInWindow);
+      }).slice(0, Math.max(options.topPicksInWindow * 2, 40));
       if (bestInWindow.length >= 2) poolForCombos = bestInWindow;
     }
 
     // The schedule feed yields ~1300 fixtures, and the fallback adds several
-    // markets per fixture. An exhaustive 3-leg sweep over that pool stalls the
-    // page, so when the pool is per-fixture it is bounded to the legs priced
-    // closest to the target's ideal single-leg price. The prediction builder's
-    // pool is already capped (~200 entries), so this only trims the fallback.
-    if (options.preferIdealOdds && poolForCombos.length > 350) {
-      poolForCombos = poolForCombos.slice().sort(function (a, b) {
-        var da = Math.abs(a.odds - idealLegOdds);
-        var db = Math.abs(b.odds - idealLegOdds);
-        return (da - db) || ((b.sourceProbability || 0) - (a.sourceProbability || 0));
-      }).slice(0, 350);
+    // markets per fixture. Bound to legs priced closest to the target's ideal
+    // single-leg price, but scale the cap up when higher target odds are requested
+    // so we don't cut the pool too aggressively and force leg count down.
+    if (options.preferIdealOdds && poolForCombos.length > 600) {
+      var cap = targetOdds >= 15 ? 1000 : targetOdds >= 10 ? 800 : targetOdds >= 7 ? 700 : 600;
+      if (poolForCombos.length > cap) {
+        poolForCombos = poolForCombos.slice().sort(function (a, b) {
+          var da = Math.abs(a.odds - idealLegOdds);
+          var db = Math.abs(b.odds - idealLegOdds);
+          return (da - db) || ((b.sourceProbability || 0) - (a.sourceProbability || 0));
+        }).slice(0, cap);
+      }
     }
 
     // Cache the identity keys once so the DFS never re-parses team names.
@@ -798,9 +801,9 @@
       numLegs: numLegs,
       targetOdds: targetOdds,
       maxOdds: maxOdds,
-      shuffle: shuffle,
-      preferIdealOdds: true,
-      maxTickets: options.maxTickets || 3
+      shuffle: options.shuffle,
+      topPicksInWindow: timeWindowHours > 0 ? (targetOdds >= 10 ? 30 : 20) : 0,
+      maxTickets: maxTickets
     });
     return {
       available: combo.available,
