@@ -352,7 +352,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
 
   <div class="toggle-row">
-   <span>Tickets use every available prediction category. Booking codes are generated for supported 1X2 tickets (up to 30 matches).</span>
+   <span>Build SportyBet codes from 1X2, Double Chance, Over 1.5, and Over 2.5 picks (up to 30 matches).</span>
   </div>
 
   <div class="form-row">
@@ -408,7 +408,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <details class="faq-item"><summary>Is the accumulator ticket builder free?</summary><p>Yes - the WinFulltime accumulator ticket builder is 100% free to use. No sign-ups, no subscriptions and no hidden fees. Build unlimited accumulator tickets every day.</p></details>
 
-  <details class="faq-item"><summary>What prediction categories can the builder use?</summary><p>The builder can combine 1X2, Over/Under goals, BTTS Yes/No, corners, cards, HT/FT, GG2+, Team to Score, win/loss/draw streaks, unbeaten picks, Highest Scoring Half, curated H2H picks, and player shots where fixture data is available. Booking codes are currently supported for plain 1X2 tickets.</p></details>
+  <details class="faq-item"><summary>Which picks can generate a SportyBet code?</summary><p>SportyBet codes can include 1X2, Double Chance, Over 1.5, and Over 2.5 picks when the fixture and market are available. The builder uses these supported markets so each generated ticket can be converted into one SportyBet code.</p></details>
 
   <details class="faq-item"><summary>Can I filter accumulator tickets by odds range?</summary><p>Yes. Set a target total odds, a minimum odds per leg, and a maximum odds per leg. The builder then finds the optimal combination of selections within your specified range.</p></details>
 
@@ -2080,7 +2080,7 @@ nav.open { display: flex !important; }
   }
 
   function getSelectedMarkets() {
-    return [];
+    return ['1x2', 'over15', 'over25'];
   }
 
     function escapeHtml(value) {
@@ -2175,7 +2175,7 @@ nav.open { display: flex !important; }
     // Search every supported prediction feed. Booking codes are attempted only
     // when the selected ticket is a plain 1X2 accumulator.
     if (bookingCodeMode) {
-      selectedMarkets = [];
+      selectedMarkets = ['1x2', 'over15', 'over25'];
     }
 
     var timeWindowHours = 24;
@@ -2407,18 +2407,22 @@ nav.open { display: flex !important; }
     var legs = ticket.selections.map(function(s) {
       return { match: s.match, tip: s.tip, category: s.category };
     });
-    var oneX2Only = ticket.selections.every(function(s) {
-      return String(s.category || '').toLowerCase() === '1x2' && /^[1X2]$/.test(String(s.tip || '').trim());
+    var sportyBetEligible = ticket.selections.every(function(s) {
+      var category = String(s.category || '').toLowerCase();
+      var tip = String(s.tip || '').trim();
+      if (category === '1x2') return /^(1|X|2|1X|12|X2)$/.test(tip);
+      if (category === 'over15') return /^over\s+1\.5$/i.test(tip);
+      if (category === 'over25') return /^over\s+2\.5$/i.test(tip);
+      return false;
     });
-    if (!oneX2Only) {
+    if (!sportyBetEligible) {
       display.className = 'code-display error';
       display.style.display = 'block';
-      display.innerHTML = '<span class="cd-label">Booking codes are currently supported for 1X2 tickets only.</span>';
+      display.innerHTML = '<span class="cd-label">This ticket contains a market SportyBet codes cannot convert.</span>';
       return;
     }
     var providers = ['sportybet'];
-    if (oneX2Only) providers.push('betway', 'betpawa');
-    var labels = { sportybet: 'SportyBet', betway: 'Betway', betpawa: 'betPawa' };
+    var labels = { sportybet: 'SportyBet' };
     var api = (window.WFT_API || 'https://winfulltime-api.onrender.com') + '/api/converter/create';
 
     display.className = 'code-display';

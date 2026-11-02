@@ -1860,7 +1860,7 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
       date: date,
       oddsResponse: oddsResponse,
       h2hMatches: h2hMatches,
-      markets: body.markets,
+      markets: ['1x2', 'over15', 'over25'],
       minProbability: 0.25,
       safeOnly: body.safeOnly === true,
       numLegs: FREE_MAX_LEGS,
