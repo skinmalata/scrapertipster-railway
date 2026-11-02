@@ -2158,7 +2158,10 @@ nav.open { display: flex !important; }
         '</div>';
     }).join('');
 
-    results.innerHTML = '<div class="matches-grid">' + html + '</div>';
+    var targetNotice = res.actualTarget && res.requestedTarget && res.actualTarget < res.requestedTarget
+      ? '<div class="no-matches"><p>Target ' + escapeHtml(res.requestedTarget) + ' odds was not reachable with current fixtures. Showing a SportyBet ticket at ' + escapeHtml(tickets[0].totalOdds) + ' odds instead.</p></div>'
+      : '';
+    results.innerHTML = targetNotice + '<div class="matches-grid">' + html + '</div>';
 
     tickets.forEach(function(ticket, tidx) { generateAllCodes(tidx, ticket); });
   }
@@ -2297,47 +2300,67 @@ nav.open { display: flex !important; }
         availableMatches = null;
       }
 
-      var res = core.build(pred, {
-        date: date,
-        oddsResponse: oddsResponse,
-        markets: selectedMarkets,
-        minProbability: 0.25,
-        h2hPicks: h2hPicks,
-        safeOnly: safeTips,
-        bookingCodeMode: bookingCodeMode,
-        availableMatches: availableMatches,
-        autoLegs: true,
-        maxOdds: maxOdds,
-        minOddsPerLeg: minOdds,
-        maxOddsPerLeg: maxOdds,
-        targetOdds: target,
-        shuffle: shuffle === true,
-        timeWindowHours: timeWindowHours,
-        unbeatenData: unbeaten
-      });
+      var targetSteps = [target, target * 0.75, target * 0.5, target * 0.35, 5, 3]
+        .filter(function (value, index, all) { return Number.isFinite(value) && value > 1 && all.indexOf(value) === index; });
+      var res = null;
+      var effectiveTarget = target;
+      for (var ti = 0; ti < targetSteps.length; ti++) {
+        effectiveTarget = targetSteps[ti];
+        res = core.build(pred, {
+          date: date,
+          oddsResponse: oddsResponse,
+          markets: selectedMarkets,
+          minProbability: 0.25,
+          h2hPicks: h2hPicks,
+          safeOnly: safeTips,
+          bookingCodeMode: bookingCodeMode,
+          availableMatches: availableMatches,
+          autoLegs: true,
+          maxOdds: maxOdds,
+          minOddsPerLeg: minOdds,
+          maxOddsPerLeg: maxOdds,
+          targetOdds: effectiveTarget,
+          shuffle: shuffle === true,
+          timeWindowHours: timeWindowHours,
+          unbeatenData: unbeaten
+        });
+        if (res.available) break;
+      }
+      if (res && res.available) {
+        res.requestedTarget = target;
+        res.actualTarget = effectiveTarget;
+      }
 
-      if (!res.available) {
+      if (!res || !res.available) {
         if (bookingCodeMode) {
-          var fbRes = core.buildFromSchedule(availableMatches, {
-            date: date,
-            targetOdds: target,
-            autoLegs: true,
-            minOddsPerLeg: 1.05,
-            maxOddsPerLeg: maxOdds,
-            maxOdds: maxOdds,
-            shuffle: shuffle === true,
-            predictions: pred,
-            timeWindowHours: timeWindowHours,
-            minProbability: 0.55
-          });
+          var fbRes = null;
+          for (var fi = 0; fi < targetSteps.length; fi++) {
+            effectiveTarget = targetSteps[fi];
+            fbRes = core.buildFromSchedule(availableMatches, {
+              date: date,
+              targetOdds: effectiveTarget,
+              autoLegs: true,
+              minOddsPerLeg: 1.05,
+              maxOddsPerLeg: maxOdds,
+              maxOdds: maxOdds,
+              shuffle: shuffle === true,
+              predictions: pred,
+              timeWindowHours: timeWindowHours,
+              minProbability: 0.55
+            });
+            if (fbRes.available) break;
+          }
           if (fbRes.available && fbRes.ticket && fbRes.ticket.selections && fbRes.ticket.selections.length >= 2) {
-            renderTickets({ tickets: fbRes.tickets || [fbRes.ticket], ticket: fbRes.ticket });
+            fbRes.requestedTarget = target;
+            fbRes.actualTarget = effectiveTarget;
+            renderTickets({ tickets: fbRes.tickets || [fbRes.ticket], ticket: fbRes.ticket,
+              requestedTarget: target, actualTarget: effectiveTarget });
             return;
           }
-          results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(fbRes.reason || res.reason || 'No tickets could be generated for this target. Try a lower target or generate again when more fixtures are available.') + '</p></div>';
+          results.innerHTML = '<div class="no-matches"><p>' + escapeHtml((fbRes && fbRes.reason) || (res && res.reason) || 'No SportyBet-codeable ticket could be generated. Try again when more fixtures are available.') + '</p></div>';
           return;
         }
-        results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(res.reason || 'No ticket could be generated for this target. Try a lower target or generate again when more fixtures are available.') + '</p></div>';
+        results.innerHTML = '<div class="no-matches"><p>' + escapeHtml((res && res.reason) || 'No ticket could be generated for this target. Try a lower target or generate again when more fixtures are available.') + '</p></div>';
         return;
       }
 
