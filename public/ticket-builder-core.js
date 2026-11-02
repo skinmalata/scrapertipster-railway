@@ -645,6 +645,7 @@
   function buildFromSchedule(availableMatches, options) {
     options = options || {};
     var numLegs = options.numLegs || 3;
+    var maxTickets = options.maxTickets || 8;
     var targetOdds = options.targetOdds || 5;
     var maxOdds = options.maxOdds || 100;
     var minOddsPerLeg = options.minOddsPerLeg || 1.05;
