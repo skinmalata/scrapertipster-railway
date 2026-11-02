@@ -2163,7 +2163,8 @@ nav.open { display: flex !important; }
       : '';
     results.innerHTML = targetNotice + '<div class="matches-grid">' + html + '</div>';
 
-    tickets.forEach(function(ticket, tidx) { generateAllCodes(tidx, ticket); });
+    var replacementPool = res.pool && Array.isArray(res.pool.pool) ? res.pool.pool : [];
+    tickets.forEach(function(ticket, tidx) { generateAllCodes(tidx, ticket, replacementPool); });
   }
 
   async function generateTickets(shuffle) {
@@ -2365,7 +2366,7 @@ nav.open { display: flex !important; }
             fbRes.requestedTarget = target;
             fbRes.actualTarget = effectiveTarget;
             renderTickets({ tickets: fbRes.tickets || [fbRes.ticket], ticket: fbRes.ticket,
-              requestedTarget: target, actualTarget: effectiveTarget });
+              requestedTarget: target, actualTarget: effectiveTarget, pool: res && res.pool });
             return;
           }
           results.innerHTML = '<div class="no-matches"><p>' + escapeHtml((fbRes && fbRes.reason) || (res && res.reason) || 'No SportyBet-codeable ticket could be generated. Try again when more fixtures are available.') + '</p></div>';
@@ -2434,12 +2435,12 @@ nav.open { display: flex !important; }
   // Auto-generate all eligible booking codes (SportyBet, plus Betway and
   // betPawa when every leg is a plain 1X2) for a ticket the moment results
   // are rendered, instead of requiring a click per bookmaker.
-  function generateAllCodes(tidx, ticket) {
+  function generateAllCodes(tidx, ticket, replacementPool) {
     var display = document.getElementById('code-display-' + tidx);
     if (!display || !ticket || !ticket.selections) return;
 
     var legs = ticket.selections.map(function(s) {
-      return { match: s.match, tip: s.tip, category: s.category };
+      return { match: s.match, tip: s.tip, category: s.category, odds: s.odds };
     });
     var sportyBetEligible = ticket.selections.every(function(s) {
       var category = String(s.category || '').toLowerCase();
@@ -2467,22 +2468,66 @@ nav.open { display: flex !important; }
     var country = countryEl ? countryEl.value.trim() : '';
 
     var pending = providers.map(function(bm) {
-      var payload = { bookmaker: bm, legs: legs };
-      if (country) payload.country = country;
-      return fetch(api, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      }).then(function(r) {
-        return r.json().then(function(body) { return { ok: r.ok, body: body }; });
-      }).then(function(res) {
-        if (res.ok && res.body && res.body.success) {
-          return { bm: bm, ok: true, code: res.body.code };
-        }
-        return { bm: bm, ok: false, msg: (res.body && res.body.error) || 'Could not be created' };
-      }).catch(function() {
-        return { bm: bm, ok: false, msg: 'Network error' };
-      });
+      function createWithReplacements(currentLegs, replaced, tried) {
+        if (tried.size >= 40) return Promise.resolve({ bm: bm, ok: false, msg: 'Could not find an available replacement for every selection.' });
+        var signature = currentLegs.map(function(leg) { return matchIdentity(leg.match) + '|' + leg.category + '|' + leg.tip; }).sort().join('||');
+        if (tried.has(signature)) return Promise.resolve({ bm: bm, ok: false, msg: 'No new SportyBet replacement combination is available.' });
+        tried.add(signature);
+        var payload = { bookmaker: bm, legs: currentLegs };
+        if (country) payload.country = country;
+        return fetch(api, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).then(function(r) {
+          return r.json().then(function(body) { return { ok: r.ok, body: body }; });
+        }).then(function(res) {
+          if (res.ok && res.body && res.body.success) {
+            return { bm: bm, ok: true, code: res.body.code, legCount: res.body.legCount || currentLegs.length, replaced: replaced, legs: currentLegs };
+          }
+          var message = (res.body && res.body.error) || 'Could not be created';
+          // SportyBet names fixtures whose selected market is missing. Replace
+          // that leg with another unused prediction and retry at the same size.
+          var match = /(?:for|match)\s+"([^"]+)"/i.exec(message);
+          if (match) {
+            var rejected = matchIdentity(match[1]);
+            var badIndex = currentLegs.findIndex(function(leg) { return matchIdentity(leg.match) === rejected; });
+            if (badIndex !== -1) {
+              var occupied = new Set(currentLegs.filter(function(_, index) { return index !== badIndex; }).map(function(leg) { return matchIdentity(leg.match); }));
+              var alternatives = (replacementPool || []).filter(function(candidate) {
+                if (!candidate || !candidate.match || !candidate.tip || matchIdentity(candidate.match) === rejected || occupied.has(matchIdentity(candidate.match))) return false;
+                var category = String(candidate.category || '').toLowerCase();
+                var tip = String(candidate.tip || '').trim();
+                return (category === '1x2' && /^(1|X|2|1X|12|X2)$/.test(tip)) ||
+                  (category === 'over15' && /^over\s+1\.5$/i.test(tip)) ||
+                  (category === 'over25' && /^over\s+2\.5$/i.test(tip));
+              }).sort(function(a, b) {
+                var old = currentLegs[badIndex];
+                var categoryRank = (String(a.category).toLowerCase() === String(old.category).toLowerCase() ? 0 : 1) -
+                  (String(b.category).toLowerCase() === String(old.category).toLowerCase() ? 0 : 1);
+                if (categoryRank) return categoryRank;
+                return Math.abs(Number(a.odds || 0) - Number(old.odds || 0)) - Math.abs(Number(b.odds || 0) - Number(old.odds || 0));
+              });
+              function tryAlternative(index) {
+                if (index >= alternatives.length || tried.size >= 40) return Promise.resolve({ bm: bm, ok: false, msg: message });
+                var candidate = alternatives[index];
+                var nextLegs = currentLegs.slice();
+                nextLegs[badIndex] = { match: candidate.match, tip: candidate.tip, category: candidate.category, odds: candidate.odds };
+                var nextSignature = nextLegs.map(function(leg) { return matchIdentity(leg.match) + '|' + leg.category + '|' + leg.tip; }).sort().join('||');
+                if (tried.has(nextSignature)) return tryAlternative(index + 1);
+                return createWithReplacements(nextLegs, replaced + 1, tried).then(function(result) {
+                  return result.ok ? result : tryAlternative(index + 1);
+                });
+              }
+              return tryAlternative(0);
+            }
+          }
+          return { bm: bm, ok: false, msg: message };
+        }).catch(function() {
+          return { bm: bm, ok: false, msg: 'Network error' };
+        });
+      }
+      return createWithReplacements(legs.slice(), 0, new Set());
     });
 
     Promise.all(pending).then(function(results) {
@@ -2490,12 +2535,35 @@ nav.open { display: flex !important; }
       var okCount = results.filter(function(r) { return r.ok; }).length;
       var html = '<span class="cd-head">Booking Codes' + (okCount ? ' \u2014 ' + okCount + ' ready' : '') + '</span>' +
         results.map(function(r) {
-          if (r.ok) return '<div class="cd-row"><span class="cd-provider">' + escapeHtml(labels[r.bm] || r.bm) + '</span><span class="cd-code">' + escapeHtml(r.code) + '</span></div>';
+          if (r.ok) return '<div class="cd-row"><span class="cd-provider">' + escapeHtml(labels[r.bm] || r.bm) + (r.replaced ? ' (' + r.legCount + ' legs; replaced ' + r.replaced + ' unavailable)' : '') + '</span><span class="cd-code">' + escapeHtml(r.code) + '</span></div>';
           return '<div class="cd-row cd-err"><span class="cd-provider">' + escapeHtml(labels[r.bm] || r.bm) + '</span><span class="cd-code">' + escapeHtml(r.msg) + '</span></div>';
         }).join('');
       display.innerHTML = html;
       if (!okCount) display.className = 'code-display error';
+      var replacement = results.find(function(r) { return r.ok && r.replaced; });
+      if (replacement) updateTicketAfterReplacement(tidx, ticket, replacement.legs);
     });
+  }
+
+  function updateTicketAfterReplacement(tidx, ticket, legs) {
+    ticket.selections = legs;
+    ticket.totalOdds = Number(legs.reduce(function(total, leg) { return total * (Number(leg.odds) || 1); }, 1).toFixed(2));
+    var display = document.getElementById('code-display-' + tidx);
+    var wrap = display && display.closest('.ticket-table-wrap');
+    if (!wrap) return;
+    var title = wrap.querySelector('.ticket-table-title');
+    if (title) title.textContent = 'Ticket ' + (tidx + 1) + ' — ' + legs.length + ' Legs';
+    var odds = wrap.querySelector('.ticket-odds');
+    if (odds) odds.textContent = ticket.totalOdds + ' odds';
+    var body = wrap.querySelector('.ticket-table tbody');
+    if (body) body.innerHTML = legs.map(function(leg, index) {
+      return '<tr class="ticket-row fade-in"><td class="ticket-cell-num">' + (index + 1) + '</td><td class="ticket-cell-match">' + escapeHtml(leg.match) + '</td><td class="ticket-cell-tip"><span class="tip-badge">' + escapeHtml(leg.tip) + '</span></td></tr>';
+    }).join('');
+    var data = encodeURIComponent(JSON.stringify({
+      legs: legs.map(function(leg, index) { return (index + 1) + '. ' + leg.match + ' - ' + leg.tip; }),
+      total: ticket.totalOdds, num: tidx + 1, target: lastTarget, aff: ''
+    })).replace(/'/g, '%27');
+    wrap.querySelectorAll('[data-copy]').forEach(function(button) { button.dataset.copy = data; });
   }
 
   function applyAccess() {
