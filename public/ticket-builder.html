@@ -2057,7 +2057,7 @@ nav.open { display: flex !important; }
 <script src="/supabase-client.js"></script>
 
 <script src="/auth.js?v=20260801"></script>
-<script src="/ticket-builder-core.js?v=20261102b"></script>
+<script src="/ticket-builder-core.js?v=20261102c"></script>
 
   <script>
   (function() { var WFT = window.WFT;
@@ -2066,6 +2066,7 @@ nav.open { display: flex !important; }
   var lastMinOdds = 1.20;
   var lastBookingCode = true;
   var lastTickets = [];
+  var previousTicketMatches = [];
 
   var MAX_ODDS = 500;
 
@@ -2106,6 +2107,9 @@ nav.open { display: flex !important; }
     var bookingCodeMode = lastBookingCode;
 
     lastTickets = tickets;
+    if (tickets[0] && Array.isArray(tickets[0].selections)) {
+      previousTicketMatches = tickets[0].selections.map(function(selection) { return selection.match; }).filter(Boolean);
+    }
 
     if (!tickets.length) {
       results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(res.reason || 'No tickets generated.') + '</p></div>';
@@ -2302,7 +2306,10 @@ nav.open { display: flex !important; }
 
       var availableMatches = null;
       try {
-        var amResult = await fetchJson((window.WFT_API || 'https://winfulltime-api.onrender.com') + '/api/converter/available-matches', 8000);
+        // A cold SportyBet event-index build needs about 14 seconds; the old
+        // 8-second timeout discarded its valid response and forced the empty
+        // schedule fallback. Allow the upstream schedule build to finish.
+        var amResult = await fetchJson((window.WFT_API || 'https://winfulltime-api.onrender.com') + '/api/converter/available-matches', 45000);
         if (amResult && amResult.success && Array.isArray(amResult.matches)) {
           availableMatches = amResult.matches;
         }
@@ -2327,6 +2334,7 @@ nav.open { display: flex !important; }
           safeOnly: safeTips,
           bookingCodeMode: bookingCodeMode,
           availableMatches: availableMatches,
+          avoidMatches: previousTicketMatches.slice(),
           autoLegs: true,
           maxOdds: maxOdds,
           minOddsPerLeg: minOdds,
@@ -2358,7 +2366,8 @@ nav.open { display: flex !important; }
               shuffle: shuffle === true,
               predictions: pred,
               timeWindowHours: timeWindowHours,
-              minProbability: 0.55
+              minProbability: 0.55,
+              avoidMatches: previousTicketMatches.slice()
             });
             if (fbRes.available) break;
           }
@@ -2548,6 +2557,7 @@ nav.open { display: flex !important; }
   function updateTicketAfterReplacement(tidx, ticket, legs) {
     ticket.selections = legs;
     ticket.totalOdds = Number(legs.reduce(function(total, leg) { return total * (Number(leg.odds) || 1); }, 1).toFixed(2));
+    if (tidx === 0) previousTicketMatches = legs.map(function(leg) { return leg.match; }).filter(Boolean);
     var display = document.getElementById('code-display-' + tidx);
     var wrap = display && display.closest('.ticket-table-wrap');
     if (!wrap) return;

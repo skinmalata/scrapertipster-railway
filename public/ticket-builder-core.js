@@ -463,6 +463,12 @@
     return teams.length === 2 ? teams.sort().join('|') : normaliseTeam(match);
   }
 
+  function withoutRecentMatches(pool, avoidMatches) {
+    if (!Array.isArray(avoidMatches) || !avoidMatches.length) return pool;
+    var avoided = new Set(avoidMatches.map(matchIdentity));
+    return pool.filter(function(pick) { return !avoided.has(matchIdentity(pick.match)); });
+  }
+
   function matchIdentity(match) {
     var teams = splitMatchName(match).map(normaliseTeam).filter(Boolean);
     return teams.length === 2 ? teams.sort().join('|') : normaliseTeam(match);
@@ -848,6 +854,8 @@
       });
     });
 
+    pool = withoutRecentMatches(pool, options.avoidMatches);
+
     if (pool.length < 2) {
       return {
         available: false, date: date, generatedAt: generatedAt,
@@ -936,6 +944,10 @@
         return markets.some(function (m) { return m.toLowerCase() === String(p.category).toLowerCase(); });
       });
     }
+
+    pool = withoutRecentMatches(pool, options.avoidMatches);
+    poolResult.pool = pool;
+    poolResult.total = pool.length;
 
     applyLiveOdds(pool, oddsResponse);
 
