@@ -352,7 +352,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   </div>
 
   <div class="toggle-row">
-   <span>Booking codes are generated automatically with each ticket (up to 30 matches).</span>
+   <span>Tickets use every available prediction category. Booking codes are generated for supported 1X2 tickets (up to 30 matches).</span>
   </div>
 
   <div class="form-row">
@@ -408,7 +408,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <details class="faq-item"><summary>Is the accumulator ticket builder free?</summary><p>Yes - the WinFulltime accumulator ticket builder is 100% free to use. No sign-ups, no subscriptions and no hidden fees. Build unlimited accumulator tickets every day.</p></details>
 
-  <details class="faq-item"><summary>What markets are included in the accumulator builder?</summary><p>The builder covers 1X2 (match result), Over 1.5 goals, Over 2.5 goals, Under 2.5 goals, BTTS Yes, BTTS No, and Double Chance selections derived from unbeaten streak analysis. All predictions are based on statistical analysis of team form, head-to-head records, and models.</p></details>
+  <details class="faq-item"><summary>What prediction categories can the builder use?</summary><p>The builder can combine 1X2, Over/Under goals, BTTS Yes/No, corners, cards, HT/FT, GG2+, Team to Score, win/loss/draw streaks, unbeaten picks, Highest Scoring Half, curated H2H picks, and player shots where fixture data is available. Booking codes are currently supported for plain 1X2 tickets.</p></details>
 
   <details class="faq-item"><summary>Can I filter accumulator tickets by odds range?</summary><p>Yes. Set a target total odds, a minimum odds per leg, and a maximum odds per leg. The builder then finds the optimal combination of selections within your specified range.</p></details>
 
@@ -2080,7 +2080,7 @@ nav.open { display: flex !important; }
   }
 
   function getSelectedMarkets() {
-    return ['1x2', 'over15', 'over25', 'under25', 'btts', 'bttsNo', 'corners', 'teamScore', 'winStreak', 'unbeaten'];
+    return [];
   }
 
     function escapeHtml(value) {
@@ -2172,11 +2172,10 @@ nav.open { display: flex !important; }
     var selectedMarkets = getSelectedMarkets();
     var results = document.getElementById('ticketResults');
 
-    // Booking codes (SportyBet, Betway, betPawa) mint plain 1X2 only, so
-    // build the tickets from 1X2 picks whenever a code is requested. This
-    // guarantees every ticket can produce all three codes at once.
+    // Search every supported prediction feed. Booking codes are attempted only
+    // when the selected ticket is a plain 1X2 accumulator.
     if (bookingCodeMode) {
-      selectedMarkets = ['1x2'];
+      selectedMarkets = [];
     }
 
     var timeWindowHours = 24;
@@ -2214,14 +2213,39 @@ nav.open { display: flex !important; }
       var unbeaten = null;
       var oddsResponse = null;
       var h2hPicks = [];
+      var highestScoringHalf = null;
+      var playerShots = null;
 
       var dataResults = await Promise.allSettled([
         fetchJson('/data/predictions.json', 20000),
         fetchJson('/data/h2h-unbeaten.json', 15000),
-        fetchJson((window.WFT_API || 'https://winfulltime-api.onrender.com') + '/api/author-picks', 20000)
+        fetchJson((window.WFT_API || 'https://winfulltime-api.onrender.com') + '/api/author-picks', 20000),
+        fetchJson('/data/highest-scoring-half.json', 20000),
+        fetchJson('/data/player-shots.json', 20000)
       ]);
       if (dataResults[0].status === 'fulfilled') pred = dataResults[0].value;
       if (dataResults[1].status === 'fulfilled') unbeaten = dataResults[1].value;
+      if (dataResults[3].status === 'fulfilled') highestScoringHalf = dataResults[3].value;
+      if (dataResults[4].status === 'fulfilled') playerShots = dataResults[4].value;
+      if (pred && highestScoringHalf && highestScoringHalf.dates) {
+        pred.highestScoringHalfMatches = (highestScoringHalf.dates[date] || []).map(function (pick) {
+          if (!pick) return null;
+          return { match: pick.home + ' - ' + pick.away, tip: pick.hsh && (pick.hsh.label || pick.hsh.pick),
+            probability: pick.hsh && pick.hsh.prob, date: date, time: pick.time || '', league: pick.leagueName || pick.league || '' };
+        }).filter(Boolean);
+      }
+      if (pred && playerShots && Array.isArray(playerShots.fixtures)) {
+        pred.playerShotsMatches = playerShots.fixtures.reduce(function (all, fixture) {
+          if (!fixture) return all;
+          if (fixture.date !== date || !Array.isArray(fixture.tips)) return all;
+          fixture.tips.forEach(function (tip) {
+            if (!tip) return;
+            all.push({ match: fixture.match || (fixture.home + ' - ' + fixture.away), player: tip.player,
+              tip: tip.tip, spg: tip.spg, line: tip.line, date: fixture.date, time: fixture.time || '', league: fixture.league || '' });
+          });
+          return all;
+        }, []);
+      }
       if (dataResults[2].status === 'fulfilled' && dataResults[2].value && Array.isArray(dataResults[2].value.matches)) {
         h2hPicks = dataResults[2].value.matches.map(function (pick) {
           var kickoff = pick.kickoff ? new Date(pick.kickoff) : null;
@@ -2277,6 +2301,7 @@ nav.open { display: flex !important; }
         date: date,
         oddsResponse: oddsResponse,
         markets: selectedMarkets,
+        minProbability: 0.25,
         h2hPicks: h2hPicks,
         safeOnly: safeTips,
         bookingCodeMode: bookingCodeMode,
@@ -2319,7 +2344,8 @@ nav.open { display: flex !important; }
       renderTickets(res);
     } catch (e) {
       console.error('[ticket-builder] Generate failed:', e);
-      results.innerHTML = '<div class="no-matches"><p>Unable to generate tickets. Please try again in a few seconds.</p></div>';
+      var detail = e && e.message ? ': ' + e.message : '';
+      results.innerHTML = '<div class="no-matches"><p>Unable to generate tickets' + escapeHtml(detail) + '. Please try again in a few seconds.</p></div>';
     }
   }
 
@@ -2384,6 +2410,12 @@ nav.open { display: flex !important; }
     var oneX2Only = ticket.selections.every(function(s) {
       return String(s.category || '').toLowerCase() === '1x2' && /^[1X2]$/.test(String(s.tip || '').trim());
     });
+    if (!oneX2Only) {
+      display.className = 'code-display error';
+      display.style.display = 'block';
+      display.innerHTML = '<span class="cd-label">Booking codes are currently supported for 1X2 tickets only.</span>';
+      return;
+    }
     var providers = ['sportybet'];
     if (oneX2Only) providers.push('betway', 'betpawa');
     var labels = { sportybet: 'SportyBet', betway: 'Betway', betpawa: 'betPawa' };

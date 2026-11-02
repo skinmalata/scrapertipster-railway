@@ -84,6 +84,20 @@ function teamKey(match) {
   return normaliseTeam(parts[0]) + '|' + normaliseTeam(parts[1]);
 }
 
+function playerShotsProbability(source) {
+  var mean = Number(source && source.spg);
+  var line = Number(source && source.line);
+  if (!(mean > 0) || !Number.isFinite(line)) return 0;
+  var limit = Math.floor(line);
+  var term = Math.exp(-mean);
+  var cumulative = term;
+  for (var i = 1; i <= limit; i++) {
+    term *= mean / i;
+    cumulative += term;
+  }
+  return Math.max(0, Math.min(1, 1 - cumulative)) * 100;
+}
+
 function buildPool(predictions, options) {
   options = options || {};
   var date = options.date || watDate();
@@ -101,11 +115,14 @@ function buildPool(predictions, options) {
   var timeWindowHours = Number(options.timeWindowHours) > 0 ? Number(options.timeWindowHours) : 0;
 
   var availableKeys = null;
+  var availableByKey = new Map();
   if (bookingCodeMode && Array.isArray(availableMatches)) {
     availableKeys = new Set();
     availableMatches.forEach(function (m) {
+      if (!m || !m.home || !m.away) return;
       var key = normaliseTeam(m.home) + '|' + normaliseTeam(m.away);
       availableKeys.add(key);
+      availableByKey.set(key, m);
     });
   }
 
@@ -130,11 +147,20 @@ function buildPool(predictions, options) {
     if (Array.isArray(markets) && markets.length > 0 && !markets.includes(category)) return;
 
     matches.forEach(function(source) {
+      if (!source) return;
       var matchName = source.nextMatch || source.match;
       if (!matchName) return;
 
+      // Ignore malformed aggregate rows and enrich time-less feeds from the
+      // bookmaker schedule when the same fixture is available there.
+      var sides = splitMatchName(matchName);
+      if (sides.length !== 2) return;
+      var scheduleMatch = availableByKey.get(normaliseTeam(sides[0]) + '|' + normaliseTeam(sides[1]));
+      var sourceDate = source.date || source.nextMatchDate || (scheduleMatch && scheduleMatch.date) || date;
+      var sourceTime = source.time || (scheduleMatch && scheduleMatch.time) || '';
+
       if (source.result || source.score) return;
-      if (bookingCodeMode && hasKickedOff(source.date, source.time)) return;
+      if (bookingCodeMode && hasKickedOff(sourceDate, sourceTime)) return;
       if (availableKeys) {
         var key = teamKey(matchName);
         if (!key || !availableKeys.has(key)) return;
@@ -147,13 +173,13 @@ function buildPool(predictions, options) {
       var prob = Number.isFinite(rawProb) && rawProb > 0 ? (rawProb > 1 ? rawProb / 100 : rawProb) : 0;
       if (prob < minProbability) return;
 
-      var pickDate = source.date || date;
+      var pickDate = sourceDate;
       // Booking-code mode allows picks from any upcoming date so matches the
       // bookmaker actually offers still count.
       if (!bookingCodeMode && !source.h2hPick && pickDate !== date) return;
 
       // Restrict to kickoffs within the requested window (e.g. next 6 hours).
-      if (timeWindowHours > 0 && !withinTimeWindow(source.date || pickDate, source.time, timeWindowHours)) return;
+      if (timeWindowHours > 0 && !withinTimeWindow(pickDate, sourceTime, timeWindowHours)) return;
 
       var key = pickKey(matchName, tip, pickDate);
       if (seen.has(key)) return;
@@ -170,7 +196,7 @@ function buildPool(predictions, options) {
         odds: odds,
         probability: Math.round(prob * 100),
         date: pickDate,
-        time: source.time || '',
+        time: sourceTime,
         league: source.league || '',
         category: category,
         sourceProbability: prob,
@@ -191,7 +217,23 @@ function buildPool(predictions, options) {
   addPicks('bttsNo', predictions.bttsNoMatches);
   addPicks('corners', predictions.cornersMatches);
   addPicks('cards', predictions.cardsMatches);
-  addPicks('teamScore', predictions.teamToScore2PlusMatches);
+  addPicks('htft', predictions.htftMatches);
+  addPicks('gg2', predictions.gg2PlusMatches);
+  addPicks('teamScore', predictions.teamToScore2PlusMatches, function(s) {
+    return s.team ? s.team + ' to score 2+' : s.tip;
+  });
+  addPicks('teamToScore', predictions.teamToScoreMatches, function(s) {
+    return s.team ? s.team + ' to score' : s.tip;
+  });
+  addPicks('highestScoringHalf', predictions.highestScoringHalfMatches, function(s) {
+    return s.tip || (s.hsh && (s.hsh.label || s.hsh.pick));
+  }, function(s) {
+    var probability = Number(s.probability != null ? s.probability : (s.hsh && s.hsh.prob));
+    return probability > 1 ? probability : probability * 100;
+  });
+  addPicks('playerShots', predictions.playerShotsMatches, function(s) {
+    return (s.player || 'Player') + ' ' + (s.tip || ('Over ' + s.line + ' shots'));
+  }, playerShotsProbability);
 
   function streakTip(s, word) {
     var team = s.match || '';
@@ -205,9 +247,11 @@ function buildPool(predictions, options) {
   if (unbeatenData && Array.isArray(unbeatenData)) {
     if (!Array.isArray(markets) || markets.length === 0 || markets.includes('unbeaten')) {
       unbeatenData.forEach(function(item) {
+        if (!item) return;
         if (!item.match || !Array.isArray(item.streaks)) return;
         if (timeWindowHours > 0 && !withinTimeWindow(item.date || date, item.time, timeWindowHours)) return;
         (item.streaks || []).forEach(function(s) {
+          if (!s) return;
           var tipText = (s.team || '') + ' or Draw';
           if (!tipText) return;
 

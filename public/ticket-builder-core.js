@@ -119,6 +119,20 @@
     return Number((1 / conservativeProbability).toFixed(2));
   }
 
+  function playerShotsProbability(source) {
+    var mean = Number(source && source.spg);
+    var line = Number(source && source.line);
+    if (!(mean > 0) || !Number.isFinite(line)) return 0;
+    var limit = Math.floor(line);
+    var term = Math.exp(-mean);
+    var cumulative = term;
+    for (var i = 1; i <= limit; i++) {
+      term *= mean / i;
+      cumulative += term;
+    }
+    return Math.max(0, Math.min(1, 1 - cumulative)) * 100;
+  }
+
   function buildPool(predictions, options) {
     options = options || {};
     var date = options.date || watDate();
@@ -140,10 +154,14 @@
     var minProbability = options.minProbability || (bookingCodeMode ? BOOKING_CODE_MIN_PROB : MIN_PROBABILITY);
 
     var availableKeys = null;
+    var availableByKey = new Map();
     if (bookingCodeMode && Array.isArray(availableMatches)) {
       availableKeys = new Set();
       availableMatches.forEach(function (m) {
-        availableKeys.add(normaliseTeam(m.home) + '|' + normaliseTeam(m.away));
+        if (!m || !m.home || !m.away) return;
+        var key = normaliseTeam(m.home) + '|' + normaliseTeam(m.away);
+        availableKeys.add(key);
+        availableByKey.set(key, m);
       });
     }
 
@@ -168,11 +186,18 @@
       if (Array.isArray(markets) && markets.length > 0 && !markets.some(function (m) { return m.toLowerCase() === category.toLowerCase(); })) return;
 
       matches.forEach(function (source) {
+        if (!source) return;
         var matchName = source.nextMatch || source.match;
         if (!matchName) return;
 
+        var sides = splitMatch(matchName);
+        if (sides.length !== 2) return;
+        var scheduleMatch = availableByKey.get(normaliseTeam(sides[0]) + '|' + normaliseTeam(sides[1]));
+        var sourceDate = source.date || source.nextMatchDate || (scheduleMatch && scheduleMatch.date) || date;
+        var sourceTime = source.time || (scheduleMatch && scheduleMatch.time) || '';
+
         if (source.result || source.score) return;
-        if (bookingCodeMode && hasKickedOff(source.date, source.time)) return;
+        if (bookingCodeMode && hasKickedOff(sourceDate, sourceTime)) return;
         if (availableKeys) {
           var akey = teamKey(matchName);
           if (!akey || !availableKeys.has(akey)) return;
@@ -185,13 +210,13 @@
         var prob = Number.isFinite(rawProb) && rawProb > 0 ? (rawProb > 1 ? rawProb / 100 : rawProb) : 0;
         if (prob < minProbability) return;
 
-        var pickDate = source.date || date;
+        var pickDate = sourceDate;
         // Booking-code mode allows picks from any upcoming date (not only the
         // selected day) so matches the bookmaker actually offers still count.
         if (!bookingCodeMode && !source.h2hPick && pickDate !== date) return;
 
         // Restrict to kickoffs within the requested window (e.g. next 6 hours).
-        if (timeWindowHours > 0 && !withinTimeWindow(source.date || pickDate, source.time, timeWindowHours)) return;
+        if (timeWindowHours > 0 && !withinTimeWindow(pickDate, sourceTime, timeWindowHours)) return;
 
         var key = pickKey(matchName, tip, pickDate);
         if (seen.has(key)) return;
@@ -208,7 +233,7 @@
           odds: odds,
           probability: Math.round(prob * 100),
           date: pickDate,
-          time: source.time || '',
+          time: sourceTime,
           league: source.league || '',
           category: category,
           sourceProbability: prob,
@@ -229,7 +254,23 @@
     addPicks('bttsNo', predictions.bttsNoMatches);
     addPicks('corners', predictions.cornersMatches);
     addPicks('cards', predictions.cardsMatches);
-    addPicks('teamScore', predictions.teamToScore2PlusMatches);
+    addPicks('htft', predictions.htftMatches);
+    addPicks('gg2', predictions.gg2PlusMatches);
+    addPicks('teamScore', predictions.teamToScore2PlusMatches, function (s) {
+      return s.team ? s.team + ' to score 2+' : s.tip;
+    });
+    addPicks('teamToScore', predictions.teamToScoreMatches, function (s) {
+      return s.team ? s.team + ' to score' : s.tip;
+    });
+    addPicks('highestScoringHalf', predictions.highestScoringHalfMatches, function (s) {
+      return s.tip || (s.hsh && (s.hsh.label || s.hsh.pick));
+    }, function (s) {
+      var probability = Number(s.probability != null ? s.probability : (s.hsh && s.hsh.prob));
+      return probability > 1 ? probability : probability * 100;
+    });
+    addPicks('playerShots', predictions.playerShotsMatches, function (s) {
+      return (s.player || 'Player') + ' ' + (s.tip || ('Over ' + s.line + ' shots'));
+    }, playerShotsProbability);
 
     function streakTip(s, word) {
       var team = s.match || '';
@@ -248,7 +289,8 @@
       var category = categoryByType[pick.type];
       if (!category || (Array.isArray(markets) && markets.length && !markets.some(function (m) { return m.toLowerCase() === category.toLowerCase(); }))) return;
       var matchName = typeof pick.match === 'string' ? pick.match : (pick.match.home || '') + ' - ' + (pick.match.away || '');
-      var prob = Number(pick.probability) / 100;
+      var prob = Number(pick.probability);
+      if (prob > 1) prob /= 100;
       if (!matchName || !Number.isFinite(prob) || prob < minProbability) return;
       var pickDate = pick.date || date;
       if (!withinTimeWindow(pickDate, pick.time, 24)) return;
@@ -267,8 +309,10 @@
       var unbeatenAllowed = !Array.isArray(markets) || markets.length === 0 || markets.some(function (m) { return m.toLowerCase() === 'unbeaten'; });
       if (unbeatenAllowed) {
         unbeatenData.forEach(function (item) {
+          if (!item) return;
           if (!item.match || !Array.isArray(item.streaks)) return;
           (item.streaks || []).forEach(function (s) {
+            if (!s) return;
             var tipText = (s.team || '') + ' or Draw';
             if (!tipText) return;
 
@@ -396,17 +440,6 @@
   function matchIdentity(match) {
     var teams = splitMatchName(match).map(normaliseTeam).filter(Boolean);
     return teams.length === 2 ? teams.sort().join('|') : normaliseTeam(match);
-  }
-
-  var BOOKING_CODE_TIPS = {
-    '1x2': ['1', 'X', '2', '1X', 'X2', '12'],
-    'over15': ['Over 1.5'],
-    'over25': ['Over 2.5']
-  };
-  function bookingCodeEligible(category, tip) {
-    var allowed = BOOKING_CODE_TIPS[String(category || '').toLowerCase()];
-    if (!allowed) return false;
-    return allowed.indexOf(String(tip || '').trim()) !== -1;
   }
 
   function matchIdentity(match) {
@@ -876,10 +909,6 @@
       pool = pool.filter(function (p) {
         return markets.some(function (m) { return m.toLowerCase() === String(p.category).toLowerCase(); });
       });
-    }
-
-    if (bookingCodeMode) {
-      pool = pool.filter(function (p) { return bookingCodeEligible(p.category, p.tip); });
     }
 
     applyLiveOdds(pool, oddsResponse);

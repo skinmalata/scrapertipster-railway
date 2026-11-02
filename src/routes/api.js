@@ -1800,6 +1800,28 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
 
     var date = watDate();
     var predictions = vipPredictionData();
+    predictions = predictions || { matches: [], dates: [] };
+    try {
+      var hshCache = JSON.parse(fs.readFileSync(pathHshCache, 'utf8'));
+      predictions.highestScoringHalfMatches = (hshCache.dates && hshCache.dates[date] || []).map(function (pick) {
+        if (!pick) return null;
+        return { match: pick.home + ' - ' + pick.away, tip: pick.hsh && (pick.hsh.label || pick.hsh.pick),
+          probability: pick.hsh && pick.hsh.prob, date: date, time: pick.time || '', league: pick.leagueName || pick.league || '' };
+      }).filter(Boolean);
+    } catch (e) { predictions.highestScoringHalfMatches = []; }
+    try {
+      var playerShotsData = JSON.parse(fs.readFileSync(path.join(__dirname, '../../public/data/player-shots.json'), 'utf8'));
+      predictions.playerShotsMatches = (playerShotsData.fixtures || []).reduce(function (all, fixture) {
+        if (!fixture) return all;
+        if (fixture.date !== date || !Array.isArray(fixture.tips)) return all;
+        fixture.tips.forEach(function (tip) {
+          if (!tip) return;
+          all.push({ match: fixture.match || fixture.home + ' - ' + fixture.away, player: tip.player,
+            tip: tip.tip, spg: tip.spg, line: tip.line, date: fixture.date, time: fixture.time || '', league: fixture.league || '' });
+        });
+        return all;
+      }, []);
+    } catch (e) { predictions.playerShotsMatches = []; }
     var oddsResponse = null; // API-Football removed: buildTicket falls back to model estimates.
     var h2hMatches = await fetchTodayStreaks();
 
@@ -1839,6 +1861,7 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
       oddsResponse: oddsResponse,
       h2hMatches: h2hMatches,
       markets: body.markets,
+      minProbability: 0.25,
       safeOnly: body.safeOnly === true,
       numLegs: FREE_MAX_LEGS,
       autoLegs: true,

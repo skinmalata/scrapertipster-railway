@@ -3,22 +3,6 @@ const { buildPool, applyLiveOdds } = require('./dailyPool');
 const fs = require('fs');
 const path = require('path');
 
-var CATEGORY_MAP = {
-  '1x2': '1x2',
-  'over15': 'over15',
-  'over25': 'over25',
-  'under25': 'under25',
-  'btts': 'btts',
-  'bttsNo': 'bttsNo',
-  'corners': 'corners',
-  'cards': 'cards',
-  'teamScore': 'teamScore',
-  'winStreak': 'winStreak',
-  'lossStreak': 'lossStreak',
-  'drawStreak': 'drawStreak',
-  'unbeaten': 'unbeaten'
-};
-
 function loadUnbeatenData() {
   var cachePath = path.join(__dirname, '../../h2h-unbeaten-cache.json');
   try {
@@ -53,20 +37,8 @@ function splitMatchName(match) {
   return parts.length === 2 && parts[0] && parts[1] ? parts : [];
 }
 
-// Selections that can be turned into a real booking code (SportyBet: 1X2,
-// Double Chance 1X/X2/12 and Over 1.5/2.5; Betway: plain 1X2).
 var BOOKING_CODE_MIN_PROB = 0.55;
 var BOOKING_CODE_MIN_ODDS = 1.05;
-var BOOKING_CODE_TIPS = {
-  '1x2': ['1', 'X', '2', '1X', 'X2', '12'],
-  'over15': ['Over 1.5'],
-  'over25': ['Over 2.5']
-};
-function bookingCodeEligible(category, tip) {
-  var allowed = BOOKING_CODE_TIPS[category];
-  if (!allowed) return false;
-  return allowed.indexOf(String(tip || '').trim()) !== -1;
-}
 
 function buildTicket(predictions, options) {
   options = options || {};
@@ -111,7 +83,7 @@ function buildTicket(predictions, options) {
     h2hMatches: h2hMatches,
     unbeatenData: unbeatenForDate,
     safeOnly: safeOnly,
-    minProbability: options.bookingCodeMode === true ? BOOKING_CODE_MIN_PROB : MIN_PROBABILITY,
+    minProbability: options.minProbability || (options.bookingCodeMode === true ? BOOKING_CODE_MIN_PROB : MIN_PROBABILITY),
     minOddsPerLeg: minOddsPerLeg,
     maxOddsPerLeg: maxOddsPerLeg,
     markets: markets,
@@ -125,10 +97,6 @@ function buildTicket(predictions, options) {
 
   if (Array.isArray(markets) && markets.length > 0) {
     pool = pool.filter(function(p) { return markets.includes(p.category); });
-  }
-
-  if (options.bookingCodeMode) {
-    pool = pool.filter(function(p) { return bookingCodeEligible(p.category, p.tip); });
   }
 
   applyLiveOdds(pool, oddsResponse);
