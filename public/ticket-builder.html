@@ -385,15 +385,8 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </div>
 
   <div class="time-window-row">
-   <label for="timeWindowSeg">Kickoff Within (Best Picks Only)</label>
-   <div class="time-window-seg" id="timeWindowSeg" role="group" aria-label="Kickoff time window">
-    <button type="button" data-window="1">1 Hour</button>
-    <button type="button" data-window="2">2 Hours</button>
-    <button type="button" data-window="6">6 Hours</button>
-    <button type="button" data-window="12">12 Hours</button>
-    <button type="button" data-window="24">24 Hours</button>
-    <button type="button" data-window="0" class="active">Any Time</button>
-   </div>
+  <label>Kickoff Window</label>
+   <div class="time-window-seg" aria-label="Kickoff time window"><span>Upcoming matches in the next 24 hours only</span></div>
   </div>
 
 
@@ -2215,9 +2208,7 @@ nav.open { display: flex !important; }
       selectedMarkets = ['1x2'];
     }
 
-    var timeWindowHours = 0;
-    var activeWindow = document.querySelector('#timeWindowSeg button.active');
-    if (activeWindow) timeWindowHours = parseInt(activeWindow.getAttribute('data-window'), 10) || 0;
+    var timeWindowHours = 24;
 
     lastTarget = target;
     lastMinOdds = minOdds;
@@ -2251,13 +2242,28 @@ nav.open { display: flex !important; }
       var pred = null;
       var unbeaten = null;
       var oddsResponse = null;
+      var h2hPicks = [];
 
       var dataResults = await Promise.allSettled([
         fetchJson('/data/predictions.json', 20000),
-        fetchJson('/data/h2h-unbeaten.json', 15000)
+        fetchJson('/data/h2h-unbeaten.json', 15000),
+        fetchJson((window.WFT_API || 'https://winfulltime-api.onrender.com') + '/api/author-picks', 20000)
       ]);
       if (dataResults[0].status === 'fulfilled') pred = dataResults[0].value;
       if (dataResults[1].status === 'fulfilled') unbeaten = dataResults[1].value;
+      if (dataResults[2].status === 'fulfilled' && dataResults[2].value && Array.isArray(dataResults[2].value.matches)) {
+        h2hPicks = dataResults[2].value.matches.map(function (pick) {
+          var kickoff = pick.kickoff ? new Date(pick.kickoff) : null;
+          var parts = kickoff && !isNaN(kickoff.getTime()) ? new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Lagos', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(kickoff) : [];
+          var part = function (type) { var x = parts.find(function (p) { return p.type === type; }); return x ? x.value : ''; };
+          var matchName = pick.home && pick.away ? pick.home + ' - ' + pick.away : pick.match;
+          var timeMatch = String(pick.time || '').match(/\d{1,2}:\d{2}/);
+          var type = pick.type || ({ '1X2': '1x2', 'Over 1.5': 'over15', 'Over 2.5': 'over25', 'Under 2.5': 'under25', 'BTTS Yes': 'btts', 'BTTS No': 'bttsNo', Corners: 'corners', Cards: 'cards' }[pick.category]);
+          return { match: matchName, type: type, tip: pick.tip, probability: pick.probability,
+            league: pick.league, date: parts.length ? part('year') + '-' + part('month') + '-' + part('day') : date,
+            time: parts.length ? (part('hour') === '24' ? '00' : part('hour')) + ':' + part('minute') : (timeMatch ? timeMatch[0] : '') };
+        });
+      }
 
       if (!pred || !Array.isArray(pred.matches)) {
         results.innerHTML = '<div class="no-matches"><p>Pre-match data is not available yet. Please try again shortly.</p></div>';
@@ -2302,6 +2308,7 @@ nav.open { display: flex !important; }
         date: date,
         oddsResponse: oddsResponse,
         markets: selectedMarkets,
+        h2hPicks: h2hPicks,
         safeOnly: safeTips,
         bookingCodeMode: bookingCodeMode,
         availableMatches: availableMatches,

@@ -1804,6 +1804,30 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
     var oddsResponse = null; // API-Football removed: buildTicket falls back to model estimates.
     var h2hMatches = await fetchTodayStreaks();
 
+    // Merge today's curated H2H picks into the matching market candidates.
+    // Their kickoff timestamp is converted to Lagos time for the same strict
+    // next-24-hour filter used by the client builder.
+    try {
+      var h2hFile = path.join(DATA_ROOT, 'author-picks', date.replace(/-/g, '') + '.json');
+      var h2hData = JSON.parse(fs.readFileSync(h2hFile, 'utf8'));
+      var marketArrays = { '1x2': 'matches', over15: 'over15Matches', over25: 'over25Matches', under25: 'under25Matches', btts: 'bttsMatches', bttsNo: 'bttsNoMatches', corners: 'cornersMatches', cards: 'cardsMatches' };
+      predictions = Object.assign({}, predictions);
+      Object.keys(marketArrays).forEach(function (type) { predictions[marketArrays[type]] = (predictions[marketArrays[type]] || []).slice(); });
+      (h2hData.matches || []).forEach(function (pick) {
+        var market = pick.type || ({ '1X2': '1x2', 'Over 1.5': 'over15', 'Over 2.5': 'over25', 'Under 2.5': 'under25', 'BTTS Yes': 'btts', 'BTTS No': 'bttsNo', Corners: 'corners', Cards: 'cards' }[pick.category]);
+        var arrayName = marketArrays[market];
+        var matchName = pick.home && pick.away ? pick.home + ' - ' + pick.away : pick.match;
+        if (!arrayName || !matchName || !pick.tip) return;
+        var kickoff = pick.kickoff ? new Date(pick.kickoff) : null;
+        var parts = kickoff && Number.isFinite(kickoff.getTime()) ? new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Lagos', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(kickoff) : [];
+        var part = function (key) { var found = parts.find(function (p) { return p.type === key; }); return found ? found.value : ''; };
+        var timeMatch = String(pick.time || '').match(/\d{1,2}:\d{2}/);
+        predictions[arrayName].push({ match: matchName, nextMatch: matchName, tip: pick.tip,
+          probability: Number(pick.probability), date: parts.length ? part('year') + '-' + part('month') + '-' + part('day') : date,
+          time: parts.length ? (part('hour') === '24' ? '00' : part('hour')) + ':' + part('minute') : (timeMatch ? timeMatch[0] : ''), league: pick.league || '', h2hPick: true });
+      });
+    } catch (e) {}
+
     var availableMatches = null;
     if (body.bookingCode === true) {
       try {
@@ -1825,7 +1849,7 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
       maxOddsPerLeg: parseFloat(body.maxOddsPerLeg) || 100,
       targetOdds: parseFloat(body.targetOdds) || 20,
       shuffle: body.shuffle === true,
-      timeWindowHours: parseFloat(body.timeWindowHours) || 0,
+      timeWindowHours: 24,
       bookingCodeMode: body.bookingCode === true,
       availableMatches: availableMatches
     };

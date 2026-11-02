@@ -150,7 +150,7 @@ function buildPool(predictions, options) {
       var pickDate = source.date || date;
       // Booking-code mode allows picks from any upcoming date so matches the
       // bookmaker actually offers still count.
-      if (!bookingCodeMode && pickDate !== date) return;
+      if (!bookingCodeMode && !source.h2hPick && pickDate !== date) return;
 
       // Restrict to kickoffs within the requested window (e.g. next 6 hours).
       if (timeWindowHours > 0 && !withinTimeWindow(source.date || pickDate, source.time, timeWindowHours)) return;
@@ -206,6 +206,7 @@ function buildPool(predictions, options) {
     if (!Array.isArray(markets) || markets.length === 0 || markets.includes('unbeaten')) {
       unbeatenData.forEach(function(item) {
         if (!item.match || !Array.isArray(item.streaks)) return;
+        if (timeWindowHours > 0 && !withinTimeWindow(item.date || date, item.time, timeWindowHours)) return;
         (item.streaks || []).forEach(function(s) {
           var tipText = (s.team || '') + ' or Draw';
           if (!tipText) return;

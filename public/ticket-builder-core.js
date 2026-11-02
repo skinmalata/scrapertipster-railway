@@ -131,7 +131,8 @@
     var maxOdds = options.maxOddsPerLeg || 100;
     var markets = options.markets;
     var maxEntries = options.maxEntries;
-    var timeWindowHours = Number(options.timeWindowHours) > 0 ? Number(options.timeWindowHours) : 0;
+    // Tickets may only contain fixtures kicking off in the next 24 hours.
+    var timeWindowHours = 24;
     var bookingCodeMode = options.bookingCodeMode || false;
     var availableMatches = options.availableMatches;
     // Booking-code mode relaxes the confidence floor so higher-odds legs are
@@ -187,7 +188,7 @@
         var pickDate = source.date || date;
         // Booking-code mode allows picks from any upcoming date (not only the
         // selected day) so matches the bookmaker actually offers still count.
-        if (!bookingCodeMode && pickDate !== date) return;
+        if (!bookingCodeMode && !source.h2hPick && pickDate !== date) return;
 
         // Restrict to kickoffs within the requested window (e.g. next 6 hours).
         if (timeWindowHours > 0 && !withinTimeWindow(source.date || pickDate, source.time, timeWindowHours)) return;
@@ -239,6 +240,29 @@
     addPicks('lossStreak', predictions.losestreakMatches, function (s) { return streakTip(s, 'Lose'); });
     addPicks('drawStreak', predictions.drawstreakMatches, function (s) { return streakTip(s, 'Draw'); });
 
+    // Curated H2H Picks are supplied by /api/author-picks. Keep their source
+    // probability and scheduled kickoff, and merge them with model candidates.
+    (Array.isArray(options.h2hPicks) ? options.h2hPicks : []).forEach(function (pick) {
+      if (!pick || !pick.match || !pick.tip) return;
+      var categoryByType = { '1x2': '1x2', over15: 'over15', over25: 'over25', under25: 'under25', btts: 'btts', bttsNo: 'bttsNo', corners: 'corners', cards: 'cards' };
+      var category = categoryByType[pick.type];
+      if (!category || (Array.isArray(markets) && markets.length && !markets.some(function (m) { return m.toLowerCase() === category.toLowerCase(); }))) return;
+      var matchName = typeof pick.match === 'string' ? pick.match : (pick.match.home || '') + ' - ' + (pick.match.away || '');
+      var prob = Number(pick.probability) / 100;
+      if (!matchName || !Number.isFinite(prob) || prob < minProbability) return;
+      var pickDate = pick.date || date;
+      if (!withinTimeWindow(pickDate, pick.time, 24)) return;
+      var key = pickKey(matchName, pick.tip, pickDate);
+      if (seen.has(key)) return;
+      seen.add(key);
+      var odds = estimatedOdds(Math.min(0.92, prob));
+      if (odds < minOdds || odds > maxOdds) return;
+      pool.push({ match: matchName, tip: pick.tip, odds: odds, probability: Math.round(prob * 100), date: pickDate,
+        time: pick.time, league: pick.league || '', category: category, sourceProbability: prob,
+        fixtureKey: fixtureKey(matchName), streak: pick.streak || null, oddsSource: 'estimated', bookmaker: '',
+        evidence: ['Curated H2H pick'] });
+    });
+
     if (unbeatenData && Array.isArray(unbeatenData)) {
       var unbeatenAllowed = !Array.isArray(markets) || markets.length === 0 || markets.some(function (m) { return m.toLowerCase() === 'unbeaten'; });
       if (unbeatenAllowed) {
@@ -259,6 +283,7 @@
             if (seen.has(key)) return;
             seen.add(key);
 
+            if (!withinTimeWindow(item.date || date, item.time, 24)) return;
             pool.push({
               match: item.match,
               tip: tipText,
@@ -535,8 +560,9 @@
     // Prefer tickets that land closest to the target odds; when two are equally
     // close, favor the one with the higher average implied confidence.
     tickets.sort(function (a, b) {
-      if (a.diff !== b.diff) return a.diff - b.diff;
-      return (b.avgProb || 0) - (a.avgProb || 0);
+      var scoreA = (a.avgProb || 0) - a.diff * 0.002;
+      var scoreB = (b.avgProb || 0) - b.diff * 0.002;
+      return scoreB - scoreA;
     });
 
     var top = [];
@@ -555,7 +581,7 @@
           if (pairs.some(function (pair) { return usedPairs.has(pair); })) continue;
           if (pass === 0 && matchIds.some(function (matchId) { return usedMatchIds.has(matchId); })) continue;
           var freshCount = matchIds.filter(function (mId) { return !usedMatchIds.has(mId); }).length;
-          var sc = freshCount * 100 - tickets[ti].diff;
+          var sc = freshCount * 100000 + (tickets[ti].avgProb || 0) * 1000 - tickets[ti].diff;
           if (sc > bestScore) { bestScore = sc; bestIdx = ti; }
         }
       }
@@ -589,7 +615,7 @@
     var maxOddsPerLeg = options.maxOddsPerLeg || 100;
     var shuffle = options.shuffle === true;
     var date = options.date || watDate();
-    var timeWindowHours = Number(options.timeWindowHours) > 0 ? Number(options.timeWindowHours) : 0;
+    var timeWindowHours = 24;
     var generatedAt = new Date().toISOString();
     // Confidence floor for fallback picks. Bookmaker odds are margin-inflated,
     // so 1/odds overstates the true probability; only keep legs where the
@@ -801,7 +827,7 @@
     var targetOdds = options.targetOdds || 20;
     var maxTickets = options.maxTickets || 8;
     var bookingCodeMode = options.bookingCodeMode === true;
-    var timeWindowHours = Number(options.timeWindowHours) > 0 ? Number(options.timeWindowHours) : 0;
+    var timeWindowHours = 24;
 
     // Booking-code legs are valid from ~1.05, so high-confidence picks that
     // estimate below the UI's 1.20 floor are not thrown away.
