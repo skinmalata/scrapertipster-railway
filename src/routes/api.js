@@ -1793,11 +1793,10 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
     var FREE_MAX_ODDS = 500;
 
     var body = req.body || {};
-    var requestedLegs = parseInt(body.numLegs, 10) || 3;
     var requestedMaxOdds = parseFloat(body.maxOdds) || FREE_MAX_ODDS;
-
-    var clampedLegs = Math.min(requestedLegs, FREE_MAX_LEGS);
     var clampedMaxOdds = Math.min(requestedMaxOdds, FREE_MAX_ODDS);
+    var requestedTargetOdds = parseFloat(body.targetOdds) || 20;
+    var clampedTargetOdds = Math.min(requestedTargetOdds, FREE_MAX_ODDS);
 
     var date = watDate();
     var predictions = vipPredictionData();
@@ -1829,12 +1828,10 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
     } catch (e) {}
 
     var availableMatches = null;
-    if (body.bookingCode === true) {
-      try {
-        availableMatches = await getAvailableMatches();
-      } catch (e) {
-        availableMatches = null;
-      }
+    try {
+      availableMatches = await getAvailableMatches();
+    } catch (e) {
+      availableMatches = null;
     }
 
     var buildOpts = {
@@ -1843,14 +1840,15 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
       h2hMatches: h2hMatches,
       markets: body.markets,
       safeOnly: body.safeOnly === true,
-      numLegs: clampedLegs,
+      numLegs: FREE_MAX_LEGS,
+      autoLegs: true,
       maxOdds: clampedMaxOdds,
       minOddsPerLeg: parseFloat(body.minOddsPerLeg) || 1.20,
       maxOddsPerLeg: parseFloat(body.maxOddsPerLeg) || 100,
-      targetOdds: parseFloat(body.targetOdds) || 20,
+      targetOdds: clampedTargetOdds,
       shuffle: body.shuffle === true,
       timeWindowHours: 24,
-      bookingCodeMode: body.bookingCode === true,
+      bookingCodeMode: true,
       availableMatches: availableMatches
     };
 

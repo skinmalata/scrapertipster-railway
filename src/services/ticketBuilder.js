@@ -160,12 +160,13 @@ function buildTicket(predictions, options) {
   });
   onePerFixture = Array.from(usedPerFixture.values());
   var poolForCombos = onePerFixture.length > 50 ? onePerFixture : filtered;
+  if (options.autoLegs === true) numLegs = Math.min(30, onePerFixture.length);
 
   // When a kickoff time window is active, combine only the highest-confidence
   // picks from that window so the ticket is built from the best winning
   // outcomes rather than every marginal pick above the probability floor.
   if (timeWindowHours > 0 && poolForCombos.length > 20) {
-    var topCount = targetOdds >= 10 ? 40 : 30;
+    var topCount = targetOdds >= 100 ? 80 : targetOdds >= 20 ? 60 : targetOdds >= 10 ? 40 : 30;
     var bestInWindow = poolForCombos.slice().sort(function(a, b) { return b.sourceProbability - a.sourceProbability; }).slice(0, topCount);
     if (bestInWindow.length >= 2) poolForCombos = bestInWindow;
   }

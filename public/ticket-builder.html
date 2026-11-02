@@ -12,7 +12,7 @@
 
  <title>Free AI Football Accumulator &amp; Bet Builder - WinFulltime</title>
 
- <meta name="description" content="Free AI football accumulator and bet builder. Build accas up to 30 legs from data-driven 1X2, Over/Under, BTTS and streak predictions. No sign-up, no payment.">
+ <meta name="description" content="Free football accumulator builder with target odds up to 500. Match count is selected automatically and booking codes are generated with each ticket.">
  <meta name="keywords" content="accumulator builder, football acca generator, betting ticket builder, multi bet builder, football accumulator tips, bet builder, parlay builder, free acca tips, daily football predictions, acca insurance tips, double chance accumulator, over 2.5 accumulator, BTTS accumulator">
 
  <meta property="og:title" content="Free AI Football Accumulator &amp; Bet Builder - WinFulltime">
@@ -351,17 +351,8 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <label for="safeTips">Safe Tips Only (&ge;70% confidence)</label>
   </div>
 
-  <div class="toggle-row" id="bookingCodeRow">
-   <input type="checkbox" id="bookingCode">
-   <label for="bookingCode">Generate Booking Code <span class="booking-code-note">(builds 1X2 tickets; codes minted for SportyBet, Betway &amp; betPawa)</span></label>
-  </div>
-
-  <div class="legs-row">
-<label for="numLegs">Number of Matches</label>
-    <div class="legs-input-wrap">
-     <input type="number" id="numLegs" min="2" max="30" value="3" step="1">
-     <span class="legs-value" id="numLegsValue">Matches</span>
-    </div>
+  <div class="toggle-row">
+   <span>Booking codes are generated automatically with each ticket (up to 30 matches).</span>
   </div>
 
   <div class="form-row">
@@ -370,17 +361,9 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <label for="ticketTarget">Target Odds</label>
 
-  <input type="number" id="ticketTarget" value="2.5" step="any">
+  <input type="number" id="ticketTarget" value="20" min="1.01" max="500" step="any">
 
 </div>
-
-</div>
-
-  <div class="toggle-row">
-
-  <input type="checkbox" id="ticketTodayOnly" checked>
-
-  <label for="ticketTodayOnly">Only Today's Matches</label>
 
 </div>
 
@@ -429,7 +412,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <details class="faq-item"><summary>Can I filter accumulator tickets by odds range?</summary><p>Yes. Set a target total odds, a minimum odds per leg, and a maximum odds per leg. The builder then finds the optimal combination of selections within your specified range.</p></details>
 
-  <details class="faq-item"><summary>Is the accumulator ticket builder free to use?</summary><p>Yes, completely free. The builder supports up to 30 legs, target odds up to 500, market filtering, safe tips mode, and unlimited daily usage - with no account or payment required.</p></details>
+  <details class="faq-item"><summary>How does the builder choose matches?</summary><p>Set target odds up to 500. The builder chooses how many matches to include, up to 30, then generates available booking codes with the ticket.</p></details>
 
   <details class="faq-item"><summary>What does double chance mean in an accumulator?</summary><p>Double chance covers two of three possible match outcomes in a single selection. For example, "Home or Draw" wins if the home team wins or the match ends in a draw. This increases your probability of winning each leg, making it popular for accumulators.</p></details>
 
@@ -2074,17 +2057,16 @@ nav.open { display: flex !important; }
 <script src="/supabase-client.js"></script>
 
 <script src="/auth.js?v=20260801"></script>
-<script src="/ticket-builder-core.js?v=20260812"></script>
+<script src="/ticket-builder-core.js?v=20261102"></script>
 
   <script>
   (function() { var WFT = window.WFT;
 
   var lastTarget = 20;
   var lastMinOdds = 1.20;
-  var lastBookingCode = false;
+  var lastBookingCode = true;
   var lastTickets = [];
 
-  var MAX_LEGS = 30;
   var MAX_ODDS = 500;
 
     function setupUI() {
@@ -2093,11 +2075,6 @@ nav.open { display: flex !important; }
     var targetInput = document.getElementById('ticketTarget');
     targetInput.disabled = false;
     targetInput.title = '';
-    var legsInput = document.getElementById('numLegs');
-    legsInput.disabled = false;
-    legsInput.title = '';
-    legsInput.max = MAX_LEGS;
-
     var shuffleBtn = document.getElementById('shuffleBtn');
     shuffleBtn.style.display = '';
   }
@@ -2177,27 +2154,21 @@ nav.open { display: flex !important; }
         '</div></div>' +
         (AFFILIATE_URL ? '<a href="' + AFFILIATE_URL + '" target="_blank" rel="noopener" class="bet-btn"> Bet Now</a>' : '') +
         '</div></div>' +
-        (bookingCodeMode ? '<div class="code-display" id="code-display-' + tidx + '"></div>' : '') +
+        '<div class="code-display" id="code-display-' + tidx + '"></div>' +
         '</div>';
     }).join('');
 
     results.innerHTML = '<div class="matches-grid">' + html + '</div>';
 
-    if (bookingCodeMode) {
-      tickets.forEach(function(ticket, tidx) {
-        generateAllCodes(tidx, ticket);
-      });
-    }
+    tickets.forEach(function(ticket, tidx) { generateAllCodes(tidx, ticket); });
   }
 
   async function generateTickets(shuffle) {
     var target = parseFloat(document.getElementById('ticketTarget').value);
     var minOdds = 1.20;
-    var maxOdds = 100;
-    var todayOnly = document.getElementById('ticketTodayOnly').checked;
-    var numLegs = parseInt(document.getElementById('numLegs').value, 10) || 3;
+    var maxOdds = MAX_ODDS;
     var safeTips = document.getElementById('safeTips').checked;
-    var bookingCodeMode = document.getElementById('bookingCode').checked;
+    var bookingCodeMode = true;
     var selectedMarkets = getSelectedMarkets();
     var results = document.getElementById('ticketResults');
 
@@ -2214,8 +2185,8 @@ nav.open { display: flex !important; }
     lastMinOdds = minOdds;
     lastBookingCode = bookingCodeMode;
 
-    if (!Number.isFinite(target) || !Number.isFinite(minOdds) || !Number.isFinite(maxOdds) || target <= 1 || minOdds <= 1 || maxOdds < minOdds) {
-      results.innerHTML = '<div class="no-matches"><p>Enter a target odds above 1.00.</p></div>';
+    if (!Number.isFinite(target) || !Number.isFinite(minOdds) || !Number.isFinite(maxOdds) || target <= 1 || target > MAX_ODDS || minOdds <= 1 || maxOdds < minOdds) {
+      results.innerHTML = '<div class="no-matches"><p>Enter target odds between 1.01 and 500.</p></div>';
       return;
     }
 
@@ -2293,15 +2264,13 @@ nav.open { display: flex !important; }
       }
 
       var availableMatches = null;
-      if (bookingCodeMode) {
-        try {
-          var amResult = await fetchJson((window.WFT_API || 'https://winfulltime-api.onrender.com') + '/api/converter/available-matches', 8000);
-          if (amResult && amResult.success && Array.isArray(amResult.matches)) {
-            availableMatches = amResult.matches;
-          }
-        } catch (e) {
-          availableMatches = null;
+      try {
+        var amResult = await fetchJson((window.WFT_API || 'https://winfulltime-api.onrender.com') + '/api/converter/available-matches', 8000);
+        if (amResult && amResult.success && Array.isArray(amResult.matches)) {
+          availableMatches = amResult.matches;
         }
+      } catch (e) {
+        availableMatches = null;
       }
 
       var res = core.build(pred, {
@@ -2312,7 +2281,7 @@ nav.open { display: flex !important; }
         safeOnly: safeTips,
         bookingCodeMode: bookingCodeMode,
         availableMatches: availableMatches,
-        numLegs: numLegs,
+        autoLegs: true,
         maxOdds: maxOdds,
         minOddsPerLeg: minOdds,
         maxOddsPerLeg: maxOdds,
@@ -2327,7 +2296,7 @@ nav.open { display: flex !important; }
           var fbRes = core.buildFromSchedule(availableMatches, {
             date: date,
             targetOdds: target,
-            numLegs: numLegs,
+            autoLegs: true,
             minOddsPerLeg: 1.05,
             maxOddsPerLeg: maxOdds,
             maxOdds: maxOdds,
@@ -2340,10 +2309,10 @@ nav.open { display: flex !important; }
             renderTickets({ tickets: fbRes.tickets || [fbRes.ticket], ticket: fbRes.ticket });
             return;
           }
-          results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(fbRes.reason || res.reason || 'No tickets could be generated with the current settings. Try adjusting the target odds, number of legs, or odds range.') + '</p></div>';
+          results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(fbRes.reason || res.reason || 'No tickets could be generated for this target. Try a lower target or generate again when more fixtures are available.') + '</p></div>';
           return;
         }
-        results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(res.reason || 'No tickets could be generated with the current settings. Try adjusting the target odds, number of legs, or odds range.') + '</p></div>';
+        results.innerHTML = '<div class="no-matches"><p>' + escapeHtml(res.reason || 'No ticket could be generated for this target. Try a lower target or generate again when more fixtures are available.') + '</p></div>';
         return;
       }
 
@@ -2458,21 +2427,6 @@ nav.open { display: flex !important; }
       if (!okCount) display.className = 'code-display error';
     });
   }
-
-  document.getElementById('ticketTarget').addEventListener('input', function() {
-    var target = parseFloat(this.value);
-    if (isNaN(target) || target <= 1) return;
-    var legs = Math.max(2, Math.min(30, Math.round(Math.log(target) / Math.log(1.30))));
-    document.getElementById('numLegs').value = legs;
-  });
-
-  document.getElementById('numLegs').addEventListener('change', function() {
-    var v = parseInt(this.value, 10);
-    var min = parseInt(this.min, 10) || 2;
-    var max = parseInt(this.max, 10) || 30;
-    if (v < min) this.value = min;
-    if (v > max) this.value = max;
-  });
 
   function applyAccess() {
     var form = document.querySelector('.ticket-form');

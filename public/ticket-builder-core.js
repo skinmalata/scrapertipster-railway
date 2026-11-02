@@ -420,7 +420,7 @@
   // the schedule fallback.
   function combineSelections(pool, options) {
     options = options || {};
-    var numLegs = options.numLegs || 3;
+    var numLegs = options.autoLegs === true ? Math.min(30, pool.length) : (options.numLegs || 3);
     var targetOdds = options.targetOdds || 20;
     var maxOdds = options.maxOdds || 500;
     var maxTickets = options.maxTickets || 8;
@@ -799,6 +799,7 @@
 
     var combo = combineSelections(pool, {
       numLegs: numLegs,
+      autoLegs: options.autoLegs === true,
       targetOdds: targetOdds,
       maxOdds: maxOdds,
       shuffle: options.shuffle,
@@ -896,10 +897,11 @@
 
     var combo = combineSelections(filtered, {
       numLegs: numLegs,
+      autoLegs: options.autoLegs === true,
       targetOdds: targetOdds,
       maxOdds: maxOdds,
       shuffle: options.shuffle,
-      topPicksInWindow: timeWindowHours > 0 ? 15 : 0,
+      topPicksInWindow: timeWindowHours > 0 ? (targetOdds >= 100 ? 30 : targetOdds >= 20 ? 25 : 15) : 0,
       maxTickets: maxTickets
     });
 
