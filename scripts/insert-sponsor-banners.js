@@ -1,49 +1,20 @@
 'use strict';
 
-// Bulk-inject the shared sponsor banner into already-deployed static prediction
-// grids (public/predictions/<league>/<market>/index.html and
-// public/predictions/league/<slug>/index.html). Idempotent: skips any page that
-// already carries a .wft-sponsor slot. Generators that (re)create these pages
-// already splice the banner themselves (see generate-matrix-pages.js and
-// generate-league-pages.js); this script is a one-time migration for committed
-// pages.
+// Replace legacy 1win banners in committed static prediction grids with the
+// shared Bitmedia slot. Page generators use the same renderer going forward.
 
 const fs = require('fs');
 const path = require('path');
 const { renderSponsorBanner } = require('./lib/sponsor-banner');
 
 const PREDICTIONS_DIR = path.join(__dirname, '..', 'public', 'predictions');
-const GUARD = '<div class="wft-sponsor">';
-const CARD_MARKER = '<div class="match-card fade-in"';
-
-function pageHasCards(html) {
-  return html.indexOf('<div class="matches-grid">') !== -1 && html.indexOf(CARD_MARKER) !== -1;
-}
+const LEGACY_1WIN_RE = /<div class="wft-sponsor">\s*<a\b[^>]*href="https:\/\/one-vv5314\.com\/betting[^\"]*"[^>]*>[\s\S]*?<img\b[^>]*alt="1Win"[^>]*>[\s\S]*?<\/a>\s*<\/div>/i;
 
 function insertBanner(html, seed) {
-  if (html.indexOf(GUARD) !== -1) return { html, inserted: false, reason: 'already has sponsor' };
-  if (!pageHasCards(html)) return { html, inserted: false, reason: 'no match-card grid' };
-
-  let count = 0;
-  let second = -1;
-  let from = 0;
-  while (count < 2) {
-    const idx = html.indexOf(CARD_MARKER, from);
-    if (idx < 0) break;
-    count += 1;
-    if (count === 2) second = idx;
-    from = idx + CARD_MARKER.length;
+  if (LEGACY_1WIN_RE.test(html)) {
+    return { html: html.replace(LEGACY_1WIN_RE, renderSponsorBanner(seed)), inserted: true, reason: 'replaced 1win' };
   }
-  if (second < 0) return { html, inserted: false, reason: 'fewer than 2 cards' };
-
-  let runStart = second;
-  while (runStart > 0 && /\s/.test(html[runStart - 1])) runStart--;
-
-  return {
-    html: html.slice(0, runStart) + '\n' + renderSponsorBanner(seed) + '\n\n  ' + html.slice(second),
-    inserted: true,
-    reason: 'ok'
-  };
+  return { html, inserted: false, reason: 'no legacy 1win banner' };
 }
 
 function ensureTrailingNewline(s) {
@@ -95,7 +66,7 @@ function main() {
     const result = processFile(file, seed);
     if (result.inserted) {
       inserted += 1;
-      console.log(`[sponsor] ${seed}`);
+      console.log(`[sponsor] ${result.reason === 'replaced 1win' ? 'Replaced 1win at ' : 'Added Bitmedia at '}${seed}`);
     } else {
       skipped += 1;
       skippedReasons[result.reason] = (skippedReasons[result.reason] || 0) + 1;

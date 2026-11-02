@@ -132,21 +132,47 @@
     } catch (e) {}
   }
 
+  function loadBitmediaUnit(unit, unitId) {
+    if (!unit || unit.getAttribute('data-wft-bitmedia-loaded') === 'true') return;
+    unit.setAttribute('data-wft-bitmedia-loaded', 'true');
+    var hosts = ['cdn.bmcdn6.com'];
+    function loadHost(index) {
+      if (index >= hosts.length) return;
+      var script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://' + hosts[index] + '/js/' + unitId + '.js?v=' + new Date().getTime();
+      script.onerror = function() {
+        script.remove();
+        loadHost(index + 1);
+      };
+      var first = document.getElementsByTagName('script')[0];
+      if (first && first.parentNode) first.parentNode.insertBefore(script, first);
+      else document.head.appendChild(script);
+    }
+    loadHost(0);
+  }
+
   function processNode(el, impressions) {
     var key = el.getAttribute('data-ad-position');
     if (!key) return;
-    if (key === 'global_leaderboard') {
-      var bitmediaUnits = el.getElementsByTagName('ins');
-      for (var unitIndex = 0; unitIndex < bitmediaUnits.length; unitIndex++) {
-        if (bitmediaUnits[unitIndex].className === '6ae882436485fffa717939a1') return;
-      }
-    }
     el.classList.add('wft-ad-slot');
 
     var pos = POSITIONS[key] || {};
     if (pos.w && pos.h) {
       el.setAttribute('data-ad-ratio', '');
       el.style.setProperty('--wft-ad-ratio', pos.w + '/' + pos.h);
+    }
+
+    var bitmediaId = key === 'global_leaderboard' ? '6ae882436485fffa717939a1' :
+      (key === 'sponsored_match_card' ? '6ae8887bf30577b049694c23' : '');
+    if (bitmediaId) {
+      var units = el.getElementsByTagName('ins');
+      for (var unitIndex = 0; unitIndex < units.length; unitIndex++) {
+        if (units[unitIndex].className === bitmediaId) {
+          loadBitmediaUnit(units[unitIndex], bitmediaId);
+          return;
+        }
+      }
     }
 
     var list = cached && cached[key];
@@ -158,7 +184,7 @@
     }
 
     // No creative: draw the placeholder only when the slot is empty so any
-    // baked fallback (e.g. the 1win banner) stays visible.
+    // baked third-party unit stays visible.
     if (!el.innerHTML.trim()) el.innerHTML = placeholderHTML(key);
   }
 

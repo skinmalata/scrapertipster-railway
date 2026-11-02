@@ -383,7 +383,8 @@ function applyLayoutToHtml(html, activePath) {
   // four-hour edge cache GitHub Pages sets on static assets.
   html = html.replace(/(<script[^>]*src=["'][^"']*\/consent\.js)(?:\?v=\d+)?(["'][^>]*>)/gi, '$1?v=3$2');
   // Ensure pages use the runtime that preserves the fixed Bitmedia unit.
-  html = html.replace(/(<script[^>]*src=["'][^"']*\/ads\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261102b$2');
+  html = html.replace(/(<script[^>]*src=["'][^"']*\/ads\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261102c$2');
+  html = html.replace(/(<script[^>]*src=["'][^"']*\/sponsor-banner\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=4$2');
 
   const navRe = /(<nav id="nav">)[\s\S]*?(<\/nav>)/;
   // 1. Nav: replace the inner content of an existing <nav id="nav">, or inject
@@ -399,7 +400,7 @@ function applyLayoutToHtml(html, activePath) {
   // 1b. Advert slot. The global leaderboard sits directly below the header on
   //     every page. Bitmedia serves this placement directly.
   if (!/data-ad-position="global_leaderboard"/.test(html) && /<\/header>/i.test(html)) {
-    html = html.replace(/<\/header>/i, '</header>\n<div class="wft-ad-slot" data-ad-position="global_leaderboard" aria-label="Advertisement"><ins class="6ae882436485fffa717939a1" style="display:inline-block;width:1px;height:1px;"></ins><script>!function(e,n,c,t,o,r,d){!function e(n,c,t,o,r,m,d,s,a){s=c.getElementsByTagName(t)[0],(a=c.createElement(t)).async=!0,a.src="https://"+r[m]+"/js/"+o+".js?v="+d,a.onerror=function(){a.remove(),(m+=1)>=r.length||e(n,c,t,o,r,m)},s.parentNode.insertBefore(a,s)}(window,document,"script","6ae882436485fffa717939a1",["cdn.bmcdn6.com"], 0, new Date().getTime())}();</script></div>');
+    html = html.replace(/<\/header>/i, '</header>\n<div class="wft-ad-slot" data-ad-position="global_leaderboard" aria-label="Advertisement"><ins class="6ae882436485fffa717939a1" style="display:inline-block;width:1px;height:1px;"></ins></div>');
   }
 
   // 2. Pages that don't load app.css need the header/theme styles so the
@@ -474,7 +475,7 @@ function applyLayoutToHtml(html, activePath) {
     if (needsAuth) block += '<script src="/auth.js?v=20260801"></script>\n';
     if (needsVipTab) block += '<script src="/vip-tab.js?v=20261027" defer></script>\n';
     if (needsPlayerShotsTab) block += '<script src="/player-shots-tab.js?v=20261018" defer></script>\n';
-    if (needsAds) block += '<script src="/ads.js?v=20261102b" defer></script>\n';
+    if (needsAds) block += '<script src="/ads.js?v=20261102c" defer></script>\n';
     if (needsConsent) block += '<script src="/consent.js?v=3" defer></script>\n';
     if (needsTheme) {
       block += `<script>
