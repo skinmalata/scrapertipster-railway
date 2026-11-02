@@ -135,6 +135,12 @@
   function processNode(el, impressions) {
     var key = el.getAttribute('data-ad-position');
     if (!key) return;
+    if (key === 'global_leaderboard') {
+      var bitmediaUnits = el.getElementsByTagName('ins');
+      for (var unitIndex = 0; unitIndex < bitmediaUnits.length; unitIndex++) {
+        if (bitmediaUnits[unitIndex].className === '6ae882436485fffa717939a1') return;
+      }
+    }
     el.classList.add('wft-ad-slot');
 
     var pos = POSITIONS[key] || {};
