@@ -24,6 +24,7 @@
     end_of_content: { label: 'End of Content Leaderboard', w: 728, h: 90 },
     global_rectangle: { label: 'Global Rectangle', w: 300, h: 250 },
     global_skyscraper: { label: 'Global Skyscraper', w: 160, h: 600 },
+    sticky_banner: { label: 'Sticky Banner' },
     in_content: { label: 'In-Content', w: 728, h: 90 },
     homepage_featured: { label: 'Homepage Featured', w: 728, h: 90 },
     carousel_slot: { label: 'Homepage Carousel Slot', w: null, h: null },
@@ -67,8 +68,10 @@
       '.wft-ad-body{font-size:13px;color:#cbd5e1;line-height:1.5;}',
       '.wft-ad-cta{align-self:flex-start;margin-top:6px;font-size:12px;font-weight:700;color:#fff;',
       ' background:linear-gradient(135deg,#ff2448,#d41a38);padding:8px 16px;border-radius:8px;}',
-      '.wft-ad-slot[data-ad-position="sticky_banner"]{display:none!important;}',
-      '@media (max-width:768px){.wft-ad-ph{min-height:90px;}.wft-ad-slot{padding:0 8px;}}'
+      '.wft-ad-slot[data-ad-position="sticky_banner"]{display:none!important;position:fixed;left:0;right:0;bottom:0;z-index:99990;width:100%;max-width:none;margin:0;padding:6px 48px 6px 6px;min-height:50px;max-height:96px;box-sizing:border-box;overflow:hidden;align-items:center;justify-content:center;background:rgba(12,16,27,.96);border-top:1px solid rgba(255,255,255,.14);}',
+      '.wft-ad-slot[data-ad-position="sticky_banner"].wft-sticky-visible{display:flex!important;}',
+      '.wft-ad-slot[data-ad-position="sticky_banner"] .wft-sticky-close{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:32px;height:32px;padding:0;border:1px solid rgba(255,255,255,.55);border-radius:50%;background:#111827;color:#fff;font:22px/1 system-ui,sans-serif;cursor:pointer;z-index:2;}',
+      '@media (max-width:768px){.wft-ad-ph{min-height:90px;}.wft-ad-slot{padding:0 8px;}.wft-ad-slot[data-ad-position="sticky_banner"]{max-height:12vh;padding:4px 44px 4px 4px;}}'
     ].join('\n');
     document.head.appendChild(style);
   }
@@ -152,6 +155,42 @@
     loadHost(0);
   }
 
+  function activateStickyBitmediaCode(el) {
+    var inert = el.querySelector('script[data-wft-bitmedia-sticky]');
+    if (!inert || inert.getAttribute('data-wft-activated') === 'true') return;
+    var active = document.createElement('script');
+    active.type = 'text/javascript';
+    active.setAttribute('data-wft-activated', 'true');
+    active.textContent = inert.textContent;
+    inert.parentNode.replaceChild(active, inert);
+  }
+
+  function prepareStickyBitmedia(el, unit) {
+    if (!el || !unit || el.getAttribute('data-wft-sticky-ready') === 'true') return;
+    el.setAttribute('data-wft-sticky-ready', 'true');
+    var dismissed = false;
+    try { dismissed = window.sessionStorage.getItem('wft-bitmedia-sticky-dismissed') === '1'; } catch (e) {}
+    if (dismissed) return;
+
+    var close = el.querySelector('.wft-sticky-close');
+    if (close) close.addEventListener('click', function() {
+      dismissed = true;
+      el.hidden = true;
+      el.classList.remove('wft-sticky-visible');
+      try { window.sessionStorage.setItem('wft-bitmedia-sticky-dismissed', '1'); } catch (e) {}
+    });
+
+    function showAfterScroll() {
+      if (dismissed || window.scrollY < 400) return;
+      window.removeEventListener('scroll', showAfterScroll);
+      el.hidden = false;
+      el.classList.add('wft-sticky-visible');
+      activateStickyBitmediaCode(el);
+    }
+    window.addEventListener('scroll', showAfterScroll, { passive: true });
+    showAfterScroll();
+  }
+
   function processNode(el, impressions) {
     var key = el.getAttribute('data-ad-position');
     if (!key) return;
@@ -164,12 +203,14 @@
     }
 
     var bitmediaId = key === 'global_leaderboard' ? '6ae882436485fffa717939a1' :
-      (key === 'sponsored_match_card' ? '6ae8887bf30577b049694c23' : '');
+      (key === 'sponsored_match_card' ? '6ae8887bf30577b049694c23' :
+      (key === 'sticky_banner' ? '6ae8959ff30577b0496d401f' : ''));
     if (bitmediaId) {
       var units = el.getElementsByTagName('ins');
       for (var unitIndex = 0; unitIndex < units.length; unitIndex++) {
         if (units[unitIndex].className === bitmediaId) {
-          loadBitmediaUnit(units[unitIndex], bitmediaId);
+          if (key === 'sticky_banner') prepareStickyBitmedia(el, units[unitIndex]);
+          else loadBitmediaUnit(units[unitIndex], bitmediaId);
           return;
         }
       }
