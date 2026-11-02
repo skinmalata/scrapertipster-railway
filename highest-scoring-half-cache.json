@@ -266,6 +266,39 @@
         }
       },
       {
+        "matchId": "2513318",
+        "home": "Al Oruba (KSA)",
+        "away": "Al Anwar (KSA)",
+        "league": "Sa2",
+        "leagueName": "1st Division",
+        "country": "Saudi Arabia",
+        "time": "",
+        "probs": {
+          "home": 21,
+          "draw": 57,
+          "away": 22
+        },
+        "avgGoals": 3,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.624,
+          "margin": 0.454,
+          "firstHalfShare": 0.32,
+          "firstHalfExp": 0.96,
+          "secondHalfExp": 2.04,
+          "p1": 0.17,
+          "p2": 0.624,
+          "tie": 0.207,
+          "fitErr": 0.01027,
+          "totalExp": 3,
+          "referenceFirstHalfProb": 0.33,
+          "referenceDrawProb": 0.48,
+          "referenceSecondHalfProb": 0.2,
+          "reason": "Expected 3.0 goals, split 1.0 in the 1st half vs 2.0 in the 2nd. The 2nd half wins the half race 62% of the time, 45% clear of the other half."
+        }
+      },
+      {
         "matchId": "2494945",
         "home": "Genclerbirligi",
         "away": "Alanyaspor",
@@ -363,43 +396,177 @@
           "referenceSecondHalfProb": 0.3,
           "reason": "Expected 2.8 goals, split 1.0 in the 1st half vs 1.8 in the 2nd. The 2nd half wins the half race 56% of the time, 34% clear of the other half."
         }
-      },
+      }
+    ],
+    "2026-11-03": [
       {
-        "matchId": "2497595",
-        "home": "Reims",
-        "away": "FC Sochaux",
-        "league": "Fr2",
-        "leagueName": "Ligue 2",
-        "country": "France",
+        "matchId": "2494015",
+        "home": "Omiya Ardija",
+        "away": "Iwaki FC",
+        "league": "Jp2",
+        "leagueName": "J2 League",
+        "country": "Japan",
         "time": "",
         "probs": {
-          "home": 41,
-          "draw": 42,
-          "away": 16
+          "home": 27,
+          "draw": 38,
+          "away": 35
         },
-        "avgGoals": 3.04,
+        "avgGoals": 3.48,
         "hsh": {
           "pick": "2H",
           "label": "2nd Half",
-          "prob": 0.558,
-          "margin": 0.337,
-          "firstHalfShare": 0.37,
-          "firstHalfExp": 1.12,
-          "secondHalfExp": 1.92,
-          "p1": 0.221,
-          "p2": 0.558,
-          "tie": 0.222,
-          "fitErr": 0.02022,
-          "totalExp": 3.04,
-          "referenceFirstHalfProb": 0.38,
-          "referenceDrawProb": 0.37,
+          "prob": 0.746,
+          "margin": 0.644,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.87,
+          "secondHalfExp": 2.61,
+          "p1": 0.102,
+          "p2": 0.746,
+          "tie": 0.152,
+          "fitErr": 0.01944,
+          "totalExp": 3.48,
+          "referenceFirstHalfProb": 0.31,
+          "referenceDrawProb": 0.5,
+          "referenceSecondHalfProb": 0.19,
+          "reason": "Expected 3.5 goals, split 0.9 in the 1st half vs 2.6 in the 2nd. The 2nd half wins the half race 75% of the time, 64% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2494012",
+        "home": "Ventforet Kofu",
+        "away": "Albirex Niigata",
+        "league": "Jp2",
+        "leagueName": "J2 League",
+        "country": "Japan",
+        "time": "",
+        "probs": {
+          "home": 28,
+          "draw": 21,
+          "away": 52
+        },
+        "avgGoals": 3.45,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.744,
+          "margin": 0.642,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.86,
+          "secondHalfExp": 2.59,
+          "p1": 0.102,
+          "p2": 0.744,
+          "tie": 0.153,
+          "fitErr": 0.0182,
+          "totalExp": 3.45,
+          "referenceFirstHalfProb": 0.26,
+          "referenceDrawProb": 0.49,
           "referenceSecondHalfProb": 0.25,
-          "reason": "Expected 3.0 goals, split 1.1 in the 1st half vs 1.9 in the 2nd. The 2nd half wins the half race 56% of the time, 34% clear of the other half."
+          "reason": "Expected 3.5 goals, split 0.9 in the 1st half vs 2.6 in the 2nd. The 2nd half wins the half race 74% of the time, 64% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2494017",
+        "home": "FC Imabari",
+        "away": "Consadole Sapporo",
+        "league": "Jp2",
+        "leagueName": "J2 League",
+        "country": "Japan",
+        "time": "",
+        "probs": {
+          "home": 19,
+          "draw": 38,
+          "away": 43
+        },
+        "avgGoals": 2.88,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.705,
+          "margin": 0.594,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.72,
+          "secondHalfExp": 2.16,
+          "p1": 0.111,
+          "p2": 0.705,
+          "tie": 0.184,
+          "fitErr": 0.02619,
+          "totalExp": 2.88,
+          "referenceFirstHalfProb": 0.25,
+          "referenceDrawProb": 0.52,
+          "referenceSecondHalfProb": 0.23,
+          "reason": "Expected 2.9 goals, split 0.7 in the 1st half vs 2.2 in the 2nd. The 2nd half wins the half race 71% of the time, 59% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2494013",
+        "home": "Shonan Bellmare",
+        "away": "Sagan Tosu",
+        "league": "Jp2",
+        "leagueName": "J2 League",
+        "country": "Japan",
+        "time": "",
+        "probs": {
+          "home": 43,
+          "draw": 32,
+          "away": 25
+        },
+        "avgGoals": 2.45,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.669,
+          "margin": 0.552,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.61,
+          "secondHalfExp": 1.84,
+          "p1": 0.117,
+          "p2": 0.669,
+          "tie": 0.214,
+          "fitErr": 0.02659,
+          "totalExp": 2.45,
+          "referenceFirstHalfProb": 0.17,
+          "referenceDrawProb": 0.56,
+          "referenceSecondHalfProb": 0.27,
+          "reason": "Expected 2.5 goals, split 0.6 in the 1st half vs 1.8 in the 2nd. The 2nd half wins the half race 67% of the time, 55% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2507169",
+        "home": "Charlton Athletic",
+        "away": "Bolton Wanderers",
+        "league": "CH",
+        "leagueName": "Championship",
+        "country": "England",
+        "time": "",
+        "probs": {
+          "home": 30,
+          "draw": 42,
+          "away": 28
+        },
+        "avgGoals": 2.4,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.664,
+          "margin": 0.546,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.6,
+          "secondHalfExp": 1.8,
+          "p1": 0.118,
+          "p2": 0.664,
+          "tie": 0.219,
+          "fitErr": 0.00063,
+          "totalExp": 2.4,
+          "referenceFirstHalfProb": 0.19,
+          "referenceDrawProb": 0.6,
+          "referenceSecondHalfProb": 0.21,
+          "reason": "Expected 2.4 goals, split 0.6 in the 1st half vs 1.8 in the 2nd. The 2nd half wins the half race 66% of the time, 55% clear of the other half."
         }
       }
     ]
   },
-  "lastFetch": "2026-11-02T00:44:04.183Z",
+  "lastFetch": "2026-11-02T08:08:05.193Z",
   "meta": {
     "minProb": 0.55,
     "maxPicks": 12,
