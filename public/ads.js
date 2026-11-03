@@ -227,9 +227,9 @@
 
     // The Bitmedia Prebid runtime owns this slot and handles its no-bid
     // fallback. Do not also render a direct tag or house-ad creative here.
-    if (el.getAttribute('data-wft-prebid') === 'bitmedia' && el.getAttribute('data-wft-hb-no-bid') !== 'true') return;
+    if (el.getAttribute('data-wft-prebid') === 'bitmedia') return;
 
-    var bitmediaId = (key === 'global_leaderboard' || key === 'end_of_content') ? '6ae882436485fffa717939a1' :
+    var bitmediaId = key === 'global_leaderboard' ? '6ae882436485fffa717939a1' :
       (key === 'sponsored_match_card' ? '6ae8887bf30577b049694c23' :
       (key === 'sticky_banner' ? '6ae8959ff30577b0496d401f' : ''));
     if (bitmediaId) {
