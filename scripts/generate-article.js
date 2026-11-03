@@ -857,7 +857,7 @@ ${relatedHtml(a.related)}
  <script src="/config.js"></script>
  <script src="/supabase-client.js"></script>
  <script src="/auth.js?v=20260801"></script>
-<script src="/chat-widget.js" async></script>
+<script src="/chat-widget.js?v=paused-20261103" async></script>
 <script src="/responsible-gambling.js"></script>
 </body>
 </html>

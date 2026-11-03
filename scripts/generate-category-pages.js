@@ -558,7 +558,7 @@ ${generateFaqHtml(slug)}
 <div style="text-align:center;padding:12px 0;"><button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">Light</button></div>
 <div style="text-align:center;padding:0 0 8px;"><div google-add-preferred-source-btn data-theme="dark"></div></div>
 </footer>
-<script src="/chat-widget.js"></script>
+<script src="/chat-widget.js?v=paused-20261103"></script>
 <script src="/sponsor-banner.js?v=4"></script>
 ${slug === 'under-2-5' ? '<script src="/config.js"></script>' : ''}
 <script>
