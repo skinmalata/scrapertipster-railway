@@ -499,6 +499,39 @@
         }
       },
       {
+        "matchId": "2513325",
+        "home": "Damak",
+        "away": "Al Akhdood",
+        "league": "Sa2",
+        "leagueName": "1st Division",
+        "country": "Saudi Arabia",
+        "time": "",
+        "probs": {
+          "home": 58,
+          "draw": 31,
+          "away": 12
+        },
+        "avgGoals": 2.5,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.673,
+          "margin": 0.557,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.63,
+          "secondHalfExp": 1.88,
+          "p1": 0.116,
+          "p2": 0.673,
+          "tie": 0.21,
+          "fitErr": 0.02602,
+          "totalExp": 2.5,
+          "referenceFirstHalfProb": 0.28,
+          "referenceDrawProb": 0.53,
+          "referenceSecondHalfProb": 0.19,
+          "reason": "Expected 2.5 goals, split 0.6 in the 1st half vs 1.9 in the 2nd. The 2nd half wins the half race 67% of the time, 56% clear of the other half."
+        }
+      },
+      {
         "matchId": "2494013",
         "home": "Shonan Bellmare",
         "away": "Sagan Tosu",
@@ -532,41 +565,142 @@
         }
       },
       {
-        "matchId": "2507169",
-        "home": "Charlton Athletic",
-        "away": "Bolton Wanderers",
-        "league": "CH",
-        "leagueName": "Championship",
-        "country": "England",
+        "matchId": "2418226",
+        "home": "RB Bragantino",
+        "away": "Santos",
+        "league": "Br1",
+        "leagueName": "Brasileiro Serie A",
+        "country": "Brazil",
         "time": "",
         "probs": {
-          "home": 30,
-          "draw": 42,
-          "away": 28
+          "home": 28,
+          "draw": 47,
+          "away": 26
         },
-        "avgGoals": 2.4,
+        "avgGoals": 3.28,
         "hsh": {
           "pick": "2H",
           "label": "2nd Half",
-          "prob": 0.664,
-          "margin": 0.546,
-          "firstHalfShare": 0.25,
-          "firstHalfExp": 0.6,
-          "secondHalfExp": 1.8,
-          "p1": 0.118,
-          "p2": 0.664,
-          "tie": 0.219,
-          "fitErr": 0.00063,
-          "totalExp": 2.4,
+          "prob": 0.681,
+          "margin": 0.543,
+          "firstHalfShare": 0.29,
+          "firstHalfExp": 0.95,
+          "secondHalfExp": 2.33,
+          "p1": 0.138,
+          "p2": 0.681,
+          "tie": 0.18,
+          "fitErr": 0.01553,
+          "totalExp": 3.28,
+          "referenceFirstHalfProb": 0.36,
+          "referenceDrawProb": 0.48,
+          "referenceSecondHalfProb": 0.16,
+          "reason": "Expected 3.3 goals, split 1.0 in the 1st half vs 2.3 in the 2nd. The 2nd half wins the half race 68% of the time, 54% clear of the other half."
+        }
+      }
+    ],
+    "2026-11-04": [
+      {
+        "matchId": "2563377",
+        "home": "Deportivo Pasto",
+        "away": "Jaguares de Córdoba",
+        "league": "Co1",
+        "leagueName": "Primera A",
+        "country": "Colombia",
+        "time": "",
+        "probs": {
+          "home": 47,
+          "draw": 30,
+          "away": 24
+        },
+        "avgGoals": 2.35,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.624,
+          "margin": 0.482,
+          "firstHalfShare": 0.28,
+          "firstHalfExp": 0.66,
+          "secondHalfExp": 1.69,
+          "p1": 0.141,
+          "p2": 0.624,
+          "tie": 0.235,
+          "fitErr": 0.00182,
+          "totalExp": 2.35,
+          "referenceFirstHalfProb": 0.27,
+          "referenceDrawProb": 0.56,
+          "referenceSecondHalfProb": 0.17,
+          "reason": "Expected 2.4 goals, split 0.7 in the 1st half vs 1.7 in the 2nd. The 2nd half wins the half race 62% of the time, 48% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2468599",
+        "home": "Alianza Lima",
+        "away": "Cienciano",
+        "league": "Pe1",
+        "leagueName": "Primera División",
+        "country": "Peru",
+        "time": "",
+        "probs": {
+          "home": 47,
+          "draw": 25,
+          "away": 29
+        },
+        "avgGoals": 2.91,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.604,
+          "margin": 0.424,
+          "firstHalfShare": 0.33,
+          "firstHalfExp": 0.96,
+          "secondHalfExp": 1.95,
+          "p1": 0.18,
+          "p2": 0.604,
+          "tie": 0.215,
+          "fitErr": 0.00676,
+          "totalExp": 2.91,
+          "referenceFirstHalfProb": 0.29,
+          "referenceDrawProb": 0.46,
+          "referenceSecondHalfProb": 0.25,
+          "reason": "Expected 2.9 goals, split 1.0 in the 1st half vs 1.9 in the 2nd. The 2nd half wins the half race 60% of the time, 42% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2563059",
+        "home": "Real Cartagena",
+        "away": "Deportes Quindío",
+        "league": "Co2",
+        "leagueName": "Primera B",
+        "country": "Colombia",
+        "time": "",
+        "probs": {
+          "home": 25,
+          "draw": 33,
+          "away": 42
+        },
+        "avgGoals": 2.32,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.573,
+          "margin": 0.398,
+          "firstHalfShare": 0.32,
+          "firstHalfExp": 0.74,
+          "secondHalfExp": 1.58,
+          "p1": 0.175,
+          "p2": 0.573,
+          "tie": 0.252,
+          "fitErr": 0.00118,
+          "totalExp": 2.32,
           "referenceFirstHalfProb": 0.19,
-          "referenceDrawProb": 0.6,
-          "referenceSecondHalfProb": 0.21,
-          "reason": "Expected 2.4 goals, split 0.6 in the 1st half vs 1.8 in the 2nd. The 2nd half wins the half race 66% of the time, 55% clear of the other half."
+          "referenceDrawProb": 0.53,
+          "referenceSecondHalfProb": 0.28,
+          "reason": "Expected 2.3 goals, split 0.7 in the 1st half vs 1.6 in the 2nd. The 2nd half wins the half race 57% of the time, 40% clear of the other half."
         }
       }
     ]
   },
-  "lastFetch": "2026-11-02T08:08:05.193Z",
+  "lastFetch": "2026-11-03T08:08:02.352Z",
   "meta": {
     "minProb": 0.55,
     "maxPicks": 12,
