@@ -397,10 +397,14 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(/<body([^>]*)>/i, (m, attrs) => `<body${attrs}>` + headerHtml(activePath));
   }
 
-  // 1b. Advert slot. The global leaderboard sits directly below the header on
-  //     every page. Bitmedia serves this placement directly.
-  if (!/data-ad-position="global_leaderboard"/.test(html) && /<\/header>/i.test(html)) {
-    html = html.replace(/<\/header>/i, '</header>\n<div class="wft-ad-slot" data-ad-position="global_leaderboard" aria-label="Advertisement"><ins class="6ae882436485fffa717939a1" style="display:inline-block;width:1px;height:1px;"></ins></div>');
+  // 1b. Global leaderboard. Prebid runs Bitmedia header bidding in this slot;
+  //     the existing direct Bitmedia unit remains available as a no-bid fallback.
+  const leaderboardSlot = '<div id="classname-container-placement" class="wft-ad-slot" data-ad-position="global_leaderboard" data-wft-prebid="bitmedia" aria-label="Advertisement" style="min-height:100px"></div>';
+  const leaderboardRe = /<div\b(?=[^>]*\bdata-ad-position=["']global_leaderboard["'])[^>]*>[\s\S]*?<\/div>/i;
+  if (leaderboardRe.test(html)) {
+    html = html.replace(leaderboardRe, leaderboardSlot);
+  } else if (/<\/header>/i.test(html)) {
+    html = html.replace(/<\/header>/i, '</header>\n' + leaderboardSlot);
   }
 
   // 1c. Load the sticky unit only after the visitor has scrolled into the
@@ -472,10 +476,11 @@ function applyLayoutToHtml(html, activePath) {
   const needsVipTab = !/vip-tab\.js/.test(html) && /id="categoryLinks"|id="categoryTabs"/.test(html);
   const needsPlayerShotsTab = !/player-shots-tab\.js/.test(html) && /id="categoryLinks"|id="categoryTabs"/.test(html);
   const needsAds = !/ads\.js/.test(html);
+  const needsBitmediaPrebid = !/bitmedia-prebid\.js/.test(html);
   // The consent gate is what decides whether Google Analytics may run, so
   // every page needs it. The generated pages used to ship without it.
   const needsConsent = !/consent\.js/.test(html);
-  if (needsTheme || needsAuth || needsConfig || needsSupabase || needsHamburger || needsVipTab || needsPlayerShotsTab || needsAds || needsConsent) {
+  if (needsTheme || needsAuth || needsConfig || needsSupabase || needsHamburger || needsVipTab || needsPlayerShotsTab || needsAds || needsConsent || needsBitmediaPrebid) {
     let block = '\n';
     if (needsConfig) block += '<script src="/config.js"></script>\n';
     if (needsSupabase) block += '<script src="/supabase-client.js"></script>\n';
@@ -484,6 +489,7 @@ function applyLayoutToHtml(html, activePath) {
     if (needsPlayerShotsTab) block += '<script src="/player-shots-tab.js?v=20261018" defer></script>\n';
     if (needsAds) block += '<script src="/ads.js?v=20261102d" defer></script>\n';
     if (needsConsent) block += '<script src="/consent.js?v=3" defer></script>\n';
+    if (needsBitmediaPrebid) block += '<script src="/bitmedia-prebid.js?v=20261103" defer></script>\n';
     if (needsTheme) {
       block += `<script>
 (function() {
