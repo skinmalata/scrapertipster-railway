@@ -539,10 +539,6 @@ ${generateFaqHtml(slug)}
 </div>
 <footer>
 <div class="footer-content">
-<div style="text-align:center;margin-bottom:24px;">
-<p style="margin:0 0 12px;font-size:14px;color:var(--text-muted);">Support WinFulltime &mdash; your donations keep the site running and our free picks open to everyone.</p>
-<a href="https://ko-fi.com/winfulltime" target="_blank" rel="noopener nofollow" style="display:inline-block;background:var(--accent-gradient);color:white;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Donate on Ko-fi</a>
-</div>
 <div class="footer-links">
 <a href="/">Home</a>
 <a href="/ticket-builder.html">Ticket Builder</a>
