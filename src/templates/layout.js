@@ -384,6 +384,8 @@ function applyLayoutToHtml(html, activePath) {
   html = html.replace(/(<script[^>]*src=["'][^"']*\/consent\.js)(?:\?v=\d+)?(["'][^>]*>)/gi, '$1?v=3$2');
   // Ensure pages use the runtime that preserves the fixed Bitmedia unit.
   html = html.replace(/(<script[^>]*src=["'][^"']*\/ads\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261103-endfill$2');
+  // Make sure static pages pick up changes to the shared login/tier runtime.
+  html = html.replace(/(<script[^>]*src=["'][^"']*\/auth\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261104$2');
   html = html.replace(/(<script[^>]*src=["'][^"']*\/sponsor-banner\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=4$2');
 
   const navRe = /(<nav id="nav">)[\s\S]*?(<\/nav>)/;
@@ -481,7 +483,7 @@ function applyLayoutToHtml(html, activePath) {
     let block = '\n';
     if (needsConfig) block += '<script src="/config.js"></script>\n';
     if (needsSupabase) block += '<script src="/supabase-client.js"></script>\n';
-    if (needsAuth) block += '<script src="/auth.js?v=20260801"></script>\n';
+    if (needsAuth) block += '<script src="/auth.js?v=20261104"></script>\n';
     if (needsVipTab) block += '<script src="/vip-tab.js?v=20261027" defer></script>\n';
     if (needsPlayerShotsTab) block += '<script src="/player-shots-tab.js?v=20261018" defer></script>\n';
     if (needsAds) block += '<script src="/ads.js?v=20261103-endfill" defer></script>\n';
