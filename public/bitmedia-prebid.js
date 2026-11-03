@@ -1,36 +1,24 @@
-/* Bitmedia Prebid integration for the end-of-content leaderboard. */
+/* Bitmedia Prebid integration for the header leaderboard. */
 (function (window, document) {
   'use strict';
 
   var AD_UNIT_CODE = 'classname-container-placement';
   var BITMEDIA_AD_UNIT_ID = '6ae9a1a5f30577b049914348';
-  var DIRECT_FALLBACK_ID = '6ae882436485fffa717939a1';
   var PREBID_SRC = '/prebid-11.46.0.js?v=20261103';
   var BID_TIMEOUT = 1200;
   var BANNER_SIZES = [[728, 90], [468, 60], [468, 90], [300, 100]];
   var started = false;
 
-  function fallbackToDirectTag(slot) {
-    if (!slot || slot.getAttribute('data-wft-hb-fallback') === 'true') return;
-    slot.setAttribute('data-wft-hb-fallback', 'true');
+  function fallbackToHouseAd(slot) {
+    if (!slot || slot.getAttribute('data-wft-hb-no-bid') === 'true') return;
+    slot.setAttribute('data-wft-hb-no-bid', 'true');
     slot.innerHTML = '';
-
-    var unit = document.createElement('ins');
-    unit.className = DIRECT_FALLBACK_ID;
-    unit.style.display = 'inline-block';
-    unit.style.width = '1px';
-    unit.style.height = '1px';
-    slot.appendChild(unit);
-
-    var script = document.createElement('script');
-    script.async = true;
-    script.src = 'https://cdn.bmcdn6.com/js/' + DIRECT_FALLBACK_ID + '.js?v=' + Date.now();
-    (document.head || document.documentElement).appendChild(script);
+    if (window.WFTAds && typeof window.WFTAds.refresh === 'function') window.WFTAds.refresh();
   }
 
   function renderWinner(pbjs, slot, bid) {
     if (!bid || !bid.adId) {
-      fallbackToDirectTag(slot);
+      fallbackToHouseAd(slot);
       return;
     }
 
@@ -57,7 +45,7 @@
       pbjs.renderAd(iframe.contentDocument || iframe.contentWindow.document, bid.adId);
       slot.setAttribute('data-wft-hb-filled', 'true');
     } catch (error) {
-      fallbackToDirectTag(slot);
+      fallbackToHouseAd(slot);
     }
   }
 
@@ -68,7 +56,7 @@
     var loader = document.createElement('script');
     loader.async = true;
     loader.src = PREBID_SRC;
-    loader.onerror = function () { fallbackToDirectTag(slot); };
+    loader.onerror = function () { fallbackToHouseAd(slot); };
     loader.onload = function () {
       pbjs.que.push(function () {
         try {
@@ -97,7 +85,7 @@
             }
           });
         } catch (error) {
-          fallbackToDirectTag(slot);
+          fallbackToHouseAd(slot);
         }
       });
     };
