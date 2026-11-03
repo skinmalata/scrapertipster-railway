@@ -1,4 +1,4 @@
-/* Bitmedia Prebid integration for the site-wide leaderboard. */
+/* Bitmedia Prebid integration for the end-of-content leaderboard. */
 (function (window, document) {
   'use strict';
 

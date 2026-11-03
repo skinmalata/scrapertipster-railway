@@ -397,9 +397,8 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(/<body([^>]*)>/i, (m, attrs) => `<body${attrs}>` + headerHtml(activePath));
   }
 
-  // 1b. Global leaderboard. Prebid runs Bitmedia header bidding in this slot;
-  //     the existing direct Bitmedia unit remains available as a no-bid fallback.
-  const leaderboardSlot = '<div id="classname-container-placement" class="wft-ad-slot" data-ad-position="global_leaderboard" data-wft-prebid="bitmedia" aria-label="Advertisement" style="min-height:100px"></div>';
+  // 1b. Global leaderboard. Keep the direct Bitmedia unit below the header.
+  const leaderboardSlot = '<div class="wft-ad-slot" data-ad-position="global_leaderboard" aria-label="Advertisement"><ins class="6ae882436485fffa717939a1" style="display:inline-block;width:1px;height:1px;"></ins></div>';
   const leaderboardRe = /<div\b(?=[^>]*\bdata-ad-position=["']global_leaderboard["'])[^>]*>[\s\S]*?<\/div>/i;
   if (leaderboardRe.test(html)) {
     html = html.replace(leaderboardRe, leaderboardSlot);
@@ -460,10 +459,14 @@ function applyLayoutToHtml(html, activePath) {
   // 3. Footer: replace the existing <footer> or inject one before </body>.
   html = applyFooterToHtml(html);
 
-  // 3b. End-of-content leaderboard: a full-width slot sitting directly above
-  //     the footer, mirroring the header leaderboard. Filled by /ads.js.
-  if (!/data-ad-position="end_of_content"/.test(html) && /<footer[^>]*>/i.test(html)) {
-    html = html.replace(/<footer[^>]*>/i, (m) => '<div class="wft-ad-slot" data-ad-position="end_of_content" aria-label="Advertisement"></div>\n' + m);
+  // 3b. End-of-content leaderboard: Bitmedia header bidding runs in the
+  //     728x90 slot immediately above the footer.
+  const endOfContentSlot = '<div id="classname-container-placement" class="wft-ad-slot" data-ad-position="end_of_content" data-wft-prebid="bitmedia" aria-label="Advertisement" style="min-height:100px"></div>';
+  const endOfContentRe = /<div\b(?=[^>]*\bdata-ad-position=["']end_of_content["'])[^>]*>[\s\S]*?<\/div>/i;
+  if (endOfContentRe.test(html)) {
+    html = html.replace(endOfContentRe, endOfContentSlot);
+  } else if (/<footer[^>]*>/i.test(html)) {
+    html = html.replace(/<footer[^>]*>/i, (m) => endOfContentSlot + '\n' + m);
   }
 
   // 4. Ensure the auth stack + theme/hamburger scripts are present so the
