@@ -383,7 +383,7 @@ function applyLayoutToHtml(html, activePath) {
   // four-hour edge cache GitHub Pages sets on static assets.
   html = html.replace(/(<script[^>]*src=["'][^"']*\/consent\.js)(?:\?v=\d+)?(["'][^>]*>)/gi, '$1?v=3$2');
   // Ensure pages use the runtime that preserves the fixed Bitmedia unit.
-  html = html.replace(/(<script[^>]*src=["'][^"']*\/ads\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261102d$2');
+  html = html.replace(/(<script[^>]*src=["'][^"']*\/ads\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261103-endfill$2');
   html = html.replace(/(<script[^>]*src=["'][^"']*\/sponsor-banner\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=4$2');
 
   const navRe = /(<nav id="nav">)[\s\S]*?(<\/nav>)/;
@@ -461,12 +461,14 @@ function applyLayoutToHtml(html, activePath) {
 
   // 3b. Move the existing direct Bitmedia leaderboard to the 728x90 slot
   //     immediately above the footer.
-  const endOfContentSlot = '<div class="wft-ad-slot" data-ad-position="end_of_content" aria-label="Advertisement"><ins class="6ae882436485fffa717939a1" style="display:inline-block;width:1px;height:1px;"></ins></div>';
+  const endOfContentSlot = '<div class="wft-ad-slot" data-ad-position="end_of_content" aria-label="Advertisement" style="min-height:90px"><ins class="6ae882436485fffa717939a1" style="display:inline-block;width:1px;height:1px;"></ins></div>';
   const endOfContentRe = /<div\b(?=[^>]*\bdata-ad-position=["']end_of_content["'])[^>]*>[\s\S]*?<\/div>/i;
   if (endOfContentRe.test(html)) {
     html = html.replace(endOfContentRe, endOfContentSlot);
   } else if (/<footer[^>]*>/i.test(html)) {
     html = html.replace(/<footer[^>]*>/i, (m) => endOfContentSlot + '\n' + m);
+  } else if (/<\/body>/i.test(html)) {
+    html = html.replace(/<\/body>/i, endOfContentSlot + '\n</body>');
   }
 
   // 4. Ensure the auth stack + theme/hamburger scripts are present so the
@@ -490,7 +492,7 @@ function applyLayoutToHtml(html, activePath) {
     if (needsAuth) block += '<script src="/auth.js?v=20260801"></script>\n';
     if (needsVipTab) block += '<script src="/vip-tab.js?v=20261027" defer></script>\n';
     if (needsPlayerShotsTab) block += '<script src="/player-shots-tab.js?v=20261018" defer></script>\n';
-    if (needsAds) block += '<script src="/ads.js?v=20261102d" defer></script>\n';
+    if (needsAds) block += '<script src="/ads.js?v=20261103-endfill" defer></script>\n';
     if (needsConsent) block += '<script src="/consent.js?v=3" defer></script>\n';
     if (needsBitmediaPrebid) block += '<script src="/bitmedia-prebid.js?v=20261103" defer></script>\n';
     if (needsTheme) {

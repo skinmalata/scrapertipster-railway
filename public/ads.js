@@ -157,6 +157,27 @@
     loadHost(0);
   }
 
+  function scheduleEndOfContentFallback(slot, unit) {
+    if (!slot || !unit || slot.getAttribute('data-wft-endfill-watch') === 'true') return;
+    slot.setAttribute('data-wft-endfill-watch', 'true');
+    window.setTimeout(function () {
+      if (!document.documentElement.contains(slot) || slot.getAttribute('data-wft-endfill-done') === 'true') return;
+      var creatives = slot.querySelectorAll('iframe, img, video, object, embed');
+      for (var i = 0; i < creatives.length; i++) {
+        var rect = creatives[i].getBoundingClientRect();
+        if (rect.width > 2 && rect.height > 2) return;
+      }
+
+      // If Bitmedia has not rendered a creative, let the site ad pool fill the
+      // same reserved slot. That keeps the end-of-content placement visible.
+      slot.setAttribute('data-wft-endfill-done', 'true');
+      if (unit.parentNode) unit.parentNode.removeChild(unit);
+      var impressions = [];
+      processNode(slot, impressions);
+      trackImpressions(impressions);
+    }, 8000);
+  }
+
   function activateStickyBitmediaCode(el) {
     var inert = el.querySelector('script[data-wft-bitmedia-sticky]');
     if (!inert || inert.getAttribute('data-wft-activated') === 'true') return;
@@ -216,7 +237,10 @@
       for (var unitIndex = 0; unitIndex < units.length; unitIndex++) {
         if (units[unitIndex].className === bitmediaId) {
           if (key === 'sticky_banner') prepareStickyBitmedia(el, units[unitIndex]);
-          else loadBitmediaUnit(units[unitIndex], bitmediaId);
+          else {
+            loadBitmediaUnit(units[unitIndex], bitmediaId);
+            if (key === 'end_of_content') scheduleEndOfContentFallback(el, units[unitIndex]);
+          }
           return;
         }
       }
