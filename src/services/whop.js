@@ -110,10 +110,17 @@ function verifyWebhook(_a) {
     if (!msgId || !timestamp || !signature) return Promise.resolve(false);
     if (typeof rawBody !== 'string') return Promise.resolve(false);
 
-    var sigs = signature.split(',');
-    if (sigs[0] !== 'v1') return Promise.resolve(false);
-    var candidates = sigs.slice(1).join(',').trim().split(/\s+/).filter(Boolean);
+    var candidates = signature.trim().split(/\s+/).map(function (part) {
+      var comma = part.indexOf(',');
+      if (comma < 0 || part.slice(0, comma) !== 'v1') return null;
+      return part.slice(comma + 1);
+    }).filter(Boolean);
     if (!candidates.length) return Promise.resolve(false);
+
+    var timestampSeconds = Number(timestamp);
+    if (!isFinite(timestampSeconds) || Math.abs(Date.now() / 1000 - timestampSeconds) > 300) {
+      return Promise.resolve(false);
+    }
 
     var signedContent = msgId + '.' + timestamp + '.' + rawBody;
     var secretBytes = Buffer.from(WHOP_WEBHOOK_SECRET, 'utf8');
