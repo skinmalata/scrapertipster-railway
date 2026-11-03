@@ -406,6 +406,11 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(/<\/header>/i, '</header>\n' + leaderboardSlot);
   }
 
+  // Header bidding is disabled. Remove any previously baked Prebid script and
+  // end-of-content slot so the direct banner runs only in the header region.
+  html = html.replace(/<script\b[^>]*src=["'][^"']*bitmedia-prebid\.js[^"']*["'][^>]*>\s*<\/script>/gi, '');
+  html = html.replace(/<div\b(?=[^>]*\bdata-ad-position=["']end_of_content["'])[^>]*>[\s\S]*?<\/div>/i, '');
+
   // 1c. Load the sticky unit only after the visitor has scrolled into the
   //     page. It stays below the content, is dismissible, and does not shift
   //     the document layout on initial load.
@@ -459,18 +464,6 @@ function applyLayoutToHtml(html, activePath) {
   // 3. Footer: replace the existing <footer> or inject one before </body>.
   html = applyFooterToHtml(html);
 
-  // 3b. End-of-content leaderboard: Bitmedia header bidding runs in the
-  //     728x90 slot immediately above the footer.
-  const endOfContentSlot = '<div id="classname-container-placement" class="wft-ad-slot" data-ad-position="end_of_content" data-wft-prebid="bitmedia" aria-label="Advertisement" style="min-height:100px"></div>';
-  const endOfContentRe = /<div\b(?=[^>]*\bdata-ad-position=["']end_of_content["'])[^>]*>[\s\S]*?<\/div>/i;
-  if (endOfContentRe.test(html)) {
-    html = html.replace(endOfContentRe, endOfContentSlot);
-  } else if (/<footer[^>]*>/i.test(html)) {
-    html = html.replace(/<footer[^>]*>/i, (m) => endOfContentSlot + '\n' + m);
-  } else if (/<\/body>/i.test(html)) {
-    html = html.replace(/<\/body>/i, endOfContentSlot + '\n</body>');
-  }
-
   // 4. Ensure the auth stack + theme/hamburger scripts are present so the
   //    auth-driven nav links and theme toggle work on every page.
   const needsTheme = !/wf-theme/.test(html);
@@ -481,11 +474,10 @@ function applyLayoutToHtml(html, activePath) {
   const needsVipTab = !/vip-tab\.js/.test(html) && /id="categoryLinks"|id="categoryTabs"/.test(html);
   const needsPlayerShotsTab = !/player-shots-tab\.js/.test(html) && /id="categoryLinks"|id="categoryTabs"/.test(html);
   const needsAds = !/ads\.js/.test(html);
-  const needsBitmediaPrebid = !/bitmedia-prebid\.js/.test(html);
   // The consent gate is what decides whether Google Analytics may run, so
   // every page needs it. The generated pages used to ship without it.
   const needsConsent = !/consent\.js/.test(html);
-  if (needsTheme || needsAuth || needsConfig || needsSupabase || needsHamburger || needsVipTab || needsPlayerShotsTab || needsAds || needsConsent || needsBitmediaPrebid) {
+  if (needsTheme || needsAuth || needsConfig || needsSupabase || needsHamburger || needsVipTab || needsPlayerShotsTab || needsAds || needsConsent) {
     let block = '\n';
     if (needsConfig) block += '<script src="/config.js"></script>\n';
     if (needsSupabase) block += '<script src="/supabase-client.js"></script>\n';
@@ -494,7 +486,6 @@ function applyLayoutToHtml(html, activePath) {
     if (needsPlayerShotsTab) block += '<script src="/player-shots-tab.js?v=20261018" defer></script>\n';
     if (needsAds) block += '<script src="/ads.js?v=20261103-endfill" defer></script>\n';
     if (needsConsent) block += '<script src="/consent.js?v=3" defer></script>\n';
-    if (needsBitmediaPrebid) block += '<script src="/bitmedia-prebid.js?v=20261103" defer></script>\n';
     if (needsTheme) {
       block += `<script>
 (function() {
