@@ -383,10 +383,10 @@ function applyLayoutToHtml(html, activePath) {
   // four-hour edge cache GitHub Pages sets on static assets.
   html = html.replace(/(<script[^>]*src=["'][^"']*\/consent\.js)(?:\?v=\d+)?(["'][^>]*>)/gi, '$1?v=3$2');
   // Ensure pages use the runtime that preserves the fixed Bitmedia unit.
-  html = html.replace(/(<script[^>]*src=["'][^"']*\/ads\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261103-endfill$2');
+  html = html.replace(/(<script[^>]*src=["'][^"']*\/ads\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261106-prebid$2');
   // Make sure static pages pick up changes to the shared login/tier runtime.
   html = html.replace(/(<script[^>]*src=["'][^"']*\/auth\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261104$2');
-  html = html.replace(/(<script[^>]*src=["'][^"']*\/sponsor-banner\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=4$2');
+  html = html.replace(/(<script[^>]*src=["'][^"']*\/sponsor-banner\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=5$2');
 
   const navRe = /(<nav id="nav">)[\s\S]*?(<\/nav>)/;
   // 1. Nav: replace the inner content of an existing <nav id="nav">, or inject
@@ -408,9 +408,9 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(/<\/header>/i, '</header>\n' + leaderboardSlot);
   }
 
-  // Header bidding is disabled. Remove any previously baked Prebid script and
-  // end-of-content slot so the direct banner runs only in the header region.
-  html = html.replace(/<script\b[^>]*src=["'][^"']*bitmedia-prebid\.js[^"']*["'][^>]*>\s*<\/script>/gi, '');
+  // Bitmedia header bidding powers the first in-feed Prebid slot and the
+  // analysis-page unit. Drop any legacy end-of-content slot so the direct
+  // banner still runs only in the header region.
   html = html.replace(/<div\b(?=[^>]*\bdata-ad-position=["']end_of_content["'])[^>]*>[\s\S]*?<\/div>/i, '');
 
   // 1c. Load the sticky unit only after the visitor has scrolled into the
@@ -476,18 +476,20 @@ function applyLayoutToHtml(html, activePath) {
   const needsVipTab = !/vip-tab\.js/.test(html) && /id="categoryLinks"|id="categoryTabs"/.test(html);
   const needsPlayerShotsTab = !/player-shots-tab\.js/.test(html) && /id="categoryLinks"|id="categoryTabs"/.test(html);
   const needsAds = !/ads\.js/.test(html);
+  const needsPrebid = !/bitmedia-prebid\.js/.test(html);
   // The consent gate is what decides whether Google Analytics may run, so
   // every page needs it. The generated pages used to ship without it.
   const needsConsent = !/consent\.js/.test(html);
-  if (needsTheme || needsAuth || needsConfig || needsSupabase || needsHamburger || needsVipTab || needsPlayerShotsTab || needsAds || needsConsent) {
+  if (needsTheme || needsAuth || needsConfig || needsSupabase || needsHamburger || needsVipTab || needsPlayerShotsTab || needsAds || needsPrebid || needsConsent) {
     let block = '\n';
     if (needsConfig) block += '<script src="/config.js"></script>\n';
     if (needsSupabase) block += '<script src="/supabase-client.js"></script>\n';
     if (needsAuth) block += '<script src="/auth.js?v=20261104"></script>\n';
     if (needsVipTab) block += '<script src="/vip-tab.js?v=20261027" defer></script>\n';
     if (needsPlayerShotsTab) block += '<script src="/player-shots-tab.js?v=20261018" defer></script>\n';
-    if (needsAds) block += '<script src="/ads.js?v=20261103-endfill" defer></script>\n';
+    if (needsAds) block += '<script src="/ads.js?v=20261106-prebid" defer></script>\n';
     if (needsConsent) block += '<script src="/consent.js?v=3" defer></script>\n';
+    if (needsPrebid) block += '<script src="/bitmedia-prebid.js?v=20261106" defer></script>\n';
     if (needsTheme) {
       block += `<script>
 (function() {

@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 const { renderBookmakerCTA } = require('./lib/bookmaker-cta');
+const { renderPrebidSlot } = require('./lib/sponsor-banner');
 
 const HTTP_TIMEOUT_MS = 10000;
 const DETAIL_CONCURRENCY = 3;
@@ -789,6 +790,9 @@ function buildContentHtml(analysis, home, away, matchup, dateStr, ctx) {
   const h2h = analysis.h2h || [];
   const summary = analysis.summary || '';
   let html = '';
+
+  // Prominent Bitmedia Prebid unit, directly under the page heading.
+  html += renderPrebidSlot();
 
   const today = new Date().toISOString().slice(0, 10);
   const infoBits = [];

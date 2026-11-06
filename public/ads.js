@@ -47,7 +47,7 @@
     style.id = STYLE_ID;
     style.textContent = [
       '.wft-ad-slot{display:block;width:100%;max-width:960px;margin:16px auto;padding:0 16px;box-sizing:border-box;}',
-      '.wft-ad-slot[data-wft-prebid="bitmedia"]{display:flex;align-items:center;justify-content:center;min-height:100px;overflow:hidden;}',
+      '.wft-ad-slot[data-wft-prebid="bitmedia"]{grid-column:1/-1;display:flex;align-items:center;justify-content:center;min-height:100px;overflow:hidden;}',
       '.wft-ad-slot[data-wft-prebid="bitmedia"] iframe{display:block;max-width:100%;border:0;}',
       '.wft-ad-slot[data-ad-position="sponsored_match_card"]{max-width:100%;padding:0;grid-column:1/-1;}',
       '.wft-sponsor{grid-column:1/-1;}',

@@ -1,4 +1,4 @@
-/* Bitmedia Prebid integration for the end-of-content leaderboard. */
+/* Bitmedia Prebid integration for in-feed prediction slots and analysis pages. */
 (function (window, document) {
   'use strict';
 
@@ -7,8 +7,11 @@
   var DIRECT_FALLBACK_ID = '6ae882436485fffa717939a1';
   var PREBID_SRC = '/prebid-11.46.0.js?v=20261103';
   var BID_TIMEOUT = 1200;
-  var BANNER_SIZES = [[728, 90], [468, 60], [468, 90], [300, 100]];
-  var started = false;
+  var BANNER_SIZES = [[250, 250], [336, 280], [300, 250], [300, 100], [728, 90], [468, 60], [200, 200], [468, 90], [320, 1200]];
+
+  var pbjsLoading = false;
+  var prebidWaiters = [];
+  var requestSeq = 0;
 
   function fallbackToDirectTag(slot) {
     if (!slot || slot.getAttribute('data-wft-hb-fallback') === 'true') return;
@@ -61,15 +64,51 @@
     }
   }
 
-  function requestBitmediaBid(slot) {
+  function ensurePrebid(onReady, onError) {
+    if (window.pbjs && typeof window.pbjs.requestBids === 'function') {
+      onReady(window.pbjs);
+      return;
+    }
+    if (pbjsLoading) {
+      prebidWaiters.push({ ready: onReady, error: onError });
+      return;
+    }
+
+    pbjsLoading = true;
     var pbjs = window.pbjs = window.pbjs || {};
     pbjs.que = pbjs.que || [];
 
     var loader = document.createElement('script');
     loader.async = true;
     loader.src = PREBID_SRC;
-    loader.onerror = function () { fallbackToDirectTag(slot); };
+    loader.onerror = function () {
+      pbjsLoading = false;
+      var waiters = prebidWaiters;
+      prebidWaiters = [];
+      waiters.forEach(function (waiter) { if (waiter.error) waiter.error(); });
+      if (onError) onError();
+    };
     loader.onload = function () {
+      pbjsLoading = false;
+      var lib = window.pbjs = window.pbjs || {};
+      lib.que = lib.que || [];
+      var waiters = prebidWaiters;
+      prebidWaiters = [];
+      waiters.forEach(function (waiter) { waiter.ready(lib); });
+      onReady(lib);
+    };
+    (document.head || document.documentElement).appendChild(loader);
+  }
+
+  function requestBitmediaBid(slot) {
+    if (!slot || slot.getAttribute('data-wft-hb-requested') === 'true') return;
+    slot.setAttribute('data-wft-hb-requested', 'true');
+
+    ensurePrebid(function (pbjs) {
+      // First request keeps the canonical ad unit code; re-renders (e.g. date
+      // switches) get a suffix so they never collide with a previous ad unit.
+      requestSeq += 1;
+      var code = requestSeq === 1 ? AD_UNIT_CODE : AD_UNIT_CODE + '-' + requestSeq;
       pbjs.que.push(function () {
         try {
           pbjs.setConfig({
@@ -81,7 +120,7 @@
             storageAllowed: true
           });
           pbjs.addAdUnits([{
-            code: AD_UNIT_CODE,
+            code: code,
             mediaTypes: { banner: { sizes: BANNER_SIZES } },
             bids: [{
               bidder: 'bitmedia',
@@ -89,32 +128,31 @@
             }]
           }]);
           pbjs.requestBids({
-            adUnitCodes: [AD_UNIT_CODE],
+            adUnitCodes: [code],
             timeout: BID_TIMEOUT,
             bidsBackHandler: function () {
-              var winners = pbjs.getHighestCpmBids([AD_UNIT_CODE]) || [];
+              var winners = pbjs.getHighestCpmBids([code]) || [];
               renderWinner(pbjs, slot, winners[0]);
+              try {
+                if (typeof pbjs.removeAdUnit === 'function') pbjs.removeAdUnit(code);
+              } catch (error) {}
             }
           });
         } catch (error) {
           fallbackToDirectTag(slot);
         }
       });
-    };
-    (document.head || document.documentElement).appendChild(loader);
+    }, function () {
+      fallbackToDirectTag(slot);
+    });
   }
 
-  function waitForConsent() {
-    var slot = document.getElementById(AD_UNIT_CODE);
-    if (!slot || started) return;
-
+  function bindSlot(slot) {
+    if (!slot || slot.getAttribute('data-wft-hb-bound') === 'true') return;
     var consent = window.WFT && window.WFT.consent;
-    if (!consent || typeof consent.whenGranted !== 'function') {
-      window.setTimeout(waitForConsent, 100);
-      return;
-    }
+    if (!consent || typeof consent.whenGranted !== 'function') return;
 
-    started = true;
+    slot.setAttribute('data-wft-hb-bound', 'true');
     if (typeof consent.get === 'function' && consent.get() === false) {
       slot.hidden = true;
       return;
@@ -122,9 +160,27 @@
     consent.whenGranted(function () { requestBitmediaBid(slot); });
   }
 
+  function scan() {
+    var slots = document.querySelectorAll('[data-wft-prebid="bitmedia"]');
+    for (var i = 0; i < slots.length; i++) bindSlot(slots[i]);
+  }
+
+  function start() {
+    scan();
+    if (window.MutationObserver) {
+      new MutationObserver(scan).observe(document.documentElement || document.body, {
+        childList: true,
+        subtree: true
+      });
+    }
+    // Consent can arrive after the first scan, and grids are re-rendered on
+    // date switches, so keep a light poll to catch both.
+    window.setInterval(scan, 1000);
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', waitForConsent, { once: true });
+    document.addEventListener('DOMContentLoaded', start, { once: true });
   } else {
-    waitForConsent();
+    start();
   }
 })(window, document);
