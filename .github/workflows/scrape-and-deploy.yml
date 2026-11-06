@@ -139,6 +139,11 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # The Pages deployment service occasionally needs longer than the
+          # action's 10-minute default for this ~15k-page artifact. Give it
+          # 25 minutes so a slow backend does not fail an otherwise good build.
+          timeout: 1500000
 
       - name: Submit changed URLs to IndexNow
         if: github.event_name == 'push'
