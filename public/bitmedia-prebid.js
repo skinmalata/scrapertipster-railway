@@ -7,11 +7,36 @@
   var DIRECT_FALLBACK_ID = '6ae882436485fffa717939a1';
   var PREBID_SRC = '/prebid-11.46.0.js?v=20261103';
   var BID_TIMEOUT = 1200;
-  var BANNER_SIZES = [[250, 250], [336, 280], [300, 250], [300, 100], [728, 90], [468, 60], [200, 200], [468, 90], [320, 1200]];
+  // In-feed slots sit in a half-width grid cell on desktop, so request sizes
+  // that fit that cell instead of a leaderboard. Full-width slots (analysis
+  // and blog) can take a leaderboard. Phones never request 728x90 because the
+  // iframe would be clipped by the narrow column.
+  var PHONE_SIZES = [[300, 250], [336, 280], [320, 100], [300, 100]];
+  var DESKTOP_GRID_SIZES = [[300, 250], [336, 280], [250, 250], [300, 100]];
+  var DESKTOP_FULL_SIZES = [[728, 90], [468, 60], [300, 250], [336, 280]];
 
   var pbjsLoading = false;
   var prebidWaiters = [];
   var requestSeq = 0;
+
+  function isPhoneViewport() {
+    return typeof window.matchMedia === 'function'
+      ? window.matchMedia('(max-width: 639px)').matches
+      : window.innerWidth <= 639;
+  }
+
+  function insideMatchesGrid(el) {
+    while (el) {
+      if (el.classList && el.classList.contains('matches-grid')) return true;
+      el = el.parentNode;
+    }
+    return false;
+  }
+
+  function bannerSizesFor(slot) {
+    if (isPhoneViewport()) return PHONE_SIZES;
+    return insideMatchesGrid(slot) ? DESKTOP_GRID_SIZES : DESKTOP_FULL_SIZES;
+  }
 
   function fallbackToDirectTag(slot) {
     if (!slot || slot.getAttribute('data-wft-hb-fallback') === 'true') return;
@@ -121,7 +146,7 @@
           });
           pbjs.addAdUnits([{
             code: code,
-            mediaTypes: { banner: { sizes: BANNER_SIZES } },
+            mediaTypes: { banner: { sizes: bannerSizesFor(slot) } },
             bids: [{
               bidder: 'bitmedia',
               params: { adUnitID: BITMEDIA_AD_UNIT_ID, currency: 'USD' }

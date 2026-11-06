@@ -383,10 +383,11 @@ function applyLayoutToHtml(html, activePath) {
   // four-hour edge cache GitHub Pages sets on static assets.
   html = html.replace(/(<script[^>]*src=["'][^"']*\/consent\.js)(?:\?v=\d+)?(["'][^>]*>)/gi, '$1?v=3$2');
   // Ensure pages use the runtime that preserves the fixed Bitmedia unit.
-  html = html.replace(/(<script[^>]*src=["'][^"']*\/ads\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261106-prebid$2');
+  html = html.replace(/(<script[^>]*src=["'][^"']*\/ads\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261107-ads$2');
   // Make sure static pages pick up changes to the shared login/tier runtime.
   html = html.replace(/(<script[^>]*src=["'][^"']*\/auth\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261104$2');
-  html = html.replace(/(<script[^>]*src=["'][^"']*\/sponsor-banner\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=5$2');
+  html = html.replace(/(<script[^>]*src=["'][^"']*\/sponsor-banner\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=6$2');
+  html = html.replace(/(<script[^>]*src=["'][^"']*\/bitmedia-prebid\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261107$2');
 
   const navRe = /(<nav id="nav">)[\s\S]*?(<\/nav>)/;
   // 1. Nav: replace the inner content of an existing <nav id="nav">, or inject
@@ -487,9 +488,9 @@ function applyLayoutToHtml(html, activePath) {
     if (needsAuth) block += '<script src="/auth.js?v=20261104"></script>\n';
     if (needsVipTab) block += '<script src="/vip-tab.js?v=20261027" defer></script>\n';
     if (needsPlayerShotsTab) block += '<script src="/player-shots-tab.js?v=20261018" defer></script>\n';
-    if (needsAds) block += '<script src="/ads.js?v=20261106-prebid" defer></script>\n';
+    if (needsAds) block += '<script src="/ads.js?v=20261107-ads" defer></script>\n';
     if (needsConsent) block += '<script src="/consent.js?v=3" defer></script>\n';
-    if (needsPrebid) block += '<script src="/bitmedia-prebid.js?v=20261106" defer></script>\n';
+    if (needsPrebid) block += '<script src="/bitmedia-prebid.js?v=20261107" defer></script>\n';
     if (needsTheme) {
       block += `<script>
 (function() {

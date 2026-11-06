@@ -791,9 +791,6 @@ function buildContentHtml(analysis, home, away, matchup, dateStr, ctx) {
   const summary = analysis.summary || '';
   let html = '';
 
-  // Prominent Bitmedia Prebid unit, directly under the page heading.
-  html += renderPrebidSlot();
-
   const today = new Date().toISOString().slice(0, 10);
   const infoBits = [];
   if (dateStr) infoBits.push(escapeHtml(dateStr));
@@ -825,6 +822,11 @@ function buildContentHtml(analysis, home, away, matchup, dateStr, ctx) {
   if (formCards.length) {
     html += '<div class="analysis-section"><h3>Recent Form</h3><div class="analysis-grid">' + formCards.join('') + '</div></div>';
   }
+
+  // First in-content Bitmedia Prebid unit, after Recent Form (or after the
+  // match info when form data is unavailable), so it does not push the page
+  // heading and summary off the first screen.
+  html += renderPrebidSlot();
 
   const statCards = [];
   const homeHasStats = hasStats(analysis.homeLast10);

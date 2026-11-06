@@ -5,14 +5,17 @@
 //
 // Placement:
 //   1. Bitmedia Prebid unit first, between the 1st and 2nd match card.
-//   2. Existing sponsored Bitmedia banner pushed below the 8th card.
+//   2. Existing sponsored Bitmedia banner after the 3rd card on phones and
+//      after the 5th card on wider screens. Both positions complete a full
+//      2-column row before the full-width banner starts, so the grid never
+//      opens an empty cell next to the half-width prebid slot.
 (function () {
   var BITMEDIA_UNIT = '6ae8887bf30577b049694c23';
   var PREBID_SLOT_ID = 'classname-container-placement';
   var MARKER = '<div class="match-card fade-in"';
 
   function renderPrebidSlot() {
-    return '<div id="' + PREBID_SLOT_ID + '" class="wft-ad-slot" data-wft-prebid="bitmedia" data-ad-position="in_content" aria-label="Advertisement" style="grid-column:1/-1;"></div>';
+    return '<div id="' + PREBID_SLOT_ID + '" class="wft-ad-slot" data-wft-prebid="bitmedia" data-ad-position="in_content" aria-label="Advertisement"></div>';
   }
 
   function renderLegacySlot() {
@@ -26,6 +29,12 @@
     return html.slice(0, at) + '\n\n' + markup + '\n\n  ' + html.slice(index);
   }
 
+  function isPhone() {
+    return typeof window.matchMedia === 'function'
+      ? window.matchMedia('(max-width: 639px)').matches
+      : window.innerWidth <= 639;
+  }
+
   function insertSponsor(gridHtml) {
     var positions = [];
     var at = gridHtml.indexOf(MARKER);
@@ -35,9 +44,11 @@
     }
     if (positions.length < 2) return gridHtml;
 
-    // Existing in-feed sponsored banner moves below the 8th card. When the grid
-    // has fewer cards it falls to the end of the grid.
-    var sponsorAt = positions.length >= 9 ? positions[8] : gridHtml.length;
+    // Phones see one card per row, so the second ad moves to card 3. On wider
+    // screens the prebid slot already fills a cell, so card 5 keeps the
+    // full-width banner on an even grid-row boundary.
+    var afterCard = isPhone() ? 3 : (positions.length >= 5 ? 5 : 3);
+    var sponsorAt = positions.length > afterCard ? positions[afterCard] : gridHtml.length;
     gridHtml = insertAt(gridHtml, sponsorAt, renderLegacySlot());
 
     // The Bitmedia Prebid unit is the first in-feed ad (after card 1).

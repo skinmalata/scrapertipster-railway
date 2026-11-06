@@ -5,7 +5,7 @@ const PREBID_SLOT_ID = 'classname-container-placement';
 // First in-feed slot: the Bitmedia Prebid unit (header bidding). Picked up by
 // public/bitmedia-prebid.js, which waits for consent and for this element.
 function renderPrebidSlot() {
-  return '<div id="' + PREBID_SLOT_ID + '" class="wft-ad-slot" data-wft-prebid="bitmedia" data-ad-position="in_content" aria-label="Advertisement" style="grid-column:1/-1;"></div>';
+  return '<div id="' + PREBID_SLOT_ID + '" class="wft-ad-slot" data-wft-prebid="bitmedia" data-ad-position="in_content" aria-label="Advertisement"></div>';
 }
 
 function renderSponsorBanner(seed) {
@@ -15,8 +15,10 @@ function renderSponsorBanner(seed) {
 /**
  * Splice the in-feed ads into a rendered card list:
  *   - Prebid slot between the 1st and 2nd card (first ad on the page).
- *   - Existing sponsored banner after the 8th card (or at the end when the
- *     page has fewer than 8 cards).
+ *   - Existing sponsored banner after the 3rd card (or at the end when the
+ *     page has fewer than 3 cards). The prebid slot already occupies the
+ *     second cell of the desktop grid, so placing the full-width banner after
+ *     card 3 completes two full rows and avoids an empty grid cell.
  * @returns {string} card HTML or null if fewer than 2 cards.
  */
 function spliceSponsorBetweenCards(cards, seed) {
@@ -25,9 +27,9 @@ function spliceSponsorBetweenCards(cards, seed) {
   for (let i = 0; i < cards.length; i++) {
     out.push(cards[i]);
     if (i === 0) out.push(renderPrebidSlot());
-    if (i === 7) out.push(renderSponsorBanner(seed));
+    if (i === 2) out.push(renderSponsorBanner(seed));
   }
-  if (cards.length < 8) out.push(renderSponsorBanner(seed));
+  if (cards.length < 3) out.push(renderSponsorBanner(seed));
   return out.join('\n');
 }
 

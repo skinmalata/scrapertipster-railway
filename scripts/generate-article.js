@@ -193,12 +193,36 @@ function relatedHtml(related) {
   return (related || []).map(r => `    <li><a href="${r.href}">${r.label}</a></li>`).join('\n');
 }
 
+const ARTICLE_AD_SLOT = '<div id="classname-container-placement-article" class="wft-ad-slot" data-wft-prebid="bitmedia" data-ad-position="in_content" data-wft-article-ad="1" aria-label="Advertisement"></div>';
+
+// Place one Bitmedia Prebid unit after the second section of the article (before
+// the third H2). Short posts get it at the end of the body so the ad is never
+// pushed into the FAQ or related-posts blocks.
+function insertArticleAd(content) {
+  const source = String(content || '');
+  if (!source.trim()) return source;
+  if (source.indexOf('data-wft-article-ad') !== -1) return source;
+  let count = 0;
+  let from = 0;
+  while (true) {
+    const at = source.indexOf('<h2', from);
+    if (at === -1) break;
+    count += 1;
+    if (count === 3) {
+      return source.slice(0, at) + ARTICLE_AD_SLOT + '\n' + source.slice(at);
+    }
+    from = at + 3;
+  }
+  return source + '\n' + ARTICLE_AD_SLOT + '\n';
+}
+
 function articleHtml(a, relatedBox) {
   const url = `${DOMAIN}/blog/${a.slug}.html`;
   const image = `${DOMAIN}/blog/thumbnails/${a.slug}.webp`;
   const breadcrumb = a.title.replace(/\s*[\|—]\s*WinFulltime.*$/, '').trim();
   const faqs = Array.isArray(a.faqs) ? a.faqs : [];
-  const { content: bodyContent, toc } = addHeadingIds(a.content);
+  const { content, toc } = addHeadingIds(a.content);
+  const bodyContent = insertArticleAd(content);
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
