@@ -1,1623 +1,5 @@
 {
   "dates": {
-    "2026-11-05": [],
-    "2026-11-06": [
-      {
-        "matchId": "2476842",
-        "home": "Rapid Wien",
-        "away": "Wolfsberger AC",
-        "league": "At1",
-        "leagueName": "Bundesliga",
-        "country": "Austria",
-        "time": "",
-        "probs": {
-          "home": 76,
-          "draw": 14,
-          "away": 9
-        },
-        "predictionText": "1",
-        "avgGoals": 3.36,
-        "avgOdds": {
-          "home": 1.25,
-          "draw": 6.5,
-          "away": 9
-        },
-        "matchUrl": "rapid-wien-wolfsberger-ac-2476842",
-        "sportybetAvailable": true,
-        "sportybet": {
-          "home": "SK Rapid",
-          "away": "Wolfsberger AC",
-          "league": "Austria - Bundesliga",
-          "country": "Austria",
-          "womens": false,
-          "homeLevel": "",
-          "awayLevel": "",
-          "time": "19:30",
-          "odds": {
-            "1": 1.25,
-            "2": 9.5,
-            "X": 6.5
-          }
-        },
-        "detail": null,
-        "detailOverBudget": true,
-        "market": "team-to-score",
-        "pick": "home",
-        "team": "Rapid Wien",
-        "teamScoreProb": 95,
-        "winProb": null,
-        "mustScore": 40,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 0,
-          "h2h": 0
-        },
-        "locked": false,
-        "estimatedOdd": 1.05,
-        "confidence": 95,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 3,
-          "away": 0.36
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 95,
-            "estimatedOdd": 1.05
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 30.2,
-            "estimatedOdd": 3.31
-          }
-        ],
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.414,
-          "margin": 0.056,
-          "firstHalfShare": 0.48,
-          "firstHalfExp": 1.61,
-          "secondHalfExp": 1.75,
-          "p1": 0.358,
-          "p2": 0.414,
-          "tie": 0.227,
-          "fitErr": 0.00907,
-          "totalExp": 3.36,
-          "referenceFirstHalfProb": 0.67,
-          "referenceDrawProb": 0.21,
-          "referenceSecondHalfProb": 0.12,
-          "reason": "Expected 3.4 goals, split 1.6 in the 1st half vs 1.7 in the 2nd. The 2nd half wins the half race 41% of the time, 6% clear of the other half."
-        },
-        "preview": null,
-        "form": null,
-        "h2h": null,
-        "sportybetLeague": "Austria - Bundesliga"
-      },
-      {
-        "matchId": "2492443",
-        "home": "FC Dordrecht",
-        "away": "NAC Breda",
-        "league": "Nl2",
-        "leagueName": "Eerste Divisie",
-        "country": "Netherlands",
-        "time": "",
-        "probs": {
-          "home": 16,
-          "draw": 22,
-          "away": 62
-        },
-        "predictionText": "2",
-        "avgGoals": 3.25,
-        "avgOdds": {
-          "home": 5.25,
-          "draw": 4.33,
-          "away": 1.55
-        },
-        "matchUrl": "fc-dordrecht-nac-breda-2492443",
-        "sportybetAvailable": true,
-        "sportybet": {
-          "home": "FC Dordrecht",
-          "away": "NAC Breda",
-          "league": "Netherlands - Eerste Divisie",
-          "country": "Netherlands",
-          "womens": false,
-          "homeLevel": "",
-          "awayLevel": "",
-          "time": "20:00",
-          "odds": {
-            "1": 5.2,
-            "2": 1.54,
-            "X": 4.6
-          }
-        },
-        "detail": null,
-        "detailOverBudget": true,
-        "market": "team-to-score",
-        "pick": "away",
-        "team": "NAC Breda",
-        "teamScoreProb": 92.4,
-        "winProb": null,
-        "mustScore": 40,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 0,
-          "h2h": 0
-        },
-        "locked": false,
-        "estimatedOdd": 1.08,
-        "confidence": 92,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 0.67,
-          "away": 2.58
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 48.8,
-            "estimatedOdd": 2.05
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 92.4,
-            "estimatedOdd": 1.08
-          }
-        ],
-        "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.384,
-          "margin": 0,
-          "firstHalfShare": 0.5,
-          "firstHalfExp": 1.63,
-          "secondHalfExp": 1.63,
-          "p1": 0.384,
-          "p2": 0.384,
-          "tie": 0.232,
-          "fitErr": 0.00297,
-          "totalExp": 3.25,
-          "referenceFirstHalfProb": 0.14,
-          "referenceDrawProb": 0.27,
-          "referenceSecondHalfProb": 0.59,
-          "reason": "Expected 3.3 goals, split 1.6 in the 1st half vs 1.6 in the 2nd. The 1st half wins the half race 38% of the time, 0% clear of the other half."
-        },
-        "preview": null,
-        "form": null,
-        "h2h": null,
-        "sportybetLeague": "Netherlands - Eerste Divisie"
-      },
-      {
-        "matchId": "2492437",
-        "home": "VVV Venlo",
-        "away": "Jong PSV",
-        "league": "Nl2",
-        "leagueName": "Eerste Divisie",
-        "country": "Netherlands",
-        "time": "",
-        "probs": {
-          "home": 49,
-          "draw": 25,
-          "away": 26
-        },
-        "predictionText": "1",
-        "avgGoals": 3.61,
-        "avgOdds": {
-          "home": 1.57,
-          "draw": 4.75,
-          "away": 4.75
-        },
-        "matchUrl": "vvv-venlo-jong-psv-2492437",
-        "sportybetAvailable": true,
-        "sportybet": {
-          "home": "VVV Venlo",
-          "away": "Jong PSV Eindhoven",
-          "league": "Netherlands - Eerste Divisie",
-          "country": "Netherlands",
-          "womens": false,
-          "homeLevel": "",
-          "awayLevel": "",
-          "time": "20:00",
-          "odds": {
-            "1": 1.58,
-            "2": 4.6,
-            "X": 4.75
-          }
-        },
-        "detail": null,
-        "detailOverBudget": true,
-        "market": "team-to-score",
-        "pick": "home",
-        "team": "VVV Venlo",
-        "teamScoreProb": 90.6,
-        "winProb": null,
-        "mustScore": 40,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 0,
-          "h2h": 0
-        },
-        "locked": false,
-        "estimatedOdd": 1.1,
-        "confidence": 91,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 2.36,
-          "away": 1.25
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 90.6,
-            "estimatedOdd": 1.1
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 71.3,
-            "estimatedOdd": 1.4
-          }
-        ],
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.754,
-          "margin": 0.654,
-          "firstHalfShare": 0.25,
-          "firstHalfExp": 0.9,
-          "secondHalfExp": 2.71,
-          "p1": 0.1,
-          "p2": 0.754,
-          "tie": 0.146,
-          "fitErr": 0.00437,
-          "totalExp": 3.61,
-          "referenceFirstHalfProb": 0.3,
-          "referenceDrawProb": 0.51,
-          "referenceSecondHalfProb": 0.19,
-          "reason": "Expected 3.6 goals, split 0.9 in the 1st half vs 2.7 in the 2nd. The 2nd half wins the half race 75% of the time, 65% clear of the other half."
-        },
-        "preview": null,
-        "form": null,
-        "h2h": null,
-        "sportybetLeague": "Netherlands - Eerste Divisie"
-      },
-      {
-        "matchId": "2490232",
-        "home": "Standard Liège",
-        "away": "Waasland Beveren",
-        "league": "Be1",
-        "leagueName": "Jupiler Pro League",
-        "country": "Belgium",
-        "time": "",
-        "probs": {
-          "home": 54,
-          "draw": 32,
-          "away": 14
-        },
-        "predictionText": "1",
-        "avgGoals": 2.99,
-        "avgOdds": {
-          "home": 1.9,
-          "draw": 3.5,
-          "away": 3.5
-        },
-        "matchUrl": "standard-liège-waasland-beveren-2490232",
-        "sportybetAvailable": true,
-        "sportybet": {
-          "home": "Standard Liege",
-          "away": "KV Waasland-Beveren",
-          "league": "Belgium - Pro League",
-          "country": "Belgium",
-          "womens": false,
-          "homeLevel": "",
-          "awayLevel": "",
-          "time": "20:45",
-          "odds": {
-            "1": 1.98,
-            "2": 3.74,
-            "X": 3.74
-          }
-        },
-        "detail": null,
-        "detailOverBudget": true,
-        "market": "team-to-score",
-        "pick": "home",
-        "team": "Standard Liège",
-        "teamScoreProb": 90.7,
-        "winProb": null,
-        "mustScore": 40,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 0,
-          "h2h": 0
-        },
-        "locked": false,
-        "estimatedOdd": 1.1,
-        "confidence": 91,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 2.37,
-          "away": 0.62
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 90.7,
-            "estimatedOdd": 1.1
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 46.2,
-            "estimatedOdd": 2.16
-          }
-        ],
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.713,
-          "margin": 0.604,
-          "firstHalfShare": 0.25,
-          "firstHalfExp": 0.75,
-          "secondHalfExp": 2.24,
-          "p1": 0.109,
-          "p2": 0.713,
-          "tie": 0.177,
-          "fitErr": 0.00745,
-          "totalExp": 2.99,
-          "referenceFirstHalfProb": 0.33,
-          "referenceDrawProb": 0.54,
-          "referenceSecondHalfProb": 0.13,
-          "reason": "Expected 3.0 goals, split 0.7 in the 1st half vs 2.2 in the 2nd. The 2nd half wins the half race 71% of the time, 60% clear of the other half."
-        },
-        "preview": null,
-        "form": null,
-        "h2h": null,
-        "sportybetLeague": "Belgium - Pro League"
-      },
-      {
-        "matchId": "2521392",
-        "home": "Ascoli",
-        "away": "Palermo",
-        "league": "It2",
-        "leagueName": "Serie B",
-        "country": "Italy",
-        "time": "",
-        "probs": {
-          "home": 18,
-          "draw": 40,
-          "away": 42
-        },
-        "predictionText": "2",
-        "avgGoals": 3.03,
-        "avgOdds": {
-          "home": 3.3,
-          "draw": 3.4,
-          "away": 2.15
-        },
-        "matchUrl": "ascoli-palermo-2521392",
-        "sportybetAvailable": true,
-        "sportybet": {
-          "home": "Ascoli Calcio 1898",
-          "away": "Palermo FC",
-          "league": "Italy - Serie B",
-          "country": "Italy",
-          "womens": false,
-          "homeLevel": "",
-          "awayLevel": "",
-          "time": "20:30",
-          "odds": {
-            "1": 3.2,
-            "2": 2.2,
-            "X": 3.5
-          }
-        },
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "DWWDDW",
-            "awayForm": "WDWWWW",
-            "homeRecently": 50,
-            "awayRecently": 83
-          },
-          "h2h": {
-            "wins": {
-              "home": 1,
-              "away": 3
-            },
-            "meets": 5
-          },
-          "expGoals": null
-        },
-        "market": "team-to-score",
-        "pick": "away",
-        "team": "Palermo",
-        "teamScoreProb": 88,
-        "winProb": null,
-        "mustScore": 90,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 35,
-          "h2h": 15
-        },
-        "locked": false,
-        "estimatedOdd": 1.14,
-        "confidence": 88,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 0.91,
-          "away": 2.12
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 59.7,
-            "estimatedOdd": 1.67
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 88,
-            "estimatedOdd": 1.14
-          }
-        ],
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.716,
-          "margin": 0.608,
-          "firstHalfShare": 0.25,
-          "firstHalfExp": 0.76,
-          "secondHalfExp": 2.27,
-          "p1": 0.109,
-          "p2": 0.716,
-          "tie": 0.175,
-          "fitErr": 0.00595,
-          "totalExp": 3.03,
-          "referenceFirstHalfProb": 0.13,
-          "referenceDrawProb": 0.58,
-          "referenceSecondHalfProb": 0.29,
-          "reason": "Expected 3.0 goals, split 0.8 in the 1st half vs 2.3 in the 2nd. The 2nd half wins the half race 72% of the time, 61% clear of the other half."
-        },
-        "preview": null,
-        "form": {
-          "home": "DWWDDW",
-          "away": "WDWWWW"
-        },
-        "h2h": {
-          "wins": {
-            "home": 1,
-            "away": 3
-          },
-          "meets": 5
-        },
-        "sportybetLeague": "Italy - Serie B"
-      },
-      {
-        "matchId": "2497606",
-        "home": "Montpellier",
-        "away": "Metz",
-        "league": "Fr2",
-        "leagueName": "Ligue 2",
-        "country": "France",
-        "time": "",
-        "probs": {
-          "home": 43,
-          "draw": 39,
-          "away": 18
-        },
-        "predictionText": "1",
-        "avgGoals": 2.9,
-        "avgOdds": {
-          "home": 1.9,
-          "draw": 3.4,
-          "away": 3.5
-        },
-        "matchUrl": "montpellier-metz-2497606",
-        "sportybetAvailable": true,
-        "sportybet": {
-          "home": "Montpellier",
-          "away": "Metz",
-          "league": "France - Ligue 2",
-          "country": "France",
-          "womens": false,
-          "homeLevel": "",
-          "awayLevel": "",
-          "time": "20:00",
-          "odds": {
-            "1": 2.05,
-            "2": 3.6,
-            "X": 3.5
-          }
-        },
-        "detail": null,
-        "detailOverBudget": true,
-        "market": "team-to-score",
-        "pick": "home",
-        "team": "Montpellier",
-        "teamScoreProb": 87,
-        "winProb": null,
-        "mustScore": 40,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 0,
-          "h2h": 0
-        },
-        "locked": false,
-        "estimatedOdd": 1.15,
-        "confidence": 87,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 2.04,
-          "away": 0.86
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 87,
-            "estimatedOdd": 1.15
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 57.7,
-            "estimatedOdd": 1.73
-          }
-        ],
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.682,
-          "margin": 0.555,
-          "firstHalfShare": 0.27,
-          "firstHalfExp": 0.78,
-          "secondHalfExp": 2.12,
-          "p1": 0.126,
-          "p2": 0.682,
-          "tie": 0.192,
-          "fitErr": 0.02388,
-          "totalExp": 2.9,
-          "referenceFirstHalfProb": 0.27,
-          "referenceDrawProb": 0.48,
-          "referenceSecondHalfProb": 0.25,
-          "reason": "Expected 2.9 goals, split 0.8 in the 1st half vs 2.1 in the 2nd. The 2nd half wins the half race 68% of the time, 56% clear of the other half."
-        },
-        "preview": null,
-        "form": null,
-        "h2h": null,
-        "sportybetLeague": "France - Ligue 2"
-      },
-      {
-        "matchId": "2492438",
-        "home": "TOP Oss",
-        "away": "Waalwijk",
-        "league": "Nl2",
-        "leagueName": "Eerste Divisie",
-        "country": "Netherlands",
-        "time": "",
-        "probs": {
-          "home": 33,
-          "draw": 44,
-          "away": 23
-        },
-        "predictionText": "X",
-        "avgGoals": 3.47,
-        "avgOdds": {
-          "home": 3.7,
-          "draw": 4,
-          "away": 1.85
-        },
-        "matchUrl": "top-oss-waalwijk-2492438",
-        "sportybetAvailable": true,
-        "sportybet": {
-          "home": "TOP Oss",
-          "away": "RKC Waalwijk",
-          "league": "Netherlands - Eerste Divisie",
-          "country": "Netherlands",
-          "womens": false,
-          "homeLevel": "",
-          "awayLevel": "",
-          "time": "20:00",
-          "odds": {
-            "1": 3.7,
-            "2": 1.88,
-            "X": 3.9
-          }
-        },
-        "detail": null,
-        "detailOverBudget": true,
-        "market": "team-to-score",
-        "pick": "home",
-        "team": "TOP Oss",
-        "teamScoreProb": 87,
-        "winProb": null,
-        "mustScore": 40,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 0,
-          "h2h": 0
-        },
-        "locked": false,
-        "estimatedOdd": 1.15,
-        "confidence": 87,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 2.04,
-          "away": 1.43
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 87,
-            "estimatedOdd": 1.15
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 76.1,
-            "estimatedOdd": 1.31
-          }
-        ],
-        "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.608,
-          "margin": 0.413,
-          "firstHalfShare": 0.65,
-          "firstHalfExp": 2.26,
-          "secondHalfExp": 1.21,
-          "p1": 0.608,
-          "p2": 0.196,
-          "tie": 0.196,
-          "fitErr": 0.0158,
-          "totalExp": 3.47,
-          "referenceFirstHalfProb": 0.56,
-          "referenceDrawProb": 0.24,
-          "referenceSecondHalfProb": 0.2,
-          "reason": "Expected 3.5 goals, split 2.3 in the 1st half vs 1.2 in the 2nd. The 1st half wins the half race 61% of the time, 41% clear of the other half."
-        },
-        "preview": null,
-        "form": null,
-        "h2h": null,
-        "sportybetLeague": "Netherlands - Eerste Divisie"
-      },
-      {
-        "matchId": "2495642",
-        "home": "Everton",
-        "away": "Coventry City",
-        "league": "EPL",
-        "leagueName": "Premier League",
-        "country": "England",
-        "time": "",
-        "probs": {
-          "home": 49,
-          "draw": 18,
-          "away": 33
-        },
-        "predictionText": "1",
-        "avgGoals": 3.25,
-        "avgOdds": {
-          "home": 1.66,
-          "draw": 4,
-          "away": 5
-        },
-        "matchUrl": "everton-coventry-city-2495642",
-        "sportybetAvailable": true,
-        "sportybet": {
-          "home": "Everton",
-          "away": "Coventry City",
-          "league": "England - Premier League",
-          "country": "England",
-          "womens": false,
-          "homeLevel": "",
-          "awayLevel": "",
-          "time": "21:00",
-          "odds": {
-            "1": 1.73,
-            "2": 4.97,
-            "X": 4.16
-          }
-        },
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "WWLLDW",
-            "awayForm": "WLLWWL",
-            "homeRecently": 50,
-            "awayRecently": 50
-          },
-          "h2h": {
-            "wins": {
-              "home": 1,
-              "away": 1
-            },
-            "meets": 2
-          },
-          "expGoals": null
-        },
-        "market": "team-to-score",
-        "pick": "home",
-        "team": "Everton",
-        "teamScoreProb": 85.6,
-        "winProb": null,
-        "mustScore": 55,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 10,
-          "h2h": 5
-        },
-        "locked": false,
-        "estimatedOdd": 1.17,
-        "confidence": 86,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 1.94,
-          "away": 1.31
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 85.6,
-            "estimatedOdd": 1.17
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 73,
-            "estimatedOdd": 1.37
-          }
-        ],
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.454,
-          "margin": 0.137,
-          "firstHalfShare": 0.45,
-          "firstHalfExp": 1.46,
-          "secondHalfExp": 1.79,
-          "p1": 0.317,
-          "p2": 0.454,
-          "tie": 0.229,
-          "fitErr": 0.00457,
-          "totalExp": 3.25,
-          "referenceFirstHalfProb": 0.44,
-          "referenceDrawProb": 0.38,
-          "referenceSecondHalfProb": 0.18,
-          "reason": "Expected 3.3 goals, split 1.5 in the 1st half vs 1.8 in the 2nd. The 2nd half wins the half race 45% of the time, 14% clear of the other half."
-        },
-        "preview": null,
-        "form": {
-          "home": "WWLLDW",
-          "away": "WLLWWL"
-        },
-        "h2h": {
-          "wins": {
-            "home": 1,
-            "away": 1
-          },
-          "meets": 2
-        },
-        "sportybetLeague": "England - Premier League"
-      },
-      {
-        "matchId": "2492440",
-        "home": "Heracles",
-        "away": "Roda Kerkrade",
-        "league": "Nl2",
-        "leagueName": "Eerste Divisie",
-        "country": "Netherlands",
-        "time": "",
-        "probs": {
-          "home": 39,
-          "draw": 31,
-          "away": 30
-        },
-        "predictionText": "1",
-        "avgGoals": 3.33,
-        "avgOdds": {
-          "home": 1.42,
-          "draw": 4.75,
-          "away": 6.5
-        },
-        "matchUrl": "heracles-roda-kerkrade-2492440",
-        "sportybetAvailable": true,
-        "sportybet": {
-          "home": "Heracles Almelo",
-          "away": "Roda JC Kerkrade",
-          "league": "Netherlands - Eerste Divisie",
-          "country": "Netherlands",
-          "womens": false,
-          "homeLevel": "",
-          "awayLevel": "",
-          "time": "20:00",
-          "odds": {
-            "1": 1.42,
-            "2": 6.4,
-            "X": 5
-          }
-        },
-        "detail": null,
-        "detailOverBudget": true,
-        "market": "team-to-score",
-        "pick": "home",
-        "team": "Heracles",
-        "teamScoreProb": 84.7,
-        "winProb": null,
-        "mustScore": 40,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 0,
-          "h2h": 0
-        },
-        "locked": false,
-        "estimatedOdd": 1.18,
-        "confidence": 85,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 1.88,
-          "away": 1.45
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 84.7,
-            "estimatedOdd": 1.18
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 76.5,
-            "estimatedOdd": 1.31
-          }
-        ],
-        "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.442,
-          "margin": 0.111,
-          "firstHalfShare": 0.54,
-          "firstHalfExp": 1.8,
-          "secondHalfExp": 1.53,
-          "p1": 0.442,
-          "p2": 0.331,
-          "tie": 0.227,
-          "fitErr": 0.00097,
-          "totalExp": 3.33,
-          "referenceFirstHalfProb": 0.42,
-          "referenceDrawProb": 0.33,
-          "referenceSecondHalfProb": 0.25,
-          "reason": "Expected 3.3 goals, split 1.8 in the 1st half vs 1.5 in the 2nd. The 1st half wins the half race 44% of the time, 11% clear of the other half."
-        },
-        "preview": null,
-        "form": null,
-        "h2h": null,
-        "sportybetLeague": "Netherlands - Eerste Divisie"
-      },
-      {
-        "matchId": "2494343",
-        "home": "FC Famalicão",
-        "away": "FC Arouca",
-        "league": "Pt1",
-        "leagueName": "Liga Portugal",
-        "country": "Portugal",
-        "time": "",
-        "probs": {
-          "home": 20,
-          "draw": 36,
-          "away": 44
-        },
-        "predictionText": "2",
-        "avgGoals": 2.7,
-        "avgOdds": {
-          "home": 2.25,
-          "draw": 3.3,
-          "away": 3.1
-        },
-        "matchUrl": "fc-famalicão-fc-arouca-2494343",
-        "sportybetAvailable": true,
-        "sportybet": {
-          "home": "FC Famalicao",
-          "away": "FC Arouca",
-          "league": "Portugal - Liga Portugal",
-          "country": "Portugal",
-          "womens": false,
-          "homeLevel": "",
-          "awayLevel": "",
-          "time": "21:45",
-          "odds": {
-            "1": 2.31,
-            "2": 3.32,
-            "X": 3.38
-          }
-        },
-        "detail": null,
-        "detailOverBudget": true,
-        "market": "team-to-score",
-        "pick": "away",
-        "team": "FC Arouca",
-        "teamScoreProb": 84.4,
-        "winProb": null,
-        "mustScore": 40,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 0,
-          "h2h": 0
-        },
-        "locked": false,
-        "estimatedOdd": 1.18,
-        "confidence": 84,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 0.84,
-          "away": 1.86
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 56.8,
-            "estimatedOdd": 1.76
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 84.4,
-            "estimatedOdd": 1.18
-          }
-        ],
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.691,
-          "margin": 0.577,
-          "firstHalfShare": 0.25,
-          "firstHalfExp": 0.68,
-          "secondHalfExp": 2.03,
-          "p1": 0.114,
-          "p2": 0.691,
-          "tie": 0.196,
-          "fitErr": 0.02568,
-          "totalExp": 2.7,
-          "referenceFirstHalfProb": 0.25,
-          "referenceDrawProb": 0.53,
-          "referenceSecondHalfProb": 0.22,
-          "reason": "Expected 2.7 goals, split 0.7 in the 1st half vs 2.0 in the 2nd. The 2nd half wins the half race 69% of the time, 58% clear of the other half."
-        },
-        "preview": null,
-        "form": null,
-        "h2h": null,
-        "sportybetLeague": "Portugal - Liga Portugal"
-      },
-      {
-        "matchId": "2497607",
-        "home": "Grenoble",
-        "away": "Reims",
-        "league": "Fr2",
-        "leagueName": "Ligue 2",
-        "country": "France",
-        "time": "",
-        "probs": {
-          "home": 16,
-          "draw": 38,
-          "away": 46
-        },
-        "predictionText": "2",
-        "avgGoals": 2.41,
-        "avgOdds": {
-          "home": 3.8,
-          "draw": 3.4,
-          "away": 1.85
-        },
-        "matchUrl": "grenoble-reims-2497607",
-        "sportybetAvailable": true,
-        "sportybet": {
-          "home": "Grenoble Foot",
-          "away": "Reims",
-          "league": "France - Ligue 2",
-          "country": "France",
-          "womens": false,
-          "homeLevel": "",
-          "awayLevel": "",
-          "time": "20:00",
-          "odds": {
-            "1": 3.9,
-            "2": 1.93,
-            "X": 3.5
-          }
-        },
-        "detail": null,
-        "detailOverBudget": true,
-        "market": "team-to-score",
-        "pick": "away",
-        "team": "Reims",
-        "teamScoreProb": 83.3,
-        "winProb": null,
-        "mustScore": 40,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 0,
-          "h2h": 0
-        },
-        "locked": false,
-        "estimatedOdd": 1.2,
-        "confidence": 83,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 0.62,
-          "away": 1.79
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 46.2,
-            "estimatedOdd": 2.16
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 83.3,
-            "estimatedOdd": 1.2
-          }
-        ],
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.458,
-          "margin": 0.185,
-          "firstHalfShare": 0.42,
-          "firstHalfExp": 1.01,
-          "secondHalfExp": 1.4,
-          "p1": 0.272,
-          "p2": 0.458,
-          "tie": 0.27,
-          "fitErr": 0.03629,
-          "totalExp": 2.41,
-          "referenceFirstHalfProb": 0.27,
-          "referenceDrawProb": 0.37,
-          "referenceSecondHalfProb": 0.35,
-          "reason": "Expected 2.4 goals, split 1.0 in the 1st half vs 1.4 in the 2nd. The 2nd half wins the half race 46% of the time, 19% clear of the other half."
-        },
-        "preview": null,
-        "form": null,
-        "h2h": null,
-        "sportybetLeague": "France - Ligue 2"
-      },
-      {
-        "matchId": "2492442",
-        "home": "FC Eindhoven",
-        "away": "Jong Ajax",
-        "league": "Nl2",
-        "leagueName": "Eerste Divisie",
-        "country": "Netherlands",
-        "time": "",
-        "probs": {
-          "home": 32,
-          "draw": 40,
-          "away": 27
-        },
-        "predictionText": "X",
-        "avgGoals": 3.25,
-        "avgOdds": {
-          "home": 2.15,
-          "draw": 3.9,
-          "away": 2.9
-        },
-        "matchUrl": "fc-eindhoven-jong-ajax-2492442",
-        "sportybetAvailable": true,
-        "sportybet": {
-          "home": "FC Eindhoven",
-          "away": "Jong Ajax Amsterdam",
-          "league": "Netherlands - Eerste Divisie",
-          "country": "Netherlands",
-          "womens": false,
-          "homeLevel": "",
-          "awayLevel": "",
-          "time": "20:00",
-          "odds": {
-            "1": 2.15,
-            "2": 2.95,
-            "X": 3.9
-          }
-        },
-        "detail": null,
-        "detailOverBudget": true,
-        "market": "team-to-score",
-        "pick": "home",
-        "team": "FC Eindhoven",
-        "teamScoreProb": 82.8,
-        "winProb": null,
-        "mustScore": 40,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 0,
-          "h2h": 0
-        },
-        "locked": false,
-        "estimatedOdd": 1.21,
-        "confidence": 83,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 1.76,
-          "away": 1.49
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 82.8,
-            "estimatedOdd": 1.21
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 77.5,
-            "estimatedOdd": 1.29
-          }
-        ],
-        "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.454,
-          "margin": 0.137,
-          "firstHalfShare": 0.55,
-          "firstHalfExp": 1.79,
-          "secondHalfExp": 1.46,
-          "p1": 0.454,
-          "p2": 0.317,
-          "tie": 0.229,
-          "fitErr": 0.01171,
-          "totalExp": 3.25,
-          "referenceFirstHalfProb": 0.31,
-          "referenceDrawProb": 0.32,
-          "referenceSecondHalfProb": 0.38,
-          "reason": "Expected 3.3 goals, split 1.8 in the 1st half vs 1.5 in the 2nd. The 1st half wins the half race 45% of the time, 14% clear of the other half."
-        },
-        "preview": null,
-        "form": null,
-        "h2h": null,
-        "sportybetLeague": "Netherlands - Eerste Divisie"
-      },
-      {
-        "matchId": "2474147",
-        "home": "Lokomotiv Moscow",
-        "away": "Rubin Kazan",
-        "league": "Ru1",
-        "leagueName": "Premier League",
-        "country": "Russia",
-        "time": "",
-        "probs": {
-          "home": 30,
-          "draw": 44,
-          "away": 27
-        },
-        "predictionText": "X",
-        "avgGoals": 3.4,
-        "avgOdds": {
-          "home": 2.22,
-          "draw": 3.6,
-          "away": 3.26
-        },
-        "matchUrl": "lokomotiv-moscow-rubin-kazan-2474147",
-        "sportybetAvailable": true,
-        "sportybet": {
-          "home": "Lokomotiv Moscow",
-          "away": "FK Rubin Kazan",
-          "league": "Russia - Premier League",
-          "country": "Russia",
-          "womens": false,
-          "homeLevel": "",
-          "awayLevel": "",
-          "time": "17:30",
-          "odds": {
-            "1": 2.25,
-            "2": 3.25,
-            "X": 3.4
-          }
-        },
-        "detail": null,
-        "detailOverBudget": true,
-        "market": "team-to-score",
-        "pick": "home",
-        "team": "Lokomotiv Moscow",
-        "teamScoreProb": 83.3,
-        "winProb": null,
-        "mustScore": 40,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 0,
-          "h2h": 0
-        },
-        "locked": false,
-        "estimatedOdd": 1.2,
-        "confidence": 83,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 1.79,
-          "away": 1.61
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 83.3,
-            "estimatedOdd": 1.2
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 80,
-            "estimatedOdd": 1.25
-          }
-        ],
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.633,
-          "margin": 0.458,
-          "firstHalfShare": 0.33,
-          "firstHalfExp": 1.12,
-          "secondHalfExp": 2.28,
-          "p1": 0.175,
-          "p2": 0.633,
-          "tie": 0.191,
-          "fitErr": 0.00517,
-          "totalExp": 3.4,
-          "referenceFirstHalfProb": 0.35,
-          "referenceDrawProb": 0.44,
-          "referenceSecondHalfProb": 0.21,
-          "reason": "Expected 3.4 goals, split 1.1 in the 1st half vs 2.3 in the 2nd. The 2nd half wins the half race 63% of the time, 46% clear of the other half."
-        },
-        "preview": null,
-        "form": null,
-        "h2h": null,
-        "sportybetLeague": "Russia - Premier League"
-      },
-      {
-        "matchId": "2523622",
-        "home": "Hamburger SV",
-        "away": "Borussia M'gladbach",
-        "league": "De1",
-        "leagueName": "Bundesliga",
-        "country": "Germany",
-        "time": "",
-        "probs": {
-          "home": 45,
-          "draw": 30,
-          "away": 24
-        },
-        "predictionText": "1",
-        "avgGoals": 2.67,
-        "avgOdds": {
-          "home": 2.35,
-          "draw": 3.6,
-          "away": 2.9
-        },
-        "matchUrl": "hamburger-sv-borussia-mgladbach-2523622",
-        "sportybetAvailable": true,
-        "sportybet": {
-          "home": "Hamburger SV",
-          "away": "Borussia M´gladbach",
-          "league": "Germany - Bundesliga",
-          "country": "Germany",
-          "womens": false,
-          "homeLevel": "",
-          "awayLevel": "",
-          "time": "20:30",
-          "odds": {
-            "1": 2.45,
-            "2": 2.91,
-            "X": 3.72
-          }
-        },
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "LLLWWW",
-            "awayForm": "DWWLLL",
-            "homeRecently": 50,
-            "awayRecently": 33
-          },
-          "h2h": {
-            "wins": {
-              "home": 2,
-              "away": 1
-            },
-            "meets": 5
-          },
-          "expGoals": null
-        },
-        "market": "team-to-score",
-        "pick": "home",
-        "team": "Hamburger SV",
-        "teamScoreProb": 82.4,
-        "winProb": null,
-        "mustScore": 60,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 10,
-          "h2h": 10
-        },
-        "locked": false,
-        "estimatedOdd": 1.21,
-        "confidence": 82,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 1.74,
-          "away": 0.93
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 82.4,
-            "estimatedOdd": 1.21
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 60.5,
-            "estimatedOdd": 1.65
-          }
-        ],
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.537,
-          "margin": 0.315,
-          "firstHalfShare": 0.37,
-          "firstHalfExp": 0.99,
-          "secondHalfExp": 1.68,
-          "p1": 0.221,
-          "p2": 0.537,
-          "tie": 0.242,
-          "fitErr": 0.00085,
-          "totalExp": 2.67,
-          "referenceFirstHalfProb": 0.39,
-          "referenceDrawProb": 0.47,
-          "referenceSecondHalfProb": 0.15,
-          "reason": "Expected 2.7 goals, split 1.0 in the 1st half vs 1.7 in the 2nd. The 2nd half wins the half race 54% of the time, 32% clear of the other half."
-        },
-        "preview": null,
-        "form": {
-          "home": "LLLWWW",
-          "away": "DWWLLL"
-        },
-        "h2h": {
-          "wins": {
-            "home": 2,
-            "away": 1
-          },
-          "meets": 5
-        },
-        "sportybetLeague": "Germany - Bundesliga"
-      },
-      {
-        "matchId": "2559685",
-        "home": "Canberra FC",
-        "away": "Sydney United",
-        "league": "Au2",
-        "leagueName": "Australian Championship",
-        "country": "Australia",
-        "time": "",
-        "probs": {
-          "home": 12,
-          "draw": 46,
-          "away": 42
-        },
-        "predictionText": "X",
-        "avgGoals": 2.13,
-        "avgOdds": {
-          "home": 6,
-          "draw": 4.2,
-          "away": 1.4
-        },
-        "matchUrl": "canberra-fc-sydney-united-2559685",
-        "sportybetAvailable": true,
-        "sportybet": {
-          "home": "Canberra Croatia FC",
-          "away": "Sydney United 58 FC",
-          "league": "Australia - Australian Championship",
-          "country": "Australia",
-          "womens": false,
-          "homeLevel": "",
-          "awayLevel": "",
-          "time": "09:30",
-          "odds": {
-            "1": 6.1,
-            "2": 1.39,
-            "X": 4.6
-          }
-        },
-        "detail": {
-          "books": [],
-          "previewText": "",
-          "form": {
-            "homeForm": "LLDLWW",
-            "awayForm": "WDDWWW",
-            "homeRecently": 33,
-            "awayRecently": 67
-          },
-          "h2h": {
-            "wins": {
-              "home": 0,
-              "away": 0
-            },
-            "meets": 1
-          },
-          "expGoals": null
-        },
-        "market": "team-to-score",
-        "pick": "away",
-        "team": "Sydney United",
-        "teamScoreProb": 81,
-        "winProb": null,
-        "mustScore": 67,
-        "mustScoreBreakdown": {
-          "model": 40,
-          "form": 27,
-          "h2h": 0
-        },
-        "locked": false,
-        "estimatedOdd": 1.23,
-        "confidence": 81,
-        "edge": null,
-        "bestOdds": null,
-        "marketPick": null,
-        "margin": null,
-        "passesGate": true,
-        "expGoals": {
-          "home": 0.47,
-          "away": 1.66
-        },
-        "teamScoreProps": [
-          {
-            "market": "team-to-score",
-            "side": "home",
-            "team": "home",
-            "prob": 37.5,
-            "estimatedOdd": 2.67
-          },
-          {
-            "market": "team-to-score",
-            "side": "away",
-            "team": "away",
-            "prob": 81,
-            "estimatedOdd": 1.23
-          }
-        ],
-        "hsh": {
-          "pick": "1H",
-          "label": "1st Half",
-          "prob": 0.521,
-          "margin": 0.32,
-          "firstHalfShare": 0.65,
-          "firstHalfExp": 1.38,
-          "secondHalfExp": 0.75,
-          "p1": 0.521,
-          "p2": 0.202,
-          "tie": 0.277,
-          "fitErr": 0.00887,
-          "totalExp": 2.13,
-          "referenceFirstHalfProb": 0.05,
-          "referenceDrawProb": 0.32,
-          "referenceSecondHalfProb": 0.63,
-          "reason": "Expected 2.1 goals, split 1.4 in the 1st half vs 0.7 in the 2nd. The 1st half wins the half race 52% of the time, 32% clear of the other half."
-        },
-        "preview": null,
-        "form": {
-          "home": "LLDLWW",
-          "away": "WDDWWW"
-        },
-        "h2h": {
-          "wins": {
-            "home": 0,
-            "away": 0
-          },
-          "meets": 1
-        },
-        "sportybetLeague": "Australia - Australian Championship"
-      }
-    ],
     "2026-11-07": [
       {
         "matchId": "2523623",
@@ -3458,9 +1840,1867 @@
         },
         "sportybetLeague": "England - Championship"
       }
+    ],
+    "2026-11-08": [
+      {
+        "matchId": "2496592",
+        "home": "Napoli",
+        "away": "Lazio",
+        "league": "It1",
+        "leagueName": "Serie A",
+        "country": "Italy",
+        "time": "",
+        "probs": {
+          "home": 20,
+          "draw": 22,
+          "away": 58
+        },
+        "predictionText": "2",
+        "avgGoals": 4.29,
+        "avgOdds": {
+          "home": 2.3,
+          "draw": 3.6,
+          "away": 2.9
+        },
+        "matchUrl": "napoli-lazio-2496592",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Napoli",
+          "away": "Lazio",
+          "league": "Italy - Serie A",
+          "country": "Italy",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "12:30",
+          "odds": {
+            "1": 2.39,
+            "2": 3.02,
+            "X": 3.69
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "LLWDWL",
+            "awayForm": "WWWWWW",
+            "homeRecently": 33,
+            "awayRecently": 100
+          },
+          "h2h": {
+            "wins": {
+              "home": 1,
+              "away": 3
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "Lazio",
+        "teamScoreProb": 95.9,
+        "winProb": null,
+        "mustScore": 90,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 35,
+          "h2h": 15
+        },
+        "locked": false,
+        "estimatedOdd": 1.04,
+        "confidence": 96,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.1,
+          "away": 3.19
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 66.7,
+            "estimatedOdd": 1.5
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 95.9,
+            "estimatedOdd": 1.04
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.789,
+          "margin": 0.699,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 1.07,
+          "secondHalfExp": 3.22,
+          "p1": 0.09,
+          "p2": 0.789,
+          "tie": 0.121,
+          "fitErr": 0.01531,
+          "totalExp": 4.29,
+          "referenceFirstHalfProb": 0.15,
+          "referenceDrawProb": 0.49,
+          "referenceSecondHalfProb": 0.36,
+          "reason": "Expected 4.3 goals, split 1.1 in the 1st half vs 3.2 in the 2nd. The 2nd half wins the half race 79% of the time, 70% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "LLWDWL",
+          "away": "WWWWWW"
+        },
+        "h2h": {
+          "wins": {
+            "home": 1,
+            "away": 3
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "Italy - Serie A"
+      },
+      {
+        "matchId": "2492105",
+        "home": "Heerenveen",
+        "away": "Feyenoord",
+        "league": "Nl1",
+        "leagueName": "Eredivisie",
+        "country": "Netherlands",
+        "time": "",
+        "probs": {
+          "home": 18,
+          "draw": 34,
+          "away": 49
+        },
+        "predictionText": "2",
+        "avgGoals": 3.48,
+        "avgOdds": {
+          "home": 4.5,
+          "draw": 4.2,
+          "away": 1.7
+        },
+        "matchUrl": "heerenveen-feyenoord-2492105",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "SC Heerenveen",
+          "away": "Feyenoord",
+          "league": "Netherlands - Eredivisie",
+          "country": "Netherlands",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "12:15",
+          "odds": {
+            "1": 4.38,
+            "2": 1.75,
+            "X": 4.37
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "WWWWLW",
+            "awayForm": "LDDLWW",
+            "homeRecently": 83,
+            "awayRecently": 33
+          },
+          "h2h": {
+            "wins": {
+              "home": 2,
+              "away": 2
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "Feyenoord",
+        "teamScoreProb": 92.2,
+        "winProb": null,
+        "mustScore": 50,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 0,
+          "h2h": 10
+        },
+        "locked": false,
+        "estimatedOdd": 1.08,
+        "confidence": 92,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 0.93,
+          "away": 2.55
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 60.5,
+            "estimatedOdd": 1.65
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 92.2,
+            "estimatedOdd": 1.08
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.52,
+          "margin": 0.254,
+          "firstHalfShare": 0.41,
+          "firstHalfExp": 1.43,
+          "secondHalfExp": 2.05,
+          "p1": 0.266,
+          "p2": 0.52,
+          "tie": 0.213,
+          "fitErr": 0.0113,
+          "totalExp": 3.48,
+          "referenceFirstHalfProb": 0.22,
+          "referenceDrawProb": 0.31,
+          "referenceSecondHalfProb": 0.47,
+          "reason": "Expected 3.5 goals, split 1.4 in the 1st half vs 2.1 in the 2nd. The 2nd half wins the half race 52% of the time, 25% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "WWWWLW",
+          "away": "LDDLWW"
+        },
+        "h2h": {
+          "wins": {
+            "home": 2,
+            "away": 2
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "Netherlands - Eredivisie"
+      },
+      {
+        "matchId": "2495285",
+        "home": "Atlético Madrid",
+        "away": "Barcelona",
+        "league": "Es1",
+        "leagueName": "La Liga",
+        "country": "Spain",
+        "time": "",
+        "probs": {
+          "home": 25,
+          "draw": 27,
+          "away": 48
+        },
+        "predictionText": "2",
+        "avgGoals": 3.49,
+        "avgOdds": {
+          "home": 3.75,
+          "draw": 4.33,
+          "away": 1.8
+        },
+        "matchUrl": "atlético-madrid-barcelona-2495285",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Atletico Madrid",
+          "away": "Barcelona",
+          "league": "Spain - LaLiga",
+          "country": "Spain",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "21:00",
+          "odds": {
+            "1": 3.73,
+            "2": 1.9,
+            "X": 4.45
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "LWWDWW",
+            "awayForm": "WWLLWW",
+            "homeRecently": 67,
+            "awayRecently": 67
+          },
+          "h2h": {
+            "wins": {
+              "home": 2,
+              "away": 3
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "Barcelona",
+        "teamScoreProb": 89.9,
+        "winProb": null,
+        "mustScore": 82,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 27,
+          "h2h": 15
+        },
+        "locked": false,
+        "estimatedOdd": 1.11,
+        "confidence": 90,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.2,
+          "away": 2.29
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 69.9,
+            "estimatedOdd": 1.43
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 89.9,
+            "estimatedOdd": 1.11
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.417,
+          "margin": 0.057,
+          "firstHalfShare": 0.48,
+          "firstHalfExp": 1.68,
+          "secondHalfExp": 1.81,
+          "p1": 0.36,
+          "p2": 0.417,
+          "tie": 0.223,
+          "fitErr": 0.00155,
+          "totalExp": 3.49,
+          "referenceFirstHalfProb": 0.16,
+          "referenceDrawProb": 0.34,
+          "referenceSecondHalfProb": 0.5,
+          "reason": "Expected 3.5 goals, split 1.7 in the 1st half vs 1.8 in the 2nd. The 2nd half wins the half race 42% of the time, 6% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "LWWDWW",
+          "away": "WWLLWW"
+        },
+        "h2h": {
+          "wins": {
+            "home": 2,
+            "away": 3
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "Spain - LaLiga"
+      },
+      {
+        "matchId": "2496593",
+        "home": "Monza",
+        "away": "Atalanta",
+        "league": "It1",
+        "leagueName": "Serie A",
+        "country": "Italy",
+        "time": "",
+        "probs": {
+          "home": 32,
+          "draw": 27,
+          "away": 41
+        },
+        "predictionText": "2",
+        "avgGoals": 4,
+        "avgOdds": {
+          "home": 3.4,
+          "draw": 3.6,
+          "away": 2.1
+        },
+        "matchUrl": "monza-atalanta-2496593",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Monza",
+          "away": "Atalanta",
+          "league": "Italy - Serie A",
+          "country": "Italy",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "15:00",
+          "odds": {
+            "1": 3.39,
+            "2": 2.14,
+            "X": 3.88
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "LLLWLW",
+            "awayForm": "DLDDLL",
+            "homeRecently": 33,
+            "awayRecently": 0
+          },
+          "h2h": {
+            "wins": {
+              "home": 0,
+              "away": 5
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "Atalanta",
+        "teamScoreProb": 89.5,
+        "winProb": null,
+        "mustScore": 65,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 0,
+          "h2h": 25
+        },
+        "locked": false,
+        "estimatedOdd": 1.12,
+        "confidence": 90,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.75,
+          "away": 2.25
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 82.6,
+            "estimatedOdd": 1.21
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 89.5,
+            "estimatedOdd": 1.12
+          }
+        ],
+        "hsh": {
+          "pick": "1H",
+          "label": "1st Half",
+          "prob": 0.633,
+          "margin": 0.442,
+          "firstHalfShare": 0.65,
+          "firstHalfExp": 2.6,
+          "secondHalfExp": 1.4,
+          "p1": 0.633,
+          "p2": 0.191,
+          "tie": 0.177,
+          "fitErr": 0.00038,
+          "totalExp": 4,
+          "referenceFirstHalfProb": 0.31,
+          "referenceDrawProb": 0.25,
+          "referenceSecondHalfProb": 0.44,
+          "reason": "Expected 4.0 goals, split 2.6 in the 1st half vs 1.4 in the 2nd. The 1st half wins the half race 63% of the time, 44% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "LLLWLW",
+          "away": "DLDDLL"
+        },
+        "h2h": {
+          "wins": {
+            "home": 0,
+            "away": 5
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "Italy - Serie A"
+      },
+      {
+        "matchId": "2495643",
+        "home": "Crystal Palace",
+        "away": "Liverpool",
+        "league": "EPL",
+        "leagueName": "Premier League",
+        "country": "England",
+        "time": "",
+        "probs": {
+          "home": 21,
+          "draw": 18,
+          "away": 62
+        },
+        "predictionText": "2",
+        "avgGoals": 3.11,
+        "avgOdds": {
+          "home": 5.5,
+          "draw": 4.33,
+          "away": 1.57
+        },
+        "matchUrl": "crystal-palace-liverpool-2495643",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Crystal Palace",
+          "away": "Liverpool",
+          "league": "England - Premier League",
+          "country": "England",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "15:00",
+          "odds": {
+            "1": 5.52,
+            "2": 1.61,
+            "X": 4.57
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "DLWLDL",
+            "awayForm": "LLDWWW",
+            "homeRecently": 17,
+            "awayRecently": 50
+          },
+          "h2h": {
+            "wins": {
+              "home": 2,
+              "away": 1
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "Liverpool",
+        "teamScoreProb": 90.2,
+        "winProb": null,
+        "mustScore": 55,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 10,
+          "h2h": 5
+        },
+        "locked": false,
+        "estimatedOdd": 1.11,
+        "confidence": 90,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 0.79,
+          "away": 2.32
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 54.6,
+            "estimatedOdd": 1.83
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 90.2,
+            "estimatedOdd": 1.11
+          }
+        ],
+        "hsh": null,
+        "preview": null,
+        "form": {
+          "home": "DLWLDL",
+          "away": "LLDWWW"
+        },
+        "h2h": {
+          "wins": {
+            "home": 2,
+            "away": 1
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "England - Premier League"
+      },
+      {
+        "matchId": "2523625",
+        "home": "Hoffenheim",
+        "away": "Schalke 04",
+        "league": "De1",
+        "leagueName": "Bundesliga",
+        "country": "Germany",
+        "time": "",
+        "probs": {
+          "home": 47,
+          "draw": 32,
+          "away": 22
+        },
+        "predictionText": "1",
+        "avgGoals": 2.99,
+        "avgOdds": {
+          "home": 1.6,
+          "draw": 4.33,
+          "away": 5
+        },
+        "matchUrl": "hoffenheim-schalke-04-2523625",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Hoffenheim",
+          "away": "Schalke",
+          "league": "Germany - Bundesliga",
+          "country": "Germany",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "19:30",
+          "odds": {
+            "1": 1.65,
+            "2": 5.13,
+            "X": 4.56
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "DLDWWW",
+            "awayForm": "LLDLLD",
+            "homeRecently": 50,
+            "awayRecently": 0
+          },
+          "h2h": {
+            "wins": {
+              "home": 4,
+              "away": 1
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "home",
+        "team": "Hoffenheim",
+        "teamScoreProb": 87,
+        "winProb": null,
+        "mustScore": 70,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 10,
+          "h2h": 20
+        },
+        "locked": false,
+        "estimatedOdd": 1.15,
+        "confidence": 87,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 2.04,
+          "away": 0.95
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 87,
+            "estimatedOdd": 1.15
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 61.3,
+            "estimatedOdd": 1.63
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.582,
+          "margin": 0.383,
+          "firstHalfShare": 0.35,
+          "firstHalfExp": 1.05,
+          "secondHalfExp": 1.94,
+          "p1": 0.2,
+          "p2": 0.582,
+          "tie": 0.218,
+          "fitErr": 0.00472,
+          "totalExp": 2.99,
+          "referenceFirstHalfProb": 0.37,
+          "referenceDrawProb": 0.42,
+          "referenceSecondHalfProb": 0.21,
+          "reason": "Expected 3.0 goals, split 1.0 in the 1st half vs 1.9 in the 2nd. The 2nd half wins the half race 58% of the time, 38% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "DLDWWW",
+          "away": "LLDLLD"
+        },
+        "h2h": {
+          "wins": {
+            "home": 4,
+            "away": 1
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "Germany - Bundesliga"
+      },
+      {
+        "matchId": "2564553",
+        "home": "Charleston Battery",
+        "away": "Hartford Athletic",
+        "league": "Us2",
+        "leagueName": "USL Championship",
+        "country": "USA",
+        "time": "",
+        "probs": {
+          "home": 47,
+          "draw": 24,
+          "away": 28
+        },
+        "predictionText": "1",
+        "avgGoals": 3.13,
+        "avgOdds": {
+          "home": 1.65,
+          "draw": 3.5,
+          "away": 4.33
+        },
+        "matchUrl": "charleston-battery-hartford-athletic-2564553",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Charleston Battery",
+          "away": "Hartford Athletic",
+          "league": "USA - USL Championship",
+          "country": "USA",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "01:30",
+          "odds": {
+            "1": 1.74,
+            "2": 4.25,
+            "X": 3.7
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "DWWDLW",
+            "awayForm": "WWLDLD",
+            "homeRecently": 50,
+            "awayRecently": 33
+          },
+          "h2h": {
+            "wins": {
+              "home": 2,
+              "away": 1
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "home",
+        "team": "Charleston Battery",
+        "teamScoreProb": 85.9,
+        "winProb": null,
+        "mustScore": 60,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 10,
+          "h2h": 10
+        },
+        "locked": false,
+        "estimatedOdd": 1.16,
+        "confidence": 86,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.96,
+          "away": 1.17
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 85.9,
+            "estimatedOdd": 1.16
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 69,
+            "estimatedOdd": 1.45
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.45,
+          "margin": 0.135,
+          "firstHalfShare": 0.45,
+          "firstHalfExp": 1.41,
+          "secondHalfExp": 1.72,
+          "p1": 0.316,
+          "p2": 0.45,
+          "tie": 0.234,
+          "fitErr": 0.0163,
+          "totalExp": 3.13,
+          "referenceFirstHalfProb": 0.35,
+          "referenceDrawProb": 0.34,
+          "referenceSecondHalfProb": 0.31,
+          "reason": "Expected 3.1 goals, split 1.4 in the 1st half vs 1.7 in the 2nd. The 2nd half wins the half race 45% of the time, 13% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "DWWDLW",
+          "away": "WWLDLD"
+        },
+        "h2h": {
+          "wins": {
+            "home": 2,
+            "away": 1
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "USA - USL Championship"
+      },
+      {
+        "matchId": "2495644",
+        "home": "Brighton",
+        "away": "Brentford",
+        "league": "EPL",
+        "leagueName": "Premier League",
+        "country": "England",
+        "time": "",
+        "probs": {
+          "home": 34,
+          "draw": 45,
+          "away": 20
+        },
+        "predictionText": "X",
+        "avgGoals": 3.06,
+        "avgOdds": {
+          "home": 1.83,
+          "draw": 3.8,
+          "away": 3.8
+        },
+        "matchUrl": "brighton-brentford-2495644",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Brighton",
+          "away": "Brentford",
+          "league": "England - Premier League",
+          "country": "England",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "15:00",
+          "odds": {
+            "1": 1.93,
+            "2": 3.99,
+            "X": 3.99
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "WWDLDW",
+            "awayForm": "WLDLDW",
+            "homeRecently": 50,
+            "awayRecently": 33
+          },
+          "h2h": {
+            "wins": {
+              "home": 2,
+              "away": 1
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "home",
+        "team": "Brighton",
+        "teamScoreProb": 85.5,
+        "winProb": null,
+        "mustScore": 60,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 10,
+          "h2h": 10
+        },
+        "locked": false,
+        "estimatedOdd": 1.17,
+        "confidence": 86,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.93,
+          "away": 1.13
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 85.5,
+            "estimatedOdd": 1.17
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 67.7,
+            "estimatedOdd": 1.48
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.559,
+          "margin": 0.339,
+          "firstHalfShare": 0.37,
+          "firstHalfExp": 1.13,
+          "secondHalfExp": 1.93,
+          "p1": 0.22,
+          "p2": 0.559,
+          "tie": 0.221,
+          "fitErr": 0.02207,
+          "totalExp": 3.06,
+          "referenceFirstHalfProb": 0.3,
+          "referenceDrawProb": 0.39,
+          "referenceSecondHalfProb": 0.31,
+          "reason": "Expected 3.1 goals, split 1.1 in the 1st half vs 1.9 in the 2nd. The 2nd half wins the half race 56% of the time, 34% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "WWDLDW",
+          "away": "WLDLDW"
+        },
+        "h2h": {
+          "wins": {
+            "home": 2,
+            "away": 1
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "England - Premier League"
+      },
+      {
+        "matchId": "2496268",
+        "home": "Brest",
+        "away": "Lyon",
+        "league": "Fr1",
+        "leagueName": "Ligue 1",
+        "country": "France",
+        "time": "",
+        "probs": {
+          "home": 27,
+          "draw": 31,
+          "away": 42
+        },
+        "predictionText": "2",
+        "avgGoals": 3.13,
+        "avgOdds": {
+          "home": 2.75,
+          "draw": 3.4,
+          "away": 2.5
+        },
+        "matchUrl": "brest-lyon-2496268",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Brest",
+          "away": "Lyon",
+          "league": "France - Ligue 1",
+          "country": "France",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "17:15",
+          "odds": {
+            "1": 2.87,
+            "2": 2.58,
+            "X": 3.53
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "WLDWLL",
+            "awayForm": "DWLLWW",
+            "homeRecently": 33,
+            "awayRecently": 50
+          },
+          "h2h": {
+            "wins": {
+              "home": 1,
+              "away": 3
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "Lyon",
+        "teamScoreProb": 85.2,
+        "winProb": null,
+        "mustScore": 65,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 10,
+          "h2h": 15
+        },
+        "locked": false,
+        "estimatedOdd": 1.17,
+        "confidence": 85,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.22,
+          "away": 1.91
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 70.5,
+            "estimatedOdd": 1.42
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 85.2,
+            "estimatedOdd": 1.17
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.535,
+          "margin": 0.292,
+          "firstHalfShare": 0.39,
+          "firstHalfExp": 1.22,
+          "secondHalfExp": 1.91,
+          "p1": 0.243,
+          "p2": 0.535,
+          "tie": 0.223,
+          "fitErr": 0.01024,
+          "totalExp": 3.13,
+          "referenceFirstHalfProb": 0.29,
+          "referenceDrawProb": 0.39,
+          "referenceSecondHalfProb": 0.32,
+          "reason": "Expected 3.1 goals, split 1.2 in the 1st half vs 1.9 in the 2nd. The 2nd half wins the half race 53% of the time, 29% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "WLDWLL",
+          "away": "DWLLWW"
+        },
+        "h2h": {
+          "wins": {
+            "home": 1,
+            "away": 3
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "France - Ligue 1"
+      },
+      {
+        "matchId": "2496596",
+        "home": "Fiorentina",
+        "away": "Juventus",
+        "league": "It1",
+        "leagueName": "Serie A",
+        "country": "Italy",
+        "time": "",
+        "probs": {
+          "home": 21,
+          "draw": 32,
+          "away": 47
+        },
+        "predictionText": "2",
+        "avgGoals": 2.76,
+        "avgOdds": {
+          "home": 3.4,
+          "draw": 3.5,
+          "away": 2.15
+        },
+        "matchUrl": "fiorentina-juventus-2496596",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Fiorentina",
+          "away": "Juventus",
+          "league": "Italy - Serie A",
+          "country": "Italy",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "20:45",
+          "odds": {
+            "1": 3.42,
+            "2": 2.21,
+            "X": 3.62
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "WDLLLD",
+            "awayForm": "WWLWDL",
+            "homeRecently": 17,
+            "awayRecently": 50
+          },
+          "h2h": {
+            "wins": {
+              "home": 2,
+              "away": 1
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "Juventus",
+        "teamScoreProb": 85.2,
+        "winProb": null,
+        "mustScore": 55,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 10,
+          "h2h": 5
+        },
+        "locked": false,
+        "estimatedOdd": 1.17,
+        "confidence": 85,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 0.85,
+          "away": 1.91
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 57.3,
+            "estimatedOdd": 1.75
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 85.2,
+            "estimatedOdd": 1.17
+          }
+        ],
+        "hsh": {
+          "pick": "1H",
+          "label": "1st Half",
+          "prob": 0.529,
+          "margin": 0.297,
+          "firstHalfShare": 0.62,
+          "firstHalfExp": 1.71,
+          "secondHalfExp": 1.05,
+          "p1": 0.529,
+          "p2": 0.232,
+          "tie": 0.239,
+          "fitErr": 0.01998,
+          "totalExp": 2.76,
+          "referenceFirstHalfProb": 0.28,
+          "referenceDrawProb": 0.26,
+          "referenceSecondHalfProb": 0.46,
+          "reason": "Expected 2.8 goals, split 1.7 in the 1st half vs 1.0 in the 2nd. The 1st half wins the half race 53% of the time, 30% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "WDLLLD",
+          "away": "WWLWDL"
+        },
+        "h2h": {
+          "wins": {
+            "home": 2,
+            "away": 1
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "Italy - Serie A"
+      },
+      {
+        "matchId": "2523624",
+        "home": "Freiburg",
+        "away": "Union Berlin",
+        "league": "De1",
+        "leagueName": "Bundesliga",
+        "country": "Germany",
+        "time": "",
+        "probs": {
+          "home": 48,
+          "draw": 30,
+          "away": 21
+        },
+        "predictionText": "1",
+        "avgGoals": 2.76,
+        "avgOdds": {
+          "home": 1.48,
+          "draw": 4.5,
+          "away": 6.25
+        },
+        "matchUrl": "freiburg-union-berlin-2523624",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Freiburg",
+          "away": "Union Berlin",
+          "league": "Germany - Bundesliga",
+          "country": "Germany",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "17:30",
+          "odds": {
+            "1": 1.54,
+            "2": 6.18,
+            "X": 4.81
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "WWWLLL",
+            "awayForm": "DLDDWL",
+            "homeRecently": 50,
+            "awayRecently": 17
+          },
+          "h2h": {
+            "wins": {
+              "home": 0,
+              "away": 3
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "home",
+        "team": "Freiburg",
+        "teamScoreProb": 85.3,
+        "winProb": null,
+        "mustScore": 50,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 10,
+          "h2h": 0
+        },
+        "locked": false,
+        "estimatedOdd": 1.17,
+        "confidence": 85,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.92,
+          "away": 0.84
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 85.3,
+            "estimatedOdd": 1.17
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 56.8,
+            "estimatedOdd": 1.76
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.542,
+          "margin": 0.321,
+          "firstHalfShare": 0.37,
+          "firstHalfExp": 1.02,
+          "secondHalfExp": 1.74,
+          "p1": 0.221,
+          "p2": 0.542,
+          "tie": 0.237,
+          "fitErr": 0.0018,
+          "totalExp": 2.76,
+          "referenceFirstHalfProb": 0.39,
+          "referenceDrawProb": 0.43,
+          "referenceSecondHalfProb": 0.18,
+          "reason": "Expected 2.8 goals, split 1.0 in the 1st half vs 1.7 in the 2nd. The 2nd half wins the half race 54% of the time, 32% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "WWWLLL",
+          "away": "DLDDWL"
+        },
+        "h2h": {
+          "wins": {
+            "home": 0,
+            "away": 3
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "Germany - Bundesliga"
+      },
+      {
+        "matchId": "2496270",
+        "home": "Angers",
+        "away": "Nice",
+        "league": "Fr1",
+        "leagueName": "Ligue 1",
+        "country": "France",
+        "time": "",
+        "probs": {
+          "home": 26,
+          "draw": 25,
+          "away": 50
+        },
+        "predictionText": "2",
+        "avgGoals": 2.78,
+        "avgOdds": {
+          "home": 3.6,
+          "draw": 3.6,
+          "away": 2
+        },
+        "matchUrl": "angers-nice-2496270",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Angers",
+          "away": "Nice",
+          "league": "France - Ligue 1",
+          "country": "France",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "17:15",
+          "odds": {
+            "1": 3.62,
+            "2": 2.1,
+            "X": 3.73
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "LDLLWD",
+            "awayForm": "WWLWWL",
+            "homeRecently": 17,
+            "awayRecently": 67
+          },
+          "h2h": {
+            "wins": {
+              "home": 1,
+              "away": 3
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "Nice",
+        "teamScoreProb": 84,
+        "winProb": null,
+        "mustScore": 82,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 27,
+          "h2h": 15
+        },
+        "locked": false,
+        "estimatedOdd": 1.19,
+        "confidence": 84,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 0.95,
+          "away": 1.83
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 61.3,
+            "estimatedOdd": 1.63
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 84,
+            "estimatedOdd": 1.19
+          }
+        ],
+        "hsh": null,
+        "preview": null,
+        "form": {
+          "home": "LDLLWD",
+          "away": "WWLWWL"
+        },
+        "h2h": {
+          "wins": {
+            "home": 1,
+            "away": 3
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "France - Ligue 1"
+      },
+      {
+        "matchId": "2468200",
+        "home": "Tigres UANL",
+        "away": "Cruz Azul",
+        "league": "Mx1",
+        "leagueName": "Liga MX",
+        "country": "Mexico",
+        "time": "",
+        "probs": {
+          "home": 21,
+          "draw": 25,
+          "away": 53
+        },
+        "predictionText": "2",
+        "avgGoals": 2.59,
+        "avgOdds": {
+          "home": 3.5,
+          "draw": 3.7,
+          "away": 2
+        },
+        "matchUrl": "tigres-uanl-cruz-azul-2468200",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Tigres UANL",
+          "away": "CF Cruz Azul",
+          "league": "Mexico - Liga MX",
+          "country": "Mexico",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "02:00",
+          "odds": {
+            "1": 3.5,
+            "2": 2,
+            "X": 3.75
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "LDLDWW",
+            "awayForm": "WWWWDD",
+            "homeRecently": 33,
+            "awayRecently": 67
+          },
+          "h2h": {
+            "wins": {
+              "home": 0,
+              "away": 2
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "Cruz Azul",
+        "teamScoreProb": 84.3,
+        "winProb": null,
+        "mustScore": 77,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 27,
+          "h2h": 10
+        },
+        "locked": false,
+        "estimatedOdd": 1.19,
+        "confidence": 84,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 0.73,
+          "away": 1.85
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 51.8,
+            "estimatedOdd": 1.93
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 84.3,
+            "estimatedOdd": 1.19
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.57,
+          "margin": 0.378,
+          "firstHalfShare": 0.34,
+          "firstHalfExp": 0.88,
+          "secondHalfExp": 1.71,
+          "p1": 0.192,
+          "p2": 0.57,
+          "tie": 0.238,
+          "fitErr": 0.01012,
+          "totalExp": 2.59,
+          "referenceFirstHalfProb": 0.21,
+          "referenceDrawProb": 0.46,
+          "referenceSecondHalfProb": 0.34,
+          "reason": "Expected 2.6 goals, split 0.9 in the 1st half vs 1.7 in the 2nd. The 2nd half wins the half race 57% of the time, 38% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "LDLDWW",
+          "away": "WWWWDD"
+        },
+        "h2h": {
+          "wins": {
+            "home": 0,
+            "away": 2
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "Mexico - Liga MX"
+      },
+      {
+        "matchId": "2495284",
+        "home": "Celta Vigo",
+        "away": "Levante",
+        "league": "Es1",
+        "leagueName": "La Liga",
+        "country": "Spain",
+        "time": "",
+        "probs": {
+          "home": 47,
+          "draw": 37,
+          "away": 16
+        },
+        "predictionText": "1",
+        "avgGoals": 2.44,
+        "avgOdds": {
+          "home": 1.85,
+          "draw": 3.5,
+          "away": 4.33
+        },
+        "matchUrl": "celta-vigo-levante-2495284",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Celta",
+          "away": "Levante",
+          "league": "Spain - LaLiga",
+          "country": "Spain",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "18:30",
+          "odds": {
+            "1": 1.93,
+            "2": 4.28,
+            "X": 3.72
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "LLDWWL",
+            "awayForm": "LLWDDL",
+            "homeRecently": 33,
+            "awayRecently": 17
+          },
+          "h2h": {
+            "wins": {
+              "home": 3,
+              "away": 1
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "home",
+        "team": "Celta Vigo",
+        "teamScoreProb": 83.8,
+        "winProb": null,
+        "mustScore": 55,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 0,
+          "h2h": 15
+        },
+        "locked": false,
+        "estimatedOdd": 1.19,
+        "confidence": 84,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.82,
+          "away": 0.62
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 83.8,
+            "estimatedOdd": 1.19
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 46.2,
+            "estimatedOdd": 2.16
+          }
+        ],
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.447,
+          "margin": 0.164,
+          "firstHalfShare": 0.43,
+          "firstHalfExp": 1.05,
+          "secondHalfExp": 1.39,
+          "p1": 0.284,
+          "p2": 0.447,
+          "tie": 0.269,
+          "fitErr": 0.00022,
+          "totalExp": 2.44,
+          "referenceFirstHalfProb": 0.45,
+          "referenceDrawProb": 0.42,
+          "referenceSecondHalfProb": 0.13,
+          "reason": "Expected 2.4 goals, split 1.0 in the 1st half vs 1.4 in the 2nd. The 2nd half wins the half race 45% of the time, 16% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "LLDWWL",
+          "away": "LLWDDL"
+        },
+        "h2h": {
+          "wins": {
+            "home": 3,
+            "away": 1
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "Spain - LaLiga"
+      },
+      {
+        "matchId": "2495640",
+        "home": "Ipswich Town",
+        "away": "Bournemouth",
+        "league": "EPL",
+        "leagueName": "Premier League",
+        "country": "England",
+        "time": "",
+        "probs": {
+          "home": 30,
+          "draw": 37,
+          "away": 33
+        },
+        "predictionText": "X",
+        "avgGoals": 3.25,
+        "avgOdds": {
+          "home": 3.8,
+          "draw": 3.7,
+          "away": 1.9
+        },
+        "matchUrl": "ipswich-town-bournemouth-2495640",
+        "sportybetAvailable": true,
+        "sportybet": {
+          "home": "Ipswich Town",
+          "away": "Bournemouth",
+          "league": "England - Premier League",
+          "country": "England",
+          "womens": false,
+          "homeLevel": "",
+          "awayLevel": "",
+          "time": "15:00",
+          "odds": {
+            "1": 4.01,
+            "2": 1.95,
+            "X": 3.86
+          }
+        },
+        "detail": {
+          "books": [],
+          "previewText": "",
+          "form": {
+            "homeForm": "DDLWLL",
+            "awayForm": "WWWWWW",
+            "homeRecently": 17,
+            "awayRecently": 100
+          },
+          "h2h": {
+            "wins": {
+              "home": 1,
+              "away": 1
+            },
+            "meets": 5
+          },
+          "expGoals": null
+        },
+        "market": "team-to-score",
+        "pick": "away",
+        "team": "Bournemouth",
+        "teamScoreProb": 81.7,
+        "winProb": null,
+        "mustScore": 80,
+        "mustScoreBreakdown": {
+          "model": 40,
+          "form": 35,
+          "h2h": 5
+        },
+        "locked": false,
+        "estimatedOdd": 1.22,
+        "confidence": 82,
+        "edge": null,
+        "bestOdds": null,
+        "marketPick": null,
+        "margin": null,
+        "passesGate": true,
+        "expGoals": {
+          "home": 1.55,
+          "away": 1.7
+        },
+        "teamScoreProps": [
+          {
+            "market": "team-to-score",
+            "side": "home",
+            "team": "home",
+            "prob": 78.8,
+            "estimatedOdd": 1.27
+          },
+          {
+            "market": "team-to-score",
+            "side": "away",
+            "team": "away",
+            "prob": 81.7,
+            "estimatedOdd": 1.22
+          }
+        ],
+        "hsh": {
+          "pick": "1H",
+          "label": "1st Half",
+          "prob": 0.398,
+          "margin": 0.028,
+          "firstHalfShare": 0.51,
+          "firstHalfExp": 1.66,
+          "secondHalfExp": 1.59,
+          "p1": 0.398,
+          "p2": 0.37,
+          "tie": 0.232,
+          "fitErr": 0.01395,
+          "totalExp": 3.25,
+          "referenceFirstHalfProb": 0.22,
+          "referenceDrawProb": 0.35,
+          "referenceSecondHalfProb": 0.43,
+          "reason": "Expected 3.3 goals, split 1.7 in the 1st half vs 1.6 in the 2nd. The 1st half wins the half race 40% of the time, 3% clear of the other half."
+        },
+        "preview": null,
+        "form": {
+          "home": "DDLWLL",
+          "away": "WWWWWW"
+        },
+        "h2h": {
+          "wins": {
+            "home": 1,
+            "away": 1
+          },
+          "meets": 5
+        },
+        "sportybetLeague": "England - Premier League"
+      }
     ]
   },
-  "lastFetch": "2026-11-06T08:08:21.072Z",
+  "lastFetch": "2026-11-08T00:15:28.169Z",
   "meta": {
     "markets": [
       "match-winner",
