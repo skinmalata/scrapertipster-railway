@@ -15,7 +15,7 @@
   var MARKER = '<div class="match-card fade-in"';
 
   function renderPrebidSlot() {
-    return '<div id="' + PREBID_SLOT_ID + '" class="wft-ad-slot" data-wft-prebid="bitmedia" data-ad-position="in_content" aria-label="Advertisement"></div>';
+    return '<div id="' + PREBID_SLOT_ID + '" class="wft-ad-slot" data-wft-prebid="bitmedia" data-wft-prebid-size="300x250" data-ad-position="in_content" aria-label="Advertisement" style="min-height:250px;"></div>';
   }
 
   function renderLegacySlot() {

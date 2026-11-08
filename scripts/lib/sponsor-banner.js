@@ -5,7 +5,7 @@ const PREBID_SLOT_ID = 'classname-container-placement';
 // First in-feed slot: the Bitmedia Prebid unit (header bidding). Picked up by
 // public/bitmedia-prebid.js, which waits for consent and for this element.
 function renderPrebidSlot() {
-  return '<div id="' + PREBID_SLOT_ID + '" class="wft-ad-slot" data-wft-prebid="bitmedia" data-ad-position="in_content" aria-label="Advertisement"></div>';
+  return '<div id="' + PREBID_SLOT_ID + '" class="wft-ad-slot" data-wft-prebid="bitmedia" data-wft-prebid-size="300x250" data-ad-position="in_content" aria-label="Advertisement" style="min-height:250px;"></div>';
 }
 
 function renderSponsorBanner(seed) {

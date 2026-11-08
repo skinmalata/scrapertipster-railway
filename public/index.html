@@ -509,10 +509,17 @@ gtag('config', 'G-HMGZMW9EDP');
 
 
  <script src="/analysis-maps.js"></script>
+ <script src="/sponsor-banner.js?v=7"></script>
 
  <script>
 
  console.log('Script starting...');
+
+ function insertGridAds(gridHtml) {
+  return (window.wftSponsor && typeof window.wftSponsor.insertSponsor === 'function')
+   ? window.wftSponsor.insertSponsor(gridHtml)
+   : gridHtml;
+ }
 
  try {
 
@@ -881,7 +888,7 @@ gtag('config', 'G-HMGZMW9EDP');
    let fbLocked = '';
    for (let fk = fbShown; fk < fallbackMatches.length; fk++) fbLocked += lockedCardHtml(fk);
    const fbNote = (fbShown < fallbackMatches.length) ? lockedNoteHtml(fbShown, fallbackMatches.length, 'Unbeaten') : '';
-   content.innerHTML = notice + fbNote + `<div class="matches-grid">${fallbackHtml + fbLocked}</div>`;
+   content.innerHTML = notice + fbNote + `<div class="matches-grid">${insertGridAds(fallbackHtml + fbLocked)}</div>`;
    return;
  }
 
@@ -959,7 +966,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
  const unbeatenNote = (unbeatenShown < matches.length) ? lockedNoteHtml(unbeatenShown, matches.length, 'Unbeaten') : '';
 
- content.innerHTML = unbeatenNote + `<div class="matches-grid">${html + unbeatenLocked}</div>`;
+ content.innerHTML = unbeatenNote + `<div class="matches-grid">${insertGridAds(html + unbeatenLocked)}</div>`;
 
  }
 
@@ -1335,7 +1342,7 @@ gtag('config', 'G-HMGZMW9EDP');
   ? '<div class="locked-note">See all ' + fullCount + ' ' + getCategoryLabel(currentCategory).toLowerCase() + ' picks for this date with <a href="/pricing.html">Pro</a> \u2014 here\u2019s a preview of the top ' + displayMatches.length + '.</div>'
   : '';
 
- content.innerHTML = note + `<div class="matches-grid">${html + lockedHtml}</div>`;
+ content.innerHTML = note + `<div class="matches-grid">${insertGridAds(html + lockedHtml)}</div>`;
 
 
 

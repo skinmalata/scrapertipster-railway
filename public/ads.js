@@ -1,10 +1,10 @@
 // WinFulltime advertisement runtime.
 //
-// Every ad position on the site is rendered as a placeholder <div> carrying a
+// Every ad position on the site is rendered as an empty <div> carrying a
 // data-ad-position attribute (injected by src/templates/layout.js or placed by
 // page/grid generators). This script:
-//   1. draws a labelled "Advertise here" placeholder for each empty slot, so no
-//      position is ever blank;
+//   1. reserves each slot's height when no creative is available, without
+//      drawing an "Ad space / Advertise here" placeholder;
 //   2. fetches the active creatives from /api/ads and swaps in the best creative
 //      for each position (rotating by weight, stable per URL);
 //   3. records impressions (batched, fire-and-forget) and routes clicks through
@@ -47,21 +47,15 @@
     style.id = STYLE_ID;
     style.textContent = [
       '.wft-ad-slot{display:block;width:100%;max-width:960px;margin:16px auto;padding:0 16px;box-sizing:border-box;}',
-      '.wft-ad-slot[data-wft-prebid="bitmedia"]{grid-column:1/-1;display:flex;align-items:center;justify-content:center;min-height:100px;overflow:hidden;}',
-      '@media (min-width:640px){.matches-grid > .wft-ad-slot[data-wft-prebid="bitmedia"]{grid-column:auto;}}',
+      '.wft-ad-slot[data-wft-prebid="bitmedia"]{grid-column:1/-1;display:flex;align-items:center;justify-content:center;min-height:90px;overflow:hidden;}',
+      '@media (max-width:639px){.wft-ad-slot[data-wft-prebid="bitmedia"]{min-height:250px;}}',
+      '.matches-grid > .wft-ad-slot[data-wft-prebid="bitmedia"]{min-height:250px;}',
+      '@media (min-width:640px){.matches-grid > .wft-ad-slot[data-wft-prebid="bitmedia"]{grid-column:auto;min-height:250px;}}',
       '.wft-ad-slot[data-wft-prebid="bitmedia"] iframe{display:block;max-width:100%;border:0;}',
       '.wft-ad-slot[data-ad-position="sponsored_match_card"]{max-width:100%;padding:0;grid-column:1/-1;}',
       '.wft-sponsor{grid-column:1/-1;}',
-      '.wft-ad-ph{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;text-align:center;',
-      ' min-height:var(--wft-ad-min,120px);border:1px dashed rgba(255,255,255,0.22);border-radius:12px;',
-      ' background:rgba(126,162,255,0.04);padding:14px;}',
-      '.wft-ad-ph-label{font-size:12px;font-weight:700;letter-spacing:0.4px;color:#94a3b8;text-transform:uppercase;}',
-      '.wft-ad-ph-cta{font-size:12px;font-weight:700;color:#ff6b8a;text-decoration:none;border:1px solid rgba(255,36,72,0.4);',
-      ' border-radius:20px;padding:4px 12px;white-space:nowrap;}',
-      '.wft-ad-ph-cta:hover{background:rgba(255,36,72,0.12);}',
       '.wft-ad-fill{display:block;text-decoration:none;color:inherit;}',
       '.wft-ad-img{display:block;width:100%;height:auto;border-radius:12px;}',
-      '.wft-ad-slot[data-ad-ratio] .wft-ad-ph{aspect-ratio:var(--wft-ad-ratio);min-height:0;box-sizing:border-box;}',
       '.wft-ad-slot[data-ad-ratio] .wft-ad-fill{aspect-ratio:var(--wft-ad-ratio);}',
       '.wft-ad-slot[data-ad-ratio] .wft-ad-img{height:100%;object-fit:contain;}',
       '.wft-ad-text{display:flex;flex-direction:column;gap:4px;padding:16px;border-radius:12px;',
@@ -74,20 +68,9 @@
       '.wft-ad-slot[data-ad-position="sticky_banner"]{display:none!important;position:fixed;left:0;right:0;bottom:0;z-index:99990;width:100%;max-width:none;margin:0;padding:6px 48px 6px 6px;min-height:50px;max-height:96px;box-sizing:border-box;overflow:hidden;align-items:center;justify-content:center;background:rgba(12,16,27,.96);border-top:1px solid rgba(255,255,255,.14);}',
       '.wft-ad-slot[data-ad-position="sticky_banner"].wft-sticky-visible{display:flex!important;}',
       '.wft-ad-slot[data-ad-position="sticky_banner"] .wft-sticky-close{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:32px;height:32px;padding:0;border:1px solid rgba(255,255,255,.55);border-radius:50%;background:#111827;color:#fff;font:22px/1 system-ui,sans-serif;cursor:pointer;z-index:2;}',
-      '@media (max-width:768px){.wft-ad-ph{min-height:90px;}.wft-ad-slot{padding:0 8px;}.wft-ad-slot[data-ad-position="sticky_banner"]{max-height:12vh;padding:4px 44px 4px 4px;}}'
+      '@media (max-width:768px){.wft-ad-slot{padding:0 8px;}.wft-ad-slot[data-ad-position="sticky_banner"]{max-height:12vh;padding:4px 44px 4px 4px;}}'
     ].join('\n');
     document.head.appendChild(style);
-  }
-
-  function placeholderHTML(key) {
-    var p = POSITIONS[key] || {};
-    var dim = (p.w && p.h) ? ' &middot; ' + p.w + '&times;' + p.h : '';
-    var min = p.h ? Math.min(p.h, 260) : 120;
-    if (key === 'sponsored_match_card') min = 260;
-    return '<div class="wft-ad-ph" style="--wft-ad-min:' + min + 'px">' +
-      '<span class="wft-ad-ph-label">Ad space &middot; ' + escapeHtml(p.label || key) + dim + '</span>' +
-      '<a class="wft-ad-ph-cta" href="' + ADVERTISE_URL + '">Advertise here</a>' +
-      '</div>';
   }
 
   function pickCreative(key, list) {
@@ -255,9 +238,11 @@
       return;
     }
 
-    // No creative: draw the placeholder only when the slot is empty so any
-    // baked third-party unit stays visible.
-    if (!el.innerHTML.trim()) el.innerHTML = placeholderHTML(key);
+    // No creative: keep the slot's reserved height so the layout does not jump,
+    // but do not draw an "Ad space / Advertise here" placeholder.
+    if (!el.innerHTML.trim()) {
+      if (pos.h) el.style.minHeight = pos.h + 'px';
+    }
   }
 
   function processAll(root) {

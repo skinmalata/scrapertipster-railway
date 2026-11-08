@@ -7,13 +7,13 @@
   var DIRECT_FALLBACK_ID = '6ae882436485fffa717939a1';
   var PREBID_SRC = '/prebid-11.46.0.js?v=20261103';
   var BID_TIMEOUT = 1200;
-  // In-feed slots sit in a half-width grid cell on desktop, so request sizes
-  // that fit that cell instead of a leaderboard. Full-width slots (analysis
-  // and blog) can take a leaderboard. Phones never request 728x90 because the
-  // iframe would be clipped by the narrow column.
-  var PHONE_SIZES = [[300, 250], [336, 280], [320, 100], [300, 100]];
-  var DESKTOP_GRID_SIZES = [[300, 250], [336, 280], [250, 250], [300, 100]];
-  var DESKTOP_FULL_SIZES = [[728, 90], [468, 60], [300, 250], [336, 280]];
+  // Fixed sizes keep the slot height stable before and after the bid lands, so
+  // the prediction grid does not shift (CLS). Grid slots use a 300x250
+  // rectangle; full-width slots use a 728x90 leaderboard on desktop and the
+  // same 300x250 rectangle on phones.
+  var GRID_SIZE = { width: 300, height: 250 };
+  var FULL_PHONE_SIZE = { width: 300, height: 250 };
+  var FULL_DESKTOP_SIZE = { width: 728, height: 90 };
 
   var pbjsLoading = false;
   var prebidWaiters = [];
@@ -33,9 +33,31 @@
     return false;
   }
 
+  function fixedSizeFor(slot) {
+    var explicit = slot && slot.getAttribute('data-wft-prebid-size');
+    if (explicit) {
+      var parts = explicit.split('x');
+      var width = parseInt(parts[0], 10);
+      var height = parseInt(parts[1], 10);
+      if (width > 0 && height > 0) return { width: width, height: height };
+    }
+    if (insideMatchesGrid(slot)) return GRID_SIZE;
+    return isPhoneViewport() ? FULL_PHONE_SIZE : FULL_DESKTOP_SIZE;
+  }
+
+  function reserveSlot(slot) {
+    var size = fixedSizeFor(slot);
+    slot.setAttribute('data-wft-prebid-size', size.width + 'x' + size.height);
+    slot.style.height = size.height + 'px';
+    slot.style.minHeight = size.height + 'px';
+    slot.style.maxHeight = size.height + 'px';
+    slot.style.overflow = 'hidden';
+    return size;
+  }
+
   function bannerSizesFor(slot) {
-    if (isPhoneViewport()) return PHONE_SIZES;
-    return insideMatchesGrid(slot) ? DESKTOP_GRID_SIZES : DESKTOP_FULL_SIZES;
+    var size = fixedSizeFor(slot);
+    return [[size.width, size.height]];
   }
 
   function fallbackToDirectTag(slot) {
@@ -62,9 +84,9 @@
       return;
     }
 
-    var size = String(bid.size || '').split('x');
-    var width = Number(size[0]) || Number(bid.width) || 728;
-    var height = Number(size[1]) || Number(bid.height) || 90;
+    var fixed = reserveSlot(slot);
+    var width = fixed.width;
+    var height = fixed.height;
     var iframe = document.createElement('iframe');
     iframe.title = 'Advertisement';
     iframe.width = String(width);
@@ -79,7 +101,6 @@
     iframe.style.margin = '0 auto';
 
     slot.innerHTML = '';
-    slot.style.minHeight = height + 'px';
     slot.appendChild(iframe);
     try {
       pbjs.renderAd(iframe.contentDocument || iframe.contentWindow.document, bid.adId);
@@ -187,7 +208,10 @@
 
   function scan() {
     var slots = document.querySelectorAll('[data-wft-prebid="bitmedia"]');
-    for (var i = 0; i < slots.length; i++) bindSlot(slots[i]);
+    for (var i = 0; i < slots.length; i++) {
+      reserveSlot(slots[i]);
+      bindSlot(slots[i]);
+    }
   }
 
   function start() {
