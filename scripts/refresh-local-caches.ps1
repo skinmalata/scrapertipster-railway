@@ -16,6 +16,8 @@
 #   2) scrape-btts-no.js         -> btts-no-cache.json           (3-day horizon)
 #   3) scrape-forebet-vip.js     -> forebet-vip-cache.json
 #                                   highest-scoring-half-cache.json
+#   4) scrape-player-shots.js    -> data/player-shots/fotmob.json
+#                                   public/data/player-shots.json
 # A failure in one does not abort the others; whatever refreshed still gets
 # pushed, and the task exits non-zero so Task Scheduler flags the run.
 #
@@ -35,7 +37,7 @@ $cacheFiles = @(
   'btts-no-cache.json',
   'forebet-vip-cache.json',
   'highest-scoring-half-cache.json',
-  'data/player-shots/understat.json',
+  'data/player-shots/fotmob.json',
   # Tracked despite the public/data/ ignore rule (force-added); without it in
   # this list the daily job never stages the static mirror the site reads.
   'public/data/player-shots.json'
@@ -106,8 +108,8 @@ Write-Output '=== scrape-forebet-vip ==='
 & $node 'scripts/scrape-forebet-vip.js' $dates
 if ($LASTEXITCODE -ne 0) { Write-Warning "forebet-vip scraper failed (exit $LASTEXITCODE)"; $failed += 'forebet-vip' }
 
-# 4) Player Shots (Understat JSON API; plain HTTPS, no browser). Writes
-#    data/player-shots/understat.json (players + today's fixtures + shot tips).
+# 4) Player Shots (FotMob JSON API; plain HTTPS, no browser). Writes
+#    data/player-shots/fotmob.json (players + today's fixtures + shot tips).
 Write-Output '=== scrape-player-shots ==='
 & $node 'scripts/scrape-player-shots.js'
 if ($LASTEXITCODE -ne 0) { Write-Warning "player-shots scraper failed (exit $LASTEXITCODE)"; $failed += 'player-shots' }
@@ -143,7 +145,7 @@ if (-not $cachedChanges) {
   Write-Output 'No cache changes; nothing to push.'
 } else {
   $date = Get-Date -Format 'yyyy-MM-dd'
-  git commit -m "chore: refresh local caches (h2h/btts-no/vip/hsh) $date" 2>$null
+  git commit -m "chore: refresh local caches (h2h/btts-no/vip/hsh/player-shots) $date" 2>$null
   if ($LASTEXITCODE -ne 0) { Write-Output "git commit failed (exit $LASTEXITCODE)"; Stop-Transcript | Out-Null; exit 1 }
   git -c rebase.autostash=true pull --rebase origin main 2>$null
   if ($LASTEXITCODE -ne 0) { Write-Output 'git pull --rebase failed'; Stop-Transcript | Out-Null; exit 1 }

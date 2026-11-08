@@ -1,28 +1,31 @@
 'use strict';
 
-// Player-shots tips from Understat (free JSON API, no Cloudflare, no headless
-// browser). Covers the big-5 European leagues. For every league we store:
-//   - players:  season shot totals + team (team_title) + shots-per-game
+// Player-shots tips from FotMob (website JSON API, no key, no headless browser).
+// Covers the big-5 European leagues. For every league we store:
+//   - players:  season shot totals + team + shots-per-game
 //   - fixtures: today's matches (falls back to the next matchday when the
 //               league has no games today) with generated shot tips:
 //               the highest-volume shooters on each side, mapped to a
-//               half-goal shots line (e.g. Haaland 3.86 shots/game -> Over 3.5).
-// Output: data/player-shots/understat.json (cache) + public/data/player-shots.json
+//               half-goal shots line (e.g. Haaland 3.8 shots/game -> Over 3.5).
+// Output: data/player-shots/fotmob.json (cache) + public/data/player-shots.json
 // (static mirror read by /player-shots.html). Runs from refresh-local-caches.ps1.
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
 const zlib = require('zlib');
 
-const CACHE_FILE = path.join(process.cwd(), 'data', 'player-shots', 'understat.json');
+const CACHE_FILE = path.join(process.cwd(), 'data', 'player-shots', 'fotmob.json');
 const STATIC_FILE = path.join(process.cwd(), 'public', 'data', 'player-shots.json');
 
+const API_BASE = 'https://www.fotmob.com/api/data';
+const STATS_BASE = 'https://data.fotmob.com/stats';
+
 const LEAGUES = [
-  { key: 'EPL', label: 'English Premier League' },
-  { key: 'La Liga', label: 'La Liga' },
-  { key: 'Serie A', label: 'Serie A' },
-  { key: 'Bundesliga', label: 'Bundesliga' },
-  { key: 'Ligue 1', label: 'Ligue 1' }
+  { id: 47, label: 'English Premier League' },
+  { id: 87, label: 'La Liga' },
+  { id: 55, label: 'Serie A' },
+  { id: 54, label: 'Bundesliga' },
+  { id: 53, label: 'Ligue 1' }
 ];
 
 const MIN_GAMES = 3;       // ignore players with too small a sample for tips
@@ -31,19 +34,13 @@ const TIPS_PER_TEAM = 2;   // top shooters listed per side
 const MAX_PLAYERS_PER_LEAGUE = 100; // leaderboard size cap per league
 const HTTP_TIMEOUT_MS = 20000;
 
-// Understat season key: "2026" means the 2026/2027 season (starts in July).
-function seasonYear(d) {
-  return d.getMonth() >= 6 ? d.getFullYear() : d.getFullYear() - 1;
-}
-
 function httpGet(url) {
   return new Promise((resolve, reject) => {
     const req = https.get(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-        // Understat returns 404 for plain requests; the XHR header is required.
-        'X-Requested-With': 'XMLHttpRequest',
-        'Referer': 'https://understat.com/league/EPL',
+        'Accept': 'application/json',
+        'Referer': 'https://www.fotmob.com/',
         'Accept-Encoding': 'gzip, deflate'
       },
       timeout: HTTP_TIMEOUT_MS
@@ -73,15 +70,20 @@ function httpGet(url) {
   });
 }
 
-async function fetchLeague(leagueKey, year) {
-  const url = `https://understat.com/getLeagueData/${encodeURIComponent(leagueKey)}/${year}`;
-  const body = await httpGet(url);
-  return JSON.parse(body);
-}
-
 function toNum(v) {
   const n = parseFloat(v);
   return Number.isFinite(n) ? n : 0;
+}
+
+function teamKey(name) {
+  return String(name || '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[.'’]/g, '')
+    .replace(/\b(?:afc|fc|cf|sc|ac|club|football club)\b/g, ' ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 // Highest half-line (x.5) that sits below the player's shots-per-game average,
@@ -91,9 +93,94 @@ function shotsLine(spg) {
   return Math.max(0.5, Math.min(line, 5.5));
 }
 
-function buildTipsForLeague(data, leagueLabel, todayStr) {
-  const fixtures = (data.dates || []).filter((d) => d && d.h && d.a);
-  const todays = fixtures.filter((d) => !d.isResult && String(d.datetime || '').slice(0, 10) === todayStr);
+function statList(payload) {
+  const list = payload && payload.TopLists && payload.TopLists[0] && payload.TopLists[0].StatList;
+  return Array.isArray(list) ? list : [];
+}
+
+async function fetchStats(leagueId, seasonId, stat) {
+  try {
+    const body = await httpGet(`${STATS_BASE}/${leagueId}/season/${seasonId}/${stat}.json`);
+    return statList(JSON.parse(body));
+  } catch (err) {
+    console.warn(`[Player Shots] ${stat} unavailable for league ${leagueId}: ${err.message}`);
+    return [];
+  }
+}
+
+async function fetchLeague(league) {
+  const body = await httpGet(`${API_BASE}/leagues?id=${league.id}`);
+  const data = JSON.parse(body);
+  const links = (data.stats && data.stats.seasonStatLinks) || [];
+  if (!links.length) throw new Error('no season statistics links');
+
+  const seasonLink = links[0];
+  const seasonId = seasonLink.TournamentId;
+  const [shots, goals, xg] = await Promise.all([
+    fetchStats(league.id, seasonId, 'total_scoring_att'),
+    fetchStats(league.id, seasonId, 'goals'),
+    fetchStats(league.id, seasonId, 'expected_goals')
+  ]);
+
+  return { league: data, season: seasonLink.Name, seasonId, shots, goals, xg };
+}
+
+function buildPlayerPool(leagueLabel, data) {
+  const goalsById = new Map(data.goals.map((p) => [p.ParticiantId, toNum(p.StatValue)]));
+  const xgById = new Map(data.xg.map((p) => [p.ParticiantId, toNum(p.StatValue)]));
+
+  return data.shots
+    .map((p) => {
+      const minutes = toNum(p.MinutesPlayed);
+      const games = toNum(p.MatchesPlayed);
+      const shotsPer90 = toNum(p.StatValue);
+      const shots = Math.round((shotsPer90 * minutes) / 90);
+      return {
+        name: String(p.ParticipantName || '').trim(),
+        team: String(p.TeamName || '').trim(),
+        league: leagueLabel,
+        position: '',
+        games,
+        shots,
+        goals: goalsById.get(p.ParticiantId) || 0,
+        xg: xgById.get(p.ParticiantId) || 0,
+        spg: games > 0 ? shots / games : 0
+      };
+    })
+    .filter((p) => p.name && p.team && p.games >= MIN_GAMES && p.shots > 0);
+}
+
+function buildLeaderboard(players) {
+  return players
+    .map((p) => ({
+      name: p.name,
+      team: p.team,
+      league: p.league,
+      position: p.position,
+      games: p.games,
+      shots: p.shots,
+      goals: p.goals,
+      xg: Math.round(p.xg * 10) / 10,
+      spg: Math.round(p.spg * 100) / 100
+    }))
+    .filter((p) => p.games >= MIN_GAMES && p.shots > 0)
+    .sort((a, b) => b.shots - a.shots)
+    .slice(0, MAX_PLAYERS_PER_LEAGUE);
+}
+
+function buildTipsForLeague(leagueData, leagueLabel, players, todayStr) {
+  const fixtures = ((leagueData.fixtures && leagueData.fixtures.allMatches) || [])
+    .filter((m) => m && m.home && m.away && m.status && m.status.utcTime && !m.status.cancelled)
+    .map((m) => ({
+      date: String(m.status.utcTime).slice(0, 10),
+      time: String(m.status.utcTime).slice(11, 16),
+      home: String(m.home.name || '').trim(),
+      away: String(m.away.name || '').trim(),
+      finished: !!m.status.finished
+    }))
+    .filter((m) => m.home && m.away);
+
+  const todays = fixtures.filter((m) => !m.finished && m.date === todayStr);
 
   let selected = todays;
   let isNextMatchday = false;
@@ -101,42 +188,32 @@ function buildTipsForLeague(data, leagueLabel, todayStr) {
     // No games today: fall back to the next upcoming matchday so the page is
     // never empty (labelled as such in the UI).
     const upcoming = fixtures
-      .filter((d) => !d.isResult)
-      .sort((a, b) => String(a.datetime).localeCompare(String(b.datetime)));
+      .filter((m) => !m.finished)
+      .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
     if (!upcoming.length) return { fixtures: [], isNextMatchday: false };
-    const nextDate = String(upcoming[0].datetime).slice(0, 10);
-    selected = upcoming.filter((d) => String(d.datetime).slice(0, 10) === nextDate);
+    const nextDate = upcoming[0].date;
+    selected = upcoming.filter((m) => m.date === nextDate);
     isNextMatchday = true;
   }
 
-  const players = data.players || [];
   const byTeam = new Map();
   for (const p of players) {
-    const team = String(p.team_title || '').trim();
-    if (!team) continue;
-    if (!byTeam.has(team)) byTeam.set(team, []);
-    byTeam.get(team).push(p);
+    const key = teamKey(p.team);
+    if (!key) continue;
+    if (!byTeam.has(key)) byTeam.set(key, []);
+    byTeam.get(key).push(p);
   }
 
   const out = [];
   for (const fx of selected) {
     const sides = [
-      { side: 'home', team: String(fx.h.title).trim() },
-      { side: 'away', team: String(fx.a.title).trim() }
+      { side: 'home', team: fx.home },
+      { side: 'away', team: fx.away }
     ];
     const tips = [];
     for (const s of sides) {
-      const squad = (byTeam.get(s.team) || []).slice();
+      const squad = (byTeam.get(teamKey(s.team)) || []).slice();
       const ranked = squad
-        .map((p) => ({
-          name: String(p.player_name).trim(),
-          position: String(p.position || '').trim(),
-          games: toNum(p.games),
-          shots: toNum(p.shots),
-          goals: toNum(p.goals),
-          xg: toNum(p.xG),
-          spg: toNum(p.games) > 0 ? toNum(p.shots) / toNum(p.games) : 0
-        }))
         .filter((p) => p.games >= MIN_GAMES && p.spg >= MIN_SPG)
         .sort((a, b) => b.spg - a.spg || b.shots - a.shots)
         .slice(0, TIPS_PER_TEAM);
@@ -160,11 +237,11 @@ function buildTipsForLeague(data, leagueLabel, todayStr) {
     if (!tips.length) continue;
     out.push({
       league: leagueLabel,
-      date: String(fx.datetime).slice(0, 10),
-      time: String(fx.datetime).slice(11, 16),
-      home: String(fx.h.title).trim(),
-      away: String(fx.a.title).trim(),
-      match: `${String(fx.h.title).trim()} vs ${String(fx.a.title).trim()}`,
+      date: fx.date,
+      time: fx.time,
+      home: fx.home,
+      away: fx.away,
+      match: `${fx.home} vs ${fx.away}`,
       tips
     });
   }
@@ -172,48 +249,28 @@ function buildTipsForLeague(data, leagueLabel, todayStr) {
   return { fixtures: out, isNextMatchday };
 }
 
-function buildLeaderboard(data, leagueLabel) {
-  return (data.players || [])
-    .map((p) => {
-      const games = toNum(p.games);
-      const shots = toNum(p.shots);
-      return {
-        name: String(p.player_name).trim(),
-        team: String(p.team_title || '').trim(),
-        league: leagueLabel,
-        position: String(p.position || '').trim(),
-        games,
-        shots,
-        goals: toNum(p.goals),
-        xg: Math.round(toNum(p.xG) * 10) / 10,
-        spg: games > 0 ? Math.round((shots / games) * 100) / 100 : 0
-      };
-    })
-    .filter((p) => p.games >= MIN_GAMES && p.shots > 0)
-    .sort((a, b) => b.shots - a.shots)
-    .slice(0, MAX_PLAYERS_PER_LEAGUE);
-}
-
 async function main() {
   const now = new Date();
-  const year = seasonYear(now);
   const todayStr = now.toISOString().slice(0, 10);
 
   const fixtures = [];
   const players = [];
   let anyNextMatchday = false;
+  let season = '';
 
   for (const lg of LEAGUES) {
     try {
-      console.log(`[Player Shots] Fetching Understat ${lg.key} ${year}...`);
-      const data = await fetchLeague(lg.key, year);
-      const built = buildTipsForLeague(data, lg.label, todayStr);
+      console.log(`[Player Shots] Fetching FotMob ${lg.label}...`);
+      const data = await fetchLeague(lg);
+      if (!season) season = data.season;
+      const pool = buildPlayerPool(lg.label, data);
+      const built = buildTipsForLeague(data.league, lg.label, pool, todayStr);
       fixtures.push(...built.fixtures);
       if (built.isNextMatchday) anyNextMatchday = true;
-      players.push(...buildLeaderboard(data, lg.label));
-      console.log(`[Player Shots] ${lg.key}: ${(data.players || []).length} players, ${built.fixtures.length} fixture(s) with tips`);
+      players.push(...buildLeaderboard(pool));
+      console.log(`[Player Shots] ${lg.label}: ${pool.length} players, ${built.fixtures.length} fixture(s) with tips`);
     } catch (err) {
-      console.warn(`[Player Shots] ${lg.key} failed: ${err.message} — skipping league`);
+      console.warn(`[Player Shots] ${lg.label} failed: ${err.message} - skipping league`);
     }
   }
 
@@ -226,8 +283,9 @@ async function main() {
     success: true,
     date: todayStr,
     updatedAt: now.toISOString(),
-    source: 'understat.com',
-    season: `${year}/${year + 1}`,
+    source: 'player-scoring-v1',
+    provider: 'fotmob.com',
+    season,
     isNextMatchday: anyNextMatchday,
     totalFixtures: fixtures.length,
     totalPlayers: players.length,
