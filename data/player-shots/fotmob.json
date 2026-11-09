@@ -1,70 +1,132 @@
 {
   "success": true,
-  "date": "2026-11-08",
-  "updatedAt": "2026-11-08T00:07:02.740Z",
+  "date": "2026-11-09",
+  "updatedAt": "2026-11-09T01:36:23.480Z",
   "source": "player-scoring-v1",
   "provider": "fotmob.com",
   "season": "2026/2027",
-  "isNextMatchday": false,
-  "totalFixtures": 23,
+  "isNextMatchday": true,
+  "totalFixtures": 14,
   "totalPlayers": 500,
   "fixtures": [
     {
       "league": "English Premier League",
-      "date": "2026-11-08",
-      "time": "14:00",
-      "home": "Brighton & Hove Albion",
-      "away": "Brentford",
-      "match": "Brighton & Hove Albion vs Brentford",
+      "date": "2026-11-21",
+      "time": "12:30",
+      "home": "Manchester City",
+      "away": "Fulham",
+      "match": "Manchester City vs Fulham",
       "tips": [
         {
-          "player": "Diego Gómez",
-          "team": "Brighton & Hove Albion",
+          "player": "Erling Haaland",
+          "team": "Manchester City",
+          "side": "home",
+          "position": "",
+          "games": 10,
+          "shots": 38,
+          "goals": 9,
+          "xg": 7.1,
+          "spg": 3.8,
+          "line": 3.5,
+          "tip": "Over 3.5 shots"
+        },
+        {
+          "player": "Rayan Cherki",
+          "team": "Manchester City",
           "side": "home",
           "position": "",
           "games": 9,
-          "shots": 23,
-          "goals": 1,
-          "xg": 1.2,
-          "spg": 2.56,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
-        },
-        {
-          "player": "Yasin Ayari",
-          "team": "Brighton & Hove Albion",
-          "side": "home",
-          "position": "",
-          "games": 8,
-          "shots": 20,
-          "goals": 3,
-          "xg": 2,
-          "spg": 2.5,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
-        },
-        {
-          "player": "Igor Thiago",
-          "team": "Brentford",
-          "side": "away",
-          "position": "",
-          "games": 9,
-          "shots": 20,
-          "goals": 2,
-          "xg": 4.1,
-          "spg": 2.22,
+          "shots": 18,
+          "goals": 5,
+          "xg": 1.9,
+          "spg": 2,
           "line": 1.5,
           "tip": "Over 1.5 shots"
         },
         {
-          "player": "Kevin Schade",
-          "team": "Brentford",
+          "player": "Gonzalo García",
+          "team": "Fulham",
+          "side": "away",
+          "position": "",
+          "games": 10,
+          "shots": 24,
+          "goals": 1,
+          "xg": 4.1,
+          "spg": 2.4,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
+        },
+        {
+          "player": "Joshua King",
+          "team": "Fulham",
+          "side": "away",
+          "position": "",
+          "games": 10,
+          "shots": 23,
+          "goals": 2,
+          "xg": 2,
+          "spg": 2.3,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
+        }
+      ]
+    },
+    {
+      "league": "English Premier League",
+      "date": "2026-11-21",
+      "time": "15:00",
+      "home": "AFC Bournemouth",
+      "away": "Nottingham Forest",
+      "match": "AFC Bournemouth vs Nottingham Forest",
+      "tips": [
+        {
+          "player": "Rayan",
+          "team": "AFC Bournemouth",
+          "side": "home",
+          "position": "",
+          "games": 10,
+          "shots": 28,
+          "goals": 1,
+          "xg": 2.5,
+          "spg": 2.8,
+          "line": 2.5,
+          "tip": "Over 2.5 shots"
+        },
+        {
+          "player": "Evanilson",
+          "team": "AFC Bournemouth",
+          "side": "home",
+          "position": "",
+          "games": 10,
+          "shots": 26,
+          "goals": 5,
+          "xg": 4.4,
+          "spg": 2.6,
+          "line": 2.5,
+          "tip": "Over 2.5 shots"
+        },
+        {
+          "player": "Liam Delap",
+          "team": "Nottingham Forest",
           "side": "away",
           "position": "",
           "games": 9,
-          "shots": 18,
+          "shots": 27,
           "goals": 3,
-          "xg": 2.1,
+          "xg": 3,
+          "spg": 3,
+          "line": 2.5,
+          "tip": "Over 2.5 shots"
+        },
+        {
+          "player": "Dan Ndoye",
+          "team": "Nottingham Forest",
+          "side": "away",
+          "position": "",
+          "games": 10,
+          "shots": 20,
+          "goals": 2,
+          "xg": 2.3,
           "spg": 2,
           "line": 1.5,
           "tip": "Over 1.5 shots"
@@ -73,153 +135,91 @@
     },
     {
       "league": "English Premier League",
-      "date": "2026-11-08",
-      "time": "14:00",
-      "home": "Crystal Palace",
-      "away": "Liverpool",
-      "match": "Crystal Palace vs Liverpool",
+      "date": "2026-11-21",
+      "time": "15:00",
+      "home": "Aston Villa",
+      "away": "Sunderland",
+      "match": "Aston Villa vs Sunderland",
       "tips": [
         {
-          "player": "Alexander Isak",
-          "team": "Liverpool",
-          "side": "away",
-          "position": "",
-          "games": 8,
-          "shots": 22,
-          "goals": 6,
-          "xg": 4.3,
-          "spg": 2.75,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
-        },
-        {
-          "player": "Cody Gakpo",
-          "team": "Liverpool",
-          "side": "away",
+          "player": "Johan Manzambi",
+          "team": "Aston Villa",
+          "side": "home",
           "position": "",
           "games": 7,
-          "shots": 17,
-          "goals": 1,
-          "xg": 1.2,
-          "spg": 2.43,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        }
-      ]
-    },
-    {
-      "league": "English Premier League",
-      "date": "2026-11-08",
-      "time": "14:00",
-      "home": "Ipswich Town",
-      "away": "AFC Bournemouth",
-      "match": "Ipswich Town vs AFC Bournemouth",
-      "tips": [
-        {
-          "player": "Julio Enciso",
-          "team": "Ipswich Town",
-          "side": "home",
-          "position": "",
-          "games": 9,
-          "shots": 28,
+          "shots": 18,
           "goals": 2,
-          "xg": 1.9,
-          "spg": 3.11,
+          "xg": 1.7,
+          "spg": 2.57,
           "line": 2.5,
           "tip": "Over 2.5 shots"
         },
         {
-          "player": "Emersonn",
-          "team": "Ipswich Town",
+          "player": "Nicolas Jackson",
+          "team": "Aston Villa",
           "side": "home",
           "position": "",
           "games": 9,
-          "shots": 16,
-          "goals": 2,
-          "xg": 2.7,
-          "spg": 1.78,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Rayan",
-          "team": "AFC Bournemouth",
-          "side": "away",
-          "position": "",
-          "games": 9,
-          "shots": 27,
-          "goals": 1,
-          "xg": 2.5,
-          "spg": 3,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
-        },
-        {
-          "player": "Evanilson",
-          "team": "AFC Bournemouth",
-          "side": "away",
-          "position": "",
-          "games": 9,
-          "shots": 22,
-          "goals": 4,
+          "shots": 23,
+          "goals": 6,
           "xg": 3.6,
-          "spg": 2.44,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        }
-      ]
-    },
-    {
-      "league": "English Premier League",
-      "date": "2026-11-08",
-      "time": "14:00",
-      "home": "Sunderland",
-      "away": "Chelsea",
-      "match": "Sunderland vs Chelsea",
-      "tips": [
+          "spg": 2.56,
+          "line": 2.5,
+          "tip": "Over 2.5 shots"
+        },
         {
           "player": "Brian Brobbey",
           "team": "Sunderland",
-          "side": "home",
+          "side": "away",
           "position": "",
-          "games": 7,
-          "shots": 15,
+          "games": 8,
+          "shots": 17,
           "goals": 3,
-          "xg": 3.5,
-          "spg": 2.14,
+          "xg": 4.2,
+          "spg": 2.13,
           "line": 1.5,
           "tip": "Over 1.5 shots"
         },
         {
           "player": "Enzo Le Fée",
           "team": "Sunderland",
-          "side": "home",
+          "side": "away",
           "position": "",
-          "games": 9,
-          "shots": 16,
-          "goals": 2,
-          "xg": 3,
-          "spg": 1.78,
+          "games": 10,
+          "shots": 17,
+          "goals": 3,
+          "xg": 3.8,
+          "spg": 1.7,
           "line": 1.5,
           "tip": "Over 1.5 shots"
-        },
+        }
+      ]
+    },
+    {
+      "league": "English Premier League",
+      "date": "2026-11-21",
+      "time": "15:00",
+      "home": "Chelsea",
+      "away": "Leeds United",
+      "match": "Chelsea vs Leeds United",
+      "tips": [
         {
           "player": "Cole Palmer",
           "team": "Chelsea",
-          "side": "away",
+          "side": "home",
           "position": "",
-          "games": 9,
-          "shots": 29,
+          "games": 10,
+          "shots": 30,
           "goals": 3,
-          "xg": 2.5,
-          "spg": 3.22,
+          "xg": 2.6,
+          "spg": 3,
           "line": 2.5,
           "tip": "Over 2.5 shots"
         },
         {
           "player": "João Pedro",
           "team": "Chelsea",
-          "side": "away",
+          "side": "home",
           "position": "",
           "games": 6,
           "shots": 16,
@@ -228,288 +228,203 @@
           "spg": 2.67,
           "line": 2.5,
           "tip": "Over 2.5 shots"
+        },
+        {
+          "player": "Dominic Calvert-Lewin",
+          "team": "Leeds United",
+          "side": "away",
+          "position": "",
+          "games": 10,
+          "shots": 19,
+          "goals": 4,
+          "xg": 4.4,
+          "spg": 1.9,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
         }
       ]
     },
     {
       "league": "English Premier League",
-      "date": "2026-11-08",
-      "time": "16:30",
-      "home": "Manchester United",
-      "away": "Aston Villa",
-      "match": "Manchester United vs Aston Villa",
+      "date": "2026-11-21",
+      "time": "15:00",
+      "home": "Coventry City",
+      "away": "Crystal Palace",
+      "match": "Coventry City vs Crystal Palace",
       "tips": [
         {
-          "player": "Bruno Fernandes",
-          "team": "Manchester United",
+          "player": "Bobby Thomas",
+          "team": "Coventry City",
           "side": "home",
           "position": "",
           "games": 8,
-          "shots": 25,
-          "goals": 3,
-          "xg": 3,
-          "spg": 3.13,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
+          "shots": 14,
+          "goals": 0,
+          "xg": 0.6,
+          "spg": 1.75,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
         },
         {
-          "player": "Bryan Mbeumo",
-          "team": "Manchester United",
+          "player": "Jack Rudoni",
+          "team": "Coventry City",
           "side": "home",
           "position": "",
-          "games": 9,
-          "shots": 27,
-          "goals": 4,
-          "xg": 4.2,
-          "spg": 3,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
+          "games": 10,
+          "shots": 17,
+          "goals": 3,
+          "xg": 2.2,
+          "spg": 1.7,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
         },
         {
-          "player": "Johan Manzambi",
-          "team": "Aston Villa",
+          "player": "Yéremi Pino",
+          "team": "Crystal Palace",
+          "side": "away",
+          "position": "",
+          "games": 10,
+          "shots": 15,
+          "goals": 1,
+          "xg": 1.6,
+          "spg": 1.5,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
+        },
+        {
+          "player": "Quinten Timber",
+          "team": "Crystal Palace",
           "side": "away",
           "position": "",
           "games": 6,
-          "shots": 17,
-          "goals": 2,
-          "xg": 1.6,
-          "spg": 2.83,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
-        },
-        {
-          "player": "Nicolas Jackson",
-          "team": "Aston Villa",
-          "side": "away",
-          "position": "",
-          "games": 8,
-          "shots": 21,
-          "goals": 5,
-          "xg": 2.3,
-          "spg": 2.63,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
-        }
-      ]
-    },
-    {
-      "league": "La Liga",
-      "date": "2026-11-08",
-      "time": "13:00",
-      "home": "Elche",
-      "away": "Real Betis",
-      "match": "Elche vs Real Betis",
-      "tips": [
-        {
-          "player": "Fer Niño",
-          "team": "Elche",
-          "side": "home",
-          "position": "",
-          "games": 11,
-          "shots": 20,
-          "goals": 6,
-          "xg": 4.5,
-          "spg": 1.82,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Facundo Buonanotte",
-          "team": "Elche",
-          "side": "home",
-          "position": "",
-          "games": 7,
-          "shots": 11,
-          "goals": 1,
-          "xg": 1.4,
-          "spg": 1.57,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Antony",
-          "team": "Real Betis",
-          "side": "away",
-          "position": "",
-          "games": 10,
-          "shots": 34,
+          "shots": 9,
           "goals": 0,
-          "xg": 2.2,
-          "spg": 3.4,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
-        },
-        {
-          "player": "Abdessamad Ezzalzouli",
-          "team": "Real Betis",
-          "side": "away",
-          "position": "",
-          "games": 8,
-          "shots": 17,
-          "goals": 3,
-          "xg": 2.1,
-          "spg": 2.13,
+          "xg": 0.5,
+          "spg": 1.5,
           "line": 1.5,
           "tip": "Over 1.5 shots"
         }
       ]
     },
     {
-      "league": "La Liga",
-      "date": "2026-11-08",
-      "time": "15:15",
-      "home": "Real Sociedad",
-      "away": "Rayo Vallecano",
-      "match": "Real Sociedad vs Rayo Vallecano",
+      "league": "English Premier League",
+      "date": "2026-11-21",
+      "time": "15:00",
+      "home": "Tottenham Hotspur",
+      "away": "Ipswich Town",
+      "match": "Tottenham Hotspur vs Ipswich Town",
       "tips": [
         {
-          "player": "Orri Óskarsson",
-          "team": "Real Sociedad",
+          "player": "Omar Marmoush",
+          "team": "Tottenham Hotspur",
           "side": "home",
           "position": "",
           "games": 9,
-          "shots": 21,
-          "goals": 3,
-          "xg": 4.5,
-          "spg": 2.33,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Gonçalo Guedes",
-          "team": "Real Sociedad",
-          "side": "home",
-          "position": "",
-          "games": 10,
-          "shots": 20,
-          "goals": 2,
-          "xg": 1.7,
+          "shots": 18,
+          "goals": 1,
+          "xg": 1,
           "spg": 2,
           "line": 1.5,
           "tip": "Over 1.5 shots"
         },
         {
-          "player": "Pedro Díaz",
-          "team": "Rayo Vallecano",
-          "side": "away",
+          "player": "Pedro Porro",
+          "team": "Tottenham Hotspur",
+          "side": "home",
           "position": "",
-          "games": 10,
-          "shots": 23,
+          "games": 6,
+          "shots": 11,
           "goals": 0,
-          "xg": 0.9,
-          "spg": 2.3,
+          "xg": 0.6,
+          "spg": 1.83,
           "line": 1.5,
           "tip": "Over 1.5 shots"
         },
         {
-          "player": "Sergio Camello",
-          "team": "Rayo Vallecano",
-          "side": "away",
-          "position": "",
-          "games": 11,
-          "shots": 25,
-          "goals": 7,
-          "xg": 3.3,
-          "spg": 2.27,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        }
-      ]
-    },
-    {
-      "league": "La Liga",
-      "date": "2026-11-08",
-      "time": "17:30",
-      "home": "Celta Vigo",
-      "away": "Levante",
-      "match": "Celta Vigo vs Levante",
-      "tips": [
-        {
-          "player": "Roger Brugué",
-          "team": "Levante",
+          "player": "Julio Enciso",
+          "team": "Ipswich Town",
           "side": "away",
           "position": "",
           "games": 10,
-          "shots": 23,
-          "goals": 5,
-          "xg": 3.9,
-          "spg": 2.3,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
+          "shots": 32,
+          "goals": 2,
+          "xg": 2.1,
+          "spg": 3.2,
+          "line": 2.5,
+          "tip": "Over 2.5 shots"
         },
         {
-          "player": "Iván Romero",
-          "team": "Levante",
+          "player": "Emersonn",
+          "team": "Ipswich Town",
           "side": "away",
           "position": "",
-          "games": 11,
-          "shots": 22,
-          "goals": 3,
-          "xg": 3.4,
-          "spg": 2,
+          "games": 10,
+          "shots": 18,
+          "goals": 2,
+          "xg": 2.7,
+          "spg": 1.8,
           "line": 1.5,
           "tip": "Over 1.5 shots"
         }
       ]
     },
     {
-      "league": "La Liga",
-      "date": "2026-11-08",
+      "league": "English Premier League",
+      "date": "2026-11-21",
       "time": "17:30",
-      "home": "Villarreal",
-      "away": "Getafe",
-      "match": "Villarreal vs Getafe",
+      "home": "Newcastle United",
+      "away": "Arsenal",
+      "match": "Newcastle United vs Arsenal",
       "tips": [
         {
-          "player": "Nicolas Pépé",
-          "team": "Villarreal",
+          "player": "Harvey Barnes",
+          "team": "Newcastle United",
           "side": "home",
+          "position": "",
+          "games": 10,
+          "shots": 23,
+          "goals": 2,
+          "xg": 2.2,
+          "spg": 2.3,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
+        },
+        {
+          "player": "Yoane Wissa",
+          "team": "Newcastle United",
+          "side": "home",
+          "position": "",
+          "games": 10,
+          "shots": 21,
+          "goals": 1,
+          "xg": 3.4,
+          "spg": 2.1,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
+        },
+        {
+          "player": "Bukayo Saka",
+          "team": "Arsenal",
+          "side": "away",
           "position": "",
           "games": 7,
           "shots": 17,
-          "goals": 2,
-          "xg": 0.9,
+          "goals": 3,
+          "xg": 3.6,
           "spg": 2.43,
           "line": 1.5,
           "tip": "Over 1.5 shots"
         },
         {
-          "player": "Georges Mikautadze",
-          "team": "Villarreal",
-          "side": "home",
-          "position": "",
-          "games": 11,
-          "shots": 25,
-          "goals": 3,
-          "xg": 4.8,
-          "spg": 2.27,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Martín Satriano",
-          "team": "Getafe",
+          "player": "Noni Madueke",
+          "team": "Arsenal",
           "side": "away",
           "position": "",
-          "games": 11,
-          "shots": 22,
-          "goals": 3,
-          "xg": 2,
-          "spg": 2,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Ramón Terrats",
-          "team": "Getafe",
-          "side": "away",
-          "position": "",
-          "games": 10,
-          "shots": 20,
+          "games": 7,
+          "shots": 13,
           "goals": 1,
-          "xg": 1.2,
-          "spg": 2,
+          "xg": 0.9,
+          "spg": 1.86,
           "line": 1.5,
           "tip": "Over 1.5 shots"
         }
@@ -517,104 +432,127 @@
     },
     {
       "league": "La Liga",
-      "date": "2026-11-08",
+      "date": "2026-11-20",
       "time": "20:00",
-      "home": "Atlético Madrid",
-      "away": "Barcelona",
-      "match": "Atlético Madrid vs Barcelona",
+      "home": "Athletic Club",
+      "away": "Espanyol",
+      "match": "Athletic Club vs Espanyol",
       "tips": [
         {
-          "player": "Kang-In Lee",
-          "team": "Atlético Madrid",
+          "player": "Oihan Sancet",
+          "team": "Athletic Club",
           "side": "home",
           "position": "",
-          "games": 11,
-          "shots": 27,
-          "goals": 2,
-          "xg": 1.6,
-          "spg": 2.45,
+          "games": 8,
+          "shots": 18,
+          "goals": 1,
+          "xg": 2.9,
+          "spg": 2.25,
           "line": 1.5,
           "tip": "Over 1.5 shots"
         },
         {
-          "player": "Jonathan David",
-          "team": "Atlético Madrid",
+          "player": "Nico Williams",
+          "team": "Athletic Club",
           "side": "home",
-          "position": "",
-          "games": 6,
-          "shots": 14,
-          "goals": 3,
-          "xg": 3,
-          "spg": 2.33,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Lamine Yamal",
-          "team": "Barcelona",
-          "side": "away",
-          "position": "",
-          "games": 11,
-          "shots": 59,
-          "goals": 10,
-          "xg": 7.8,
-          "spg": 5.36,
-          "line": 4.5,
-          "tip": "Over 4.5 shots"
-        },
-        {
-          "player": "Raphinha",
-          "team": "Barcelona",
-          "side": "away",
           "position": "",
           "games": 10,
-          "shots": 35,
-          "goals": 15,
-          "xg": 11,
-          "spg": 3.5,
-          "line": 3.5,
-          "tip": "Over 3.5 shots"
+          "shots": 21,
+          "goals": 2,
+          "xg": 2.2,
+          "spg": 2.1,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
+        },
+        {
+          "player": "Roberto Fernández",
+          "team": "Espanyol",
+          "side": "away",
+          "position": "",
+          "games": 12,
+          "shots": 24,
+          "goals": 6,
+          "xg": 4.2,
+          "spg": 2,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
+        },
+        {
+          "player": "Edu Expósito",
+          "team": "Espanyol",
+          "side": "away",
+          "position": "",
+          "games": 12,
+          "shots": 20,
+          "goals": 1,
+          "xg": 1.3,
+          "spg": 1.67,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
         }
       ]
     },
     {
       "league": "Serie A",
-      "date": "2026-11-08",
-      "time": "11:30",
-      "home": "Napoli",
-      "away": "Lazio",
-      "match": "Napoli vs Lazio",
+      "date": "2026-11-21",
+      "time": "14:00",
+      "home": "Como",
+      "away": "Cagliari",
+      "match": "Como vs Cagliari",
       "tips": [
         {
-          "player": "Scott McTominay",
-          "team": "Napoli",
+          "player": "Nico Paz",
+          "team": "Como",
           "side": "home",
           "position": "",
-          "games": 7,
-          "shots": 17,
-          "goals": 2,
-          "xg": 1.7,
-          "spg": 2.43,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
+          "games": 10,
+          "shots": 46,
+          "goals": 3,
+          "xg": 3,
+          "spg": 4.6,
+          "line": 4.5,
+          "tip": "Over 4.5 shots"
         },
         {
-          "player": "Rasmus Højlund",
-          "team": "Napoli",
+          "player": "Anastasios Douvikas",
+          "team": "Como",
           "side": "home",
           "position": "",
-          "games": 9,
-          "shots": 18,
-          "goals": 3,
-          "xg": 1.8,
-          "spg": 2,
+          "games": 11,
+          "shots": 28,
+          "goals": 5,
+          "xg": 4.7,
+          "spg": 2.55,
+          "line": 2.5,
+          "tip": "Over 2.5 shots"
+        },
+        {
+          "player": "Paul Mendy",
+          "team": "Cagliari",
+          "side": "away",
+          "position": "",
+          "games": 11,
+          "shots": 19,
+          "goals": 1,
+          "xg": 3,
+          "spg": 1.73,
           "line": 1.5,
           "tip": "Over 1.5 shots"
-        },
+        }
+      ]
+    },
+    {
+      "league": "Serie A",
+      "date": "2026-11-21",
+      "time": "14:00",
+      "home": "Lazio",
+      "away": "Lecce",
+      "match": "Lazio vs Lecce",
+      "tips": [
         {
           "player": "Mattia Zaccagni",
           "team": "Lazio",
-          "side": "away",
+          "side": "home",
           "position": "",
           "games": 10,
           "shots": 27,
@@ -627,13 +565,39 @@
         {
           "player": "Gustav Isaksen",
           "team": "Lazio",
+          "side": "home",
+          "position": "",
+          "games": 11,
+          "shots": 23,
+          "goals": 4,
+          "xg": 1.5,
+          "spg": 2.09,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
+        },
+        {
+          "player": "Willem Geubbels",
+          "team": "Lecce",
           "side": "away",
           "position": "",
-          "games": 10,
-          "shots": 19,
-          "goals": 4,
+          "games": 6,
+          "shots": 11,
+          "goals": 0,
+          "xg": 2.8,
+          "spg": 1.83,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
+        },
+        {
+          "player": "Konan N’Dri",
+          "team": "Lecce",
+          "side": "away",
+          "position": "",
+          "games": 11,
+          "shots": 17,
+          "goals": 1,
           "xg": 1.4,
-          "spg": 1.9,
+          "spg": 1.55,
           "line": 1.5,
           "tip": "Over 1.5 shots"
         }
@@ -641,221 +605,123 @@
     },
     {
       "league": "Serie A",
-      "date": "2026-11-08",
-      "time": "14:00",
-      "home": "Genoa",
-      "away": "Milan",
-      "match": "Genoa vs Milan",
+      "date": "2026-11-21",
+      "time": "17:00",
+      "home": "Parma",
+      "away": "Roma",
+      "match": "Parma vs Roma",
       "tips": [
         {
-          "player": "Tommaso Baldanzi",
-          "team": "Genoa",
-          "side": "home",
-          "position": "",
-          "games": 6,
-          "shots": 13,
-          "goals": 1,
-          "xg": 1.3,
-          "spg": 2.17,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Milutin Osmajić",
-          "team": "Genoa",
+          "player": "David Romero",
+          "team": "Parma",
           "side": "home",
           "position": "",
           "games": 9,
           "shots": 16,
-          "goals": 4,
-          "xg": 2,
+          "goals": 2,
+          "xg": 1.8,
           "spg": 1.78,
           "line": 1.5,
           "tip": "Over 1.5 shots"
         },
         {
-          "player": "Gonçalo Ramos",
-          "team": "Milan",
+          "player": "Simone Lontani",
+          "team": "Parma",
+          "side": "home",
+          "position": "",
+          "games": 11,
+          "shots": 17,
+          "goals": 3,
+          "xg": 1,
+          "spg": 1.55,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
+        },
+        {
+          "player": "Donyell Malen",
+          "team": "Roma",
           "side": "away",
           "position": "",
           "games": 10,
-          "shots": 25,
+          "shots": 41,
+          "goals": 8,
+          "xg": 9.7,
+          "spg": 4.1,
+          "line": 3.5,
+          "tip": "Over 3.5 shots"
+        },
+        {
+          "player": "Paulo Dybala",
+          "team": "Roma",
+          "side": "away",
+          "position": "",
+          "games": 6,
+          "shots": 21,
+          "goals": 0,
+          "xg": 2,
+          "spg": 3.5,
+          "line": 3.5,
+          "tip": "Over 3.5 shots"
+        }
+      ]
+    },
+    {
+      "league": "Serie A",
+      "date": "2026-11-21",
+      "time": "19:45",
+      "home": "Napoli",
+      "away": "Torino",
+      "match": "Napoli vs Torino",
+      "tips": [
+        {
+          "player": "Scott McTominay",
+          "team": "Napoli",
+          "side": "home",
+          "position": "",
+          "games": 8,
+          "shots": 20,
           "goals": 2,
-          "xg": 4.1,
+          "xg": 1.9,
           "spg": 2.5,
           "line": 2.5,
           "tip": "Over 2.5 shots"
         },
         {
-          "player": "Alphadjo Cissè",
-          "team": "Milan",
-          "side": "away",
-          "position": "",
-          "games": 8,
-          "shots": 12,
-          "goals": 4,
-          "xg": 2.1,
-          "spg": 1.5,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        }
-      ]
-    },
-    {
-      "league": "Serie A",
-      "date": "2026-11-08",
-      "time": "14:00",
-      "home": "Monza",
-      "away": "Atalanta",
-      "match": "Monza vs Atalanta",
-      "tips": [
-        {
-          "player": "Gustavo Varela",
-          "team": "Monza",
+          "player": "Rasmus Højlund",
+          "team": "Napoli",
           "side": "home",
-          "position": "",
-          "games": 9,
-          "shots": 23,
-          "goals": 9,
-          "xg": 5.1,
-          "spg": 2.56,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
-        },
-        {
-          "player": "Dany Mota",
-          "team": "Monza",
-          "side": "home",
-          "position": "",
-          "games": 7,
-          "shots": 13,
-          "goals": 0,
-          "xg": 1.7,
-          "spg": 1.86,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Nikola Krstović",
-          "team": "Atalanta",
-          "side": "away",
           "position": "",
           "games": 10,
-          "shots": 30,
-          "goals": 6,
-          "xg": 4.8,
-          "spg": 3,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
-        },
-        {
-          "player": "Jonathan Rowe",
-          "team": "Atalanta",
-          "side": "away",
-          "position": "",
-          "games": 8,
-          "shots": 16,
-          "goals": 0,
-          "xg": 1.6,
-          "spg": 2,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        }
-      ]
-    },
-    {
-      "league": "Serie A",
-      "date": "2026-11-08",
-      "time": "17:00",
-      "home": "Inter",
-      "away": "Como",
-      "match": "Inter vs Como",
-      "tips": [
-        {
-          "player": "Nico Paz",
-          "team": "Como",
-          "side": "away",
-          "position": "",
-          "games": 9,
-          "shots": 43,
+          "shots": 21,
           "goals": 3,
           "xg": 2.8,
-          "spg": 4.78,
-          "line": 4.5,
-          "tip": "Over 4.5 shots"
-        },
-        {
-          "player": "Anastasios Douvikas",
-          "team": "Como",
-          "side": "away",
-          "position": "",
-          "games": 10,
-          "shots": 28,
-          "goals": 5,
-          "xg": 4.7,
-          "spg": 2.8,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
-        }
-      ]
-    },
-    {
-      "league": "Serie A",
-      "date": "2026-11-08",
-      "time": "19:45",
-      "home": "Fiorentina",
-      "away": "Juventus",
-      "match": "Fiorentina vs Juventus",
-      "tips": [
-        {
-          "player": "Franco Mastantuono",
-          "team": "Fiorentina",
-          "side": "home",
-          "position": "",
-          "games": 10,
-          "shots": 38,
-          "goals": 4,
-          "xg": 3.3,
-          "spg": 3.8,
-          "line": 3.5,
-          "tip": "Over 3.5 shots"
-        },
-        {
-          "player": "Arthur Atta",
-          "team": "Fiorentina",
-          "side": "home",
-          "position": "",
-          "games": 5,
-          "shots": 11,
-          "goals": 0,
-          "xg": 1.3,
-          "spg": 2.2,
+          "spg": 2.1,
           "line": 1.5,
           "tip": "Over 1.5 shots"
         },
         {
-          "player": "Kerim Alajbegović",
-          "team": "Juventus",
+          "player": "Giovanni Simeone",
+          "team": "Torino",
+          "side": "away",
+          "position": "",
+          "games": 11,
+          "shots": 23,
+          "goals": 2,
+          "xg": 2.9,
+          "spg": 2.09,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
+        },
+        {
+          "player": "Ché Adams",
+          "team": "Torino",
           "side": "away",
           "position": "",
           "games": 9,
-          "shots": 19,
-          "goals": 1,
-          "xg": 0.6,
-          "spg": 2.11,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Edon Zhegrova",
-          "team": "Juventus",
-          "side": "away",
-          "position": "",
-          "games": 8,
-          "shots": 16,
-          "goals": 2,
-          "xg": 0.8,
-          "spg": 2,
+          "shots": 15,
+          "goals": 4,
+          "xg": 2.4,
+          "spg": 1.67,
           "line": 1.5,
           "tip": "Over 1.5 shots"
         }
@@ -863,32 +729,58 @@
     },
     {
       "league": "Bundesliga",
-      "date": "2026-11-08",
-      "time": "14:30",
-      "home": "1. FC Köln",
-      "away": "Bayer Leverkusen",
-      "match": "1. FC Köln vs Bayer Leverkusen",
+      "date": "2026-11-20",
+      "time": "19:30",
+      "home": "Bayern München",
+      "away": "1. FC Köln",
+      "match": "Bayern München vs 1. FC Köln",
       "tips": [
+        {
+          "player": "Harry Kane",
+          "team": "Bayern München",
+          "side": "home",
+          "position": "",
+          "games": 9,
+          "shots": 43,
+          "goals": 4,
+          "xg": 7,
+          "spg": 4.78,
+          "line": 4.5,
+          "tip": "Over 4.5 shots"
+        },
+        {
+          "player": "Michael Olise",
+          "team": "Bayern München",
+          "side": "home",
+          "position": "",
+          "games": 9,
+          "shots": 40,
+          "goals": 6,
+          "xg": 5.1,
+          "spg": 4.44,
+          "line": 3.5,
+          "tip": "Over 3.5 shots"
+        },
         {
           "player": "Saïd El Mala",
           "team": "1. FC Köln",
-          "side": "home",
+          "side": "away",
           "position": "",
-          "games": 7,
-          "shots": 29,
-          "goals": 2,
-          "xg": 2.5,
-          "spg": 4.14,
+          "games": 8,
+          "shots": 32,
+          "goals": 3,
+          "xg": 3,
+          "spg": 4,
           "line": 3.5,
           "tip": "Over 3.5 shots"
         },
         {
           "player": "Mikey Moore",
           "team": "1. FC Köln",
-          "side": "home",
+          "side": "away",
           "position": "",
-          "games": 7,
-          "shots": 14,
+          "games": 8,
+          "shots": 16,
           "goals": 0,
           "xg": 1.1,
           "spg": 2,
@@ -898,394 +790,61 @@
       ]
     },
     {
-      "league": "Bundesliga",
-      "date": "2026-11-08",
-      "time": "18:30",
-      "home": "Hoffenheim",
-      "away": "Schalke 04",
-      "match": "Hoffenheim vs Schalke 04",
-      "tips": [
-        {
-          "player": "Adil Aouchiche",
-          "team": "Schalke 04",
-          "side": "away",
-          "position": "",
-          "games": 8,
-          "shots": 13,
-          "goals": 1,
-          "xg": 1.4,
-          "spg": 1.63,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Chukwubuike Adamu",
-          "team": "Schalke 04",
-          "side": "away",
-          "position": "",
-          "games": 6,
-          "shots": 9,
-          "goals": 0,
-          "xg": 1.8,
-          "spg": 1.5,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        }
-      ]
-    },
-    {
       "league": "Ligue 1",
-      "date": "2026-11-08",
-      "time": "14:00",
-      "home": "Rennes",
-      "away": "Lille",
-      "match": "Rennes vs Lille",
+      "date": "2026-11-20",
+      "time": "19:45",
+      "home": "Troyes",
+      "away": "Le Havre",
+      "match": "Troyes vs Le Havre",
       "tips": [
         {
-          "player": "Estéban Lepaul",
-          "team": "Rennes",
+          "player": "Renaud Ripart",
+          "team": "Troyes",
           "side": "home",
           "position": "",
-          "games": 7,
-          "shots": 28,
-          "goals": 7,
-          "xg": 5.8,
-          "spg": 4,
-          "line": 3.5,
-          "tip": "Over 3.5 shots"
-        },
-        {
-          "player": "Ludovic Blas",
-          "team": "Rennes",
-          "side": "home",
-          "position": "",
-          "games": 8,
-          "shots": 14,
-          "goals": 0,
-          "xg": 1.6,
-          "spg": 1.75,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Ethan Mbappé",
-          "team": "Lille",
-          "side": "away",
-          "position": "",
-          "games": 8,
-          "shots": 14,
-          "goals": 2,
-          "xg": 2.1,
-          "spg": 1.75,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Tiago Santos",
-          "team": "Lille",
-          "side": "away",
-          "position": "",
-          "games": 6,
-          "shots": 9,
-          "goals": 2,
-          "xg": 0.6,
-          "spg": 1.5,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        }
-      ]
-    },
-    {
-      "league": "Ligue 1",
-      "date": "2026-11-08",
-      "time": "16:15",
-      "home": "Angers",
-      "away": "Nice",
-      "match": "Angers vs Nice",
-      "tips": [
-        {
-          "player": "Amine Sbaï",
-          "team": "Angers",
-          "side": "home",
-          "position": "",
-          "games": 9,
-          "shots": 21,
-          "goals": 1,
-          "xg": 1.5,
-          "spg": 2.33,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Jim Allevinah",
-          "team": "Angers",
-          "side": "home",
-          "position": "",
-          "games": 9,
-          "shots": 16,
-          "goals": 0,
-          "xg": 0.9,
-          "spg": 1.78,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Elye Wahi",
-          "team": "Nice",
-          "side": "away",
-          "position": "",
-          "games": 8,
-          "shots": 18,
-          "goals": 6,
-          "xg": 5.6,
-          "spg": 2.25,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Mohamed Amoura",
-          "team": "Nice",
-          "side": "away",
-          "position": "",
-          "games": 7,
-          "shots": 15,
-          "goals": 2,
-          "xg": 1.9,
-          "spg": 2.14,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        }
-      ]
-    },
-    {
-      "league": "Ligue 1",
-      "date": "2026-11-08",
-      "time": "16:15",
-      "home": "Brest",
-      "away": "Lyon",
-      "match": "Brest vs Lyon",
-      "tips": [
-        {
-          "player": "Pathé Mboup",
-          "team": "Brest",
-          "side": "home",
-          "position": "",
-          "games": 9,
-          "shots": 26,
-          "goals": 2,
-          "xg": 2.5,
-          "spg": 2.89,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
-        },
-        {
-          "player": "Ludovic Ajorque",
-          "team": "Brest",
-          "side": "home",
-          "position": "",
-          "games": 9,
-          "shots": 23,
-          "goals": 4,
-          "xg": 3,
-          "spg": 2.56,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
-        },
-        {
-          "player": "Loïs Openda",
-          "team": "Lyon",
-          "side": "away",
-          "position": "",
-          "games": 5,
-          "shots": 17,
-          "goals": 1,
-          "xg": 2.7,
-          "spg": 3.4,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
-        },
-        {
-          "player": "Ernest Nuamah",
-          "team": "Lyon",
-          "side": "away",
-          "position": "",
-          "games": 7,
+          "games": 10,
           "shots": 20,
-          "goals": 4,
-          "xg": 2.4,
-          "spg": 2.86,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
-        }
-      ]
-    },
-    {
-      "league": "Ligue 1",
-      "date": "2026-11-08",
-      "time": "16:15",
-      "home": "Le Havre",
-      "away": "Lorient",
-      "match": "Le Havre vs Lorient",
-      "tips": [
+          "goals": 1,
+          "xg": 3.3,
+          "spg": 2,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
+        },
+        {
+          "player": "Timothé Nkada",
+          "team": "Troyes",
+          "side": "home",
+          "position": "",
+          "games": 8,
+          "shots": 15,
+          "goals": 1,
+          "xg": 0.9,
+          "spg": 1.88,
+          "line": 1.5,
+          "tip": "Over 1.5 shots"
+        },
         {
           "player": "Mbwana Samatta",
           "team": "Le Havre",
-          "side": "home",
+          "side": "away",
           "position": "",
-          "games": 9,
-          "shots": 35,
+          "games": 10,
+          "shots": 37,
           "goals": 2,
           "xg": 3.1,
-          "spg": 3.89,
+          "spg": 3.7,
           "line": 3.5,
           "tip": "Over 3.5 shots"
         },
         {
           "player": "Rayan Fofana",
           "team": "Le Havre",
-          "side": "home",
-          "position": "",
-          "games": 7,
-          "shots": 14,
-          "goals": 2,
-          "xg": 2.3,
-          "spg": 2,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Jean-Victor Makengo",
-          "team": "Lorient",
-          "side": "away",
-          "position": "",
-          "games": 9,
-          "shots": 15,
-          "goals": 1,
-          "xg": 1.6,
-          "spg": 1.67,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Mamadou Koné",
-          "team": "Lorient",
-          "side": "away",
-          "position": "",
-          "games": 8,
-          "shots": 12,
-          "goals": 1,
-          "xg": 2,
-          "spg": 1.5,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        }
-      ]
-    },
-    {
-      "league": "Ligue 1",
-      "date": "2026-11-08",
-      "time": "16:15",
-      "home": "Le Mans",
-      "away": "Monaco",
-      "match": "Le Mans vs Monaco",
-      "tips": [
-        {
-          "player": "Louis Mafouta",
-          "team": "Le Mans",
-          "side": "home",
-          "position": "",
-          "games": 9,
-          "shots": 20,
-          "goals": 4,
-          "xg": 6,
-          "spg": 2.22,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Paris Brunner",
-          "team": "Monaco",
-          "side": "away",
-          "position": "",
-          "games": 7,
-          "shots": 20,
-          "goals": 4,
-          "xg": 4.4,
-          "spg": 2.86,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
-        },
-        {
-          "player": "Stanis Idumbo",
-          "team": "Monaco",
-          "side": "away",
-          "position": "",
-          "games": 5,
-          "shots": 12,
-          "goals": 1,
-          "xg": 0.8,
-          "spg": 2.4,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        }
-      ]
-    },
-    {
-      "league": "Ligue 1",
-      "date": "2026-11-08",
-      "time": "19:45",
-      "home": "Lens",
-      "away": "Marseille",
-      "match": "Lens vs Marseille",
-      "tips": [
-        {
-          "player": "Florian Thauvin",
-          "team": "Lens",
-          "side": "home",
-          "position": "",
-          "games": 9,
-          "shots": 21,
-          "goals": 4,
-          "xg": 4,
-          "spg": 2.33,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Abdallah Sima",
-          "team": "Lens",
-          "side": "home",
-          "position": "",
-          "games": 5,
-          "shots": 9,
-          "goals": 1,
-          "xg": 0.8,
-          "spg": 1.8,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Amine Gouiri",
-          "team": "Marseille",
-          "side": "away",
-          "position": "",
-          "games": 9,
-          "shots": 20,
-          "goals": 6,
-          "xg": 3.9,
-          "spg": 2.22,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Igor Paixão",
-          "team": "Marseille",
           "side": "away",
           "position": "",
           "games": 8,
           "shots": 17,
           "goals": 2,
-          "xg": 2.1,
+          "xg": 2.4,
           "spg": 2.13,
           "line": 1.5,
           "tip": "Over 1.5 shots"
@@ -1317,26 +876,59 @@
       "spg": 3.6
     },
     {
-      "name": "Cole Palmer",
-      "team": "Chelsea",
-      "league": "English Premier League",
-      "position": "",
-      "games": 9,
-      "shots": 29,
-      "goals": 3,
-      "xg": 2.5,
-      "spg": 3.22
-    },
-    {
       "name": "Julio Enciso",
       "team": "Ipswich Town",
       "league": "English Premier League",
       "position": "",
-      "games": 9,
-      "shots": 28,
+      "games": 10,
+      "shots": 32,
       "goals": 2,
-      "xg": 1.9,
-      "spg": 3.11
+      "xg": 2.1,
+      "spg": 3.2
+    },
+    {
+      "name": "Bruno Fernandes",
+      "team": "Manchester United",
+      "league": "English Premier League",
+      "position": "",
+      "games": 9,
+      "shots": 31,
+      "goals": 4,
+      "xg": 4,
+      "spg": 3.44
+    },
+    {
+      "name": "Cole Palmer",
+      "team": "Chelsea",
+      "league": "English Premier League",
+      "position": "",
+      "games": 10,
+      "shots": 30,
+      "goals": 3,
+      "xg": 2.6,
+      "spg": 3
+    },
+    {
+      "name": "Bryan Mbeumo",
+      "team": "Manchester United",
+      "league": "English Premier League",
+      "position": "",
+      "games": 10,
+      "shots": 30,
+      "goals": 4,
+      "xg": 4.6,
+      "spg": 3
+    },
+    {
+      "name": "Rayan",
+      "team": "Bournemouth",
+      "league": "English Premier League",
+      "position": "",
+      "games": 10,
+      "shots": 28,
+      "goals": 1,
+      "xg": 2.5,
+      "spg": 2.8
     },
     {
       "name": "Liam Delap",
@@ -1350,37 +942,48 @@
       "spg": 3
     },
     {
-      "name": "Rayan",
+      "name": "Evanilson",
       "team": "Bournemouth",
       "league": "English Premier League",
       "position": "",
-      "games": 9,
-      "shots": 27,
-      "goals": 1,
-      "xg": 2.5,
-      "spg": 3
+      "games": 10,
+      "shots": 26,
+      "goals": 5,
+      "xg": 4.4,
+      "spg": 2.6
     },
     {
-      "name": "Bryan Mbeumo",
-      "team": "Manchester United",
+      "name": "Diego Gómez",
+      "team": "Brighton and Hove Albion",
       "league": "English Premier League",
       "position": "",
-      "games": 9,
-      "shots": 27,
-      "goals": 4,
-      "xg": 4.2,
-      "spg": 3
+      "games": 10,
+      "shots": 26,
+      "goals": 2,
+      "xg": 1.3,
+      "spg": 2.6
     },
     {
-      "name": "Bruno Fernandes",
-      "team": "Manchester United",
+      "name": "Charalampos Kostoulas",
+      "team": "Brighton and Hove Albion",
       "league": "English Premier League",
       "position": "",
-      "games": 8,
+      "games": 10,
       "shots": 25,
       "goals": 3,
-      "xg": 3,
-      "spg": 3.13
+      "xg": 2.6,
+      "spg": 2.5
+    },
+    {
+      "name": "Alexander Isak",
+      "team": "Liverpool",
+      "league": "English Premier League",
+      "position": "",
+      "games": 9,
+      "shots": 25,
+      "goals": 7,
+      "xg": 4.9,
+      "spg": 2.78
     },
     {
       "name": "Kiernan Dewsbury-Hall",
@@ -1392,6 +995,17 @@
       "goals": 3,
       "xg": 1.8,
       "spg": 2.5
+    },
+    {
+      "name": "Yasin Ayari",
+      "team": "Brighton and Hove Albion",
+      "league": "English Premier League",
+      "position": "",
+      "games": 9,
+      "shots": 24,
+      "goals": 3,
+      "xg": 2.2,
+      "spg": 2.67
     },
     {
       "name": "Gonzalo García",
@@ -1416,15 +1030,26 @@
       "spg": 2.56
     },
     {
-      "name": "Diego Gómez",
-      "team": "Brighton and Hove Albion",
+      "name": "Nicolas Jackson",
+      "team": "Aston Villa",
       "league": "English Premier League",
       "position": "",
       "games": 9,
       "shots": 23,
-      "goals": 1,
-      "xg": 1.2,
+      "goals": 6,
+      "xg": 3.6,
       "spg": 2.56
+    },
+    {
+      "name": "Florian Wirtz",
+      "team": "Liverpool",
+      "league": "English Premier League",
+      "position": "",
+      "games": 10,
+      "shots": 23,
+      "goals": 1,
+      "xg": 1.8,
+      "spg": 2.3
     },
     {
       "name": "Joshua King",
@@ -1435,6 +1060,17 @@
       "shots": 23,
       "goals": 2,
       "xg": 2,
+      "spg": 2.3
+    },
+    {
+      "name": "Morgan Rogers",
+      "team": "Chelsea",
+      "league": "English Premier League",
+      "position": "",
+      "games": 10,
+      "shots": 23,
+      "goals": 5,
+      "xg": 3,
       "spg": 2.3
     },
     {
@@ -1449,48 +1085,15 @@
       "spg": 2.3
     },
     {
-      "name": "Charalampos Kostoulas",
-      "team": "Brighton and Hove Albion",
+      "name": "Matheus Cunha",
+      "team": "Manchester United",
       "league": "English Premier League",
       "position": "",
-      "games": 9,
-      "shots": 22,
-      "goals": 3,
-      "xg": 2.3,
-      "spg": 2.44
-    },
-    {
-      "name": "Alexander Isak",
-      "team": "Liverpool",
-      "league": "English Premier League",
-      "position": "",
-      "games": 8,
-      "shots": 22,
-      "goals": 6,
-      "xg": 4.3,
-      "spg": 2.75
-    },
-    {
-      "name": "Evanilson",
-      "team": "Bournemouth",
-      "league": "English Premier League",
-      "position": "",
-      "games": 9,
-      "shots": 22,
-      "goals": 4,
-      "xg": 3.6,
-      "spg": 2.44
-    },
-    {
-      "name": "Nicolas Jackson",
-      "team": "Aston Villa",
-      "league": "English Premier League",
-      "position": "",
-      "games": 8,
+      "games": 10,
       "shots": 21,
-      "goals": 5,
-      "xg": 2.3,
-      "spg": 2.63
+      "goals": 1,
+      "xg": 1.5,
+      "spg": 2.1
     },
     {
       "name": "Yoane Wissa",
@@ -1504,15 +1107,15 @@
       "spg": 2.1
     },
     {
-      "name": "Morgan Rogers",
-      "team": "Chelsea",
+      "name": "Igor Thiago",
+      "team": "Brentford",
       "league": "English Premier League",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 21,
-      "goals": 5,
-      "xg": 2.8,
-      "spg": 2.33
+      "goals": 2,
+      "xg": 4.1,
+      "spg": 2.1
     },
     {
       "name": "Dan Ndoye",
@@ -1526,26 +1129,15 @@
       "spg": 2
     },
     {
-      "name": "Yasin Ayari",
-      "team": "Brighton and Hove Albion",
+      "name": "Marcus Tavernier",
+      "team": "Bournemouth",
       "league": "English Premier League",
       "position": "",
-      "games": 8,
+      "games": 10,
       "shots": 20,
-      "goals": 3,
-      "xg": 2,
-      "spg": 2.5
-    },
-    {
-      "name": "Igor Thiago",
-      "team": "Brentford",
-      "league": "English Premier League",
-      "position": "",
-      "games": 9,
-      "shots": 20,
-      "goals": 2,
-      "xg": 4.1,
-      "spg": 2.22
+      "goals": 5,
+      "xg": 4.2,
+      "spg": 2
     },
     {
       "name": "Joseph Willock",
@@ -1559,26 +1151,15 @@
       "spg": 1.9
     },
     {
-      "name": "Florian Wirtz",
-      "team": "Liverpool",
+      "name": "Kevin Schade",
+      "team": "Brentford",
       "league": "English Premier League",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 19,
-      "goals": 0,
-      "xg": 1.5,
-      "spg": 2.11
-    },
-    {
-      "name": "Marcus Tavernier",
-      "team": "Bournemouth",
-      "league": "English Premier League",
-      "position": "",
-      "games": 9,
-      "shots": 19,
-      "goals": 5,
-      "xg": 3.7,
-      "spg": 2.11
+      "goals": 3,
+      "xg": 2.4,
+      "spg": 1.9
     },
     {
       "name": "Dominic Calvert-Lewin",
@@ -1592,6 +1173,17 @@
       "spg": 1.9
     },
     {
+      "name": "Johan Manzambi",
+      "team": "Aston Villa",
+      "league": "English Premier League",
+      "position": "",
+      "games": 7,
+      "shots": 18,
+      "goals": 2,
+      "xg": 1.7,
+      "spg": 2.57
+    },
+    {
       "name": "Rayan Cherki",
       "team": "Manchester City",
       "league": "English Premier League",
@@ -1603,15 +1195,15 @@
       "spg": 2
     },
     {
-      "name": "Matheus Cunha",
-      "team": "Manchester United",
+      "name": "Emersonn",
+      "team": "Ipswich Town",
       "league": "English Premier League",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 18,
-      "goals": 1,
-      "xg": 1.4,
-      "spg": 2
+      "goals": 2,
+      "xg": 2.7,
+      "spg": 1.8
     },
     {
       "name": "Omar Marmoush",
@@ -1625,37 +1217,15 @@
       "spg": 2
     },
     {
-      "name": "Kevin Schade",
-      "team": "Brentford",
+      "name": "Pedro Neto",
+      "team": "Chelsea",
       "league": "English Premier League",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 18,
       "goals": 3,
-      "xg": 2.1,
-      "spg": 2
-    },
-    {
-      "name": "Johan Manzambi",
-      "team": "Aston Villa",
-      "league": "English Premier League",
-      "position": "",
-      "games": 6,
-      "shots": 17,
-      "goals": 2,
-      "xg": 1.6,
-      "spg": 2.83
-    },
-    {
-      "name": "Cody Gakpo",
-      "team": "Liverpool",
-      "league": "English Premier League",
-      "position": "",
-      "games": 7,
-      "shots": 17,
-      "goals": 1,
-      "xg": 1.2,
-      "spg": 2.43
+      "xg": 1.8,
+      "spg": 1.8
     },
     {
       "name": "Bukayo Saka",
@@ -1669,15 +1239,26 @@
       "spg": 2.43
     },
     {
-      "name": "Pedro Neto",
-      "team": "Chelsea",
+      "name": "Brian Brobbey",
+      "team": "Sunderland",
       "league": "English Premier League",
       "position": "",
-      "games": 9,
+      "games": 8,
       "shots": 17,
       "goals": 3,
-      "xg": 1.8,
-      "spg": 1.89
+      "xg": 4.2,
+      "spg": 2.13
+    },
+    {
+      "name": "Cody Gakpo",
+      "team": "Liverpool",
+      "league": "English Premier League",
+      "position": "",
+      "games": 8,
+      "shots": 17,
+      "goals": 1,
+      "xg": 1.2,
+      "spg": 2.13
     },
     {
       "name": "Jack Rudoni",
@@ -1688,6 +1269,17 @@
       "shots": 17,
       "goals": 3,
       "xg": 2.2,
+      "spg": 1.7
+    },
+    {
+      "name": "Alexis Mac Allister",
+      "team": "Liverpool",
+      "league": "English Premier League",
+      "position": "",
+      "games": 10,
+      "shots": 17,
+      "goals": 1,
+      "xg": 1,
       "spg": 1.7
     },
     {
@@ -1711,6 +1303,17 @@
       "goals": 1,
       "xg": 2.6,
       "spg": 1.89
+    },
+    {
+      "name": "Enzo Le Fée",
+      "team": "Sunderland",
+      "league": "English Premier League",
+      "position": "",
+      "games": 10,
+      "shots": 17,
+      "goals": 3,
+      "xg": 3.8,
+      "spg": 1.7
     },
     {
       "name": "James McAtee",
@@ -1757,15 +1360,15 @@
       "spg": 2.67
     },
     {
-      "name": "Emersonn",
-      "team": "Ipswich Town",
+      "name": "Justin Kluivert",
+      "team": "Bournemouth",
       "league": "English Premier League",
       "position": "",
-      "games": 9,
+      "games": 8,
       "shots": 16,
-      "goals": 2,
-      "xg": 2.7,
-      "spg": 1.78
+      "goals": 1,
+      "xg": 1.4,
+      "spg": 2
     },
     {
       "name": "Tyrique George",
@@ -1779,17 +1382,6 @@
       "spg": 1.6
     },
     {
-      "name": "Enzo Le Fée",
-      "team": "Sunderland",
-      "league": "English Premier League",
-      "position": "",
-      "games": 9,
-      "shots": 16,
-      "goals": 2,
-      "xg": 3,
-      "spg": 1.78
-    },
-    {
       "name": "Martin Ødegaard",
       "team": "Arsenal",
       "league": "English Premier League",
@@ -1801,15 +1393,26 @@
       "spg": 1.6
     },
     {
-      "name": "Brian Brobbey",
-      "team": "Sunderland",
+      "name": "Luka Vušković",
+      "team": "Brighton and Hove Albion",
       "league": "English Premier League",
       "position": "",
-      "games": 7,
+      "games": 10,
+      "shots": 16,
+      "goals": 1,
+      "xg": 1.3,
+      "spg": 1.6
+    },
+    {
+      "name": "Dominik Szoboszlai",
+      "team": "Liverpool",
+      "league": "English Premier League",
+      "position": "",
+      "games": 8,
       "shots": 15,
-      "goals": 3,
-      "xg": 3.5,
-      "spg": 2.14
+      "goals": 1,
+      "xg": 1.5,
+      "spg": 1.88
     },
     {
       "name": "Emiliano Buendía",
@@ -1821,6 +1424,17 @@
       "goals": 1,
       "xg": 1.6,
       "spg": 1.67
+    },
+    {
+      "name": "Yéremi Pino",
+      "team": "Crystal Palace",
+      "league": "English Premier League",
+      "position": "",
+      "games": 10,
+      "shots": 15,
+      "goals": 1,
+      "xg": 1.6,
+      "spg": 1.5
     },
     {
       "name": "Kai Havertz",
@@ -1845,15 +1459,15 @@
       "spg": 1.5
     },
     {
-      "name": "Luka Vušković",
+      "name": "Maxim De Cuyper",
       "team": "Brighton and Hove Albion",
       "league": "English Premier League",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 15,
-      "goals": 1,
-      "xg": 1.2,
-      "spg": 1.67
+      "goals": 2,
+      "xg": 2.4,
+      "spg": 1.5
     },
     {
       "name": "Alex Iwobi",
@@ -1867,37 +1481,15 @@
       "spg": 1.5
     },
     {
-      "name": "Justin Kluivert",
-      "team": "Bournemouth",
+      "name": "Pascal Groß",
+      "team": "Brighton and Hove Albion",
       "league": "English Premier League",
       "position": "",
-      "games": 7,
-      "shots": 14,
-      "goals": 1,
-      "xg": 1.4,
-      "spg": 2
-    },
-    {
-      "name": "Dominik Szoboszlai",
-      "team": "Liverpool",
-      "league": "English Premier League",
-      "position": "",
-      "games": 7,
-      "shots": 14,
-      "goals": 1,
-      "xg": 1.5,
-      "spg": 2
-    },
-    {
-      "name": "Alexis Mac Allister",
-      "team": "Liverpool",
-      "league": "English Premier League",
-      "position": "",
-      "games": 9,
-      "shots": 14,
-      "goals": 0,
-      "xg": 0.7,
-      "spg": 1.56
+      "games": 10,
+      "shots": 15,
+      "goals": 4,
+      "xg": 3,
+      "spg": 1.5
     },
     {
       "name": "Bobby Thomas",
@@ -1909,6 +1501,17 @@
       "goals": 0,
       "xg": 0.6,
       "spg": 1.75
+    },
+    {
+      "name": "Keane Lewis-Potter",
+      "team": "Brentford",
+      "league": "English Premier League",
+      "position": "",
+      "games": 10,
+      "shots": 14,
+      "goals": 2,
+      "xg": 1.4,
+      "spg": 1.4
     },
     {
       "name": "Sandro Tonali",
@@ -1933,17 +1536,6 @@
       "spg": 2.17
     },
     {
-      "name": "Víctor Muñoz",
-      "team": "Liverpool",
-      "league": "English Premier League",
-      "position": "",
-      "games": 8,
-      "shots": 13,
-      "goals": 2,
-      "xg": 0.8,
-      "spg": 1.63
-    },
-    {
       "name": "Noni Madueke",
       "team": "Arsenal",
       "league": "English Premier League",
@@ -1953,6 +1545,17 @@
       "goals": 1,
       "xg": 0.9,
       "spg": 1.86
+    },
+    {
+      "name": "Víctor Muñoz",
+      "team": "Liverpool",
+      "league": "English Premier League",
+      "position": "",
+      "games": 9,
+      "shots": 13,
+      "goals": 2,
+      "xg": 0.8,
+      "spg": 1.44
     },
     {
       "name": "Jaidon Anthony",
@@ -2010,28 +1613,6 @@
       "spg": 1.44
     },
     {
-      "name": "Keane Lewis-Potter",
-      "team": "Brentford",
-      "league": "English Premier League",
-      "position": "",
-      "games": 9,
-      "shots": 13,
-      "goals": 2,
-      "xg": 1.4,
-      "spg": 1.44
-    },
-    {
-      "name": "Pascal Groß",
-      "team": "Brighton and Hove Albion",
-      "league": "English Premier League",
-      "position": "",
-      "games": 9,
-      "shots": 13,
-      "goals": 3,
-      "xg": 2.2,
-      "spg": 1.44
-    },
-    {
       "name": "Oli McBurnie",
       "team": "Hull City",
       "league": "English Premier League",
@@ -2054,6 +1635,28 @@
       "spg": 1.5
     },
     {
+      "name": "Amad Diallo",
+      "team": "Manchester United",
+      "league": "English Premier League",
+      "position": "",
+      "games": 5,
+      "shots": 12,
+      "goals": 0,
+      "xg": 1.1,
+      "spg": 2.4
+    },
+    {
+      "name": "Ryan Christie",
+      "team": "Bournemouth",
+      "league": "English Premier League",
+      "position": "",
+      "games": 9,
+      "shots": 12,
+      "goals": 0,
+      "xg": 1,
+      "spg": 1.33
+    },
+    {
       "name": "Brandon Thomas-Asante",
       "team": "Coventry City",
       "league": "English Premier League",
@@ -2065,15 +1668,15 @@
       "spg": 1.2
     },
     {
-      "name": "Maxim De Cuyper",
-      "team": "Brighton and Hove Albion",
+      "name": "Bradley Barcola",
+      "team": "Liverpool",
       "league": "English Premier League",
       "position": "",
-      "games": 9,
+      "games": 8,
       "shots": 12,
-      "goals": 2,
-      "xg": 2.1,
-      "spg": 1.33
+      "goals": 0,
+      "xg": 1.4,
+      "spg": 1.5
     },
     {
       "name": "Xaver Schlager",
@@ -2131,6 +1734,17 @@
       "spg": 1.83
     },
     {
+      "name": "Ross Barkley",
+      "team": "Aston Villa",
+      "league": "English Premier League",
+      "position": "",
+      "games": 10,
+      "shots": 11,
+      "goals": 0,
+      "xg": 0.6,
+      "spg": 1.1
+    },
+    {
       "name": "Jérémy Doku",
       "team": "Manchester City",
       "league": "English Premier League",
@@ -2164,14 +1778,14 @@
       "spg": 1.1
     },
     {
-      "name": "Anan Khalaili",
-      "team": "Crystal Palace",
+      "name": "Youri Tielemans",
+      "team": "Manchester United",
       "league": "English Premier League",
       "position": "",
       "games": 9,
       "shots": 11,
       "goals": 1,
-      "xg": 1.2,
+      "xg": 0.9,
       "spg": 1.22
     },
     {
@@ -2184,6 +1798,17 @@
       "goals": 0,
       "xg": 1.3,
       "spg": 1.22
+    },
+    {
+      "name": "Anan Khalaili",
+      "team": "Crystal Palace",
+      "league": "English Premier League",
+      "position": "",
+      "games": 10,
+      "shots": 11,
+      "goals": 1,
+      "xg": 1.2,
+      "spg": 1.1
     },
     {
       "name": "Jan Paul van Hecke",
@@ -2208,6 +1833,17 @@
       "spg": 1
     },
     {
+      "name": "Wilson Isidor",
+      "team": "Sunderland",
+      "league": "English Premier League",
+      "position": "",
+      "games": 8,
+      "shots": 10,
+      "goals": 1,
+      "xg": 2.2,
+      "spg": 1.25
+    },
+    {
       "name": "Conor Gallagher",
       "team": "Tottenham Hotspur",
       "league": "English Premier League",
@@ -2230,6 +1866,17 @@
       "spg": 1.11
     },
     {
+      "name": "Jørgen Strand Larsen",
+      "team": "Crystal Palace",
+      "league": "English Premier League",
+      "position": "",
+      "games": 8,
+      "shots": 10,
+      "goals": 1,
+      "xg": 1.5,
+      "spg": 1.25
+    },
+    {
       "name": "Daniel Muñoz",
       "team": "Nottingham Forest",
       "league": "English Premier League",
@@ -2239,6 +1886,17 @@
       "goals": 0,
       "xg": 1.1,
       "spg": 1.11
+    },
+    {
+      "name": "Diogo Dalot",
+      "team": "Manchester United",
+      "league": "English Premier League",
+      "position": "",
+      "games": 10,
+      "shots": 10,
+      "goals": 0,
+      "xg": 0.3,
+      "spg": 1
     },
     {
       "name": "Joe Gelhardt",
@@ -2256,11 +1914,11 @@
       "team": "Chelsea",
       "league": "English Premier League",
       "position": "",
-      "games": 7,
+      "games": 8,
       "shots": 9,
       "goals": 0,
       "xg": 0.4,
-      "spg": 1.29
+      "spg": 1.13
     },
     {
       "name": "Igor Jesus",
@@ -2285,114 +1943,26 @@
       "spg": 1.13
     },
     {
-      "name": "Ryan Christie",
-      "team": "Bournemouth",
-      "league": "English Premier League",
-      "position": "",
-      "games": 8,
-      "shots": 9,
-      "goals": 0,
-      "xg": 0.9,
-      "spg": 1.13
-    },
-    {
-      "name": "Ross Barkley",
-      "team": "Aston Villa",
-      "league": "English Premier League",
-      "position": "",
-      "games": 9,
-      "shots": 9,
-      "goals": 0,
-      "xg": 0.5,
-      "spg": 1
-    },
-    {
       "name": "Dango Ouattara",
       "team": "Brentford",
       "league": "English Premier League",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 9,
       "goals": 1,
       "xg": 1.1,
-      "spg": 1
+      "spg": 0.9
     },
     {
-      "name": "Jørgen Strand Larsen",
-      "team": "Crystal Palace",
-      "league": "English Premier League",
+      "name": "Lamine Yamal",
+      "team": "Barcelona",
+      "league": "La Liga",
       "position": "",
-      "games": 7,
-      "shots": 9,
-      "goals": 1,
-      "xg": 1.4,
-      "spg": 1.29
-    },
-    {
-      "name": "Bradley Barcola",
-      "team": "Liverpool",
-      "league": "English Premier League",
-      "position": "",
-      "games": 7,
-      "shots": 9,
-      "goals": 0,
-      "xg": 1,
-      "spg": 1.29
-    },
-    {
-      "name": "Christos Tzolis",
-      "team": "Arsenal",
-      "league": "English Premier League",
-      "position": "",
-      "games": 7,
-      "shots": 9,
-      "goals": 0,
-      "xg": 0.4,
-      "spg": 1.29
-    },
-    {
-      "name": "Ian Maatsen",
-      "team": "Aston Villa",
-      "league": "English Premier League",
-      "position": "",
-      "games": 6,
-      "shots": 9,
-      "goals": 0,
-      "xg": 0.4,
-      "spg": 1.5
-    },
-    {
-      "name": "Nordi Mukiele",
-      "team": "Sunderland",
-      "league": "English Premier League",
-      "position": "",
-      "games": 7,
-      "shots": 9,
-      "goals": 0,
-      "xg": 0.8,
-      "spg": 1.29
-    },
-    {
-      "name": "Yéremi Pino",
-      "team": "Crystal Palace",
-      "league": "English Premier League",
-      "position": "",
-      "games": 9,
-      "shots": 9,
-      "goals": 1,
-      "xg": 1,
-      "spg": 1
-    },
-    {
-      "name": "Diogo Dalot",
-      "team": "Manchester United",
-      "league": "English Premier League",
-      "position": "",
-      "games": 9,
-      "shots": 9,
-      "goals": 0,
-      "xg": 0.3,
-      "spg": 1
+      "games": 12,
+      "shots": 64,
+      "goals": 10,
+      "xg": 8,
+      "spg": 5.33
     },
     {
       "name": "Kylian Mbappé",
@@ -2406,37 +1976,26 @@
       "spg": 5.33
     },
     {
-      "name": "Lamine Yamal",
-      "team": "Barcelona",
-      "league": "La Liga",
-      "position": "",
-      "games": 11,
-      "shots": 59,
-      "goals": 10,
-      "xg": 7.8,
-      "spg": 5.36
-    },
-    {
       "name": "Raphinha",
       "team": "Barcelona",
       "league": "La Liga",
       "position": "",
-      "games": 10,
-      "shots": 35,
+      "games": 11,
+      "shots": 38,
       "goals": 15,
-      "xg": 11,
-      "spg": 3.5
+      "xg": 11.2,
+      "spg": 3.45
     },
     {
       "name": "Antony",
       "team": "Real Betis",
       "league": "La Liga",
       "position": "",
-      "games": 10,
-      "shots": 34,
+      "games": 11,
+      "shots": 37,
       "goals": 0,
-      "xg": 2.2,
-      "spg": 3.4
+      "xg": 2.4,
+      "spg": 3.36
     },
     {
       "name": "Ante Budimir",
@@ -2476,11 +2035,33 @@
       "team": "Atlético Madrid",
       "league": "La Liga",
       "position": "",
-      "games": 11,
-      "shots": 27,
+      "games": 12,
+      "shots": 28,
       "goals": 2,
-      "xg": 1.6,
-      "spg": 2.45
+      "xg": 1.7,
+      "spg": 2.33
+    },
+    {
+      "name": "Georges Mikautadze",
+      "team": "Villarreal",
+      "league": "La Liga",
+      "position": "",
+      "games": 12,
+      "shots": 26,
+      "goals": 3,
+      "xg": 4.8,
+      "spg": 2.17
+    },
+    {
+      "name": "Sergio Camello",
+      "team": "Rayo Vallecano",
+      "league": "La Liga",
+      "position": "",
+      "games": 12,
+      "shots": 26,
+      "goals": 7,
+      "xg": 3.4,
+      "spg": 2.17
     },
     {
       "name": "Lucas Boyé",
@@ -2505,6 +2086,17 @@
       "spg": 2.17
     },
     {
+      "name": "Roger Brugué",
+      "team": "Levante",
+      "league": "La Liga",
+      "position": "",
+      "games": 11,
+      "shots": 26,
+      "goals": 5,
+      "xg": 4,
+      "spg": 2.36
+    },
+    {
       "name": "Jude Bellingham",
       "team": "Real Madrid",
       "league": "La Liga",
@@ -2512,29 +2104,18 @@
       "games": 12,
       "shots": 26,
       "goals": 4,
-      "xg": 2.8,
+      "xg": 2.9,
       "spg": 2.17
     },
     {
-      "name": "Georges Mikautadze",
-      "team": "Villarreal",
-      "league": "La Liga",
-      "position": "",
-      "games": 11,
-      "shots": 25,
-      "goals": 3,
-      "xg": 4.8,
-      "spg": 2.27
-    },
-    {
-      "name": "Sergio Camello",
+      "name": "Pedro Díaz",
       "team": "Rayo Vallecano",
       "league": "La Liga",
       "position": "",
       "games": 11,
       "shots": 25,
-      "goals": 7,
-      "xg": 3.3,
+      "goals": 0,
+      "xg": 1.5,
       "spg": 2.27
     },
     {
@@ -2549,6 +2130,17 @@
       "spg": 2.08
     },
     {
+      "name": "Álex Baena",
+      "team": "Atlético Madrid",
+      "league": "La Liga",
+      "position": "",
+      "games": 12,
+      "shots": 25,
+      "goals": 5,
+      "xg": 2,
+      "spg": 2.08
+    },
+    {
       "name": "Chupe",
       "team": "Málaga",
       "league": "La Liga",
@@ -2558,6 +2150,17 @@
       "goals": 1,
       "xg": 4,
       "spg": 2.08
+    },
+    {
+      "name": "Orri Óskarsson",
+      "team": "Real Sociedad",
+      "league": "La Liga",
+      "position": "",
+      "games": 10,
+      "shots": 24,
+      "goals": 4,
+      "xg": 5.4,
+      "spg": 2.4
     },
     {
       "name": "Roberto Fernández",
@@ -2582,15 +2185,15 @@
       "spg": 2.88
     },
     {
-      "name": "Pedro Díaz",
-      "team": "Rayo Vallecano",
+      "name": "Gonçalo Guedes",
+      "team": "Real Sociedad",
       "league": "La Liga",
       "position": "",
-      "games": 10,
+      "games": 11,
       "shots": 23,
-      "goals": 0,
-      "xg": 0.9,
-      "spg": 2.3
+      "goals": 2,
+      "xg": 1.8,
+      "spg": 2.09
     },
     {
       "name": "Vinícius Júnior",
@@ -2604,59 +2207,81 @@
       "spg": 2.88
     },
     {
-      "name": "Álex Baena",
-      "team": "Atlético Madrid",
-      "league": "La Liga",
-      "position": "",
-      "games": 11,
-      "shots": 23,
-      "goals": 5,
-      "xg": 1.5,
-      "spg": 2.09
-    },
-    {
-      "name": "Roger Brugué",
-      "team": "Levante",
+      "name": "Tajon Buchanan",
+      "team": "Villarreal",
       "league": "La Liga",
       "position": "",
       "games": 10,
       "shots": 23,
-      "goals": 5,
-      "xg": 3.9,
+      "goals": 1,
+      "xg": 2.1,
       "spg": 2.3
-    },
-    {
-      "name": "Nelson Deossa",
-      "team": "Real Betis",
-      "league": "La Liga",
-      "position": "",
-      "games": 11,
-      "shots": 22,
-      "goals": 0,
-      "xg": 0.9,
-      "spg": 2
     },
     {
       "name": "Anthony Gordon",
       "team": "Barcelona",
       "league": "La Liga",
       "position": "",
-      "games": 10,
-      "shots": 22,
+      "games": 11,
+      "shots": 23,
       "goals": 2,
-      "xg": 3,
-      "spg": 2.2
+      "xg": 3.1,
+      "spg": 2.09
+    },
+    {
+      "name": "Fermín López",
+      "team": "Barcelona",
+      "league": "La Liga",
+      "position": "",
+      "games": 11,
+      "shots": 23,
+      "goals": 7,
+      "xg": 4,
+      "spg": 2.09
     },
     {
       "name": "Iván Romero",
       "team": "Levante",
       "league": "La Liga",
       "position": "",
-      "games": 11,
-      "shots": 22,
+      "games": 12,
+      "shots": 23,
       "goals": 3,
-      "xg": 3.4,
-      "spg": 2
+      "xg": 3.5,
+      "spg": 1.92
+    },
+    {
+      "name": "Martín Satriano",
+      "team": "Getafe",
+      "league": "La Liga",
+      "position": "",
+      "games": 12,
+      "shots": 23,
+      "goals": 3,
+      "xg": 2,
+      "spg": 1.92
+    },
+    {
+      "name": "Nelson Deossa",
+      "team": "Real Betis",
+      "league": "La Liga",
+      "position": "",
+      "games": 12,
+      "shots": 22,
+      "goals": 0,
+      "xg": 0.9,
+      "spg": 1.83
+    },
+    {
+      "name": "Fer Niño",
+      "team": "Elche",
+      "league": "La Liga",
+      "position": "",
+      "games": 12,
+      "shots": 22,
+      "goals": 6,
+      "xg": 4.6,
+      "spg": 1.83
     },
     {
       "name": "Iñaki Williams",
@@ -2666,18 +2291,29 @@
       "games": 12,
       "shots": 22,
       "goals": 2,
-      "xg": 3.3,
+      "xg": 3.4,
       "spg": 1.83
     },
     {
-      "name": "Martín Satriano",
+      "name": "Luka Sučić",
+      "team": "Real Sociedad",
+      "league": "La Liga",
+      "position": "",
+      "games": 11,
+      "shots": 22,
+      "goals": 4,
+      "xg": 1.4,
+      "spg": 2
+    },
+    {
+      "name": "Ramón Terrats",
       "team": "Getafe",
       "league": "La Liga",
       "position": "",
       "games": 11,
       "shots": 22,
-      "goals": 3,
-      "xg": 2,
+      "goals": 1,
+      "xg": 1.3,
       "spg": 2
     },
     {
@@ -2692,15 +2328,15 @@
       "spg": 1.91
     },
     {
-      "name": "Orri Óskarsson",
-      "team": "Real Sociedad",
+      "name": "Isco",
+      "team": "Real Betis",
       "league": "La Liga",
       "position": "",
-      "games": 9,
+      "games": 11,
       "shots": 21,
-      "goals": 3,
-      "xg": 4.5,
-      "spg": 2.33
+      "goals": 2,
+      "xg": 2.9,
+      "spg": 1.91
     },
     {
       "name": "Nico Williams",
@@ -2747,37 +2383,37 @@
       "spg": 1.91
     },
     {
-      "name": "Gonçalo Guedes",
-      "team": "Real Sociedad",
-      "league": "La Liga",
-      "position": "",
-      "games": 10,
-      "shots": 20,
-      "goals": 2,
-      "xg": 1.7,
-      "spg": 2
-    },
-    {
-      "name": "Fer Niño",
-      "team": "Elche",
+      "name": "Pablo Fornals",
+      "team": "Real Betis",
       "league": "La Liga",
       "position": "",
       "games": 11,
-      "shots": 20,
-      "goals": 6,
-      "xg": 4.5,
-      "spg": 1.82
+      "shots": 21,
+      "goals": 1,
+      "xg": 1.7,
+      "spg": 1.91
     },
     {
-      "name": "Ramón Terrats",
-      "team": "Getafe",
+      "name": "Julián Álvarez",
+      "team": "Atlético Madrid",
       "league": "La Liga",
       "position": "",
-      "games": 10,
+      "games": 8,
       "shots": 20,
       "goals": 1,
-      "xg": 1.2,
-      "spg": 2
+      "xg": 1.8,
+      "spg": 2.5
+    },
+    {
+      "name": "Alberto Moleiro",
+      "team": "Villarreal",
+      "league": "La Liga",
+      "position": "",
+      "games": 12,
+      "shots": 20,
+      "goals": 2,
+      "xg": 3.3,
+      "spg": 1.67
     },
     {
       "name": "Edu Expósito",
@@ -2791,48 +2427,48 @@
       "spg": 1.67
     },
     {
-      "name": "Isco",
-      "team": "Real Betis",
+      "name": "Lucas Cepeda",
+      "team": "Elche",
       "league": "La Liga",
       "position": "",
-      "games": 10,
-      "shots": 19,
-      "goals": 2,
-      "xg": 2.8,
-      "spg": 1.9
-    },
-    {
-      "name": "Tajon Buchanan",
-      "team": "Villarreal",
-      "league": "La Liga",
-      "position": "",
-      "games": 9,
+      "games": 12,
       "shots": 19,
       "goals": 0,
-      "xg": 1.5,
-      "spg": 2.11
+      "xg": 0.8,
+      "spg": 1.58
     },
     {
       "name": "Ayoze Pérez",
       "team": "Villarreal",
       "league": "La Liga",
       "position": "",
-      "games": 11,
+      "games": 12,
       "shots": 19,
       "goals": 1,
       "xg": 3.9,
-      "spg": 1.73
+      "spg": 1.58
     },
     {
-      "name": "Luka Sučić",
-      "team": "Real Sociedad",
+      "name": "Abdessamad Ezzalzouli",
+      "team": "Real Betis",
       "league": "La Liga",
       "position": "",
-      "games": 10,
+      "games": 9,
       "shots": 19,
-      "goals": 4,
-      "xg": 1.3,
-      "spg": 1.9
+      "goals": 3,
+      "xg": 2.4,
+      "spg": 2.11
+    },
+    {
+      "name": "Pape Gueye",
+      "team": "Villarreal",
+      "league": "La Liga",
+      "position": "",
+      "games": 11,
+      "shots": 19,
+      "goals": 3,
+      "xg": 2.3,
+      "spg": 1.73
     },
     {
       "name": "Arnaut Danjuma",
@@ -2850,11 +2486,11 @@
       "team": "Rayo Vallecano",
       "league": "La Liga",
       "position": "",
-      "games": 11,
+      "games": 12,
       "shots": 19,
       "goals": 0,
       "xg": 0.6,
-      "spg": 1.73
+      "spg": 1.58
     },
     {
       "name": "Oihan Sancet",
@@ -2864,7 +2500,7 @@
       "games": 8,
       "shots": 18,
       "goals": 1,
-      "xg": 2.8,
+      "xg": 2.9,
       "spg": 2.25
     },
     {
@@ -2879,28 +2515,6 @@
       "spg": 2
     },
     {
-      "name": "Alberto Moleiro",
-      "team": "Villarreal",
-      "league": "La Liga",
-      "position": "",
-      "games": 11,
-      "shots": 18,
-      "goals": 2,
-      "xg": 3.2,
-      "spg": 1.64
-    },
-    {
-      "name": "Pablo Fornals",
-      "team": "Real Betis",
-      "league": "La Liga",
-      "position": "",
-      "games": 10,
-      "shots": 18,
-      "goals": 1,
-      "xg": 1.4,
-      "spg": 1.8
-    },
-    {
       "name": "Yuri Berchiche",
       "team": "Athletic Club",
       "league": "La Liga",
@@ -2908,7 +2522,7 @@
       "games": 10,
       "shots": 18,
       "goals": 1,
-      "xg": 0.6,
+      "xg": 0.7,
       "spg": 1.8
     },
     {
@@ -2916,55 +2530,33 @@
       "team": "Barcelona",
       "league": "La Liga",
       "position": "",
-      "games": 11,
+      "games": 12,
       "shots": 17,
       "goals": 2,
       "xg": 4.5,
-      "spg": 1.55
+      "spg": 1.42
     },
     {
       "name": "Nicolas Pépé",
       "team": "Villarreal",
       "league": "La Liga",
       "position": "",
-      "games": 7,
+      "games": 8,
       "shots": 17,
       "goals": 2,
       "xg": 0.9,
-      "spg": 2.43
-    },
-    {
-      "name": "Abdessamad Ezzalzouli",
-      "team": "Real Betis",
-      "league": "La Liga",
-      "position": "",
-      "games": 8,
-      "shots": 17,
-      "goals": 3,
-      "xg": 2.1,
       "spg": 2.13
-    },
-    {
-      "name": "Fermín López",
-      "team": "Barcelona",
-      "league": "La Liga",
-      "position": "",
-      "games": 10,
-      "shots": 17,
-      "goals": 5,
-      "xg": 3,
-      "spg": 1.7
     },
     {
       "name": "Adrián De La Fuente",
       "team": "Levante",
       "league": "La Liga",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 17,
       "goals": 2,
       "xg": 0.9,
-      "spg": 1.89
+      "spg": 1.7
     },
     {
       "name": "Javier Guerra",
@@ -2978,28 +2570,6 @@
       "spg": 1.42
     },
     {
-      "name": "Julián Álvarez",
-      "team": "Atlético Madrid",
-      "league": "La Liga",
-      "position": "",
-      "games": 7,
-      "shots": 16,
-      "goals": 1,
-      "xg": 1.6,
-      "spg": 2.29
-    },
-    {
-      "name": "Lucas Cepeda",
-      "team": "Elche",
-      "league": "La Liga",
-      "position": "",
-      "games": 11,
-      "shots": 16,
-      "goals": 0,
-      "xg": 0.7,
-      "spg": 1.45
-    },
-    {
       "name": "Raúl García",
       "team": "Osasuna",
       "league": "La Liga",
@@ -3009,6 +2579,17 @@
       "goals": 1,
       "xg": 2.1,
       "spg": 1.33
+    },
+    {
+      "name": "Pablo Durán",
+      "team": "Celta de Vigo",
+      "league": "La Liga",
+      "position": "",
+      "games": 9,
+      "shots": 16,
+      "goals": 2,
+      "xg": 2.6,
+      "spg": 1.78
     },
     {
       "name": "Álex Calatrava",
@@ -3033,26 +2614,26 @@
       "spg": 1.78
     },
     {
-      "name": "Pape Gueye",
-      "team": "Villarreal",
+      "name": "Giuliano Simeone",
+      "team": "Atlético Madrid",
       "league": "La Liga",
       "position": "",
-      "games": 10,
+      "games": 12,
       "shots": 16,
-      "goals": 3,
-      "xg": 1.7,
-      "spg": 1.6
+      "goals": 4,
+      "xg": 2.1,
+      "spg": 1.33
     },
     {
       "name": "Alejandro Grimaldo",
       "team": "Atlético Madrid",
       "league": "La Liga",
       "position": "",
-      "games": 10,
+      "games": 11,
       "shots": 16,
       "goals": 4,
       "xg": 2.5,
-      "spg": 1.6
+      "spg": 1.45
     },
     {
       "name": "Andrés Martin",
@@ -3074,17 +2655,6 @@
       "shots": 15,
       "goals": 1,
       "xg": 1.6,
-      "spg": 1.36
-    },
-    {
-      "name": "Giuliano Simeone",
-      "team": "Atlético Madrid",
-      "league": "La Liga",
-      "position": "",
-      "games": 11,
-      "shots": 15,
-      "goals": 3,
-      "xg": 1.4,
       "spg": 1.36
     },
     {
@@ -3136,11 +2706,11 @@
       "team": "Atlético Madrid",
       "league": "La Liga",
       "position": "",
-      "games": 6,
+      "games": 7,
       "shots": 14,
       "goals": 3,
       "xg": 3,
-      "spg": 2.33
+      "spg": 2
     },
     {
       "name": "Dani Olmo",
@@ -3154,6 +2724,17 @@
       "spg": 1.56
     },
     {
+      "name": "Iago Aspas",
+      "team": "Celta de Vigo",
+      "league": "La Liga",
+      "position": "",
+      "games": 10,
+      "shots": 14,
+      "goals": 1,
+      "xg": 1.6,
+      "spg": 1.4
+    },
+    {
       "name": "Mariano Díaz",
       "team": "Deportivo Alavés",
       "league": "La Liga",
@@ -3163,17 +2744,6 @@
       "goals": 4,
       "xg": 2,
       "spg": 1.17
-    },
-    {
-      "name": "Thiago Fernández",
-      "team": "Levante",
-      "league": "La Liga",
-      "position": "",
-      "games": 9,
-      "shots": 14,
-      "goals": 0,
-      "xg": 1.1,
-      "spg": 1.56
     },
     {
       "name": "Yan Diomande",
@@ -3187,14 +2757,14 @@
       "spg": 1.17
     },
     {
-      "name": "Enes Ünal",
-      "team": "Getafe",
+      "name": "Thiago Fernández",
+      "team": "Levante",
       "league": "La Liga",
       "position": "",
       "games": 10,
       "shots": 14,
-      "goals": 2,
-      "xg": 1.9,
+      "goals": 0,
+      "xg": 1.1,
       "spg": 1.4
     },
     {
@@ -3209,6 +2779,17 @@
       "spg": 1.27
     },
     {
+      "name": "Enes Ünal",
+      "team": "Getafe",
+      "league": "La Liga",
+      "position": "",
+      "games": 11,
+      "shots": 14,
+      "goals": 2,
+      "xg": 1.9,
+      "spg": 1.27
+    },
+    {
       "name": "Javi Hernández",
       "team": "Espanyol",
       "league": "La Liga",
@@ -3217,6 +2798,17 @@
       "shots": 14,
       "goals": 0,
       "xg": 1,
+      "spg": 1.17
+    },
+    {
+      "name": "Jon Olasagasti",
+      "team": "Levante",
+      "league": "La Liga",
+      "position": "",
+      "games": 12,
+      "shots": 14,
+      "goals": 1,
+      "xg": 0.8,
       "spg": 1.17
     },
     {
@@ -3240,6 +2832,17 @@
       "goals": 1,
       "xg": 1.1,
       "spg": 1.08
+    },
+    {
+      "name": "Ander Barrenetxea",
+      "team": "Real Sociedad",
+      "league": "La Liga",
+      "position": "",
+      "games": 11,
+      "shots": 13,
+      "goals": 2,
+      "xg": 1.1,
+      "spg": 1.18
     },
     {
       "name": "Ferrán Jutglà",
@@ -3286,17 +2889,6 @@
       "spg": 1.08
     },
     {
-      "name": "Jon Olasagasti",
-      "team": "Levante",
-      "league": "La Liga",
-      "position": "",
-      "games": 11,
-      "shots": 13,
-      "goals": 1,
-      "xg": 0.7,
-      "spg": 1.18
-    },
-    {
       "name": "Pablo Ibáñez",
       "team": "Deportivo Alavés",
       "league": "La Liga",
@@ -3312,11 +2904,33 @@
       "team": "Celta de Vigo",
       "league": "La Liga",
       "position": "",
-      "games": 6,
+      "games": 7,
       "shots": 12,
       "goals": 1,
       "xg": 1.4,
-      "spg": 2
+      "spg": 1.71
+    },
+    {
+      "name": "Giorgi Tsitaishvili",
+      "team": "Rayo Vallecano",
+      "league": "La Liga",
+      "position": "",
+      "games": 8,
+      "shots": 12,
+      "goals": 0,
+      "xg": 0.8,
+      "spg": 1.5
+    },
+    {
+      "name": "Rodrigo Riquelme",
+      "team": "Real Betis",
+      "league": "La Liga",
+      "position": "",
+      "games": 11,
+      "shots": 12,
+      "goals": 3,
+      "xg": 1.9,
+      "spg": 1.09
     },
     {
       "name": "Lucas Stassin",
@@ -3328,17 +2942,6 @@
       "goals": 1,
       "xg": 1.1,
       "spg": 1.71
-    },
-    {
-      "name": "Ander Barrenetxea",
-      "team": "Real Sociedad",
-      "league": "La Liga",
-      "position": "",
-      "games": 10,
-      "shots": 12,
-      "goals": 2,
-      "xg": 1,
-      "spg": 1.2
     },
     {
       "name": "Yeremay Hernández",
@@ -3367,21 +2970,10 @@
       "team": "Real Sociedad",
       "league": "La Liga",
       "position": "",
-      "games": 10,
+      "games": 11,
       "shots": 12,
       "goals": 1,
       "xg": 1.6,
-      "spg": 1.2
-    },
-    {
-      "name": "Dávid Hancko",
-      "team": "Atlético Madrid",
-      "league": "La Liga",
-      "position": "",
-      "games": 11,
-      "shots": 12,
-      "goals": 0,
-      "xg": 0.6,
       "spg": 1.09
     },
     {
@@ -3394,6 +2986,17 @@
       "goals": 1,
       "xg": 0.5,
       "spg": 1.2
+    },
+    {
+      "name": "Dávid Hancko",
+      "team": "Atlético Madrid",
+      "league": "La Liga",
+      "position": "",
+      "games": 12,
+      "shots": 12,
+      "goals": 0,
+      "xg": 0.6,
+      "spg": 1
     },
     {
       "name": "Juan Iglesias",
@@ -3418,92 +3021,59 @@
       "spg": 1.38
     },
     {
-      "name": "Facundo Buonanotte",
-      "team": "Elche",
-      "league": "La Liga",
-      "position": "",
-      "games": 7,
-      "shots": 11,
-      "goals": 1,
-      "xg": 1.4,
-      "spg": 1.57
-    },
-    {
-      "name": "Gerard Moreno",
-      "team": "Villarreal",
-      "league": "La Liga",
-      "position": "",
-      "games": 10,
-      "shots": 11,
-      "goals": 2,
-      "xg": 2.2,
-      "spg": 1.1
-    },
-    {
-      "name": "Luismi Cruz",
-      "team": "Deportivo A Coruña",
-      "league": "La Liga",
-      "position": "",
-      "games": 12,
-      "shots": 11,
-      "goals": 1,
-      "xg": 1,
-      "spg": 0.92
-    },
-    {
-      "name": "Unai López",
-      "team": "Rayo Vallecano",
-      "league": "La Liga",
-      "position": "",
-      "games": 11,
-      "shots": 11,
-      "goals": 1,
-      "xg": 0.4,
-      "spg": 1
-    },
-    {
       "name": "Job Ochieng",
       "team": "Real Sociedad",
       "league": "La Liga",
       "position": "",
-      "games": 8,
-      "shots": 10,
+      "games": 9,
+      "shots": 11,
       "goals": 1,
       "xg": 0.6,
-      "spg": 1.25
+      "spg": 1.22
     },
     {
-      "name": "Rafa Rodríguez",
-      "team": "Málaga",
-      "league": "La Liga",
-      "position": "",
-      "games": 8,
-      "shots": 10,
-      "goals": 0,
-      "xg": 0.4,
-      "spg": 1.25
-    },
-    {
-      "name": "Abiel Osorio",
+      "name": "Facundo Buonanotte",
       "team": "Elche",
       "league": "La Liga",
       "position": "",
       "games": 8,
-      "shots": 10,
+      "shots": 11,
       "goals": 1,
-      "xg": 1.1,
-      "spg": 1.25
+      "xg": 1.4,
+      "spg": 1.38
+    },
+    {
+      "name": "Troy Parrott",
+      "team": "Real Betis",
+      "league": "La Liga",
+      "position": "",
+      "games": 9,
+      "shots": 11,
+      "goals": 1,
+      "xg": 1.9,
+      "spg": 1.22
     },
     {
       "name": "Nico Paz",
       "team": "Como",
       "league": "Serie A",
       "position": "",
-      "games": 9,
-      "shots": 43,
+      "games": 10,
+      "shots": 46,
       "goals": 3,
-      "xg": 2.8,
-      "spg": 4.78
+      "xg": 3,
+      "spg": 4.6
+    },
+    {
+      "name": "Franco Mastantuono",
+      "team": "Fiorentina",
+      "league": "Serie A",
+      "position": "",
+      "games": 11,
+      "shots": 44,
+      "goals": 4,
+      "xg": 3.6,
+      "spg": 4
     },
     {
       "name": "Donyell Malen",
@@ -3513,30 +3083,30 @@
       "games": 10,
       "shots": 41,
       "goals": 8,
-      "xg": 9.4,
+      "xg": 9.7,
       "spg": 4.1
-    },
-    {
-      "name": "Franco Mastantuono",
-      "team": "Fiorentina",
-      "league": "Serie A",
-      "position": "",
-      "games": 10,
-      "shots": 38,
-      "goals": 4,
-      "xg": 3.3,
-      "spg": 3.8
     },
     {
       "name": "Marcus Thuram",
       "team": "Internazionale",
       "league": "Serie A",
       "position": "",
-      "games": 9,
+      "games": 10,
+      "shots": 38,
+      "goals": 6,
+      "xg": 4.9,
+      "spg": 3.8
+    },
+    {
+      "name": "Nikola Krstović",
+      "team": "Atalanta",
+      "league": "Serie A",
+      "position": "",
+      "games": 11,
       "shots": 33,
-      "goals": 5,
-      "xg": 4.4,
-      "spg": 3.67
+      "goals": 7,
+      "xg": 5.3,
+      "spg": 3
     },
     {
       "name": "Giorgi Kvernadze",
@@ -3583,17 +3153,6 @@
       "spg": 2.82
     },
     {
-      "name": "Nikola Krstović",
-      "team": "Atalanta",
-      "league": "Serie A",
-      "position": "",
-      "games": 10,
-      "shots": 30,
-      "goals": 6,
-      "xg": 4.8,
-      "spg": 3
-    },
-    {
       "name": "Farès Ghedjemis",
       "team": "Frosinone",
       "league": "Serie A",
@@ -3638,17 +3197,6 @@
       "spg": 2.64
     },
     {
-      "name": "Anastasios Douvikas",
-      "team": "Como",
-      "league": "Serie A",
-      "position": "",
-      "games": 10,
-      "shots": 28,
-      "goals": 5,
-      "xg": 4.7,
-      "spg": 2.8
-    },
-    {
       "name": "Federico Bernardeschi",
       "team": "Bologna",
       "league": "Serie A",
@@ -3657,6 +3205,28 @@
       "shots": 28,
       "goals": 3,
       "xg": 3,
+      "spg": 2.55
+    },
+    {
+      "name": "Gustavo Varela",
+      "team": "Monza",
+      "league": "Serie A",
+      "position": "",
+      "games": 10,
+      "shots": 28,
+      "goals": 9,
+      "xg": 5.5,
+      "spg": 2.8
+    },
+    {
+      "name": "Anastasios Douvikas",
+      "team": "Como",
+      "league": "Serie A",
+      "position": "",
+      "games": 11,
+      "shots": 28,
+      "goals": 5,
+      "xg": 4.7,
       "spg": 2.55
     },
     {
@@ -3682,6 +3252,17 @@
       "spg": 2.45
     },
     {
+      "name": "Gonçalo Ramos",
+      "team": "Milan",
+      "league": "Serie A",
+      "position": "",
+      "games": 11,
+      "shots": 26,
+      "goals": 2,
+      "xg": 4.2,
+      "spg": 2.36
+    },
+    {
       "name": "Lautaro Martínez",
       "team": "Internazionale",
       "league": "Serie A",
@@ -3693,26 +3274,15 @@
       "spg": 5
     },
     {
-      "name": "Gonçalo Ramos",
-      "team": "Milan",
+      "name": "Gustav Isaksen",
+      "team": "Lazio",
       "league": "Serie A",
       "position": "",
-      "games": 10,
-      "shots": 25,
-      "goals": 2,
-      "xg": 4.1,
-      "spg": 2.5
-    },
-    {
-      "name": "Gustavo Varela",
-      "team": "Monza",
-      "league": "Serie A",
-      "position": "",
-      "games": 9,
+      "games": 11,
       "shots": 23,
-      "goals": 9,
-      "xg": 5.1,
-      "spg": 2.56
+      "goals": 4,
+      "xg": 1.5,
+      "spg": 2.09
     },
     {
       "name": "Giovanni Simeone",
@@ -3737,6 +3307,50 @@
       "spg": 3.5
     },
     {
+      "name": "Rasmus Højlund",
+      "team": "Napoli",
+      "league": "Serie A",
+      "position": "",
+      "games": 10,
+      "shots": 21,
+      "goals": 3,
+      "xg": 2.8,
+      "spg": 2.1
+    },
+    {
+      "name": "Douglas Luiz",
+      "team": "Juventus",
+      "league": "Serie A",
+      "position": "",
+      "games": 11,
+      "shots": 21,
+      "goals": 1,
+      "xg": 1.1,
+      "spg": 1.91
+    },
+    {
+      "name": "Kerim Alajbegović",
+      "team": "Juventus",
+      "league": "Serie A",
+      "position": "",
+      "games": 10,
+      "shots": 20,
+      "goals": 1,
+      "xg": 0.6,
+      "spg": 2
+    },
+    {
+      "name": "Scott McTominay",
+      "team": "Napoli",
+      "league": "Serie A",
+      "position": "",
+      "games": 8,
+      "shots": 20,
+      "goals": 2,
+      "xg": 1.9,
+      "spg": 2.5
+    },
+    {
       "name": "Keinan Davis",
       "team": "Udinese",
       "league": "Serie A",
@@ -3759,36 +3373,58 @@
       "spg": 2.22
     },
     {
+      "name": "Randal Kolo Muani",
+      "team": "Juventus",
+      "league": "Serie A",
+      "position": "",
+      "games": 11,
+      "shots": 20,
+      "goals": 1,
+      "xg": 3.9,
+      "spg": 1.82
+    },
+    {
       "name": "Martin Baturina",
       "team": "Como",
       "league": "Serie A",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 19,
       "goals": 3,
       "xg": 1.6,
-      "spg": 2.11
+      "spg": 1.9
     },
     {
-      "name": "Kerim Alajbegović",
-      "team": "Juventus",
+      "name": "Francesco Pio Esposito",
+      "team": "Internazionale",
       "league": "Serie A",
       "position": "",
-      "games": 9,
+      "games": 11,
       "shots": 19,
-      "goals": 1,
-      "xg": 0.6,
-      "spg": 2.11
+      "goals": 3,
+      "xg": 3.6,
+      "spg": 1.73
     },
     {
-      "name": "Gustav Isaksen",
-      "team": "Lazio",
+      "name": "Federico Dimarco",
+      "team": "Internazionale",
+      "league": "Serie A",
+      "position": "",
+      "games": 11,
+      "shots": 19,
+      "goals": 0,
+      "xg": 1.4,
+      "spg": 1.73
+    },
+    {
+      "name": "Alieu Njie",
+      "team": "Fiorentina",
       "league": "Serie A",
       "position": "",
       "games": 10,
       "shots": 19,
-      "goals": 4,
-      "xg": 1.4,
+      "goals": 3,
+      "xg": 2.6,
       "spg": 1.9
     },
     {
@@ -3814,47 +3450,25 @@
       "spg": 2
     },
     {
-      "name": "Francesco Pio Esposito",
+      "name": "Charles De Ketelaere",
+      "team": "Atalanta",
+      "league": "Serie A",
+      "position": "",
+      "games": 11,
+      "shots": 18,
+      "goals": 1,
+      "xg": 1.6,
+      "spg": 1.64
+    },
+    {
+      "name": "Nicolò Barella",
       "team": "Internazionale",
       "league": "Serie A",
       "position": "",
       "games": 10,
       "shots": 18,
-      "goals": 2,
-      "xg": 2.7,
-      "spg": 1.8
-    },
-    {
-      "name": "Rasmus Højlund",
-      "team": "Napoli",
-      "league": "Serie A",
-      "position": "",
-      "games": 9,
-      "shots": 18,
-      "goals": 3,
-      "xg": 1.8,
-      "spg": 2
-    },
-    {
-      "name": "Douglas Luiz",
-      "team": "Juventus",
-      "league": "Serie A",
-      "position": "",
-      "games": 10,
-      "shots": 18,
       "goals": 1,
-      "xg": 0.7,
-      "spg": 1.8
-    },
-    {
-      "name": "Randal Kolo Muani",
-      "team": "Juventus",
-      "league": "Serie A",
-      "position": "",
-      "games": 10,
-      "shots": 18,
-      "goals": 1,
-      "xg": 3.8,
+      "xg": 1,
       "spg": 1.8
     },
     {
@@ -3869,17 +3483,6 @@
       "spg": 1.55
     },
     {
-      "name": "Scott McTominay",
-      "team": "Napoli",
-      "league": "Serie A",
-      "position": "",
-      "games": 7,
-      "shots": 17,
-      "goals": 2,
-      "xg": 1.7,
-      "spg": 2.43
-    },
-    {
       "name": "Simone Lontani",
       "team": "Parma",
       "league": "Serie A",
@@ -3891,15 +3494,59 @@
       "spg": 1.55
     },
     {
+      "name": "Junior Messias",
+      "team": "Genoa",
+      "league": "Serie A",
+      "position": "",
+      "games": 11,
+      "shots": 17,
+      "goals": 2,
+      "xg": 1.5,
+      "spg": 1.55
+    },
+    {
+      "name": "Mateo Pellegrino",
+      "team": "Fiorentina",
+      "league": "Serie A",
+      "position": "",
+      "games": 11,
+      "shots": 17,
+      "goals": 4,
+      "xg": 2,
+      "spg": 1.55
+    },
+    {
+      "name": "Milutin Osmajić",
+      "team": "Genoa",
+      "league": "Serie A",
+      "position": "",
+      "games": 10,
+      "shots": 17,
+      "goals": 4,
+      "xg": 2.2,
+      "spg": 1.7
+    },
+    {
+      "name": "Davide Frattesi",
+      "team": "Lazio",
+      "league": "Serie A",
+      "position": "",
+      "games": 11,
+      "shots": 17,
+      "goals": 4,
+      "xg": 3.3,
+      "spg": 1.55
+    },
+    {
       "name": "Edon Zhegrova",
       "team": "Juventus",
       "league": "Serie A",
       "position": "",
-      "games": 8,
+      "games": 9,
       "shots": 16,
       "goals": 2,
       "xg": 0.8,
-      "spg": 2
+      "spg": 1.78
     },
     {
       "name": "David Romero",
@@ -3917,77 +3564,33 @@
       "team": "Atalanta",
       "league": "Serie A",
       "position": "",
-      "games": 8,
+      "games": 9,
       "shots": 16,
       "goals": 0,
       "xg": 1.6,
-      "spg": 2
+      "spg": 1.78
     },
     {
-      "name": "Junior Messias",
-      "team": "Genoa",
+      "name": "Tijjani Noslin",
+      "team": "Lazio",
       "league": "Serie A",
       "position": "",
       "games": 10,
       "shots": 16,
-      "goals": 2,
-      "xg": 1.4,
-      "spg": 1.6
-    },
-    {
-      "name": "Alieu Njie",
-      "team": "Fiorentina",
-      "league": "Serie A",
-      "position": "",
-      "games": 9,
-      "shots": 16,
-      "goals": 2,
-      "xg": 2,
-      "spg": 1.78
-    },
-    {
-      "name": "Milutin Osmajić",
-      "team": "Genoa",
-      "league": "Serie A",
-      "position": "",
-      "games": 9,
-      "shots": 16,
       "goals": 4,
-      "xg": 2,
-      "spg": 1.78
+      "xg": 2.3,
+      "spg": 1.6
     },
     {
       "name": "Lucas Da Cunha",
       "team": "Como",
       "league": "Serie A",
       "position": "",
-      "games": 10,
+      "games": 11,
       "shots": 16,
       "goals": 1,
       "xg": 1.6,
-      "spg": 1.6
-    },
-    {
-      "name": "Charles De Ketelaere",
-      "team": "Atalanta",
-      "league": "Serie A",
-      "position": "",
-      "games": 10,
-      "shots": 16,
-      "goals": 1,
-      "xg": 1.6,
-      "spg": 1.6
-    },
-    {
-      "name": "Nicolò Barella",
-      "team": "Internazionale",
-      "league": "Serie A",
-      "position": "",
-      "games": 9,
-      "shots": 16,
-      "goals": 1,
-      "xg": 0.9,
-      "spg": 1.78
+      "spg": 1.45
     },
     {
       "name": "Santiago Castro",
@@ -4023,17 +3626,6 @@
       "spg": 1.67
     },
     {
-      "name": "Federico Dimarco",
-      "team": "Internazionale",
-      "league": "Serie A",
-      "position": "",
-      "games": 10,
-      "shots": 15,
-      "goals": 0,
-      "xg": 1.1,
-      "spg": 1.5
-    },
-    {
       "name": "Ché Adams",
       "team": "Torino",
       "league": "Serie A",
@@ -4042,6 +3634,17 @@
       "shots": 15,
       "goals": 4,
       "xg": 2.4,
+      "spg": 1.67
+    },
+    {
+      "name": "Noa Lang",
+      "team": "Napoli",
+      "league": "Serie A",
+      "position": "",
+      "games": 9,
+      "shots": 15,
+      "goals": 1,
+      "xg": 1.7,
       "spg": 1.67
     },
     {
@@ -4054,17 +3657,6 @@
       "goals": 5,
       "xg": 3.5,
       "spg": 1.36
-    },
-    {
-      "name": "Davide Frattesi",
-      "team": "Lazio",
-      "league": "Serie A",
-      "position": "",
-      "games": 10,
-      "shots": 15,
-      "goals": 3,
-      "xg": 3.1,
-      "spg": 1.5
     },
     {
       "name": "Tommaso Pobega",
@@ -4086,6 +3678,17 @@
       "shots": 15,
       "goals": 2,
       "xg": 1,
+      "spg": 1.36
+    },
+    {
+      "name": "Éderson",
+      "team": "Atalanta",
+      "league": "Serie A",
+      "position": "",
+      "games": 11,
+      "shots": 15,
+      "goals": 2,
+      "xg": 1.7,
       "spg": 1.36
     },
     {
@@ -4115,11 +3718,11 @@
       "team": "Internazionale",
       "league": "Serie A",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 14,
       "goals": 2,
       "xg": 3.5,
-      "spg": 1.56
+      "spg": 1.4
     },
     {
       "name": "Nicolò Zaniolo",
@@ -4144,6 +3747,17 @@
       "spg": 1.56
     },
     {
+      "name": "Tommaso Baldanzi",
+      "team": "Genoa",
+      "league": "Serie A",
+      "position": "",
+      "games": 7,
+      "shots": 14,
+      "goals": 1,
+      "xg": 1.3,
+      "spg": 2
+    },
+    {
       "name": "Francisco Conceição",
       "team": "Juventus",
       "league": "Serie A",
@@ -4155,14 +3769,36 @@
       "spg": 2
     },
     {
-      "name": "Piotr Zieliński",
+      "name": "Vítinha",
+      "team": "Genoa",
+      "league": "Serie A",
+      "position": "",
+      "games": 10,
+      "shots": 14,
+      "goals": 0,
+      "xg": 1.2,
+      "spg": 1.4
+    },
+    {
+      "name": "Jay Robinson",
+      "team": "Monza",
+      "league": "Serie A",
+      "position": "",
+      "games": 9,
+      "shots": 14,
+      "goals": 2,
+      "xg": 1.5,
+      "spg": 1.56
+    },
+    {
+      "name": "Carlos Augusto",
       "team": "Internazionale",
       "league": "Serie A",
       "position": "",
       "games": 9,
       "shots": 14,
       "goals": 2,
-      "xg": 1.4,
+      "xg": 1.7,
       "spg": 1.56
     },
     {
@@ -4177,6 +3813,17 @@
       "spg": 1.56
     },
     {
+      "name": "Piotr Zieliński",
+      "team": "Internazionale",
+      "league": "Serie A",
+      "position": "",
+      "games": 10,
+      "shots": 14,
+      "goals": 2,
+      "xg": 1.4,
+      "spg": 1.4
+    },
+    {
       "name": "Nicolò Cambiaghi",
       "team": "Bologna",
       "league": "Serie A",
@@ -4185,6 +3832,17 @@
       "shots": 14,
       "goals": 0,
       "xg": 0.9,
+      "spg": 1.27
+    },
+    {
+      "name": "Cher Ndour",
+      "team": "Fiorentina",
+      "league": "Serie A",
+      "position": "",
+      "games": 11,
+      "shots": 14,
+      "goals": 0,
+      "xg": 0.7,
       "spg": 1.27
     },
     {
@@ -4203,66 +3861,33 @@
       "team": "Monza",
       "league": "Serie A",
       "position": "",
-      "games": 7,
-      "shots": 13,
-      "goals": 0,
-      "xg": 1.7,
-      "spg": 1.86
-    },
-    {
-      "name": "Tommaso Baldanzi",
-      "team": "Genoa",
-      "league": "Serie A",
-      "position": "",
-      "games": 6,
-      "shots": 13,
-      "goals": 1,
-      "xg": 1.3,
-      "spg": 2.17
-    },
-    {
-      "name": "Noa Lang",
-      "team": "Napoli",
-      "league": "Serie A",
-      "position": "",
       "games": 8,
       "shots": 13,
-      "goals": 1,
+      "goals": 0,
       "xg": 1.7,
       "spg": 1.63
     },
     {
-      "name": "Tijjani Noslin",
-      "team": "Lazio",
+      "name": "Alphadjo Cissè",
+      "team": "Milan",
       "league": "Serie A",
       "position": "",
       "games": 9,
       "shots": 13,
-      "goals": 4,
-      "xg": 2,
+      "goals": 5,
+      "xg": 2.2,
       "spg": 1.44
     },
     {
-      "name": "Mateo Pellegrino",
-      "team": "Fiorentina",
+      "name": "Nuno Tavares",
+      "team": "Lazio",
       "league": "Serie A",
       "position": "",
-      "games": 10,
+      "games": 11,
       "shots": 13,
-      "goals": 3,
-      "xg": 1.4,
-      "spg": 1.3
-    },
-    {
-      "name": "Éderson",
-      "team": "Atalanta",
-      "league": "Serie A",
-      "position": "",
-      "games": 10,
-      "shots": 13,
-      "goals": 2,
-      "xg": 1.7,
-      "spg": 1.3
+      "goals": 1,
+      "xg": 0.5,
+      "spg": 1.18
     },
     {
       "name": "El Bilal Touré",
@@ -4273,6 +3898,28 @@
       "shots": 13,
       "goals": 0,
       "xg": 1.2,
+      "spg": 1.18
+    },
+    {
+      "name": "Jacobo Ramón",
+      "team": "Como",
+      "league": "Serie A",
+      "position": "",
+      "games": 11,
+      "shots": 13,
+      "goals": 2,
+      "xg": 1.7,
+      "spg": 1.18
+    },
+    {
+      "name": "Kenneth Taylor",
+      "team": "Lazio",
+      "league": "Serie A",
+      "position": "",
+      "games": 11,
+      "shots": 13,
+      "goals": 2,
+      "xg": 0.8,
       "spg": 1.18
     },
     {
@@ -4291,22 +3938,11 @@
       "team": "Internazionale",
       "league": "Serie A",
       "position": "",
-      "games": 5,
+      "games": 6,
       "shots": 12,
       "goals": 0,
       "xg": 0.8,
-      "spg": 2.4
-    },
-    {
-      "name": "Alphadjo Cissè",
-      "team": "Milan",
-      "league": "Serie A",
-      "position": "",
-      "games": 8,
-      "shots": 12,
-      "goals": 4,
-      "xg": 2.1,
-      "spg": 1.5
+      "spg": 2
     },
     {
       "name": "Nicolás González",
@@ -4320,14 +3956,14 @@
       "spg": 2
     },
     {
-      "name": "Vítinha",
-      "team": "Genoa",
+      "name": "Nick Woltemade",
+      "team": "Juventus",
       "league": "Serie A",
       "position": "",
       "games": 9,
       "shots": 12,
-      "goals": 0,
-      "xg": 0.8,
+      "goals": 1,
+      "xg": 1.9,
       "spg": 1.33
     },
     {
@@ -4353,26 +3989,26 @@
       "spg": 1.33
     },
     {
-      "name": "Carlos Augusto",
-      "team": "Internazionale",
+      "name": "Kevin De Bruyne",
+      "team": "Napoli",
       "league": "Serie A",
       "position": "",
-      "games": 8,
+      "games": 11,
       "shots": 12,
-      "goals": 2,
-      "xg": 1.7,
-      "spg": 1.5
+      "goals": 4,
+      "xg": 3.9,
+      "spg": 1.09
     },
     {
-      "name": "Nuno Tavares",
-      "team": "Lazio",
+      "name": "Adrien Rabiot",
+      "team": "Milan",
       "league": "Serie A",
       "position": "",
-      "games": 10,
+      "games": 9,
       "shots": 12,
-      "goals": 1,
-      "xg": 0.5,
-      "spg": 1.2
+      "goals": 5,
+      "xg": 1.5,
+      "spg": 1.33
     },
     {
       "name": "Youssef Maleh",
@@ -4395,17 +4031,6 @@
       "goals": 2,
       "xg": 1.2,
       "spg": 1.09
-    },
-    {
-      "name": "Cher Ndour",
-      "team": "Fiorentina",
-      "league": "Serie A",
-      "position": "",
-      "games": 10,
-      "shots": 12,
-      "goals": 0,
-      "xg": 0.6,
-      "spg": 1.2
     },
     {
       "name": "Nikola Vlašić",
@@ -4441,6 +4066,17 @@
       "spg": 2.2
     },
     {
+      "name": "Stephan El Shaarawy",
+      "team": "Genoa",
+      "league": "Serie A",
+      "position": "",
+      "games": 7,
+      "shots": 11,
+      "goals": 0,
+      "xg": 0.8,
+      "spg": 1.57
+    },
+    {
       "name": "Amar Fatah",
       "team": "Lecce",
       "league": "Serie A",
@@ -4463,70 +4099,26 @@
       "spg": 1.38
     },
     {
-      "name": "Jay Robinson",
-      "team": "Monza",
-      "league": "Serie A",
-      "position": "",
-      "games": 8,
-      "shots": 11,
-      "goals": 2,
-      "xg": 1.3,
-      "spg": 1.38
-    },
-    {
-      "name": "Kevin De Bruyne",
-      "team": "Napoli",
-      "league": "Serie A",
-      "position": "",
-      "games": 10,
-      "shots": 11,
-      "goals": 4,
-      "xg": 3.3,
-      "spg": 1.1
-    },
-    {
-      "name": "Adrien Rabiot",
+      "name": "Christian Pulisic",
       "team": "Milan",
       "league": "Serie A",
       "position": "",
       "games": 8,
       "shots": 11,
-      "goals": 5,
-      "xg": 1.4,
+      "goals": 4,
+      "xg": 2.2,
       "spg": 1.38
-    },
-    {
-      "name": "Manuel Akanji",
-      "team": "Internazionale",
-      "league": "Serie A",
-      "position": "",
-      "games": 9,
-      "shots": 11,
-      "goals": 0,
-      "xg": 1.3,
-      "spg": 1.22
-    },
-    {
-      "name": "Kenneth Taylor",
-      "team": "Lazio",
-      "league": "Serie A",
-      "position": "",
-      "games": 10,
-      "shots": 11,
-      "goals": 2,
-      "xg": 0.7,
-      "spg": 1.1
     },
     {
       "name": "Nicolò Fagioli",
       "team": "Fiorentina",
       "league": "Serie A",
       "position": "",
-      "games": 10,
+      "games": 11,
       "shots": 11,
       "goals": 0,
       "xg": 0.8,
-      "spg": 1.1
+      "spg": 1
     },
     {
       "name": "Oumar Ngom",
@@ -4540,59 +4132,26 @@
       "spg": 1
     },
     {
-      "name": "Jacobo Ramón",
-      "team": "Como",
+      "name": "Manuel Akanji",
+      "team": "Internazionale",
       "league": "Serie A",
       "position": "",
       "games": 10,
       "shots": 11,
-      "goals": 2,
-      "xg": 1.6,
+      "goals": 0,
+      "xg": 1.3,
       "spg": 1.1
     },
     {
-      "name": "Enrico Del Prato",
-      "team": "Parma",
+      "name": "Gleison Bremer",
+      "team": "Juventus",
       "league": "Serie A",
       "position": "",
       "games": 11,
       "shots": 11,
-      "goals": 0,
-      "xg": 0.7,
-      "spg": 1
-    },
-    {
-      "name": "Assane Diao",
-      "team": "Como",
-      "league": "Serie A",
-      "position": "",
-      "games": 6,
-      "shots": 10,
-      "goals": 2,
-      "xg": 0.6,
-      "spg": 1.67
-    },
-    {
-      "name": "Nikola Štulić",
-      "team": "Lecce",
-      "league": "Serie A",
-      "position": "",
-      "games": 9,
-      "shots": 10,
-      "goals": 0,
-      "xg": 1.4,
-      "spg": 1.11
-    },
-    {
-      "name": "Christian Pulisic",
-      "team": "Milan",
-      "league": "Serie A",
-      "position": "",
-      "games": 7,
-      "shots": 10,
       "goals": 3,
-      "xg": 1.9,
-      "spg": 1.43
+      "xg": 1.6,
+      "spg": 1
     },
     {
       "name": "Harry Kane",
@@ -4617,6 +4176,17 @@
       "spg": 4.44
     },
     {
+      "name": "Patrik Schick",
+      "team": "Bayer 04 Leverkusen",
+      "league": "Bundesliga",
+      "position": "",
+      "games": 9,
+      "shots": 35,
+      "goals": 8,
+      "xg": 5.6,
+      "spg": 3.89
+    },
+    {
       "name": "Niclas Füllkrug",
       "team": "SV Werder Bremen",
       "league": "Bundesliga",
@@ -4628,15 +4198,15 @@
       "spg": 3.67
     },
     {
-      "name": "Patrik Schick",
-      "team": "Bayer 04 Leverkusen",
+      "name": "Saïd El Mala",
+      "team": "1. FC Köln",
       "league": "Bundesliga",
       "position": "",
       "games": 8,
-      "shots": 31,
-      "goals": 7,
-      "xg": 5.1,
-      "spg": 3.88
+      "shots": 32,
+      "goals": 3,
+      "xg": 3,
+      "spg": 4
     },
     {
       "name": "Phillip Tietz",
@@ -4650,37 +4220,26 @@
       "spg": 3.44
     },
     {
-      "name": "Saïd El Mala",
-      "team": "1. FC Köln",
-      "league": "Bundesliga",
-      "position": "",
-      "games": 7,
-      "shots": 29,
-      "goals": 2,
-      "xg": 2.5,
-      "spg": 4.14
-    },
-    {
       "name": "Igor Matanović",
       "team": "Sport-Club Freiburg",
       "league": "Bundesliga",
       "position": "",
-      "games": 8,
-      "shots": 26,
+      "games": 9,
+      "shots": 30,
       "goals": 4,
-      "xg": 2.9,
-      "spg": 3.25
+      "xg": 3.5,
+      "spg": 3.33
     },
     {
       "name": "Ibrahim Maza",
       "team": "Bayer 04 Leverkusen",
       "league": "Bundesliga",
       "position": "",
-      "games": 8,
-      "shots": 26,
+      "games": 9,
+      "shots": 28,
       "goals": 3,
-      "xg": 2.3,
-      "spg": 3.25
+      "xg": 2.4,
+      "spg": 3.11
     },
     {
       "name": "Tidiam Gomis",
@@ -4716,6 +4275,28 @@
       "spg": 3
     },
     {
+      "name": "Fisnik Asllani",
+      "team": "TSG 1899 Hoffenheim",
+      "league": "Bundesliga",
+      "position": "",
+      "games": 7,
+      "shots": 23,
+      "goals": 1,
+      "xg": 2.4,
+      "spg": 3.29
+    },
+    {
+      "name": "Adam Hložek",
+      "team": "TSG 1899 Hoffenheim",
+      "league": "Bundesliga",
+      "position": "",
+      "games": 9,
+      "shots": 23,
+      "goals": 2,
+      "xg": 3.5,
+      "spg": 2.56
+    },
+    {
       "name": "Ismael Saibari",
       "team": "Bayern München",
       "league": "Bundesliga",
@@ -4724,17 +4305,6 @@
       "shots": 22,
       "goals": 2,
       "xg": 3.5,
-      "spg": 2.75
-    },
-    {
-      "name": "Adam Hložek",
-      "team": "TSG 1899 Hoffenheim",
-      "league": "Bundesliga",
-      "position": "",
-      "games": 8,
-      "shots": 22,
-      "goals": 2,
-      "xg": 3.4,
       "spg": 2.75
     },
     {
@@ -4804,6 +4374,17 @@
       "spg": 2.33
     },
     {
+      "name": "Derry Scherhant",
+      "team": "Sport-Club Freiburg",
+      "league": "Bundesliga",
+      "position": "",
+      "games": 9,
+      "shots": 21,
+      "goals": 2,
+      "xg": 1.4,
+      "spg": 2.33
+    },
+    {
       "name": "Anton Kade",
       "team": "FC Augsburg",
       "league": "Bundesliga",
@@ -4815,6 +4396,28 @@
       "spg": 3.33
     },
     {
+      "name": "Afonso Moreira",
+      "team": "Bayer 04 Leverkusen",
+      "league": "Bundesliga",
+      "position": "",
+      "games": 9,
+      "shots": 20,
+      "goals": 0,
+      "xg": 1.5,
+      "spg": 2.22
+    },
+    {
+      "name": "Adil Aouchiche",
+      "team": "FC Schalke 04",
+      "league": "Bundesliga",
+      "position": "",
+      "games": 9,
+      "shots": 20,
+      "goals": 1,
+      "xg": 1.8,
+      "spg": 2.22
+    },
+    {
       "name": "Marco Grüll",
       "team": "SV Werder Bremen",
       "league": "Bundesliga",
@@ -4824,17 +4427,6 @@
       "goals": 2,
       "xg": 1.6,
       "spg": 2.22
-    },
-    {
-      "name": "Fisnik Asllani",
-      "team": "TSG 1899 Hoffenheim",
-      "league": "Bundesliga",
-      "position": "",
-      "games": 6,
-      "shots": 19,
-      "goals": 0,
-      "xg": 1.8,
-      "spg": 3.17
     },
     {
       "name": "Antonio Nusa",
@@ -4868,17 +4460,6 @@
       "goals": 2,
       "xg": 2.2,
       "spg": 2.57
-    },
-    {
-      "name": "Afonso Moreira",
-      "team": "Bayer 04 Leverkusen",
-      "league": "Bundesliga",
-      "position": "",
-      "games": 8,
-      "shots": 18,
-      "goals": 0,
-      "xg": 1.3,
-      "spg": 2.25
     },
     {
       "name": "Felix Nmecha",
@@ -4947,13 +4528,24 @@
       "spg": 1.89
     },
     {
-      "name": "Derry Scherhant",
-      "team": "Sport-Club Freiburg",
+      "name": "Tim Lemperle",
+      "team": "TSG 1899 Hoffenheim",
+      "league": "Bundesliga",
+      "position": "",
+      "games": 7,
+      "shots": 16,
+      "goals": 2,
+      "xg": 1.8,
+      "spg": 2.29
+    },
+    {
+      "name": "Mikey Moore",
+      "team": "1. FC Köln",
       "league": "Bundesliga",
       "position": "",
       "games": 8,
       "shots": 16,
-      "goals": 2,
+      "goals": 0,
       "xg": 1.1,
       "spg": 2
     },
@@ -5035,17 +4627,6 @@
       "spg": 2.33
     },
     {
-      "name": "Mikey Moore",
-      "team": "1. FC Köln",
-      "league": "Bundesliga",
-      "position": "",
-      "games": 7,
-      "shots": 14,
-      "goals": 0,
-      "xg": 1.1,
-      "spg": 2
-    },
-    {
       "name": "Maurice Krattenmacher",
       "team": "SV 07 Elversberg",
       "league": "Bundesliga",
@@ -5079,6 +4660,17 @@
       "spg": 1.56
     },
     {
+      "name": "Maximilian Eggestein",
+      "team": "Sport-Club Freiburg",
+      "league": "Bundesliga",
+      "position": "",
+      "games": 9,
+      "shots": 14,
+      "goals": 3,
+      "xg": 1.4,
+      "spg": 1.56
+    },
+    {
       "name": "Fabian Rieder",
       "team": "FC Augsburg",
       "league": "Bundesliga",
@@ -5099,17 +4691,6 @@
       "goals": 1,
       "xg": 1.1,
       "spg": 1.56
-    },
-    {
-      "name": "Tim Lemperle",
-      "team": "TSG 1899 Hoffenheim",
-      "league": "Bundesliga",
-      "position": "",
-      "games": 6,
-      "shots": 13,
-      "goals": 1,
-      "xg": 1.3,
-      "spg": 2.17
     },
     {
       "name": "Bambasé Conté",
@@ -5145,14 +4726,14 @@
       "spg": 1.44
     },
     {
-      "name": "Adil Aouchiche",
-      "team": "FC Schalke 04",
+      "name": "Yuito Suzuki",
+      "team": "Sport-Club Freiburg",
       "league": "Bundesliga",
       "position": "",
       "games": 8,
       "shots": 13,
-      "goals": 1,
-      "xg": 1.4,
+      "goals": 5,
+      "xg": 3.2,
       "spg": 1.63
     },
     {
@@ -5167,26 +4748,15 @@
       "spg": 1.44
     },
     {
-      "name": "Maximilian Eggestein",
-      "team": "Sport-Club Freiburg",
-      "league": "Bundesliga",
-      "position": "",
-      "games": 8,
-      "shots": 13,
-      "goals": 3,
-      "xg": 1.3,
-      "spg": 1.63
-    },
-    {
       "name": "Matthias Ginter",
       "team": "Sport-Club Freiburg",
       "league": "Bundesliga",
       "position": "",
-      "games": 8,
+      "games": 9,
       "shots": 13,
       "goals": 0,
       "xg": 1.2,
-      "spg": 1.63
+      "spg": 1.44
     },
     {
       "name": "Patson Daka",
@@ -5211,6 +4781,17 @@
       "spg": 1.33
     },
     {
+      "name": "Marius Bülter",
+      "team": "1. FC Köln",
+      "league": "Bundesliga",
+      "position": "",
+      "games": 9,
+      "shots": 12,
+      "goals": 0,
+      "xg": 2.4,
+      "spg": 1.33
+    },
+    {
       "name": "Grischa Prömel",
       "team": "VfB Stuttgart",
       "league": "Bundesliga",
@@ -5219,6 +4800,17 @@
       "shots": 12,
       "goals": 1,
       "xg": 1.7,
+      "spg": 1.33
+    },
+    {
+      "name": "Ozan Kabak",
+      "team": "TSG 1899 Hoffenheim",
+      "league": "Bundesliga",
+      "position": "",
+      "games": 9,
+      "shots": 12,
+      "goals": 1,
+      "xg": 0.9,
       "spg": 1.33
     },
     {
@@ -5244,6 +4836,17 @@
       "spg": 1.33
     },
     {
+      "name": "Alexander Prass",
+      "team": "TSG 1899 Hoffenheim",
+      "league": "Bundesliga",
+      "position": "",
+      "games": 4,
+      "shots": 11,
+      "goals": 2,
+      "xg": 1.4,
+      "spg": 2.75
+    },
+    {
       "name": "Lennart Karl",
       "team": "Bayern München",
       "league": "Bundesliga",
@@ -5266,17 +4869,6 @@
       "spg": 1.38
     },
     {
-      "name": "Tim Skarke",
-      "team": "1. FC Union Berlin",
-      "league": "Bundesliga",
-      "position": "",
-      "games": 8,
-      "shots": 11,
-      "goals": 2,
-      "xg": 1.6,
-      "spg": 1.38
-    },
-    {
       "name": "Rômulo",
       "team": "RB Leipzig",
       "league": "Bundesliga",
@@ -5285,6 +4877,17 @@
       "shots": 11,
       "goals": 5,
       "xg": 3.8,
+      "spg": 1.57
+    },
+    {
+      "name": "Chukwubuike Adamu",
+      "team": "FC Schalke 04",
+      "league": "Bundesliga",
+      "position": "",
+      "games": 7,
+      "shots": 11,
+      "goals": 1,
+      "xg": 3,
       "spg": 1.57
     },
     {
@@ -5299,6 +4902,17 @@
       "spg": 1.83
     },
     {
+      "name": "Tim Skarke",
+      "team": "1. FC Union Berlin",
+      "league": "Bundesliga",
+      "position": "",
+      "games": 9,
+      "shots": 11,
+      "goals": 2,
+      "xg": 1.6,
+      "spg": 1.22
+    },
+    {
       "name": "Florian Neuhaus",
       "team": "Borussia Mönchengladbach",
       "league": "Bundesliga",
@@ -5310,37 +4924,15 @@
       "spg": 1.83
     },
     {
-      "name": "Marius Bülter",
-      "team": "1. FC Köln",
-      "league": "Bundesliga",
-      "position": "",
-      "games": 8,
-      "shots": 11,
-      "goals": 0,
-      "xg": 2.3,
-      "spg": 1.38
-    },
-    {
       "name": "Woo-Yeong Jeong",
       "team": "1. FC Union Berlin",
       "league": "Bundesliga",
       "position": "",
-      "games": 8,
+      "games": 9,
       "shots": 11,
       "goals": 0,
       "xg": 0.6,
-      "spg": 1.38
-    },
-    {
-      "name": "Ozan Kabak",
-      "team": "TSG 1899 Hoffenheim",
-      "league": "Bundesliga",
-      "position": "",
-      "games": 8,
-      "shots": 11,
-      "goals": 1,
-      "xg": 0.9,
-      "spg": 1.38
+      "spg": 1.22
     },
     {
       "name": "Robin Fellhauer",
@@ -5464,26 +5056,15 @@
       "spg": 1.11
     },
     {
-      "name": "Yuito Suzuki",
+      "name": "Jan-Niklas Beste",
       "team": "Sport-Club Freiburg",
       "league": "Bundesliga",
       "position": "",
-      "games": 7,
-      "shots": 10,
-      "goals": 4,
-      "xg": 2.8,
-      "spg": 1.43
-    },
-    {
-      "name": "Wouter Burger",
-      "team": "TSG 1899 Hoffenheim",
-      "league": "Bundesliga",
-      "position": "",
-      "games": 7,
+      "games": 9,
       "shots": 10,
       "goals": 0,
       "xg": 0.7,
-      "spg": 1.43
+      "spg": 1.11
     },
     {
       "name": "Jobe Bellingham",
@@ -5508,6 +5089,17 @@
       "spg": 1.25
     },
     {
+      "name": "Wouter Burger",
+      "team": "TSG 1899 Hoffenheim",
+      "league": "Bundesliga",
+      "position": "",
+      "games": 8,
+      "shots": 10,
+      "goals": 0,
+      "xg": 0.7,
+      "spg": 1.25
+    },
+    {
       "name": "Raphael Obermair",
       "team": "SC Paderborn 07",
       "league": "Bundesliga",
@@ -5516,6 +5108,17 @@
       "shots": 10,
       "goals": 1,
       "xg": 0.9,
+      "spg": 1.11
+    },
+    {
+      "name": "Miguel Gutiérrez",
+      "team": "Bayer 04 Leverkusen",
+      "league": "Bundesliga",
+      "position": "",
+      "games": 9,
+      "shots": 10,
+      "goals": 1,
+      "xg": 0.6,
       "spg": 1.11
     },
     {
@@ -5574,17 +5177,6 @@
       "spg": 1
     },
     {
-      "name": "Chukwubuike Adamu",
-      "team": "FC Schalke 04",
-      "league": "Bundesliga",
-      "position": "",
-      "games": 6,
-      "shots": 9,
-      "goals": 0,
-      "xg": 1.8,
-      "spg": 1.5
-    },
-    {
       "name": "Ridle Baku",
       "team": "RB Leipzig",
       "league": "Bundesliga",
@@ -5594,6 +5186,17 @@
       "goals": 2,
       "xg": 1.2,
       "spg": 1.29
+    },
+    {
+      "name": "Junior Dina Ebimbe",
+      "team": "FC Schalke 04",
+      "league": "Bundesliga",
+      "position": "",
+      "games": 8,
+      "shots": 9,
+      "goals": 0,
+      "xg": 0.6,
+      "spg": 1.13
     },
     {
       "name": "Brajan Gruda",
@@ -5618,6 +5221,17 @@
       "spg": 1.5
     },
     {
+      "name": "Kenan Karaman",
+      "team": "FC Schalke 04",
+      "league": "Bundesliga",
+      "position": "",
+      "games": 7,
+      "shots": 9,
+      "goals": 1,
+      "xg": 0.5,
+      "spg": 1.29
+    },
+    {
       "name": "Laurin Ulrich",
       "team": "SC Paderborn 07",
       "league": "Bundesliga",
@@ -5629,81 +5243,26 @@
       "spg": 1.13
     },
     {
-      "name": "Yannik Engelhardt",
-      "team": "Sport-Club Freiburg",
-      "league": "Bundesliga",
-      "position": "",
-      "games": 7,
-      "shots": 9,
-      "goals": 2,
-      "xg": 1.4,
-      "spg": 1.29
-    },
-    {
       "name": "Adam Daghim",
       "team": "TSG 1899 Hoffenheim",
       "league": "Bundesliga",
       "position": "",
-      "games": 8,
-      "shots": 9,
-      "goals": 2,
-      "xg": 0.5,
-      "spg": 1.13
-    },
-    {
-      "name": "Finn Jeltsch",
-      "team": "VfB Stuttgart",
-      "league": "Bundesliga",
-      "position": "",
-      "games": 9,
-      "shots": 9,
-      "goals": 0,
-      "xg": 0.7,
-      "spg": 1
-    },
-    {
-      "name": "David Mokwa",
-      "team": "SV 07 Elversberg",
-      "league": "Bundesliga",
-      "position": "",
       "games": 9,
       "shots": 9,
       "goals": 2,
-      "xg": 1.4,
-      "spg": 1
-    },
-    {
-      "name": "Jeff Chabot",
-      "team": "VfB Stuttgart",
-      "league": "Bundesliga",
-      "position": "",
-      "games": 9,
-      "shots": 9,
-      "goals": 1,
-      "xg": 0.8,
-      "spg": 1
-    },
-    {
-      "name": "Joshua Kimmich",
-      "team": "Bayern München",
-      "league": "Bundesliga",
-      "position": "",
-      "games": 8,
-      "shots": 9,
-      "goals": 1,
       "xg": 0.5,
-      "spg": 1.13
+      "spg": 1
     },
     {
       "name": "Mbwana Samatta",
       "team": "Le Havre",
       "league": "Ligue 1",
       "position": "",
-      "games": 9,
-      "shots": 35,
+      "games": 10,
+      "shots": 37,
       "goals": 2,
       "xg": 3.1,
-      "spg": 3.89
+      "spg": 3.7
     },
     {
       "name": "Lassine Sinayoko",
@@ -5739,6 +5298,17 @@
       "spg": 3.5
     },
     {
+      "name": "Ludovic Ajorque",
+      "team": "Brest",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 10,
+      "shots": 28,
+      "goals": 5,
+      "xg": 4,
+      "spg": 2.8
+    },
+    {
       "name": "Désiré Doué",
       "team": "Paris Saint-Germain",
       "league": "Ligue 1",
@@ -5754,11 +5324,33 @@
       "team": "Brest",
       "league": "Ligue 1",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 26,
       "goals": 2,
       "xg": 2.5,
-      "spg": 2.89
+      "spg": 2.6
+    },
+    {
+      "name": "Florian Thauvin",
+      "team": "Lens",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 10,
+      "shots": 25,
+      "goals": 5,
+      "xg": 4.7,
+      "spg": 2.5
+    },
+    {
+      "name": "Amine Gouiri",
+      "team": "Marseille",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 10,
+      "shots": 24,
+      "goals": 7,
+      "xg": 5.3,
+      "spg": 2.4
     },
     {
       "name": "Ferrán Torres",
@@ -5783,15 +5375,15 @@
       "spg": 2.3
     },
     {
-      "name": "Ludovic Ajorque",
-      "team": "Brest",
+      "name": "Amine Sbaï",
+      "team": "Angers",
       "league": "Ligue 1",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 23,
-      "goals": 4,
-      "xg": 3,
-      "spg": 2.56
+      "goals": 1,
+      "xg": 1.6,
+      "spg": 2.3
     },
     {
       "name": "Pablo Pagis",
@@ -5801,29 +5393,51 @@
       "games": 10,
       "shots": 22,
       "goals": 2,
-      "xg": 1.5,
+      "xg": 1.4,
       "spg": 2.2
     },
     {
-      "name": "Florian Thauvin",
-      "team": "Lens",
+      "name": "Ernest Nuamah",
+      "team": "Lyon",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 8,
+      "shots": 21,
+      "goals": 4,
+      "xg": 2.5,
+      "spg": 2.63
+    },
+    {
+      "name": "Josh Maja",
+      "team": "Le Havre",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 10,
+      "shots": 21,
+      "goals": 4,
+      "xg": 4.6,
+      "spg": 2.1
+    },
+    {
+      "name": "Elye Wahi",
+      "team": "Nice",
       "league": "Ligue 1",
       "position": "",
       "games": 9,
       "shots": 21,
-      "goals": 4,
-      "xg": 4,
+      "goals": 6,
+      "xg": 6.3,
       "spg": 2.33
     },
     {
-      "name": "Amine Sbaï",
-      "team": "Angers",
+      "name": "Igor Paixão",
+      "team": "Marseille",
       "league": "Ligue 1",
       "position": "",
       "games": 9,
       "shots": 21,
-      "goals": 1,
-      "xg": 1.5,
+      "goals": 2,
+      "xg": 2.4,
       "spg": 2.33
     },
     {
@@ -5842,22 +5456,11 @@
       "team": "Monaco",
       "league": "Ligue 1",
       "position": "",
-      "games": 7,
+      "games": 8,
       "shots": 20,
       "goals": 4,
       "xg": 4.4,
-      "spg": 2.86
-    },
-    {
-      "name": "Ernest Nuamah",
-      "team": "Lyon",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 7,
-      "shots": 20,
-      "goals": 4,
-      "xg": 2.4,
-      "spg": 2.86
+      "spg": 2.5
     },
     {
       "name": "Renaud Ripart",
@@ -5875,22 +5478,22 @@
       "team": "Le Mans",
       "league": "Ligue 1",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 20,
       "goals": 4,
       "xg": 6,
-      "spg": 2.22
+      "spg": 2
     },
     {
-      "name": "Amine Gouiri",
-      "team": "Marseille",
+      "name": "Jonathan Clauss",
+      "team": "Nice",
       "league": "Ligue 1",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 20,
-      "goals": 6,
-      "xg": 3.9,
-      "spg": 2.22
+      "goals": 3,
+      "xg": 1.5,
+      "spg": 2
     },
     {
       "name": "Achraf Hakimi",
@@ -5904,15 +5507,15 @@
       "spg": 2.38
     },
     {
-      "name": "Elye Wahi",
+      "name": "Mohamed Amoura",
       "team": "Nice",
       "league": "Ligue 1",
       "position": "",
       "games": 8,
-      "shots": 18,
-      "goals": 6,
-      "xg": 5.6,
-      "spg": 2.25
+      "shots": 19,
+      "goals": 2,
+      "xg": 2.2,
+      "spg": 2.38
     },
     {
       "name": "Romain Faivre",
@@ -5923,6 +5526,17 @@
       "shots": 18,
       "goals": 1,
       "xg": 1.9,
+      "spg": 1.8
+    },
+    {
+      "name": "Jim Allevinah",
+      "team": "Angers",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 10,
+      "shots": 18,
+      "goals": 0,
+      "xg": 1,
       "spg": 1.8
     },
     {
@@ -5937,15 +5551,15 @@
       "spg": 2.25
     },
     {
-      "name": "Jonathan Clauss",
-      "team": "Nice",
+      "name": "Kamory Doumbia",
+      "team": "Brest",
       "league": "Ligue 1",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 18,
-      "goals": 2,
-      "xg": 1.4,
-      "spg": 2
+      "goals": 4,
+      "xg": 4.7,
+      "spg": 1.8
     },
     {
       "name": "Thomas Jørgensen",
@@ -5970,15 +5584,15 @@
       "spg": 3.4
     },
     {
-      "name": "Josh Maja",
+      "name": "Rayan Fofana",
       "team": "Le Havre",
       "league": "Ligue 1",
       "position": "",
-      "games": 9,
+      "games": 8,
       "shots": 17,
-      "goals": 4,
-      "xg": 4.4,
-      "spg": 1.89
+      "goals": 2,
+      "xg": 2.4,
+      "spg": 2.13
     },
     {
       "name": "Luca Koleosho",
@@ -5989,17 +5603,6 @@
       "shots": 17,
       "goals": 1,
       "xg": 1.4,
-      "spg": 2.13
-    },
-    {
-      "name": "Igor Paixão",
-      "team": "Marseille",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 8,
-      "shots": 17,
-      "goals": 2,
-      "xg": 2.1,
       "spg": 2.13
     },
     {
@@ -6036,26 +5639,26 @@
       "spg": 1.7
     },
     {
-      "name": "Jim Allevinah",
-      "team": "Angers",
+      "name": "Jean-Victor Makengo",
+      "team": "Lorient",
       "league": "Ligue 1",
       "position": "",
-      "games": 9,
-      "shots": 16,
-      "goals": 0,
-      "xg": 0.9,
-      "spg": 1.78
+      "games": 10,
+      "shots": 17,
+      "goals": 2,
+      "xg": 2.5,
+      "spg": 1.7
     },
     {
-      "name": "Kamory Doumbia",
-      "team": "Brest",
+      "name": "Mousa Tamari",
+      "team": "Rennes",
       "league": "Ligue 1",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 16,
-      "goals": 4,
-      "xg": 4.6,
-      "spg": 1.78
+      "goals": 0,
+      "xg": 1.7,
+      "spg": 1.6
     },
     {
       "name": "Timothé Nkada",
@@ -6069,70 +5672,37 @@
       "spg": 1.88
     },
     {
-      "name": "Matthis Abline",
-      "team": "Monaco",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 8,
-      "shots": 15,
-      "goals": 1,
-      "xg": 1.4,
-      "spg": 1.88
-    },
-    {
-      "name": "Mohamed Amoura",
-      "team": "Nice",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 7,
-      "shots": 15,
-      "goals": 2,
-      "xg": 1.9,
-      "spg": 2.14
-    },
-    {
-      "name": "Mousa Tamari",
-      "team": "Rennes",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 9,
-      "shots": 15,
-      "goals": 0,
-      "xg": 1.5,
-      "spg": 1.67
-    },
-    {
-      "name": "Jean-Victor Makengo",
-      "team": "Lorient",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 9,
-      "shots": 15,
-      "goals": 1,
-      "xg": 1.6,
-      "spg": 1.67
-    },
-    {
       "name": "Ludovic Blas",
       "team": "Rennes",
       "league": "Ligue 1",
       "position": "",
-      "games": 8,
-      "shots": 14,
+      "games": 9,
+      "shots": 15,
       "goals": 0,
-      "xg": 1.6,
-      "spg": 1.75
+      "xg": 1.7,
+      "spg": 1.67
     },
     {
-      "name": "Rayan Fofana",
+      "name": "Matthis Abline",
+      "team": "Monaco",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 9,
+      "shots": 15,
+      "goals": 1,
+      "xg": 1.4,
+      "spg": 1.67
+    },
+    {
+      "name": "Amir Richardson",
       "team": "Le Havre",
       "league": "Ligue 1",
       "position": "",
-      "games": 7,
-      "shots": 14,
-      "goals": 2,
-      "xg": 2.3,
-      "spg": 2
+      "games": 10,
+      "shots": 15,
+      "goals": 0,
+      "xg": 0.6,
+      "spg": 1.5
     },
     {
       "name": "Khvicha Kvaratskhelia",
@@ -6150,22 +5720,22 @@
       "team": "Angers",
       "league": "Ligue 1",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 14,
       "goals": 2,
       "xg": 3.5,
-      "spg": 1.56
+      "spg": 1.4
     },
     {
       "name": "Ethan Mbappé",
       "team": "Lille",
       "league": "Ligue 1",
       "position": "",
-      "games": 8,
+      "games": 9,
       "shots": 14,
       "goals": 2,
       "xg": 2.1,
-      "spg": 1.75
+      "spg": 1.56
     },
     {
       "name": "Vítinha",
@@ -6179,6 +5749,28 @@
       "spg": 1.56
     },
     {
+      "name": "Pierre-Emile Højbjerg",
+      "team": "Marseille",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 8,
+      "shots": 14,
+      "goals": 1,
+      "xg": 0.9,
+      "spg": 1.75
+    },
+    {
+      "name": "Corentin Tolisso",
+      "team": "Lyon",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 10,
+      "shots": 14,
+      "goals": 2,
+      "xg": 1.3,
+      "spg": 1.4
+    },
+    {
       "name": "Antoine Mille",
       "team": "Troyes",
       "league": "Ligue 1",
@@ -6188,6 +5780,17 @@
       "goals": 1,
       "xg": 0.8,
       "spg": 1.4
+    },
+    {
+      "name": "Mamadou Koné",
+      "team": "Lorient",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 9,
+      "shots": 13,
+      "goals": 1,
+      "xg": 2.6,
+      "spg": 1.44
     },
     {
       "name": "Amine El Ouazzani",
@@ -6201,6 +5804,17 @@
       "spg": 1.63
     },
     {
+      "name": "Dame Gueye",
+      "team": "Le Mans",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 10,
+      "shots": 13,
+      "goals": 1,
+      "xg": 3,
+      "spg": 1.3
+    },
+    {
       "name": "Giovanni Reyna",
       "team": "Strasbourg",
       "league": "Ligue 1",
@@ -6210,17 +5824,6 @@
       "goals": 3,
       "xg": 1,
       "spg": 1.3
-    },
-    {
-      "name": "Amir Richardson",
-      "team": "Le Havre",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 9,
-      "shots": 13,
-      "goals": 0,
-      "xg": 0.6,
-      "spg": 1.44
     },
     {
       "name": "Santiago Hidalgo",
@@ -6242,17 +5845,6 @@
       "shots": 12,
       "goals": 1,
       "xg": 1.9,
-      "spg": 1.5
-    },
-    {
-      "name": "Mamadou Koné",
-      "team": "Lorient",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 8,
-      "shots": 12,
-      "goals": 1,
-      "xg": 2,
       "spg": 1.5
     },
     {
@@ -6278,37 +5870,48 @@
       "spg": 1.5
     },
     {
-      "name": "Pierre-Emile Højbjerg",
-      "team": "Marseille",
+      "name": "Djibril Ouziad",
+      "team": "Le Havre",
       "league": "Ligue 1",
       "position": "",
-      "games": 7,
+      "games": 9,
       "shots": 12,
-      "goals": 1,
-      "xg": 0.8,
-      "spg": 1.71
+      "goals": 0,
+      "xg": 0.6,
+      "spg": 1.33
     },
     {
       "name": "Aleksandr Golovin",
       "team": "Monaco",
       "league": "Ligue 1",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 12,
       "goals": 0,
       "xg": 0.7,
-      "spg": 1.33
+      "spg": 1.2
+    },
+    {
+      "name": "Usman Simbakoli",
+      "team": "Angers",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 8,
+      "shots": 11,
+      "goals": 0,
+      "xg": 1.1,
+      "spg": 1.38
     },
     {
       "name": "Issa Soumaré",
       "team": "Rennes",
       "league": "Ligue 1",
       "position": "",
-      "games": 7,
+      "games": 8,
       "shots": 11,
       "goals": 0,
       "xg": 0.8,
-      "spg": 1.57
+      "spg": 1.38
     },
     {
       "name": "Conrad Harder",
@@ -6320,6 +5923,17 @@
       "goals": 2,
       "xg": 1.5,
       "spg": 1.38
+    },
+    {
+      "name": "Angel Gomes",
+      "team": "Marseille",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 10,
+      "shots": 11,
+      "goals": 1,
+      "xg": 1.6,
+      "spg": 1.1
     },
     {
       "name": "Fabián Ruiz",
@@ -6344,28 +5958,6 @@
       "spg": 1.38
     },
     {
-      "name": "Djibril Ouziad",
-      "team": "Le Havre",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 8,
-      "shots": 11,
-      "goals": 0,
-      "xg": 0.6,
-      "spg": 1.38
-    },
-    {
-      "name": "Corentin Tolisso",
-      "team": "Lyon",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 9,
-      "shots": 11,
-      "goals": 2,
-      "xg": 1.2,
-      "spg": 1.22
-    },
-    {
       "name": "Dermane Karim",
       "team": "Troyes",
       "league": "Ligue 1",
@@ -6377,15 +5969,26 @@
       "spg": 1.22
     },
     {
-      "name": "Nabil Bentaleb",
-      "team": "Lille",
+      "name": "Matthieu Udol",
+      "team": "Lens",
       "league": "Ligue 1",
       "position": "",
       "games": 9,
       "shots": 11,
+      "goals": 2,
+      "xg": 2,
+      "spg": 1.22
+    },
+    {
+      "name": "Nabil Bentaleb",
+      "team": "Lille",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 10,
+      "shots": 11,
       "goals": 0,
       "xg": 0.4,
-      "spg": 1.22
+      "spg": 1.1
     },
     {
       "name": "Mouhamed Diop",
@@ -6403,11 +6006,11 @@
       "team": "Lorient",
       "league": "Ligue 1",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 11,
       "goals": 1,
       "xg": 1.3,
-      "spg": 1.22
+      "spg": 1.1
     },
     {
       "name": "Adrien Monfray",
@@ -6419,6 +6022,17 @@
       "goals": 0,
       "xg": 0.9,
       "spg": 1.1
+    },
+    {
+      "name": "Folarin Balogun",
+      "team": "Monaco",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 6,
+      "shots": 10,
+      "goals": 1,
+      "xg": 0.8,
+      "spg": 1.67
     },
     {
       "name": "Andrija Bulatović",
@@ -6436,33 +6050,22 @@
       "team": "Lyon",
       "league": "Ligue 1",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 10,
       "goals": 0,
       "xg": 1.5,
-      "spg": 1.11
-    },
-    {
-      "name": "Mama Baldé",
-      "team": "Brest",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 8,
-      "shots": 10,
-      "goals": 2,
-      "xg": 1,
-      "spg": 1.25
+      "spg": 1
     },
     {
       "name": "Olivier Giroud",
       "team": "Lille",
       "league": "Ligue 1",
       "position": "",
-      "games": 8,
+      "games": 9,
       "shots": 10,
       "goals": 3,
       "xg": 2.5,
-      "spg": 1.25
+      "spg": 1.11
     },
     {
       "name": "Sebastian Nanasi",
@@ -6476,14 +6079,14 @@
       "spg": 1.43
     },
     {
-      "name": "Angel Gomes",
-      "team": "Marseille",
+      "name": "Mama Baldé",
+      "team": "Brest",
       "league": "Ligue 1",
       "position": "",
       "games": 9,
       "shots": 10,
-      "goals": 1,
-      "xg": 1.5,
+      "goals": 2,
+      "xg": 1,
       "spg": 1.11
     },
     {
@@ -6498,24 +6101,35 @@
       "spg": 1.11
     },
     {
+      "name": "Amine Harit",
+      "team": "Marseille",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 10,
+      "shots": 10,
+      "goals": 3,
+      "xg": 0.6,
+      "spg": 1
+    },
+    {
+      "name": "Himad Abdelli",
+      "team": "Marseille",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 10,
+      "shots": 10,
+      "goals": 3,
+      "xg": 2,
+      "spg": 1
+    },
+    {
       "name": "Timothy Weah",
       "team": "Marseille",
       "league": "Ligue 1",
       "position": "",
-      "games": 8,
-      "shots": 10,
-      "goals": 1,
-      "xg": 0.5,
-      "spg": 1.25
-    },
-    {
-      "name": "Joris Chotard",
-      "team": "Brest",
-      "league": "Ligue 1",
-      "position": "",
       "games": 9,
       "shots": 10,
-      "goals": 0,
+      "goals": 1,
       "xg": 0.5,
       "spg": 1.11
     },
@@ -6531,6 +6145,17 @@
       "spg": 1
     },
     {
+      "name": "Joris Chotard",
+      "team": "Brest",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 10,
+      "shots": 10,
+      "goals": 0,
+      "xg": 0.5,
+      "spg": 1
+    },
+    {
       "name": "Pierre Lees-Melou",
       "team": "Paris FC",
       "league": "Ligue 1",
@@ -6542,26 +6167,26 @@
       "spg": 1
     },
     {
-      "name": "Usman Simbakoli",
-      "team": "Angers",
+      "name": "Simon Ebonog",
+      "team": "Le Havre",
       "league": "Ligue 1",
       "position": "",
-      "games": 7,
-      "shots": 9,
+      "games": 10,
+      "shots": 10,
       "goals": 0,
-      "xg": 0.8,
-      "spg": 1.29
+      "xg": 0.4,
+      "spg": 1
     },
     {
-      "name": "Folarin Balogun",
-      "team": "Monaco",
+      "name": "Keyliane Abdallah",
+      "team": "Marseille",
       "league": "Ligue 1",
       "position": "",
-      "games": 5,
+      "games": 9,
       "shots": 9,
-      "goals": 1,
-      "xg": 0.8,
-      "spg": 1.8
+      "goals": 2,
+      "xg": 1.1,
+      "spg": 1
     },
     {
       "name": "Samuel Amo-Ameyaw",
@@ -6586,15 +6211,15 @@
       "spg": 1.5
     },
     {
-      "name": "Florian Sotoca",
-      "team": "Lens",
+      "name": "Boulaye Dia",
+      "team": "Rennes",
       "league": "Ligue 1",
       "position": "",
-      "games": 6,
+      "games": 8,
       "shots": 9,
-      "goals": 1,
-      "xg": 1,
-      "spg": 1.5
+      "goals": 5,
+      "xg": 3.1,
+      "spg": 1.13
     },
     {
       "name": "Ilyas Azizi",
@@ -6619,6 +6244,17 @@
       "spg": 1.8
     },
     {
+      "name": "Florian Sotoca",
+      "team": "Lens",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 7,
+      "shots": 9,
+      "goals": 1,
+      "xg": 1,
+      "spg": 1.29
+    },
+    {
       "name": "Dário Essugo",
       "team": "Strasbourg",
       "league": "Ligue 1",
@@ -6626,17 +6262,6 @@
       "games": 8,
       "shots": 9,
       "goals": 2,
-      "xg": 0.9,
-      "spg": 1.13
-    },
-    {
-      "name": "Jean Vercruysse",
-      "team": "Le Mans",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 8,
-      "shots": 9,
-      "goals": 0,
       "xg": 0.9,
       "spg": 1.13
     },
@@ -6652,17 +6277,6 @@
       "spg": 1.8
     },
     {
-      "name": "Sebastian Szymański",
-      "team": "Rennes",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 7,
-      "shots": 9,
-      "goals": 4,
-      "xg": 1,
-      "spg": 1.29
-    },
-    {
       "name": "Tiago Santos",
       "team": "Lille",
       "league": "Ligue 1",
@@ -6674,37 +6288,48 @@
       "spg": 1.5
     },
     {
-      "name": "Dame Gueye",
+      "name": "Sebastian Szymański",
+      "team": "Rennes",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 8,
+      "shots": 9,
+      "goals": 4,
+      "xg": 1,
+      "spg": 1.13
+    },
+    {
+      "name": "Jean Vercruysse",
       "team": "Le Mans",
       "league": "Ligue 1",
       "position": "",
       "games": 9,
       "shots": 9,
-      "goals": 1,
-      "xg": 2.5,
+      "goals": 0,
+      "xg": 0.9,
       "spg": 1
+    },
+    {
+      "name": "Lucas Buadés",
+      "team": "Le Mans",
+      "league": "Ligue 1",
+      "position": "",
+      "games": 6,
+      "shots": 9,
+      "goals": 0,
+      "xg": 0.6,
+      "spg": 1.5
     },
     {
       "name": "Gabin Bernardeau",
       "team": "Lorient",
       "league": "Ligue 1",
       "position": "",
-      "games": 9,
+      "games": 10,
       "shots": 9,
       "goals": 1,
       "xg": 0.7,
-      "spg": 1
-    },
-    {
-      "name": "Mahdi Camara",
-      "team": "Rennes",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 8,
-      "shots": 9,
-      "goals": 0,
-      "xg": 1.3,
-      "spg": 1.13
+      "spg": 0.9
     },
     {
       "name": "Diogo Sousa",
@@ -6727,72 +6352,6 @@
       "goals": 0,
       "xg": 0.4,
       "spg": 0.9
-    },
-    {
-      "name": "Hákon Arnar Haraldsson",
-      "team": "Lille",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 9,
-      "shots": 9,
-      "goals": 1,
-      "xg": 0.8,
-      "spg": 1
-    },
-    {
-      "name": "Naouirou Ahamada",
-      "team": "Auxerre",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 10,
-      "shots": 9,
-      "goals": 0,
-      "xg": 0.2,
-      "spg": 0.9
-    },
-    {
-      "name": "Himad Abdelli",
-      "team": "Marseille",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 9,
-      "shots": 9,
-      "goals": 3,
-      "xg": 2,
-      "spg": 1
-    },
-    {
-      "name": "Simon Ebonog",
-      "team": "Le Havre",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 9,
-      "shots": 9,
-      "goals": 0,
-      "xg": 0.3,
-      "spg": 1
-    },
-    {
-      "name": "Keyliane Abdallah",
-      "team": "Marseille",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 8,
-      "shots": 8,
-      "goals": 1,
-      "xg": 0.6,
-      "spg": 1
-    },
-    {
-      "name": "Odsonne Édouard",
-      "team": "Lens",
-      "league": "Ligue 1",
-      "position": "",
-      "games": 6,
-      "shots": 8,
-      "goals": 1,
-      "xg": 1.4,
-      "spg": 1.33
     }
   ]
 }
