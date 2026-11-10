@@ -222,9 +222,13 @@
         subtree: true
       });
     }
-    // Consent can arrive after the first scan, and grids are re-rendered on
-    // date switches, so keep a light poll to catch both.
-    window.setInterval(scan, 1000);
+    // Date switches and late grid renders are caught by the observer. Consent
+    // can arrive after the first scan, so re-scan once it is granted instead of
+    // polling every second for the life of the page.
+    var consent = window.WFT && window.WFT.consent;
+    if (consent && typeof consent.whenGranted === 'function') {
+      consent.whenGranted(scan);
+    }
   }
 
   if (document.readyState === 'loading') {

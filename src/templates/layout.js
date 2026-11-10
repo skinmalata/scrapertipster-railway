@@ -383,11 +383,34 @@ function applyLayoutToHtml(html, activePath) {
   // four-hour edge cache GitHub Pages sets on static assets.
   html = html.replace(/(<script[^>]*src=["'][^"']*\/consent\.js)(?:\?v=\d+)?(["'][^>]*>)/gi, '$1?v=3$2');
   // Ensure pages use the runtime that preserves the fixed Bitmedia unit.
-  html = html.replace(/(<script[^>]*src=["'][^"']*\/ads\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261108-fixed$2');
+  html = html.replace(/(<script[^>]*src=["'][^"']*\/ads\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261110-seo$2');
   // Make sure static pages pick up changes to the shared login/tier runtime.
   html = html.replace(/(<script[^>]*src=["'][^"']*\/auth\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261104$2');
-  html = html.replace(/(<script[^>]*src=["'][^"']*\/sponsor-banner\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=7$2');
-  html = html.replace(/(<script[^>]*src=["'][^"']*\/bitmedia-prebid\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261108-fixed$2');
+  // The in-feed grid helper only needs the DOM, so defer it. Keep the version
+  // bump and add defer when the tag lacks it.
+  html = html.replace(/(<script\b[^>]*\bsrc=["'][^"']*\/sponsor-banner\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, function (m, pre, post) {
+    const tag = pre + '?v=7' + post;
+    return /\b(?:defer|async)\b/i.test(tag) ? tag : tag.replace(/>$/, ' defer>');
+  });
+  // The header-bidding runtime is re-added below only on pages that actually
+  // render a Prebid slot, so drop any existing tag first (matrix, league, team
+  // and h2h pages used to ship it without ever using it).
+  html = html.replace(/\s*<script\b[^>]*\bsrc=["'][^"']*\/bitmedia-prebid\.js[^"']*["'][^>]*>\s*<\/script>/gi, '');
+  // Non-critical footer/PWA helpers do not need to block parsing.
+  html = html.replace(/(<script\b[^>]*\bsrc=["'][^"']*\/(?:responsible-gambling|pwa)\.js)(\?v=[^"']*)?(["'][^>]*>)/gi, function (m, pre, query, post) {
+    const tag = pre + (query || '') + post;
+    return /\b(?:defer|async)\b/i.test(tag) ? tag : tag.replace(/>$/, ' defer>');
+  });
+  // Some pages carry the Preferred Sources loader twice (head + body). Keep the
+  // first occurrence so the browser only fetches and executes it once.
+  (function () {
+    let seen = false;
+    html = html.replace(/<script\b[^>]*\bsrc=["'][^"']*news\.google\.com\/swg\/js\/v1\/publisher\.js[^"']*["'][^>]*><\/script>\s*/gi, function (tag) {
+      if (seen) return '';
+      seen = true;
+      return tag;
+    });
+  })();
 
   const navRe = /(<nav id="nav">)[\s\S]*?(<\/nav>)/;
   // 1. Nav: replace the inner content of an existing <nav id="nav">, or inject
@@ -483,7 +506,12 @@ function applyLayoutToHtml(html, activePath) {
   const needsVipTab = !/vip-tab\.js/.test(html) && /id="categoryLinks"|id="categoryTabs"/.test(html);
   const needsPlayerShotsTab = !/player-shots-tab\.js/.test(html) && /id="categoryLinks"|id="categoryTabs"/.test(html);
   const needsAds = !/ads\.js/.test(html);
-  const needsPrebid = !/bitmedia-prebid\.js/.test(html);
+  // Only pages that will actually render a Prebid slot need the 234 KB
+  // header-bidding runtime: prediction grids (client-side sponsor-banner.js),
+  // analysis pages and blog articles (data-wft-prebid baked into the HTML).
+  const hasPrebidSlot = /data-wft-prebid/.test(html)
+    || /insertGridAds|wftSponsor|sponsor-banner\.js/.test(html);
+  const needsPrebid = hasPrebidSlot && !/bitmedia-prebid\.js/.test(html);
   // The consent gate is what decides whether Google Analytics may run, so
   // every page needs it. The generated pages used to ship without it.
   const needsConsent = !/consent\.js/.test(html);
@@ -494,9 +522,9 @@ function applyLayoutToHtml(html, activePath) {
     if (needsAuth) block += '<script src="/auth.js?v=20261104"></script>\n';
     if (needsVipTab) block += '<script src="/vip-tab.js?v=20261027" defer></script>\n';
     if (needsPlayerShotsTab) block += '<script src="/player-shots-tab.js?v=20261018" defer></script>\n';
-    if (needsAds) block += '<script src="/ads.js?v=20261108-fixed" defer></script>\n';
+    if (needsAds) block += '<script src="/ads.js?v=20261110-seo" defer></script>\n';
     if (needsConsent) block += '<script src="/consent.js?v=3" defer></script>\n';
-    if (needsPrebid) block += '<script src="/bitmedia-prebid.js?v=20261108-fixed" defer></script>\n';
+    if (needsPrebid) block += '<script src="/bitmedia-prebid.js?v=20261110-seo" defer></script>\n';
     if (needsTheme) {
       block += `<script>
 (function() {

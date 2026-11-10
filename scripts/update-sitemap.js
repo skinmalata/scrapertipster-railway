@@ -191,6 +191,7 @@ function buildSitemaps() {
     { loc: 'https://winfulltime.com/predictions/draws-streak', file: 'predictions/draws-streak.html', changefreq: 'daily', priority: '0.8' },
     { loc: 'https://winfulltime.com/predictions/corners', file: 'predictions/corners.html', changefreq: 'daily', priority: '0.8' },
     { loc: 'https://winfulltime.com/predictions/cards', file: 'predictions/cards.html', changefreq: 'daily', priority: '0.8' },
+    { loc: 'https://winfulltime.com/predictions/player-shots', file: 'predictions/player-shots.html', changefreq: 'daily', priority: '0.7' },
     // evergreen: only moves when the file itself changes
     { loc: 'https://winfulltime.com/options.html', file: 'options.html', changefreq: 'weekly', priority: '0.8' },
     { loc: 'https://winfulltime.com/about.html', file: 'about.html', changefreq: 'monthly', priority: '0.7' },
