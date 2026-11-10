@@ -3,10 +3,10 @@
 // Player-shots tips from FotMob (website JSON API, no key, no headless browser).
 // Covers the big-5 European leagues. For every league we store:
 //   - players:  season shot totals + team + shots-per-game
-//   - fixtures: today's matches (falls back to the next matchday when the
-//               league has no games today) with generated shot tips:
-//               the highest-volume shooters on each side, mapped to a
-//               half-goal shots line (e.g. Haaland 3.8 shots/game -> Over 3.5).
+//   - fixtures: matches for a 3-day window (yesterday, today, tomorrow) plus
+//               the next matchday, with generated shot tips: the highest-volume
+//               shooters on each side, mapped to a half-goal shots line
+//               (e.g. Haaland 3.8 shots/game -> Over 3.5).
 // Output: data/player-shots/fotmob.json (cache) + public/data/player-shots.json
 // (static mirror read by /player-shots.html). Runs from refresh-local-caches.ps1.
 const path = require('path');
@@ -168,8 +168,20 @@ function buildLeaderboard(players) {
     .slice(0, MAX_PLAYERS_PER_LEAGUE);
 }
 
-function buildTipsForLeague(leagueData, leagueLabel, players, todayStr) {
-  const fixtures = ((leagueData.fixtures && leagueData.fixtures.allMatches) || [])
+function dateOffset(baseStr, offset) {
+  const d = new Date(baseStr + 'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() + offset);
+  return d.toISOString().slice(0, 10);
+}
+
+// Build tips for every fixture inside the [yesterday, today, tomorrow] window,
+// plus the league's next matchday so the page still has an explicitly labelled
+// upcoming preview when there are no games in the window (e.g. international
+// breaks). Yesterday is kept so the date tabs have a "Yesterday" view (mostly
+// finished matches); today and tomorrow only carry actionable fixtures.
+function buildTipsForLeague(leagueData, leagueLabel, players, windowDates, todayStr, tomorrowStr) {
+  const dateSet = new Set(windowDates);
+  const all = ((leagueData.fixtures && leagueData.fixtures.allMatches) || [])
     .filter((m) => m && m.home && m.away && m.status && m.status.utcTime && !m.status.cancelled)
     .map((m) => ({
       date: String(m.status.utcTime).slice(0, 10),
@@ -180,21 +192,17 @@ function buildTipsForLeague(leagueData, leagueLabel, players, todayStr) {
     }))
     .filter((m) => m.home && m.away);
 
-  const todays = fixtures.filter((m) => !m.finished && m.date === todayStr);
+  const windowFixtures = all
+    .filter((m) => dateSet.has(m.date))
+    .filter((m) => m.date !== todayStr || !m.finished);
 
-  let selected = todays;
-  let isNextMatchday = false;
-  if (!selected.length) {
-    // No games today: fall back to the next upcoming matchday so the page is
-    // never empty (labelled as such in the UI).
-    const upcoming = fixtures
-      .filter((m) => !m.finished)
-      .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
-    if (!upcoming.length) return { fixtures: [], isNextMatchday: false };
-    const nextDate = upcoming[0].date;
-    selected = upcoming.filter((m) => m.date === nextDate);
-    isNextMatchday = true;
-  }
+  const upcoming = all
+    .filter((m) => m.date > tomorrowStr && !m.finished)
+    .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  const nextDate = upcoming.length ? upcoming[0].date : null;
+  const nextFixtures = nextDate ? all.filter((m) => m.date === nextDate && !m.finished) : [];
+
+  const fixtures = windowFixtures.concat(nextFixtures);
 
   const byTeam = new Map();
   for (const p of players) {
@@ -205,7 +213,7 @@ function buildTipsForLeague(leagueData, leagueLabel, players, todayStr) {
   }
 
   const out = [];
-  for (const fx of selected) {
+  for (const fx of fixtures) {
     const sides = [
       { side: 'home', team: fx.home },
       { side: 'away', team: fx.away }
@@ -246,16 +254,18 @@ function buildTipsForLeague(leagueData, leagueLabel, players, todayStr) {
     });
   }
   out.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
-  return { fixtures: out, isNextMatchday };
+  return out;
 }
 
 async function main() {
   const now = new Date();
   const todayStr = now.toISOString().slice(0, 10);
+  const yesterdayStr = dateOffset(todayStr, -1);
+  const tomorrowStr = dateOffset(todayStr, 1);
+  const windowDates = [yesterdayStr, todayStr, tomorrowStr];
 
   const fixtures = [];
   const players = [];
-  let anyNextMatchday = false;
   let season = '';
 
   for (const lg of LEAGUES) {
@@ -264,11 +274,10 @@ async function main() {
       const data = await fetchLeague(lg);
       if (!season) season = data.season;
       const pool = buildPlayerPool(lg.label, data);
-      const built = buildTipsForLeague(data.league, lg.label, pool, todayStr);
-      fixtures.push(...built.fixtures);
-      if (built.isNextMatchday) anyNextMatchday = true;
+      const built = buildTipsForLeague(data.league, lg.label, pool, windowDates, todayStr, tomorrowStr);
+      fixtures.push(...built);
       players.push(...buildLeaderboard(pool));
-      console.log(`[Player Shots] ${lg.label}: ${pool.length} players, ${built.fixtures.length} fixture(s) with tips`);
+      console.log(`[Player Shots] ${lg.label}: ${pool.length} players, ${built.length} fixture(s) with tips`);
     } catch (err) {
       console.warn(`[Player Shots] ${lg.label} failed: ${err.message} - skipping league`);
     }
@@ -279,14 +288,18 @@ async function main() {
     process.exit(1);
   }
 
+  const hasToday = fixtures.some((f) => f.date === todayStr);
+  const hasFuture = fixtures.some((f) => f.date > todayStr);
+
   const result = {
     success: true,
     date: todayStr,
     updatedAt: now.toISOString(),
+    window: { yesterday: yesterdayStr, today: todayStr, tomorrow: tomorrowStr },
     source: 'player-scoring-v1',
     provider: 'fotmob.com',
     season,
-    isNextMatchday: anyNextMatchday,
+    isNextMatchday: !hasToday && hasFuture,
     totalFixtures: fixtures.length,
     totalPlayers: players.length,
     fixtures,

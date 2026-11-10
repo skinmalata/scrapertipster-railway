@@ -158,6 +158,7 @@
   <button class="date-tab" data-date="yesterday" onclick="switchDate('yesterday')">Yesterday</button>
   <button class="date-tab active" data-date="today" onclick="switchDate('today')">Today</button>
   <button class="date-tab" data-date="tomorrow" onclick="switchDate('tomorrow')">Tomorrow</button>
+  <button class="date-tab" data-date="next" onclick="switchDate('next')" style="display:none">Next matchday</button>
 </div>
 
 <section id="loadingState" style="text-align:center;padding:40px 0;color:var(--text-secondary)">
@@ -213,18 +214,66 @@
 <script>
 (function () {
   var DATA_URL = '/data/player-shots.json';
-  var state = { data: null, players: [], fixtures: [], tab: 'tips' };
+  var state = { data: null, players: [], fixtures: [], tab: 'tips', dateKey: 'today' };
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  function shiftDate(baseStr, offset) {
+    var d = new Date((baseStr || new Date().toISOString().slice(0, 10)) + 'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() + offset);
+    return d.toISOString().slice(0, 10);
+  }
+
+  function windowDates() {
+    var data = state.data || {};
+    var w = data.window || {};
+    var base = data.date || new Date().toISOString().slice(0, 10);
+    return {
+      yesterday: w.yesterday || shiftDate(base, -1),
+      today: w.today || base,
+      tomorrow: w.tomorrow || shiftDate(base, 1)
+    };
+  }
+
+  function formatDate(dateStr) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateStr || ''))) return '';
+    var d = new Date(dateStr + 'T00:00:00Z');
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
+  }
+
+  function selectedFixtures() {
+    var dates = windowDates();
+    if (state.dateKey === 'next') {
+      return {
+        key: 'next',
+        date: null,
+        fixtures: state.fixtures.filter(function (f) { return f && f.date > dates.tomorrow; })
+      };
+    }
+    var target = dates[state.dateKey] || dates.today;
+    return {
+      key: state.dateKey,
+      date: target,
+      fixtures: state.fixtures.filter(function (f) { return f && f.date === target; })
+    };
+  }
+
   function renderTips() {
     var wrap = document.getElementById('tipsWrap');
     var body = document.getElementById('tipsBody');
-    var fixtures = state.fixtures;
+    var sel = selectedFixtures();
+    var fixtures = sel.fixtures;
+    var heading = document.getElementById('pageHeading');
+    if (heading) heading.textContent = 'Player Shots Tips - ' + (sel.key === 'next' ? 'Next Matchday' : formatDate(sel.date));
     if (!fixtures.length) {
-      body.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:30px 0">No player shots tips scheduled right now. Check back on the next matchday.</p>';
+      var hasNext = state.fixtures.some(function (f) { return f && f.date > windowDates().tomorrow; });
+      var msg = sel.key === 'today'
+        ? (hasNext ? 'No top-5 league matches today. Check the Next matchday tab for upcoming tips.' : 'No top-5 league matches today.')
+        : (sel.key === 'next' ? 'No upcoming player shots tips right now.' : 'No player shots tips for ' + formatDate(sel.date) + '.');
+      body.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:30px 0">' + esc(msg) + '</p>';
       wrap.style.display = 'block';
       return;
     }
@@ -234,6 +283,7 @@
       html += '<div style="background:var(--card-bg, #1a1a2e);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:14px">' +
         '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">' +
           '<span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#ffb300">' + esc(fx.league) + '</span>' +
+          '<span style="font-size:12px;color:var(--text-secondary)">' + esc(formatDate(fx.date)) + '</span>' +
           '<span style="font-size:12px;color:var(--text-secondary)">' + esc(fx.time) + '</span>' +
           '<span style="font-weight:700;font-size:15px">' + esc(fx.match) + '</span>' +
         '</div>';
@@ -309,13 +359,20 @@
       state.fixtures = data.fixtures || [];
       var chip = document.getElementById('updatedAtChip');
       if (chip) chip.textContent = data.date ? ('Updated ' + data.date) : 'Updated daily';
+      var dates = windowDates();
+      var hasToday = state.fixtures.some(function (f) { return f && f.date === dates.today; });
+      var hasNext = state.fixtures.some(function (f) { return f && f.date > dates.tomorrow; });
+      var nextTab = document.querySelector('.date-tab[data-date="next"]');
+      if (nextTab) nextTab.style.display = (!hasToday && hasNext) ? '' : 'none';
       var nextChip = document.getElementById('nextMatchdayChip');
-      if (nextChip && data.isNextMatchday) {
-        nextChip.textContent = 'Next matchday';
-        nextChip.style.display = 'inline-block';
+      if (nextChip) {
+        if (!hasToday) {
+          nextChip.textContent = 'No games today';
+          nextChip.style.display = 'inline-block';
+        } else {
+          nextChip.style.display = 'none';
+        }
       }
-      var heading = document.getElementById('pageHeading');
-      if (heading && data.date) heading.textContent = 'Player Shots Tips - ' + data.date;
       render();
     })
     .catch(function (err) {
@@ -324,14 +381,13 @@
       document.getElementById('errorState').style.display = 'block';
     });
 
-  document.querySelectorAll('.date-tab').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      document.querySelectorAll('.date-tab').forEach(function (b) { b.classList.remove('active'); });
-      btn.classList.add('active');
-      state.tab = btn.getAttribute('data-tab');
-      render();
+  window.switchDate = function (key) {
+    state.dateKey = key || 'today';
+    document.querySelectorAll('.date-tab').forEach(function (b) {
+      b.classList.toggle('active', b.getAttribute('data-date') === state.dateKey);
     });
-  });
+    render();
+  };
 })();
 </script>
 

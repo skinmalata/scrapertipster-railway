@@ -427,6 +427,12 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(/<\/head>/i, HEADER_STYLE_OVERRIDE + '\n</head>');
   }
 
+  // 2b. Inject the Bitmedia site-verification meta tag so every page carries it
+  //     (not just the homepage).
+  if (!/bitmedia-site-verification/i.test(html)) {
+    html = html.replace(/<\/head>/i, '<meta name="bitmedia-site-verification" content="28cb5d6395ea086d915a377b96884fce" />\n</head>');
+  }
+
   // 2b. Inject RSS feed auto-discovery tag into <head>
   if (!/type="application\/rss\+xml"/i.test(html)) {
     html = html.replace(/<\/head>/i, '<link rel="alternate" type="application/rss+xml" title="WinFulltime Football Predictions RSS" href="/feed.xml">\n</head>');
