@@ -5,7 +5,12 @@ const path = require('path');
 const { getAvailableMatches } = require('./bookingCodes/resolver');
 const { createCodeFromLegs } = require('./bookingCodes/converter');
 const { fetchTodayStreaks } = require('./h2hWinningStreaks');
-const { watDate, estimatedOdds } = require('./twoOddsOfDay');
+const { watDate } = require('./twoOddsOfDay');
+
+function estimatedOdds(prob) {
+  const p = Math.max(0.01, Math.min(0.95, prob));
+  return Number((1 / p * 0.95).toFixed(2));
+}
 
 // Helper to get Lagos local time formatted as 'YYYY-MM-DD HH:MM'
 function lagosNowString() {
@@ -399,10 +404,12 @@ function findOptimalCombination(candidates, targetOdds, options = {}) {
   const minAcceptable = Math.max(1.85, targetOdds * 0.85);
   const maxAcceptable = Math.min(10.50, targetOdds * 1.20);
   const minLegs = 2;
-  const maxLegs = targetOdds <= 3.5 ? 4 : targetOdds <= 6 ? 5 : 6;
+  const maxLegs = targetOdds <= 3.5 ? 4 : targetOdds <= 6 ? 6 : 8;
 
   let bestCombo = null;
   let minDiff = Infinity;
+  let closestAnywhere = null;
+  let minDiffAnywhere = Infinity;
   let iterations = 0;
   const MAX_ITER = 40000;
 
@@ -411,6 +418,10 @@ function findOptimalCombination(candidates, targetOdds, options = {}) {
 
     if (currentLegs.length >= minLegs) {
       const diff = Math.abs(currentOdds - targetOdds);
+      if (diff < minDiffAnywhere) {
+        minDiffAnywhere = diff;
+        closestAnywhere = currentLegs.slice();
+      }
       if (currentOdds >= minAcceptable && currentOdds <= maxAcceptable) {
         if (diff < minDiff) {
           minDiff = diff;
@@ -426,7 +437,7 @@ function findOptimalCombination(candidates, targetOdds, options = {}) {
       if (iterations > MAX_ITER) return;
       const pick = uniquePerFixture[i];
       const nextOdds = currentOdds * pick.odds;
-      if (nextOdds > maxAcceptable * 1.1) continue;
+      if (nextOdds > Math.max(maxAcceptable * 1.25, targetOdds * 1.35)) continue;
 
       currentLegs.push(pick);
       backtrack(i + 1, currentLegs, nextOdds);
@@ -436,23 +447,35 @@ function findOptimalCombination(candidates, targetOdds, options = {}) {
 
   backtrack(0, [], 1.0);
 
-  // If backtracking didn't find within tolerance, greedy fallback
+  // If backtracking didn't find within tight tolerance, greedy approach geared towards selection
   if (!bestCombo || bestCombo.length < 2) {
     let accum = 1.0;
     const greedy = [];
     for (const c of uniquePerFixture) {
       if (greedy.length >= maxLegs) break;
-      if (accum * c.odds <= maxAcceptable * 1.15) {
+      if (accum * c.odds <= targetOdds * 1.18) {
         greedy.push(c);
         accum *= c.odds;
-        if (accum >= minAcceptable) {
+        if (accum >= targetOdds * 0.85) {
           bestCombo = greedy;
           break;
         }
       }
     }
-    if (greedy.length >= 2 && accum >= 1.80) {
+    if (greedy.length >= 2 && (!bestCombo || bestCombo.length < 2)) {
       bestCombo = greedy;
+    }
+  }
+
+  // Whatever is available: if still null, return the closest valid candidate set
+  if ((!bestCombo || bestCombo.length < 2) && closestAnywhere && closestAnywhere.length >= 2) {
+    bestCombo = closestAnywhere;
+  }
+
+  // Fallback: take top 2 to 3 available matches geared towards selection
+  if (!bestCombo || bestCombo.length < 2) {
+    if (uniquePerFixture.length >= 2) {
+      bestCombo = uniquePerFixture.slice(0, Math.min(uniquePerFixture.length, targetOdds > 5 ? 4 : 2));
     }
   }
 

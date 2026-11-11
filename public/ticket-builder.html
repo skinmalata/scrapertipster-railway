@@ -900,7 +900,8 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
     btnGen.innerHTML = '<span class="spinner"></span><span>Building SportyBet Code...</span>';
 
     try {
-      var resp = await fetch('/api/sportybuilder/generate', {
+      var apiBase = window.WFT_API || 'https://winfulltime-api.onrender.com';
+      var resp = await fetch(apiBase + '/api/sportybuilder/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -909,7 +910,13 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
         })
       });
 
-      var data = await resp.json();
+      var text = await resp.text();
+      var data;
+      try {
+        data = JSON.parse(text);
+      } catch (parseErr) {
+        throw new Error('API server is updating. Please try again in a few moments.');
+      }
 
       if (!data || !data.success) {
         throw new Error(data && data.error ? data.error : 'Could not generate ticket');
