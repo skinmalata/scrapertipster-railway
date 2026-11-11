@@ -358,6 +358,10 @@ function parseEventMarkets(html) {
   const $ = cheerio.load(html);
   const overUnder = {};
   const doubleChance = {};
+  const btts = {};
+  const highestScoringHalf = {};
+  const drawNoBet = {};
+
   $('.m-market-item').each(function () {
     const title = $(this).find('.m-market-item-title').first().text().trim().toLowerCase();
     if (title === 'over/under') {
@@ -391,9 +395,57 @@ function parseEventMarkets(html) {
           doubleChance[sign] = { marketId: mMarket[1], outcomeId: mOut[1] };
         }
       });
+      return;
+    }
+    if (title === 'gg/ng') {
+      $(this).find('a.m-outcome').each(function () {
+        const href = $(this).attr('href') || '';
+        const mMarket = /marketId=(\d+)/.exec(href);
+        const mOut = /outcomeId=(\d+)/.exec(href);
+        if (!mMarket || !mOut) return;
+        const desc = $(this).find('.m-desc').first().text().trim().toLowerCase();
+        if (desc === 'yes') {
+          btts.yes = { marketId: mMarket[1], outcomeId: mOut[1] };
+        } else if (desc === 'no') {
+          btts.no = { marketId: mMarket[1], outcomeId: mOut[1] };
+        }
+      });
+      return;
+    }
+    if (title === 'highest scoring half') {
+      $(this).find('a.m-outcome').each(function () {
+        const href = $(this).attr('href') || '';
+        const mMarket = /marketId=(\d+)/.exec(href);
+        const mOut = /outcomeId=(\d+)/.exec(href);
+        if (!mMarket || !mOut) return;
+        const desc = $(this).find('.m-desc').first().text().trim().toLowerCase();
+        if (desc.includes('1st')) {
+          highestScoringHalf['1H'] = { marketId: mMarket[1], outcomeId: mOut[1] };
+        } else if (desc.includes('2nd')) {
+          highestScoringHalf['2H'] = { marketId: mMarket[1], outcomeId: mOut[1] };
+        } else if (desc.includes('equal') || desc.includes('draw')) {
+          highestScoringHalf['equal'] = { marketId: mMarket[1], outcomeId: mOut[1] };
+        }
+      });
+      return;
+    }
+    if (title === 'draw no bet') {
+      $(this).find('a.m-outcome').each(function () {
+        const href = $(this).attr('href') || '';
+        const mMarket = /marketId=(\d+)/.exec(href);
+        const mOut = /outcomeId=(\d+)/.exec(href);
+        if (!mMarket || !mOut) return;
+        const desc = $(this).find('.m-desc').first().text().trim().toLowerCase();
+        if (desc === 'home' || desc === '1') {
+          drawNoBet['1'] = { marketId: mMarket[1], outcomeId: mOut[1] };
+        } else if (desc === 'away' || desc === '2') {
+          drawNoBet['2'] = { marketId: mMarket[1], outcomeId: mOut[1] };
+        }
+      });
+      return;
     }
   });
-  return { overUnder: overUnder, doubleChance: doubleChance };
+  return { overUnder, doubleChance, btts, highestScoringHalf, drawNoBet };
 }
 
 function doubleChanceSign(desc) {
@@ -445,6 +497,38 @@ async function sportybetSelection(event, leg) {
       throw unsupportedMarketError(leg, 'Over ' + total + ' is not offered for "' + leg.match + '", so the code was not created.');
     }
     return { eventId: event.eventId, marketId: row.over.marketId, outcomeId: row.over.outcomeId, specifier: row.over.specifier };
+  }
+
+  // BTTS (Both Teams To Score / GG)
+  if (category === 'btts' || category === 'gg') {
+    const isYes = /yes|btts\s*yes|^gg$/i.test(tip);
+    const sideKey = isYes ? 'yes' : 'no';
+    const markets = await getEventMarkets(event.eventId);
+    const row = markets.btts && markets.btts[sideKey];
+    if (!row) throw unsupportedMarketError(leg, 'GG/NG (Both Teams to Score) is not offered for "' + leg.match + '", so the code was not created.');
+    return { eventId: event.eventId, marketId: row.marketId, outcomeId: row.outcomeId, specifier: null };
+  }
+
+  // Highest Scoring Half (1H / 2H)
+  if (category === 'highestscoringhalf' || category === 'hsh') {
+    let halfKey = null;
+    if (/1st|1h|first/i.test(tip)) halfKey = '1H';
+    else if (/2nd|2h|second/i.test(tip)) halfKey = '2H';
+    else if (/equal|draw/i.test(tip)) halfKey = 'equal';
+    const markets = await getEventMarkets(event.eventId);
+    const row = markets.highestScoringHalf && markets.highestScoringHalf[halfKey];
+    if (!row) throw unsupportedMarketError(leg, 'Highest Scoring Half is not offered for "' + leg.match + '", so the code was not created.');
+    return { eventId: event.eventId, marketId: row.marketId, outcomeId: row.outcomeId, specifier: null };
+  }
+
+  // Draw No Bet (DNB)
+  if (category === 'dnb' || category === 'drawnobet') {
+    let dnbKey = '1';
+    if (/away|^2$/i.test(tip)) dnbKey = '2';
+    const markets = await getEventMarkets(event.eventId);
+    const row = markets.drawNoBet && markets.drawNoBet[dnbKey];
+    if (!row) throw unsupportedMarketError(leg, 'Draw No Bet is not offered for "' + leg.match + '", so the code was not created.');
+    return { eventId: event.eventId, marketId: row.marketId, outcomeId: row.outcomeId, specifier: null };
   }
 
   throw unsupportedMarketError(leg);

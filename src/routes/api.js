@@ -1898,11 +1898,11 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
   }
 });
 
-// POST /api/sportybuilder/generate — SportyBuilder: auto SportyBet code for 2–10 odds
+// POST /api/sportybuilder/generate — SportyBuilder: auto SportyBet code for 2–50 odds
 router.post('/sportybuilder/generate', optionalAuth, async function (req, res) {
   try {
     var body = req.body || {};
-    var targetOdds = Math.min(10.0, Math.max(2.0, parseFloat(body.targetOdds) || 3.0));
+    var targetOdds = Math.min(50.0, Math.max(2.0, parseFloat(body.targetOdds) || 3.0));
     var avoidMatches = Array.isArray(body.avoidMatches) ? body.avoidMatches.slice(0, 20) : [];
     var { generateSportyTicket } = require('../services/sportyBuilder');
     var result = await generateSportyTicket({ targetOdds: targetOdds, avoidMatches: avoidMatches });

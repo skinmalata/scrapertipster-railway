@@ -736,7 +736,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   <div class="builder-card">
     <div class="builder-label">
       <span>Select Target Odds</span>
-      <span class="range-hint">Min 2.0 &bull; Max 10.0</span>
+      <span class="range-hint">Min 2.0 &bull; Max 50.0</span>
     </div>
 
     <!-- Quick Odds Pills -->
@@ -744,13 +744,14 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
       <button type="button" class="odds-pill" data-odds="2">2.0 Odds</button>
       <button type="button" class="odds-pill active" data-odds="3">3.0 Odds</button>
       <button type="button" class="odds-pill" data-odds="5">5.0 Odds</button>
-      <button type="button" class="odds-pill" data-odds="7">7.0 Odds</button>
       <button type="button" class="odds-pill" data-odds="10">10.0 Odds</button>
+      <button type="button" class="odds-pill" data-odds="20">20.0 Odds</button>
+      <button type="button" class="odds-pill" data-odds="50">50.0 Odds</button>
     </div>
 
     <!-- Slider for fine control -->
     <div class="odds-slider-container">
-      <input type="range" id="oddsSlider" class="odds-slider" min="2.0" max="10.0" step="0.5" value="3.0">
+      <input type="range" id="oddsSlider" class="odds-slider" min="2.0" max="50.0" step="0.5" value="3.0">
       <div class="slider-value"><span id="oddsValueDisplay">3.0</span>x</div>
     </div>
 
