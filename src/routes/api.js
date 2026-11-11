@@ -1898,6 +1898,22 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
   }
 });
 
+// POST /api/sportybuilder/generate — SportyBuilder: auto SportyBet code for 2–10 odds
+router.post('/sportybuilder/generate', optionalAuth, async function (req, res) {
+  try {
+    var body = req.body || {};
+    var targetOdds = Math.min(10.0, Math.max(2.0, parseFloat(body.targetOdds) || 3.0));
+    var avoidMatches = Array.isArray(body.avoidMatches) ? body.avoidMatches.slice(0, 20) : [];
+    var { generateSportyTicket } = require('../services/sportyBuilder');
+    var result = await generateSportyTicket({ targetOdds: targetOdds, avoidMatches: avoidMatches });
+    res.json(result);
+  } catch (e) {
+    console.error('[sportybuilder] Error:', e.message);
+    console.error('[sportybuilder] Stack:', e.stack);
+    res.status(500).json({ success: false, error: e.message || 'Failed to generate SportyBet ticket' });
+  }
+});
+
 // GET /api/best-picks — top pick per category, cached once per day
 var DATA_ROOT = process.env.RAILWAY_VOLUME_MOUNT_PATH || process.env.RENDER_DISK_PATH || path.join(__dirname, '../../data');
 
