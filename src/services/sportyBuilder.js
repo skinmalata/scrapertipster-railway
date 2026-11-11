@@ -200,24 +200,44 @@ async function buildSportyCandidatePool(options = {}) {
   const candidates = [];
   const seenPicks = new Set();
 
+  // Safe odds window: per-leg max 1.80, min 1.08.
+  // DC selections (1X/X2) are safe even at 1.60-1.80 since they cover two outcomes.
+  // Over 1.5 and Over 2.5 have tighter windows specified per-section below.
   function addCandidate(c) {
     if (!c || !c.match || !c.tip || !c.odds) return;
-    // Strict safety limits per leg: max 1.55 odds per selection, min 1.08
-    if (c.odds < 1.08 || c.odds > 1.55) return;
-    if (c.confidence && c.confidence < 72) return;
+    if (c.odds < 1.08 || c.odds > 1.80) return;
     const uid = `${matchKey(c.home, c.away)}|${c.category}|${c.tip}`;
     if (seenPicks.has(uid)) return;
     seenPicks.add(uid);
     candidates.push(c);
   }
 
-  // 1 & 2: Process SportyBet active fixtures for Unbeaten & Convincing H2H records
+  // 1 & 2: Process SportyBet live fixtures for Unbeaten streaks & H2H records
   for (const [key, sm] of sportyByKey.entries()) {
     const matchName = `${sm.home} - ${sm.away}`;
-    const h2h = h2hMap.get(key) || (sm.h2h ? { streaks: { all: [] } } : null);
     const unbeaten = unbeatenMap.get(key);
 
-    // 1. Unbeaten Streaks (Double Chance 1X / X2)
+    // Build H2H signal from both live h2hMap and embedded sm.h2h summary
+    const summary = sm.h2h || {};
+    const hRecord = h2hMap.get(key);
+    let h2hHomeWins = summary.homeWin || 0;
+    let h2hAwayWins = summary.awayWin || 0;
+    let h2hHomeUnbeaten = summary.homeUnbeaten || 0;
+    let h2hAwayUnbeaten = summary.awayUnbeaten || 0;
+
+    if (hRecord && hRecord.streaks && Array.isArray(hRecord.streaks.all)) {
+      for (const rec of hRecord.streaks.all) {
+        const side = rec.normal === normaliseTeam(sm.home) ? 'home'
+          : rec.normal === normaliseTeam(sm.away) ? 'away' : null;
+        if (!side) continue;
+        if (rec.type === 'win')     { if (side === 'home') h2hHomeWins    = Math.max(h2hHomeWins,    rec.count || 0);
+                                      else                  h2hAwayWins    = Math.max(h2hAwayWins,    rec.count || 0); }
+        if (rec.type === 'unbeaten'){ if (side === 'home') h2hHomeUnbeaten= Math.max(h2hHomeUnbeaten,rec.count || 0);
+                                      else                  h2hAwayUnbeaten= Math.max(h2hAwayUnbeaten,rec.count || 0); }
+      }
+    }
+
+    // 1. Unbeaten streaks → Double Chance (covers draw, maximally safe)
     if (unbeaten && Array.isArray(unbeaten.streaks) && unbeaten.streaks.length) {
       const best = unbeaten.streaks[0];
       const count = Number(best.count) || 5;
@@ -226,107 +246,96 @@ async function buildSportyCandidatePool(options = {}) {
 
       if (isHome || isAway) {
         const tip = isHome ? '1X' : 'X2';
-        const dcOdds = calculateDoubleChanceOdds(sm.odds, tip) || (isHome ? 1.18 : 1.22);
-        // Only accept if Double Chance odds are within safe range (1.08 to 1.38)
-        if (dcOdds >= 1.08 && dcOdds <= 1.38) {
+        const dcOdds = calculateDoubleChanceOdds(sm.odds, tip);
+        if (dcOdds && dcOdds >= 1.08 && dcOdds <= 1.75) {
           addCandidate({
             match: matchName,
-            home: sm.home,
-            away: sm.away,
-            league: sm.league,
-            date: sm.date,
-            time: sm.time,
-            category: '1x2',
-            tip: tip,
+            home: sm.home, away: sm.away, league: sm.league,
+            date: sm.date, time: sm.time,
+            category: '1x2', tip,
             odds: dcOdds,
             confidence: Math.min(95, 80 + count * 2),
             qualityScore: 94 + Math.min(6, count),
-            reason: `${best.team} unbeaten in ${count} matches (${tip})`,
+            reason: `${best.team} unbeaten in ${count} matches — ${tip}`,
             marketLabel: `Double Chance (${tip})`
           });
         }
       }
     }
 
-    // 2. Convincing Head-to-Head (H2H) Records
-    const summary = sm.h2h || {};
-    const hRecord = h2hMap.get(key);
-    let h2hHomeWins = summary.homeWin || 0;
-    let h2hAwayWins = summary.awayWin || 0;
-    let h2hHomeUnbeaten = summary.homeUnbeaten || 0;
-    let h2hAwayUnbeaten = summary.awayUnbeaten || 0;
-
-    if (hRecord && Array.isArray(hRecord.streaks && hRecord.streaks.all)) {
-      for (const rec of hRecord.streaks.all) {
-        if (rec.normal === hRecord.homeNormal) {
-          if (rec.type === 'win') h2hHomeWins = Math.max(h2hHomeWins, rec.count || 0);
-          if (rec.type === 'unbeaten') h2hHomeUnbeaten = Math.max(h2hHomeUnbeaten, rec.count || 0);
-        } else if (rec.normal === hRecord.awayNormal) {
-          if (rec.type === 'win') h2hAwayWins = Math.max(h2hAwayWins, rec.count || 0);
-          if (rec.type === 'unbeaten') h2hAwayUnbeaten = Math.max(h2hAwayUnbeaten, rec.count || 0);
-        }
-      }
-    }
-
+    // 2. Convincing H2H dominance → safe DC or straight win for ultra-heavy favorites
     if (h2hHomeWins >= 2 || h2hHomeUnbeaten >= 3) {
       const hOdds = sm.odds ? Number(sm.odds['1']) : null;
-      if (hOdds && hOdds >= 1.12 && hOdds <= 1.30) {
-        // Ultra-heavy home favorite with dominating H2H
+      if (hOdds && hOdds >= 1.10 && hOdds <= 1.35) {
         addCandidate({
-          match: matchName,
-          home: sm.home,
-          away: sm.away,
-          league: sm.league,
-          date: sm.date,
-          time: sm.time,
-          category: '1x2',
-          tip: '1',
-          odds: hOdds,
-          confidence: 86,
-          qualityScore: 92,
-          reason: `Convincing H2H dominance (${sm.home} dominates head-to-head)`,
+          match: matchName, home: sm.home, away: sm.away, league: sm.league,
+          date: sm.date, time: sm.time,
+          category: '1x2', tip: '1', odds: hOdds,
+          confidence: 86, qualityScore: 92,
+          reason: `${sm.home} dominates H2H (${h2hHomeWins} wins / ${h2hHomeUnbeaten} unbeaten)`,
           marketLabel: 'Home Win (1)'
         });
       } else {
-        // Use Double Chance 1X for maximum safety (covers win + draw)
-        const dcOdds = calculateDoubleChanceOdds(sm.odds, '1X') || 1.18;
-        if (dcOdds >= 1.08 && dcOdds <= 1.38) {
+        const dcOdds = calculateDoubleChanceOdds(sm.odds, '1X');
+        if (dcOdds && dcOdds >= 1.08 && dcOdds <= 1.75) {
           addCandidate({
-            match: matchName,
-            home: sm.home,
-            away: sm.away,
-            league: sm.league,
-            date: sm.date,
-            time: sm.time,
-            category: '1x2',
-            tip: '1X',
-            odds: dcOdds,
-            confidence: 90,
-            qualityScore: 95,
-            reason: `Convincing H2H record (${sm.home} unbeaten in recent meetings + Draw cover)`,
+            match: matchName, home: sm.home, away: sm.away, league: sm.league,
+            date: sm.date, time: sm.time,
+            category: '1x2', tip: '1X', odds: dcOdds,
+            confidence: 90, qualityScore: 95,
+            reason: `${sm.home} H2H dominance — 1X cover`,
             marketLabel: 'Double Chance (1X)'
           });
         }
       }
     } else if (h2hAwayWins >= 2 || h2hAwayUnbeaten >= 3) {
-      // Away games are risky, so use Double Chance X2 for maximum safety
-      const dcOdds = calculateDoubleChanceOdds(sm.odds, 'X2') || 1.22;
-      if (dcOdds >= 1.08 && dcOdds <= 1.38) {
+      const dcOdds = calculateDoubleChanceOdds(sm.odds, 'X2');
+      if (dcOdds && dcOdds >= 1.08 && dcOdds <= 1.75) {
         addCandidate({
-          match: matchName,
-          home: sm.home,
-          away: sm.away,
-          league: sm.league,
-          date: sm.date,
-          time: sm.time,
-          category: '1x2',
-          tip: 'X2',
-          odds: dcOdds,
-          confidence: 88,
-          qualityScore: 93,
-          reason: `Convincing H2H record (${sm.away} dominates head-to-head + Draw cover)`,
+          match: matchName, home: sm.home, away: sm.away, league: sm.league,
+          date: sm.date, time: sm.time,
+          category: '1x2', tip: 'X2', odds: dcOdds,
+          confidence: 88, qualityScore: 93,
+          reason: `${sm.away} dominates H2H (away) — X2 cover`,
           marketLabel: 'Double Chance (X2)'
         });
+      }
+    }
+
+    // 3a. Live 1X2 odds from SportyBet schedule — heavy favorites → DC for safety
+    if (sm.odds) {
+      const hOdds = Number(sm.odds['1']);
+      const aOdds = Number(sm.odds['2']);
+
+      // Home strong favorites: DC 1X (covers win + draw)
+      if (hOdds && hOdds >= 1.25 && hOdds <= 1.65) {
+        const dcOdds = calculateDoubleChanceOdds(sm.odds, '1X');
+        if (dcOdds && dcOdds >= 1.08 && dcOdds <= 1.70) {
+          addCandidate({
+            match: matchName, home: sm.home, away: sm.away, league: sm.league,
+            date: sm.date, time: sm.time,
+            category: '1x2', tip: '1X', odds: dcOdds,
+            confidence: Math.round(Math.min(93, (1 / hOdds) * 100 + 15)),
+            qualityScore: 86 + (hOdds <= 1.40 ? 5 : 0),
+            reason: `Strong home favorite (${hOdds.toFixed(2)}) — 1X cover`,
+            marketLabel: 'Double Chance (1X)'
+          });
+        }
+      }
+      // Away favorites playing against weak homes: DC X2
+      if (aOdds && aOdds >= 1.30 && aOdds <= 1.65) {
+        const dcOdds = calculateDoubleChanceOdds(sm.odds, 'X2');
+        if (dcOdds && dcOdds >= 1.08 && dcOdds <= 1.70) {
+          addCandidate({
+            match: matchName, home: sm.home, away: sm.away, league: sm.league,
+            date: sm.date, time: sm.time,
+            category: '1x2', tip: 'X2', odds: dcOdds,
+            confidence: Math.round(Math.min(91, (1 / aOdds) * 100 + 15)),
+            qualityScore: 84 + (aOdds <= 1.40 ? 5 : 0),
+            reason: `Strong away favorite (${aOdds.toFixed(2)}) — X2 cover`,
+            marketLabel: 'Double Chance (X2)'
+          });
+        }
       }
     }
   }
@@ -366,7 +375,7 @@ async function buildSportyCandidatePool(options = {}) {
       } else {
         // Use Double Chance 1X to cover draw and make it almost certain to win
         const dcOdds = calculateDoubleChanceOdds(sm.odds, '1X') || estimatedOdds(Math.min(0.92, (prob + 18) / 100));
-        if (dcOdds >= 1.08 && dcOdds <= 1.38) {
+        if (dcOdds >= 1.08 && dcOdds <= 1.75) {
           addCandidate({
             match: matchName,
             home: sm.home,
@@ -387,7 +396,7 @@ async function buildSportyCandidatePool(options = {}) {
     } else if (p.tip === '2') {
       // Away favorite: always use Double Chance X2 for safety
       const dcOdds = calculateDoubleChanceOdds(sm.odds, 'X2') || estimatedOdds(Math.min(0.90, (prob + 18) / 100));
-      if (dcOdds >= 1.08 && dcOdds <= 1.38) {
+      if (dcOdds >= 1.08 && dcOdds <= 1.75) {
         addCandidate({
           match: matchName,
           home: sm.home,
@@ -406,7 +415,7 @@ async function buildSportyCandidatePool(options = {}) {
       }
     } else if (p.tip === '1X' || p.tip === 'X2') {
       const dcOdds = calculateDoubleChanceOdds(sm.odds, p.tip) || estimatedOdds(Math.min(0.92, (prob + 10) / 100));
-      if (dcOdds >= 1.08 && dcOdds <= 1.38) {
+      if (dcOdds >= 1.08 && dcOdds <= 1.75) {
         addCandidate({
           match: matchName,
           home: sm.home,
@@ -436,10 +445,10 @@ async function buildSportyCandidatePool(options = {}) {
     if (!sm) continue;
 
     const prob = Number(p.probability) || (p.probabilities && p.probabilities.over15) || 75;
-    if (prob < 74) continue;
+    if (prob < 72) continue;
     const odds = Number((sm.goals && sm.goals.over15) || estimatedOdds(prob / 100));
-    // Safe odds window for Over 1.5 (1.10 to 1.34)
-    if (odds >= 1.10 && odds <= 1.34) {
+    // Safe odds window for Over 1.5 (1.10 to 1.55)
+    if (odds >= 1.10 && odds <= 1.55) {
       addCandidate({
         match: `${sm.home} - ${sm.away}`,
         home: sm.home,
@@ -468,11 +477,11 @@ async function buildSportyCandidatePool(options = {}) {
     if (!sm) continue;
 
     const prob = Number(p.probability) || (p.probabilities && p.probabilities.over25) || 75;
-    // Over 2.5 is inherently more volatile, so only accept with very strong site backing (>= 76%)
-    if (prob < 76) continue;
+    // Over 2.5 is inherently more volatile, so only accept with very strong site backing (>= 74%)
+    if (prob < 74) continue;
     const odds = Number((sm.goals && sm.goals.over25) || estimatedOdds(prob / 100));
     // Must be in safe range, not wild 1.80-2.20 coin tosses
-    if (odds >= 1.25 && odds <= 1.58) {
+    if (odds >= 1.25 && odds <= 1.75) {
       addCandidate({
         match: `${sm.home} - ${sm.away}`,
         home: sm.home,
@@ -494,7 +503,7 @@ async function buildSportyCandidatePool(options = {}) {
   // 6. Recent Form — Teams with outstanding winning streaks
   const winstreaks = predictions.winstreakMatches || [];
   for (const w of winstreaks) {
-    if (!w || !w.streak || w.streak < 4) continue;
+    if (!w || !w.streak || w.streak < 3) continue;
     const nextMatch = w.nextMatch || w.match;
     if (!nextMatch) continue;
     const sides = nextMatch.split(/\s+(?:-|vs)\s+/i);
@@ -505,7 +514,7 @@ async function buildSportyCandidatePool(options = {}) {
     const isHome = normaliseTeam(w.match) === normaliseTeam(sm.home) || w.isHome === true;
     const tip = isHome ? '1X' : 'X2';
     const dcOdds = calculateDoubleChanceOdds(sm.odds, tip) || (isHome ? 1.18 : 1.22);
-    if (dcOdds >= 1.08 && dcOdds <= 1.38) {
+    if (dcOdds >= 1.08 && dcOdds <= 1.75) {
       addCandidate({
         match: `${sm.home} - ${sm.away}`,
         home: sm.home,
@@ -662,7 +671,30 @@ async function generateSportyTicket(options = {}) {
   if (targetOdds > 10.0) targetOdds = 10.0;
 
   const avoidMatches = Array.isArray(options.avoidMatches) ? options.avoidMatches : [];
-  const candidates = await buildSportyCandidatePool({ date: options.date });
+  const allCandidates = await buildSportyCandidatePool({ date: options.date });
+
+  if (allCandidates.length < 2) {
+    throw new Error('Not enough upcoming matches found in the 24-hour window. Please try again shortly as more matches are priced.');
+  }
+
+  // For shuffle: build a "fresh" pool that excludes previously selected matches.
+  // Only fall back to full pool if the fresh pool is too small to build a ticket.
+  let candidates = allCandidates;
+  if (avoidMatches.length > 0) {
+    const avoidSet = avoidMatches.map(normaliseTeam).filter(Boolean);
+    const isAvoided = (c) => {
+      const nm = normaliseTeam(c.match);
+      const nh = normaliseTeam(c.home);
+      const na = normaliseTeam(c.away);
+      return avoidSet.some(a =>
+        a === nh || a === na || nm.includes(a) ||
+        (a.length > 4 && (nh.includes(a) || na.includes(a)))
+      );
+    };
+    const fresh = allCandidates.filter(c => !isAvoided(c));
+    // Use fresh pool if it has enough variety; otherwise use full pool
+    candidates = fresh.length >= 4 ? fresh : allCandidates;
+  }
 
   if (candidates.length < 2) {
     throw new Error('Not enough upcoming matches found in the 24-hour window. Please try again shortly as more matches are priced.');
@@ -673,17 +705,18 @@ async function generateSportyTicket(options = {}) {
   let chosenLegs = null;
   let codeResult = null;
   let lastError = null;
-  const currentAvoidList = [...avoidMatches];
+  const rejectedLegs = [];
 
   while (attempts < 5 && !codeResult) {
     attempts++;
-    chosenLegs = findOptimalCombination(candidates, targetOdds, { avoidMatches: currentAvoidList });
+    // Pass empty avoidMatches — we already pre-filtered the pool above for shuffle.
+    // rejectedLegs accumulates any legs SportyBet API rejects across retries.
+    chosenLegs = findOptimalCombination(candidates, targetOdds, { avoidMatches: rejectedLegs });
 
     if (!chosenLegs || chosenLegs.length < 2) {
-      // If avoidMatches was too strict, loosen it
-      if (currentAvoidList.length > 0) {
-        currentAvoidList.length = 0;
-        chosenLegs = findOptimalCombination(candidates, targetOdds, { avoidMatches: [] });
+      // If the fresh pool failed, retry with full pool as last resort
+      if (candidates !== allCandidates) {
+        chosenLegs = findOptimalCombination(allCandidates, targetOdds, { avoidMatches: rejectedLegs });
       }
     }
 
@@ -705,9 +738,9 @@ async function generateSportyTicket(options = {}) {
       lastError = err;
       const rejectedMatch = /(?:for|match)\s+"([^"]+)"/i.exec(err.message);
       if (rejectedMatch && rejectedMatch[1]) {
-        currentAvoidList.push(rejectedMatch[1]);
+        rejectedLegs.push(rejectedMatch[1]);
       } else if (chosenLegs.length > 0) {
-        currentAvoidList.push(chosenLegs[0].match);
+        rejectedLegs.push(chosenLegs[0].match);
       }
     }
   }
