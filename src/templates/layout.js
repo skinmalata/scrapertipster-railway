@@ -6,6 +6,9 @@
 const fs = require('fs');
 const path = require('path');
 
+// Temporarily disabled while the bottom sticky ad is being adjusted.
+const STICKY_ADS_ENABLED = false;
+
 const NAV_LINKS = [
   { href: '/', label: 'Home', match: (p) => p === '/' || p === '/index.html' },
   {
@@ -439,8 +442,11 @@ function applyLayoutToHtml(html, activePath) {
 
   // 1c. Load the sticky unit only after the visitor has scrolled into the
   //     page. It stays below the content, is dismissible, and does not shift
-  //     the document layout on initial load.
-  if (!/data-ad-position="sticky_banner"/.test(html) && /<\/body>/i.test(html)) {
+  //     the document layout on initial load. Temporarily disabled: strip any
+  //     previously baked sticky slot so the banner cannot render.
+  if (!STICKY_ADS_ENABLED) {
+    html = html.replace(/<aside\b(?=[^>]*\bdata-ad-position=["']sticky_banner["'])[^>]*>[\s\S]*?<\/aside>\s*/gi, '');
+  } else if (!/data-ad-position="sticky_banner"/.test(html) && /<\/body>/i.test(html)) {
     html = html.replace(/<\/body>/i, '<aside class="wft-ad-slot" data-ad-position="sticky_banner" aria-label="Advertisement" hidden><ins class="6ae8959ff30577b0496d401f" style="display:inline-block;width:1px;height:1px;"></ins><script type="text/plain" data-wft-bitmedia-sticky>!function(e,n,c,t,o,r,d){!function e(n,c,t,o,r,m,d,s,a){s=c.getElementsByTagName(t)[0],(a=c.createElement(t)).async=!0,a.src="https://"+r[m]+"/js/"+o+".js?v="+d,a.onerror=function(){a.remove(),(m+=1)>=r.length||e(n,c,t,o,r,m)},s.parentNode.insertBefore(a,s)}(window,document,"script","6ae8959ff30577b0496d401f",["cdn.bmcdn6.com"], 0, new Date().getTime())}();</script><button class="wft-sticky-close" type="button" aria-label="Close advertisement">&times;</button></aside>\n</body>');
   }
 

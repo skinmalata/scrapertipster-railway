@@ -18,6 +18,8 @@
 
   var API = (window.WFT_API || 'https://winfulltime-api.onrender.com') + '/api';
   var ADVERTISE_URL = '/advertise.html';
+  // Temporarily disabled while the bottom sticky ad is being adjusted.
+  var STICKY_ADS_ENABLED = false;
 
   var POSITIONS = {
     global_leaderboard: { label: 'Global Leaderboard', w: 728, h: 90 },
@@ -222,8 +224,10 @@
       var units = el.getElementsByTagName('ins');
       for (var unitIndex = 0; unitIndex < units.length; unitIndex++) {
         if (units[unitIndex].className === bitmediaId) {
-          if (key === 'sticky_banner') prepareStickyBitmedia(el, units[unitIndex]);
-          else {
+          if (key === 'sticky_banner') {
+            if (!STICKY_ADS_ENABLED) return;
+            prepareStickyBitmedia(el, units[unitIndex]);
+          } else {
             loadBitmediaUnit(units[unitIndex], bitmediaId);
             if (key === 'end_of_content') scheduleEndOfContentFallback(el, units[unitIndex]);
           }
