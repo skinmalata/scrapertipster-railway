@@ -1805,75 +1805,159 @@ async function scrapeCorners() {
     });
     
     const html = response.data;
-    // Unescape RSC payload quotes for regex parsing
-    const unescaped = html.replace(/\\"/g, '"');
-    
-    // Extract home teams
-    const homePattern = '"className":"font-medium text-sm text-white truncate","children":"([^"]+)"';
-    const homeMatches = [...unescaped.matchAll(new RegExp(homePattern, 'g'))];
-    
-    // Extract away teams
-    const awayPattern = '"vs"," ","([^"]+)"';
-    const awayMatches = [...unescaped.matchAll(new RegExp(awayPattern, 'g'))];
-    
-    // Extract leagues (one per pair of entries)
-    const leaguePattern = '"className":"truncate max-w-\\[140px\\]","children":"([^"]+)"';
-    const leagueMatches = [...unescaped.matchAll(new RegExp(leaguePattern, 'g'))];
-    
-    // Extract hit rates
-    const hitPattern = '"children":"(\\d{2,3})%"';
-    const hitMatches = [...unescaped.matchAll(new RegExp(hitPattern, 'g'))];
-    
-    // Extract odds
-    const oddsPattern = '"children":"(1\\.\\d{2})"';
-    const oddsMatches = [...unescaped.matchAll(new RegExp(oddsPattern, 'g'))];
-    
-    // Extract markets
-    const marketPattern = '"children":"(Over [89]\\.5 Corners)"';
-    const marketMatches = [...unescaped.matchAll(new RegExp(marketPattern, 'g'))];
-    
-    console.log(`[Corners] Parsed: ${homeMatches.length} homes, ${awayMatches.length} aways, ${hitMatches.length} hits`);
-    
-    const totalEntries = homeMatches.length;
+    const today = new Date().toISOString().split('T')[0];
     const cornersMatches = [];
     let matchId = 0;
-    
-    for (let i = 0; i < totalEntries; i++) {
-      const home = homeMatches[i]?.[1] || '';
-      const away = awayMatches[i]?.[1] || '';
-      const league = leagueMatches[Math.floor(i / 2)]?.[1] || 'Various';
-      const hitRate = parseInt(hitMatches[i]?.[1] || '0', 10);
-      const odds = oddsMatches[i]?.[1] || '';
-      const market = marketMatches[i]?.[1] || 'Over 8.5 Corners';
-      
-      if (!home || !away || home.length < 2 || away.length < 2) continue;
-      
-      // Only include matches with hit rate > 80%
-      if (hitRate <= 80) continue;
-      
-      const matchKey = `${home} vs ${away}`;
-      if (cornersMatches.find(cm => cm.match === matchKey)) continue;
-      
-      const parsedOdds = odds ? parseFloat(odds) : null;
-      cornersMatches.push({
-        id: matchId++,
-        match: matchKey,
-        tip: market,
-        insights: [`Hit rate: ${hitRate}%`, `Odds: ${odds}`, league],
-        probability: hitRate,
-        odds: parsedOdds && parsedOdds > 1 ? parsedOdds : null,
-        league: league,
-        date: new Date().toISOString().split('T')[0]
+
+    // 1. Try Cheerio HTML table parsing (modern statsbet structure)
+    try {
+      const $ = getCheerio().load(html);
+      $('table tbody tr').each((i, row) => {
+        const $row = $(row);
+        const tds = $row.find('> td');
+        if (tds.length < 3) return;
+
+        const td0 = tds.eq(0);
+        let home = td0.find('p.font-medium span.truncate').eq(0).text().trim();
+        let away = td0.find('p.font-medium span.truncate').eq(1).text().trim();
+
+        if (!home || !away) {
+          const detailsBtn = td0.find('button[aria-label*="Details:"]').attr('aria-label') || '';
+          const m = detailsBtn.match(/Details:\s*(.*?)\s*[–-]\s*(.*)/);
+          if (m) {
+            home = m[1].trim();
+            away = m[2].trim();
+          }
+        }
+        if (!home || !away) return;
+
+        const leagueLink = td0.find('a[href*="/football/matches/"]');
+        const league = leagueLink.text().trim() || 'Various';
+        const matchHref = leagueLink.attr('href') || '';
+        const dateMatch = matchHref.match(/(\d{4}-\d{2}-\d{2})/);
+        const matchDate = dateMatch ? dateMatch[1] : today;
+
+        const timeMatch = td0.text().match(/\b(\d{1,2}:\d{2})\b/);
+        const time = timeMatch ? timeMatch[1] : '';
+
+        const lineText = tds.eq(1).find('p.font-semibold').text().trim() || tds.eq(1).text().trim();
+        let market = 'Over 8.5 Corners';
+        if (lineText.includes('Corners')) {
+          market = lineText;
+        } else if (lineText.includes('Over')) {
+          market = `${lineText} Corners`;
+        }
+
+        const oddsText = tds.eq(2).find('span.font-mono').text().trim() || tds.eq(2).text().trim();
+        const oddsMatch = oddsText.match(/(\d+(?:\.\d+)?)/);
+        const odds = oddsMatch ? parseFloat(oddsMatch[1]) : null;
+
+        let hitRate = 0;
+        const l10Match = tds.eq(7).text().trim().match(/(\d{1,3})%/);
+        if (l10Match) {
+          hitRate = parseInt(l10Match[1], 10);
+        } else {
+          const l5Match = tds.eq(6).text().trim().match(/(\d{1,3})%/);
+          if (l5Match) {
+            hitRate = parseInt(l5Match[1], 10);
+          } else {
+            const probMatch = tds.eq(3).text().trim().match(/(\d{1,3})%/);
+            if (probMatch) hitRate = parseInt(probMatch[1], 10);
+          }
+        }
+
+        if (hitRate < 70) return;
+
+        const matchKey = `${home} vs ${away}`;
+        if (cornersMatches.some(cm => cm.match === matchKey && cm.date === matchDate)) return;
+
+        cornersMatches.push({
+          id: matchId++,
+          match: matchKey,
+          tip: market,
+          league,
+          date: matchDate,
+          time: time || null,
+          odds: odds && odds > 1 ? odds : null,
+          probability: hitRate,
+          insights: [`Hit rate: ${hitRate}%`, odds ? `Odds: ${odds}` : '', league].filter(Boolean)
+        });
       });
+      console.log(`[Corners] Cheerio parsed ${cornersMatches.length} matches`);
+    } catch (parseErr) {
+      console.warn('[Corners] Cheerio parse error:', parseErr.message);
     }
-    
-    console.log(`[Corners] Filtered (>80% hit rate): ${cornersMatches.length} matches`);
-    
+
+    // 2. Fallback to RSC regex parsing if table parsing yielded no matches
+    if (cornersMatches.length === 0) {
+      const unescaped = html.replace(/\\"/g, '"');
+      const homePattern = '"className":"font-medium text-sm text-white truncate","children":"([^"]+)"';
+      const homeMatches = [...unescaped.matchAll(new RegExp(homePattern, 'g'))];
+      const awayPattern = '"vs"," ","([^"]+)"';
+      const awayMatches = [...unescaped.matchAll(new RegExp(awayPattern, 'g'))];
+      const leaguePattern = '"className":"truncate max-w-\\[140px\\]","children":"([^"]+)"';
+      const leagueMatches = [...unescaped.matchAll(new RegExp(leaguePattern, 'g'))];
+      const hitPattern = '"children":"(\\d{2,3})%"';
+      const hitMatches = [...unescaped.matchAll(new RegExp(hitPattern, 'g'))];
+      const oddsPattern = '"children":"(1\\.\\d{2})"';
+      const oddsMatches = [...unescaped.matchAll(new RegExp(oddsPattern, 'g'))];
+      const marketPattern = '"children":"(Over [89]\\.5 Corners)"';
+      const marketMatches = [...unescaped.matchAll(new RegExp(marketPattern, 'g'))];
+
+      console.log(`[Corners] Regex fallback parsed: ${homeMatches.length} homes, ${awayMatches.length} aways, ${hitMatches.length} hits`);
+      const totalEntries = homeMatches.length;
+
+      for (let i = 0; i < totalEntries; i++) {
+        const home = homeMatches[i]?.[1] || '';
+        const away = awayMatches[i]?.[1] || '';
+        const league = leagueMatches[Math.floor(i / 2)]?.[1] || 'Various';
+        const hitRate = parseInt(hitMatches[i]?.[1] || '0', 10);
+        const odds = oddsMatches[i]?.[1] || '';
+        const market = marketMatches[i]?.[1] || 'Over 8.5 Corners';
+
+        if (!home || !away || home.length < 2 || away.length < 2) continue;
+        if (hitRate < 70) continue;
+
+        const matchKey = `${home} vs ${away}`;
+        if (cornersMatches.find(cm => cm.match === matchKey)) continue;
+
+        const parsedOdds = odds ? parseFloat(odds) : null;
+        cornersMatches.push({
+          id: matchId++,
+          match: matchKey,
+          tip: market,
+          insights: [`Hit rate: ${hitRate}%`, `Odds: ${odds}`, league].filter(Boolean),
+          probability: hitRate,
+          odds: parsedOdds && parsedOdds > 1 ? parsedOdds : null,
+          league: league,
+          date: today
+        });
+      }
+    }
+
+    console.log(`[Corners] Filtered matches: ${cornersMatches.length} matches`);
+
+    // Merge with unexpired cached matches (yesterday or newer)
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const merged = [...cornersMatches];
+    if (fs.existsSync(cornersCacheFile)) {
+      try {
+        const cached = JSON.parse(fs.readFileSync(cornersCacheFile, 'utf8'));
+        if (cached && Array.isArray(cached.matches)) {
+          for (const cm of cached.matches) {
+            if (cm && cm.date && cm.date >= yesterday && !merged.some(m => m.match === cm.match && m.date === cm.date)) {
+              merged.push(cm);
+            }
+          }
+        }
+      } catch (e) {}
+    }
+
     const result = {
       success: true,
-      date: new Date().toISOString().split('T')[0],
-      totalMatches: cornersMatches.length,
-      matches: cornersMatches.slice(0, 50)
+      date: today,
+      totalMatches: merged.length,
+      matches: merged.slice(0, 50)
     };
     
     fs.writeFileSync(cornersCacheFile, JSON.stringify(result, null, 2));
