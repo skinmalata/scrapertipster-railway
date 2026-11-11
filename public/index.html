@@ -352,83 +352,277 @@ gtag('config', 'G-HMGZMW9EDP');
   </div>
 
 
- <div class="home-ticket-builder">
+ <div class="home-ticket-builder sporty-home-widget">
   <div class="htb-header">
-   <h2>Free Ticket Builder</h2>
-   <a href="/ticket-builder.html" class="htb-full-link">Full Ticket Builder &rarr;</a>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="background:rgba(228,30,49,0.15);color:#ff5466;border:1px solid rgba(228,30,49,0.3);padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;">⚡ Instant</span>
+      <h2>SportyBuilder</h2>
+    </div>
+    <a href="/ticket-builder.html" class="htb-full-link">Full Builder &rarr;</a>
   </div>
-  <p class="htb-desc">Combine predictions into a free accumulator ticket. No sign-up and no upgrades needed - build, copy and share instantly.</p>
-  <div class="htb-form">
-   <div class="htb-row">
-    <div><label for="htbTarget">Target Odds</label><input type="number" id="htbTarget" value="5" step="any" max="5" readonly></div>
-    <div><label for="htbMin">Min / Leg</label><input type="number" id="htbMin" value="1.20" step="any" readonly></div>
-    <div><label for="htbMax">Max / Leg</label><input type="number" id="htbMax" value="3.00" step="any" readonly></div>
-   </div>
-   <div class="htb-toggle"><input type="checkbox" id="htbToday" checked><label for="htbToday">Today only</label></div>
-   <div class="htb-toggle"><input type="checkbox" id="htbCode"><label for="htbCode">Generate booking code <span class="htb-code-note">(1X2, Double Chance &amp; Over 1.5/2.5 only)</span></label></div>
-   <div class="htb-btn-row">
-    <button class="htb-btn" id="htbGenerate">Build Ticket</button>
-    <button class="htb-btn htb-btn-shuffle" id="htbShuffle" disabled>Shuffle</button>
-   </div>
+  <p class="htb-desc">Auto-generate verified SportyBet booking codes (2 to 10 odds) from today's top statistical models for the next 24 hours.</p>
+
+  <div class="shb-pills">
+    <button type="button" class="shb-pill" data-odds="2">2.0</button>
+    <button type="button" class="shb-pill active" data-odds="3">3.0</button>
+    <button type="button" class="shb-pill" data-odds="5">5.0</button>
+    <button type="button" class="shb-pill" data-odds="7">7.0</button>
+    <button type="button" class="shb-pill" data-odds="10">10.0</button>
   </div>
-  <div id="htbResult"></div>
- </div>
- <style>
-  .home-ticket-builder{background:linear-gradient(135deg,rgba(37,46,64,.65),rgba(30,38,56,.9));backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:28px 24px;margin:32px auto;max-width:560px;box-shadow:0 8px 40px rgba(0,0,0,.3)}
-  .htb-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-  .htb-header h2{font-size:18px;font-weight:700;color:#e8edf5;margin:0;letter-spacing:-.3px}
-  .htb-full-link{font-size:13px;font-weight:600;color:#ffffff;text-decoration:none;white-space:nowrap}
-  .htb-full-link:hover{text-decoration:underline}
-  .htb-desc{font-size:13px;color:rgba(232,237,245,.5);margin:0 0 16px;line-height:1.6}
-  .htb-form{display:flex;flex-direction:column;gap:12px}
-  .htb-row{display:flex;gap:12px}
-  .htb-row>div{flex:1;display:flex;flex-direction:column}
-  .htb-row label{font-size:11px;font-weight:600;color:rgba(232,237,245,.45);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px}
-  .htb-row input{background:rgba(21,26,44,.6);border:1px solid rgba(255,255,255,.08);color:#e8edf5;padding:10px 12px;border-radius:8px;font-size:14px;font-family:'Inter',sans-serif;font-weight:500;width:100%;transition:border-color .25s,box-shadow .25s}
-  .htb-row input:focus{outline:none;border-color:rgba(255,36,72,.5);box-shadow:0 0 0 3px rgba(255,36,72,.1)}
-  .htb-row input[readonly]{opacity:.6;cursor:not-allowed;user-select:none}
-   .htb-toggle{display:flex;align-items:center;gap:10px}
-   .htb-toggle input[type=checkbox]{accent-color:#ff2448;width:16px;height:16px}
-   .htb-toggle label{font-size:13px;color:rgba(232,237,245,.65);cursor:pointer;margin:0}
-   .htb-code-note{display:block;font-size:11px;color:rgba(232,237,245,.4);margin-top:1px}
-  .htb-btn-row{display:flex;gap:10px}
-  .htb-btn{background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;border:none;padding:12px 24px;border-radius:10px;font-size:15px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:transform .2s,box-shadow .3s;letter-spacing:.3px;flex:1}
-  .htb-btn-shuffle{background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.04));font-size:13px;padding:12px 16px;flex:0 0 auto;min-width:100px}
-  .htb-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 30px rgba(255,36,72,.3)}
-  .htb-btn:active:not(:disabled){transform:translateY(0)}
-  .htb-btn:disabled{opacity:.4;cursor:not-allowed}
-  .htb-loading{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 0}
-  .htb-loading .htb-spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,.06);border-top-color:#ff2448;border-radius:50%;animation:htbSpin .8s linear infinite}
-  .htb-loading .htb-loading-text{font-size:13px;color:rgba(232,237,245,.45)}
-  @keyframes htbSpin{to{transform:rotate(360deg)}}
-  #htbResult .htb-ticket{background:rgba(21,26,44,.7);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px;margin-top:16px}
-  #htbResult .htb-ticket-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-  #htbResult .htb-ticket-odds{font-size:22px;font-weight:800;background:linear-gradient(135deg,#4ade80,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-  #htbResult .htb-ticket-label{font-size:14px;font-weight:600;color:rgba(232,237,245,.8)}
-  #htbResult .htb-leg{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;color:rgba(232,237,245,.75);line-height:1.5}
-  #htbResult .htb-leg:last-child{border-bottom:none}
-  #htbResult .htb-leg strong{color:rgba(232,237,245,.9);font-weight:600}
-  #htbResult .htb-leg .htb-tip{display:inline-block;background:linear-gradient(135deg,#ff2448,#d41a38);color:#fff;font-size:12px;font-weight:700;padding:2px 8px;border-radius:5px;margin-left:6px;vertical-align:middle}
-  #htbResult .htb-empty{text-align:center;padding:16px;color:rgba(232,237,245,.35);font-size:13px}
-  #htbResult .htb-full{display:block;text-align:center;margin-top:12px;font-size:16px;font-weight:600;color:#ffffff;text-decoration:none}
-  #htbResult .htb-full:hover{text-decoration:underline}
-   #htbResult .htb-stale{background:rgba(255,200,0,.08);border:1px solid rgba(255,200,0,.15);border-radius:8px;padding:10px 14px;margin-top:12px;font-size:12px;color:rgba(255,200,0,.8);line-height:1.5}
-   #htbResult .htb-actions{display:flex;gap:8px;margin-top:12px}
-   #htbResult .code-btn{flex:1;border:none;padding:10px 12px;border-radius:8px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:transform .2s,box-shadow .3s;letter-spacing:.2px}
-   #htbResult .code-btn.sportybet{background:linear-gradient(135deg,#facc15,#eab308);color:#0a0e17}
-   #htbResult .code-btn.betway{background:linear-gradient(135deg,#fb923c,#ea580c);color:#fff}
-   #htbResult .code-btn.betpawa{background:linear-gradient(135deg,#34d399,#059669);color:#fff}
-   #htbResult .code-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 16px rgba(255,255,255,.2)}
-   #htbResult .code-btn:disabled{opacity:.5;cursor:wait;transform:none}
-   #htbResult .code-display{display:none;margin-top:10px;padding:12px 14px;border-radius:8px;background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.3);font-size:14px;color:#4ade80;text-align:center;font-weight:700;letter-spacing:1px;word-break:break-all}
-   #htbResult .code-display.error{background:rgba(255,36,72,.12);border-color:rgba(255,36,72,.3);color:#ff5a7d;font-weight:500;letter-spacing:.2px}
-   #htbResult .code-display .cd-label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px;opacity:.7;margin-bottom:4px;font-weight:600}
-    @media(max-width:640px){.htb-row{flex-direction:column;gap:10px}.home-ticket-builder{padding:20px 16px;margin:24px 12px}.htb-btn-row{flex-direction:column}}
-  </style>
 
+  <div class="shb-actions">
+    <button type="button" id="shbGenerate" class="shb-btn shb-btn-primary">
+      <span>🎯 Generate SportyBet Code</span>
+    </button>
+    <button type="button" id="shbShuffle" class="shb-btn shb-btn-secondary" title="Generate a different combination for these odds">
+      <span>🔀 Shuffle</span>
+    </button>
+  </div>
 
+  <div id="shbResult" class="shb-result-container"></div>
+</div>
 
-  <!-- Prediction Tools -->
+<style>
+.sporty-home-widget {
+  background: linear-gradient(180deg, var(--bg-elevated, #1a2236), var(--bg-card, #151a2c));
+  border: 1px solid var(--border, rgba(255,255,255,0.08));
+  border-radius: 16px;
+  padding: 24px;
+  margin: 32px auto;
+  max-width: 580px;
+  box-shadow: var(--shadow, 0 10px 30px rgba(0,0,0,0.35));
+}
+.htb-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.htb-header h2 { font-size: 19px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.3px; }
+.htb-full-link { font-size: 13px; font-weight: 600; color: #ff2448; text-decoration: none; }
+.htb-full-link:hover { text-decoration: underline; }
+.htb-desc { font-size: 13px; color: var(--text-muted, #94a3b8); margin: 0 0 16px; line-height: 1.5; }
+
+.shb-pills { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 16px; }
+.shb-pill {
+  background: var(--bg, #0d1120);
+  border: 1px solid var(--border, rgba(255,255,255,0.1));
+  color: var(--text-muted, #94a3b8);
+  padding: 10px 4px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+.shb-pill:hover { border-color: rgba(228,30,49,0.5); color: #ffffff; }
+.shb-pill.active {
+  background: #e41e31;
+  border-color: #e41e31;
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(228,30,49,0.4);
+}
+
+.shb-actions { display: flex; gap: 8px; }
+.shb-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+.shb-btn-primary {
+  flex: 2;
+  background: linear-gradient(135deg, #e41e31, #b81424);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(228,30,49,0.35);
+}
+.shb-btn-primary:hover:not(:disabled) { transform: translateY(-1px); }
+.shb-btn-secondary {
+  flex: 1;
+  background: var(--bg, #0d1120);
+  color: var(--text-muted, #94a3b8);
+  border: 1px solid var(--border, rgba(255,255,255,0.1));
+}
+.shb-btn-secondary:hover:not(:disabled) { background: var(--bg-elevated, #1a2236); color: #ffffff; }
+.shb-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.shb-result-container { margin-top: 16px; }
+.shb-code-card {
+  background: var(--bg, #0d1120);
+  border: 1.5px solid #e41e31;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.shb-code-label { font-size: 11px; font-weight: 700; color: #94a3b8; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+.shb-code-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 8px 0; }
+.shb-code-val {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: #ffffff;
+  font-family: monospace;
+  background: rgba(0,0,0,0.3);
+  padding: 6px 16px;
+  border-radius: 8px;
+  border: 1px dashed rgba(228,30,49,0.4);
+}
+.shb-copy-btn {
+  background: #10b981;
+  color: #ffffff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.shb-meta { font-size: 12px; color: #94a3b8; }
+.shb-meta strong { color: #ffffff; }
+
+.shb-legs { display: flex; flex-direction: column; gap: 8px; }
+.shb-leg {
+  background: var(--bg, #0d1120);
+  border: 1px solid var(--border, rgba(255,255,255,0.06));
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+.shb-leg-match { font-weight: 600; color: #e8edf5; }
+.shb-leg-pick {
+  background: rgba(228,30,49,0.15);
+  color: #ff6475;
+  border: 1px solid rgba(228,30,49,0.3);
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-right: 6px;
+}
+.shb-leg-odds { font-weight: 800; color: #4ade80; }
+</style>
+
+<script>
+(function() {
+  var selectedOdds = 3.0;
+  var prevMatches = [];
+  var busy = false;
+
+  var pills = document.querySelectorAll('.shb-pill');
+  var btnGen = document.getElementById('shbGenerate');
+  var btnShuf = document.getElementById('shbShuffle');
+  var resBox = document.getElementById('shbResult');
+
+  pills.forEach(function(pill) {
+    pill.addEventListener('click', function() {
+      pills.forEach(function(p) { p.classList.remove('active'); });
+      this.classList.add('active');
+      selectedOdds = parseFloat(this.getAttribute('data-odds')) || 3.0;
+    });
+  });
+
+  async function runSporty(shuffle) {
+    if (busy) return;
+    busy = true;
+    btnGen.disabled = true;
+    btnShuf.disabled = true;
+    var origHtml = btnGen.innerHTML;
+    btnGen.innerHTML = '<span>⚡ Building...</span>';
+
+    try {
+      var apiBase = window.WFT_API || 'https://winfulltime-api.onrender.com';
+      var res = await fetch(apiBase + '/api/sportybuilder/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          targetOdds: selectedOdds,
+          avoidMatches: shuffle ? prevMatches : []
+        })
+      });
+
+      var text = await res.text();
+      var data;
+      try { data = JSON.parse(text); } catch (e) {
+        throw new Error('Service updating. Please retry shortly.');
+      }
+
+      if (!data || !data.success) {
+        throw new Error(data && data.error ? data.error : 'Failed to generate');
+      }
+
+      renderWidget(data);
+      if (Array.isArray(data.legs)) {
+        prevMatches = data.legs.map(function(l) { return l.match; });
+      }
+
+    } catch (err) {
+      console.error('Home SportyBuilder error:', err);
+      resBox.innerHTML = '<div style="padding:12px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;font-size:13px;color:#fca5a5;text-align:center;">' + (err.message || 'Error generating ticket') + '</div>';
+    } finally {
+      busy = false;
+      btnGen.disabled = false;
+      btnShuf.disabled = false;
+      btnGen.innerHTML = origHtml;
+    }
+  }
+
+  function renderWidget(data) {
+    var legsHtml = '';
+    if (Array.isArray(data.legs)) {
+      data.legs.forEach(function(leg) {
+        legsHtml += 
+          '<div class="shb-leg">' +
+            '<div class="shb-leg-match">' + escapeHtml(leg.home) + ' vs ' + escapeHtml(leg.away) + '</div>' +
+            '<div>' +
+              '<span class="shb-leg-pick">' + escapeHtml(leg.marketLabel || leg.pick) + '</span>' +
+              '<span class="shb-leg-odds">' + (leg.odds ? leg.odds.toFixed(2) : '') + '</span>' +
+            '</div>' +
+          '</div>';
+      });
+    }
+
+    resBox.innerHTML = 
+      '<div class="shb-code-card">' +
+        '<div class="shb-code-label">SportyBet Booking Code</div>' +
+        '<div class="shb-code-row">' +
+          '<span class="shb-code-val" id="shbCodeVal">' + escapeHtml(data.code) + '</span>' +
+          '<button type="button" class="shb-copy-btn" onclick="copyShbCode()">📋 Copy</button>' +
+        '</div>' +
+        '<div class="shb-meta">Total Odds: <strong>' + (data.totalOdds || 0).toFixed(2) + '</strong> &bull; Matches: <strong>' + (data.legs ? data.legs.length : 0) + '</strong></div>' +
+      '</div>' +
+      '<div class="shb-legs">' + legsHtml + '</div>';
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  window.copyShbCode = function() {
+    var el = document.getElementById('shbCodeVal');
+    if (!el) return;
+    var code = el.textContent.trim();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(function() {
+        alert('Copied SportyBet code: ' + code);
+      });
+    }
+  };
+
+  btnGen.addEventListener('click', function() { runSporty(false); });
+  btnShuf.addEventListener('click', function() { runSporty(true); });
+})();
+</script>
+
+<!-- Prediction Tools -->
 
   <style>
   .prediction-tools{position:relative;display:flex;flex-wrap:wrap;justify-content:center;clear:both;width:100%;max-width:900px;box-sizing:border-box;margin:24px auto 8px;padding:20px 12px;gap:12px;z-index:0}
@@ -1593,7 +1787,6 @@ gtag('config', 'G-HMGZMW9EDP');
 <script src="/config.js"></script>
 <script src="/supabase-client.js"></script>
 <script src="/auth.js?v=20260801"></script>
-<script src="/ticket-builder-core.js?v=20260812"></script>
 <script src="/chat-widget.js?v=paused-20261103" async></script>
 
 <script>
@@ -1633,7 +1826,6 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
 </script>
 
-<script src="/free-ticket-builder.js?v=20260814"></script>
 
 
 <script src="/responsible-gambling.js"></script>
