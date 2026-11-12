@@ -1363,7 +1363,7 @@ router.post('/register-checkout', async function (req, res) {
       email: email,
       fullName: fullName,
       planType: planType,
-      returnUrl: 'https://winfulltime.com/signup.html?paid=1',
+      returnUrl: 'https://winfulltime.com/api/auth/welcome-redirect?token=' + regToken,
       regToken: regToken
     });
     res.json(result);
@@ -1425,13 +1425,80 @@ router.post('/paypal/register-checkout', async function (req, res) {
       email: email,
       fullName: fullName,
       planType: planType,
-      returnUrl: 'https://winfulltime.com/signup.html?paid=1',
+      returnUrl: 'https://winfulltime.com/api/auth/welcome-redirect?token=' + regToken,
       regToken: regToken
     });
     res.json(result);
   } catch (e) {
     console.error('[paypal-register-checkout] Failed:', e.message);
     res.status(500).json({ error: 'Failed to create checkout. ' + e.message });
+  }
+});
+
+// GET /api/auth/welcome-redirect?token=<reg_token>
+// Called from the Whop/PayPal return URL after a paywall-first registration.
+// Looks up the completed registration, generates a Supabase magic link that
+// lands the buyer on /account.html?welcome=1 (already logged-in), and redirects.
+// Polls up to 6 seconds for the webhook to mark the registration completed
+// (Whop may redirect the buyer before the webhook fires). Falls back to
+// /account.html?welcome=1 so the user at least lands on the right page and
+// can sign in with the magic link from their welcome email.
+router.get('/auth/welcome-redirect', async function (req, res) {
+  var token = String(req.query.token || '').trim();
+  var fallback = 'https://winfulltime.com/account.html?welcome=1';
+  if (!token || !supabase) return res.redirect(302, fallback);
+
+  try {
+    // Poll for up to 6 s (6 × 1 s) waiting for the webhook to complete registration.
+    var email = null;
+    for (var attempt = 0; attempt < 6; attempt++) {
+      if (attempt > 0) await new Promise(function(r) { setTimeout(r, 1000); });
+      var reg = await supabase.from('pending_registrations')
+        .select('email, status')
+        .eq('reg_token', token)
+        .maybeSingle();
+
+      if (reg.error || !reg.data) {
+        console.warn('[welcome-redirect] Token not found:', token);
+        return res.redirect(302, fallback);
+      }
+      if (reg.data.status === 'completed' && reg.data.email) {
+        email = reg.data.email;
+        break;
+      }
+      console.log('[welcome-redirect] Waiting for registration completion (attempt', attempt + 1, ')');
+    }
+
+    if (!email) {
+      // Webhook not yet fired — the welcome email link will log them in.
+      console.warn('[welcome-redirect] Registration not completed after polling, falling back:', token);
+      return res.redirect(302, fallback);
+    }
+
+    var linkResult = await supabase.auth.admin.generateLink({
+      type: 'magiclink',
+      email: email,
+      options: { redirectTo: 'https://winfulltime.com/account.html?welcome=1' }
+    });
+
+    if (linkResult.error || !linkResult.data) {
+      console.warn('[welcome-redirect] Magic link failed for', email, ':', linkResult.error && linkResult.error.message);
+      return res.redirect(302, fallback);
+    }
+
+    var props = (linkResult.data && linkResult.data.properties) || {};
+    var actions = (linkResult.data && linkResult.data.actions) || [];
+    var magicLink = props.action_link || (actions[0] && actions[0].link) || null;
+    if (!magicLink) {
+      console.warn('[welcome-redirect] Magic link data missing for', email);
+      return res.redirect(302, fallback);
+    }
+
+    console.log('[welcome-redirect] Redirecting new Pro buyer to magic link:', email);
+    return res.redirect(302, magicLink);
+  } catch (e) {
+    console.error('[welcome-redirect] Error:', e.message);
+    return res.redirect(302, fallback);
   }
 });
 

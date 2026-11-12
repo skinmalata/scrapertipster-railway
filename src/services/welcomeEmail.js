@@ -128,7 +128,7 @@ function sendWelcomeEmail(client, opts) {
     ? client.auth.admin.generateLink({
         type: password ? 'recovery' : 'magiclink',
         email: email,
-        options: { redirectTo: password ? 'https://winfulltime.com/reset-password.html' : 'https://winfulltime.com/account.html' }
+        options: { redirectTo: password ? 'https://winfulltime.com/account.html?welcome=1' : 'https://winfulltime.com/account.html?welcome=1' }
       }).then(function (r) {
         if (r.error) throw r.error;
         var data = r.data || {};

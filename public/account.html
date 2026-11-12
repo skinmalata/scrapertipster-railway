@@ -36,6 +36,18 @@ body { font-family: 'Inter', sans-serif; background: #0c0f1a; color: #e2e8f0; mi
 .btn-outline:hover { border-color: rgba(255,255,255,0.2); }
 .btn-danger { background: rgba(255,36,72,0.1); color: #ff6b6b; border: 1px solid rgba(255,36,72,0.2); }
 .btn-danger:hover { background: rgba(255,36,72,0.2); }
+/* Welcome banner */
+.welcome-banner { background: linear-gradient(135deg, rgba(255,36,72,0.12), rgba(212,26,56,0.08)); border: 1px solid rgba(255,36,72,0.3); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+.welcome-banner h2 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.welcome-banner p { font-size: 13px; color: #94a3b8; margin-bottom: 16px; }
+.welcome-banner .pw-form { display: flex; flex-direction: column; gap: 10px; }
+.welcome-banner .pw-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.welcome-banner input[type="password"] { flex: 1; min-width: 180px; padding: 10px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #e2e8f0; font-size: 14px; font-family: inherit; outline: none; }
+.welcome-banner input[type="password"]:focus { border-color: #ff2448; }
+.welcome-banner .pw-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.welcome-banner .skip-link { font-size: 12px; color: #64748b; cursor: pointer; text-decoration: underline; }
+.welcome-banner .skip-link:hover { color: #94a3b8; }
+.welcome-banner .pw-alert { font-size: 13px; padding: 8px 12px; border-radius: 6px; display: none; }
 .actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
 .alert { padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
 .alert-error { background: rgba(255,36,72,0.1); border: 1px solid rgba(255,36,72,0.2); color: #ff6b6b; display: block; }
@@ -217,6 +229,23 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
     <h1>My Account</h1>
     <div id="alert" class="alert"></div>
 
+    <!-- Post-payment welcome banner — shown only when ?welcome=1 is present -->
+    <div id="welcome-banner" class="welcome-banner" style="display:none">
+      <h2>🎉 Welcome to WinFulltime Pro!</h2>
+      <p>Your account is active. Set a password now so you can sign in anytime — otherwise you'll need to use the magic link in your email each time.</p>
+      <div class="pw-form">
+        <div class="pw-row">
+          <input type="password" id="welcome-password" placeholder="New password (min. 6 characters)" autocomplete="new-password">
+          <input type="password" id="welcome-password-confirm" placeholder="Confirm password" autocomplete="new-password">
+        </div>
+        <div class="pw-alert alert" id="welcome-pw-alert"></div>
+        <div class="pw-actions">
+          <button class="btn btn-primary" id="welcome-pw-btn" onclick="handleWelcomePasswordSave()">Set Password</button>
+          <span class="skip-link" onclick="dismissWelcomeBanner()">Skip for now</span>
+        </div>
+      </div>
+    </div>
+
     <div class="card">
       <h3>Profile</h3>
       <div class="profile-row"><span class="label">Name</span><span class="value" id="display-name">—</span></div>
@@ -360,6 +389,70 @@ function handlePortal() {
 }
 
 loadAccount();
+
+// --- Post-payment welcome flow ---
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('welcome') !== '1') return;
+
+  // Show banner once auth is confirmed (user is logged in after magic link)
+  window.WFT.onAuthReady(function(user) {
+    if (!user) return; // not logged in — banner makes no sense
+    var banner = document.getElementById('welcome-banner');
+    if (banner) banner.style.display = 'block';
+    // Scroll to top so they see the banner
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Remove ?welcome=1 from the URL bar (clean URL on subsequent visits)
+    // — but only AFTER we've checked it, so do it after a tick
+    setTimeout(function() {
+      var url = new URL(window.location.href);
+      url.searchParams.delete('welcome');
+      history.replaceState(null, '', url.toString());
+    }, 100);
+  });
+})();
+
+function handleWelcomePasswordSave() {
+  var pw = document.getElementById('welcome-password').value;
+  var pw2 = document.getElementById('welcome-password-confirm').value;
+  var alert = document.getElementById('welcome-pw-alert');
+  var btn = document.getElementById('welcome-pw-btn');
+
+  function showWarn(msg, type) {
+    alert.textContent = msg;
+    alert.className = 'pw-alert alert alert-' + (type || 'error');
+    alert.style.display = 'block';
+  }
+
+  if (pw.length < 6) { showWarn('Password must be at least 6 characters.'); return; }
+  if (pw !== pw2) { showWarn('Passwords do not match.'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Saving...';
+
+  if (!window.WFT || !window.WFT.supabase) {
+    showWarn('Auth service not ready. Please try again.'); btn.disabled = false; btn.textContent = 'Set Password'; return;
+  }
+
+  window.WFT.supabase.auth.updateUser({ password: pw }).then(function(result) {
+    btn.disabled = false; btn.textContent = 'Set Password';
+    if (result.error) {
+      showWarn(result.error.message);
+    } else {
+      showWarn('✅ Password set successfully! You can now sign in with your email and password.', 'success');
+      // After 3s, hide the whole banner
+      setTimeout(function() {
+        var banner = document.getElementById('welcome-banner');
+        if (banner) banner.style.display = 'none';
+      }, 3000);
+    }
+  });
+}
+
+function dismissWelcomeBanner() {
+  var banner = document.getElementById('welcome-banner');
+  if (banner) banner.style.display = 'none';
+}
 </script>
 <footer>
  <div class="footer-grid">
