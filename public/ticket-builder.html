@@ -113,7 +113,7 @@
       "name": "What odds range does SportyBuilder support?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "SportyBuilder specializes in the sweet spot of 2.0 to 10.0 cumulative odds. This realistic range maximizes winning probability while delivering solid accumulator value."
+        "text": "SportyBuilder supports from 2.0 up to 50.0 odds. Standard odds up to 9.5 are available to all users for free, while 10.0 to 50.0 odds (with advanced markets like BTTS, Highest Scoring Half, DNB, and Corners) are exclusive to WinFulltime Pro members."
       }
     },
     {
@@ -121,7 +121,7 @@
       "name": "Is SportyBuilder completely free?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes, SportyBuilder is 100% free with no sign-up or subscription required. You can generate unlimited booking codes daily."
+        "text": "Yes, SportyBuilder is free for standard odds (up to 9.5 odds) with no sign-up or subscription required. Accumulators for 10 odds and above (10x, 20x, 50x) are unlocked exclusively with a WinFulltime Pro membership."
       }
     }
   ]
@@ -360,7 +360,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 }
 .odds-pills {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
   gap: 8px;
   margin-bottom: 20px;
 }
@@ -385,6 +385,89 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   border-color: var(--sb-red);
   color: #ffffff;
   box-shadow: 0 4px 14px rgba(228, 30, 49, 0.4);
+}
+.pill-pro-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(255, 180, 0, 0.2);
+  color: #ffb400;
+  border: 1px solid rgba(255, 180, 0, 0.4);
+  margin-left: 3px;
+  vertical-align: middle;
+  letter-spacing: 0.5px;
+}
+.pro-upgrade-card {
+  background: linear-gradient(135deg, rgba(255, 180, 0, 0.08), rgba(228, 30, 49, 0.12));
+  border: 1.5px solid rgba(255, 180, 0, 0.35);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  animation: fadeIn 0.25s ease-out;
+}
+.pro-upgrade-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.pro-upgrade-badge {
+  background: #ffb400;
+  color: #0b0e17;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+.pro-upgrade-title {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+}
+.pro-upgrade-desc {
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 0 0 12px;
+  line-height: 1.45;
+}
+.pro-upgrade-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.pro-upgrade-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #ffb400, #ff8c00);
+  color: #0b0e17;
+  font-weight: 800;
+  font-size: 13px;
+  padding: 8px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  box-shadow: 0 3px 12px rgba(255, 180, 0, 0.3);
+  transition: transform 0.15s ease;
+}
+.pro-upgrade-btn:hover {
+  transform: translateY(-1px);
+}
+.pro-upgrade-dismiss {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.pro-upgrade-dismiss:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
 }
 .odds-slider-container {
   display: flex;
@@ -744,15 +827,28 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
       <button type="button" class="odds-pill" data-odds="2">2.0 Odds</button>
       <button type="button" class="odds-pill active" data-odds="3">3.0 Odds</button>
       <button type="button" class="odds-pill" data-odds="5">5.0 Odds</button>
-      <button type="button" class="odds-pill" data-odds="10">10.0 Odds</button>
-      <button type="button" class="odds-pill" data-odds="20">20.0 Odds</button>
-      <button type="button" class="odds-pill" data-odds="50">50.0 Odds</button>
+      <button type="button" class="odds-pill pro-pill" data-odds="10">10.0 Odds <span class="pill-pro-tag">PRO</span></button>
+      <button type="button" class="odds-pill pro-pill" data-odds="20">20.0 Odds <span class="pill-pro-tag">PRO</span></button>
+      <button type="button" class="odds-pill pro-pill" data-odds="50">50.0 Odds <span class="pill-pro-tag">PRO</span></button>
     </div>
 
     <!-- Slider for fine control -->
     <div class="odds-slider-container">
       <input type="range" id="oddsSlider" class="odds-slider" min="2.0" max="50.0" step="0.5" value="3.0">
       <div class="slider-value"><span id="oddsValueDisplay">3.0</span>x</div>
+    </div>
+
+    <!-- Pro Upgrade Banner (shown when non-Pro selects 10+ odds) -->
+    <div id="proUpgradeBanner" class="pro-upgrade-card" style="display:none;">
+      <div class="pro-upgrade-top">
+        <span class="pro-upgrade-badge">👑 PRO EXCLUSIVE</span>
+        <span class="pro-upgrade-title">10+ Odds Accumulators</span>
+      </div>
+      <p class="pro-upgrade-desc">Selecting 10 odds and above (10x, 20x, and 50x) with advanced markets like BTTS, Highest Scoring Half, DNB &amp; Corners is reserved for WinFulltime Pro members.</p>
+      <div class="pro-upgrade-actions">
+        <a href="/pricing.html" class="pro-upgrade-btn">⭐ Upgrade to Pro</a>
+        <button type="button" class="pro-upgrade-dismiss" id="btnDismissProBanner">Dismiss</button>
+      </div>
     </div>
 
     <div class="action-buttons">
@@ -800,8 +896,8 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
         <p>SportyBuilder connects directly with SportyBet's active 24-hour sportsbook and cross-references each fixture with WinFulltime's statistical models (unbeaten streaks, H2H dominance, Over 1.5, and 1X2 win probabilities). It compiles the strongest combination matching your selected odds and registers a real booking code on SportyBet.</p>
       </details>
       <details class="faq-item">
-        <summary>Why is the odds range restricted to 2.0 to 10.0?</summary>
-        <p>Long-term accumulator profit relies on realistic probabilities. Limiting the range to 2.0–10.0 odds keeps your ticket composed of high-quality, data-backed selections rather than lottery bets with high failure rates.</p>
+        <summary>What odds range can I generate?</summary>
+        <p>SportyBuilder generates accumulator tickets from 2.0 up to 50.0 odds. Standard odds up to 9.5 are available to all users for free, while selecting 10 odds and above (10.0, 20.0, and 50.0 odds) is an exclusive WinFulltime Pro feature unlocking expanded markets including BTTS, Highest Scoring Half, DNB, and Corners.</p>
       </details>
       <details class="faq-item">
         <summary>Will I get the same matches every time I generate?</summary>
@@ -899,6 +995,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
 <div id="toast" class="toast"><span>Copied SportyBet code!</span></div>
 
+<script src="/config.js"></script>
+<script src="/supabase-client.js"></script>
+<script src="/auth.js?v=20260801"></script>
+
 <script>
 (function() {
   var currentOdds = 3.0;
@@ -916,9 +1016,44 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   var statMatches = document.getElementById('statMatches');
   var matchesList = document.getElementById('matchesList');
   var toast = document.getElementById('toast');
+  var proBanner = document.getElementById('proUpgradeBanner');
+  var btnDismissProBanner = document.getElementById('btnDismissProBanner');
+
+  function isUserPro() {
+    if (window.WFT && typeof window.WFT.getUser === 'function') {
+      var u = window.WFT.getUser();
+      return !!(u && (u.isPro || u.isAdmin));
+    }
+    return false;
+  }
+
+  function showProBanner() {
+    if (proBanner) {
+      proBanner.style.display = 'block';
+      proBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  function hideProBanner() {
+    if (proBanner) proBanner.style.display = 'none';
+  }
+
+  if (btnDismissProBanner) {
+    btnDismissProBanner.addEventListener('click', hideProBanner);
+  }
 
   function setOdds(val, updatePill) {
-    val = Math.min(10.0, Math.max(2.0, parseFloat(val) || 3.0));
+    var requested = parseFloat(val) || 3.0;
+    var pro = isUserPro();
+
+    if (requested >= 10.0 && !pro) {
+      showProBanner();
+      val = 5.0; // fallback safe allowed odds
+    } else {
+      var maxAllowed = pro ? 50.0 : 9.5;
+      val = Math.min(maxAllowed, Math.max(2.0, requested));
+    }
+
     currentOdds = val;
     slider.value = val;
     display.textContent = val.toFixed(val % 1 === 0 ? 0 : 1);
@@ -937,12 +1072,24 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   pills.forEach(function(pill) {
     pill.addEventListener('click', function() {
       var o = parseFloat(this.getAttribute('data-odds'));
+      if (o >= 10.0 && !isUserPro()) {
+        showProBanner();
+        return; // Non-pro members cannot select 10 odds and above
+      }
+      hideProBanner();
       setOdds(o);
     });
   });
 
   slider.addEventListener('input', function() {
     var val = parseFloat(this.value);
+    if (val >= 10.0 && !isUserPro()) {
+      val = 9.5;
+      this.value = 9.5;
+      showProBanner();
+    } else {
+      hideProBanner();
+    }
     display.textContent = val.toFixed(val % 1 === 0 ? 0 : 1);
     currentOdds = val;
     pills.forEach(function(p) {
@@ -954,37 +1101,85 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
     });
   });
 
+  function updateProState() {
+    var pro = isUserPro();
+    pills.forEach(function(p) {
+      var o = parseFloat(p.getAttribute('data-odds')) || 0;
+      if (o >= 10.0) {
+        var tag = p.querySelector('.pill-pro-tag');
+        if (pro) {
+          if (tag) tag.style.opacity = '0.35';
+          p.title = 'Pro feature unlocked';
+        } else {
+          if (tag) tag.style.opacity = '1';
+          p.title = 'WinFulltime Pro feature (10+ odds)';
+        }
+      }
+    });
+    if (pro) {
+      slider.max = "50.0";
+      hideProBanner();
+    }
+  }
+
+  document.addEventListener('wft-pro-status', updateProState);
+  if (window.WFT && typeof window.WFT.onAuthReady === 'function') {
+    window.WFT.onAuthReady(updateProState);
+  }
+
   async function generateTicket(shuffle) {
     if (isGenerating) return;
-    isGenerating = true;
 
+    if (currentOdds >= 10.0 && !isUserPro()) {
+      showProBanner();
+      return;
+    }
+
+    isGenerating = true;
     btnGen.disabled = true;
     btnShuffle.disabled = true;
     var origGenHtml = btnGen.innerHTML;
     btnGen.innerHTML = '<span class="spinner"></span><span>Building SportyBet Code...</span>';
 
     try {
-      var apiBase = window.WFT_API || 'https://winfulltime-api.onrender.com';
-      var resp = await fetch(apiBase + '/api/sportybuilder/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          targetOdds: currentOdds,
-          avoidMatches: shuffle ? previousMatches : []
-        })
-      });
-
-      var text = await resp.text();
       var data;
-      try {
-        data = JSON.parse(text);
-      } catch (parseErr) {
-        throw new Error('API server is updating. Please try again in a few moments.');
+      if (window.WFT && typeof window.WFT.apiFetch === 'function') {
+        data = await window.WFT.apiFetch('/api/sportybuilder/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            targetOdds: currentOdds,
+            avoidMatches: shuffle ? previousMatches : []
+          })
+        });
+      } else {
+        var apiBase = window.WFT_API || 'https://winfulltime-api.onrender.com';
+        var resp = await fetch(apiBase + '/api/sportybuilder/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            targetOdds: currentOdds,
+            avoidMatches: shuffle ? previousMatches : []
+          })
+        });
+        var text = await resp.text();
+        try {
+          data = JSON.parse(text);
+        } catch (parseErr) {
+          throw new Error('API server is updating. Please try again in a few moments.');
+        }
+      }
+
+      if (data && (data.code === 'PRO_REQUIRED' || data.__status === 403)) {
+        showProBanner();
+        return;
       }
 
       if (!data || !data.success) {
         throw new Error(data && data.error ? data.error : 'Could not generate ticket');
       }
+
+      hideProBanner();
 
       // Display the ticket
       renderTicket(data);
@@ -996,7 +1191,11 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
     } catch (err) {
       console.error('SportyBuilder error:', err);
-      alert('Failed to generate ticket: ' + err.message + '. Please try again.');
+      if (err.message && err.message.toLowerCase().includes('pro')) {
+        showProBanner();
+      } else {
+        alert('Failed to generate ticket: ' + err.message + '. Please try again.');
+      }
     } finally {
       isGenerating = false;
       btnGen.disabled = false;

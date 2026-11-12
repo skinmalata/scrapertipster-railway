@@ -366,9 +366,9 @@ gtag('config', 'G-HMGZMW9EDP');
     <button type="button" class="shb-pill" data-odds="2">2.0</button>
     <button type="button" class="shb-pill active" data-odds="3">3.0</button>
     <button type="button" class="shb-pill" data-odds="5">5.0</button>
-    <button type="button" class="shb-pill" data-odds="10">10.0</button>
-    <button type="button" class="shb-pill" data-odds="20">20.0</button>
-    <button type="button" class="shb-pill" data-odds="50">50.0</button>
+    <button type="button" class="shb-pill pro-pill" data-odds="10">10.0 <span class="shb-pro-tag">PRO</span></button>
+    <button type="button" class="shb-pill pro-pill" data-odds="20">20.0 <span class="shb-pro-tag">PRO</span></button>
+    <button type="button" class="shb-pill pro-pill" data-odds="50">50.0 <span class="shb-pro-tag">PRO</span></button>
   </div>
 
   <div class="shb-actions">
@@ -399,7 +399,7 @@ gtag('config', 'G-HMGZMW9EDP');
 .htb-full-link:hover { text-decoration: underline; }
 .htb-desc { font-size: 13px; color: var(--text-muted, #94a3b8); margin: 0 0 16px; line-height: 1.5; }
 
-.shb-pills { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 16px; }
+.shb-pills { display: grid; grid-template-columns: repeat(auto-fit, minmax(75px, 1fr)); gap: 6px; margin-bottom: 16px; }
 .shb-pill {
   background: var(--bg, #0d1120);
   border: 1px solid var(--border, rgba(255,255,255,0.1));
@@ -418,6 +418,67 @@ gtag('config', 'G-HMGZMW9EDP');
   border-color: #e41e31;
   color: #ffffff;
   box-shadow: 0 2px 10px rgba(228,30,49,0.4);
+}
+.shb-pro-tag {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: rgba(255, 180, 0, 0.2);
+  color: #ffb400;
+  border: 1px solid rgba(255, 180, 0, 0.4);
+  margin-left: 2px;
+  vertical-align: middle;
+  letter-spacing: 0.5px;
+}
+.shb-pro-callout {
+  background: linear-gradient(135deg, rgba(255, 180, 0, 0.08), rgba(228, 30, 49, 0.12));
+  border: 1.5px solid rgba(255, 180, 0, 0.35);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  margin-top: 12px;
+  animation: fadeIn 0.25s ease-out;
+}
+.shb-pro-callout-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: #ffffff;
+  font-size: 14px;
+}
+.shb-pro-callout-badge {
+  background: #ffb400;
+  color: #0b0e17;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+.shb-pro-callout-desc {
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 0 0 14px;
+  line-height: 1.45;
+}
+.shb-pro-callout-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #ffb400, #ff8c00);
+  color: #0b0e17;
+  font-weight: 800;
+  font-size: 13px;
+  padding: 8px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  box-shadow: 0 3px 12px rgba(255, 180, 0, 0.3);
+  transition: transform 0.15s ease;
+}
+.shb-pro-callout-btn:hover {
+  transform: translateY(-1px);
 }
 
 .shb-actions { display: flex; gap: 8px; }
@@ -522,16 +583,68 @@ gtag('config', 'G-HMGZMW9EDP');
   var btnShuf = document.getElementById('shbShuffle');
   var resBox = document.getElementById('shbResult');
 
+  function isUserPro() {
+    if (window.WFT && typeof window.WFT.getUser === 'function') {
+      var u = window.WFT.getUser();
+      return !!(u && (u.isPro || u.isAdmin));
+    }
+    return false;
+  }
+
+  function showProNotice(odds) {
+    resBox.innerHTML = 
+      '<div class="shb-pro-callout">' +
+        '<div class="shb-pro-callout-header">' +
+          '<span class="shb-pro-callout-badge">👑 PRO EXCLUSIVE</span>' +
+          '<strong>' + (odds ? odds + 'x Odds' : '10+ Odds') + ' is Exclusive to Pro</strong>' +
+        '</div>' +
+        '<p class="shb-pro-callout-desc">Generating 10.0 to 50.0 odds accumulator tickets with advanced markets (BTTS, Highest Scoring Half, DNB &amp; Corners) is reserved for WinFulltime Pro members.</p>' +
+        '<a href="/pricing.html" class="shb-pro-callout-btn">⭐ Upgrade to Pro &rarr;</a>' +
+      '</div>';
+  }
+
   pills.forEach(function(pill) {
     pill.addEventListener('click', function() {
+      var odds = parseFloat(this.getAttribute('data-odds')) || 3.0;
+      if (odds >= 10.0 && !isUserPro()) {
+        showProNotice(odds);
+        return; // Non-pro members cannot select 10 odds and above
+      }
       pills.forEach(function(p) { p.classList.remove('active'); });
       this.classList.add('active');
-      selectedOdds = parseFloat(this.getAttribute('data-odds')) || 3.0;
+      selectedOdds = odds;
     });
   });
 
+  function updateProPillUI() {
+    var pro = isUserPro();
+    pills.forEach(function(pill) {
+      var odds = parseFloat(pill.getAttribute('data-odds')) || 0;
+      if (odds >= 10.0) {
+        var tag = pill.querySelector('.shb-pro-tag');
+        if (pro) {
+          if (tag) tag.style.opacity = '0.35';
+          pill.title = 'Pro feature unlocked';
+        } else {
+          if (tag) tag.style.opacity = '1';
+          pill.title = 'WinFulltime Pro feature (10+ odds)';
+        }
+      }
+    });
+  }
+  document.addEventListener('wft-pro-status', updateProPillUI);
+  if (window.WFT && typeof window.WFT.onAuthReady === 'function') {
+    window.WFT.onAuthReady(updateProPillUI);
+  }
+
   async function runSporty(shuffle) {
     if (busy) return;
+
+    if (selectedOdds >= 10.0 && !isUserPro()) {
+      showProNotice(selectedOdds);
+      return;
+    }
+
     busy = true;
     btnGen.disabled = true;
     btnShuf.disabled = true;
@@ -539,20 +652,35 @@ gtag('config', 'G-HMGZMW9EDP');
     btnGen.innerHTML = '<span>⚡ Building...</span>';
 
     try {
-      var apiBase = window.WFT_API || 'https://winfulltime-api.onrender.com';
-      var res = await fetch(apiBase + '/api/sportybuilder/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          targetOdds: selectedOdds,
-          avoidMatches: shuffle ? prevMatches : []
-        })
-      });
-
-      var text = await res.text();
       var data;
-      try { data = JSON.parse(text); } catch (e) {
-        throw new Error('Service updating. Please retry shortly.');
+      if (window.WFT && typeof window.WFT.apiFetch === 'function') {
+        data = await window.WFT.apiFetch('/api/sportybuilder/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            targetOdds: selectedOdds,
+            avoidMatches: shuffle ? prevMatches : []
+          })
+        });
+      } else {
+        var apiBase = window.WFT_API || 'https://winfulltime-api.onrender.com';
+        var res = await fetch(apiBase + '/api/sportybuilder/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            targetOdds: selectedOdds,
+            avoidMatches: shuffle ? prevMatches : []
+          })
+        });
+        var text = await res.text();
+        try { data = JSON.parse(text); } catch (e) {
+          throw new Error('Service updating. Please retry shortly.');
+        }
+      }
+
+      if (data && (data.code === 'PRO_REQUIRED' || data.__status === 403)) {
+        showProNotice(selectedOdds);
+        return;
       }
 
       if (!data || !data.success) {
@@ -566,7 +694,11 @@ gtag('config', 'G-HMGZMW9EDP');
 
     } catch (err) {
       console.error('Home SportyBuilder error:', err);
-      resBox.innerHTML = '<div style="padding:12px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;font-size:13px;color:#fca5a5;text-align:center;">' + (err.message || 'Error generating ticket') + '</div>';
+      if (err.message && err.message.toLowerCase().includes('pro')) {
+        showProNotice(selectedOdds);
+      } else {
+        resBox.innerHTML = '<div style="padding:12px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;font-size:13px;color:#fca5a5;text-align:center;">' + (err.message || 'Error generating ticket') + '</div>';
+      }
     } finally {
       busy = false;
       btnGen.disabled = false;
