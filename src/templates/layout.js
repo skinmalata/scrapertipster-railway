@@ -6,8 +6,12 @@
 const fs = require('fs');
 const path = require('path');
 
-// Temporarily disabled while the bottom sticky ad is being adjusted.
-const STICKY_ADS_ENABLED = false;
+// Bottom sticky Bitmedia banner. Injected on every page, shown after scroll.
+const STICKY_ADS_ENABLED = true;
+
+// Shared "More football tools" strip button. Pages bake their own copy of the
+// strip, so the layout pass adds this link when it is missing.
+const BETPAWA_TOOL_BUTTON = '<a class="streak-btn tool-betpawa" href="/betpawa-builder.html" style="background:linear-gradient(135deg,#b45309,#fbbf24);color:#111827;"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">betPawa Builder</span></a>';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home', match: (p) => p === '/' || p === '/index.html' },
@@ -19,6 +23,7 @@ const NAV_LINKS = [
       { href: '/code-splitter.html', label: 'Code Splitter', match: (p) => p.startsWith('/code-splitter') },
       { href: '/predictions/in-play', label: 'In-Play', match: (p) => p.startsWith('/predictions/in-play') },
       { href: '/ticket-builder.html', label: 'Ticket Builder', match: (p) => p.startsWith('/ticket-builder') },
+      { href: '/betpawa-builder.html', label: 'betPawa Builder', match: (p) => p.startsWith('/betpawa-builder') },
       { href: '/code-analyzer.html', label: 'Code Analyzer', match: (p) => p.startsWith('/code-analyzer') }
     ]
   },
@@ -97,6 +102,7 @@ const FOOTER_HTML = `
     <li><a href="/2-odds-of-the-day.html">2 Odds</a></li>
     <li><a href="/author-picks.html">H2H Picks</a></li>
     <li><a href="/ticket-builder.html">Ticket Builder</a></li>
+    <li><a href="/betpawa-builder.html">betPawa Builder</a></li>
     <li><a href="/converter.html">Code Converter</a></li>
     <li><a href="/code-splitter.html">Code Splitter</a></li>
     <li><a href="/code-merger.html">Code Merger</a></li>
@@ -442,13 +448,24 @@ function applyLayoutToHtml(html, activePath) {
 
   // 1c. Load the sticky unit only after the visitor has scrolled into the
   //     page. It stays below the content, is dismissible, and does not shift
-  //     the document layout on initial load. Temporarily disabled: strip any
+  //     the document layout on initial load. When disabled, strip any
   //     previously baked sticky slot so the banner cannot render.
   if (!STICKY_ADS_ENABLED) {
     html = html.replace(/<aside\b(?=[^>]*\bdata-ad-position=["']sticky_banner["'])[^>]*>[\s\S]*?<\/aside>\s*/gi, '');
   } else if (!/data-ad-position="sticky_banner"/.test(html) && /<\/body>/i.test(html)) {
     html = html.replace(/<\/body>/i, '<aside class="wft-ad-slot" data-ad-position="sticky_banner" aria-label="Advertisement" hidden><ins class="6ae8959ff30577b0496d401f" style="display:inline-block;width:1px;height:1px;"></ins><script type="text/plain" data-wft-bitmedia-sticky>!function(e,n,c,t,o,r,d){!function e(n,c,t,o,r,m,d,s,a){s=c.getElementsByTagName(t)[0],(a=c.createElement(t)).async=!0,a.src="https://"+r[m]+"/js/"+o+".js?v="+d,a.onerror=function(){a.remove(),(m+=1)>=r.length||e(n,c,t,o,r,m)},s.parentNode.insertBefore(a,s)}(window,document,"script","6ae8959ff30577b0496d401f",["cdn.bmcdn6.com"], 0, new Date().getTime())}();</script><button class="wft-sticky-close" type="button" aria-label="Close advertisement">&times;</button></aside>\n</body>');
   }
+
+  // 1d. Keep the shared "More football tools" strip in sync with the main nav.
+  //     Pages bake their own copy of the strip, so add the betPawa Builder
+  //     button during the layout pass too; this is a no-op once present.
+  html = html.replace(/<nav\b[^>]*\bprediction-tools\b[^>]*>[\s\S]*?<\/nav>/gi, (nav) => {
+    if (/\btool-betpawa\b/.test(nav)) return nav;
+    if (/\btool-analyzer\b/.test(nav)) {
+      return nav.replace(/(<a\b[^>]*\btool-analyzer\b[^>]*>[\s\S]*?<\/a>)/i, BETPAWA_TOOL_BUTTON + '$1');
+    }
+    return nav.replace(/<\/nav>\s*$/i, BETPAWA_TOOL_BUTTON + '\n</nav>');
+  });
 
   // 2. Pages that don't load app.css need the header/theme styles so the
   //    injected header + theme toggle render like the rest of the site.

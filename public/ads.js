@@ -18,8 +18,8 @@
 
   var API = (window.WFT_API || 'https://winfulltime-api.onrender.com') + '/api';
   var ADVERTISE_URL = '/advertise.html';
-  // Temporarily disabled while the bottom sticky ad is being adjusted.
-  var STICKY_ADS_ENABLED = false;
+  // Bottom sticky Bitmedia banner. Activated after the visitor scrolls.
+  var STICKY_ADS_ENABLED = true;
 
   var POSITIONS = {
     global_leaderboard: { label: 'Global Leaderboard', w: 728, h: 90 },

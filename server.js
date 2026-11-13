@@ -389,6 +389,11 @@ app.get('/blog/in-play-betting-strategy.html', (req, res) => {
   res.redirect(301, '/blog/inplay-betting-strategies.html');
 });
 
+// Consolidate the retired Betway builder with the betPawa builder.
+app.get('/betway-builder.html', (req, res) => {
+  res.redirect(301, '/betpawa-builder.html');
+});
+
 // Static files with no cache
 function serveBlogPost(req, res, next) {
   const slug = req.params.slug;

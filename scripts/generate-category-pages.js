@@ -429,6 +429,7 @@ ${generateFaqSchema(FAQ_SCHEMA[slug])}
 .prediction-tools .tool-splitter{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff}
 .prediction-tools .tool-inplay{background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff}
 .prediction-tools .tool-ticket{background:linear-gradient(135deg,#0891b2,#22d3ee);color:#fff}
+.prediction-tools .tool-betpawa{background:linear-gradient(135deg,#b45309,#fbbf24);color:#111827}
 .prediction-tools .tool-analyzer{background:linear-gradient(135deg,#d97706,#f59e0b);color:#fff}
 .match-card.vip-locked{position:relative;overflow:hidden}
 .match-card.vip-locked>*:not(.vip-card-lock){filter:blur(5px);opacity:.58;pointer-events:none;user-select:none}
@@ -508,6 +509,7 @@ ${generateNoscriptFallback(slug, catConfig)}
   <a class="streak-btn tool-splitter" href="/code-splitter.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Code Splitter</span></a>
   <a class="streak-btn tool-inplay" href="/predictions/in-play"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">In-Play</span></a>
   <a class="streak-btn tool-ticket" href="/ticket-builder.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Ticket Builder</span></a>
+  <a class="streak-btn tool-betpawa" href="/betpawa-builder.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">betPawa Builder</span></a>
   <a class="streak-btn tool-analyzer" href="/code-analyzer.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Code Analyzer</span></a>
 </nav>
 

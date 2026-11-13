@@ -1995,6 +1995,36 @@ router.post('/sportybuilder/generate', optionalAuth, async function (req, res) {
   }
 });
 
+// POST /api/betpawabuilder/generate — betPawaBuilder: auto betPawa code for 2–50 odds
+router.post('/betpawabuilder/generate', optionalAuth, async function (req, res) {
+  try {
+    var body = req.body || {};
+    var targetOdds = Math.min(50.0, Math.max(2.0, parseFloat(body.targetOdds) || 3.0));
+    var avoidMatches = Array.isArray(body.avoidMatches) ? body.avoidMatches.slice(0, 20) : [];
+
+    // Same Pro gate as SportyBuilder: 10 odds and above needs a Pro account.
+    var isPro = await resolveIsPro(req);
+    if (targetOdds >= 10.0 && !isPro) {
+      return res.status(403).json({
+        success: false,
+        error: 'Selecting 10 odds and above is an exclusive Pro feature. Upgrade to Pro to unlock 10x, 20x, and 50x tickets.',
+        code: 'PRO_REQUIRED',
+        isPro: false,
+        upgradeUrl: '/pricing.html'
+      });
+    }
+
+    var { generateBetpawaTicket } = require('../services/betpawaBuilder');
+    var result = await generateBetpawaTicket({ targetOdds: targetOdds, avoidMatches: avoidMatches });
+    result.isPro = isPro;
+    res.json(result);
+  } catch (e) {
+    console.error('[betpawabuilder] Error:', e.message);
+    console.error('[betpawabuilder] Stack:', e.stack);
+    res.status(500).json({ success: false, error: e.message || 'Failed to generate betPawa ticket' });
+  }
+});
+
 // GET /api/best-picks — top pick per category, cached once per day
 var DATA_ROOT = process.env.RAILWAY_VOLUME_MOUNT_PATH || process.env.RENDER_DISK_PATH || path.join(__dirname, '../../data');
 
