@@ -2025,6 +2025,35 @@ router.post('/betpawabuilder/generate', optionalAuth, async function (req, res) 
   }
 });
 
+// POST /api/xbetbuilder/generate — 1xBetBuilder: auto 1xBet code for 2–50 odds
+router.post('/xbetbuilder/generate', optionalAuth, async function (req, res) {
+  try {
+    var body = req.body || {};
+    var targetOdds = Math.min(50.0, Math.max(2.0, parseFloat(body.targetOdds) || 3.0));
+    var avoidMatches = Array.isArray(body.avoidMatches) ? body.avoidMatches.slice(0, 20) : [];
+
+    var isPro = await resolveIsPro(req);
+    if (targetOdds >= 10.0 && !isPro) {
+      return res.status(403).json({
+        success: false,
+        error: 'Selecting 10 odds and above is an exclusive Pro feature. Upgrade to Pro to unlock 10x, 20x, and 50x tickets.',
+        code: 'PRO_REQUIRED',
+        isPro: false,
+        upgradeUrl: '/pricing.html'
+      });
+    }
+
+    var { generateXbetTicket } = require('../services/xbetBuilder');
+    var result = await generateXbetTicket({ targetOdds: targetOdds, avoidMatches: avoidMatches });
+    result.isPro = isPro;
+    res.json(result);
+  } catch (e) {
+    console.error('[xbetbuilder] Error:', e.message);
+    console.error('[xbetbuilder] Stack:', e.stack);
+    res.status(500).json({ success: false, error: e.message || 'Failed to generate 1xBet ticket' });
+  }
+});
+
 // GET /api/best-picks — top pick per category, cached once per day
 var DATA_ROOT = process.env.RAILWAY_VOLUME_MOUNT_PATH || process.env.RENDER_DISK_PATH || path.join(__dirname, '../../data');
 

@@ -82,6 +82,20 @@ function betpawaHeaders(brand) {
   };
 }
 
+// 1xBet family service API (line feed + booking codes). 1xbet.ng is challenged
+// by Cloudflare for API clients, so the adapter talks to 22bet.ng, which serves
+// the same backend and returns codes valid across the 1xBet family.
+function xbetHeaders(origin) {
+  const base = origin || 'https://22bet.ng';
+  return {
+    'User-Agent': BROWSER_UA,
+    Accept: '*/*',
+    'Accept-Language': 'en-US,en;q=0.9',
+    Origin: base,
+    Referer: base + '/en/line/football'
+  };
+}
+
 function wrapUpstreamError(err, label) {
   const status = err && err.response ? err.response.status : null;
   const reason = status
@@ -202,4 +216,4 @@ async function postForm(url, formBody, headers, timeout) {
   return postFormWithRetry(url, formBody, headers, timeout, 2);
 }
 
-module.exports = { sportradarHeaders, bet9jaHeaders, bet9jaSportsHeaders, betwayHeaders, betkingHeaders, bangbetHeaders, betpawaHeaders, getJson, postJson, postForm, BROWSER_UA };
+module.exports = { sportradarHeaders, bet9jaHeaders, bet9jaSportsHeaders, betwayHeaders, betkingHeaders, bangbetHeaders, betpawaHeaders, xbetHeaders, getJson, postJson, postForm, BROWSER_UA };

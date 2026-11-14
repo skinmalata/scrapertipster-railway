@@ -6,6 +6,7 @@ const { decodeBetway, createBetwayCode } = require('./betway');
 const { decodeBetking } = require('./betking');
 const { decodeBangbet, createBangbetCode } = require('./bangbet');
 const { decodeBetPawa, createBetPawaCode, resolvePawaLeg } = require('./betpawa');
+const { decodeXbet, createXbetCode, resolveXbetLeg } = require('./1xbet');
 const { BOOKMAKERS, isSportradar, canonicalize, buildLegs, unsupportedMarketError } = require('./matcher');
 const { resolveLeg, getAvailableMatches } = require('./resolver');
 
@@ -64,7 +65,8 @@ const DECODERS = {
   bet9ja: decodeBet9ja,
   betking: decodeBetking,
   bangbet: decodeBangbet,
-  betpawa: decodeBetPawa
+  betpawa: decodeBetPawa,
+  '1xbet': decodeXbet
 };
 
 const LABELS = {
@@ -74,7 +76,8 @@ const LABELS = {
   bet9ja: 'Bet9ja',
   betking: 'BetKing',
   bangbet: 'Bangbet',
-  betpawa: 'betPawa'
+  betpawa: 'betPawa',
+  '1xbet': '1xBet'
 };
 
 function badRequest(message) {
@@ -89,7 +92,7 @@ function normalizeCode(raw) {
 
 function assertBookmaker(bookmaker) {
   if (!BOOKMAKERS.includes(bookmaker)) {
-    throw badRequest('Unknown bookmaker "' + bookmaker + '". Choose sportybet, msport, betway, bet9ja, betking, bangbet or betpawa.');
+    throw badRequest('Unknown bookmaker "' + bookmaker + '". Choose sportybet, msport, betway, bet9ja, betking, bangbet, betpawa or 1xbet.');
   }
 }
 
@@ -153,6 +156,7 @@ async function createCode(bookmaker, legs) {
   if (bookmaker === 'msport') return createMsportCode(legs);
   if (bookmaker === 'betway') return createBetwayCode(legs);
   if (bookmaker === 'betpawa') return createBetPawaCode(legs);
+  if (bookmaker === '1xbet') return createXbetCode(legs);
   if (bookmaker === 'betking') {
     const err = new Error('BetKing booking code creation is not supported yet.');
     err.code = 'INVALID_SELECTIONS';
@@ -173,8 +177,8 @@ async function createCodeFromLegs(input) {
   const legs = input && Array.isArray(input.legs) ? input.legs : [];
   if (!bookmaker || !legs.length) throw badRequest('Please provide a bookmaker and at least one selection.');
   assertBookmaker(bookmaker);
-  if (bookmaker !== 'sportybet' && bookmaker !== 'betway' && bookmaker !== 'betpawa') {
-    throw badRequest('Booking code creation is supported for sportybet, betway and betpawa only.');
+  if (bookmaker !== 'sportybet' && bookmaker !== 'betway' && bookmaker !== 'betpawa' && bookmaker !== '1xbet') {
+    throw badRequest('Booking code creation is supported for sportybet, betway, betpawa and 1xbet only.');
   }
   if (legs.length > MAX_LEGS) {
     const err = new Error('Booking codes with more than ' + MAX_LEGS + ' selections are not supported.');
@@ -187,6 +191,10 @@ async function createCodeFromLegs(input) {
     for (const leg of legs) {
       resolved.push(await resolvePawaLeg(leg));
     }
+  } else if (bookmaker === '1xbet') {
+    for (const leg of legs) {
+      resolved.push(await resolveXbetLeg(leg));
+    }
   } else {
     for (const leg of legs) {
       resolved.push(await resolveLeg(leg, bookmaker));
@@ -198,6 +206,8 @@ async function createCodeFromLegs(input) {
     code = await createBetwayCode(resolved);
   } else if (bookmaker === 'betpawa') {
     code = await createBetPawaCode(resolved);
+  } else if (bookmaker === '1xbet') {
+    code = await createXbetCode(resolved);
   } else {
     code = await createSportybetCode(resolved);
   }
@@ -206,7 +216,8 @@ async function createCodeFromLegs(input) {
     code: code,
     bookmaker: bookmaker,
     bookmakerName: LABELS[bookmaker],
-    legCount: resolved.length
+    legCount: resolved.length,
+    totalOdds: totalOdds(resolved)
   };
 }
 

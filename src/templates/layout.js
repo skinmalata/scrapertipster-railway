@@ -24,6 +24,7 @@ const NAV_LINKS = [
       { href: '/predictions/in-play', label: 'In-Play', match: (p) => p.startsWith('/predictions/in-play') },
       { href: '/ticket-builder.html', label: 'Ticket Builder', match: (p) => p.startsWith('/ticket-builder') },
       { href: '/betpawa-builder.html', label: 'betPawa Builder', match: (p) => p.startsWith('/betpawa-builder') },
+      { href: '/1xbet-builder.html', label: '1xBet Builder', match: (p) => p.startsWith('/1xbet-builder') },
       { href: '/code-analyzer.html', label: 'Code Analyzer', match: (p) => p.startsWith('/code-analyzer') }
     ]
   },
@@ -103,6 +104,7 @@ const FOOTER_HTML = `
     <li><a href="/author-picks.html">H2H Picks</a></li>
     <li><a href="/ticket-builder.html">Ticket Builder</a></li>
     <li><a href="/betpawa-builder.html">betPawa Builder</a></li>
+    <li><a href="/1xbet-builder.html">1xBet Builder</a></li>
     <li><a href="/converter.html">Code Converter</a></li>
     <li><a href="/code-splitter.html">Code Splitter</a></li>
     <li><a href="/code-merger.html">Code Merger</a></li>

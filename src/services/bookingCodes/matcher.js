@@ -2,8 +2,10 @@
 
 const { resolveExtid, resolveEidFromExtid } = require('./bet9ja');
 const { getPawaIndex, findEventBySrId, normaliseTeam } = require('./betpawa');
+const { OUTCOME_TO_TYPE, OUTCOME_TO_SIGN, getXbetIndex, findEventByTeams } = require('./1xbet');
+const { getEventIndex } = require('./resolver');
 
-const BOOKMAKERS = ['sportybet', 'msport', 'betway', 'bet9ja', 'betking', 'bangbet', 'betpawa'];
+const BOOKMAKERS = ['sportybet', 'msport', 'betway', 'bet9ja', 'betking', 'bangbet', 'betpawa', '1xbet'];
 
 function isSportradar(bookmaker) {
   return bookmaker === 'sportybet' || bookmaker === 'msport';
@@ -27,6 +29,10 @@ function isBangbet(bookmaker) {
 
 function isBetpawa(bookmaker) {
   return bookmaker === 'betpawa';
+}
+
+function isXbet(bookmaker) {
+  return bookmaker === '1xbet';
 }
 
 // All four bookmakers resolve a match to the same Sportradar numeric event id
@@ -156,6 +162,63 @@ async function canonicalizeBetpawa(leg) {
   return { eventId: event.srId, sign: sign };
 }
 
+// 1xBet is a native platform. Its decoded legs carry the 1xBet GameId, Kind 3
+// for 1X2 and Type 1/2/3 for Home/Draw/Away. 1xBet does not expose the shared
+// Sportradar id, so the match is resolved by team names against SportyBet's
+// schedule, which is the canonical sr:match id source used by the converter.
+// 1xBet uses short country names where SportyBet follows the official FIFA name.
+const TEAM_ALIASES = {
+  taiwan: 'chinese taipei',
+  'south korea': 'korea republic',
+  iran: 'ir iran',
+  'north korea': 'korea dpr',
+  usa: 'united states',
+  czechia: 'czech republic',
+  'ivory coast': 'cote divoire'
+};
+
+function matchName(name) {
+  const base = normaliseTeam(name);
+  return TEAM_ALIASES[base] || base;
+}
+
+function findSportyEvent(events, home, away) {
+  const nh = matchName(home);
+  const na = matchName(away);
+  if (!nh || !na) return null;
+  for (const ev of events) {
+    if (matchName(ev.home) === nh && matchName(ev.away) === na) return ev;
+  }
+  for (const ev of events) {
+    const eh = matchName(ev.home);
+    const ea = matchName(ev.away);
+    const hMatch = eh === nh || (nh.length > 4 && eh.includes(nh)) || (eh.length > 4 && nh.includes(eh));
+    const aMatch = ea === na || (na.length > 4 && ea.includes(na)) || (ea.length > 4 && na.includes(ea));
+    if (hMatch && aMatch) return ev;
+  }
+  return null;
+}
+
+async function canonicalizeXbet(leg) {
+  const kind = Number(leg.kind || leg.marketId);
+  if (kind !== 3) return null;
+  const sign = OUTCOME_TO_SIGN[String(leg.outcomeName || '')];
+  if (!sign) return null;
+  const pair = String(leg.eventName || '').split(/\s+(?:-|vs)\s+/i).map(function (part) { return part.trim(); });
+  if (pair.length !== 2) return null;
+  let events = [];
+  try {
+    events = await getEventIndex();
+  } catch (e) {
+    return null;
+  }
+  const event = findSportyEvent(events, pair[0], pair[1]);
+  if (!event) throw unresolvedEventError(leg.eventName || leg.eventId);
+  const eventId = numericEventId(event.eventId);
+  if (!eventId) throw unresolvedEventError(leg.eventName || leg.eventId);
+  return { eventId: eventId, sign: sign };
+}
+
 async function canonicalize(bookmaker, leg) {
   if (isSportradar(bookmaker)) return canonicalizeSportradar(leg);
   if (isBetway(bookmaker)) return canonicalizeBetway(leg);
@@ -163,6 +226,7 @@ async function canonicalize(bookmaker, leg) {
   if (isBetking(bookmaker)) return canonicalizeBetking(leg);
   if (isBangbet(bookmaker)) return canonicalizeBangbet(leg);
   if (isBetpawa(bookmaker)) return canonicalizeBetpawa(leg);
+  if (isXbet(bookmaker)) return canonicalizeXbet(leg);
   return null;
 }
 
@@ -242,6 +306,43 @@ async function toBetpawaSelection(canonical) {
   };
 }
 
+// 1xBet minting needs the native GameId and the live 1X2 price for each leg.
+// The canonical match is resolved by team names against the 1xBet family feed.
+const XBET_OUTCOME = { H: '1', D: 'X', A: '2' };
+
+async function toXbetSelection(canonical) {
+  if (!canonical || !canonical.eventId) throw unresolvedEventError(canonical && (canonical.eventName || canonical.eventId));
+  const pair = String(canonical.eventName || '').split(/\s+(?:-|vs)\s+/i).map(function (part) { return part.trim(); });
+  let home = pair.length === 2 ? pair[0] : canonical.home;
+  let away = pair.length === 2 ? pair[1] : canonical.away;
+  if (!home || !away) {
+    try {
+      const srId = numericEventId(canonical.eventId);
+      const list = await getEventIndex();
+      const found = list.find(function (e) { return numericEventId(e.eventId) === srId; });
+      if (found) { home = found.home; away = found.away; }
+    } catch (e) { /* fall through to unresolved */ }
+  }
+  let event = null;
+  try {
+    const index = await getXbetIndex();
+    if (home && away) event = findEventByTeams(index, home, away);
+  } catch (e) {
+    throw unresolvedEventError(canonical.eventName || canonical.eventId);
+  }
+  if (!event) throw unresolvedEventError(canonical.eventName || canonical.eventId);
+  const odds = event.odds[canonical.sign];
+  if (!Number.isFinite(odds) || odds <= 1) throw unsupportedMarketError(canonical);
+  return {
+    gameId: event.gameId,
+    outcomeType: OUTCOME_TO_TYPE[canonical.sign],
+    odds: odds,
+    eventName: event.home + ' - ' + event.away,
+    marketName: '1X2',
+    outcomeName: XBET_OUTCOME[canonical.sign]
+  };
+}
+
 async function buildLegs(bookmaker, canonicals) {
   if (isSportradar(bookmaker)) return canonicals.map(toSportradarSelection);
   if (isBetway(bookmaker)) return canonicals.map(toBetwayOutcome);
@@ -265,6 +366,13 @@ async function buildLegs(bookmaker, canonicals) {
     }
     return resolved;
   }
+  if (isXbet(bookmaker)) {
+    const resolved = [];
+    for (const canonical of canonicals) {
+      resolved.push(await toXbetSelection(canonical));
+    }
+    return resolved;
+  }
   throw new Error('Unknown target bookmaker "' + bookmaker + '".');
 }
 
@@ -276,6 +384,7 @@ module.exports = {
   isBetking,
   isBangbet,
   isBetpawa,
+  isXbet,
   canonicalize,
   buildLegs,
   unsupportedMarketError
