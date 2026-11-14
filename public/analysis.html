@@ -573,11 +573,23 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
  <script>
 
- const params = new URLSearchParams(window.location.search);
+ const queryParams = new URLSearchParams(window.location.search);
 
- const homeTeam = params.get('home') || '';
+ const hashParams = new URLSearchParams(String(window.location.hash || '').replace(/^#/, ''));
 
- const awayTeam = params.get('away') || '';
+ const homeTeam = hashParams.get('home') || queryParams.get('home') || '';
+
+ const awayTeam = hashParams.get('away') || queryParams.get('away') || '';
+
+ if (!hashParams.get('home') && homeTeam) {
+
+  try {
+
+   history.replaceState(null, '', '/analysis.html#home=' + encodeURIComponent(homeTeam) + (awayTeam ? '&away=' + encodeURIComponent(awayTeam) : ''));
+
+  } catch (e) {}
+
+ }
 
 
 

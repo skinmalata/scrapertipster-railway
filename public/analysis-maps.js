@@ -100,15 +100,18 @@
   }
 
   // Fallback URL that always resolves: the live analysis router handles
-  // ?home=&away= (or a bare ?home= for single-team cards) and shows the
+  // #home=&away= (or a bare #home= for single-team cards) and shows the
   // fixture's analysis page when one exists, or a clean "Analysis Unavailable"
-  // state otherwise.
+  // state otherwise. A fragment is used instead of a query string so crawlers
+  // see one URL (/analysis.html) rather than thousands of per-fixture
+  // ?home=... variants that Google reports as alternate pages and wastes crawl
+  // budget on.
   function fallbackLink(match, home, away) {
     var h = String(home || '').trim();
     var a = String(away || '').trim();
-    if (h && a) return '/analysis.html?home=' + encodeURIComponent(h) + '&away=' + encodeURIComponent(a);
+    if (h && a) return '/analysis.html#home=' + encodeURIComponent(h) + '&away=' + encodeURIComponent(a);
     var team = String((match && (match.match || '')) || '').trim();
-    if (team) return '/analysis.html?home=' + encodeURIComponent(team);
+    if (team) return '/analysis.html#home=' + encodeURIComponent(team);
     return '';
   }
 
