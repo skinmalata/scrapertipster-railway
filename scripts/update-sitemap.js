@@ -17,7 +17,10 @@ const SITEMAP_PATH = path.join(ROOT, 'sitemap.xml');
 const SITEMAPS_DIR = path.join(ROOT, 'sitemaps');
 const STATE_PATH = path.join(__dirname, '..', 'data', 'sitemap-lastmod.json');
 const BASE_URL = 'https://winfulltime.com';
-const ANALYSIS_SITEMAP_DAYS = 60;
+// Submit every analysis page that is actually live: the live window and the
+// sitemap window must match, otherwise days 61-90 are crawlable but invisible
+// to Googlebot's sitemap discovery.
+const { ANALYSIS_RETENTION_DAYS: ANALYSIS_SITEMAP_DAYS } = require('./lib/analysis-retention');
 
 // The protocol caps a sitemap at 50,000 URLs / 50 MB uncompressed. Shard well
 // below that so a single fast-growing tree (analysis, h2h, teams) can never

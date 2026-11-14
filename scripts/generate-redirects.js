@@ -12,6 +12,9 @@ const { execFileSync } = require('child_process');
 const ROOT = path.join(__dirname, '..', 'public');
 const BASE_URL = 'https://winfulltime.com';
 const KNOWN_404_FILE = path.join(__dirname, 'data', 'known-404-redirects.json');
+// URLs of dated analysis pages that have aged out of the live retention
+// window. Written by scripts/build-analysis.js just before it prunes them.
+const EXPIRED_ANALYSIS_FILE = path.join(__dirname, '..', 'data', 'analysis-expired.json');
 
 const STUB = (target) => `<!DOCTYPE html>
 <html lang="en">
@@ -250,6 +253,52 @@ function scanCommittedMissing() {
   return map;
 }
 
+function isRedirectStubDir(dir) {
+  return fs.existsSync(path.join(dir, '.redirect-stub'));
+}
+
+// Best permanent replacement for an expired dated analysis URL: the evergreen
+// H2H page for the same fixture (same slug), then the home team's profile, then
+// the analysis hub. H2H and team pages are re-emitted from their registries on
+// every run, so these targets do not expire.
+function analysisFallbackTarget(slug) {
+  const h2hDir = path.join(ROOT, 'h2h', slug);
+  if (fs.existsSync(path.join(h2hDir, 'index.html')) && !isRedirectStubDir(h2hDir)) {
+    return `/h2h/${slug}/`;
+  }
+  const homeSlug = String(slug).split('-vs-')[0];
+  if (homeSlug) {
+    const teamDir = path.join(ROOT, 'teams', homeSlug);
+    if (fs.existsSync(path.join(teamDir, 'index.html')) && !isRedirectStubDir(teamDir)) {
+      return `/teams/${homeSlug}/`;
+    }
+  }
+  return '/analysis.html';
+}
+
+function scanExpiredAnalysis() {
+  const map = {};
+  let rows = [];
+  try {
+    if (fs.existsSync(EXPIRED_ANALYSIS_FILE)) {
+      const parsed = JSON.parse(fs.readFileSync(EXPIRED_ANALYSIS_FILE, 'utf8'));
+      if (Array.isArray(parsed)) rows = parsed;
+    }
+  } catch (e) {
+    console.warn('[redirects] Could not load expired-analysis ledger:', e.message);
+    return map;
+  }
+  rows.forEach(function (r) {
+    const date = String((r && r.date) || '');
+    const slug = String((r && r.slug) || '');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^[\w-]+$/.test(slug)) return;
+    const dir = path.join(ROOT, 'analysis', date, slug);
+    if (fs.existsSync(path.join(dir, 'index.html')) && !isRedirectStubDir(dir)) return;
+    map[`analysis/${date}/${slug}/index.html`] = analysisFallbackTarget(slug);
+  });
+  return map;
+}
+
 function collectTargets() {
   const unified = {};
   function add(pathKey, target) {
@@ -289,6 +338,9 @@ function collectTargets() {
   }
   for (const [pathKey, target] of Object.entries(scanCommittedMissing())) {
     add(pathKey.replace(/^\//, ''), target);
+  }
+  for (const [pathKey, target] of Object.entries(scanExpiredAnalysis())) {
+    add(pathKey, target);
   }
   return unified;
 }

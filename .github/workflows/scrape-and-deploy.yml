@@ -100,7 +100,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/analysis-archive.json data/team-registry.json data/h2h-registry.json data/full-predictions.json
+          git add data/analysis-archive.json data/analysis-expired.json data/team-registry.json data/h2h-registry.json data/full-predictions.json
           if git diff --cached --quiet; then
             echo "No archive changes to commit"
           else

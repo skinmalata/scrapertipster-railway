@@ -19,6 +19,11 @@ const ANALYSIS_CACHE_FILE = path.join(process.cwd(), 'analysis-cache.json');
 const LINKS_FILE = path.join(process.cwd(), 'public', 'data', 'analysis-links.json');
 const SLUG_LINKS_FILE = path.join(process.cwd(), 'public', 'data', 'analysis-links-by-slug.json');
 const ARCHIVE_FILE = path.join(process.cwd(), 'data', 'analysis-archive.json');
+// Compact, append-only ledger of dated analysis URLs that have left the
+// retention window. The full archive row is pruned (it carries the analysis
+// payload), but the URL must be remembered so scripts/generate-redirects.js
+// can keep serving it instead of returning 404.
+const EXPIRED_FILE = path.join(process.cwd(), 'data', 'analysis-expired.json');
 const PRERENDER_DIR = path.join(process.cwd(), 'public', 'analysis');
 const TEAMS_OUTPUT_DIR = path.join(process.cwd(), 'public', 'teams');
 const H2H_OUTPUT_DIR = path.join(process.cwd(), 'public', 'h2h');
@@ -28,7 +33,7 @@ const SITE_URL = 'https://winfulltime.com';
 const AFFILIATE_URL = 'https://one-vv6198.com/betting?open=register&p=f61e';
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-const RETENTION_DAYS = 90;
+const { ANALYSIS_RETENTION_DAYS: RETENTION_DAYS } = require('./lib/analysis-retention');
 
 function validDateStr(s) {
   return DATE_RE.test(String(s || '')) ? String(s) : '';
@@ -1112,6 +1117,50 @@ function loadAnalysisArchive() {
   return { matchups: [] };
 }
 
+// Remember the URL of every analysis page that is about to be pruned. The
+// redirect generator turns these into noindex stubs so already-indexed URLs
+// never hard-404 on GitHub Pages (which cannot issue server-side redirects).
+function recordExpiredAnalysis(rows) {
+  if (!rows || !rows.length) return;
+  let ledger = [];
+  try {
+    if (fs.existsSync(EXPIRED_FILE)) {
+      const parsed = JSON.parse(fs.readFileSync(EXPIRED_FILE, 'utf8'));
+      if (Array.isArray(parsed)) ledger = parsed;
+    }
+  } catch (e) {
+    console.warn('[analysis] Failed to read expired-URL ledger:', e.message);
+  }
+  const seen = new Set(ledger.map(function (r) {
+    return r && r.date && r.slug ? r.date + '/' + r.slug : '';
+  }));
+  let added = 0;
+  rows.forEach(function (r) {
+    const date = validDateStr(r && r.date);
+    const slug = String((r && r.slug) || '');
+    if (!date || !/^[\w-]+$/.test(slug)) return;
+    const id = date + '/' + slug;
+    if (seen.has(id)) return;
+    seen.add(id);
+    ledger.push({ date: date, slug: slug });
+    added++;
+  });
+  if (!added) return;
+  ledger.sort(function (a, b) {
+    if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+    return a.slug < b.slug ? -1 : 1;
+  });
+  try {
+    fs.mkdirSync(path.dirname(EXPIRED_FILE), { recursive: true });
+    const tmp = EXPIRED_FILE + '.tmp';
+    fs.writeFileSync(tmp, JSON.stringify(ledger, null, 2));
+    fs.renameSync(tmp, EXPIRED_FILE);
+    console.log('[analysis] Recorded', added, 'expired URL(s) for redirect stubs (' + ledger.length + ' total)');
+  } catch (e) {
+    console.warn('[analysis] Failed to write expired-URL ledger:', e.message);
+  }
+}
+
 // Merge freshly analyzed fixtures into the committed archive so their pages
 // keep being re-emitted after they leave the prediction window. Keyed by
 // date + slug so stable URLs are preserved; rows older than the retention
@@ -1145,6 +1194,9 @@ function updateAnalysisArchive(archive, matchups, result) {
       analysis: analysis
     });
   });
+  recordExpiredAnalysis(archive.matchups.filter(function (r) {
+    return r && r.date && r.slug && r.date < cutoff;
+  }));
   archive.matchups = archive.matchups.filter(function (r) {
     return r && r.date && r.date >= cutoff && r.slug;
   });
