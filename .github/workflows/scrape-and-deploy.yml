@@ -65,6 +65,21 @@ jobs:
           node-version: 22
           cache: npm
 
+      # Generated archive pages are not committed (the repo would balloon), so
+      # carry them between runs. Without this, a fresh checkout only contains
+      # pages newer than the rolling results/predictions caches and every older
+      # date/league fixture URL hard-404s on the next deploy.
+      - name: Restore generated archive pages
+        uses: actions/cache@v4
+        with:
+          path: |
+            public/h2h
+            public/teams
+            public/predictions
+          key: generated-pages-${{ github.run_id }}
+          restore-keys: |
+            generated-pages-
+
       - name: Install system deps for Puppeteer
         run: |
           sudo apt-get update
