@@ -530,6 +530,7 @@ function applyLayoutToHtml(html, activePath) {
   const needsHamburger = !/getElementById\(['"]hamburger['"]\)/.test(html);
   const needsVipTab = !/vip-tab\.js/.test(html) && /id="categoryLinks"|id="categoryTabs"/.test(html);
   const needsPlayerShotsTab = !/player-shots-tab\.js/.test(html) && /id="categoryLinks"|id="categoryTabs"/.test(html);
+  const needsBuilderTabs = !/builder-tabs\.js/.test(html) && /id="categoryLinks"|id="categoryTabs"/.test(html);
   const needsAds = !/ads\.js/.test(html);
   // Only pages that will actually render a Prebid slot need the 234 KB
   // header-bidding runtime: prediction grids (client-side sponsor-banner.js),
@@ -540,13 +541,14 @@ function applyLayoutToHtml(html, activePath) {
   // The consent gate is what decides whether Google Analytics may run, so
   // every page needs it. The generated pages used to ship without it.
   const needsConsent = !/consent\.js/.test(html);
-  if (needsTheme || needsAuth || needsConfig || needsSupabase || needsHamburger || needsVipTab || needsPlayerShotsTab || needsAds || needsPrebid || needsConsent) {
+  if (needsTheme || needsAuth || needsConfig || needsSupabase || needsHamburger || needsVipTab || needsPlayerShotsTab || needsBuilderTabs || needsAds || needsPrebid || needsConsent) {
     let block = '\n';
     if (needsConfig) block += '<script src="/config.js"></script>\n';
     if (needsSupabase) block += '<script src="/supabase-client.js"></script>\n';
     if (needsAuth) block += '<script src="/auth.js?v=20261104"></script>\n';
     if (needsVipTab) block += '<script src="/vip-tab.js?v=20261027" defer></script>\n';
     if (needsPlayerShotsTab) block += '<script src="/player-shots-tab.js?v=20261018" defer></script>\n';
+    if (needsBuilderTabs) block += '<script src="/builder-tabs.js?v=20261115" defer></script>\n';
     if (needsAds) block += '<script src="/ads.js?v=20261110-seo" defer></script>\n';
     if (needsConsent) block += '<script src="/consent.js?v=3" defer></script>\n';
     if (needsPrebid) block += '<script src="/bitmedia-prebid.js?v=20261110-seo" defer></script>\n';
