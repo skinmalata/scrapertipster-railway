@@ -933,6 +933,43 @@ body > header nav .wft-auth-account:hover { color: #111827; opacity: 0.92; }
   color: var(--text-muted);
   line-height: 1.65;
 }
+.tabs-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 auto 24px;
+}
+.tabs-container .tab-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-family: inherit;
+  text-decoration: none;
+  display: inline-block;
+  line-height: 1.2;
+}
+.tabs-container .tab-btn:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+.tabs-container .tab-btn.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+  color: #111827;
+  border-color: transparent;
+  box-shadow: var(--glow);
+}
+@media (max-width: 768px) {
+  .tabs-container { gap: 6px; }
+  .tabs-container .tab-btn { padding: 10px 12px; font-size: 12px; }
+}
 </style>
 <link rel="alternate" type="application/rss+xml" title="WinFulltime Football Predictions RSS" href="/feed.xml">
 <script async src="https://news.google.com/swg/js/v1/publisher.js"></script>
@@ -979,6 +1016,28 @@ body > header nav .wft-auth-account:hover { color: #111827; opacity: 0.92; }
 </nav>
 
 <main class="container">
+  <div class="tabs-container" id="categoryLinks">
+    <a href="/predictions/1x2" id="tab-1x2" class="tab-btn">1X2</a>
+    <a href="/predictions/over-1-5" id="tab-over15" class="tab-btn">Over 1.5</a>
+    <a href="/predictions/over-2-5" id="tab-over25" class="tab-btn">Over 2.5</a>
+    <a href="/predictions/under-2-5" id="tab-under25" class="tab-btn">Under 2.5</a>
+    <a href="/predictions/ht-ft" id="tab-htft" class="tab-btn">HT/FT</a>
+    <a href="/predictions/gg2" id="tab-gg2" class="tab-btn">GG2+</a>
+    <a href="/predictions/highest-scoring-half" id="tab-highest-scoring-half" class="tab-btn">Highest Scoring Half</a>
+    <a href="/predictions/unbeaten" id="tab-unbeaten" class="tab-btn">Unbeaten</a>
+    <a href="/predictions/btts" id="tab-btts" class="tab-btn">BTTS YES</a>
+    <a href="/predictions/btts-no" id="tab-bttsno" class="tab-btn">BTTS NO</a>
+    <a href="/predictions/corners" id="tab-corners" class="tab-btn">Corners</a>
+    <a href="/predictions/cards" id="tab-cards" class="tab-btn">Cards</a>
+    <a href="/predictions/in-play" id="tab-in-play" class="tab-btn">In-Play</a>
+    <a href="/author-picks.html" id="tab-author-picks" class="tab-btn">H2H Picks</a>
+    <a href="/vip.html" id="tab-vip" class="tab-btn">Team To Score</a>
+    <a href="/player-shots.html" id="tab-player-shots" class="tab-btn">Player Shots</a>
+    <a href="/ticket-builder.html" id="tab-sportybuilder" class="tab-btn">SportyBuilder</a>
+    <a href="/betpawa-builder.html" id="tab-betpawa-builder" class="tab-btn">betPawa Builder</a>
+    <a href="/1xbet-builder.html" id="tab-1xbet-builder" class="tab-btn active">1xBet Builder</a>
+  </div>
+
   <div class="sporty-hero">
     <div class="sporty-badge">Instant 1xBet Codes</div>
     <h1>1xBet Code <span>Generator</span></h1>

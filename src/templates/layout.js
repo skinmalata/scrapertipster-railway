@@ -542,7 +542,7 @@ function applyLayoutToHtml(html, activePath) {
     if (needsAuth) block += '<script src="/auth.js?v=20261104"></script>\n';
     if (needsVipTab) block += '<script src="/vip-tab.js?v=20261027" defer></script>\n';
     if (needsPlayerShotsTab) block += '<script src="/player-shots-tab.js?v=20261018" defer></script>\n';
-    if (needsBuilderTabs) block += '<script src="/builder-tabs.js?v=20261115" defer></script>\n';
+    if (needsBuilderTabs) block += '<script src="/builder-tabs.js?v=20261115b" defer></script>\n';
     if (needsAds) block += '<script src="/ads.js?v=20261110-seo" defer></script>\n';
     if (needsConsent) block += '<script src="/consent.js?v=3" defer></script>\n';
     if (needsTheme) {

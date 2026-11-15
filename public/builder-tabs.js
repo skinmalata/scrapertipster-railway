@@ -1,12 +1,13 @@
-// builder-tabs.js - appends the SportyBuilder and betPawa Builder tabs into the
-// prediction-page tab containers (#categoryLinks on prediction pages,
-// #categoryTabs on home/best-picks), so both code builders are reachable from
-// the same market menu as the prediction tabs without hand-editing every page.
+// builder-tabs.js - appends the code-builder tabs into the prediction-page tab
+// containers (#categoryLinks on prediction pages, #categoryTabs on
+// home/best-picks), so all code builders are reachable from the same market
+// menu as the prediction tabs without hand-editing every page.
 (function () {
   'use strict';
   var TABS = [
     { id: 'tab-sportybuilder', href: '/ticket-builder.html', label: 'SportyBuilder', paths: ['/ticket-builder.html', '/ticket-builder'] },
-    { id: 'tab-betpawa-builder', href: '/betpawa-builder.html', label: 'betPawa Builder', paths: ['/betpawa-builder.html', '/betpawa-builder'] }
+    { id: 'tab-betpawa-builder', href: '/betpawa-builder.html', label: 'betPawa Builder', paths: ['/betpawa-builder.html', '/betpawa-builder'] },
+    { id: 'tab-1xbet-builder', href: '/1xbet-builder.html', label: '1xBet Builder', paths: ['/1xbet-builder.html', '/1xbet-builder'] }
   ];
   function inject() {
     var containers = document.querySelectorAll('#categoryLinks, #categoryTabs');
