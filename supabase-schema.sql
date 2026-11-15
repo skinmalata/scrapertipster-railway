@@ -307,15 +307,15 @@ INSERT INTO public.ad_positions (key, label, description, width, height, pages, 
   ('end_of_content',        'End of Content Leaderboard', 'Above the footer at the end of page content', 728, 90, 'all', 10)
 ON CONFLICT (key) DO NOTHING;
 
--- Seed the live 1win sponsored match-card creatives so the existing in-feed
+-- Seed the live 1xBet sponsored match-card creatives so the existing in-feed
 -- banner becomes admin-managed. Only runs when the position has no ads yet.
 INSERT INTO public.ad_creatives (position_key, advertiser, headline, image_url, link_url, cta_text, weight, status)
 SELECT v.position_key, v.advertiser, v.headline, v.image_url, v.link_url, v.cta_text, v.weight, 'active'
 FROM (VALUES
-  ('sponsored_match_card', '1win', 'Bet on football with 1win', '/img/banners/1win-banner-a.webp', 'https://one-vv5314.com/betting?open=register&p=f61e', 'Claim offer', 1),
-  ('sponsored_match_card', '1win', 'Bet on football with 1win', '/img/banners/1win-banner-b.webp', 'https://one-vv5314.com/betting?open=register&p=f61e', 'Claim offer', 1),
-  ('sponsored_match_card', '1win', 'Bet on football with 1win', '/img/banners/1win-banner-c.webp', 'https://one-vv5314.com/betting?open=register&p=f61e', 'Claim offer', 1),
-  ('sponsored_match_card', '1win', 'Bet on football with 1win', '/img/banners/1win-banner-d.webp', 'https://one-vv5314.com/betting?open=register&p=f61e', 'Claim offer', 1)
+  ('sponsored_match_card', '1xbet', 'Bet on football with 1xBet', '/img/banners/1xbet-leaderboard.webp', 'https://reffpa.com/L?tag=d_6034393m_97c_&site=6034393&ad=97', 'Claim offer', 1),
+  ('sponsored_match_card', '1xbet', 'Bet on football with 1xBet', '/img/banners/1xbet-leaderboard.webp', 'https://reffpa.com/L?tag=d_6034393m_97c_&site=6034393&ad=97', 'Claim offer', 1),
+  ('sponsored_match_card', '1xbet', 'Bet on football with 1xBet', '/img/banners/1xbet-leaderboard.webp', 'https://reffpa.com/L?tag=d_6034393m_97c_&site=6034393&ad=97', 'Claim offer', 1),
+  ('sponsored_match_card', '1xbet', 'Bet on football with 1xBet', '/img/banners/1xbet-leaderboard.webp', 'https://reffpa.com/L?tag=d_6034393m_97c_&site=6034393&ad=97', 'Claim offer', 1)
 ) AS v(position_key, advertiser, headline, image_url, link_url, cta_text, weight)
 WHERE NOT EXISTS (
   SELECT 1 FROM public.ad_creatives c WHERE c.position_key = 'sponsored_match_card'

@@ -40,8 +40,8 @@ const knowledge = {
     'streaks': 'Winning, Losing and Draw streak predictions track teams on sustained runs of form.'
   },
   bookmakers: {
-    featured: 'Featured bookmakers: 1xBet, 1win and Stake. Review and compare betting sites, welcome offers and payments for Nigeria, Kenya, Ghana and more at /options.html. Links on the site are affiliate links — WinFulltime may earn a commission if you sign up, at no extra cost to you. 18+.',
-    review: 'In-depth, impartial bookmaker reviews are available on the blog, e.g. /blog/1xbet-review.html and the 1win reviews for Nigeria, Kenya and India.'
+    featured: 'Featured bookmakers: 1xBet and Stake. Review and compare betting sites, welcome offers and payments for Nigeria, Kenya, Ghana and more at /options.html. Links on the site are affiliate links — WinFulltime may earn a commission if you sign up, at no extra cost to you. 18+.',
+    review: 'In-depth, impartial bookmaker reviews are available on the blog, e.g. /blog/1xbet-review.html.'
   },
   pages: {
     home: 'https://winfulltime.com',
@@ -105,8 +105,8 @@ const faq = [
   { keywords: ['accuracy', 'accurate', 'reliable', 'confidence', 'probability', 'percentage'], response: knowledge.features.accuracy },
   { keywords: ['source', 'data', 'where', 'api', 'method', 'statistical', 'analysis', 'algorithm'], response: knowledge.features.sources },
   { keywords: ['features', 'offer', 'provide', 'services', 'what can'], response: `WinFulltime offers:\n- Core markets free every day (1X2, Over/Under, BTTS) plus a 3-pick preview of the other markets\n- Match, team and head-to-head analysis (free)\n- Full pick list in every market with Pro (Corners, Cards, streaks, HT/FT, GG2+, Team-to-Score, HSH, In-Play)\n- A free Ticket Builder (up to 30 legs / 500 combined odds)\n- A free booking code converter (SportyBet, Bet9ja, MSport, Betway, Bangbet, BetKing)\n- A free SportyBet code analyzer (scores every selection and removes the risky ones)\n- Daily Best Picks & H2H Picks (3-pick preview free, full list Pro)\n- Golden in-play tips and live opportunities (Pro)\n- Team To Score record-cert tips (Pro)\n- 350+ educational blog articles\n- Betting site comparisons and reviews\n- A PWA app installable on mobile and desktop` },
-  { keywords: ['bet9ja', 'sportybet', '1xbet', 'betking', 'betway', 'melbet', '22bet', 'bet365', 'bangbet'], response: `${knowledge.bookmakers.featured}\n\nRead in-depth reviews on the blog, e.g. /blog/1xbet-review.html, /blog/1win-review-nigeria.html and /blog/best-betting-sites-nigeria.html.` },
-  { keywords: ['bookmaker', 'bookmakers', 'betting sites', 'compare', 'affiliate', 'featured', 'options', '1win', 'stake', '1x bet'], response: knowledge.bookmakers.featured },
+  { keywords: ['bet9ja', 'sportybet', '1xbet', 'betking', 'betway', 'melbet', '22bet', 'bet365', 'bangbet'], response: `${knowledge.bookmakers.featured}\n\nRead in-depth reviews on the blog, e.g. /blog/1xbet-review.html and /blog/best-betting-sites-nigeria.html.` },
+  { keywords: ['bookmaker', 'bookmakers', 'betting sites', 'compare', 'affiliate', 'featured', 'options', 'stake', '1x bet'], response: knowledge.bookmakers.featured },
   { keywords: ['what is', 'meaning', 'explain', 'define', 'definition', 'term', 'glossary'], response: 'I can explain betting terms like Asian Handicap, Expected Goals (xG), Kelly Criterion, Poisson Distribution, Value Betting, double chance, booking codes and more. Ask me about any specific term!', explainer: true },
   { keywords: ['premier league', 'epl', 'english'], response: 'Premier League predictions are available daily. Visit the homepage and filter by league, or read the guide at /blog/premier-league-betting-guide.html.' },
   { keywords: ['champions league', 'ucl', 'european cup'], response: 'Champions League predictions are available on matchdays. Visit the homepage and filter by league, or read the guide at /blog/champions-league-betting-guide.html.' },
@@ -215,7 +215,7 @@ FEATURES:
 - Match, team and head-to-head analysis
 - 350+ educational blog articles
 - PWA installable as mobile app
-- Betting site comparisons and reviews (1xBet, 1win, Stake and more) at /options.html
+- Betting site comparisons and reviews (1xBet, Stake and more) at /options.html
 - Affiliate disclosure applies: links to bookmakers are affiliate links
 
 KEY PAGES:

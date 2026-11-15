@@ -57,7 +57,7 @@ Creating a 1win account from Kenya is straightforward. We timed the process — 
 
 ### How to Sign Up on 1win Kenya
 
-1. **Go to the official 1win Kenya website** ([use this link](https://one-vv6198.com/betting?open=register&p=f61e)) using your mobile browser or desktop
+1. **Go to the official 1win Kenya website** using your mobile browser or desktop
 2. **Tap or click "Registration"** in the top-right corner
 3. **Choose your sign-up method:**
    - **Quick Registration:** Enter your phone number (use your Safaricom/Airtel number), email, and create a password
@@ -508,7 +508,7 @@ After 30 days of hands-on testing with real money, here's our conclusion:
 
 If you need instant, direct M-Pesa and prioritise Kenyan football coverage, SportPesa or Betika remain the safer, more locally-optimised choices. But for bettors who want more variety, bigger bonuses, and a modern app experience, 1win is a strong addition to your betting portfolio.
 
-**Ready to give 1win a shot?** [Sign up now](https://one-vv6198.com/betting?open=register&p=f61e) and claim your welcome bonus today.
+**Ready to try 1xBet?** [Sign up on 1xBet](https://reffpa.com/L?tag=d_6034393m_97c_&site=6034393&ad=97) and check the current welcome offer. 18+.
 
 ---
 

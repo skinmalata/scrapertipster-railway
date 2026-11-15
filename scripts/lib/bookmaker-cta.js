@@ -41,8 +41,7 @@ function isRealUrl(url) {
 // -----------------------------------------------------------------------------
 const AFFILIATE_LINKS = {
   oneXBet: 'https://reffpa.com/L?tag=d_6034393m_97c_&site=6034393&ad=97',
-  bet9ja: 'https://rt.bet9ja.click/o/z1VLdR?site_id=147581',
-  oneWin: 'https://one-vv6198.com/betting?open=register&p=f61e'
+  bet9ja: 'https://rt.bet9ja.click/o/z1VLdR?site_id=147581'
 };
 
 // CTA label shown on the red "BET ON" pill. Change freely.
@@ -56,12 +55,12 @@ const CTA_LABEL = 'BET ON';
 //          attributes so the browser reserves space before the image loads).
 const BOOKMAKERS = [
   {
-    key: 'oneWin',
-    name: '1Win',
-    logoImg: '/img/logos/1win.png',
-    logoW: 349,
+    key: 'oneXBet',
+    name: '1xBet',
+    logoImg: '/img/logos/1xbet.png',
+    logoW: 399,
     logoH: 205,
-    brandClass: 'wft-book--1win'
+    brandClass: 'wft-book--1xbet'
   }
 ];
 

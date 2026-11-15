@@ -29,7 +29,6 @@ const H2H_OUTPUT_DIR = path.join(process.cwd(), 'public', 'h2h');
 const ANALYSIS_TEMPLATE_FILE = path.join(process.cwd(), 'public', 'analysis.html');
 const PLAYER_SHOTS_FILE = path.join(process.cwd(), 'public', 'data', 'player-shots.json');
 const SITE_URL = 'https://winfulltime.com';
-const AFFILIATE_URL = 'https://one-vv6198.com/betting?open=register&p=f61e';
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const { ANALYSIS_RETENTION_DAYS: RETENTION_DAYS } = require('./lib/analysis-retention');

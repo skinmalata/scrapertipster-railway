@@ -4,8 +4,6 @@ const { buildLeagueLabelBySlug, readableLeagueLabel, formatDateChips } = require
 const { CHIPS_CSS, chipsSection, faqBlock, renderHead, collectionPageSchema, generateFaqSchema } = require('./lib/seo-blocks');
 const { renderBookmakerCTABody } = require('./lib/bookmaker-cta');
 
-const AFFILIATE_URL = 'https://one-vv6198.com/betting?open=register&p=f61e';
-
 const FAQ_SCHEMA = {
   '1x2': [
     { q: 'What does 1X2 mean in football betting?', a: '1X2 is the standard match result market. 1 means the home team wins, X means the match ends in a draw, and 2 means the away team wins. It covers the three possible outcomes after 90 minutes of regulation time including stoppage time.' },
@@ -347,7 +345,7 @@ const HIGHEST_SCORING_HALF_TAB = {
 };
 
 function generateCategoryPage(slug, catConfig, ctx) {
-  const BOOKMAKER_CTA_BODY = renderBookmakerCTABody({ excludeKeys: ['oneWin'] });
+  const BOOKMAKER_CTA_BODY = renderBookmakerCTABody();
   const allSlugs = Object.keys(CATEGORIES);
   const baseTabs = allSlugs.map(s => {
     const c = CATEGORIES[s];

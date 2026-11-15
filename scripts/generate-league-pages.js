@@ -75,8 +75,6 @@ function listDirSlugs(dir) {
   );
 }
 
-const AFFILIATE_URL = 'https://one-vv6198.com/betting?open=register&p=f61e';
-
 const MARKET_LABELS = {
   '1x2': '1X2',
   'over-1-5': 'Over 1.5',
@@ -171,7 +169,7 @@ function renderMatchCard(m, analysisUrls) {
       </div>
     </div>
     ${analysisUrl ? `<div style="text-align:center;margin-top:6px;"><a href="${analysisUrl}" class="analysis-btn" style="display:inline-flex;align-items:center;justify-content:center;min-height:44px;max-width:100%;box-sizing:border-box;padding:12px 20px;border-radius:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:700;line-height:1.2;text-align:center;text-decoration:none;">View Analysis &rarr;</a></div>` : ''}
-    ${renderBookmakerCTA({ home: homeRaw, away: awayRaw, tip: m.tip, date: dateStr, league: m.country || m.league, excludeKeys: ['oneWin'] })}
+    ${renderBookmakerCTA({ home: homeRaw, away: awayRaw, tip: m.tip, date: dateStr, league: m.country || m.league })}
   </div>`;
 }
 

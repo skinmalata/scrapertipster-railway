@@ -48,7 +48,7 @@ The registration process is one of 1win's genuine strengths. We timed it — fro
 
 ### Step-by-Step: How to Create a 1win Account in Nigeria
 
-1. **Visit the official 1win Nigeria website** ([use this link](https://one-vv6198.com/betting?open=register&p=f61e) — there are copycats out there)
+1. **Visit the official 1win Nigeria website** (there are copycats out there)
 2. **Click the green "Registration" button** in the top right corner
 3. **Choose your registration method:**
    - **Quick Registration:** Enter your phone number, email address, and create a password
@@ -478,7 +478,7 @@ After 30 days of hands-on testing, here's our conclusion:
 
 If you need OPay integration or expect instant customer support, you might want to stick with Bet9ja or Betking for now and revisit 1win as it continues to develop its Nigerian offering.
 
-**Ready to try 1win?** [Sign up here](https://one-vv6198.com/betting?open=register&p=f61e) and claim your welcome bonus.
+**Ready to try 1xBet?** [Sign up on 1xBet](https://reffpa.com/L?tag=d_6034393m_97c_&site=6034393&ad=97) and check the current welcome offer. 18+.
 
 ---
 

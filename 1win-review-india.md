@@ -49,7 +49,7 @@ Indian bettors can sign up in 90 seconds. We timed it.
 
 ### How to Create a 1win Account in India
 
-1. **Visit the official 1win India website** ([use this link](https://one-vv6198.com/betting?open=register&p=f61e) — copycats exist)
+1. **Visit the official 1win India website** (copycats exist)
 2. **Click "Registration"** in the top-right corner
 3. **Choose your method:**
    - **Quick Registration:** Enter your phone number (Indian mobile number), email address, and create a password
@@ -580,7 +580,7 @@ After 30 days of thorough testing with real money across cricket, football, and 
 
 If you prioritise raw odds above all else, 1xBet might edge ahead. If you want the fastest customer support, Betway wins. But for the overall package — bonus, app, casino, and cricket coverage — 1win is one of the top three betting platforms available to Indian bettors in 2026.
 
-**Ready to join?** [Sign up on 1win India](https://one-vv6198.com/betting?open=register&p=f61e) and claim your ₹80,400 welcome bonus now.
+**Ready to try 1xBet?** [Sign up on 1xBet](https://reffpa.com/L?tag=d_6034393m_97c_&site=6034393&ad=97) and check the current welcome offer. 18+.
 
 ---
 
