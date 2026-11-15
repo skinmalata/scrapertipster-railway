@@ -403,10 +403,11 @@ function applyLayoutToHtml(html, activePath) {
     const tag = pre + '?v=7' + post;
     return /\b(?:defer|async)\b/i.test(tag) ? tag : tag.replace(/>$/, ' defer>');
   });
-  // The header-bidding runtime is re-added below only on pages that actually
-  // render a Prebid slot, so drop any existing tag first (matrix, league, team
-  // and h2h pages used to ship it without ever using it).
-  html = html.replace(/\s*<script\b[^>]*\bsrc=["'][^"']*\/bitmedia-prebid\.js[^"']*["'][^>]*>\s*<\/script>/gi, '');
+  // Header bidding (Prebid) is disabled. Strip any previously baked runtime
+  // or slot markup so older pages cannot request the removed files.
+  html = html.replace(/\s*<script\b[^>]*\bsrc=["'][^"']*(?:\/bitmedia-prebid\.js|\/prebid-[\d.]+\.js)[^"']*["'][^>]*>\s*<\/script>/gi, '');
+  html = html.replace(/<div\b[^>]*\bdata-wft-prebid=["'][^"']*["'][^>]*>\s*<\/div>\s*/gi, '');
+  html = html.replace(/<div\b[^>]*\bid=["']classname-container-placement(?:-article)?["'][^>]*>\s*<\/div>\s*/gi, '');
   // Non-critical footer/PWA helpers do not need to block parsing.
   html = html.replace(/(<script\b[^>]*\bsrc=["'][^"']*\/(?:responsible-gambling|pwa)\.js)(\?v=[^"']*)?(["'][^>]*>)/gi, function (m, pre, query, post) {
     const tag = pre + (query || '') + post;
@@ -443,9 +444,8 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(/<\/header>/i, '</header>\n' + leaderboardSlot);
   }
 
-  // Bitmedia header bidding powers the first in-feed Prebid slot and the
-  // analysis-page unit. Drop any legacy end-of-content slot so the direct
-  // banner still runs only in the header region.
+  // Drop any legacy end-of-content slot so the direct banner still runs only
+  // in the header region.
   html = html.replace(/<div\b(?=[^>]*\bdata-ad-position=["']end_of_content["'])[^>]*>[\s\S]*?<\/div>/i, '');
 
   // 1c. Load the sticky unit only after the visitor has scrolled into the
@@ -532,16 +532,10 @@ function applyLayoutToHtml(html, activePath) {
   const needsPlayerShotsTab = !/player-shots-tab\.js/.test(html) && /id="categoryLinks"|id="categoryTabs"/.test(html);
   const needsBuilderTabs = !/builder-tabs\.js/.test(html) && /id="categoryLinks"|id="categoryTabs"/.test(html);
   const needsAds = !/ads\.js/.test(html);
-  // Only pages that will actually render a Prebid slot need the 234 KB
-  // header-bidding runtime: prediction grids (client-side sponsor-banner.js),
-  // analysis pages and blog articles (data-wft-prebid baked into the HTML).
-  const hasPrebidSlot = /data-wft-prebid/.test(html)
-    || /insertGridAds|wftSponsor|sponsor-banner\.js/.test(html);
-  const needsPrebid = hasPrebidSlot && !/bitmedia-prebid\.js/.test(html);
   // The consent gate is what decides whether Google Analytics may run, so
   // every page needs it. The generated pages used to ship without it.
   const needsConsent = !/consent\.js/.test(html);
-  if (needsTheme || needsAuth || needsConfig || needsSupabase || needsHamburger || needsVipTab || needsPlayerShotsTab || needsBuilderTabs || needsAds || needsPrebid || needsConsent) {
+  if (needsTheme || needsAuth || needsConfig || needsSupabase || needsHamburger || needsVipTab || needsPlayerShotsTab || needsBuilderTabs || needsAds || needsConsent) {
     let block = '\n';
     if (needsConfig) block += '<script src="/config.js"></script>\n';
     if (needsSupabase) block += '<script src="/supabase-client.js"></script>\n';
@@ -551,7 +545,6 @@ function applyLayoutToHtml(html, activePath) {
     if (needsBuilderTabs) block += '<script src="/builder-tabs.js?v=20261115" defer></script>\n';
     if (needsAds) block += '<script src="/ads.js?v=20261110-seo" defer></script>\n';
     if (needsConsent) block += '<script src="/consent.js?v=3" defer></script>\n';
-    if (needsPrebid) block += '<script src="/bitmedia-prebid.js?v=20261110-seo" defer></script>\n';
     if (needsTheme) {
       block += `<script>
 (function() {

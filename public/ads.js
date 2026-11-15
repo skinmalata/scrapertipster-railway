@@ -49,11 +49,6 @@
     style.id = STYLE_ID;
     style.textContent = [
       '.wft-ad-slot{display:block;width:100%;max-width:960px;margin:16px auto;padding:0 16px;box-sizing:border-box;}',
-      '.wft-ad-slot[data-wft-prebid="bitmedia"]{grid-column:1/-1;display:flex;align-items:center;justify-content:center;min-height:90px;overflow:hidden;}',
-      '@media (max-width:639px){.wft-ad-slot[data-wft-prebid="bitmedia"]{min-height:250px;}}',
-      '.matches-grid > .wft-ad-slot[data-wft-prebid="bitmedia"]{min-height:250px;}',
-      '@media (min-width:640px){.matches-grid > .wft-ad-slot[data-wft-prebid="bitmedia"]{grid-column:auto;min-height:250px;}}',
-      '.wft-ad-slot[data-wft-prebid="bitmedia"] iframe{display:block;max-width:100%;border:0;}',
       '.wft-ad-slot[data-ad-position="global_leaderboard"]{min-height:90px;}',
       '@media (max-width:639px){.wft-ad-slot[data-ad-position="global_leaderboard"]{min-height:250px;}}',
       '.wft-ad-slot[data-ad-position="sponsored_match_card"]{max-width:100%;padding:0;grid-column:1/-1;min-height:250px;}',
@@ -212,10 +207,6 @@
       el.setAttribute('data-ad-ratio', '');
       el.style.setProperty('--wft-ad-ratio', pos.w + '/' + pos.h);
     }
-
-    // The Bitmedia Prebid runtime owns this slot and handles its no-bid
-    // fallback. Do not also render a direct tag or house-ad creative here.
-    if (el.getAttribute('data-wft-prebid') === 'bitmedia') return;
 
     var bitmediaId = key === 'global_leaderboard' ? '6ae882436485fffa717939a1' :
       (key === 'sponsored_match_card' ? '6ae8887bf30577b049694c23' :

@@ -6,7 +6,6 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 const { renderBookmakerCTA } = require('./lib/bookmaker-cta');
-const { renderPrebidSlot } = require('./lib/sponsor-banner');
 
 const HTTP_TIMEOUT_MS = 10000;
 const DETAIL_CONCURRENCY = 3;
@@ -827,11 +826,6 @@ function buildContentHtml(analysis, home, away, matchup, dateStr, ctx) {
   if (formCards.length) {
     html += '<div class="analysis-section"><h3>Recent Form</h3><div class="analysis-grid">' + formCards.join('') + '</div></div>';
   }
-
-  // First in-content Bitmedia Prebid unit, after Recent Form (or after the
-  // match info when form data is unavailable), so it does not push the page
-  // heading and summary off the first screen.
-  html += renderPrebidSlot();
 
   const statCards = [];
   const homeHasStats = hasStats(analysis.homeLast10);
