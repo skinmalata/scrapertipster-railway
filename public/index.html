@@ -352,7 +352,7 @@ gtag('config', 'G-HMGZMW9EDP');
   </div>
 
 
- <div class="home-ticket-builder sporty-home-widget">
+  <div id="sportyHomeWidget" class="home-ticket-builder sporty-home-widget">
   <div class="htb-header">
     <div style="display:flex;align-items:center;gap:8px;">
       <span style="background:rgba(228,30,49,0.15);color:#ff5466;border:1px solid rgba(228,30,49,0.3);padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;">⚡ Instant</span>
@@ -360,7 +360,7 @@ gtag('config', 'G-HMGZMW9EDP');
     </div>
     <a href="/ticket-builder.html" class="htb-full-link">Full Builder &rarr;</a>
   </div>
-  <p class="htb-desc">Auto-generate verified SportyBet booking codes (2 to 50 odds) from today's top statistical models for the next 24 hours.</p>
+  <p class="htb-desc">Generate verified SportyBet booking codes (2 to 50 odds) from today's top statistical models for the next 24 hours.</p>
 
   <div class="shb-pills">
     <button type="button" class="shb-pill" data-odds="2">2.0</button>
@@ -570,6 +570,18 @@ gtag('config', 'G-HMGZMW9EDP');
   margin-right: 6px;
 }
 .shb-leg-odds { font-weight: 800; color: #4ade80; }
+
+@media (max-width: 640px) {
+  .sporty-home-widget.sporty-in-grid {
+    margin: 0;
+    max-width: none;
+    width: 100%;
+    min-width: 0;
+    padding: 16px;
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: none;
+  }
+}
 </style>
 
 <script>
@@ -577,6 +589,7 @@ gtag('config', 'G-HMGZMW9EDP');
   var selectedOdds = 3.0;
   var prevMatches = [];
   var busy = false;
+  var clickAuthorized = false;
 
   var pills = document.querySelectorAll('.shb-pill');
   var btnGen = document.getElementById('shbGenerate');
@@ -638,6 +651,8 @@ gtag('config', 'G-HMGZMW9EDP');
   }
 
   async function runSporty(shuffle) {
+    if (!clickAuthorized) return;
+    clickAuthorized = false;
     if (busy) return;
 
     if (selectedOdds >= 10.0 && !isUserPro()) {
@@ -750,8 +765,72 @@ gtag('config', 'G-HMGZMW9EDP');
     }
   };
 
-  btnGen.addEventListener('click', function() { runSporty(false); });
-  btnShuf.addEventListener('click', function() { runSporty(true); });
+  btnGen.addEventListener('click', function() { clickAuthorized = true; runSporty(false); });
+  btnShuf.addEventListener('click', function() { clickAuthorized = true; runSporty(true); });
+})();
+</script>
+
+<script>
+(function() {
+  var widget = document.getElementById('sportyHomeWidget');
+  var content = document.getElementById('content');
+  if (!widget || !content) return;
+
+  var homeParent = widget.parentNode;
+  var homeNext = widget.nextSibling;
+  var mobileQuery = window.matchMedia('(max-width: 640px)');
+  var scheduled = false;
+
+  function restore() {
+    widget.classList.remove('sporty-in-grid');
+    if (widget.parentNode !== homeParent) {
+      homeParent.insertBefore(widget, homeNext);
+    }
+  }
+
+  function isPredictionCard(node) {
+    return node.nodeType === 1 && (node.classList.contains('match-card') || node.classList.contains('match-card-link'));
+  }
+
+  function place() {
+    scheduled = false;
+    if (!mobileQuery.matches) { restore(); return; }
+
+    var grid = content.querySelector('.matches-grid');
+    if (!grid) { restore(); return; }
+
+    var cards = Array.prototype.filter.call(grid.children, isPredictionCard);
+    if (!cards.length) { restore(); return; }
+
+    var after = cards[Math.min(3, cards.length - 1)];
+    if (widget.parentNode === grid && widget.previousElementSibling === after) return;
+
+    widget.classList.add('sporty-in-grid');
+    if (after.nextSibling) {
+      grid.insertBefore(widget, after.nextSibling);
+    } else {
+      grid.appendChild(widget);
+    }
+  }
+
+  function schedule() {
+    if (scheduled) return;
+    scheduled = true;
+    if (window.requestAnimationFrame) {
+      window.requestAnimationFrame(place);
+    } else {
+      setTimeout(place, 0);
+    }
+  }
+
+  if (mobileQuery.addEventListener) {
+    mobileQuery.addEventListener('change', schedule);
+  } else if (mobileQuery.addListener) {
+    mobileQuery.addListener(schedule);
+  }
+
+  new MutationObserver(schedule).observe(content, { childList: true, subtree: true });
+  schedule();
 })();
 </script>
 
