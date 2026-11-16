@@ -352,6 +352,7 @@ gtag('config', 'G-HMGZMW9EDP');
   </div>
 
 
+  <div id="sportyHomeParking" hidden>
   <div id="sportyHomeWidget" class="home-ticket-builder sporty-home-widget">
   <div class="htb-header">
     <div style="display:flex;align-items:center;gap:8px;">
@@ -381,6 +382,7 @@ gtag('config', 'G-HMGZMW9EDP');
   </div>
 
   <div id="shbResult" class="shb-result-container"></div>
+</div>
 </div>
 
 <style>
@@ -723,20 +725,6 @@ gtag('config', 'G-HMGZMW9EDP');
   }
 
   function renderWidget(data) {
-    var legsHtml = '';
-    if (Array.isArray(data.legs)) {
-      data.legs.forEach(function(leg) {
-        legsHtml += 
-          '<div class="shb-leg">' +
-            '<div class="shb-leg-match">' + escapeHtml(leg.home) + ' vs ' + escapeHtml(leg.away) + '</div>' +
-            '<div>' +
-              '<span class="shb-leg-pick">' + escapeHtml(leg.marketLabel || leg.pick) + '</span>' +
-              '<span class="shb-leg-odds">' + (leg.odds ? leg.odds.toFixed(2) : '') + '</span>' +
-            '</div>' +
-          '</div>';
-      });
-    }
-
     resBox.innerHTML = 
       '<div class="shb-code-card">' +
         '<div class="shb-code-label">SportyBet Booking Code</div>' +
@@ -744,9 +732,8 @@ gtag('config', 'G-HMGZMW9EDP');
           '<span class="shb-code-val" id="shbCodeVal">' + escapeHtml(data.code) + '</span>' +
           '<button type="button" class="shb-copy-btn" onclick="copyShbCode()">📋 Copy</button>' +
         '</div>' +
-        '<div class="shb-meta">Total Odds: <strong>' + (data.totalOdds || 0).toFixed(2) + '</strong> &bull; Matches: <strong>' + (data.legs ? data.legs.length : 0) + '</strong></div>' +
-      '</div>' +
-      '<div class="shb-legs">' + legsHtml + '</div>';
+        '<div class="shb-meta">Total Odds: <strong>' + (data.totalOdds || 0).toFixed(2) + '</strong></div>' +
+      '</div>';
   }
 
   function escapeHtml(str) {
@@ -776,15 +763,14 @@ gtag('config', 'G-HMGZMW9EDP');
   var content = document.getElementById('content');
   if (!widget || !content) return;
 
-  var homeParent = widget.parentNode;
-  var homeNext = widget.nextSibling;
+  var parking = document.getElementById('sportyHomeParking');
   var mobileQuery = window.matchMedia('(max-width: 640px)');
   var scheduled = false;
 
   function restore() {
     widget.classList.remove('sporty-in-grid');
-    if (widget.parentNode !== homeParent) {
-      homeParent.insertBefore(widget, homeNext);
+    if (parking && widget.parentNode !== parking) {
+      parking.appendChild(widget);
     }
   }
 
