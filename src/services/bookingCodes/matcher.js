@@ -174,8 +174,27 @@ const TEAM_ALIASES = {
   'north korea': 'korea dpr',
   usa: 'united states',
   czechia: 'czech republic',
-  'ivory coast': 'cote divoire'
+  'ivory coast': 'cote divoire',
+  'dr congo': 'congo dr',
+  'democratic republic of congo': 'congo dr',
+  'democratic republic of the congo': 'congo dr',
+  'cape verde': 'cabo verde',
+  'bosnia and herzegovina': 'bosnia herzegovina',
+  macedonia: 'north macedonia',
+  kyrgyzstan: 'kyrgyz republic',
+  syria: 'syrian arab republic',
+  burma: 'myanmar',
+  'comoro islands': 'comoros',
+  'republic of the gambia': 'gambia'
 };
+
+function tokenSetMatch(nameA, nameB) {
+  if (!nameA || !nameB) return false;
+  if (nameA === nameB) return true;
+  const tA = nameA.split(' ').filter(Boolean).sort().join(' ');
+  const tB = nameB.split(' ').filter(Boolean).sort().join(' ');
+  return tA === tB;
+}
 
 function matchName(name) {
   const base = normaliseTeam(name);
@@ -187,13 +206,15 @@ function findSportyEvent(events, home, away) {
   const na = matchName(away);
   if (!nh || !na) return null;
   for (const ev of events) {
-    if (matchName(ev.home) === nh && matchName(ev.away) === na) return ev;
+    const eh = matchName(ev.home);
+    const ea = matchName(ev.away);
+    if ((eh === nh || tokenSetMatch(eh, nh)) && (ea === na || tokenSetMatch(ea, na))) return ev;
   }
   for (const ev of events) {
     const eh = matchName(ev.home);
     const ea = matchName(ev.away);
-    const hMatch = eh === nh || (nh.length > 4 && eh.includes(nh)) || (eh.length > 4 && nh.includes(eh));
-    const aMatch = ea === na || (na.length > 4 && ea.includes(na)) || (ea.length > 4 && na.includes(ea));
+    const hMatch = eh === nh || tokenSetMatch(eh, nh) || (nh.length > 4 && eh.includes(nh)) || (eh.length > 4 && nh.includes(eh));
+    const aMatch = ea === na || tokenSetMatch(ea, na) || (na.length > 4 && ea.includes(na)) || (ea.length > 4 && na.includes(ea));
     if (hMatch && aMatch) return ev;
   }
   return null;

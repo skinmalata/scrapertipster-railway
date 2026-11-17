@@ -88,10 +88,10 @@ function hasKickedOff(dateStr, timeStr) {
   return k < lagosNowString();
 }
 
-function withinNext24Hours(dateStr, timeStr) {
+function withinTargetWindow(dateStr, timeStr) {
   const k = kickoffString(dateStr, timeStr);
   if (!k) return true; // if time unknown, accept if date is today
-  return k >= lagosNowString() && k <= lagosDateTimeString(26);
+  return k >= lagosNowString() && k <= lagosDateTimeString(36);
 }
 
 function normaliseTeam(value) {
@@ -101,8 +101,51 @@ function normaliseTeam(value) {
     .replace(/\s+/g, ' ').trim();
 }
 
+const TEAM_ALIASES = {
+  taiwan: 'chinese taipei',
+  'south korea': 'korea republic',
+  iran: 'ir iran',
+  'north korea': 'korea dpr',
+  usa: 'united states',
+  czechia: 'czech republic',
+  'ivory coast': 'cote divoire',
+  'dr congo': 'congo dr',
+  'democratic republic of congo': 'congo dr',
+  'democratic republic of the congo': 'congo dr',
+  'cape verde': 'cabo verde',
+  'bosnia and herzegovina': 'bosnia herzegovina',
+  macedonia: 'north macedonia',
+  kyrgyzstan: 'kyrgyz republic',
+  syria: 'syrian arab republic',
+  burma: 'myanmar',
+  'comoro islands': 'comoros',
+  'republic of the gambia': 'gambia'
+};
+
+function tokenSetMatch(nameA, nameB) {
+  if (!nameA || !nameB) return false;
+  if (nameA === nameB) return true;
+  const tA = nameA.split(' ').filter(Boolean).sort().join(' ');
+  const tB = nameB.split(' ').filter(Boolean).sort().join(' ');
+  return tA === tB;
+}
+
+function isInvalidFixture(home, away) {
+  const h = String(home || '').toLowerCase().trim();
+  const a = String(away || '').toLowerCase().trim();
+  if (!h || !a || h === a) return true;
+  if (h === 'home' || a === 'away' || h === 'away' || a === 'home') return true;
+  if (/special|corner|cards|penalt|substitut|offside/i.test(h) || /special|corner|cards|penalt|substitut|offside/i.test(a)) return true;
+  return false;
+}
+
+function aliasTeam(name) {
+  const base = normaliseTeam(name);
+  return TEAM_ALIASES[base] || base;
+}
+
 function matchKey(home, away) {
-  return `${normaliseTeam(home)}|${normaliseTeam(away)}`;
+  return `${aliasTeam(home)}|${aliasTeam(away)}`;
 }
 
 // Load Unbeaten streak cache
@@ -161,13 +204,20 @@ function findSportyMatch(sportyByKey, home, away) {
   const directKey = matchKey(home, away);
   if (sportyByKey.has(directKey)) return sportyByKey.get(directKey);
 
-  const nh = normaliseTeam(home);
-  const na = normaliseTeam(away);
+  const nh = aliasTeam(home);
+  const na = aliasTeam(away);
   for (const [key, sm] of sportyByKey.entries()) {
-    const smh = normaliseTeam(sm.home);
-    const sma = normaliseTeam(sm.away);
-    const hMatch = smh === nh || (nh.length > 4 && smh.includes(nh)) || (smh.length > 4 && nh.includes(smh));
-    const aMatch = sma === na || (na.length > 4 && sma.includes(na)) || (sma.length > 4 && na.includes(sma));
+    const smh = aliasTeam(sm.home);
+    const sma = aliasTeam(sm.away);
+    if ((smh === nh || tokenSetMatch(smh, nh)) && (sma === na || tokenSetMatch(sma, na))) {
+      return sm;
+    }
+  }
+  for (const [key, sm] of sportyByKey.entries()) {
+    const smh = aliasTeam(sm.home);
+    const sma = aliasTeam(sm.away);
+    const hMatch = smh === nh || tokenSetMatch(smh, nh) || (nh.length > 4 && smh.includes(nh)) || (smh.length > 4 && nh.includes(smh));
+    const aMatch = sma === na || tokenSetMatch(sma, na) || (na.length > 4 && sma.includes(na)) || (sma.length > 4 && na.includes(sma));
     if (hMatch && aMatch) {
       return sm;
     }
@@ -196,8 +246,9 @@ async function buildSportyCandidatePool(options = {}) {
   const sportyByKey = new Map();
   for (const m of sportyMatches) {
     if (!m || !m.home || !m.away) continue;
+    if (isInvalidFixture(m.home, m.away)) continue;
     if (hasKickedOff(m.date, m.time)) continue;
-    if (!withinNext24Hours(m.date, m.time)) continue;
+    if (!withinTargetWindow(m.date, m.time)) continue;
 
     const key = matchKey(m.home, m.away);
     sportyByKey.set(key, m);
@@ -226,19 +277,20 @@ async function buildSportyCandidatePool(options = {}) {
   const candidates = [];
   const seenPicks = new Set();
 
-  // Safe odds window: per-leg max 1.80, min 1.08.
-  // DC selections (1X/X2) are safe even at 1.60-1.80 since they cover two outcomes.
-  // Over 1.5 and Over 2.5 have tighter windows specified per-section below.
+  const targetOddsNum = parseFloat(options.targetOdds) || 2.0;
+  const minLegOdds = 1.06;
+  const maxLegOdds = targetOddsNum >= 20 ? 2.80 : targetOddsNum >= 10 ? 2.40 : targetOddsNum >= 5 ? 2.10 : 1.80;
+
   function addCandidate(c) {
     if (!c || !c.match || !c.tip || !c.odds) return;
-    if (c.odds < 1.08 || c.odds > 1.80) return;
+    if (c.odds < minLegOdds || c.odds > maxLegOdds) return;
     const uid = `${matchKey(c.home, c.away)}|${c.category}|${c.tip}`;
     if (seenPicks.has(uid)) return;
     seenPicks.add(uid);
     candidates.push(c);
   }
 
-  // 1 & 2: Process SportyBet live fixtures for Unbeaten streaks & H2H records
+  // 1 & 2: Process SportyBet live fixtures for Unbeaten streaks, H2H records & live market odds
   for (const [key, sm] of sportyByKey.entries()) {
     const matchName = `${sm.home} - ${sm.away}`;
     const unbeaten = unbeatenMap.get(key);
@@ -328,13 +380,39 @@ async function buildSportyCandidatePool(options = {}) {
       }
     }
 
-    // 3a. Live 1X2 odds from SportyBet schedule — heavy favorites → DC for safety
+    // 3a. Live 1X2 odds directly from SportyBet schedule — favourites as straight wins & DC
     if (sm.odds) {
       const hOdds = Number(sm.odds['1']);
       const aOdds = Number(sm.odds['2']);
 
-      // Home strong favorites: DC 1X (covers win + draw)
-      if (hOdds && hOdds >= 1.25 && hOdds <= 1.65) {
+      // Solid home favourites: straight win
+      if (hOdds && hOdds >= 1.12 && hOdds <= 1.55) {
+        addCandidate({
+          match: matchName, home: sm.home, away: sm.away, league: sm.league,
+          date: sm.date, time: sm.time,
+          category: '1x2', tip: '1', odds: hOdds,
+          confidence: Math.round(Math.min(94, (1 / hOdds) * 100 + 8)),
+          qualityScore: 90 + (hOdds <= 1.35 ? 4 : 0),
+          reason: `Strong home favourite (${hOdds.toFixed(2)})`,
+          marketLabel: 'Home Win (1)'
+        });
+      }
+
+      // Solid away favourites: straight win
+      if (aOdds && aOdds >= 1.15 && aOdds <= 1.60) {
+        addCandidate({
+          match: matchName, home: sm.home, away: sm.away, league: sm.league,
+          date: sm.date, time: sm.time,
+          category: '1x2', tip: '2', odds: aOdds,
+          confidence: Math.round(Math.min(92, (1 / aOdds) * 100 + 8)),
+          qualityScore: 88 + (aOdds <= 1.35 ? 4 : 0),
+          reason: `Strong away favourite (${aOdds.toFixed(2)})`,
+          marketLabel: 'Away Win (2)'
+        });
+      }
+
+      // Home favourites: DC 1X (covers win + draw)
+      if (hOdds && hOdds >= 1.20 && hOdds <= 1.85) {
         const dcOdds = calculateDoubleChanceOdds(sm.odds, '1X');
         if (dcOdds && dcOdds >= 1.08 && dcOdds <= 1.70) {
           addCandidate({
@@ -343,13 +421,14 @@ async function buildSportyCandidatePool(options = {}) {
             category: '1x2', tip: '1X', odds: dcOdds,
             confidence: Math.round(Math.min(93, (1 / hOdds) * 100 + 15)),
             qualityScore: 86 + (hOdds <= 1.40 ? 5 : 0),
-            reason: `Strong home favorite (${hOdds.toFixed(2)}) — 1X cover`,
+            reason: `Strong home favourite (${hOdds.toFixed(2)}) — 1X cover`,
             marketLabel: 'Double Chance (1X)'
           });
         }
       }
-      // Away favorites playing against weak homes: DC X2
-      if (aOdds && aOdds >= 1.30 && aOdds <= 1.65) {
+
+      // Away favourites: DC X2 (covers win + draw)
+      if (aOdds && aOdds >= 1.25 && aOdds <= 1.85) {
         const dcOdds = calculateDoubleChanceOdds(sm.odds, 'X2');
         if (dcOdds && dcOdds >= 1.08 && dcOdds <= 1.70) {
           addCandidate({
@@ -358,10 +437,40 @@ async function buildSportyCandidatePool(options = {}) {
             category: '1x2', tip: 'X2', odds: dcOdds,
             confidence: Math.round(Math.min(91, (1 / aOdds) * 100 + 15)),
             qualityScore: 84 + (aOdds <= 1.40 ? 5 : 0),
-            reason: `Strong away favorite (${aOdds.toFixed(2)}) — X2 cover`,
+            reason: `Strong away favourite (${aOdds.toFixed(2)}) — X2 cover`,
             marketLabel: 'Double Chance (X2)'
           });
         }
+      }
+    }
+
+    // 3b. Live schedule Over 1.5 Goals
+    if (sm.goals && sm.goals.over15) {
+      const o15 = Number(sm.goals.over15);
+      if (o15 >= 1.10 && o15 <= 1.50) {
+        addCandidate({
+          match: matchName, home: sm.home, away: sm.away, league: sm.league,
+          date: sm.date, time: sm.time,
+          category: 'over15', tip: 'Over 1.5', odds: o15,
+          confidence: 80, qualityScore: 88,
+          reason: `High goal expectation (Over 1.5 @ ${o15.toFixed(2)})`,
+          marketLabel: 'Over 1.5 Goals'
+        });
+      }
+    }
+
+    // 3c. Live schedule Over 2.5 Goals
+    if (sm.goals && sm.goals.over25) {
+      const o25 = Number(sm.goals.over25);
+      if (o25 >= 1.28 && o25 <= 1.85) {
+        addCandidate({
+          match: matchName, home: sm.home, away: sm.away, league: sm.league,
+          date: sm.date, time: sm.time,
+          category: 'over25', tip: 'Over 2.5', odds: o25,
+          confidence: 76, qualityScore: 84,
+          reason: `Strong goal expectation (Over 2.5 @ ${o25.toFixed(2)})`,
+          marketLabel: 'Over 2.5 Goals'
+        });
       }
     }
   }
@@ -561,7 +670,6 @@ async function buildSportyCandidatePool(options = {}) {
 
   // 7. Higher Odds Markets (Target Odds >= 5.0 only):
   // Integrates BTTS (Both Teams to Score) and Highest Scoring Half
-  const targetOddsNum = parseFloat(options.targetOdds) || 2.0;
   if (targetOddsNum >= 5.0) {
     // 7a. BTTS (Both Teams To Score) from predictions tab
     const bttsList = predictions.bttsMatches || [];

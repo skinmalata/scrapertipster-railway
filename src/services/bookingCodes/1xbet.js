@@ -34,7 +34,9 @@ const OUTCOME_TO_SIGN = { '1': 'H', X: 'D', '2': 'A' };
 
 const INDEX_TTL_MS = 5 * 60 * 1000;
 const ODDS_TTL_MS = 3 * 60 * 1000;
-const MAX_WINDOW_HOURS = 26;
+const MAX_WINDOW_HOURS = 36;
+const LINE_PAGE_COUNT = 6;
+const LINE_PAGE_SIZE = 50;
 const ODDS_CONCURRENCY = 8;
 
 let indexCache = null;
@@ -71,8 +73,36 @@ const TEAM_ALIASES = {
   'north korea': 'korea dpr',
   usa: 'united states',
   czechia: 'czech republic',
-  'ivory coast': 'cote divoire'
+  'ivory coast': 'cote divoire',
+  'dr congo': 'congo dr',
+  'democratic republic of congo': 'congo dr',
+  'democratic republic of the congo': 'congo dr',
+  'cape verde': 'cabo verde',
+  'bosnia and herzegovina': 'bosnia herzegovina',
+  macedonia: 'north macedonia',
+  kyrgyzstan: 'kyrgyz republic',
+  syria: 'syrian arab republic',
+  burma: 'myanmar',
+  'comoro islands': 'comoros',
+  'republic of the gambia': 'gambia'
 };
+
+function tokenSetMatch(nameA, nameB) {
+  if (!nameA || !nameB) return false;
+  if (nameA === nameB) return true;
+  const tA = nameA.split(' ').filter(Boolean).sort().join(' ');
+  const tB = nameB.split(' ').filter(Boolean).sort().join(' ');
+  return tA === tB;
+}
+
+function isInvalidFixture(home, away) {
+  const h = String(home || '').toLowerCase().trim();
+  const a = String(away || '').toLowerCase().trim();
+  if (!h || !a || h === a) return true;
+  if (h === 'home' || a === 'away' || h === 'away' || a === 'home') return true;
+  if (/special|corner|cards|penalt|substitut|offside/i.test(h) || /special|corner|cards|penalt|substitut|offside/i.test(a)) return true;
+  return false;
+}
 
 function aliasTeam(name) {
   const base = normaliseTeam(name);
@@ -80,7 +110,7 @@ function aliasTeam(name) {
 }
 
 function matchKey(home, away) {
-  return normaliseTeam(home) + '|' + normaliseTeam(away);
+  return aliasTeam(home) + '|' + aliasTeam(away);
 }
 
 function splitMatchName(match) {
@@ -111,17 +141,37 @@ function startFromEvent(event) {
 
 // --- feed ---
 
-async function fetchLine() {
-  let data;
+async function fetchLinePages() {
+  const promises = [];
+  for (let p = 0; p < LINE_PAGE_COUNT; p++) {
+    const url = BASE + '/service-api/LineFeed/Get1x2_Zip?sports=1&count=' + LINE_PAGE_SIZE + '&page=' + p + '&lng=en&partner=' + PARTNER + '&mode=4';
+    promises.push(
+      getJson(url, xbetHeaders(BASE), 15000)
+        .then(function (d) { return (d && d.Success !== false && Array.isArray(d.Value)) ? d.Value : []; })
+        .catch(function () { return []; })
+    );
+  }
+  const batches = await Promise.all(promises);
+  const all = batches.flat();
+  const seen = new Set();
+  const unique = [];
+  for (const game of all) {
+    const id = Number(game && game.I);
+    if (id && seen.has(id)) continue;
+    if (id) seen.add(id);
+    unique.push(game);
+  }
+  if (unique.length) return unique;
+  // Fallback to legacy single-page URL if parallel mode=4 returned nothing
   try {
-    data = await getJson(LINE_URL, xbetHeaders(BASE), 20000);
-  } catch (err) {
-    throw upstreamError(err.message);
-  }
-  if (!data || data.Success === false || !Array.isArray(data.Value)) {
-    throw upstreamError('1xBet did not return its schedule.');
-  }
-  return data.Value;
+    const data = await getJson(LINE_URL, xbetHeaders(BASE), 20000);
+    if (data && data.Success !== false && Array.isArray(data.Value)) return data.Value;
+  } catch (err) {}
+  throw upstreamError('1xBet did not return its schedule.');
+}
+
+async function fetchLine() {
+  return fetchLinePages();
 }
 
 async function fetchOdds(gameId, force) {
@@ -156,42 +206,74 @@ async function fetchOdds(gameId, force) {
 }
 
 async function buildIndex() {
-  const games = await fetchLine();
+  const games = await fetchLinePages();
   const now = Date.now();
   const max = now + MAX_WINDOW_HOURS * 3600 * 1000;
-  const upcoming = [];
+  const events = [];
+  const needIndividualOdds = [];
   const seen = new Set();
+
   for (const game of games) {
     const gameId = Number(game && game.I);
     if (!gameId || seen.has(gameId)) continue;
+    const home = game.O1 || game.O1E || '';
+    const away = game.O2 || game.O2E || '';
+    if (!home || !away || isInvalidFixture(home, away)) continue;
+
     const start = startFromEvent(game);
     if (start && (start < now - 5 * 60 * 1000 || start > max)) continue;
     seen.add(gameId);
-    upcoming.push({
-      gameId: gameId,
-      home: game.O1 || game.O1E || '',
-      away: game.O2 || game.O2E || '',
-      league: game.L || game.LE || '',
-      startTime: start
-    });
+
+    // Fast path: mode=4 returns 1X2 odds directly inside game.E
+    const odds = { H: null, D: null, A: null };
+    for (const row of (Array.isArray(game.E) ? game.E : [])) {
+      if (!row || Number(row.G) !== 1) continue;
+      if (row.T === 1) odds.H = Number(row.C) || null;
+      else if (row.T === 2) odds.D = Number(row.C) || null;
+      else if (row.T === 3) odds.A = Number(row.C) || null;
+    }
+
+    if (odds.H || odds.A) {
+      const parsed = {
+        gameId: gameId,
+        home: home,
+        away: away,
+        league: game.L || game.LE || '',
+        startTime: start,
+        key: matchKey(home, away),
+        odds: odds
+      };
+      oddsCache.set(String(gameId), { at: Date.now(), value: parsed });
+      events.push(parsed);
+    } else {
+      needIndividualOdds.push({
+        gameId: gameId,
+        home: home,
+        away: away,
+        league: game.L || game.LE || '',
+        startTime: start
+      });
+    }
   }
 
-  const events = [];
-  for (let i = 0; i < upcoming.length; i += ODDS_CONCURRENCY) {
-    const batch = upcoming.slice(i, i + ODDS_CONCURRENCY);
-    const rows = await Promise.all(batch.map(function (g) { return fetchOdds(g.gameId, false); }));
-    for (const row of rows) {
-      if (!row || !row.home || !row.away) continue;
-      if (!row.odds.H && !row.odds.D && !row.odds.A) continue;
-      events.push({
-        gameId: row.gameId,
-        home: row.home,
-        away: row.away,
-        league: row.league,
-        startTime: row.startTime,
-        key: matchKey(row.home, row.away),
-        odds: row.odds
-      });
+  // Fetch individual odds for any game the line feed did not price inline.
+  if (needIndividualOdds.length) {
+    for (let i = 0; i < needIndividualOdds.length; i += ODDS_CONCURRENCY) {
+      const batch = needIndividualOdds.slice(i, i + ODDS_CONCURRENCY);
+      const rows = await Promise.all(batch.map(function (g) { return fetchOdds(g.gameId, false); }));
+      for (const row of rows) {
+        if (!row || !row.home || !row.away) continue;
+        if (!row.odds.H && !row.odds.D && !row.odds.A) continue;
+        events.push({
+          gameId: row.gameId,
+          home: row.home,
+          away: row.away,
+          league: row.league,
+          startTime: row.startTime,
+          key: matchKey(row.home, row.away),
+          odds: row.odds
+        });
+      }
     }
   }
 
@@ -218,14 +300,25 @@ function findEvent(events, home, away) {
   const nh = aliasTeam(home);
   const na = aliasTeam(away);
   if (!nh || !na) return null;
+
+  // 1. Exact match with aliases
   for (const ev of events) {
     if (aliasTeam(ev.home) === nh && aliasTeam(ev.away) === na) return ev;
   }
+
+  // 2. Token set match (word-order invariant, e.g. "DR Congo" vs "Congo DR")
   for (const ev of events) {
     const eh = aliasTeam(ev.home);
     const ea = aliasTeam(ev.away);
-    const hMatch = eh === nh || (nh.length > 4 && eh.includes(nh)) || (eh.length > 4 && nh.includes(eh));
-    const aMatch = ea === na || (na.length > 4 && ea.includes(na)) || (ea.length > 4 && na.includes(ea));
+    if ((eh === nh || tokenSetMatch(eh, nh)) && (ea === na || tokenSetMatch(ea, na))) return ev;
+  }
+
+  // 3. Substring / partial token match
+  for (const ev of events) {
+    const eh = aliasTeam(ev.home);
+    const ea = aliasTeam(ev.away);
+    const hMatch = eh === nh || tokenSetMatch(eh, nh) || (nh.length > 4 && eh.includes(nh)) || (eh.length > 4 && nh.includes(eh));
+    const aMatch = ea === na || tokenSetMatch(ea, na) || (na.length > 4 && ea.includes(na)) || (ea.length > 4 && na.includes(ea));
     if (hMatch && aMatch) return ev;
   }
   return null;
@@ -421,5 +514,7 @@ module.exports = {
   resolveXbetLeg,
   getXbetIndex,
   findEventByTeams,
-  normaliseTeam
+  normaliseTeam,
+  tokenSetMatch,
+  isInvalidFixture
 };

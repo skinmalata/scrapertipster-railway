@@ -120,7 +120,9 @@ const TOP_LEVEL_REDIRECTS = {
   'latest-news': '/blog/',
   'blog': '/blog/',
   'news': '/blog/',
-  'watch-live': '/predictions/in-play'
+  'watch-live': '/predictions/in-play',
+  '1xbet-builder': '/1xbet-builder.html',
+  'betpawa-builder': '/betpawa-builder.html'
 };
 
 // Nested dead URLs (dir stubs or flat files under public/).

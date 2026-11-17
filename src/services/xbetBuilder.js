@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { getAvailableMatches } = require('./bookingCodes/resolver');
-const { getXbetIndex, resolveXbetLeg, createXbetCode } = require('./bookingCodes/1xbet');
+const { getXbetIndex, resolveXbetLeg, createXbetCode, tokenSetMatch, isInvalidFixture } = require('./bookingCodes/1xbet');
 const { loadUnbeatenCacheForToday } = require('./h2hWinningStreaks');
 const { findOptimalCombination } = require('./sportyBuilder');
 
@@ -67,10 +67,10 @@ function hasKickedOff(dateStr, timeStr) {
   return k ? k < lagosNowString() : false;
 }
 
-function withinNext24Hours(dateStr, timeStr) {
+function withinTargetWindow(dateStr, timeStr) {
   const k = kickoffString(dateStr, timeStr);
   if (!k) return true;
-  return k >= lagosNowString() && k <= lagosDateTimeString(26);
+  return k >= lagosNowString() && k <= lagosDateTimeString(36);
 }
 
 function normaliseTeam(value) {
@@ -80,8 +80,34 @@ function normaliseTeam(value) {
     .replace(/\s+/g, ' ').trim();
 }
 
+const TEAM_ALIASES = {
+  taiwan: 'chinese taipei',
+  'south korea': 'korea republic',
+  iran: 'ir iran',
+  'north korea': 'korea dpr',
+  usa: 'united states',
+  czechia: 'czech republic',
+  'ivory coast': 'cote divoire',
+  'dr congo': 'congo dr',
+  'democratic republic of congo': 'congo dr',
+  'democratic republic of the congo': 'congo dr',
+  'cape verde': 'cabo verde',
+  'bosnia and herzegovina': 'bosnia herzegovina',
+  macedonia: 'north macedonia',
+  kyrgyzstan: 'kyrgyz republic',
+  syria: 'syrian arab republic',
+  burma: 'myanmar',
+  'comoro islands': 'comoros',
+  'republic of the gambia': 'gambia'
+};
+
+function aliasTeam(name) {
+  const base = normaliseTeam(name);
+  return TEAM_ALIASES[base] || base;
+}
+
 function matchKey(home, away) {
-  return normaliseTeam(home) + '|' + normaliseTeam(away);
+  return aliasTeam(home) + '|' + aliasTeam(away);
 }
 
 function loadJsonCache(fileName) {
@@ -106,13 +132,18 @@ function leagueBoost(league) {
 function findSportyMatch(sportyByKey, home, away) {
   const directKey = matchKey(home, away);
   if (sportyByKey.has(directKey)) return sportyByKey.get(directKey);
-  const nh = normaliseTeam(home);
-  const na = normaliseTeam(away);
+  const nh = aliasTeam(home);
+  const na = aliasTeam(away);
   for (const sm of sportyByKey.values()) {
-    const smh = normaliseTeam(sm.home);
-    const sma = normaliseTeam(sm.away);
-    const hMatch = smh === nh || (nh.length > 4 && smh.includes(nh)) || (smh.length > 4 && nh.includes(smh));
-    const aMatch = sma === na || (na.length > 4 && sma.includes(na)) || (sma.length > 4 && na.includes(sma));
+    const smh = aliasTeam(sm.home);
+    const sma = aliasTeam(sm.away);
+    if ((smh === nh || tokenSetMatch(smh, nh)) && (sma === na || tokenSetMatch(sma, na))) return sm;
+  }
+  for (const sm of sportyByKey.values()) {
+    const smh = aliasTeam(sm.home);
+    const sma = aliasTeam(sm.away);
+    const hMatch = smh === nh || tokenSetMatch(smh, nh) || (nh.length > 4 && smh.includes(nh)) || (smh.length > 4 && nh.includes(smh));
+    const aMatch = sma === na || tokenSetMatch(sma, na) || (na.length > 4 && sma.includes(na)) || (sma.length > 4 && na.includes(sma));
     if (hMatch && aMatch) return sm;
   }
   return null;
@@ -148,14 +179,15 @@ async function buildXbetCandidatePool(options) {
   const xbetByKey = new Map();
   for (const ev of xbetEvents) {
     if (!ev || !ev.home || !ev.away || !ev.odds) continue;
+    if (isInvalidFixture(ev.home, ev.away)) continue;
     const startMs = Number(ev.startTime);
     if (!Number.isFinite(startMs) || startMs < now - 5 * 60 * 1000) continue;
-    if (startMs > now + 26 * 3600 * 1000) continue;
+    if (startMs > now + 36 * 3600 * 1000) continue;
     xbetUpcoming.push(ev);
     xbetByKey.set(matchKey(ev.home, ev.away), ev);
   }
   if (!xbetUpcoming.length) {
-    throw new Error('Not enough upcoming matches found in the 24-hour window. Please try again shortly as more matches are priced.');
+    throw new Error('Not enough upcoming matches found in the 36-hour window. Please try again shortly as more matches are priced.');
   }
 
   let sportyMatches = [];
@@ -168,7 +200,7 @@ async function buildXbetCandidatePool(options) {
   for (const m of sportyMatches) {
     if (!m || !m.home || !m.away) continue;
     if (hasKickedOff(m.date, m.time)) continue;
-    if (!withinNext24Hours(m.date, m.time)) continue;
+    if (!withinTargetWindow(m.date, m.time)) continue;
     sportyByKey.set(matchKey(m.home, m.away), m);
   }
 
@@ -184,7 +216,8 @@ async function buildXbetCandidatePool(options) {
   const seenFixtures = new Set();
 
   const minLegOdds = 1.10;
-  const maxLegOdds = targetOdds >= 10 ? 3.20 : targetOdds >= 5 ? 2.80 : 2.40;
+  const maxLegOdds = targetOdds >= 20 ? 3.50 : targetOdds >= 10 ? 3.20 : targetOdds >= 5 ? 2.80 : 2.40;
+  const maxFavOdds = targetOdds >= 10 ? 2.35 : targetOdds >= 5 ? 2.15 : 2.00;
 
   function addCandidate(c) {
     if (!c || !c.match || !c.tip || !c.odds) return;
@@ -194,6 +227,13 @@ async function buildXbetCandidatePool(options) {
     if (seenPicks.has(uid)) return;
     seenPicks.add(uid);
     seenFixtures.add(matchKey(c.home, c.away));
+
+    // Tag whether match is present on SportyBet
+    const sm = findSportyMatch(sportyByKey, c.home, c.away);
+    c.inSporty = Boolean(sm);
+    if (c.inSporty) {
+      c.qualityScore = (c.qualityScore || 80) + 6;
+    }
     candidates.push(c);
   }
 
@@ -326,7 +366,8 @@ async function buildXbetCandidatePool(options) {
       tip = '2'; odds = o2;
     }
     if (!tip || !odds) continue;
-    addXbetCandidate(ev, tip, Math.min(90, (1 / odds) * 100 + 8), Math.round(Math.min(88, (1 / odds) * 100 + 10)), 66,
+    if (odds > maxFavOdds) continue;
+    addXbetCandidate(ev, tip, Math.min(90, (1 / odds) * 100 + 8), Math.round(Math.min(88, (1 / odds) * 100 + 10)), 68,
       '1xBet favourite at ' + odds.toFixed(2));
   }
 
@@ -343,7 +384,7 @@ async function generateXbetTicket(options) {
   const allCandidates = await buildXbetCandidatePool({ targetOdds: targetOdds });
 
   if (allCandidates.length < 2) {
-    throw new Error('Not enough upcoming matches found in the 24-hour window. Please try again shortly as more matches are priced.');
+    throw new Error('Not enough upcoming matches found in the 36-hour window. Please try again shortly as more matches are priced.');
   }
 
   let candidates = allCandidates;
@@ -362,7 +403,7 @@ async function generateXbetTicket(options) {
   }
 
   if (candidates.length < 2) {
-    throw new Error('Not enough upcoming matches found in the 24-hour window. Please try again shortly as more matches are priced.');
+    throw new Error('Not enough upcoming matches found in the 36-hour window. Please try again shortly as more matches are priced.');
   }
 
   let attempts = 0;
@@ -383,9 +424,16 @@ async function generateXbetTicket(options) {
         return a === nh || a === na || nm.includes(a) || (a.length > 4 && (nh.includes(a) || na.includes(a)));
       });
     });
-    const pool = usable.length >= 2 ? usable : candidates;
+
+    // To guarantee that generated 1xBet codes can be converted to SportyBet,
+    // strongly prefer candidates verified to exist on SportyBet.
+    const sportyPool = usable.filter(function (c) { return c.inSporty; });
+    const pool = (sportyPool.length >= 4) ? sportyPool : (usable.length >= 2 ? usable : candidates);
 
     chosenLegs = findOptimalCombination(pool, targetOdds, { avoidMatches: rejectedLegs });
+    if ((!chosenLegs || chosenLegs.length < 2) && pool !== usable && usable.length >= 2) {
+      chosenLegs = findOptimalCombination(usable, targetOdds, { avoidMatches: rejectedLegs });
+    }
     if ((!chosenLegs || chosenLegs.length < 2) && candidates !== allCandidates) {
       chosenLegs = findOptimalCombination(allCandidates, targetOdds, { avoidMatches: rejectedLegs });
     }

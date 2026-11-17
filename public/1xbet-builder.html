@@ -1463,6 +1463,17 @@ body > header nav .wft-auth-account:hover { color: #111827; opacity: 0.92; }
     var origGenHtml = btnGen.innerHTML;
     btnGen.innerHTML = '<span class="spinner"></span><span>Building 1xBet Code...</span>';
 
+    var loadTimer1 = setTimeout(function() {
+      if (isGenerating && btnGen) {
+        btnGen.innerHTML = '<span class="spinner"></span><span>Verifying 1X2 odds...</span>';
+      }
+    }, 1500);
+    var loadTimer2 = setTimeout(function() {
+      if (isGenerating && btnGen) {
+        btnGen.innerHTML = '<span class="spinner"></span><span>Matching SportyBet lines...</span>';
+      }
+    }, 3500);
+
     try {
       var data;
       if (window.WFT && typeof window.WFT.apiFetch === 'function') {
@@ -1519,6 +1530,8 @@ body > header nav .wft-auth-account:hover { color: #111827; opacity: 0.92; }
         alert('Failed to generate ticket: ' + err.message + '. Please try again.');
       }
     } finally {
+      clearTimeout(loadTimer1);
+      clearTimeout(loadTimer2);
       isGenerating = false;
       btnGen.disabled = false;
       btnShuffle.disabled = false;
@@ -1619,7 +1632,7 @@ body > header nav .wft-auth-account:hover { color: #111827; opacity: 0.92; }
     if (!code || code === '------' || code === 'N/A') return;
 
     btnConvertSporty.disabled = true;
-    btnConvertSporty.textContent = 'Converting...';
+    btnConvertSporty.innerHTML = '<span class="spinner" style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;vertical-align:middle;"></span><span>Converting to SportyBet...</span>';
     sportyResult.hidden = true;
     convertError.hidden = true;
 
