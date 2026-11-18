@@ -11,8 +11,8 @@ const knowledge = {
   },
   plans: {
     free: 'There is a Free plan ($0, forever). Free members get the full daily picks in the core markets (1X2, Over 1.5/2.5, Under 2.5, BTTS), a 3-pick preview of the other markets each day, live scores, match analysis and daily match results and form stats. Create it free at /signup.html — no payment needed.',
-    proMonthly: 'Pro Monthly is $20/month. It unlocks the full daily pick list in every other market (Corners, Cards, HT/FT, GG2+, streaks, Team-to-Score, Highest Scoring Half and In-Play tips), complete Daily Best Picks & H2H Picks, golden in-play tips and live opportunities, full win/loss/draw streak analysis, Team To Score record-cert tips, and priority support.',
-    proYearly: 'Pro Yearly is $100/year (save 58%). It includes everything in Pro Monthly.',
+    proMonthly: 'Pro Monthly is $40/month. It unlocks the full daily pick list in every other market (Corners, Cards, HT/FT, GG2+, streaks, Team-to-Score, Highest Scoring Half and In-Play tips), complete Daily Best Picks & H2H Picks, golden in-play tips and live opportunities, full win/loss/draw streak analysis, Team To Score record-cert tips, and priority support.',
+    proYearly: 'Pro Yearly is $200/year (save 58%). It includes everything in Pro Monthly.',
     billing: 'Payments are processed securely through Whop. Subscriptions auto-renew unless cancelled. You can upgrade or downgrade at any time (changes apply from the next billing cycle). All plans come with a 7-day money-back guarantee. See /pricing.html.'
   },
   features: {
@@ -77,7 +77,7 @@ const knowledge = {
 };
 
 const faq = [
-  { keywords: ['free', 'cost', 'price', 'pricing', 'pay', 'payment', 'vip', 'plan', 'plans', 'how much', 'subscribe', 'billing', 'membership', 'pro monthly', 'pro yearly', 'pro'], response: `WinFulltime is freemium:\n\n- Free plan: $0 forever — full daily picks in the core markets (1X2, Over 1.5/2.5, Under 2.5, BTTS), a 3-pick preview of the other markets each day, live scores, match analysis and daily results.\n- Pro Monthly: $20/month — the full daily pick list in every market (Corners, Cards, HT/FT, GG2+, streaks, Team-to-Score, Highest Scoring Half, In-Play), complete Best Picks & H2H Picks, Team To Score record-cert tips, priority support.\n- Pro Yearly: $100/year (save 58%).\n\nPayments go through Whop, subscriptions auto-renew unless cancelled, and all plans have a 7-day money-back guarantee.\n\n${knowledge.pages.pricing}` },
+  { keywords: ['free', 'cost', 'price', 'pricing', 'pay', 'payment', 'vip', 'plan', 'plans', 'how much', 'subscribe', 'billing', 'membership', 'pro monthly', 'pro yearly', 'pro'], response: `WinFulltime is freemium:\n\n- Free plan: $0 forever — full daily picks in the core markets (1X2, Over 1.5/2.5, Under 2.5, BTTS), a 3-pick preview of the other markets each day, live scores, match analysis and daily results.\n- Pro Monthly: $40/month — the full daily pick list in every market (Corners, Cards, HT/FT, GG2+, streaks, Team-to-Score, Highest Scoring Half, In-Play), complete Best Picks & H2H Picks, Team To Score record-cert tips, priority support.\n- Pro Yearly: $200/year (save 58%).\n\nPayments go through Whop, subscriptions auto-renew unless cancelled, and all plans have a 7-day money-back guarantee.\n\n${knowledge.pages.pricing}` },
   { keywords: ['refund', 'money back', 'guarantee', 'cancel', 'unsubscribe', 'cancel subscription', 'switch plans', 'upgrade', 'downgrade', 'subscription', 'renew'], response: knowledge.plans.billing },
   { keywords: ['whop', 'checkout', 'payment method', 'payments', 'payment', 'payments work', 'how do payments', 'card payment', 'paystack', 'flutterwave'], response: 'Payments are processed securely through Whop. Subscriptions auto-renew unless cancelled, changes apply from the next billing cycle, and a 7-day money-back guarantee covers all plans. See /pricing.html for details.' },
   { keywords: ['contact', 'email', 'reach', 'message', 'support', 'help'], response: `Contact: ${knowledge.business.email} or visit ${knowledge.pages.contact}` },
@@ -195,8 +195,8 @@ SITE OVERVIEW:
 
 PLANS:
 - Free: $0 forever — full daily picks in the core markets (1X2, Over 1.5/2.5, Under 2.5, BTTS), a 3-pick preview of the other markets each day, live scores, match analysis and daily match results and form stats
-- Pro Monthly: $20/month — full daily pick list in every market (Corners, Cards, HT/FT, GG2+, streaks, Team-to-Score, Highest Scoring Half, In-Play tips), complete Daily Best Picks & H2H Picks, Team To Score record-cert tips, priority support
-- Pro Yearly: $100/year (save 58%)
+- Pro Monthly: $40/month — full daily pick list in every market (Corners, Cards, HT/FT, GG2+, streaks, Team-to-Score, Highest Scoring Half, In-Play tips), complete Daily Best Picks & H2H Picks, Team To Score record-cert tips, priority support
+- Pro Yearly: $200/year (save 58%)
 - Payments via Whop, auto-renew unless cancelled, upgrade/downgrade anytime, 7-day money-back guarantee. See /pricing.html
 
 PREDICTION MARKETS:

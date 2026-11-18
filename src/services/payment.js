@@ -11,8 +11,8 @@ var VARIANT_IDS = {
 };
 
 var PLANS = {
-  monthly: { name: 'Pro Monthly', price: '20', variantId: '1960067', interval: 'monthly' },
-  yearly: { name: 'Pro Yearly', price: '100', variantId: '1960068', interval: 'annually' }
+  monthly: { name: 'Pro Monthly', price: '40', variantId: '1960067', interval: 'monthly' },
+  yearly: { name: 'Pro Yearly', price: '200', variantId: '1960068', interval: 'annually' }
 };
 
 function lsHeaders() {

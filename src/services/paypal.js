@@ -18,8 +18,8 @@ var PAYPAL_WEBHOOK_ID = process.env.PAYPAL_WEBHOOK_ID;
 var welcomeEmail = require('./welcomeEmail');
 
 var PLANS = {
-  monthly: { name: 'Pro Monthly', price: '20', interval: 'monthly' },
-  yearly: { name: 'Pro Yearly', price: '100', interval: 'yearly' }
+  monthly: { name: 'Pro Monthly', price: '40', interval: 'monthly' },
+  yearly: { name: 'Pro Yearly', price: '200', interval: 'yearly' }
 };
 
 var supabase = null;

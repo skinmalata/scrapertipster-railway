@@ -8,8 +8,8 @@
 // be claimed for a more expensive plan than the one that was paid for.
 
 var PLAN_PRICES = {
-  monthly: 20,
-  yearly: 100
+  monthly: 40,
+  yearly: 200
 };
 
 var CURRENCY = 'USD';
