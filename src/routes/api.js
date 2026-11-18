@@ -1965,6 +1965,9 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
   }
 });
 
+// Free tier code builders generate up to 3.0 odds; higher targets require Pro.
+var FREE_CODE_BUILDER_MAX_ODDS = 3.0;
+
 // POST /api/sportybuilder/generate — SportyBuilder: auto SportyBet code for 2–50 odds
 router.post('/sportybuilder/generate', optionalAuth, async function (req, res) {
   try {
@@ -1972,12 +1975,12 @@ router.post('/sportybuilder/generate', optionalAuth, async function (req, res) {
     var targetOdds = Math.min(50.0, Math.max(2.0, parseFloat(body.targetOdds) || 3.0));
     var avoidMatches = Array.isArray(body.avoidMatches) ? body.avoidMatches.slice(0, 20) : [];
 
-    // Gating: Only Pro / VIP members can select 10 odds and above
+    // Gating: Only Pro / VIP members can select more than 3 odds
     var isPro = await resolveIsPro(req);
-    if (targetOdds >= 10.0 && !isPro) {
+    if (targetOdds > FREE_CODE_BUILDER_MAX_ODDS && !isPro) {
       return res.status(403).json({
         success: false,
-        error: 'Selecting 10 odds and above is an exclusive Pro feature. Upgrade to Pro to unlock 10x, 20x, and 50x tickets.',
+        error: 'Selecting more than 3 odds is an exclusive Pro feature. Upgrade to Pro to unlock 5x, 10x, 20x, and 50x tickets.',
         code: 'PRO_REQUIRED',
         isPro: false,
         upgradeUrl: '/pricing.html'
@@ -2002,12 +2005,12 @@ router.post('/betpawabuilder/generate', optionalAuth, async function (req, res) 
     var targetOdds = Math.min(50.0, Math.max(2.0, parseFloat(body.targetOdds) || 3.0));
     var avoidMatches = Array.isArray(body.avoidMatches) ? body.avoidMatches.slice(0, 20) : [];
 
-    // Same Pro gate as SportyBuilder: 10 odds and above needs a Pro account.
+    // Same Pro gate as SportyBuilder: more than 3 odds needs a Pro account.
     var isPro = await resolveIsPro(req);
-    if (targetOdds >= 10.0 && !isPro) {
+    if (targetOdds > FREE_CODE_BUILDER_MAX_ODDS && !isPro) {
       return res.status(403).json({
         success: false,
-        error: 'Selecting 10 odds and above is an exclusive Pro feature. Upgrade to Pro to unlock 10x, 20x, and 50x tickets.',
+        error: 'Selecting more than 3 odds is an exclusive Pro feature. Upgrade to Pro to unlock 5x, 10x, 20x, and 50x tickets.',
         code: 'PRO_REQUIRED',
         isPro: false,
         upgradeUrl: '/pricing.html'
@@ -2033,10 +2036,10 @@ router.post('/xbetbuilder/generate', optionalAuth, async function (req, res) {
     var avoidMatches = Array.isArray(body.avoidMatches) ? body.avoidMatches.slice(0, 20) : [];
 
     var isPro = await resolveIsPro(req);
-    if (targetOdds >= 10.0 && !isPro) {
+    if (targetOdds > FREE_CODE_BUILDER_MAX_ODDS && !isPro) {
       return res.status(403).json({
         success: false,
-        error: 'Selecting 10 odds and above is an exclusive Pro feature. Upgrade to Pro to unlock 10x, 20x, and 50x tickets.',
+        error: 'Selecting more than 3 odds is an exclusive Pro feature. Upgrade to Pro to unlock 5x, 10x, 20x, and 50x tickets.',
         code: 'PRO_REQUIRED',
         isPro: false,
         upgradeUrl: '/pricing.html'

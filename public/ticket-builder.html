@@ -5,18 +5,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SportyBuilder — Free AI SportyBet Code Generator | WinFulltime</title>
-<meta name="description" content="Generate instant, real SportyBet booking codes for 2 to 10 odds from today's highest confidence football predictions, unbeaten streaks, and H2H records.">
+<meta name="description" content="Generate instant, real SportyBet booking codes for 2 to 50 odds from today's highest confidence football predictions, unbeaten streaks, and H2H records. Free users can generate up to 3 odds.">
 <meta name="keywords" content="sportybet code generator, sportybuilder, sportybet booking code, sportybet accumulator, football accumulator tips, bet builder, daily football predictions, h2h picks, sportybet tips">
 
 <meta property="og:title" content="SportyBuilder — Free SportyBet Code Generator | WinFulltime">
 <meta property="og:url" content="https://winfulltime.com/ticket-builder.html">
-<meta property="og:description" content="Generate verified SportyBet booking codes instantly from today's top picks. Pick your odds target (2–10 odds) and get an optimized ticket in seconds.">
+<meta property="og:description" content="Generate verified SportyBet booking codes instantly from today's top picks. Pick your odds target (2–50 odds) and get an optimized ticket in seconds.">
 <meta property="og:image" content="https://winfulltime.com/winfulltimelogo.png">
 <meta property="og:type" content="website">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="SportyBuilder — Free SportyBet Code Generator | WinFulltime">
-<meta name="twitter:description" content="Generate verified SportyBet booking codes instantly from today's top picks. Pick your odds target (2–10 odds) and get an optimized ticket in seconds.">
+<meta name="twitter:description" content="Generate verified SportyBet booking codes instantly from today's top picks. Pick your odds target (2–50 odds) and get an optimized ticket in seconds.">
 <meta name="twitter:image" content="https://winfulltime.com/winfulltimelogo.png">
 
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
@@ -47,7 +47,7 @@
   "isAccessibleForFree": true,
   "featureList": [
     "Automatic SportyBet booking code generation",
-    "2 to 10 odds targeting with high-confidence selections",
+    "2 to 50 odds targeting with high-confidence selections (free up to 3 odds)",
     "Today's verified upcoming fixtures only (next 24 hours)",
     "Unbeaten streaks, Over 1.5, Over 2.5, and 1X2 market pooling",
     "Dynamic variation engine for varied multi-ticket generation"
@@ -113,7 +113,7 @@
       "name": "What odds range does SportyBuilder support?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "SportyBuilder supports from 2.0 up to 50.0 odds. Standard odds up to 9.5 are available to all users for free, while 10.0 to 50.0 odds (with advanced markets like BTTS, Highest Scoring Half, DNB, and Corners) are exclusive to WinFulltime Pro members."
+        "text": "SportyBuilder supports from 2.0 up to 50.0 odds. Odds up to 3.0 are available to all users for free, while above 3 odds (5.0, 10.0, 20.0 and 50.0, with advanced markets like BTTS, Highest Scoring Half, DNB, and Corners) are exclusive to WinFulltime Pro members."
       }
     },
     {
@@ -121,7 +121,7 @@
       "name": "Is SportyBuilder completely free?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes, SportyBuilder is free for standard odds (up to 9.5 odds) with no sign-up or subscription required. Accumulators for 10 odds and above (10x, 20x, 50x) are unlocked exclusively with a WinFulltime Pro membership."
+        "text": "Yes, SportyBuilder is free for odds up to 3.0 with no sign-up or subscription required. Accumulators above 3 odds (5x, 10x, 20x, 50x) are unlocked exclusively with a WinFulltime Pro membership."
       }
     }
   ]
@@ -885,7 +885,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
     <div class="odds-pills">
       <button type="button" class="odds-pill" data-odds="2">2.0 Odds</button>
       <button type="button" class="odds-pill active" data-odds="3">3.0 Odds</button>
-      <button type="button" class="odds-pill" data-odds="5">5.0 Odds</button>
+      <button type="button" class="odds-pill pro-pill" data-odds="5">5.0 Odds <span class="pill-pro-tag">PRO</span></button>
       <button type="button" class="odds-pill pro-pill" data-odds="10">10.0 Odds <span class="pill-pro-tag">PRO</span></button>
       <button type="button" class="odds-pill pro-pill" data-odds="20">20.0 Odds <span class="pill-pro-tag">PRO</span></button>
       <button type="button" class="odds-pill pro-pill" data-odds="50">50.0 Odds <span class="pill-pro-tag">PRO</span></button>
@@ -897,13 +897,13 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
       <div class="slider-value"><span id="oddsValueDisplay">3.0</span>x</div>
     </div>
 
-    <!-- Pro Upgrade Banner (shown when non-Pro selects 10+ odds) -->
+    <!-- Pro Upgrade Banner (shown when non-Pro selects above 3 odds) -->
     <div id="proUpgradeBanner" class="pro-upgrade-card" style="display:none;">
       <div class="pro-upgrade-top">
         <span class="pro-upgrade-badge">👑 PRO EXCLUSIVE</span>
-        <span class="pro-upgrade-title">10+ Odds Accumulators</span>
+        <span class="pro-upgrade-title">Above 3 Odds Accumulators</span>
       </div>
-      <p class="pro-upgrade-desc">Selecting 10 odds and above (10x, 20x, and 50x) with advanced markets like BTTS, Highest Scoring Half, DNB &amp; Corners is reserved for WinFulltime Pro members.</p>
+      <p class="pro-upgrade-desc">Selecting more than 3 odds (5x, 10x, 20x, and 50x) with advanced markets like BTTS, Highest Scoring Half, DNB &amp; Corners is reserved for WinFulltime Pro members.</p>
       <div class="pro-upgrade-actions">
         <a href="/pricing.html" class="pro-upgrade-btn">⭐ Upgrade to Pro</a>
         <button type="button" class="pro-upgrade-dismiss" id="btnDismissProBanner">Dismiss</button>
@@ -956,7 +956,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
       </details>
       <details class="faq-item">
         <summary>What odds range can I generate?</summary>
-        <p>SportyBuilder generates accumulator tickets from 2.0 up to 50.0 odds. Standard odds up to 9.5 are available to all users for free, while selecting 10 odds and above (10.0, 20.0, and 50.0 odds) is an exclusive WinFulltime Pro feature unlocking expanded markets including BTTS, Highest Scoring Half, DNB, and Corners.</p>
+        <p>SportyBuilder generates accumulator tickets from 2.0 up to 50.0 odds. Odds up to 3.0 are available to all users for free, while selecting above 3 odds (5.0, 10.0, 20.0, and 50.0) is an exclusive WinFulltime Pro feature unlocking expanded markets including BTTS, Highest Scoring Half, DNB, and Corners.</p>
       </details>
       <details class="faq-item">
         <summary>Will I get the same matches every time I generate?</summary>
@@ -1105,11 +1105,11 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
     var requested = parseFloat(val) || 3.0;
     var pro = isUserPro();
 
-    if (requested >= 10.0 && !pro) {
+    if (requested > 3.0 && !pro) {
       showProBanner();
-      val = 5.0; // fallback safe allowed odds
+      val = 3.0; // fallback safe allowed odds
     } else {
-      var maxAllowed = pro ? 50.0 : 9.5;
+      var maxAllowed = pro ? 50.0 : 3.0;
       val = Math.min(maxAllowed, Math.max(2.0, requested));
     }
 
@@ -1131,9 +1131,9 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   pills.forEach(function(pill) {
     pill.addEventListener('click', function() {
       var o = parseFloat(this.getAttribute('data-odds'));
-      if (o >= 10.0 && !isUserPro()) {
+      if (o > 3.0 && !isUserPro()) {
         showProBanner();
-        return; // Non-pro members cannot select 10 odds and above
+        return; // Non-pro members cannot select more than 3 odds
       }
       hideProBanner();
       setOdds(o);
@@ -1142,9 +1142,9 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   slider.addEventListener('input', function() {
     var val = parseFloat(this.value);
-    if (val >= 10.0 && !isUserPro()) {
-      val = 9.5;
-      this.value = 9.5;
+    if (val > 3.0 && !isUserPro()) {
+      val = 3.0;
+      this.value = 3.0;
       showProBanner();
     } else {
       hideProBanner();
@@ -1164,14 +1164,14 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
     var pro = isUserPro();
     pills.forEach(function(p) {
       var o = parseFloat(p.getAttribute('data-odds')) || 0;
-      if (o >= 10.0) {
+      if (o > 3.0) {
         var tag = p.querySelector('.pill-pro-tag');
         if (pro) {
           if (tag) tag.style.opacity = '0.35';
           p.title = 'Pro feature unlocked';
         } else {
           if (tag) tag.style.opacity = '1';
-          p.title = 'WinFulltime Pro feature (10+ odds)';
+          p.title = 'WinFulltime Pro feature (above 3 odds)';
         }
       }
     });
@@ -1189,7 +1189,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   async function generateTicket(shuffle) {
     if (isGenerating) return;
 
-    if (currentOdds >= 10.0 && !isUserPro()) {
+    if (currentOdds > 3.0 && !isUserPro()) {
       showProBanner();
       return;
     }
