@@ -491,6 +491,32 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(/<\/head>/i, '<script async src="https://news.google.com/swg/js/v1/publisher.js"></script>\n</head>');
   }
 
+  // 2c-alt. Canonical alternates (query-string variants and extensionless
+  // copies) are not distinct pages. Mark them noindex so Search Console stops
+  // listing them as "Alternate page with proper canonical tag".
+  if (!/data-wft-alt-noindex/.test(html)) {
+    html = html.replace(/<\/head>/i, `<script data-wft-alt-noindex>
+(function () {
+  var p = location.pathname;
+  var q = location.search;
+  var alt = (q && (/^\\/(?:analysis|converter)\\.html$/.test(p) || p === '/')) ||
+    p === '/index.html' || p === '/predictions/in-play.html' ||
+    /^\\/(?:ticket-builder|privacy|contact|terms)$/.test(p) ||
+    /^\\/blog\\/[^/.]+$/.test(p);
+  if (!alt) return;
+  var robots = document.querySelector('meta[name="robots"]');
+  if (!robots) {
+    robots = document.createElement('meta');
+    robots.name = 'robots';
+    document.head.appendChild(robots);
+  }
+  robots.setAttribute('content', 'noindex,follow');
+  var canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical) canonical.remove();
+})();
+</script>\n</head>`);
+  }
+
   // 2d. The consent banner is styled by its own stylesheet. The generated
   //     pages load the gate but never linked the sheet, so the banner
   //     appeared unstyled there.
