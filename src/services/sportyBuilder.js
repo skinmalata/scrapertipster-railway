@@ -233,19 +233,28 @@ function findSportyMatch(sportyByKey, home, away) {
  * 4. Website Over 1.5 Goals (Strictly from the website's Over 1.5 tab/page)
  * 5. Website Over 2.5 Goals (Strictly from the website's Over 2.5 tab/page with high confidence)
  * 6. Winning streaks / form (Double Chance 1X / X2)
+ * 7. Basketball moneyline (1X2) and points Over/Under — only short-price,
+ *    high-implied-probability selections are admitted to the pool.
  */
 async function buildSportyCandidatePool(options = {}) {
   const today = options.date || watDate();
-  const sportyMatches = await getAvailableMatches();
+  const [footballMatches, basketballMatches] = await Promise.all([
+    getAvailableMatches('football'),
+    getAvailableMatches('basketball')
+  ]);
+  const sportyMatches = footballMatches.concat(basketballMatches);
 
   if (!Array.isArray(sportyMatches) || !sportyMatches.length) {
     throw new Error('SportyBet schedule is currently unavailable. Please check back in a few moments.');
   }
 
-  // Index SportyBet matches by normalized match key
+  // Index SportyBet football matches by normalized match key. Basketball is
+  // handled separately below (its teams and markets must not be cross-matched
+  // with football predictions or website H2H/streak caches).
   const sportyByKey = new Map();
   for (const m of sportyMatches) {
     if (!m || !m.home || !m.away) continue;
+    if ((m.sport || 'football') !== 'football') continue;
     if (isInvalidFixture(m.home, m.away)) continue;
     if (hasKickedOff(m.date, m.time)) continue;
     if (!withinTargetWindow(m.date, m.time)) continue;
@@ -816,6 +825,83 @@ async function buildSportyCandidatePool(options = {}) {
     }
   }
 
+  // 8. Basketball — moneyline (1X2) and points Over/Under. Basketball has no
+  // draw, so only the two moneyline sides are offered. Short prices are the
+  // strongest signal available: 1.06-1.30 implies roughly 77-94% probability.
+  // The exact Sportradar selection ids are carried through so the booking code
+  // is minted on the very same line the tip was scored against.
+  const BASKETBALL_MAX_ODDS = 1.30;
+  const basketballPool = basketballMatches.filter(function (m) {
+    return m && m.home && m.away && !isInvalidFixture(m.home, m.away) &&
+      !hasKickedOff(m.date, m.time) && withinTargetWindow(m.date, m.time);
+  });
+  for (const sm of basketballPool) {
+    const matchName = `${sm.home} - ${sm.away}`;
+    const ml = sm.moneyline || {};
+    const sides = [
+      { key: 'home', tip: '1', label: 'Home', price: ml.home },
+      { key: 'away', tip: '2', label: 'Away', price: ml.away }
+    ];
+
+    // Only back a clear favourite: a short price on both sides would mean a
+    // pick'em game, which is exactly what a high-confidence ticket must avoid.
+    for (const side of sides) {
+      const price = side.price && Number(side.price.odds);
+      if (!price || price < minLegOdds || price > BASKETBALL_MAX_ODDS) continue;
+      const rival = sides.find(function (s) { return s !== side; });
+      const rivalOdds = rival && rival.price && Number(rival.price.odds);
+      if (rivalOdds && rivalOdds < 2.40) continue;
+      addCandidate({
+        match: matchName, home: sm.home, away: sm.away, league: sm.league || 'Basketball',
+        date: sm.date, time: sm.time,
+        sport: 'basketball',
+        category: '1x2', tip: side.tip,
+        odds: price,
+        selection: {
+          marketId: side.price.marketId || ml.marketId || '219',
+          outcomeId: side.price.outcomeId,
+          specifier: null
+        },
+        confidence: Math.min(88, Math.round(100 / price)),
+        qualityScore: 97,
+        reason: `Basketball moneyline favourite (${price.toFixed(2)} — ${Math.round(100 / price)}% implied probability)`,
+        marketLabel: `Basketball Moneyline (${side.label})`
+      });
+    }
+
+    // Points totals: deliberately extreme lines carry a very high hit rate
+    // (e.g. Over 190.5 at 1.10). Keep only the three strongest per fixture.
+    const qualifyingLines = [];
+    for (const [total, line] of Object.entries(sm.totals || {})) {
+      for (const side of ['over', 'under']) {
+        const row = line && line[side];
+        const price = row && Number(row.odds);
+        if (!price || price < minLegOdds || price > BASKETBALL_MAX_ODDS) continue;
+        qualifyingLines.push({ total: total, side: side, price: price, row: row });
+      }
+    }
+    qualifyingLines.sort(function (a, b) { return a.price - b.price; });
+    for (const line of qualifyingLines.slice(0, 3)) {
+      const label = line.side === 'over' ? 'Over' : 'Under';
+      addCandidate({
+        match: matchName, home: sm.home, away: sm.away, league: sm.league || 'Basketball',
+        date: sm.date, time: sm.time,
+        sport: 'basketball',
+        category: 'basketball-total', tip: `${label} ${line.total}`, total: line.total,
+        odds: line.price,
+        selection: {
+          marketId: line.row.marketId,
+          outcomeId: line.row.outcomeId,
+          specifier: line.row.specifier || `total=${line.total}`
+        },
+        confidence: Math.min(90, Math.round(100 / line.price)),
+        qualityScore: 96,
+        reason: `Basketball ${label.toLowerCase()} ${line.total} points (${line.price.toFixed(2)} — ${Math.round(100 / line.price)}% implied probability)`,
+        marketLabel: `${label} ${line.total} Points`
+      });
+    }
+  }
+
   return candidates;
 }
 
@@ -824,6 +910,9 @@ async function buildSportyCandidatePool(options = {}) {
  * Supports avoidMatches and stochastic sampling so multiple generations give varied tickets!
  */
 function findOptimalCombination(candidates, targetOdds, options = {}) {
+  // SportyBuilder asks for at least one basketball leg whenever the pool has
+  // one; other builders leave this off and keep their football-only behaviour.
+  const requireBasketball = options.requireBasketball === true && candidates.some(function (c) { return c.sport === 'basketball'; });
   const avoidList = (options.avoidMatches || []).map(normaliseTeam).filter(Boolean);
   const isAvoided = (c) => {
     if (!avoidList.length) return false;
@@ -875,16 +964,17 @@ function findOptimalCombination(candidates, targetOdds, options = {}) {
   let iterations = 0;
   const MAX_ITER = 40000;
 
-  function backtrack(startIdx, currentLegs, currentOdds) {
+  function backtrack(startIdx, currentLegs, currentOdds, hasBasketball) {
     if (iterations++ > MAX_ITER) return;
 
     if (currentLegs.length >= minLegs) {
       const diff = Math.abs(currentOdds - targetOdds);
-      if (diff < minDiffAnywhere) {
+      const sportOk = !requireBasketball || hasBasketball;
+      if (sportOk && diff < minDiffAnywhere) {
         minDiffAnywhere = diff;
         closestAnywhere = currentLegs.slice();
       }
-      if (currentOdds >= minAcceptable && currentOdds <= maxAcceptable) {
+      if (sportOk && currentOdds >= minAcceptable && currentOdds <= maxAcceptable) {
         if (diff < minDiff) {
           minDiff = diff;
           bestCombo = currentLegs.slice();
@@ -902,29 +992,38 @@ function findOptimalCombination(candidates, targetOdds, options = {}) {
       if (nextOdds > Math.max(maxAcceptable * 1.25, targetOdds * 1.35)) continue;
 
       currentLegs.push(pick);
-      backtrack(i + 1, currentLegs, nextOdds);
+      backtrack(i + 1, currentLegs, nextOdds, hasBasketball || pick.sport === 'basketball');
       currentLegs.pop();
     }
   }
 
-  backtrack(0, [], 1.0);
+  backtrack(0, [], 1.0, false);
 
   // If backtracking didn't find within tight tolerance, greedy approach geared towards selection
   if (!bestCombo || bestCombo.length < 2) {
     let accum = 1.0;
     const greedy = [];
+    if (requireBasketball) {
+      const firstBasketball = uniquePerFixture.find(function (c) { return c.sport === 'basketball'; });
+      if (firstBasketball) {
+        greedy.push(firstBasketball);
+        accum *= firstBasketball.odds;
+      }
+    }
     for (const c of uniquePerFixture) {
       if (greedy.length >= maxLegs) break;
+      if (greedy.indexOf(c) !== -1) continue;
       if (accum * c.odds <= targetOdds * 1.18) {
         greedy.push(c);
         accum *= c.odds;
-        if (accum >= targetOdds * 0.85) {
-          bestCombo = greedy;
+        if (accum >= targetOdds * 0.85 && (!requireBasketball || greedy.some(function (l) { return l.sport === 'basketball'; }))) {
+          bestCombo = greedy.slice();
           break;
         }
       }
     }
-    if (greedy.length >= 2 && (!bestCombo || bestCombo.length < 2)) {
+    if (greedy.length >= 2 && (!bestCombo || bestCombo.length < 2) &&
+        (!requireBasketball || greedy.some(function (l) { return l.sport === 'basketball'; }))) {
       bestCombo = greedy;
     }
   }
@@ -937,7 +1036,12 @@ function findOptimalCombination(candidates, targetOdds, options = {}) {
   // Fallback: take top 2 to 3 available matches geared towards selection
   if (!bestCombo || bestCombo.length < 2) {
     if (uniquePerFixture.length >= 2) {
-      bestCombo = uniquePerFixture.slice(0, Math.min(uniquePerFixture.length, targetOdds > 5 ? 4 : 2));
+      let pool = uniquePerFixture;
+      if (requireBasketball) {
+        const firstBasketball = pool.find(function (c) { return c.sport === 'basketball'; });
+        if (firstBasketball) pool = [firstBasketball].concat(pool.filter(function (c) { return c !== firstBasketball; }));
+      }
+      bestCombo = pool.slice(0, Math.min(pool.length, targetOdds > 5 ? 4 : 2));
     }
   }
 
@@ -959,6 +1063,7 @@ async function generateSportyTicket(options = {}) {
   if (allCandidates.length < 2) {
     throw new Error('Not enough upcoming matches found in the 24-hour window. Please try again shortly as more matches are priced.');
   }
+  const hasBasketball = allCandidates.some(function (c) { return c.sport === 'basketball'; });
 
   // For shuffle: build a "fresh" pool that excludes previously selected matches.
   // Only fall back to full pool if the fresh pool is too small to build a ticket.
@@ -992,14 +1097,23 @@ async function generateSportyTicket(options = {}) {
 
   while (attempts < 5 && !codeResult) {
     attempts++;
+    // Keep a basketball leg in the ticket while basketball picks are available.
+    // Only the final recovery attempt may drop it if SportyBet rejects those legs.
+    const requireBasketball = hasBasketball && attempts < 5;
     // Pass empty avoidMatches — we already pre-filtered the pool above for shuffle.
     // rejectedLegs accumulates any legs SportyBet API rejects across retries.
-    chosenLegs = findOptimalCombination(candidates, targetOdds, { avoidMatches: rejectedLegs });
+    chosenLegs = findOptimalCombination(candidates, targetOdds, {
+      avoidMatches: rejectedLegs,
+      requireBasketball: requireBasketball
+    });
 
     if (!chosenLegs || chosenLegs.length < 2) {
       // If the fresh pool failed, retry with full pool as last resort
       if (candidates !== allCandidates) {
-        chosenLegs = findOptimalCombination(allCandidates, targetOdds, { avoidMatches: rejectedLegs });
+        chosenLegs = findOptimalCombination(allCandidates, targetOdds, {
+          avoidMatches: rejectedLegs,
+          requireBasketball: requireBasketball
+        });
       }
     }
 
@@ -1009,7 +1123,10 @@ async function generateSportyTicket(options = {}) {
       match: l.match,
       tip: l.tip,
       category: l.category,
-      odds: l.odds
+      odds: l.odds,
+      sport: l.sport || 'football',
+      total: l.total || null,
+      selection: l.selection || null
     }));
 
     try {
@@ -1046,7 +1163,8 @@ async function generateSportyTicket(options = {}) {
       match: l.match,
       home: l.home,
       away: l.away,
-      league: l.league || 'Football',
+      league: l.league || (l.sport === 'basketball' ? 'Basketball' : 'Football'),
+      sport: l.sport || 'football',
       date: l.date,
       time: l.time || 'Today',
       category: l.category,

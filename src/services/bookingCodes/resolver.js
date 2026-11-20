@@ -25,21 +25,37 @@
 // clear error.
 //
 // getAvailableMatches() additionally surfaces the Over/Under prices collected from
-// each league's marketId=18 page (m.goals) and a compact H2H streak summary
-// (m.h2h) derived from the same h2hstats feed the rest of the site uses, so the
-// schedule fallback can check head-to-head form before choosing a pick.
+// each league's marketId=18 page (m.goals / m.totals) and a compact H2H streak
+// summary (m.h2h) derived from the same h2hstats feed the rest of the site uses,
+// so the schedule fallback can check head-to-head form before choosing a pick.
+//
+// Basketball uses a different Sportradar market layout: the moneyline is
+// marketId=219 (outcomeId 4 = home, 5 = away) and points totals are marketId=18
+// (main line) plus marketId=225 (alternate lines). Its detail pages are read for
+// the strongest Over/Under prices, which SportyBuilder turns into high-confidence
+// legs with the exact market/outcome ids needed to mint a real code.
 
 const cheerio = require('cheerio');
 const { sportradarHeaders, getJson } = require('./http');
 const { fetchTodayStreaks, normaliseName } = require('../h2hWinningStreaks');
 
-const SPORTY_LEAGUE_LIST = 'https://www.sportybet.com/ng/lite/condition/league?timeId=1&sportId=sr:sport:1';
-// Each league page is fetched twice per refresh: once for the 1X2 market
-// (marketId=1, the outcome prices) and once for Over/Under (marketId=18) so
-// the schedule fallback can build Over 1.5/2.5 legs straight from real odds.
-const SPORTY_LEAGUE_EVENTS_1X2 = 'https://www.sportybet.com/ng/lite/events?sportId=sr:sport:1&timeId=1&marketId=1&tournamentId=';
-const SPORTY_LEAGUE_EVENTS_OU = 'https://www.sportybet.com/ng/lite/events?sportId=sr:sport:1&timeId=1&marketId=18&tournamentId=';
-const SPORTY_DETAIL = 'https://www.sportybet.com/ng/lite/preMatch/detail?sportId=sr:sport:1&productId=3&marketGroupsName=Main&eventId=';
+const SPORTS = {
+  football: {
+    leagueList: 'https://www.sportybet.com/ng/lite/condition/league?timeId=1&sportId=sr:sport:1',
+    eventsMain: 'https://www.sportybet.com/ng/lite/events?sportId=sr:sport:1&timeId=1&marketId=1&tournamentId=',
+    eventsOu: 'https://www.sportybet.com/ng/lite/events?sportId=sr:sport:1&timeId=1&marketId=18&tournamentId=',
+    detail: 'https://www.sportybet.com/ng/lite/preMatch/detail?sportId=sr:sport:1&productId=3&marketGroupsName=Main&eventId='
+  },
+  basketball: {
+    leagueList: 'https://www.sportybet.com/ng/lite/condition/league?timeId=1&sportId=sr:sport:2',
+    // Basketball has no marketId=1 feed; the bare events page carries the
+    // moneyline (marketId=219) prices.
+    eventsMain: 'https://www.sportybet.com/ng/lite/events?sportId=sr:sport:2&timeId=1&tournamentId=',
+    eventsOu: 'https://www.sportybet.com/ng/lite/events?sportId=sr:sport:2&timeId=1&marketId=18&tournamentId=',
+    detail: 'https://www.sportybet.com/ng/lite/preMatch/detail?sportId=sr:sport:2&productId=3&marketGroupsName=Main&eventId='
+  }
+};
+const SPORT_NAMES = ['football', 'basketball'];
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const CACHE_MAX = 400;
@@ -56,13 +72,18 @@ const LEAGUE_REFRESH_MS = 20 * 60 * 1000;
 const OU_REFRESH_MS = 60 * 60 * 1000;
 const LEAGUE_CONCURRENCY = 16;
 const NEAR_DAYS = 3;
+// Basketball alternate totals only need a bounded slice of the upcoming fixtures:
+// reading detail pages for every league would double a cold-index build for legs
+// that are far outside the builder's 36-hour window anyway.
+const BASKETBALL_DETAIL_LIMIT = 60;
+const BASKETBALL_DETAIL_CONCURRENCY = 10;
 
 let eventIndexCache = null;
 let eventIndexAt = 0;
-let leagueListCache = null;
-let leagueListAt = 0;
-let goalsCache = null;
-let goalsAt = 0;
+const leagueListCache = {};
+const leagueListAt = {};
+const goalsCache = {};
+const goalsAt = {};
 let indexBuildPromise = null;
 const detailCache = new Map();
 const resolutionCache = new Map();
@@ -153,10 +174,14 @@ function dayToDate(day) {
   return ymd.slice(0, 4) + '-' + ymd.slice(4, 6) + '-' + ymd.slice(6, 8);
 }
 
-const OUTCOME_SIGN = { '1': '1', '2': 'X', '3': '2' };
+const FOOTBALL_OUTCOME_SIGN = { '1': '1', '2': 'X', '3': '2' };
+// Basketball moneyline (marketId=219): 4 = home, 5 = away. Some basketball
+// feeds still expose the generic 1/2 ids, so accept those as a fallback.
+const BASKETBALL_OUTCOME_SIGN = { '4': '1', '5': '2', '1': '1', '3': '2' };
 
-function parseEventIndex(html) {
+function parseEventIndex(html, sport) {
   const $ = cheerio.load(html);
+  const outcomeSign = sport === 'basketball' ? BASKETBALL_OUTCOME_SIGN : FOOTBALL_OUTCOME_SIGN;
   const events = [];
   $('.m-event-list-item').each(function () {
     const league = $(this).find('.m-item-title').first().text().trim();
@@ -178,7 +203,7 @@ function parseEventIndex(html) {
         const h = $(this).attr('href') || '';
         const mOut = /outcomeId=(\d+)/.exec(h);
         const mOdds = /odds=([0-9.]+)/.exec(h);
-        const sign = OUTCOME_SIGN[mOut && mOut[1]];
+        const sign = outcomeSign[mOut && mOut[1]];
         if (sign && mOdds) odds[sign] = Number(mOdds[1]);
       });
       events.push({
@@ -188,7 +213,8 @@ function parseEventIndex(html) {
         time: time,
         date: currentDay,
         league: league,
-        odds: odds
+        odds: odds,
+        sport: sport
       });
     });
   });
@@ -196,19 +222,17 @@ function parseEventIndex(html) {
 }
 
 // The Over/Under league page (marketId=18) lists the same .m-event rows as the
-// 1X2 page, but its outcome links carry Over/Under totals. We only keep the Over
-// prices for 1.5 and 2.5 totals, which the schedule fallback uses for its
-// Over-goal legs.
-function parseGoalMarkets(html) {
+// main market page, but its outcome links carry total lines. Football keeps the
+// 1.5/2.5 goal prices (m.goals); basketball keeps every points line with its
+// exact market/outcome ids (m.totals) so a tip can be minted without guessing.
+function parseTotalsMarkets(html) {
   const $ = cheerio.load(html);
-  const goals = {};
+  const totals = {};
   $('.m-event').each(function () {
     const node = $(this);
     const href = node.find('.m-event-left').first().attr('href') || '';
     const m = /eventId=(sr:match:\d+)/.exec(href);
     if (!m) return;
-    let over15 = 0;
-    let over25 = 0;
     node.find('.m-outcome').each(function () {
       const h = $(this).attr('href') || '';
       const mMarket = /marketId=(\d+)/.exec(h);
@@ -216,18 +240,22 @@ function parseGoalMarkets(html) {
       const mSpec = /specifier=total%3D([0-9.]+)/.exec(h);
       const mOdds = /odds=([0-9.]+)/.exec(h);
       if (!(mMarket && mOut && mSpec && mOdds)) return;
-      if (mMarket[1] !== '18' || mOut[1] !== '12') return; // 12 = Over
-      const total = Number(mSpec[1]);
-      const odd = Number(mOdds[1]);
-      if (total === 1.5 && odd > 1) over15 = odd;
-      else if (total === 2.5 && odd > 1) over25 = odd;
+      const outcomeId = mOut[1];
+      if (outcomeId !== '12' && outcomeId !== '13') return; // 12 = Over, 13 = Under
+      const total = mSpec[1];
+      const odds = Number(mOdds[1]);
+      if (!(odds > 1)) return;
+      const specifier = 'total=' + total;
+      totals[m[1]] = totals[m[1]] || {};
+      totals[m[1]][total] = totals[m[1]][total] || {};
+      const row = { marketId: mMarket[1], outcomeId: outcomeId, specifier: specifier, odds: odds };
+      const key = outcomeId === '12' ? 'over' : 'under';
+      const existing = totals[m[1]][total][key];
+      // The main market (18) is the one priced on the schedule page.
+      if (!existing || existing.marketId !== '18') totals[m[1]][total][key] = row;
     });
-    const g = {};
-    if (over15 > 1) g.over15 = over15;
-    if (over25 > 1) g.over25 = over25;
-    if (g.over15 || g.over25) goals[m[1]] = g;
   });
-  return goals;
+  return totals;
 }
 
 async function getEventIndex() {
@@ -251,59 +279,128 @@ async function getEventIndex() {
 }
 
 async function buildEventIndex() {
-  const leagues = await getLeagueList();
-  const needGoals = !goalsCache || Date.now() - goalsAt >= OU_REFRESH_MS;
-  let newGoals = {};
   const all = [];
-  let done = 0;
-  let failed = 0;
-  const workers = [];
-  for (let w = 0; w < LEAGUE_CONCURRENCY; w++) {
-    workers.push((async function () {
-      for (let i = w; i < leagues.length; i += LEAGUE_CONCURRENCY) {
-        const league = leagues[i];
-        try {
-          const html = await getJson(SPORTY_LEAGUE_EVENTS_1X2 + encodeURIComponent(league.tid), sportradarHeaders('https://www.sportybet.com'), 20000);
-          const parsed = parseEventIndex(html);
-          if (needGoals) {
-            try {
-              const ouHtml = await getJson(SPORTY_LEAGUE_EVENTS_OU + encodeURIComponent(league.tid), sportradarHeaders('https://www.sportybet.com'), 20000);
-              const goalsMap = parseGoalMarkets(ouHtml);
-              for (const k in goalsMap) newGoals[k] = goalsMap[k];
-            } catch (e) {
-              // Missing Over/Under feed just means no Over-goal legs for this league.
+  for (const sport of SPORT_NAMES) {
+    const config = SPORTS[sport];
+    const leagues = await getLeagueList(sport);
+    const needTotals = !goalsCache[sport] || Date.now() - goalsAt[sport] >= OU_REFRESH_MS;
+    const newTotals = {};
+    let done = 0;
+    let failed = 0;
+    const workers = [];
+    for (let w = 0; w < LEAGUE_CONCURRENCY; w++) {
+      workers.push((async function () {
+        for (let i = w; i < leagues.length; i += LEAGUE_CONCURRENCY) {
+          const league = leagues[i];
+          try {
+            const html = await getJson(config.eventsMain + encodeURIComponent(league.tid), sportradarHeaders('https://www.sportybet.com'), 20000);
+            const parsed = parseEventIndex(html, sport);
+            if (needTotals) {
+              try {
+                const ouHtml = await getJson(config.eventsOu + encodeURIComponent(league.tid), sportradarHeaders('https://www.sportybet.com'), 20000);
+                const totalsMap = parseTotalsMarkets(ouHtml);
+                for (const k in totalsMap) newTotals[k] = totalsMap[k];
+              } catch (e) {
+                // Missing Over/Under feed just means no totals legs for this league.
+              }
             }
+            for (let k = 0; k < parsed.length; k++) all.push(parsed[k]);
+          } catch (e) {
+            failed++;
           }
-          for (let k = 0; k < parsed.length; k++) all.push(parsed[k]);
-        } catch (e) {
-          failed++;
+          done++;
         }
-        done++;
+      })());
+    }
+    await Promise.all(workers);
+    if (done && failed === done) {
+      // A single sport being down must not wipe out the other sport's schedule.
+      continue;
+    }
+    if (needTotals) {
+      goalsCache[sport] = newTotals;
+      goalsAt[sport] = Date.now();
+    }
+    for (let k = 0; k < all.length; k++) {
+      const ev = all[k];
+      if (ev.sport !== sport) continue;
+      const totals = goalsCache[sport] && goalsCache[sport][ev.eventId];
+      if (!totals) continue;
+      if (sport === 'basketball') {
+        ev.totals = totals;
+      } else {
+        const g = {};
+        if (totals['1.5'] && totals['1.5'].over) g.over15 = totals['1.5'].over.odds;
+        if (totals['2.5'] && totals['2.5'].over) g.over25 = totals['2.5'].over.odds;
+        if (g.over15 || g.over25) ev.goals = g;
       }
-    })());
+    }
   }
-  await Promise.all(workers);
-  if (done && failed === done) {
-    const err = new Error('Could not load the bookmaker schedule, so the code was not created.');
-    err.code = 'NETWORK_ERROR';
-    throw err;
+
+  const upcomingBasketball = all
+    .filter(function (e) { return e.sport === 'basketball'; })
+    .map(function (e) {
+      const prices = [e.odds && e.odds['1'], e.odds && e.odds['2']].filter(function (v) { return Number(v) > 1; });
+      e.bestOdds = prices.length ? Math.min.apply(null, prices) : 99;
+      return e;
+    })
+    .sort(function (a, b) {
+      // Spend the detail-page budget on the clearest moneyline favourites first;
+      // those are the fixtures most likely to yield a high-confidence tip.
+      if (a.bestOdds !== b.bestOdds) return a.bestOdds - b.bestOdds;
+      return String(a.date + ' ' + a.time).localeCompare(String(b.date + ' ' + b.time));
+    })
+    .slice(0, BASKETBALL_DETAIL_LIMIT);
+  if (upcomingBasketball.length) {
+    const marketsAt = {};
+    const workers = [];
+    for (let w = 0; w < BASKETBALL_DETAIL_CONCURRENCY; w++) {
+      workers.push((async function () {
+        for (let i = w; i < upcomingBasketball.length; i += BASKETBALL_DETAIL_CONCURRENCY) {
+          const ev = upcomingBasketball[i];
+          try {
+            const markets = await getEventMarkets(ev.eventId, 'basketball');
+            marketsAt[ev.eventId] = markets;
+          } catch (e) {
+            // The schedule moneyline/totals are still usable without the detail page.
+          }
+        }
+      })());
+    }
+    await Promise.all(workers);
+    for (let k = 0; k < all.length; k++) {
+      const ev = all[k];
+      if (ev.sport !== 'basketball') continue;
+      const markets = marketsAt[ev.eventId];
+      if (markets && markets.moneyline) ev.moneyline = markets.moneyline;
+      if (markets && markets.overUnder) {
+        ev.totals = Object.assign({}, ev.totals || {});
+        for (const key in markets.overUnder) {
+          // The detail parser keys lines as "total=164.5"; the schedule parser
+          // uses "164.5". Normalise so SportyBuilder can label and resolve both
+          // with the same plain numeric total.
+          const numeric = key.indexOf('total=') === 0 ? key.slice(6) : key;
+          ev.totals[numeric] = markets.overUnder[key];
+        }
+      }
+      if (!ev.moneyline && ev.odds) {
+        ev.moneyline = {
+          marketId: '219',
+          home: ev.odds['1'] ? { marketId: '219', outcomeId: '4', odds: ev.odds['1'], specifier: null } : null,
+          away: ev.odds['2'] ? { marketId: '219', outcomeId: '5', odds: ev.odds['2'], specifier: null } : null
+        };
+      }
+    }
   }
-  if (needGoals) {
-    goalsCache = newGoals;
-    goalsAt = Date.now();
-  }
-  for (let k = 0; k < all.length; k++) {
-    const g = goalsCache && goalsCache[all[k].eventId];
-    if (g) all[k].goals = g;
-  }
+
   eventIndexCache = filterNearTerm(all);
   eventIndexAt = Date.now();
   return eventIndexCache;
 }
 
-async function getLeagueList() {
-  if (leagueListCache && Date.now() - leagueListAt < LEAGUE_LIST_TTL_MS) return leagueListCache;
-  const html = await getJson(SPORTY_LEAGUE_LIST, sportradarHeaders('https://www.sportybet.com'), 20000);
+async function getLeagueList(sport) {
+  if (leagueListCache[sport] && Date.now() - leagueListAt[sport] < LEAGUE_LIST_TTL_MS) return leagueListCache[sport];
+  const html = await getJson(SPORTS[sport].leagueList, sportradarHeaders('https://www.sportybet.com'), 20000);
   const $ = cheerio.load(html);
   const leagues = [];
   const seen = new Set();
@@ -320,8 +417,8 @@ async function getLeagueList() {
     err.code = 'NETWORK_ERROR';
     throw err;
   }
-  leagueListCache = leagues;
-  leagueListAt = Date.now();
+  leagueListCache[sport] = leagues;
+  leagueListAt[sport] = Date.now();
   return leagues;
 }
 
@@ -342,11 +439,13 @@ function filterNearTerm(events) {
   });
 }
 
-function findEvent(events, home, away) {
+function findEvent(events, home, away, sport) {
   const nh = normaliseTeam(home);
   const na = normaliseTeam(away);
+  const wanted = sport || 'football';
   for (let i = 0; i < events.length; i++) {
     const ev = events[i];
+    if ((ev.sport || 'football') !== wanted) continue;
     if (normaliseTeam(ev.home) === nh && normaliseTeam(ev.away) === na) return ev;
   }
   return null;
@@ -354,9 +453,10 @@ function findEvent(events, home, away) {
 
 // --- SportyBet event detail page (extra markets, used for Over/Under) ---
 
-function parseEventMarkets(html) {
+function parseEventMarkets(html, sport) {
   const $ = cheerio.load(html);
   const overUnder = {};
+  const moneyline = {};
   const doubleChance = {};
   const btts = {};
   const highestScoringHalf = {};
@@ -364,22 +464,44 @@ function parseEventMarkets(html) {
 
   $('.m-market-item').each(function () {
     const title = $(this).find('.m-market-item-title').first().text().trim().toLowerCase();
-    if (title === 'over/under') {
+    if (title.indexOf('over/under') === 0) {
       $(this).find('a.m-outcome').each(function () {
         const href = $(this).attr('href') || '';
         const mMarket = /marketId=(\d+)/.exec(href);
         const mOut = /outcomeId=(\d+)/.exec(href);
         const mSpec = /specifier=total%3D([0-9.]+)/.exec(href);
+        const mOdds = /odds=([0-9.]+)/.exec(href);
         if (!mMarket || !mOut || !mSpec) return;
         const total = mSpec[1];
         const isOver = mOut[1] === '12'; // 12 = Over, 13 = Under
         const specifier = 'total=' + total;
         overUnder[specifier] = overUnder[specifier] || {};
-        overUnder[specifier][isOver ? 'over' : 'under'] = {
+        const row = {
           marketId: mMarket[1],
           outcomeId: mOut[1],
-          specifier: specifier
+          specifier: specifier,
+          odds: mOdds ? Number(mOdds[1]) : null
         };
+        const key = isOver ? 'over' : 'under';
+        const existing = overUnder[specifier][key];
+        // Prefer the main market (18) over alternate totals markets (e.g. 225).
+        if (!existing || (existing.marketId !== '18' && row.marketId === '18')) {
+          overUnder[specifier][key] = row;
+        }
+      });
+      return;
+    }
+    if (sport === 'basketball' && title.indexOf('winner') === 0) {
+      $(this).find('a.m-outcome').each(function () {
+        const href = $(this).attr('href') || '';
+        const mMarket = /marketId=(\d+)/.exec(href);
+        const mOut = /outcomeId=(\d+)/.exec(href);
+        const mOdds = /odds=([0-9.]+)/.exec(href);
+        if (!(mMarket && mOut && mOdds)) return;
+        const side = mOut[1] === '4' ? 'home' : (mOut[1] === '5' ? 'away' : null);
+        if (!side) return;
+        moneyline.marketId = mMarket[1];
+        moneyline[side] = { marketId: mMarket[1], outcomeId: mOut[1], odds: Number(mOdds[1]), specifier: null };
       });
       return;
     }
@@ -445,7 +567,7 @@ function parseEventMarkets(html) {
       return;
     }
   });
-  return { overUnder, doubleChance, btts, highestScoringHalf, drawNoBet };
+  return { overUnder, moneyline, doubleChance, btts, highestScoringHalf, drawNoBet };
 }
 
 function doubleChanceSign(desc) {
@@ -456,11 +578,12 @@ function doubleChanceSign(desc) {
   return null;
 }
 
-async function getEventMarkets(eventId) {
+async function getEventMarkets(eventId, sport) {
   const cached = cacheGet(detailCache, eventId);
   if (cached) return cached;
-  const html = await getJson(SPORTY_DETAIL + encodeURIComponent(eventId), sportradarHeaders('https://www.sportybet.com'), 20000);
-  const markets = parseEventMarkets(html);
+  const config = SPORTS[sport] || SPORTS.football;
+  const html = await getJson(config.detail + encodeURIComponent(eventId), sportradarHeaders('https://www.sportybet.com'), 20000);
+  const markets = parseEventMarkets(html, sport);
   cacheSet(detailCache, eventId, markets);
   return markets;
 }
@@ -475,6 +598,51 @@ const OVER_TOTAL_BY_CATEGORY = { over15: '1.5', over25: '2.5' };
 async function sportybetSelection(event, leg) {
   const category = String(leg.category || '').toLowerCase();
   const tip = String(leg.tip || '').trim();
+
+  if (event.sport === 'basketball') {
+    // SportyBuilder carries the exact ids read off the bookmaker's detail page,
+    // so the minted code uses the same line/price the tip was scored against.
+    const picked = leg.selection;
+    if (picked && picked.marketId && picked.outcomeId) {
+      return {
+        eventId: event.eventId,
+        marketId: String(picked.marketId),
+        outcomeId: String(picked.outcomeId),
+        specifier: picked.specifier || null
+      };
+    }
+
+    if (category === '1x2' && (tip === '1' || tip === '2')) {
+      let side = null;
+      let marketId = '219';
+      if (event.moneyline && event.moneyline[tip === '1' ? 'home' : 'away']) {
+        side = event.moneyline[tip === '1' ? 'home' : 'away'];
+        marketId = event.moneyline.marketId || marketId;
+      } else {
+        const markets = await getEventMarkets(event.eventId, 'basketball');
+        side = markets.moneyline[tip === '1' ? 'home' : 'away'];
+        marketId = markets.moneyline.marketId || marketId;
+      }
+      if (!side || !side.outcomeId) throw unsupportedMarketError(leg, 'Basketball moneyline is not offered for "' + leg.match + '", so the code was not created.');
+      return { eventId: event.eventId, marketId: String(side.marketId || marketId), outcomeId: String(side.outcomeId), specifier: null };
+    }
+
+    const total = leg.total;
+    const isOver = /^over\b/i.test(tip);
+    const isUnder = /^under\b/i.test(tip);
+    if (total && (isOver || isUnder)) {
+      let row = event.totals && event.totals[total] && event.totals[total][isOver ? 'over' : 'under'];
+      if (!row) {
+        const markets = await getEventMarkets(event.eventId, 'basketball');
+        const lines = markets.overUnder['total=' + total];
+        row = lines && lines[isOver ? 'over' : 'under'];
+      }
+      if (!row) throw unsupportedMarketError(leg, 'The ' + (isOver ? 'Over' : 'Under') + ' ' + total + ' points line is not offered for "' + leg.match + '", so the code was not created.');
+      return { eventId: event.eventId, marketId: String(row.marketId), outcomeId: String(row.outcomeId), specifier: row.specifier || 'total=' + total };
+    }
+
+    throw unsupportedMarketError(leg, 'Only basketball moneyline (1X2) and points Over/Under selections can be turned into a code.');
+  }
 
   if (category === '1x2' && SR_OUTCOME[tip]) {
     return { eventId: event.eventId, marketId: '1', outcomeId: SR_OUTCOME[tip], specifier: null };
@@ -571,28 +739,35 @@ function h2hSummary(entry) {
   return s;
 }
 
-// Currently available (upcoming) football events in the bookmaker's schedule,
-// used by the ticket builder to drop matches that have already started or are
-// not offered at all, so tickets are as likely as possible to resolve. Also
-// carries the live 1X2 odds, the Over/Under prices and kickoff date/time so the
-// schedule fallback can build a ticket straight from the bookmaker's own prices,
-// plus the H2H streak summary for the fixtures the h2hstats feed covers.
-async function getAvailableMatches() {
+// Currently available (upcoming) events in the bookmaker's schedule, used by the
+// ticket builders to drop matches that have already started or are not offered
+// at all. Defaults to football so the other builders keep their existing feed;
+// SportyBuilder asks for both sports. Basketball entries carry points totals and
+// moneyline selections with exact ids, football entries keep goals and H2H.
+async function getAvailableMatches(sport) {
   const events = await getEventIndex();
+  const wanted = sport || 'football';
+  const selected = wanted === 'all'
+    ? events
+    : events.filter(function (e) { return (e.sport || 'football') === wanted; });
   const h2hIndex = {};
-  try {
-    (await fetchTodayStreaks()).forEach(function (m) {
-      const key = normaliseName(m.home) + '|' + normaliseName(m.away);
-      if (!h2hIndex[key]) h2hIndex[key] = m;
-    });
-  } catch (e) {
-    // H2H is a bonus signal; its absence must never break the schedule feed.
+  if (wanted === 'football' || wanted === 'all') {
+    try {
+      (await fetchTodayStreaks()).forEach(function (m) {
+        const key = normaliseName(m.home) + '|' + normaliseName(m.away);
+        if (!h2hIndex[key]) h2hIndex[key] = m;
+      });
+    } catch (e) {
+      // H2H is a bonus signal; its absence must never break the schedule feed.
+    }
   }
-  return events.map(function (e) {
+  return selected.map(function (e) {
     const entry = h2hIndex[normaliseName(e.home) + '|' + normaliseName(e.away)];
     return {
       home: e.home, away: e.away, time: e.time, date: e.date || '', league: e.league || '',
+      sport: e.sport || 'football',
       odds: e.odds || {}, goals: e.goals || {},
+      totals: e.totals || {}, moneyline: e.moneyline || null,
       h2h: entry ? h2hSummary(entry) : null
     };
   });
@@ -603,12 +778,12 @@ async function resolveLeg(leg, bookmaker) {
   const pair = splitMatchName(leg.match);
   if (pair.length !== 2) throw unresolvedEventError(leg.match);
 
-  const cacheKey = bookmaker + '|' + String(leg.match).toLowerCase() + '|' + String(leg.tip || '').toLowerCase() + '|' + String(leg.category || '').toLowerCase();
+  const cacheKey = bookmaker + '|' + (leg.sport || 'football') + '|' + String(leg.match).toLowerCase() + '|' + String(leg.tip || '').toLowerCase() + '|' + String(leg.category || '').toLowerCase() + '|' + String(leg.total || '');
   const cached = cacheGet(resolutionCache, cacheKey);
   if (cached) return cached;
 
   const events = await getEventIndex();
-  const event = findEvent(events, pair[0], pair[1]);
+  const event = findEvent(events, pair[0], pair[1], leg.sport === 'basketball' ? 'basketball' : 'football');
   if (!event) throw unresolvedEventError(leg.match);
 
   const selection = bookmaker === 'sportybet'

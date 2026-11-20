@@ -201,16 +201,19 @@ function matchName(name) {
   return TEAM_ALIASES[base] || base;
 }
 
-function findSportyEvent(events, home, away) {
+function findSportyEvent(events, home, away, sport) {
   const nh = matchName(home);
   const na = matchName(away);
   if (!nh || !na) return null;
-  for (const ev of events) {
+  // The index also carries basketball fixtures for SportyBuilder; cross-bookmaker
+  // conversion is football-only, so ignore them here.
+  const pool = events.filter(function (ev) { return (ev.sport || 'football') === (sport || 'football'); });
+  for (const ev of pool) {
     const eh = matchName(ev.home);
     const ea = matchName(ev.away);
     if ((eh === nh || tokenSetMatch(eh, nh)) && (ea === na || tokenSetMatch(ea, na))) return ev;
   }
-  for (const ev of events) {
+  for (const ev of pool) {
     const eh = matchName(ev.home);
     const ea = matchName(ev.away);
     const hMatch = eh === nh || tokenSetMatch(eh, nh) || (nh.length > 4 && eh.includes(nh)) || (eh.length > 4 && nh.includes(eh));
