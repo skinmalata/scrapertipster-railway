@@ -827,9 +827,11 @@ async function buildSportyCandidatePool(options = {}) {
 
   // 8. Basketball — moneyline (1X2) and points Over/Under. Basketball has no
   // draw, so only the two moneyline sides are offered. Short prices are the
-  // strongest signal available: 1.06-1.30 implies roughly 77-94% probability.
+  // strongest signal available: 1.20-1.30 implies roughly 77-83% probability.
+  // Nothing shorter than 1.20 is admitted, for moneyline or points totals.
   // The exact Sportradar selection ids are carried through so the booking code
   // is minted on the very same line the tip was scored against.
+  const BASKETBALL_MIN_ODDS = 1.20;
   const BASKETBALL_MAX_ODDS = 1.30;
   const basketballPool = basketballMatches.filter(function (m) {
     return m && m.home && m.away && !isInvalidFixture(m.home, m.away) &&
@@ -847,7 +849,7 @@ async function buildSportyCandidatePool(options = {}) {
     // pick'em game, which is exactly what a high-confidence ticket must avoid.
     for (const side of sides) {
       const price = side.price && Number(side.price.odds);
-      if (!price || price < minLegOdds || price > BASKETBALL_MAX_ODDS) continue;
+      if (!price || price < BASKETBALL_MIN_ODDS || price > BASKETBALL_MAX_ODDS) continue;
       const rival = sides.find(function (s) { return s !== side; });
       const rivalOdds = rival && rival.price && Number(rival.price.odds);
       if (rivalOdds && rivalOdds < 2.40) continue;
@@ -870,13 +872,13 @@ async function buildSportyCandidatePool(options = {}) {
     }
 
     // Points totals: deliberately extreme lines carry a very high hit rate
-    // (e.g. Over 190.5 at 1.10). Keep only the three strongest per fixture.
+    // (e.g. Over 190.5 at 1.20). Keep only the three strongest per fixture.
     const qualifyingLines = [];
     for (const [total, line] of Object.entries(sm.totals || {})) {
       for (const side of ['over', 'under']) {
         const row = line && line[side];
         const price = row && Number(row.odds);
-        if (!price || price < minLegOdds || price > BASKETBALL_MAX_ODDS) continue;
+        if (!price || price < BASKETBALL_MIN_ODDS || price > BASKETBALL_MAX_ODDS) continue;
         qualifyingLines.push({ total: total, side: side, price: price, row: row });
       }
     }
