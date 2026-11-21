@@ -18,8 +18,9 @@
 
   var API = (window.WFT_API || 'https://winfulltime-api.onrender.com') + '/api';
   var ADVERTISE_URL = '/advertise.html';
-  // Bottom sticky Bitmedia banner. Activated after the visitor scrolls.
-  var STICKY_ADS_ENABLED = true;
+  // Bottom sticky Bitmedia banner. Disabled; the slot stays hidden and the
+  // inert Bitmedia code is never activated on scroll.
+  var STICKY_ADS_ENABLED = false;
 
   var POSITIONS = {
     global_leaderboard: { label: 'Global Leaderboard', w: 728, h: 90 },

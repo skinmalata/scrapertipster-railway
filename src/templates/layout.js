@@ -6,8 +6,9 @@
 const fs = require('fs');
 const path = require('path');
 
-// Bottom sticky Bitmedia banner. Injected on every page, shown after scroll.
-const STICKY_ADS_ENABLED = true;
+// Bottom sticky Bitmedia banner. Disabled; any baked sticky slot is stripped
+// from responses so the banner cannot be injected or shown.
+const STICKY_ADS_ENABLED = false;
 
 // Shared "More football tools" strip button. Pages bake their own copy of the
 // strip, so the layout pass adds this link when it is missing.
@@ -394,7 +395,7 @@ function applyLayoutToHtml(html, activePath) {
   // four-hour edge cache GitHub Pages sets on static assets.
   html = html.replace(/(<script[^>]*src=["'][^"']*\/consent\.js)(?:\?v=\d+)?(["'][^>]*>)/gi, '$1?v=3$2');
   // Ensure pages use the runtime that preserves the fixed Bitmedia unit.
-  html = html.replace(/(<script[^>]*src=["'][^"']*\/ads\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261110-seo$2');
+  html = html.replace(/(<script[^>]*src=["'][^"']*\/ads\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261121-nosticky$2');
   // Make sure static pages pick up changes to the shared login/tier runtime.
   html = html.replace(/(<script[^>]*src=["'][^"']*\/auth\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261104$2');
   // The in-feed grid helper only needs the DOM, so defer it. Keep the version
