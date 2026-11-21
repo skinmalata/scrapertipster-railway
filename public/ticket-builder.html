@@ -115,6 +115,14 @@
     },
     {
       "@type": "Question",
+      "name": "Can I generate football-only or basketball-only SportyBet codes?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Choose All Sports, Football Only, or Basketball Only before generating. Selected codes use only fixtures from the chosen sport; All Sports keeps the default mix with at least one basketball leg when qualifying games are available."
+      }
+    },
+    {
+      "@type": "Question",
       "name": "Can I generate multiple different codes for the same odds?",
       "acceptedAnswer": {
         "@type": "Answer",
@@ -371,13 +379,19 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   color: #64748b;
   text-transform: none;
 }
-.odds-pills {
+.odds-pills,
+.sport-pills {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
   gap: 8px;
   margin-bottom: 20px;
 }
-.odds-pill {
+.sport-pills {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 16px;
+}
+.odds-pill,
+.sport-pill {
   background: #111827;
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #94a3b8;
@@ -389,11 +403,13 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   transition: all 0.2s ease;
   text-align: center;
 }
-.odds-pill:hover {
+.odds-pill:hover,
+.sport-pill:hover {
   border-color: rgba(228, 30, 49, 0.5);
   color: #ffffff;
 }
-.odds-pill.active {
+.odds-pill.active,
+.sport-pill.active {
   background: var(--sb-red);
   border-color: var(--sb-red);
   color: #ffffff;
@@ -890,6 +906,16 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <div class="builder-card">
     <div class="builder-label">
+      <span>Select Sport</span>
+      <span class="range-hint">All Sports by default</span>
+    </div>
+    <div class="sport-pills" role="group" aria-label="Select sport">
+      <button type="button" class="sport-pill active" data-sport="all">All Sports</button>
+      <button type="button" class="sport-pill" data-sport="football">Football Only</button>
+      <button type="button" class="sport-pill" data-sport="basketball">Basketball Only</button>
+    </div>
+
+    <div class="builder-label">
       <span>Select Target Odds</span>
       <span class="range-hint">Min 2.0 &bull; Max 50.0</span>
     </div>
@@ -970,6 +996,10 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
       <details class="faq-item">
         <summary>Does AI SportyBet Code Builder include basketball tips?</summary>
         <p>Yes. When qualifying basketball games are available, every ticket includes at least one basketball leg — either a moneyline favourite (1X2) or a points Over/Under line, each priced from 1.20 upwards. Every leg is high implied probability, but no result is guaranteed.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I generate football-only or basketball-only SportyBet codes?</summary>
+        <p>Yes. Choose All Sports, Football Only, or Basketball Only before generating. Codes use only fixtures from the selected sport; All Sports keeps the default mix with at least one basketball leg when qualifying games are available.</p>
       </details>
       <details class="faq-item">
         <summary>What odds range can I generate?</summary>
@@ -1081,10 +1111,12 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   var FREE_ODDS_LIMIT = 5.0;
   var PRO_ODDS_LIMIT = 50.0;
   var currentOdds = 3.0;
+  var selectedSport = 'all';
   var previousMatches = [];
   var isGenerating = false;
 
   var pills = document.querySelectorAll('.odds-pill');
+  var sportPills = document.querySelectorAll('.sport-pill');
   var slider = document.getElementById('oddsSlider');
   var display = document.getElementById('oddsValueDisplay');
   var btnGen = document.getElementById('btnGenerate');
@@ -1120,6 +1152,19 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   if (btnDismissProBanner) {
     btnDismissProBanner.addEventListener('click', hideProBanner);
   }
+
+  sportPills.forEach(function(pill) {
+    pill.addEventListener('click', function() {
+      selectedSport = this.getAttribute('data-sport') || 'all';
+      sportPills.forEach(function(p) {
+        if (p === pill) {
+          p.classList.add('active');
+        } else {
+          p.classList.remove('active');
+        }
+      });
+    });
+  });
 
   function setOdds(val, updatePill) {
     var requested = parseFloat(val) || 3.0;
@@ -1226,6 +1271,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             targetOdds: currentOdds,
+            sport: selectedSport,
             avoidMatches: shuffle ? previousMatches : []
           })
         });
@@ -1236,6 +1282,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             targetOdds: currentOdds,
+            sport: selectedSport,
             avoidMatches: shuffle ? previousMatches : []
           })
         });

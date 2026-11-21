@@ -1974,6 +1974,7 @@ router.post('/sportybuilder/generate', optionalAuth, async function (req, res) {
     var body = req.body || {};
     var targetOdds = Math.min(50.0, Math.max(2.0, parseFloat(body.targetOdds) || 3.0));
     var avoidMatches = Array.isArray(body.avoidMatches) ? body.avoidMatches.slice(0, 20) : [];
+    var sport = body.sport === 'football' || body.sport === 'basketball' ? body.sport : 'all';
 
     // Gating: Only Pro / VIP members can select more than 5 odds
     var isPro = await resolveIsPro(req);
@@ -1988,7 +1989,7 @@ router.post('/sportybuilder/generate', optionalAuth, async function (req, res) {
     }
 
     var { generateSportyTicket } = require('../services/sportyBuilder');
-    var result = await generateSportyTicket({ targetOdds: targetOdds, avoidMatches: avoidMatches });
+    var result = await generateSportyTicket({ targetOdds: targetOdds, avoidMatches: avoidMatches, sport: sport });
     result.isPro = isPro;
     res.json(result);
   } catch (e) {

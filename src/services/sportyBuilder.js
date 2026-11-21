@@ -101,6 +101,11 @@ function normaliseTeam(value) {
     .replace(/\s+/g, ' ').trim();
 }
 
+function normaliseSportFilter(value) {
+  const sport = String(value || '').toLowerCase().trim();
+  return sport === 'football' || sport === 'basketball' ? sport : 'all';
+}
+
 const TEAM_ALIASES = {
   taiwan: 'chinese taipei',
   'south korea': 'korea republic',
@@ -238,10 +243,15 @@ function findSportyMatch(sportyByKey, home, away) {
  */
 async function buildSportyCandidatePool(options = {}) {
   const today = options.date || watDate();
-  const [footballMatches, basketballMatches] = await Promise.all([
-    getAvailableMatches('football'),
-    getAvailableMatches('basketball')
-  ]);
+  const sportFilter = normaliseSportFilter(options.sport);
+  const wantFootball = sportFilter === 'all' || sportFilter === 'football';
+  const wantBasketball = sportFilter === 'all' || sportFilter === 'basketball';
+  const matchRequests = [];
+  if (wantFootball) matchRequests.push(getAvailableMatches('football'));
+  if (wantBasketball) matchRequests.push(getAvailableMatches('basketball'));
+  const matchLists = await Promise.all(matchRequests);
+  const footballMatches = wantFootball && Array.isArray(matchLists[0]) ? matchLists[0] : [];
+  const basketballMatches = wantBasketball && Array.isArray(matchLists[wantFootball ? 1 : 0]) ? matchLists[wantFootball ? 1 : 0] : [];
   const sportyMatches = footballMatches.concat(basketballMatches);
 
   if (!Array.isArray(sportyMatches) || !sportyMatches.length) {
@@ -1059,11 +1069,15 @@ async function generateSportyTicket(options = {}) {
   if (!Number.isFinite(targetOdds) || targetOdds < 2.0) targetOdds = 2.0;
   if (targetOdds > 50.0) targetOdds = 50.0;
 
+  const sport = normaliseSportFilter(options.sport);
   const avoidMatches = Array.isArray(options.avoidMatches) ? options.avoidMatches : [];
-  const allCandidates = await buildSportyCandidatePool({ date: options.date, targetOdds: targetOdds });
+  const allCandidates = await buildSportyCandidatePool({ date: options.date, targetOdds: targetOdds, sport: sport });
 
+  const poolError = sport === 'all'
+    ? 'Not enough upcoming matches found in the 24-hour window. Please try again shortly as more matches are priced.'
+    : `Not enough upcoming ${sport} matches found in the 24-hour window. Please try again shortly as more matches are priced.`;
   if (allCandidates.length < 2) {
-    throw new Error('Not enough upcoming matches found in the 24-hour window. Please try again shortly as more matches are priced.');
+    throw new Error(poolError);
   }
   const hasBasketball = allCandidates.some(function (c) { return c.sport === 'basketball'; });
 
@@ -1087,7 +1101,7 @@ async function generateSportyTicket(options = {}) {
   }
 
   if (candidates.length < 2) {
-    throw new Error('Not enough upcoming matches found in the 24-hour window. Please try again shortly as more matches are priced.');
+    throw new Error(poolError);
   }
 
   // Attempt up to 4 variations if SportyBet API rejects a specific leg
@@ -1160,6 +1174,7 @@ async function generateSportyTicket(options = {}) {
     bookmakerName: 'SportyBet',
     totalOdds: finalTotalOdds,
     targetOdds: targetOdds,
+    sport: sport,
     legCount: chosenLegs.length,
     legs: chosenLegs.map(l => ({
       match: l.match,
