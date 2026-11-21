@@ -368,7 +368,7 @@ gtag('config', 'G-HMGZMW9EDP');
   <div class="shb-pills">
     <button type="button" class="shb-pill" data-odds="2">2.0</button>
     <button type="button" class="shb-pill active" data-odds="3">3.0</button>
-    <button type="button" class="shb-pill pro-pill" data-odds="5">5.0 <span class="shb-pro-tag">PRO</span></button>
+    <button type="button" class="shb-pill" data-odds="5">5.0</button>
     <button type="button" class="shb-pill pro-pill" data-odds="10">10.0 <span class="shb-pro-tag">PRO</span></button>
     <button type="button" class="shb-pill pro-pill" data-odds="20">20.0 <span class="shb-pro-tag">PRO</span></button>
     <button type="button" class="shb-pill pro-pill" data-odds="50">50.0 <span class="shb-pro-tag">PRO</span></button>
@@ -590,6 +590,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
 <script>
 (function() {
+  var FREE_ODDS_LIMIT = 5.0;
   var selectedOdds = 3.0;
   var prevMatches = [];
   var busy = false;
@@ -613,9 +614,9 @@ gtag('config', 'G-HMGZMW9EDP');
       '<div class="shb-pro-callout">' +
         '<div class="shb-pro-callout-header">' +
           '<span class="shb-pro-callout-badge">👑 PRO EXCLUSIVE</span>' +
-          '<strong>' + (odds ? odds + 'x Odds' : 'Above 3 Odds') + ' is Exclusive to Pro</strong>' +
+          '<strong>' + (odds ? odds + 'x Odds' : 'Above 5 Odds') + ' is Exclusive to Pro</strong>' +
         '</div>' +
-        '<p class="shb-pro-callout-desc">Generating more than 3 odds (5.0 to 50.0) accumulator tickets with advanced markets (BTTS, Highest Scoring Half, DNB &amp; Corners) is reserved for WinFulltime Pro members.</p>' +
+        '<p class="shb-pro-callout-desc">Generating more than 5 odds (10.0 to 50.0) accumulator tickets with advanced markets (BTTS, Highest Scoring Half, DNB &amp; Corners) is reserved for WinFulltime Pro members.</p>' +
         '<a href="/pricing.html" class="shb-pro-callout-btn">⭐ Upgrade to Pro &rarr;</a>' +
       '</div>';
   }
@@ -623,9 +624,9 @@ gtag('config', 'G-HMGZMW9EDP');
   pills.forEach(function(pill) {
     pill.addEventListener('click', function() {
       var odds = parseFloat(this.getAttribute('data-odds')) || 3.0;
-      if (odds > 3.0 && !isUserPro()) {
+      if (odds > FREE_ODDS_LIMIT && !isUserPro()) {
         showProNotice(odds);
-        return; // Non-pro members cannot select more than 3 odds
+        return; // Non-pro members cannot select more than 5 odds
       }
       pills.forEach(function(p) { p.classList.remove('active'); });
       this.classList.add('active');
@@ -637,14 +638,14 @@ gtag('config', 'G-HMGZMW9EDP');
     var pro = isUserPro();
     pills.forEach(function(pill) {
       var odds = parseFloat(pill.getAttribute('data-odds')) || 0;
-      if (odds > 3.0) {
+      if (odds > FREE_ODDS_LIMIT) {
         var tag = pill.querySelector('.shb-pro-tag');
         if (pro) {
           if (tag) tag.style.opacity = '0.35';
           pill.title = 'Pro feature unlocked';
         } else {
           if (tag) tag.style.opacity = '1';
-          pill.title = 'WinFulltime Pro feature (above 3 odds)';
+          pill.title = 'WinFulltime Pro feature (above 5 odds)';
         }
       }
     });
@@ -659,7 +660,7 @@ gtag('config', 'G-HMGZMW9EDP');
     clickAuthorized = false;
     if (busy) return;
 
-    if (selectedOdds > 3.0 && !isUserPro()) {
+    if (selectedOdds > FREE_ODDS_LIMIT && !isUserPro()) {
       showProNotice(selectedOdds);
       return;
     }
