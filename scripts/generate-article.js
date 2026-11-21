@@ -714,7 +714,7 @@ ${faqSchema(faqs, url)}
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav id="nav">
    <a href="/">Home</a>
-   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/ticket-builder.html">AI SportyBet Code Builder</a>
    <a href="/best-picks.html">Best Picks</a>
    <a href="/author-picks.html">H2H Picks</a>
    <a href="/predictions/in-play">In-Play</a>
@@ -768,7 +768,7 @@ ${relatedHtml(a.related)}
    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,36,72,0.6); margin-bottom: 8px;">Featured Tool</div>
    <h3 style="margin: 0 0 10px; font-size: 20px; font-weight: 700; color: #e8edf5;">Build Winning Accumulator Tickets</h3>
    <p style="margin: 0 auto 16px; font-size: 14px; line-height: 1.6; max-width: 440px; color: rgba(232,237,245,0.55);">Generate optimized accumulator combinations from today's data-driven predictions. Set your target odds and get instant ticket suggestions.</p>
-   <a href="/ticket-builder.html" style="display: inline-block; background: linear-gradient(135deg, #ff2448, #d41a38); color: #fff; padding: 12px 32px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 15px;">Free Ticket Builder &rarr;</a>
+   <a href="/ticket-builder.html" style="display: inline-block; background: linear-gradient(135deg, #ff2448, #d41a38); color: #fff; padding: 12px 32px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 15px;">Free AI SportyBet Code Builder &rarr;</a>
   </div>
 
  </div>
@@ -789,7 +789,7 @@ ${relatedHtml(a.related)}
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
-   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/ticket-builder.html">AI SportyBet Code Builder</a>
    <a href="/2-odds-of-the-day.html">2 Odds</a>
    <a href="/best-picks.html">Best Picks</a>
    <a href="/author-picks.html">H2H Picks</a>

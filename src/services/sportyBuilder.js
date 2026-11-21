@@ -912,7 +912,7 @@ async function buildSportyCandidatePool(options = {}) {
  * Supports avoidMatches and stochastic sampling so multiple generations give varied tickets!
  */
 function findOptimalCombination(candidates, targetOdds, options = {}) {
-  // SportyBuilder asks for at least one basketball leg whenever the pool has
+  // AI SportyBet Code Builder asks for at least one basketball leg whenever the pool has
   // one; other builders leave this off and keep their football-only behaviour.
   const requireBasketball = options.requireBasketball === true && candidates.some(function (c) { return c.sport === 'basketball'; });
   const avoidList = (options.avoidMatches || []).map(normaliseTeam).filter(Boolean);
@@ -1051,7 +1051,7 @@ function findOptimalCombination(candidates, targetOdds, options = {}) {
 }
 
 /**
- * Main SportyBuilder entry point:
+ * Main AI SportyBet Code Builder entry point:
  * Builds the ticket, auto-generates the SportyBet booking code, and auto-heals if any leg is rejected.
  */
 async function generateSportyTicket(options = {}) {

@@ -5,9 +5,9 @@
 (function () {
   'use strict';
   var TABS = [
-    { id: 'tab-sportybuilder', href: '/ticket-builder.html', label: 'SportyBuilder', paths: ['/ticket-builder.html', '/ticket-builder'] },
-    { id: 'tab-betpawa-builder', href: '/betpawa-builder.html', label: 'betPawa Builder', paths: ['/betpawa-builder.html', '/betpawa-builder'] },
-    { id: 'tab-1xbet-builder', href: '/1xbet-builder.html', label: '1xBet Builder', paths: ['/1xbet-builder.html', '/1xbet-builder'] }
+    { id: 'tab-sportybuilder', href: '/ticket-builder.html', label: 'AI SportyBet Code Builder', paths: ['/ticket-builder.html', '/ticket-builder'] },
+    { id: 'tab-betpawa-builder', href: '/betpawa-builder.html', label: 'AI betPawa Code Builder', paths: ['/betpawa-builder.html', '/betpawa-builder'] },
+    { id: 'tab-1xbet-builder', href: '/1xbet-builder.html', label: 'AI 1xBet Code Builder', paths: ['/1xbet-builder.html', '/1xbet-builder'] }
   ];
   function inject() {
     var containers = document.querySelectorAll('#categoryLinks, #categoryTabs');

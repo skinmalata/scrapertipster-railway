@@ -10,13 +10,13 @@ const FAQ_SCHEMA = {
     { q: 'How accurate are WinFulltime 1X2 predictions?', a: 'Our statistical model analyzes team form, head-to-head records, home/away performance, and league context to assign a probability percentage to each outcome. No system guarantees wins, but probability scores help you assess risk. Higher percentages indicate stronger confidence picks.' },
     { q: 'Do 1X2 predictions include extra time?', a: 'No. All 1X2 predictions cover only the 90-minute regulation result plus stoppage time. Extra time and penalty shootouts are excluded from this market.' },
     { q: 'How often are 1X2 predictions updated?', a: 'Predictions are refreshed daily. The primary update runs at 1:00 AM WAT and a secondary update at 6:00 AM WAT captures late-appearing fixtures across 50+ leagues worldwide.' },
-    { q: 'Can I use 1X2 picks in accumulators?', a: 'Yes. 1X2 picks are the most common accumulator legs. Use our Ticket Builder to automatically combine 1X2 picks with Over 2.5, BTTS, and other markets for optimized tickets.' },
+    { q: 'Can I use 1X2 picks in accumulators?', a: 'Yes. 1X2 picks are the most common accumulator legs. Use our AI SportyBet Code Builder to automatically combine 1X2 picks with Over 2.5, BTTS, and other markets for optimized tickets.' },
     { q: 'Which leagues do 1X2 predictions cover?', a: 'WinFulltime covers 50+ leagues including the Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, and second divisions across South America, Africa, and Asia.' }
   ],
   'over-1-5': [
     { q: 'What does Over 1.5 goals mean?', a: 'Over 1.5 means you predict the total goals scored by both teams combined will be 2 or more. Scores of 1-1, 2-0, 0-2, 2-1, or higher win the bet. Scores of 0-0, 1-0, or 0-1 lose.' },
     { q: 'How often do matches go over 1.5 goals?', a: 'Globally, roughly 70-75% of professional football matches produce 2 or more goals. The rate varies by league — the Eredivisie and Bundesliga tend higher, while Ligue 1 and Serie A tend lower.' },
-    { q: 'Is Over 1.5 a good accumulator leg?', a: 'Yes. Over 1.5 is one of the most popular accumulator legs due to its high strike rate. It adds a safety buffer while contributing to overall odds. Use our Ticket Builder to combine Over 1.5 picks with other markets.' },
+    { q: 'Is Over 1.5 a good accumulator leg?', a: 'Yes. Over 1.5 is one of the most popular accumulator legs due to its high strike rate. It adds a safety buffer while contributing to overall odds. Use our AI SportyBet Code Builder to combine Over 1.5 picks with other markets.' },
     { q: 'How do Over 1.5 predictions differ from Over 2.5?', a: 'Over 1.5 requires 2+ goals while Over 2.5 requires 3+. Over 1.5 has a higher hit rate but shorter odds. Many bettors use Over 1.5 as a foundation leg in accumulators because of its reliability.' },
     { q: 'Do Over 1.5 predictions include own goals?', a: 'Yes. Own goals count toward the total in all goal-based markets including Over 1.5. Any goal scored by either team counts.' },
     { q: 'How are Over 1.5 predictions generated?', a: 'Our statistical model evaluates average goals per game, attack vs defense matchups, both teams\' scoring records, historical over 1.5 rates, and home/away scoring patterns. Picks with 80%+ probability are the strongest.' }
@@ -67,7 +67,7 @@ const FAQ_SCHEMA = {
     { q: 'Does a 0-0 draw win BTTS No?', a: 'Yes. A 0-0 result means neither team scored, which satisfies the BTTS No condition. Any clean sheet — whether 0-0, 1-0, or 2-0 — wins a BTTS No bet.' },
     { q: 'How does BTTS No differ from Under 2.5?', a: 'BTTS No only requires one team to fail to score (a 2-0 wins). Under 2.5 requires fewer than 3 total goals (a 1-1 wins). They overlap but are not the same market.' },
     { q: 'What teams are good BTTS No candidates?', a: 'Teams with 10+ clean sheets in a season, strong goalkeepers, and defensive tactical setups are prime BTTS No picks. Teams that struggle to score away from home also increase BTTS No probability.' },
-    { q: 'Can I combine BTTS No with other markets?', a: 'Yes. BTTS No pairs well with Under 2.5 goals and 1X2 bets where a clean sheet is expected. Use our Ticket Builder to combine BTTS No with other markets for balanced accumulators.' }
+    { q: 'Can I combine BTTS No with other markets?', a: 'Yes. BTTS No pairs well with Under 2.5 goals and 1X2 bets where a clean sheet is expected. Use our AI SportyBet Code Builder to combine BTTS No with other markets for balanced accumulators.' }
   ],
   'unbeaten': [
     { q: 'What counts as an unbeaten streak?', a: 'An unbeaten streak is a sequence of consecutive matches in which a team has not lost. This includes wins and draws. A streak ends when the team suffers a defeat. We track streaks of 5 or more games across all competitions.' },
@@ -82,7 +82,7 @@ const FAQ_SCHEMA = {
     { q: 'How are corner predictions calculated?', a: 'Each prediction is based on historical corner statistics. We only show matches where the hit rate exceeds 80%, meaning the Over 8.5 or Over 9.5 corners market has landed in 4 out of the last 5 similar fixtures. Hit rate, odds, and league are shown for each pick.' },
     { q: 'What does "hit rate" mean for corners?', a: 'Hit rate is the percentage of recent matches in which the corners market landed. A 100% hit rate means the Over 8.5 or Over 9.5 corners line has been exceeded in every recent match for that fixture or league. We only display picks above 80%.' },
     { q: 'Which leagues have the most corners?', a: 'Leagues like the Eredivisie, Allsvenskan, Eliteserien, and Serie B tend to produce higher corner counts due to their attacking styles. Our predictions span 50+ leagues and highlight the highest corner-producing fixtures daily.' },
-    { q: 'Can I use corner picks in accumulators?', a: 'Yes. Corner picks with high hit rates make solid accumulator legs. Combine corners with 1X2, Over 2.5, or BTTS picks using our Ticket Builder for diversified accumulator tickets.' },
+    { q: 'Can I use corner picks in accumulators?', a: 'Yes. Corner picks with high hit rates make solid accumulator legs. Combine corners with 1X2, Over 2.5, or BTTS picks using our AI SportyBet Code Builder for diversified accumulator tickets.' },
     { q: 'When are corner predictions updated?', a: 'Corner predictions update daily alongside all other markets. The primary refresh runs at 1:00 AM WAT with a secondary update at 6:00 AM WAT to capture fixtures that appear closer to matchday.' }
   ],
   'cards': [
@@ -460,7 +460,7 @@ ${CHIPS_CSS}
 <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 <nav id="nav">
 <a href="/">Home</a>
-<a href="/ticket-builder.html">Ticket Builder</a>
+<a href="/ticket-builder.html">AI SportyBet Code Builder</a>
 <a href="/blog/">Blog</a>
 <a href="/contact.html">Contact</a>
 </nav>
@@ -502,20 +502,20 @@ ${generateNoscriptFallback(slug, catConfig)}
 <p class="picks-note"><strong>Daily picks aren\u2019t final results.</strong> Football is unpredictable &mdash; no tip wins every time. Pick only a few you\u2019re genuinely confident in, and never stake more than you can afford to lose.</p>
 
 <nav class="streak-buttons prediction-tools" aria-label="More football tools">
-  <a class="streak-btn tool-converter" href="/converter.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Code Converter</span></a>
-  <a class="streak-btn tool-merger" href="/code-merger.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Code Merger</span></a>
-  <a class="streak-btn tool-splitter" href="/code-splitter.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Code Splitter</span></a>
+  <a class="streak-btn tool-converter" href="/converter.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">AI Code Converter</span></a>
+  <a class="streak-btn tool-merger" href="/code-merger.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">AI Code Merger</span></a>
+  <a class="streak-btn tool-splitter" href="/code-splitter.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">AI Code Splitter</span></a>
   <a class="streak-btn tool-inplay" href="/predictions/in-play"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">In-Play</span></a>
-  <a class="streak-btn tool-ticket" href="/ticket-builder.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Ticket Builder</span></a>
-  <a class="streak-btn tool-betpawa" href="/betpawa-builder.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">betPawa Builder</span></a>
-  <a class="streak-btn tool-analyzer" href="/code-analyzer.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Code Analyzer</span></a>
+  <a class="streak-btn tool-ticket" href="/ticket-builder.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">AI SportyBet Code Builder</span></a>
+  <a class="streak-btn tool-betpawa" href="/betpawa-builder.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">AI betPawa Code Builder</span></a>
+  <a class="streak-btn tool-analyzer" href="/code-analyzer.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">AI Code Analyzer</span></a>
 </nav>
 
 <div class="featured-cta">
 <div class="label">Featured Tool</div>
 <h3>Build Winning Accumulator Tickets</h3>
 <p>Generate optimized accumulator combinations from today's data-driven predictions. Set your target odds and get instant ticket suggestions.</p>
-<a href="/ticket-builder.html">Free Ticket Builder &rarr;</a>
+<a href="/ticket-builder.html">Free AI SportyBet Code Builder &rarr;</a>
 </div>
 
 <div class="telegram-cta">
@@ -541,7 +541,7 @@ ${generateFaqHtml(slug)}
 <div class="footer-content">
 <div class="footer-links">
 <a href="/">Home</a>
-<a href="/ticket-builder.html">Ticket Builder</a>
+<a href="/ticket-builder.html">AI SportyBet Code Builder</a>
 <a href="/blog/">Blog</a>
 <a href="/advertise.html">Advertise</a>
 <a href="/contact.html">Contact</a>

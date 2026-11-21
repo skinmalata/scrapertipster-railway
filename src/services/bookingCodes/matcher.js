@@ -205,7 +205,7 @@ function findSportyEvent(events, home, away, sport) {
   const nh = matchName(home);
   const na = matchName(away);
   if (!nh || !na) return null;
-  // The index also carries basketball fixtures for SportyBuilder; cross-bookmaker
+  // The index also carries basketball fixtures for AI SportyBet Code Builder; cross-bookmaker
   // conversion is football-only, so ignore them here.
   const pool = events.filter(function (ev) { return (ev.sport || 'football') === (sport || 'football'); });
   for (const ev of pool) {

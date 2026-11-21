@@ -87,7 +87,7 @@ function pairPageBody(pair) {
 
   return `
   <div class="converter-hero">
-   <h1>${esc(src.name)} to ${esc(tgt.name)} Code Converter — Free</h1>
+   <h1>${esc(src.name)} to ${esc(tgt.name)} AI Code Converter — Free</h1>
    <p class="converter-hero-sub">${esc(pair.blurb)}</p>
    <div class="converter-badges">
     <span>Free to use</span><span>No sign-in</span><span>Up to 30 selections</span><span>Nigeria (NG)</span>
@@ -143,14 +143,14 @@ function buildPairPage(pair) {
   const tgt = BOOKMAKERS[pair.to];
   const slug = slugFor(pair.from, pair.to);
   const canonical = `${SITE_URL}/convert/${slug}/`;
-  const title = `${src.name} to ${tgt.name} Code Converter (Free) | WinFulltime`;
+  const title = `${src.name} to ${tgt.name} AI Code Converter (Free) | WinFulltime`;
   const description = `Convert ${src.name} codes to ${tgt.name} free. Paste a ${src.name} ${src.codeType} and get a fresh ${tgt.name} ${tgt.codeType} with the same selections and odds — no sign-in, up to 30 legs.${pair.to === 'bet9ja' ? ' Bet9ja conversion currently supports 1X2 selections.' : ''}`;
   const keywords = `${src.name} to ${tgt.name} code converter, convert ${src.name} code to ${tgt.name} free, ${src.name} to ${tgt.name} converter, ${src.name} to ${tgt.name} booking code`;
 
   const webApp = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
-    name: `${src.name} to ${tgt.name} Code Converter`,
+    name: `${src.name} to ${tgt.name} AI Code Converter`,
     url: canonical,
     description,
     applicationCategory: 'SportsApplication',
@@ -174,7 +174,7 @@ function buildPairPage(pair) {
     pageCss: PAIR_CSS,
     breadcrumbs: [
       { label: 'Home', href: '/' },
-      { label: 'Code Converter', href: '/convert/' },
+      { label: 'AI Code Converter', href: '/convert/' },
       { label: `${src.name} to ${tgt.name}` }
     ],
     body: pairPageBody(pair)
@@ -197,7 +197,7 @@ function hubPageBody() {
 
   return `
   <div class="converter-hero">
-   <h1>Booking Code Converter</h1>
+   <h1>AI Booking Code Converter</h1>
    <p class="converter-hero-sub">${esc(HUB.intro)}</p>
    <div class="converter-badges">
     <span>Free to use</span><span>No sign-in</span><span>Up to 30 selections</span><span>SportyBet · MSport · Bet9ja · Betway · BetKing · Bangbet · betPawa</span>
@@ -234,14 +234,14 @@ ${faq}
 
 function buildHubPage() {
   const canonical = `${SITE_URL}/convert/`;
-  const title = 'Booking Code Converter — SportyBet, MSport, Bet9ja, Betway, BetKing, Bangbet, betPawa | WinFulltime';
+  const title = 'AI Booking Code Converter — SportyBet, MSport, Bet9ja, Betway, BetKing, Bangbet, betPawa | WinFulltime';
   const description = 'Free booking code converter for SportyBet, MSport, Bet9ja, Betway, BetKing, Bangbet and betPawa. Decode any code, preview selections and odds, and generate a fresh playable code for the bookmaker you use — no sign-in, up to 30 selections.';
   const keywords = 'booking code converter, convert betting code, SportyBet to Bet9ja, Betway to SportyBet, MSport code converter, Bangbet code converter, BetKing code converter';
 
   const webApp = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
-    name: 'Booking Code Converter',
+    name: 'AI Booking Code Converter',
     url: canonical,
     description,
     applicationCategory: 'SportsApplication',
@@ -265,7 +265,7 @@ function buildHubPage() {
     pageCss: PAIR_CSS,
     breadcrumbs: [
       { label: 'Home', href: '/' },
-      { label: 'Code Converter' }
+      { label: 'AI Code Converter' }
     ],
     body: hubPageBody()
   });

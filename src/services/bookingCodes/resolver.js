@@ -32,7 +32,7 @@
 // Basketball uses a different Sportradar market layout: the moneyline is
 // marketId=219 (outcomeId 4 = home, 5 = away) and points totals are marketId=18
 // (main line) plus marketId=225 (alternate lines). Its detail pages are read for
-// the strongest Over/Under prices, which SportyBuilder turns into high-confidence
+// the strongest Over/Under prices, which AI SportyBet Code Builder turns into high-confidence
 // legs with the exact market/outcome ids needed to mint a real code.
 
 const cheerio = require('cheerio');
@@ -377,7 +377,7 @@ async function buildEventIndex() {
         ev.totals = Object.assign({}, ev.totals || {});
         for (const key in markets.overUnder) {
           // The detail parser keys lines as "total=164.5"; the schedule parser
-          // uses "164.5". Normalise so SportyBuilder can label and resolve both
+          // uses "164.5". Normalise so AI SportyBet Code Builder can label and resolve both
           // with the same plain numeric total.
           const numeric = key.indexOf('total=') === 0 ? key.slice(6) : key;
           ev.totals[numeric] = markets.overUnder[key];
@@ -600,7 +600,7 @@ async function sportybetSelection(event, leg) {
   const tip = String(leg.tip || '').trim();
 
   if (event.sport === 'basketball') {
-    // SportyBuilder carries the exact ids read off the bookmaker's detail page,
+    // AI SportyBet Code Builder carries the exact ids read off the bookmaker's detail page,
     // so the minted code uses the same line/price the tip was scored against.
     const picked = leg.selection;
     if (picked && picked.marketId && picked.outcomeId) {
@@ -742,7 +742,7 @@ function h2hSummary(entry) {
 // Currently available (upcoming) events in the bookmaker's schedule, used by the
 // ticket builders to drop matches that have already started or are not offered
 // at all. Defaults to football so the other builders keep their existing feed;
-// SportyBuilder asks for both sports. Basketball entries carry points totals and
+// AI SportyBet Code Builder asks for both sports. Basketball entries carry points totals and
 // moneyline selections with exact ids, football entries keep goals and H2H.
 async function getAvailableMatches(sport) {
   const events = await getEventIndex();

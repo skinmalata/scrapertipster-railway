@@ -166,7 +166,7 @@ function generateMatrixPage(leagueName, leagueSlug, marketSlug, marketConfig, ma
     },
     {
       q: `Can I combine ${leagueName} ${marketConfig.label} picks with other markets?`,
-      a: `Yes. Our ${marketConfig.label.toLowerCase()} picks for ${leagueName} pair well with other market predictions. Use the Ticket Builder to combine selections from 1X2, Over 2.5, BTTS, and corners into optimized accumulators.`
+      a: `Yes. Our ${marketConfig.label.toLowerCase()} picks for ${leagueName} pair well with other market predictions. Use the AI SportyBet Code Builder to combine selections from 1X2, Over 2.5, BTTS, and corners into optimized accumulators.`
     }
   ]);
 
@@ -209,7 +209,7 @@ Our prediction engine processes ${escapeHtml(leagueName)} fixture data specifica
   </details>
   <details class="faq-item">
     <summary>Can I combine ${escapeHtml(leagueName)} ${escapeHtml(marketConfig.label)} picks with other markets?</summary>
-    <p>Yes. Our ${escapeHtml(marketConfig.label.toLowerCase())} picks for ${escapeHtml(leagueName)} pair well with other market predictions. Use the Ticket Builder to combine selections from 1X2, Over 2.5, BTTS, and corners into optimized accumulators.</p>
+    <p>Yes. Our ${escapeHtml(marketConfig.label.toLowerCase())} picks for ${escapeHtml(leagueName)} pair well with other market predictions. Use the AI SportyBet Code Builder to combine selections from 1X2, Over 2.5, BTTS, and corners into optimized accumulators.</p>
   </details>
 </div>
 </section>`;

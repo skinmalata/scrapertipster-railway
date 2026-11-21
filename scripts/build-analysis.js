@@ -892,7 +892,7 @@ function buildContentHtml(analysis, home, away, matchup, dateStr, ctx) {
     '<a href="/predictions/1x2" class="cta-link">1X2</a>' +
     '<a href="/predictions/over-2-5" class="cta-link">Over 2.5 Goals</a>' +
     '<a href="/predictions/btts" class="cta-link">BTTS</a>' +
-    '<a href="/ticket-builder.html" class="cta-link">Ticket Builder</a>' +
+    '<a href="/ticket-builder.html" class="cta-link">AI SportyBet Code Builder</a>' +
     '</div>';
 
   if (ctx.teamExists) {

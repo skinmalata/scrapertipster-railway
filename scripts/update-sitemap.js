@@ -306,7 +306,7 @@ function buildSitemaps() {
     })
     .filter(Boolean);
 
-  // Prerendered Booking Code Converter Pages (/convert/ hub + /convert/<from>-to-<to>/).
+  // Prerendered AI Booking Code Converter Pages (/convert/ hub + /convert/<from>-to-<to>/).
   const convertHub = 'https://winfulltime.com/convert/';
   const convertEntries = [
     indexablePage(path.join(ROOT, 'convert', 'index.html'), convertHub)

@@ -12,21 +12,22 @@ const STICKY_ADS_ENABLED = false;
 
 // Shared "More football tools" strip button. Pages bake their own copy of the
 // strip, so the layout pass adds this link when it is missing.
-const BETPAWA_TOOL_BUTTON = '<a class="streak-btn tool-betpawa" href="/betpawa-builder.html" style="background:linear-gradient(135deg,#b45309,#fbbf24);color:#111827;"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">betPawa Builder</span></a>';
+const BETPAWA_TOOL_BUTTON = '<a class="streak-btn tool-betpawa" href="/betpawa-builder.html" style="background:linear-gradient(135deg,#b45309,#fbbf24);color:#111827;"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">AI betPawa Code Builder</span></a>';
+const ONEXBET_TOOL_BUTTON = '<a class="streak-btn tool-1xbet" href="/1xbet-builder.html" style="background:linear-gradient(135deg,#1e3a8a,#60a5fa);color:#fff;"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">AI 1xBet Code Builder</span></a>';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home', match: (p) => p === '/' || p === '/index.html' },
   {
     label: 'Winning Tools',
     children: [
-      { href: '/converter.html', label: 'Code Converter', match: (p) => p.startsWith('/converter') },
-      { href: '/code-merger.html', label: 'Code Merger', match: (p) => p.startsWith('/code-merger') },
-      { href: '/code-splitter.html', label: 'Code Splitter', match: (p) => p.startsWith('/code-splitter') },
+      { href: '/converter.html', label: 'AI Code Converter', match: (p) => p.startsWith('/converter') },
+      { href: '/code-merger.html', label: 'AI Code Merger', match: (p) => p.startsWith('/code-merger') },
+      { href: '/code-splitter.html', label: 'AI Code Splitter', match: (p) => p.startsWith('/code-splitter') },
       { href: '/predictions/in-play', label: 'In-Play', match: (p) => p.startsWith('/predictions/in-play') },
-      { href: '/ticket-builder.html', label: 'Ticket Builder', match: (p) => p.startsWith('/ticket-builder') },
-      { href: '/betpawa-builder.html', label: 'betPawa Builder', match: (p) => p.startsWith('/betpawa-builder') },
-      { href: '/1xbet-builder.html', label: '1xBet Builder', match: (p) => p.startsWith('/1xbet-builder') },
-      { href: '/code-analyzer.html', label: 'Code Analyzer', match: (p) => p.startsWith('/code-analyzer') }
+      { href: '/ticket-builder.html', label: 'AI SportyBet Code Builder', match: (p) => p.startsWith('/ticket-builder') },
+      { href: '/betpawa-builder.html', label: 'AI betPawa Code Builder', match: (p) => p.startsWith('/betpawa-builder') },
+      { href: '/1xbet-builder.html', label: 'AI 1xBet Code Builder', match: (p) => p.startsWith('/1xbet-builder') },
+      { href: '/code-analyzer.html', label: 'AI Code Analyzer', match: (p) => p.startsWith('/code-analyzer') }
     ]
   },
   { href: '/blog/', label: 'Blog', match: (p) => p.startsWith('/blog') }
@@ -103,13 +104,13 @@ const FOOTER_HTML = `
     <li><a href="/best-picks.html">Best Picks</a></li>
     <li><a href="/2-odds-of-the-day.html">2 Odds</a></li>
     <li><a href="/author-picks.html">H2H Picks</a></li>
-    <li><a href="/ticket-builder.html">Ticket Builder</a></li>
-    <li><a href="/betpawa-builder.html">betPawa Builder</a></li>
-    <li><a href="/1xbet-builder.html">1xBet Builder</a></li>
-    <li><a href="/converter.html">Code Converter</a></li>
-    <li><a href="/code-splitter.html">Code Splitter</a></li>
-    <li><a href="/code-merger.html">Code Merger</a></li>
-    <li><a href="/code-analyzer.html">Code Analyzer</a></li>
+    <li><a href="/ticket-builder.html">AI SportyBet Code Builder</a></li>
+    <li><a href="/betpawa-builder.html">AI betPawa Code Builder</a></li>
+    <li><a href="/1xbet-builder.html">AI 1xBet Code Builder</a></li>
+    <li><a href="/converter.html">AI Code Converter</a></li>
+    <li><a href="/code-splitter.html">AI Code Splitter</a></li>
+    <li><a href="/code-merger.html">AI Code Merger</a></li>
+    <li><a href="/code-analyzer.html">AI Code Analyzer</a></li>
    </ul>
   </div>
 
@@ -460,14 +461,25 @@ function applyLayoutToHtml(html, activePath) {
   }
 
   // 1d. Keep the shared "More football tools" strip in sync with the main nav.
-  //     Pages bake their own copy of the strip, so add the betPawa Builder
+  //     Pages bake their own copy of the strip, so add the AI betPawa Code Builder
   //     button during the layout pass too; this is a no-op once present.
   html = html.replace(/<nav\b[^>]*\bprediction-tools\b[^>]*>[\s\S]*?<\/nav>/gi, (nav) => {
-    if (/\btool-betpawa\b/.test(nav)) return nav;
-    if (/\btool-analyzer\b/.test(nav)) {
-      return nav.replace(/(<a\b[^>]*\btool-analyzer\b[^>]*>[\s\S]*?<\/a>)/i, BETPAWA_TOOL_BUTTON + '$1');
+    let updated = nav;
+    if (!/\btool-betpawa\b/.test(updated)) {
+      if (/\btool-analyzer\b/.test(updated)) {
+        updated = updated.replace(/(<a\b[^>]*\btool-analyzer\b[^>]*>[\s\S]*?<\/a>)/i, BETPAWA_TOOL_BUTTON + '$1');
+      } else {
+        updated = updated.replace(/<\/nav>\s*$/i, BETPAWA_TOOL_BUTTON + '\n</nav>');
+      }
     }
-    return nav.replace(/<\/nav>\s*$/i, BETPAWA_TOOL_BUTTON + '\n</nav>');
+    if (!/\btool-1xbet\b/.test(updated)) {
+      if (/\btool-analyzer\b/.test(updated)) {
+        updated = updated.replace(/(<a\b[^>]*\btool-analyzer\b[^>]*>[\s\S]*?<\/a>)/i, ONEXBET_TOOL_BUTTON + '$1');
+      } else {
+        updated = updated.replace(/<\/nav>\s*$/i, ONEXBET_TOOL_BUTTON + '\n</nav>');
+      }
+    }
+    return updated;
   });
 
   // 2. Pages that don't load app.css need the header/theme styles so the

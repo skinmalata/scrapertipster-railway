@@ -76,7 +76,7 @@ const HEADER_HTML = `<header>
 <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 <nav id="nav">
  <a href="/">Home</a>
- <a href="/ticket-builder.html">Ticket Builder</a>
+ <a href="/ticket-builder.html">AI SportyBet Code Builder</a>
  <a href="/best-picks.html">Best Picks</a>
  <a href="/author-picks.html">H2H Picks</a>
  <a href="/predictions/in-play">In-Play</a>
@@ -96,7 +96,7 @@ const FOOTER_HTML = `<footer>
   </div>
   <div class="footer-links">
    <a href="/">Home</a>
-   <a href="/ticket-builder.html">Ticket Builder</a>
+   <a href="/ticket-builder.html">AI SportyBet Code Builder</a>
    <a href="/2-odds-of-the-day.html">2 Odds</a>
    <a href="/best-picks.html">Best Picks</a>
    <a href="/author-picks.html">H2H Picks</a>

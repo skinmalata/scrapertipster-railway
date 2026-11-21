@@ -120,7 +120,7 @@ function leagueFaqs(leagueName) {
     },
     {
       q: `Can I use ${leagueName} picks in accumulator bets?`,
-      a: `Yes. ${leagueName} picks with 75%+ probability make strong accumulator legs. Use our Ticket Builder tool to automatically combine market picks into optimized tickets.`
+      a: `Yes. ${leagueName} picks with 75%+ probability make strong accumulator legs. Use our AI SportyBet Code Builder tool to automatically combine market picks into optimized tickets.`
     }
   ];
 }
@@ -239,7 +239,7 @@ ${CHIPS_CSS}
 <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 <nav id="nav">
 <a href="/">Home</a>
-<a href="/ticket-builder.html">Ticket Builder</a>
+<a href="/ticket-builder.html">AI SportyBet Code Builder</a>
 <a href="/best-picks.html">Best Picks</a>
 <a href="/author-picks.html">H2H Picks</a>
 <a href="/blog/">Blog</a>

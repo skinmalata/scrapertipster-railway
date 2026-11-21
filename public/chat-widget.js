@@ -13,7 +13,7 @@ var SITE={
   url:'https://winfulltime.com',
   tagline:'Free AI Football Predictions',
   email:'officialwinfulltime@gmail.com',
-  desc:'WinFulltime provides data-driven football predictions across 50+ global leagues and 750+ teams. The core markets (1X2, Over 1.5/2.5, Under 2.5, BTTS) are free for everyone; Pro unlocks the full daily pick list in every other market. Predictions, analysis, blog and free tools (Ticket Builder, Code Converter) are accessible to everyone.',
+  desc:'WinFulltime provides data-driven football predictions across 50+ global leagues and 750+ teams. The core markets (1X2, Over 1.5/2.5, Under 2.5, BTTS) are free for everyone; Pro unlocks the full daily pick list in every other market. Predictions, analysis, blog and free tools (AI SportyBet Code Builder, AI Code Converter) are accessible to everyone.',
   pages:{
     home:{url:'/',title:'Home - Daily Predictions'},
     '1x2':{url:'/predictions/1x2',title:'1X2 Predictions'},
@@ -27,7 +27,7 @@ var SITE={
     'winning-streak':{url:'/predictions/winning-streak',title:'Winning Streaks'},
     'losing-streak':{url:'/predictions/losing-streak',title:'Losing Streaks'},
     'draws-streak':{url:'/predictions/draws-streak',title:'Draw Streaks'},
-    'ticket-builder':{url:'/ticket-builder.html',title:'Free Ticket Builder'},
+    'ticket-builder':{url:'/ticket-builder.html',title:'Free AI SportyBet Code Builder'},
     blog:{url:'/blog/',title:'Betting Blog'},
     about:{url:'/about.html',title:'About Us'},
     contact:{url:'/contact.html',title:'Contact'},
@@ -43,7 +43,7 @@ var SITE={
     'BTTS YES & BTTS NO (Both Teams To Score)',
     'Corners and Cards predictions (free 3-pick preview daily)',
     'Unbeaten team streaks (winning/drawing streaks) with a free daily preview',
-    'Free Accumulator/Ticket Builder with AI optimization',
+    'Free Accumulator/AI SportyBet Code Builder with AI optimization',
     'Free booking code converter (SportyBet, Bet9ja, MSport, Betway, Bangbet, BetKing)',
     'Free SportyBet code analyzer (scores each selection for risk and removes the risky ones)',
     '350+ educational blog articles on betting strategy',
@@ -86,7 +86,7 @@ var FAQ=[
 {k:['free','cost','price','pricing','pay','payment','subscription','vip','plan','membership','billing','whop','how much','pro monthly','pro yearly'],r:'WinFulltime is freemium:\n\u2022 Free plan — $0, forever. Full daily picks in the core markets (1X2, Over 1.5/2.5, Under 2.5, BTTS), a free 3-pick preview of other markets each day, live scores, match analysis and daily results.\n\u2022 Pro Monthly — $40/month. Full daily pick list in every market (Corners, Cards, HT/FT, GG2+, streaks, Team-to-Score, Highest Scoring Half, In-Play), complete Best Picks & H2H Picks, Team To Score record-cert tips, priority support.\n\u2022 Pro Yearly — $200/year (save 58%).\n\nPayments go through Whop or PayPal, subscriptions auto-renew unless cancelled, and all plans have a 7-day money-back guarantee. Create your free account at '+SITE.url+'/signup.html or see '+SITE.url+'/pricing.html.'},
 {k:['contact','email','reach','message','support'],r:'Contact us at '+SITE.email+' or visit '+SITE.url+'/contact.html'},
 {k:['about','what is winfulltime','who are','tell me about','who is','company','about us','organization'],r:SITE.desc},
-{k:['how','use','works','work','guide','start'],r:'Using WinFulltime:\n1. Visit '+SITE.url+'\n2. Pick a day using the tabs (Today, Tomorrow)\n3. Choose a market: 1X2, Over 2.5, BTTS, etc.\n4. Browse predictions with confidence percentages\n5. Click any match for detailed analysis\n6. Try the Free Ticket Builder to build accumulators'},
+{k:['how','use','works','work','guide','start'],r:'Using WinFulltime:\n1. Visit '+SITE.url+'\n2. Pick a day using the tabs (Today, Tomorrow)\n3. Choose a market: 1X2, Over 2.5, BTTS, etc.\n4. Browse predictions with confidence percentages\n5. Click any match for detailed analysis\n6. Try the Free AI SportyBet Code Builder to build accumulators'},
 {k:['leagues','competition','tournament'],r:'We cover 50+ leagues: '+SITE.leagues},
 {k:['prediction','tip','pick','bet'],r:'We provide: 1X2, Over 2.5, Over 1.5, Under 2.5, BTTS YES, BTTS NO — all fully free. Corners, Cards, streaks, HT/FT, GG2+, Unbeaten Teams, Best Picks and H2H Picks show a free 3-pick preview daily, with the full list on Pro. Daily updates for 50+ leagues.'},
   {k:['1x2','1 x 2','match result','home win','away win','draw'],r:'1X2 betting: 1=Home Win, X=Draw, 2=Away Win. Our picks show 65%+ probability. Visit '+SITE.url+'/predictions/1x2 for today\'s predictions.'},
@@ -100,7 +100,7 @@ var FAQ=[
 {k:['blog','article','post','guide','strategy','educational','read'],r:'Our blog features 350+ articles on betting strategies, market guides, league analysis, betting site reviews, and betting education. Browse all categories at '+SITE.url+'/blog/'},
 {k:['responsible','gamble','gambling','addict','problem','18+'],r:'WinFulltime promotes responsible gambling. All predictions are informational. We recommend: set limits, never chase losses, treat betting as entertainment. If gambling becomes a problem, seek help at BeGambleAware.org.'},
 {k:['youtube','video','channel','subscribe'],r:'Check out our YouTube channel @winfulltime for video predictions, analysis, and betting tips: https://www.youtube.com/@winfulltime/videos'},
-{k:['register','sign up','signup','account','login','create','password','forgot'],r:'Registration is free and optional. Create a free account at '+SITE.url+'/signup.html — no payment needed and no card required. Free accounts get the Free plan by default; you can browse predictions and use the Ticket Builder and Code Converter without paying. Upgrade to Pro anytime at '+SITE.url+'/pricing.html.'},
+{k:['register','sign up','signup','account','login','create','password','forgot'],r:'Registration is free and optional. Create a free account at '+SITE.url+'/signup.html — no payment needed and no card required. Free accounts get the Free plan by default; you can browse predictions and use the AI SportyBet Code Builder and AI Code Converter without paying. Upgrade to Pro anytime at '+SITE.url+'/pricing.html.'},
 {k:['ticket','builder','acca','accumulator','multi','parlay','generate'],r:SITE.ticketBuilder.desc+'\n\nHow to use: '+SITE.ticketBuilder.howto+'\n\nTip: '+SITE.ticketBuilder.tip},
 {k:['converter','convert','booking code','code convert','decode','transfer code','msport','betking','bangbet','bet9ja code','sportybet code'],r:'Free booking code converter for SportyBet, Bet9ja, MSport, Betway, Bangbet and BetKing. Paste a booking code to decode it, preview every selection, market and odds, and generate a fresh code for another site. No sign-up needed. Visit '+SITE.url+'/converter.html'},
 {k:['analyzer','code analyzer','analyze booking code','risk analyzer','risky selections','remove selection','remove risky','code risk','booking code analyzer'],r:'Free SportyBet code analyzer. Paste a booking code to review every selection with a risk score from 1 to 10 (odds, market type, kick-off proximity, head-to-head form, price drift), remove the risky selections, and get a fresh code with the survivors. Original code untouched. Visit '+SITE.url+'/code-analyzer.html'},
@@ -112,7 +112,7 @@ var FAQ=[
 {k:['league','premier league','epl','la liga','serie a','bundesliga','ligue 1','champions league'],r:'We cover Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, and 40+ more leagues worldwide.'},
 {k:['features','what can','offer','provide','services'],r:'WinFulltime features:\n'+SITE.features.map(function(f,i){return (i+1)+'. '+f}).join('\n')},
 {k:['blog','betting','tips','strategies','guides','education'],r:'Explore our blog categories:\n\u2022 Betting Strategies (40+ articles on value betting, bankroll, accumulators)\n\u2022 Market Guides (BTTS, Over/Under, Asian Handicap, Cards, Corners)\n\u2022 League Guides (Premier League, La Liga, Serie A, Champions League)\n\u2022 Analysis & Statistics (football stories, data analysis)\n\u2022 Betting Sites & Payments (reviews, deposits, withdrawals)\n\u2022 Guides & Education (basics, odds, dictionary)\n\nBrowse all: '+SITE.url+'/blog/'},
-  {k:['page','site','website','pages','sitemap'],r:'WinFulltime pages:\n\u2022 Home - '+SITE.url+'\n\u2022 1X2 Predictions - '+SITE.url+'/predictions/1x2\n\u2022 Over 2.5 - '+SITE.url+'/predictions/over-2-5\n\u2022 Over 1.5 - '+SITE.url+'/predictions/over-1-5\n\u2022 BTTS Yes - '+SITE.url+'/predictions/btts\n\u2022 BTTS No - '+SITE.url+'/predictions/btts-no\n\u2022 Corners - '+SITE.url+'/predictions/corners\n\u2022 Cards - '+SITE.url+'/predictions/cards\n\u2022 Unbeaten - '+SITE.url+'/predictions/unbeaten\n\u2022 Ticket Builder - '+SITE.url+'/ticket-builder.html\n\u2022 Blog - '+SITE.url+'/blog/\n\u2022 About - '+SITE.url+'/about.html\n\u2022 Contact - '+SITE.url+'/contact.html'},
+  {k:['page','site','website','pages','sitemap'],r:'WinFulltime pages:\n\u2022 Home - '+SITE.url+'\n\u2022 1X2 Predictions - '+SITE.url+'/predictions/1x2\n\u2022 Over 2.5 - '+SITE.url+'/predictions/over-2-5\n\u2022 Over 1.5 - '+SITE.url+'/predictions/over-1-5\n\u2022 BTTS Yes - '+SITE.url+'/predictions/btts\n\u2022 BTTS No - '+SITE.url+'/predictions/btts-no\n\u2022 Corners - '+SITE.url+'/predictions/corners\n\u2022 Cards - '+SITE.url+'/predictions/cards\n\u2022 Unbeaten - '+SITE.url+'/predictions/unbeaten\n\u2022 AI SportyBet Code Builder - '+SITE.url+'/ticket-builder.html\n\u2022 Blog - '+SITE.url+'/blog/\n\u2022 About - '+SITE.url+'/about.html\n\u2022 Contact - '+SITE.url+'/contact.html'},
 {k:['bet9ja','sportybet','1xbet','betking','betway','melbet','22bet'],r:'We\'ve reviewed major betting sites:\n\u2022 Bet9ja vs SportyBet: '+SITE.url+'/blog/bet9ja-vs-sportybet.html\n\u2022 1xBet reviews across Africa: '+SITE.url+'/blog/1xbet-review.html\n\u2022 Best betting sites Nigeria: '+SITE.url+'/blog/best-betting-sites-nigeria.html\n\u2022 Best betting sites Kenya: '+SITE.url+'/blog/best-betting-sites-kenya.html\n\u2022 Best betting sites Ghana: '+SITE.url+'/blog/best-betting-sites-ghana.html'},
 {k:['what is','meaning','explain','define','definition','term'],explainer:true,r:'I can explain any betting term! Try asking about:\n\u2022 What is Asian Handicap?\n\u2022 What does BTTS mean?\n\u2022 What is Expected Goals (xG)?\n\u2022 What is the Kelly Criterion?\n\u2022 What is value betting?\n\u2022 What is Poisson distribution?\n\u2022 What is cash out?\n\u2022 What is a booking code?'},
 {k:['podcast','radio','audio','listen'],r:'We don\'t have a podcast yet, but you can check out our YouTube channel for video content: https://www.youtube.com/@winfulltime/videos'},
@@ -174,7 +174,7 @@ function buildInChatTickets(data,msg){
     out+='<tr><td colspan="4" class="tod">Total: '+tkt.total.toFixed(2)+' ('+tkt.legs.length+' legs)</td></tr></table>';
     if(ti<selected.length-1)out+='<hr style="border:none;border-top:1px solid #eee;margin:4px 0">';
   }
-  out+='<a href="'+SITE.url+'/ticket-builder.html" class="chat-mb" target="_blank">Open Full Ticket Builder \u2192</a></div>';
+  out+='<a href="'+SITE.url+'/ticket-builder.html" class="chat-mb" target="_blank">Open Full AI SportyBet Code Builder \u2192</a></div>';
   return out;
 }
 
@@ -333,7 +333,7 @@ function sendMessage(){
     setTimeout(function(){
       hideTyping();var r=findBest(text);
       if(r){addMessage(r,'bot')}else{
-        addMessage('I\'m not sure about that. Try asking about:\n\u2022 Today\'s 1X2 predictions\n\u2022 Build me an accumulator\n\u2022 TTicket Builder\n\u2022 What leagues do you cover?\n\u2022 Explain BTTS\n\u2022 Best betting sites in Kenya\n\u2022 How does the ticket builder work?\n\u2022 Blog articles about value betting\n\u2022 What is Asian Handicap?\n\nOr browse '+SITE.url+' for more info.','bot')
+        addMessage('I\'m not sure about that. Try asking about:\n\u2022 Today\'s 1X2 predictions\n\u2022 Build me an accumulator\n\u2022 TAI SportyBet Code Builder\n\u2022 What leagues do you cover?\n\u2022 Explain BTTS\n\u2022 Best betting sites in Kenya\n\u2022 How does the ticket builder work?\n\u2022 Blog articles about value betting\n\u2022 What is Asian Handicap?\n\nOr browse '+SITE.url+' for more info.','bot')
       }
     },400)
   }

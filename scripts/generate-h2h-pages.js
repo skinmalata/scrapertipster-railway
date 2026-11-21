@@ -261,7 +261,7 @@ ${generateH2hBreadcrumbSchema(home, away)}
 <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 <nav id="nav">
 <a href="/">Home</a>
-<a href="/ticket-builder.html">Ticket Builder</a>
+<a href="/ticket-builder.html">AI SportyBet Code Builder</a>
 <a href="/best-picks.html">Best Picks</a>
 <a href="/author-picks.html">H2H Picks</a>
 <a href="/blog/">Blog</a>

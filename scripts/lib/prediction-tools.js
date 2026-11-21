@@ -6,16 +6,18 @@ const PREDICTION_TOOLS_CSS = `.prediction-tools{position:relative;display:flex;f
 .prediction-tools .tool-inplay{background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff}
 .prediction-tools .tool-ticket{background:linear-gradient(135deg,#0891b2,#22d3ee);color:#fff}
 .prediction-tools .tool-betpawa{background:linear-gradient(135deg,#b45309,#fbbf24);color:#111827}
+.prediction-tools .tool-1xbet{background:linear-gradient(135deg,#1e3a8a,#60a5fa);color:#fff}
 .prediction-tools .tool-analyzer{background:linear-gradient(135deg,#d97706,#f59e0b);color:#fff}`;
 
 const PREDICTION_TOOLS_NAV = `<nav class="streak-buttons prediction-tools" aria-label="More football tools">
-<a class="streak-btn tool-converter" href="/converter.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Code Converter</span></a>
-<a class="streak-btn tool-merger" href="/code-merger.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Code Merger</span></a>
-<a class="streak-btn tool-splitter" href="/code-splitter.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Code Splitter</span></a>
+<a class="streak-btn tool-converter" href="/converter.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">AI Code Converter</span></a>
+<a class="streak-btn tool-merger" href="/code-merger.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">AI Code Merger</span></a>
+<a class="streak-btn tool-splitter" href="/code-splitter.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">AI Code Splitter</span></a>
 <a class="streak-btn tool-inplay" href="/predictions/in-play"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">In-Play</span></a>
-<a class="streak-btn tool-ticket" href="/ticket-builder.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Ticket Builder</span></a>
-<a class="streak-btn tool-betpawa" href="/betpawa-builder.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">betPawa Builder</span></a>
-<a class="streak-btn tool-analyzer" href="/code-analyzer.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">Code Analyzer</span></a>
+<a class="streak-btn tool-ticket" href="/ticket-builder.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">AI SportyBet Code Builder</span></a>
+<a class="streak-btn tool-betpawa" href="/betpawa-builder.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">AI betPawa Code Builder</span></a>
+<a class="streak-btn tool-1xbet" href="/1xbet-builder.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">AI 1xBet Code Builder</span></a>
+<a class="streak-btn tool-analyzer" href="/code-analyzer.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">AI Code Analyzer</span></a>
 </nav>`;
 
 module.exports = { PREDICTION_TOOLS_CSS, PREDICTION_TOOLS_NAV };

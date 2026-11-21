@@ -1,4 +1,4 @@
-/* Ticket Builder Core - client-side port of src/services/ticketBuilder.js,
+/* AI SportyBet Code Builder Core - client-side port of src/services/ticketBuilder.js,
    src/services/dailyPool.js and the helpers they need from
    src/services/twoOddsOfDay.js. Pure functions only - no secrets, no Node APIs.
    Exposes window.WFTTicketBuilder. */

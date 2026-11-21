@@ -1968,7 +1968,7 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
 // Free tier code builders generate up to 3.0 odds; higher targets require Pro.
 var FREE_CODE_BUILDER_MAX_ODDS = 3.0;
 
-// POST /api/sportybuilder/generate — SportyBuilder: auto SportyBet code for 2–50 odds
+// POST /api/sportybuilder/generate — AI SportyBet Code Builder: auto SportyBet code for 2–50 odds
 router.post('/sportybuilder/generate', optionalAuth, async function (req, res) {
   try {
     var body = req.body || {};
@@ -2005,7 +2005,7 @@ router.post('/betpawabuilder/generate', optionalAuth, async function (req, res) 
     var targetOdds = Math.min(50.0, Math.max(2.0, parseFloat(body.targetOdds) || 3.0));
     var avoidMatches = Array.isArray(body.avoidMatches) ? body.avoidMatches.slice(0, 20) : [];
 
-    // Same Pro gate as SportyBuilder: more than 3 odds needs a Pro account.
+    // Same Pro gate as AI SportyBet Code Builder: more than 3 odds needs a Pro account.
     var isPro = await resolveIsPro(req);
     if (targetOdds > FREE_CODE_BUILDER_MAX_ODDS && !isPro) {
       return res.status(403).json({
