@@ -12,6 +12,14 @@ const HSH_STATIC_FILE = path.join(process.cwd(), 'public', 'data', 'highest-scor
 // file cannot grow without bound across daily scraper runs.
 const KEEP_DAYS = 3;
 
+function formLastFive(value) {
+  return String(value || '').replace(/[^WDL]/gi, '').toUpperCase().slice(-5);
+}
+
+function isPerfectForm(value) {
+  return formLastFive(value) === 'WWWWW';
+}
+
 function loadCache() {
   try {
     if (fs.existsSync(CACHE_FILE)) {
@@ -43,19 +51,43 @@ async function main() {
   const byDate = await scrapeVip(dates);
   const cache = loadCache();
   const hshCache = loadHshCache();
+  const perfectDates = cache.perfectDates || {};
   cache.dates = cache.dates || {};
   hshCache.dates = hshCache.dates || {};
 
   for (const date of dates) {
     const matches = byDate[date] || [];
+    const perfectMatches = matches.filter(function (match) {
+      if (!match) return false;
+      const form = match.form || ((match.detail && match.detail.form) || {});
+      return isPerfectForm(form.home || form.homeForm) || isPerfectForm(form.away || form.awayForm);
+    }).map(function (match) {
+      const form = match.form || ((match.detail && match.detail.form) || {});
+      return {
+        matchId: match.matchId,
+        home: match.home,
+        away: match.away,
+        league: match.leagueName || match.league || '',
+        country: match.country || '',
+        time: (match.sportybet && match.sportybet.time) || match.time || '',
+        matchUrl: match.matchUrl || '',
+        form: {
+          homeForm: form.home || form.homeForm || '',
+          awayForm: form.away || form.awayForm || ''
+        },
+        sportybetAvailable: match.sportybetAvailable
+      };
+    });
     if (matches.length === 0) {
       const existingVip = cache.dates[date];
       const existingHsh = hshCache.dates[date];
       console.log('Empty scrape for ' + date + ', keeping existing ' +
         ((existingVip && existingVip.length) || 0) + ' VIP and ' +
-        ((existingHsh && existingHsh.length) || 0) + ' HSH picks');
+        ((existingHsh && existingHsh.length) || 0) + ' HSH picks and ' +
+        ((perfectDates[date] && perfectDates[date].length) || 0) + ' perfect-form fixtures');
       continue;
     }
+    perfectDates[date] = perfectMatches;
     // Strongest calls first so the API/page show the best value at the top:
     // match-winner record certs lead, then confidence, then must-score. Quality
     // over quantity - store at most VIP_MAX_TIPS per day. HSH is selected from
@@ -79,7 +111,7 @@ async function main() {
     const bettable = matches.filter(m => m.sportybetAvailable !== false).length;
     console.log(date + ': ' + matches.length + ' fixtures, ' + bettable + ' on SportyBet, ' + qualified.length + ' pass the confidence gate' +
       (qualified.length > VIP_MAX_TIPS ? ' (capped to top ' + VIP_MAX_TIPS + ')' : '') +
-      ', ' + hshPicks.length + ' 2nd-half picks');
+      ', ' + hshPicks.length + ' 2nd-half picks, ' + perfectMatches.length + ' perfect-form fixtures');
     // On a successful (non-empty) scrape the result is authoritative: an empty
     // selection legitimately means "no picks today", for both markets.
     cache.dates[date] = gated;
@@ -94,6 +126,10 @@ async function main() {
   for (const key of Object.keys(hshCache.dates)) {
     if (!keep.has(key)) delete hshCache.dates[key];
   }
+  for (const key of Object.keys(perfectDates)) {
+    if (!keep.has(key)) delete perfectDates[key];
+  }
+  cache.perfectDates = perfectDates;
   cache.lastFetch = new Date().toISOString();
   cache.meta = {
     markets: ['match-winner', 'team-to-score'],
@@ -124,8 +160,10 @@ async function main() {
   console.log('Saved ' + HSH_STATIC_FILE);
 
   const total = Object.values(cache.dates || {}).reduce((s, m) => s + m.length, 0);
+  const totalPerfect = Object.values(cache.perfectDates || {}).reduce((s, m) => s + m.length, 0);
   console.log('\n=== VIP PICKS (match-winner record certs + team-to-score, score prob >= ' + TTS_MIN_PROB + ', must-score >= ' + MUST_SCORE_MIN + '/100, max ' + VIP_MAX_TIPS + '/day) ===');
   console.log('Total VIP tips cached: ' + total);
+  console.log('Total perfect-form fixtures cached: ' + totalPerfect);
   for (const [date, matches] of Object.entries(cache.dates || {})) {
     console.log('\n--- ' + date + ' (' + matches.length + ') ---');
     matches.forEach(m => {

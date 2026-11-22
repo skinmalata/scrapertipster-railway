@@ -499,39 +499,6 @@
         }
       },
       {
-        "matchId": "2475331",
-        "home": "Probiy Horodenka",
-        "away": "Metalist Kharkov",
-        "league": "Ua2",
-        "leagueName": "Persha Liga",
-        "country": "Ukraine",
-        "time": "",
-        "probs": {
-          "home": 24,
-          "draw": 31,
-          "away": 45
-        },
-        "avgGoals": 3.5,
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.721,
-          "margin": 0.604,
-          "firstHalfShare": 0.27,
-          "firstHalfExp": 0.95,
-          "secondHalfExp": 2.55,
-          "p1": 0.118,
-          "p2": 0.721,
-          "tie": 0.161,
-          "fitErr": 0.00398,
-          "totalExp": 3.5,
-          "referenceFirstHalfProb": 0.12,
-          "referenceDrawProb": 0.49,
-          "referenceSecondHalfProb": 0.4,
-          "reason": "Expected 3.5 goals, split 0.9 in the 1st half vs 2.6 in the 2nd. The 2nd half wins the half race 72% of the time, 60% clear of the other half."
-        }
-      },
-      {
         "matchId": "2523631",
         "home": "Werder Bremen",
         "away": "Hamburger SV",
@@ -562,6 +529,39 @@
           "referenceDrawProb": 0.55,
           "referenceSecondHalfProb": 0.22,
           "reason": "Expected 2.8 goals, split 0.7 in the 1st half vs 2.1 in the 2nd. The 2nd half wins the half race 70% of the time, 58% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2565655",
+        "home": "Nashville SC",
+        "away": "FC Cincinnati",
+        "league": "Us1",
+        "leagueName": "Major League Soccer",
+        "country": "USA",
+        "time": "",
+        "probs": {
+          "home": 44,
+          "draw": 30,
+          "away": 26
+        },
+        "avgGoals": 3.22,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.691,
+          "margin": 0.561,
+          "firstHalfShare": 0.28,
+          "firstHalfExp": 0.9,
+          "secondHalfExp": 2.32,
+          "p1": 0.13,
+          "p2": 0.691,
+          "tie": 0.179,
+          "fitErr": 0.00066,
+          "totalExp": 3.22,
+          "referenceFirstHalfProb": 0.35,
+          "referenceDrawProb": 0.5,
+          "referenceSecondHalfProb": 0.16,
+          "reason": "Expected 3.2 goals, split 0.9 in the 1st half vs 2.3 in the 2nd. The 2nd half wins the half race 69% of the time, 56% clear of the other half."
         }
       },
       {
@@ -964,7 +964,7 @@
       }
     ]
   },
-  "lastFetch": "2026-11-22T11:25:24.080Z",
+  "lastFetch": "2026-11-22T22:31:35.058Z",
   "meta": {
     "minProb": 0.55,
     "maxPicks": 12,

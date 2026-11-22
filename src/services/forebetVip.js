@@ -315,9 +315,9 @@ const SCRAPE_TIMEOUT_MS = 25000;
 const ENRICH_DETAIL = process.env.VIP_ENRICH_DETAIL !== '0';
 // Hard wall-clock budget for a whole scrape run. When it is exceeded the run
 // stops starting new work and publishes whatever it has already scored, so the
-// scheduled task can never run long. Default 7 minutes (every fixture now
-// needs a detail fetch for the record-cert path, on top of TTS enrichment).
-const SCRAPE_BUDGET_MS = Math.max(1000, envNumber('VIP_SCRAPE_BUDGET_MS', 420000, 1000, 3600000));
+// scheduled task can never run long. Default 30 minutes because perfect-form
+// detection now needs a detail fetch for every fixture on every date.
+const SCRAPE_BUDGET_MS = Math.max(1000, envNumber('VIP_SCRAPE_BUDGET_MS', 1800000, 1000, 3600000));
 let _deadline = 0;
 function budgetExceeded() {
   return _deadline > 0 && Date.now() > _deadline;
@@ -1201,8 +1201,8 @@ async function enrichMatch(match) {
 
 // Enrichment is deliberately sequential: Cloudflare re-challenges parallel
 // tabs, so one shared browser session handling pages one-at-a-time is the
-// reliable path. Fixtures whose preliminary score (without the detail-only
-// form/H2H bonus) cannot possibly reach the gate are skipped entirely.
+// reliable path. Callers may pass a predicate for partial enrichment; perfect
+// form detection passes none because every fixture needs its detail page.
 async function enrichAll(matches, shouldEnrich) {
   const results = [];
   for (const match of matches) {
@@ -1304,23 +1304,17 @@ async function scrapeDay(dateStr, options) {
     return props.some((p) => (Number(p.prob) / 100) >= TTS_MIN_PROB);
   };
 
-  // Unavailable fixtures cannot be published, so they never justify a browser
-  // fetch. Available ones are still enriched whether or not they look like a
-  // team-to-score candidate, because the record-cert path needs those
-  // form/H2H pages too.
-  const worthDetail = (match) => !sportyOnly || match.sportybetAvailable;
+  const canPublish = (match) => !sportyOnly || match.sportybetAvailable;
 
   let enriched;
   if (ENRICH_DETAIL) {
-    // Detail pages carry the form/H2H records BOTH markets need. Priority:
-    // fixtures that can produce a team-to-score call first (they feed the
-    // main VIP gate); every other fixture still gets a detail fetch for the
-    // record-cert path until the wall-clock budget stops new work. Skipping
-    // non-TTS fixtures outright starved the cert path of records entirely.
-    // Unavailable fixtures sort last and are never fetched.
-    const prio = new Map(annotated.map((m) => [m, !worthDetail(m) ? 2 : shouldEnrich(m) ? 0 : 1]));
+    // Detail pages carry the form/H2H records BOTH markets need. Every fixture
+    // is fetched, regardless of bookmaker availability, so perfect-form teams
+    // outside the VIP pool are still detected. TTS candidates go first so the
+    // main VIP gate is populated before the wall-clock budget can stop work.
+    const prio = new Map(annotated.map((m) => [m, shouldEnrich(m) ? 0 : 1]));
     const ordered = annotated.slice().sort((a, b) => prio.get(a) - prio.get(b));
-    enriched = await enrichAll(ordered, worthDetail);
+    enriched = await enrichAll(ordered, null);
     const enrichedCount = enriched.filter((m) => m.detail).length;
     console.log('[forebetVip] Parsed ' + raw.length + ' fixtures for ' + dateStr + '; enriched ' + enrichedCount + '/' + raw.length + ' detail pages for form/H2H (TTS candidates prioritised)...');
   } else {
@@ -1348,7 +1342,7 @@ async function scrapeDay(dateStr, options) {
     // two divisions of the major football nations - the same rule the free
     // highest-scoring-half tab uses - so no lower-league, cup or youth fixture
     // ever publishes a tip.
-    const publishable = worthDetail(m) && isMajorTopTierLeague(m);
+    const publishable = canPublish(m) && isMajorTopTierLeague(m);
     const cert = publishable ? selectMatchWinnerCert({ home: m.home, away: m.away, probs: m.probs, form, h2h }) : null;
     const tip = publishable
       ? (cert || selectTeamScoreTip({ home: m.home, away: m.away, teamScoreProps, form, h2h }))

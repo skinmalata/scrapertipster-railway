@@ -52,11 +52,17 @@ function buildPerfectRecordMatches(dataDir) {
 
   const vip = JSON.parse(fs.readFileSync(vipFile, 'utf8'));
   const predictions = JSON.parse(fs.readFileSync(predFile, 'utf8'));
+  // A legacy cache has no Forebet form scan yet. Keep the last built rows
+  // instead of emptying the tab before the scraper publishes perfectDates.
+  if (!vip.perfectDates) return (predictions.perfectRecordMatches || []).length;
   const rows = [];
   const seen = new Set();
 
-  Object.keys(vip.dates || {}).forEach(function (date) {
-    (vip.dates[date] || []).forEach(function (pick) {
+  // Forebet detail-page form scans are the only source of truth here. The
+  // gated VIP pick list is model-curated and must never define recent form.
+  const perfectDates = vip.perfectDates;
+  Object.keys(perfectDates).forEach(function (date) {
+    (perfectDates[date] || []).forEach(function (pick) {
       if (!pick) return;
       const form = pick.form || ((pick.detail && pick.detail.form) || {});
       const home = String(pick.home || '').trim();
@@ -76,7 +82,7 @@ function buildPerfectRecordMatches(dataDir) {
       rows.push({
         id: 'perfect-' + String(pick.matchId || key.replace(/[^a-z0-9]+/gi, '-')),
         date: date,
-        time: (pick.sportybet && pick.sportybet.time) || pick.time || '',
+        time: pick.time || '',
         league: pick.leagueName || pick.league || '',
         country: pick.country || '',
         match: home + ' - ' + away,

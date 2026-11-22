@@ -283,7 +283,7 @@ const CATEGORIES = {
     dataKey: 'perfectRecordMatches',
     gated: false,
     title: 'Perfect Record Predictions Today',
-    description: 'Football predictions for teams with five wins in their last five matches. Browse every qualifying fixture for today and upcoming dates.',
+    description: 'Football predictions for teams with five wins in their last five matches, sourced from Forebet recent form data. Browse every qualifying fixture for today and upcoming dates.',
     keywords: 'perfect record predictions, 5 wins in last 5, WWWWW form, perfect recent form football tips, winning form predictions',
     heading: 'Perfect Record',
     label: 'Perfect Record',
