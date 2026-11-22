@@ -188,7 +188,7 @@ function loadKnown404Map() {
 
 const FLAT_SLUGS = new Set([
   '1x2', 'over-1-5', 'over-2-5', 'under-2-5', 'btts', 'btts-no', 'unbeaten',
-  'winning-streak', 'losing-streak', 'draws-streak', 'corners', 'cards',
+  'perfect-record', 'winning-streak', 'losing-streak', 'draws-streak', 'corners', 'cards',
   'in-play', 'live', 'leagues', 'index'
 ]);
 

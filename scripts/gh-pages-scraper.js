@@ -37,6 +37,81 @@ function splitMatch(match) {
   return [String(match).slice(0, separator), String(match).slice(separator + token[0].length)];
 }
 
+function formLastFive(value) {
+  return String(value || '').replace(/[^WDL]/gi, '').toUpperCase().slice(-5);
+}
+
+function isPerfectForm(value) {
+  return formLastFive(value) === 'WWWWW';
+}
+
+function buildPerfectRecordMatches(dataDir) {
+  const vipFile = path.join(process.cwd(), 'forebet-vip-cache.json');
+  const predFile = path.join(dataDir, 'predictions.json');
+  if (!fs.existsSync(vipFile) || !fs.existsSync(predFile)) return 0;
+
+  const vip = JSON.parse(fs.readFileSync(vipFile, 'utf8'));
+  const predictions = JSON.parse(fs.readFileSync(predFile, 'utf8'));
+  const rows = [];
+  const seen = new Set();
+
+  Object.keys(vip.dates || {}).forEach(function (date) {
+    (vip.dates[date] || []).forEach(function (pick) {
+      if (!pick) return;
+      const form = pick.form || ((pick.detail && pick.detail.form) || {});
+      const home = String(pick.home || '').trim();
+      const away = String(pick.away || '').trim();
+      const candidates = [
+        { side: 'home', team: home, form: form.homeForm || form.home },
+        { side: 'away', team: away, form: form.awayForm || form.away }
+      ].filter(function (c) { return c.team && isPerfectForm(c.form); });
+      if (!candidates.length || !home || !away) return;
+
+      const key = date + '|' + home + '|' + away;
+      if (seen.has(key)) return;
+      seen.add(key);
+
+      const best = candidates[0];
+      const lastFive = formLastFive(best.form);
+      rows.push({
+        id: 'perfect-' + String(pick.matchId || key.replace(/[^a-z0-9]+/gi, '-')),
+        date: date,
+        time: (pick.sportybet && pick.sportybet.time) || pick.time || '',
+        league: pick.leagueName || pick.league || '',
+        country: pick.country || '',
+        match: home + ' - ' + away,
+        tip: 'Perfect Record: ' + best.team,
+        probability: 100,
+        description: best.team + ' won all 5 of its last 5 matches (' + lastFive + ').',
+        perfectTeam: best.team,
+        perfectForm: lastFive,
+        perfectTeams: candidates.map(function (c) {
+          return { side: c.side, team: c.team, form: formLastFive(c.form) };
+        }),
+        market: 'perfect-record'
+      });
+    });
+  });
+
+  predictions.perfectRecordMatches = rows;
+  predictions.totalPerfectRecord = rows.length;
+  fs.writeFileSync(predFile, JSON.stringify(predictions));
+
+  const cacheFile = path.join(process.cwd(), 'predictions-cache.json');
+  if (fs.existsSync(cacheFile)) {
+    try {
+      const cache = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
+      cache.perfectRecordMatches = rows;
+      cache.totalPerfectRecord = rows.length;
+      fs.writeFileSync(cacheFile, JSON.stringify(cache));
+    } catch (e) {
+      console.warn('[perfect-record] Could not update predictions cache:', e.message);
+    }
+  }
+
+  return rows.length;
+}
+
 function getSignificantTokens(name) {
   const commonWords = new Set(['fc', 'sc', 'ac', 'rc', 'us', 'ud', 'utd', 'as', 'ss', 'cf', 'cd', 'de', 'da', 'do', 'el', 'la', 'le', 'il', 'al', 'united', 'city', 'club', 'team', 'sporting', 'athletic', 'association', 'real', 'inter', 'san', 'saint', 'st']);
   return normalizeTeam(name).split(/\s+/).filter(t => t.length > 2 && !commonWords.has(t));
@@ -545,6 +620,13 @@ async function main() {
   // Regenerate cross-link pages (teams, h2h, league, matrix, date archives)
   // AFTER buildAnalysis so they reference the freshly written analysis pages
   // and analysis-links.json instead of the committed stale snapshot.
+  try {
+    const perfectCount = buildPerfectRecordMatches(dataDir);
+    console.log(`Merged perfectRecordMatches: ${perfectCount} matches`);
+  } catch (err) {
+    console.error('Perfect record build failed:', err.message);
+  }
+
   console.log('Regenerating linker pages...');
   limitStaticForFree(dataDir);
   // The linker regenerators read predictions-cache.json rather than the public
@@ -725,5 +807,5 @@ if (require.main === module) {
     process.exit(1);
   });
 } else {
-  module.exports = { enrichWithResults, enrichPublishedPredictions, rebuildStatic, updateSitemapCore, recoverMissedFixtures, main };
+  module.exports = { enrichWithResults, enrichPublishedPredictions, rebuildStatic, updateSitemapCore, recoverMissedFixtures, buildPerfectRecordMatches, main };
 }

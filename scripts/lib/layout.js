@@ -109,8 +109,10 @@ const FOOTER_HTML = `<footer>
    <a href="/predictions/btts">BTTS Yes</a>
    <a href="/predictions/btts-no">BTTS No</a>
    <a href="/predictions/unbeaten">Unbeaten</a>
+   <a href="/predictions/perfect-record">Perfect Record</a>
    <a href="/predictions/corners">Corners</a>
    <a href="/predictions/cards">Cards</a>
+
    <a href="/advertise.html">Advertise</a>
    <a href="/contact.html">Contact</a>
    <a href="/terms.html">Terms</a>

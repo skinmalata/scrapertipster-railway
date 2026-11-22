@@ -189,6 +189,7 @@ function buildSitemaps() {
     { loc: 'https://winfulltime.com/predictions/btts', file: 'predictions/btts.html', changefreq: 'daily', priority: '0.9' },
     { loc: 'https://winfulltime.com/predictions/btts-no', file: 'predictions/btts-no.html', changefreq: 'daily', priority: '0.8' },
     { loc: 'https://winfulltime.com/predictions/unbeaten', file: 'predictions/unbeaten.html', changefreq: 'daily', priority: '0.8' },
+    { loc: 'https://winfulltime.com/predictions/perfect-record', file: 'predictions/perfect-record.html', changefreq: 'daily', priority: '0.8' },
     { loc: 'https://winfulltime.com/predictions/winning-streak', file: 'predictions/winning-streak.html', changefreq: 'daily', priority: '0.8' },
     { loc: 'https://winfulltime.com/predictions/losing-streak', file: 'predictions/losing-streak.html', changefreq: 'daily', priority: '0.8' },
     { loc: 'https://winfulltime.com/predictions/draws-streak', file: 'predictions/draws-streak.html', changefreq: 'daily', priority: '0.8' },

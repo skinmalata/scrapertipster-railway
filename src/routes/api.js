@@ -401,6 +401,7 @@ router.get('/predictions', optionalAuth, async (req, res) => {
           winstreakMatches: [],
           losestreakMatches: [],
           drawstreakMatches: [],
+          perfectRecordMatches: [],
           teamToScoreMatches: [],
           teamToScore2PlusMatches: [],
           cardsMatches: [],
@@ -413,6 +414,7 @@ router.get('/predictions', optionalAuth, async (req, res) => {
           totalWinstreak: 0,
           totalLosestreak: 0,
           totalDrawstreak: 0,
+          totalPerfectRecord: 0,
           error: 'Data temporarily unavailable'
         });
       }
@@ -617,6 +619,7 @@ router.get('/predictions', optionalAuth, async (req, res) => {
     if (!data.winstreakMatches) data.winstreakMatches = [];
     if (!data.losestreakMatches) data.losestreakMatches = [];
     if (!data.drawstreakMatches) data.drawstreakMatches = [];
+    if (!data.perfectRecordMatches) data.perfectRecordMatches = [];
     if (!data.teamToScoreMatches) data.teamToScoreMatches = [];
     if (!data.teamToScore2PlusMatches) data.teamToScore2PlusMatches = [];
     
@@ -637,6 +640,7 @@ router.get('/predictions', optionalAuth, async (req, res) => {
       winstreakMatches: [],
       losestreakMatches: [],
       drawstreakMatches: [],
+      perfectRecordMatches: [],
       teamToScoreMatches: [],
       teamToScore2PlusMatches: [],
       message: 'Predictions currently unavailable. Please try again later.'

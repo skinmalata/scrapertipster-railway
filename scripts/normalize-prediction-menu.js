@@ -26,6 +26,7 @@ const CANONICAL = [
   ['/predictions/gg2', 'tab-gg2', 'GG2+'],
   ['/predictions/highest-scoring-half', 'tab-highest-scoring-half', 'Highest Scoring Half'],
   ['/predictions/unbeaten', 'tab-unbeaten', 'Unbeaten'],
+  ['/predictions/perfect-record', 'tab-perfect-record', 'Perfect Record'],
   ['/predictions/btts', 'tab-btts', 'BTTS YES'],
   ['/predictions/btts-no', 'tab-bttsno', 'BTTS NO'],
   ['/predictions/corners', 'tab-corners', 'Corners'],

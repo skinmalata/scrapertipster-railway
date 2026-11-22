@@ -296,6 +296,7 @@ gtag('config', 'G-HMGZMW9EDP');
   <a href="/predictions/gg2" id="tab-gg2" class="tab-btn">GG2+</a>
   <a href="/predictions/highest-scoring-half" id="tab-highest-scoring-half" class="tab-btn">Highest Scoring Half</a>
   <a href="/predictions/unbeaten" id="tab-unbeaten" class="tab-btn">Unbeaten</a>
+  <a href="/predictions/perfect-record" id="tab-perfect-record" class="tab-btn">Perfect Record</a>
   <a href="/predictions/btts" id="tab-btts" class="tab-btn">BTTS YES</a>
   <a href="/predictions/btts-no" id="tab-bttsno" class="tab-btn">BTTS NO</a>
   <a href="/predictions/corners" id="tab-corners" class="tab-btn">Corners</a>
@@ -338,7 +339,7 @@ gtag('config', 'G-HMGZMW9EDP');
    <div class="noscript-card" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:24px;margin:20px 0;line-height:1.7;color:rgba(232,237,245,.9);">
     <h2 style="margin-top:0;font-size:20px;color:#fff;">Today's Football Predictions</h2>
     <p>WinFulltime publishes free football predictions for the main betting markets every day. Browse today's and tomorrow's picks by market or competition below.</p>
-    <p><strong>Markets:</strong> <a href="/predictions/1x2">1X2</a> &middot; <a href="/predictions/over-1-5">Over 1.5</a> &middot; <a href="/predictions/over-2-5">Over 2.5</a> &middot; <a href="/predictions/under-2-5">Under 2.5</a> &middot; <a href="/predictions/btts">BTTS Yes</a> &middot; <a href="/predictions/btts-no">BTTS No</a> &middot; <a href="/predictions/unbeaten">Unbeaten</a> &middot; <a href="/predictions/corners">Corners</a> &middot; <a href="/predictions/cards">Cards</a></p>
+    <p><strong>Markets:</strong> <a href="/predictions/1x2">1X2</a> &middot; <a href="/predictions/over-1-5">Over 1.5</a> &middot; <a href="/predictions/over-2-5">Over 2.5</a> &middot; <a href="/predictions/under-2-5">Under 2.5</a> &middot; <a href="/predictions/btts">BTTS Yes</a> &middot; <a href="/predictions/btts-no">BTTS No</a> &middot; <a href="/predictions/unbeaten">Unbeaten</a> &middot; <a href="/predictions/perfect-record">Perfect Record</a> &middot; <a href="/predictions/corners">Corners</a> &middot; <a href="/predictions/cards">Cards</a></p>
     <p><strong>Leagues:</strong> <a href="/predictions/league/premier-league/">Premier League</a> &middot; <a href="/predictions/league/la-liga/">La Liga</a> &middot; <a href="/predictions/league/serie-a/">Serie A</a> &middot; <a href="/predictions/league/ligue-1/">Ligue 1</a> &middot; <a href="/predictions/league/uefa-champions-league/">Champions League</a> &middot; <a href="/predictions/league/turkish-super-lig/">Turkish Super Lig</a></p>
     <p>Every tip is derived from statistical analysis of form, head-to-head records and league trends. Football predictions can lose &mdash; bet responsibly.</p>
    </div>
@@ -971,7 +972,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
  const urlCategory = urlParams.get('category');
 
- if (urlCategory && ['winstreak', 'losestreak', 'drawstreak', 'unbeaten'].includes(urlCategory)) {
+ if (urlCategory && ['winstreak', 'losestreak', 'drawstreak', 'unbeaten', 'perfectrecord'].includes(urlCategory)) {
 
  currentCategory = urlCategory;
 
@@ -1141,7 +1142,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
  function getCategoryLabel(cat) {
 
- const labels = { '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5', 'under25': 'Under 2.5', 'htft': 'HT/FT', 'gg2': 'GG2+', 'btts': 'BTTS YES', 'bttsno': 'BTTS NO', 'corners': 'Corners', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak', 'teamtoscore2plus': 'To Score 2+', 'cards': 'Cards' };
+ const labels = { '1x2': '1X2', 'over15': 'Over 1.5', 'over25': 'Over 2.5', 'under25': 'Under 2.5', 'htft': 'HT/FT', 'gg2': 'GG2+', 'btts': 'BTTS YES', 'bttsno': 'BTTS NO', 'corners': 'Corners', 'winstreak': 'Winning Streak', 'losestreak': 'Losing Streak', 'drawstreak': 'Draws Streak', 'perfectrecord': 'Perfect Record', 'teamtoscore2plus': 'To Score 2+', 'cards': 'Cards' };
 
  return labels[cat] || cat;
 
@@ -1373,7 +1374,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
 
  function renderMatches() {
-  const GATED_KEYS_HOME = { htft: 'htftMatches', gg2: 'gg2PlusMatches', corners: 'cornersMatches', cards: 'cardsMatches', winstreak: 'winstreakMatches', losestreak: 'losestreakMatches', drawstreak: 'drawstreakMatches', teamtoscore2plus: 'teamToScore2PlusMatches' };
+  const GATED_KEYS_HOME = { htft: 'htftMatches', gg2: 'gg2PlusMatches', corners: 'cornersMatches', cards: 'cardsMatches', winstreak: 'winstreakMatches', losestreak: 'losestreakMatches', drawstreak: 'drawstreakMatches', perfectrecord: 'perfectRecordMatches', teamtoscore2plus: 'teamToScore2PlusMatches' };
   function isGatedCategory(cat) { return cat === 'unbeaten' || !!GATED_KEYS_HOME[cat]; }
   function gatedTotalCount(cat, dateStr) {
    if (!GATED_KEYS_HOME[cat]) return null;
@@ -1451,7 +1452,10 @@ gtag('config', 'G-HMGZMW9EDP');
 
  else if (currentCategory === 'drawstreak') matches = currentData.drawstreakMatches || [];
 
+ else if (currentCategory === 'perfectrecord') matches = currentData.perfectRecordMatches || [];
+
  else if (currentCategory === 'teamtoscore2plus') matches = currentData.teamToScore2PlusMatches || [];
+
 
  else if (currentCategory === 'cards') matches = currentData.cardsMatches || [];
 
@@ -1595,9 +1599,10 @@ gtag('config', 'G-HMGZMW9EDP');
 
  const isDrawstreak = currentCategory === 'drawstreak';
 
- 
+ const isPerfectRecord = currentCategory === 'perfectrecord';
 
  let streakLabel = match.tip;
+
 
  if (isWinstreak) streakLabel = `Winning Streak: ${match.streak || ''}`;
 
@@ -1605,7 +1610,10 @@ gtag('config', 'G-HMGZMW9EDP');
 
  else if (isDrawstreak) streakLabel = `Draws Streak: ${match.streak || ''}`;
 
+ else if (isPerfectRecord) streakLabel = match.tip || 'Perfect Record';
+
  else if (isTeamToScore) streakLabel = match.tip || 'Score 2+ Goals';
+
 
 
 
@@ -1661,7 +1669,30 @@ gtag('config', 'G-HMGZMW9EDP');
 
 </div>
 
+ ` : isPerfectRecord ? `
+
+ <div class="match-teams" style="justify-content: center;">
+
+ <span class="team team-home" style="text-align: center; width: 100%;">${match.match}</span>
+
+</div>
+
+ <div class="match-footer">
+
+ <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+
+ <span class="tip-badge">${streakLabel}</span>
+
+ <div class="probability">${match.perfectForm || 'WWWWW'}</div>
+
+ ${match.description ? `<div style="font-size:12px;margin-top:6px;opacity:.85;">${match.description}</div>` : ''}
+
+</div>
+
+</div>
+
  ` : `
+
 
  <div class="match-teams">
 

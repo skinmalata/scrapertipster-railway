@@ -25,6 +25,7 @@ const GATED_KEYS = [
   'winstreakMatches',
   'losestreakMatches',
   'drawstreakMatches',
+  'perfectRecordMatches',
   'teamToScoreMatches',
   'teamToScore2PlusMatches',
   'htftMatches',

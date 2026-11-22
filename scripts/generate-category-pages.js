@@ -77,6 +77,13 @@ const FAQ_SCHEMA = {
     { q: 'How do I read the unbeaten streak badges?', a: 'Each match card shows the fixture, kick-off time, league, and streak badges. A badge reading "8 unbeaten" means the team has not lost in their last 8 matches. Some entries show "home" or "away" to indicate the streak applies to specific venues only.' },
     { q: 'When is unbeaten streak data updated?', a: 'Data updates daily. The primary update runs at 1:00 AM WAT and a secondary update at 6:00 AM WAT ensures late results and newly scheduled fixtures are captured across dozens of leagues worldwide.' }
   ],
+  'perfect-record': [
+    { q: 'What is a perfect record prediction?', a: 'A perfect record pick highlights a fixture where at least one team won all of its last five matches. The form string must be W-W-W-W-W; draws or losses do not qualify.' },
+    { q: 'How is perfect record different from unbeaten or winning streak?', a: 'Unbeaten includes draws and winning streak can count any run of consecutive wins. Perfect record is stricter: the last five results must all be wins.' },
+    { q: 'Do both teams need five wins?', a: 'No. A match qualifies when either side has five wins in its last five matches. When both teams qualify, the card shows each qualifying team.' },
+    { q: 'Can perfect record picks lose?', a: 'Yes. Recent form is a snapshot, not a guarantee. Injuries, rotation, motivation and opponent strength can all end a winning run, so use these picks as form signals rather than certainties.' },
+    { q: 'How many perfect record picks can free users see?', a: 'Free users see a three-pick preview for each date. Pro members can unlock the full list for that date.' }
+  ],
   'corners': [
     { q: 'What do corner predictions cover?', a: 'Our corner predictions identify matches likely to have a high number of corners. We track Over 8.5 and Over 9.5 corner markets, using historical corner data to find matches with the strongest corner trends.' },
     { q: 'How are corner predictions calculated?', a: 'Each prediction is based on historical corner statistics. We only show matches where the hit rate exceeds 80%, meaning the Over 8.5 or Over 9.5 corners market has landed in 4 out of the last 5 similar fixtures. Hit rate, odds, and league are shown for each pick.' },
@@ -271,6 +278,16 @@ const CATEGORIES = {
     keywords: 'unbeaten streak predictions, football unbeaten runs, teams on winning streak, unbeaten football tips',
     heading: 'Unbeaten Streaks',
     label: 'Unbeaten'
+  },
+  'perfect-record': {
+    dataKey: 'perfectRecordMatches',
+    gated: true,
+    title: 'Perfect Record Predictions Today',
+    description: 'Football predictions for teams with five wins in their last five matches. Free users see three previews; Pro members unlock the full perfect record list.',
+    keywords: 'perfect record predictions, 5 wins in last 5, WWWWW form, perfect recent form football tips, winning form predictions',
+    heading: 'Perfect Record',
+    label: 'Perfect Record',
+    linkAnalysis: true
   },
   'corners': {
     dataKey: 'cornersMatches',
