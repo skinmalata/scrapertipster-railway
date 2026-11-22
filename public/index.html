@@ -1374,7 +1374,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
 
  function renderMatches() {
-  const GATED_KEYS_HOME = { htft: 'htftMatches', gg2: 'gg2PlusMatches', corners: 'cornersMatches', cards: 'cardsMatches', winstreak: 'winstreakMatches', losestreak: 'losestreakMatches', drawstreak: 'drawstreakMatches', perfectrecord: 'perfectRecordMatches', teamtoscore2plus: 'teamToScore2PlusMatches' };
+  const GATED_KEYS_HOME = { htft: 'htftMatches', gg2: 'gg2PlusMatches', corners: 'cornersMatches', cards: 'cardsMatches', winstreak: 'winstreakMatches', losestreak: 'losestreakMatches', drawstreak: 'drawstreakMatches', teamtoscore2plus: 'teamToScore2PlusMatches' };
   function isGatedCategory(cat) { return cat === 'unbeaten' || !!GATED_KEYS_HOME[cat]; }
   function gatedTotalCount(cat, dateStr) {
    if (!GATED_KEYS_HOME[cat]) return null;

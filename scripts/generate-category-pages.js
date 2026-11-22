@@ -82,7 +82,7 @@ const FAQ_SCHEMA = {
     { q: 'How is perfect record different from unbeaten or winning streak?', a: 'Unbeaten includes draws and winning streak can count any run of consecutive wins. Perfect record is stricter: the last five results must all be wins.' },
     { q: 'Do both teams need five wins?', a: 'No. A match qualifies when either side has five wins in its last five matches. When both teams qualify, the card shows each qualifying team.' },
     { q: 'Can perfect record picks lose?', a: 'Yes. Recent form is a snapshot, not a guarantee. Injuries, rotation, motivation and opponent strength can all end a winning run, so use these picks as form signals rather than certainties.' },
-    { q: 'How many perfect record picks can free users see?', a: 'Free users see a three-pick preview for each date. Pro members can unlock the full list for that date.' }
+    { q: 'Can free users see all perfect record picks?', a: 'Yes. Perfect record picks are currently free to view, so every qualifying match for the selected date is shown.' }
   ],
   'corners': [
     { q: 'What do corner predictions cover?', a: 'Our corner predictions identify matches likely to have a high number of corners. We track Over 8.5 and Over 9.5 corner markets, using historical corner data to find matches with the strongest corner trends.' },
@@ -281,9 +281,9 @@ const CATEGORIES = {
   },
   'perfect-record': {
     dataKey: 'perfectRecordMatches',
-    gated: true,
+    gated: false,
     title: 'Perfect Record Predictions Today',
-    description: 'Football predictions for teams with five wins in their last five matches. Free users see three previews; Pro members unlock the full perfect record list.',
+    description: 'Football predictions for teams with five wins in their last five matches. Browse every qualifying fixture for today and upcoming dates.',
     keywords: 'perfect record predictions, 5 wins in last 5, WWWWW form, perfect recent form football tips, winning form predictions',
     heading: 'Perfect Record',
     label: 'Perfect Record',

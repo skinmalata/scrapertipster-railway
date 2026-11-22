@@ -17,7 +17,8 @@ const FREE_MARKETS = [
   'over25Matches',
   'under25Matches',
   'bttsMatches',
-  'bttsNoMatches'
+  'bttsNoMatches',
+  'perfectRecordMatches'
 ];
 
 // Gated markets: free users only ever receive the first FREE_VISIBLE rows.
@@ -25,7 +26,6 @@ const GATED_KEYS = [
   'winstreakMatches',
   'losestreakMatches',
   'drawstreakMatches',
-  'perfectRecordMatches',
   'teamToScoreMatches',
   'teamToScore2PlusMatches',
   'htftMatches',
