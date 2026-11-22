@@ -47,9 +47,7 @@ function createCheckout(_a) {
   };
   if (plan.interval) {
     planBody.renewal_price = Number(plan.price);
-    // The first period is charged like every later one. Leaving this at 0
-    // let a subscription start without a charge while still granting Pro.
-    planBody.initial_price = Number(plan.price);
+    planBody.initial_price = 0;
     if (plan.interval === 'monthly') planBody.billing_period = 30;
     if (plan.interval === 'yearly') planBody.billing_period = 365;
   } else {
@@ -275,7 +273,7 @@ function validateMembership(data, planType) {
     return { valid: false, reason: 'Membership status "' + status + '" is not an active membership' };
   }
   var amount = paymentValidation.parseAmount(data && data.initial_price_paid);
-  if (amount === null) amount = paymentValidation.parseAmount(data && data.formatted_renewal_price);
+  if (amount === null || amount <= 0) amount = paymentValidation.parseAmount(data && data.formatted_renewal_price);
   if (amount === null) return { valid: false, reason: 'Membership price missing' };
   return paymentValidation.validatePayment({
     planType: planType,
