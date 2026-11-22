@@ -21,6 +21,7 @@
   // Bottom sticky Bitmedia banner. Disabled; the slot stays hidden and the
   // inert Bitmedia code is never activated on scroll.
   var STICKY_ADS_ENABLED = false;
+  var BITMEDIA_JS_VERSION = '20261122';
 
   var POSITIONS = {
     global_leaderboard: { label: 'Global Leaderboard', w: 728, h: 90 },
@@ -51,7 +52,7 @@
     style.textContent = [
       '.wft-ad-slot{display:block;width:100%;max-width:960px;margin:16px auto;padding:0 16px;box-sizing:border-box;}',
       '.wft-ad-slot[data-ad-position="global_leaderboard"]{min-height:90px;}',
-      '@media (max-width:639px){.wft-ad-slot[data-ad-position="global_leaderboard"]{min-height:250px;}}',
+      '@media (max-width:639px){.wft-ad-slot[data-ad-position="global_leaderboard"]{min-height:90px;}}',
       '.wft-ad-slot[data-ad-position="sponsored_match_card"]{max-width:100%;padding:0;grid-column:1/-1;min-height:250px;}',
       '.wft-sponsor{grid-column:1/-1;}',
       '.wft-ad-fill{display:block;text-decoration:none;color:inherit;}',
@@ -129,7 +130,7 @@
       if (index >= hosts.length) return;
       var script = document.createElement('script');
       script.async = true;
-      script.src = 'https://' + hosts[index] + '/js/' + unitId + '.js?v=' + new Date().getTime();
+      script.src = 'https://' + hosts[index] + '/js/' + unitId + '.js?v=' + BITMEDIA_JS_VERSION;
       script.onerror = function() {
         script.remove();
         loadHost(index + 1);
@@ -285,8 +286,9 @@
     injectStyles();
     processAll(document);
     loadAds();
-    if (window.MutationObserver) {
-      new MutationObserver(handleMutations).observe(document.body, { childList: true, subtree: true });
+    var contentRoot = document.getElementById('content');
+    if (contentRoot && window.MutationObserver) {
+      new MutationObserver(handleMutations).observe(contentRoot, { childList: true });
     }
   }
 
