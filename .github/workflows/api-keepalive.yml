@@ -1,0 +1,30 @@
+name: API Keepalive
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: api-keepalive
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Ping Render health endpoint
+        run: |
+          for attempt in 1 2 3; do
+            url="https://winfulltime-api.onrender.com/api/health?t=$(date +%s)"
+            if curl -fsS --max-time 90 -o /dev/null -w "attempt ${attempt}: %{http_code} in %{time_total}s\n" "$url"; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Render API health check failed after 3 attempts"
+          exit 1

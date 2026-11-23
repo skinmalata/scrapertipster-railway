@@ -304,6 +304,42 @@ function showAlert(msg, type) {
   el.className = 'alert alert-' + type;
 }
 
+function renderMembership(user, data) {
+  var badge = document.getElementById('plan-badge');
+  var upgradeBtn = document.getElementById('upgrade-btn');
+  var portalBtn = document.getElementById('portal-btn');
+  var expiresRow = document.getElementById('expires-row');
+  var expiresAt = document.getElementById('expires-at');
+  if (!badge) return;
+
+  var isAdmin = !!(data && data.isAdmin) || !!(user && user.isAdmin);
+  var isPro = isAdmin || !!(data && data.isPro) || !!(user && user.isPro);
+
+  if (isAdmin) {
+    badge.textContent = 'Admin';
+    badge.className = 'badge badge-pro';
+  } else if (isPro) {
+    badge.textContent = 'Pro';
+    badge.className = 'badge badge-pro';
+  } else {
+    badge.textContent = 'Free';
+    badge.className = 'badge badge-free';
+  }
+
+  if (upgradeBtn) upgradeBtn.style.display = isPro ? 'none' : '';
+  if (portalBtn) portalBtn.style.display = isPro && !isAdmin ? '' : 'none';
+
+  var expiry = data && data.expiresAt ? data.expiresAt : (user && user.expiresAt);
+  if (expiresRow && expiresAt) {
+    if (expiry) {
+      expiresRow.style.display = '';
+      expiresAt.textContent = new Date(expiry).toLocaleDateString();
+    } else {
+      expiresRow.style.display = 'none';
+    }
+  }
+}
+
 function loadAccount() {
   window.WFT.onAuthReady(function (user) {
     document.getElementById('loading-state').style.display = 'none';
@@ -315,40 +351,37 @@ function loadAccount() {
     document.getElementById('display-name').textContent = user.displayName || user.email;
     document.getElementById('display-email').textContent = user.email;
 
-    window.WFT.apiFetch('/api/me/subscription').then(function (data) {
-      var badge = document.getElementById('plan-badge');
-      var upgradeBtn = document.getElementById('upgrade-btn');
-      var portalBtn = document.getElementById('portal-btn');
-      var expiresRow = document.getElementById('expires-row');
-      var expiresAt = document.getElementById('expires-at');
+    var planBadge = document.getElementById('plan-badge');
+    if (planBadge) {
+      planBadge.textContent = '...';
+      planBadge.className = 'badge badge-free';
+    }
+    function renderLocalStatus() {
+      renderMembership(window.WFT.getUser(), null);
+    }
+    if (window.WFT.onProStatusReady) window.WFT.onProStatusReady(renderLocalStatus);
+    else document.addEventListener('wft-pro-status', renderLocalStatus);
 
-      if (data.__status && data.__status >= 400) {
+    window.WFT.apiFetch('/api/me/subscription').then(function (data) {
+      if (data && data.__status && data.__status >= 400) {
         renderSubscriptionError(data.__status);
         return;
       }
-
-      if (data.isPro) {
-        badge.textContent = 'Pro';
-        badge.className = 'badge badge-pro';
-        upgradeBtn.style.display = 'none';
-        portalBtn.style.display = '';
-        if (data.expiresAt) {
-          expiresRow.style.display = '';
-          expiresAt.textContent = new Date(data.expiresAt).toLocaleDateString();
-        }
-      } else {
-        badge.textContent = 'Free';
-        badge.className = 'badge badge-free';
-        upgradeBtn.style.display = '';
-        portalBtn.style.display = 'none';
-      }
+      renderMembership(window.WFT.getUser(), data);
     }).catch(function (err) {
-      renderSubscriptionError(0);
+      var current = window.WFT.getUser();
+      if (!current || (typeof current.isPro === 'undefined' && typeof current.isAdmin === 'undefined')) {
+        renderSubscriptionError(0);
+      } else if (!current.isPro && !current.isAdmin) {
+        renderSubscriptionError(0);
+      }
     });
   });
 }
 
 function renderSubscriptionError(status) {
+  var current = window.WFT && window.WFT.getUser && window.WFT.getUser();
+  if (current && (current.isAdmin || current.isPro)) return;
   var badge = document.getElementById('plan-badge');
   var portalBtn = document.getElementById('portal-btn');
   if (badge) {

@@ -701,7 +701,7 @@ function uploadAdImage(input) {
   st.className = 'ad-upload-status';
   var fd = new FormData();
   fd.append('file', file);
-  WFT.apiFetch('/api/admin/ads/upload', { method: 'POST', body: fd }).then(function(data) {
+  WFT.apiFetch('/api/admin/ads/upload', { method: 'POST', body: fd, timeoutMs: 60000 }).then(function(data) {
     input.value = '';
     if (data.error) { setAdImage('', data.error, 'err'); return; }
     document.getElementById('adImageUrl').value = '';
@@ -955,44 +955,64 @@ function escapeHtml(value) {
 }
 window.escapeHtml = escapeHtml;
 
+function showSignInRequired() {
+  hideAll();
+  document.getElementById('accessDenied').classList.remove('hidden');
+  document.getElementById('accessDenied').innerHTML = '<h2>Sign In Required</h2><p>Please sign in to access the admin panel.</p><p style="margin-top:16px;"><a href="/login.html" style="color:#ff2448;">Sign In</a></p>';
+}
+
+function showAccessDenied() {
+  hideAll();
+  document.getElementById('accessDenied').classList.remove('hidden');
+}
+
+function enterAdmin(user) {
+  document.getElementById('adminEmail').textContent = '(' + user.email + ')';
+  var adminLinks = document.querySelectorAll('.admin-nav-link');
+  adminLinks.forEach(function(l) { l.style.display = ''; });
+  document.getElementById('mainContent').classList.remove('hidden');
+  document.getElementById('statsRow').classList.remove('hidden');
+  loadStats();
+  loadUsers(1);
+}
+
 function initWithUser(user) {
   if (!user) {
-    hideAll();
-    document.getElementById('accessDenied').classList.remove('hidden');
-    document.getElementById('accessDenied').innerHTML = '<h2>Sign In Required</h2><p>Please sign in to access the admin panel.</p><p style="margin-top:16px;"><a href="/login.html" style="color:#ff2448;">Sign In</a></p>';
+    showSignInRequired();
     return;
   }
   selectedSelfId = user.id;
 
-  // Directly check admin status via API (bypasses shared auth.js fetchProStatus)
-  window.WFT.supabase.auth.getSession().then(function(sessionResult) {
-    var session = sessionResult.data.session;
-    if (!session) {
-      hideAll();
-      document.getElementById('accessDenied').classList.remove('hidden');
-      document.getElementById('accessDenied').innerHTML = '<h2>Sign In Required</h2><p>Please sign in to access the admin panel.</p><p style="margin-top:16px;"><a href="/login.html" style="color:#ff2448;">Sign In</a></p>';
+  if (!WFT.supabase) {
+    showAccessDenied();
+    return;
+  }
+
+  WFT.supabase.auth.getSession().then(function(sessionResult) {
+    if (!sessionResult || !sessionResult.data || !sessionResult.data.session) {
+      showSignInRequired();
       return;
     }
 
-    fetch('https://winfulltime-api.onrender.com/api/me/subscription', {
-      headers: { 'Authorization': 'Bearer ' + session.access_token }
-    }).then(function(r) { return r.json(); }).then(function(data) {
-      if (data.isAdmin) {
-        document.getElementById('adminEmail').textContent = '(' + user.email + ')';
-        var adminLinks = document.querySelectorAll('.admin-nav-link');
-        adminLinks.forEach(function(l) { l.style.display = ''; });
-        document.getElementById('mainContent').classList.remove('hidden');
-        document.getElementById('statsRow').classList.remove('hidden');
-        loadStats();
-        loadUsers(1);
-      } else {
-        hideAll();
-        document.getElementById('accessDenied').classList.remove('hidden');
-      }
-    }).catch(function() {
-      hideAll();
-      document.getElementById('accessDenied').classList.remove('hidden');
-    });
+    function checkWithBackend() {
+      WFT.apiFetch('/api/me/subscription').then(function(data) {
+        if (data && data.isAdmin) enterAdmin(user);
+        else showAccessDenied();
+      }).catch(function() {
+        showAccessDenied();
+      });
+    }
+
+    if (WFT.onProStatusReady) {
+      WFT.onProStatusReady(function() {
+        if (WFT.isAdmin && WFT.isAdmin()) enterAdmin(user);
+        else checkWithBackend();
+      });
+    } else {
+      checkWithBackend();
+    }
+  }).catch(function() {
+    showAccessDenied();
   });
 }
 
