@@ -45,6 +45,13 @@ function isPerfectForm(value) {
   return formLastFive(value) === 'WWWWW';
 }
 
+function trailingFormCount(value, letter) {
+  const form = String(value || '').replace(/[^WDL]/gi, '').toUpperCase();
+  let count = 0;
+  for (let i = form.length - 1; i >= 0 && form[i] === letter; i--) count++;
+  return count;
+}
+
 function buildPerfectRecordMatches(dataDir) {
   const vipFile = path.join(process.cwd(), 'forebet-vip-cache.json');
   const predFile = path.join(dataDir, 'predictions.json');
@@ -116,6 +123,120 @@ function buildPerfectRecordMatches(dataDir) {
   }
 
   return rows.length;
+}
+
+function buildStreakMatches(dataDir) {
+  const vipFile = path.join(process.cwd(), 'forebet-vip-cache.json');
+  const predFile = path.join(dataDir, 'predictions.json');
+  const types = [
+    { key: 'winstreakMatches', totalKey: 'totalWinstreak', market: 'win-streak', letter: 'W', outcome: 'win', label: 'Back To Back Wins', noun: 'wins', min: 2 },
+    { key: 'losestreakMatches', totalKey: 'totalLosestreak', market: 'loss-streak', letter: 'L', outcome: 'loss', label: 'Back To Back Losses', noun: 'losses', min: 2 },
+    { key: 'drawstreakMatches', totalKey: 'totalDrawstreak', market: 'draw-streak', letter: 'D', outcome: 'draw', label: 'Back To Back Draws', noun: 'draws', min: 2 }
+  ];
+  const emptyCounts = function () {
+    const counts = {};
+    types.forEach(function (type) { counts[type.key] = 0; });
+    return counts;
+  };
+  if (!fs.existsSync(vipFile) || !fs.existsSync(predFile)) return emptyCounts();
+
+  const vip = JSON.parse(fs.readFileSync(vipFile, 'utf8'));
+  const predictions = JSON.parse(fs.readFileSync(predFile, 'utf8'));
+  const built = {};
+  const seen = new Set();
+  types.forEach(function (type) { built[type.key] = []; });
+
+  if (vip.dates && typeof vip.dates === 'object') {
+    Object.keys(vip.dates).forEach(function (date) {
+      const picks = Array.isArray(vip.dates[date]) ? vip.dates[date] : [];
+      picks.forEach(function (pick) {
+        if (!pick) return;
+        const home = String(pick.home || '').trim();
+        const away = String(pick.away || '').trim();
+        if (!home || !away) return;
+        const form = (pick.detail && pick.detail.form) || pick.form || {};
+        const probs = pick.probs || {};
+        const candidates = [
+          { side: 'home', team: home, form: form.homeForm || form.home },
+          { side: 'away', team: away, form: form.awayForm || form.away }
+        ];
+
+        types.forEach(function (type) {
+          candidates.forEach(function (candidate) {
+            const streak = trailingFormCount(candidate.form, type.letter);
+            if (streak < type.min) return;
+            const seenKey = type.key + '|' + date + '|' + home + '|' + away + '|' + candidate.side;
+            if (seen.has(seenKey)) return;
+            seen.add(seenKey);
+
+            let probability = 0;
+            if (type.outcome === 'draw') {
+              probability = Number(probs.draw) || 0;
+            } else if (candidate.side === 'home') {
+              probability = Number(type.outcome === 'win' ? probs.home : probs.away) || 0;
+            } else {
+              probability = Number(type.outcome === 'win' ? probs.away : probs.home) || 0;
+            }
+            probability = Math.max(1, Math.min(Math.round(probability || Math.min(streak * 10, 95)), 95));
+
+            const rawForm = String(candidate.form || '').replace(/[^WDL]/gi, '').toUpperCase();
+            const idSource = String(pick.matchId || (date + '-' + home + '-' + away + '-' + candidate.side));
+            built[type.key].push({
+              id: type.market + '-' + idSource.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, ''),
+              date: date,
+              time: pick.time || '',
+              league: pick.leagueName || pick.league || '',
+              country: pick.country || '',
+              match: candidate.team,
+              nextMatch: home + ' - ' + away,
+              nextMatchDate: date,
+              tip: type.label + ': ' + streak,
+              probability: probability,
+              streak: streak,
+              form: rawForm,
+              description: candidate.team + ' has ' + streak + ' consecutive ' + type.noun + ' in its recent form (' + rawForm.slice(-6) + ').',
+              market: type.market
+            });
+          });
+        });
+      });
+    });
+  }
+
+  const finalRows = {};
+  types.forEach(function (type) {
+    built[type.key].sort(function (a, b) {
+      return b.probability - a.probability || b.streak - a.streak || (a.date < b.date ? 1 : -1);
+    });
+    finalRows[type.key] = built[type.key].length ? built[type.key] : (predictions[type.key] || []);
+  });
+
+  const applyRows = function (target) {
+    types.forEach(function (type) {
+      target[type.key] = finalRows[type.key];
+      target[type.totalKey] = finalRows[type.key].length;
+    });
+  };
+
+  applyRows(predictions);
+  fs.writeFileSync(predFile, JSON.stringify(predictions));
+
+  const cacheFile = path.join(process.cwd(), 'predictions-cache.json');
+  if (fs.existsSync(cacheFile)) {
+    try {
+      const cache = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
+      applyRows(cache);
+      fs.writeFileSync(cacheFile, JSON.stringify(cache));
+    } catch (e) {
+      console.warn('[streaks] Could not update predictions cache:', e.message);
+    }
+  }
+
+  return {
+    winstreakMatches: finalRows.winstreakMatches.length,
+    losestreakMatches: finalRows.losestreakMatches.length,
+    drawstreakMatches: finalRows.drawstreakMatches.length
+  };
 }
 
 function getSignificantTokens(name) {
@@ -633,6 +754,13 @@ async function main() {
     console.error('Perfect record build failed:', err.message);
   }
 
+  try {
+    const streakCounts = buildStreakMatches(dataDir);
+    console.log(`Merged streak matches: ${JSON.stringify(streakCounts)}`);
+  } catch (err) {
+    console.error('Streak build failed:', err.message);
+  }
+
   console.log('Regenerating linker pages...');
   limitStaticForFree(dataDir);
   // The linker regenerators read predictions-cache.json rather than the public
@@ -813,5 +941,5 @@ if (require.main === module) {
     process.exit(1);
   });
 } else {
-  module.exports = { enrichWithResults, enrichPublishedPredictions, rebuildStatic, updateSitemapCore, recoverMissedFixtures, buildPerfectRecordMatches, main };
+  module.exports = { enrichWithResults, enrichPublishedPredictions, rebuildStatic, updateSitemapCore, recoverMissedFixtures, buildPerfectRecordMatches, buildStreakMatches, main };
 }
