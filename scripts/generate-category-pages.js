@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const { buildLeagueLabelBySlug, readableLeagueLabel, formatDateChips } = require('./league-labels');
 const { CHIPS_CSS, chipsSection, faqBlock, renderHead, collectionPageSchema, generateFaqSchema } = require('./lib/seo-blocks');
-const { renderBookmakerCTABody } = require('./lib/bookmaker-cta');
 
 const FAQ_SCHEMA = {
   '1x2': [
@@ -361,8 +360,37 @@ const HIGHEST_SCORING_HALF_TAB = {
   label: 'Highest Scoring Half'
 };
 
+function sanitizePredictionPages(rootDir) {
+  const ctaPattern = /^[ \t]*<div class="wft-bet-on"[^>]*>[\s\S]*?<\/div>[ \t]*\r?\n/gm;
+  const widgetPattern = /<script src="\/1xbet-odds-widget\.js" defer><\/script>\s*/g;
+  const notePattern = /<p class="picks-note">\s*<strong>Daily picks aren(?:'|’|&#39;|&rsquo;)t final results\.<\/strong>\s*Football is unpredictable (?:—|&mdash;) no tip wins every time\. (?:Pick|Select) only a few (?:picks )?you(?:'|’|&#39;|&rsquo;)re genuinely confident in, and never stake more than you can afford to lose\.\s*<\/p>\s*/g;
+  let sanitized = 0;
+
+  function visit(dir) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        visit(fullPath);
+        continue;
+      }
+      if (!entry.isFile() || !entry.name.endsWith('.html')) continue;
+      const before = fs.readFileSync(fullPath, 'utf8');
+      const after = before
+        .replace(ctaPattern, '')
+        .replace(widgetPattern, '')
+        .replace(notePattern, '');
+      if (after !== before) {
+        fs.writeFileSync(fullPath, after);
+        sanitized++;
+      }
+    }
+  }
+
+  if (fs.existsSync(rootDir)) visit(rootDir);
+  return sanitized;
+}
+
 function generateCategoryPage(slug, catConfig, ctx) {
-  const BOOKMAKER_CTA_BODY = renderBookmakerCTABody();
   const allSlugs = Object.keys(CATEGORIES);
   const baseTabs = allSlugs.map(s => {
     const c = CATEGORIES[s];
@@ -516,8 +544,6 @@ ${CHIPS_CSS}
 ${generateNoscriptFallback(slug, catConfig)}
 </div>
 
-<p class="picks-note"><strong>Daily picks aren\u2019t final results.</strong> Football is unpredictable &mdash; no tip wins every time. Pick only a few you\u2019re genuinely confident in, and never stake more than you can afford to lose.</p>
-
 <nav class="streak-buttons prediction-tools" aria-label="More football tools">
   <a class="streak-btn tool-converter" href="/converter.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">AI Code Converter</span></a>
   <a class="streak-btn tool-merger" href="/code-merger.html"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">AI Code Merger</span></a>
@@ -593,12 +619,6 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
   var IS_GATED = ${catConfig.gated ? 'true' : 'false'};
   var LINK_ANALYSIS = ${catConfig.linkAnalysis ? 'true' : 'false'};
   var CATEGORY_HEADING = '${escapeHtml(catConfig.heading)}';
-  var BOOKMAKER_CTA_BODY = '${BOOKMAKER_CTA_BODY}';
-
-  function bookmakerCTA(home, away, tip) {
-    return '<div class="wft-bet-on" data-home="' + escAttr(home) + '" data-away="' + escAttr(away) + '" data-tip="' + escAttr(tip) + '">' + BOOKMAKER_CTA_BODY + '</div>';
-  }
-
   var allData = null;
   var h2hData = null;
   var analysisLinks = {};
@@ -814,11 +834,6 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
           reasonHtml + '</div></div>';
       }
 
-      var ctaHtml = '';
-      if (!IS_STREAK && home && away) {
-        ctaHtml = bookmakerCTA(home, away, match.tip || '');
-      }
-
       var analysisHref = (LINK_ANALYSIS && home && away)
         ? ((typeof window.resolveAnalysisLink === 'function')
             ? window.resolveAnalysisLink(home, away, match)
@@ -836,7 +851,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
           ? '<a href="' + analysisHref + '" class="match-card-link" style="display:block;text-decoration:none;color:inherit;">' + matchHead + cardContent + '</a>'
           : matchHead + cardContent) +
         (analysisHref && CATEGORY_SLUG !== 'perfect-record' ? '<div style="text-align:center;margin-top:8px;padding:0 4px;"><a href="' + analysisHref + '" class="analysis-btn" style="display:inline-flex;align-items:center;justify-content:center;min-height:44px;max-width:100%;box-sizing:border-box;padding:12px 20px;border-radius:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:700;line-height:1.2;text-align:center;text-decoration:none;">View Analysis &rarr;</a></div>' : '') +
-        ctaHtml + '</div>';
+        '</div>';
 
       return cardHtml;
     }).join('');
@@ -992,7 +1007,6 @@ ${slug === 'under-2-5' ? '    refreshUnder25FromApi();' : ''}
 })();
 </script>
 <script src="/pwa.js?v=2"></script>
-<script src="/1xbet-odds-widget.js" defer></script>
 </body>
 </html>`;
 }
@@ -1013,6 +1027,9 @@ function generateAllPages(outputDir) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
+  const sanitized = sanitizePredictionPages(outputDir);
+  if (sanitized) console.log(`[category-pages] Sanitized ${sanitized} archived prediction pages`);
+
   const leagueSlugs = listDirSlugs(path.join(outputDir, 'league'));
   const dateSlugs = listDirSlugs(path.join(outputDir, 'date'));
   const ctx = { leagueSlugs, dateSlugs, leagueLabelBySlug: buildLeagueLabelBySlug() };
@@ -1028,7 +1045,7 @@ function generateAllPages(outputDir) {
   try { require('./update-sitemap').main(); } catch (e) { console.error('[category-pages] Sitemap refresh failed:', e.message); }
 }
 
-module.exports = { CATEGORIES, generateCategoryPage, generateAllPages };
+module.exports = { CATEGORIES, generateCategoryPage, generateAllPages, sanitizePredictionPages };
 
 if (require.main === module) {
   const outDir = path.join(__dirname, '..', 'public', 'predictions');

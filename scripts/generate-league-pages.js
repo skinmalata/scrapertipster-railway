@@ -3,9 +3,9 @@
 const fs = require('fs');
 const path = require('path');
 const { CHIPS_CSS, FAQ_CSS, faqsList, chipsSection, renderHead, collectionPageSchema } = require('./lib/seo-blocks');
-const { renderBookmakerCTA } = require('./lib/bookmaker-cta');
 const { spliceSponsorBetweenCards } = require('./lib/sponsor-banner');
 const { PREDICTION_TOOLS_CSS, PREDICTION_TOOLS_NAV } = require('./lib/prediction-tools');
+const { sanitizePredictionPages } = require('./generate-category-pages');
 
 const PREDICTIONS_FILE = path.join(__dirname, '..', 'predictions-cache.json');
 const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'predictions', 'league');
@@ -169,7 +169,6 @@ function renderMatchCard(m, analysisUrls) {
       </div>
     </div>
     ${analysisUrl ? `<div style="text-align:center;margin-top:6px;"><a href="${analysisUrl}" class="analysis-btn" style="display:inline-flex;align-items:center;justify-content:center;min-height:44px;max-width:100%;box-sizing:border-box;padding:12px 20px;border-radius:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:700;line-height:1.2;text-align:center;text-decoration:none;">View Analysis &rarr;</a></div>` : ''}
-    ${renderBookmakerCTA({ home: homeRaw, away: awayRaw, tip: m.tip, date: dateStr, league: m.country || m.league })}
   </div>`;
 }
 
@@ -298,7 +297,6 @@ ${faqsList(leagueFaqs(leagueName))}
 <p style="text-align:center;color:var(--text-secondary);font-size:13px;">&copy; ${new Date().getFullYear()} WinFulltime. All rights reserved.</p>
 </div>
 </footer>
-<script src="/1xbet-odds-widget.js" defer></script>
 </div>
 </body>
 </html>`;
@@ -349,6 +347,10 @@ function main() {
   });
 
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+
+  const sanitized = sanitizePredictionPages(path.dirname(OUTPUT_DIR));
+  if (sanitized) console.log(`[league-pages] Sanitized ${sanitized} archived prediction pages`);
+
   let generated = 0;
 
   const analysisUrls = new Set();
