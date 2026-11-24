@@ -391,10 +391,13 @@ function sanitizePredictionPages(rootDir) {
 }
 
 function generateCategoryPage(slug, catConfig, ctx) {
-  const allSlugs = Object.keys(CATEGORIES);
+  const allSlugs = Object.keys(CATEGORIES).filter(s => s !== 'under-2-5');
   const baseTabs = allSlugs.map(s => {
     const c = CATEGORIES[s];
     const active = s === slug ? ' active' : '';
+    if (s === 'corners' || s === 'cards') {
+      return `<span id="tab-${s}" class="tab-btn disabled" aria-disabled="true" title="Temporarily unavailable">${escapeHtml(c.label)}</span>`;
+    }
     return `<a href="/predictions/${s}" id="tab-${s}" class="tab-btn${active}">${escapeHtml(c.label)}</a>`;
   });
   baseTabs.splice(allSlugs.indexOf('cards') + 1, 0,
@@ -835,8 +838,8 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
       }
 
       var analysisHref = (LINK_ANALYSIS && home && away)
-        ? ((typeof window.resolveAnalysisLink === 'function')
-            ? window.resolveAnalysisLink(home, away, match)
+        ? ((typeof window.findAnalysisLink === 'function')
+            ? window.findAnalysisLink(home, away)
             : (analysisLinks[(home + '|' + away).toLowerCase()] || ''))
         : '';
 
@@ -948,7 +951,9 @@ ${slug === 'under-2-5' ? '      refreshUnder25FromApi();' : ''}
       if (mapsReady) {
         mapsReady.then(function () {
           analysisLinks = (typeof window.getAnalysisRaw === 'function') ? window.getAnalysisRaw() : {};
-          if (typeof window.wrapMatchCards === 'function') {
+          if (CATEGORY_SLUG === 'perfect-record') {
+            renderCurrentView();
+          } else if (typeof window.wrapMatchCards === 'function') {
             window.wrapMatchCards(document.getElementById('content'));
           } else {
             renderCurrentView();

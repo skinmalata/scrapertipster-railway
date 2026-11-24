@@ -6,10 +6,6 @@
 const fs = require('fs');
 const path = require('path');
 
-// Bottom sticky Bitmedia banner. Disabled; any baked sticky slot is stripped
-// from responses so the banner cannot be injected or shown.
-const STICKY_ADS_ENABLED = false;
-
 // Shared "More football tools" strip button. Pages bake their own copy of the
 // strip, so the layout pass adds this link when it is missing.
 const BETPAWA_TOOL_BUTTON = '<a class="streak-btn tool-betpawa" href="/betpawa-builder.html" style="background:linear-gradient(135deg,#b45309,#fbbf24);color:#111827;"><span class="streak-icon" aria-hidden="true"></span><span class="streak-text">AI betPawa Code Builder</span></a>';
@@ -77,7 +73,6 @@ const FOOTER_HTML = `
     <li><a href="/predictions/1x2.html">1X2</a></li>
      <li><a href="/predictions/over-2-5.html">Over 2.5</a></li>
      <li><a href="/predictions/over-1-5.html">Over 1.5</a></li>
-     <li><a href="/predictions/under-2-5.html">Under 2.5</a></li>
      <li><a href="/predictions/highest-scoring-half.html">Highest Scoring Half</a></li>
     <li><a href="/predictions/btts.html">BTTS Yes</a></li>
     <li><a href="/predictions/btts-no.html">BTTS No</a></li>
@@ -387,15 +382,26 @@ function stripInlineAnalytics(html) {
   });
 }
 
+function stripDisabledAds(html) {
+  return html
+    .replace(/<meta\b[^>]*\bname=["']bitmedia-site-verification["'][^>]*>\s*/gi, '')
+    .replace(/<ins\b[^>]*\bclass=["'](?:6ae882436485fffa717939a1|6ae8887bf30577b049694c23|6ae8959ff30577b0496d401f)["'][^>]*>\s*<\/ins>\s*/gi, '')
+    .replace(/<script\b[^>]*\bdata-wft-(?:bitmedia-sticky|activated)\b[^>]*>[\s\S]*?<\/script>\s*/gi, '')
+    .replace(/<script\b[^>]*\bsrc=["'][^"']*(?:bmcdn6\.com|bitmedia-prebid\.js|prebid-[\d.]+\.js)[^"']*["'][^>]*>\s*<\/script>\s*/gi, '')
+    .replace(/<div\b[^>]*\bdata-wft-prebid=["'][^"']*["'][^>]*>\s*<\/div>\s*/gi, '')
+    .replace(/<div\b[^>]*\bid=["']classname-container-placement(?:-article)?["'][^>]*>\s*<\/div>\s*/gi, '');
+}
+
 function applyLayoutToHtml(html, activePath) {
   html = stripFeaturedBooks(html);
   html = stripInlineAnalytics(html);
+  html = stripDisabledAds(html);
 
   // Bump the gate's cache-busting version on every bake so a changed
   // /consent.js is picked up immediately instead of sitting behind the
   // four-hour edge cache GitHub Pages sets on static assets.
   html = html.replace(/(<script[^>]*src=["'][^"']*\/consent\.js)(?:\?v=\d+)?(["'][^>]*>)/gi, '$1?v=3$2');
-  // Ensure pages use the runtime that preserves the fixed Bitmedia unit.
+  // Refresh the ad runtime cache-buster after removing Bitmedia support.
   html = html.replace(/(<script[^>]*src=["'][^"']*\/ads\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261122-cwv$2');
   // Make sure static pages pick up changes to the shared login/tier runtime.
   html = html.replace(/(<script[^>]*src=["'][^"']*\/auth\.js)(?:\?v=[^"']*)?(["'][^>]*>)/gi, '$1?v=20261104$2');
@@ -405,11 +411,7 @@ function applyLayoutToHtml(html, activePath) {
     const tag = pre + '?v=7' + post;
     return /\b(?:defer|async)\b/i.test(tag) ? tag : tag.replace(/>$/, ' defer>');
   });
-  // Header bidding (Prebid) is disabled. Strip any previously baked runtime
-  // or slot markup so older pages cannot request the removed files.
-  html = html.replace(/\s*<script\b[^>]*\bsrc=["'][^"']*(?:\/bitmedia-prebid\.js|\/prebid-[\d.]+\.js)[^"']*["'][^>]*>\s*<\/script>/gi, '');
-  html = html.replace(/<div\b[^>]*\bdata-wft-prebid=["'][^"']*["'][^>]*>\s*<\/div>\s*/gi, '');
-  html = html.replace(/<div\b[^>]*\bid=["']classname-container-placement(?:-article)?["'][^>]*>\s*<\/div>\s*/gi, '');
+  // Bitmedia and header-bidding artifacts are stripped by stripDisabledAds().
   // Non-critical footer/PWA helpers do not need to block parsing.
   html = html.replace(/(<script\b[^>]*\bsrc=["'][^"']*\/(?:responsible-gambling|pwa)\.js)(\?v=[^"']*)?(["'][^>]*>)/gi, function (m, pre, query, post) {
     const tag = pre + (query || '') + post;
@@ -437,8 +439,8 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(/<body([^>]*)>/i, (m, attrs) => `<body${attrs}>` + headerHtml(activePath));
   }
 
-  // 1b. Global leaderboard. Keep the direct Bitmedia unit below the header.
-  const leaderboardSlot = '<div class="wft-ad-slot" data-ad-position="global_leaderboard" aria-label="Advertisement"><ins class="6ae882436485fffa717939a1" style="display:inline-block;width:1px;height:1px;"></ins></div>';
+  // 1b. Global leaderboard slot below the header. No Bitmedia unit is injected.
+  const leaderboardSlot = '<div class="wft-ad-slot" data-ad-position="global_leaderboard" aria-label="Advertisement"></div>';
   const leaderboardRe = /<div\b(?=[^>]*\bdata-ad-position=["']global_leaderboard["'])[^>]*>[\s\S]*?<\/div>/i;
   if (leaderboardRe.test(html)) {
     html = html.replace(leaderboardRe, leaderboardSlot);
@@ -446,19 +448,11 @@ function applyLayoutToHtml(html, activePath) {
     html = html.replace(/<\/header>/i, '</header>\n' + leaderboardSlot);
   }
 
-  // Drop any legacy end-of-content slot so the direct banner still runs only
-  // in the header region.
   html = html.replace(/<div\b(?=[^>]*\bdata-ad-position=["']end_of_content["'])[^>]*>[\s\S]*?<\/div>/i, '');
 
-  // 1c. Load the sticky unit only after the visitor has scrolled into the
-  //     page. It stays below the content, is dismissible, and does not shift
-  //     the document layout on initial load. When disabled, strip any
-  //     previously baked sticky slot so the banner cannot render.
-  if (!STICKY_ADS_ENABLED) {
-    html = html.replace(/<aside\b(?=[^>]*\bdata-ad-position=["']sticky_banner["'])[^>]*>[\s\S]*?<\/aside>\s*/gi, '');
-  } else if (!/data-ad-position="sticky_banner"/.test(html) && /<\/body>/i.test(html)) {
-    html = html.replace(/<\/body>/i, '<aside class="wft-ad-slot" data-ad-position="sticky_banner" aria-label="Advertisement" hidden><ins class="6ae8959ff30577b0496d401f" style="display:inline-block;width:1px;height:1px;"></ins><script type="text/plain" data-wft-bitmedia-sticky>!function(e,n,c,t,o,r,d){!function e(n,c,t,o,r,m,d,s,a){s=c.getElementsByTagName(t)[0],(a=c.createElement(t)).async=!0,a.src="https://"+r[m]+"/js/"+o+".js?v="+d,a.onerror=function(){a.remove(),(m+=1)>=r.length||e(n,c,t,o,r,m)},s.parentNode.insertBefore(a,s)}(window,document,"script","6ae8959ff30577b0496d401f",["cdn.bmcdn6.com"], 0, "20261122")}();</script><button class="wft-sticky-close" type="button" aria-label="Close advertisement">&times;</button></aside>\n</body>');
-  }
+  // 1c. Sticky Bitmedia banners are disabled; strip any previously baked slot.
+  html = html.replace(/<aside\b(?=[^>]*\bdata-ad-position=["']sticky_banner["'])[^>]*>[\s\S]*?<\/aside>\s*/gi, '');
+
 
   // 1d. Keep the shared "More football tools" strip in sync with the main nav.
   //     Pages bake their own copy of the strip, so add the AI betPawa Code Builder
@@ -486,12 +480,6 @@ function applyLayoutToHtml(html, activePath) {
   //    injected header + theme toggle render like the rest of the site.
   if (!/app\.css/.test(html) && !/wf-layout-styles/.test(html)) {
     html = html.replace(/<\/head>/i, HEADER_STYLE_OVERRIDE + '\n</head>');
-  }
-
-  // 2b. Inject the Bitmedia site-verification meta tag so every page carries it
-  //     (not just the homepage).
-  if (!/bitmedia-site-verification/i.test(html)) {
-    html = html.replace(/<\/head>/i, '<meta name="bitmedia-site-verification" content="28cb5d6395ea086d915a377b96884fce" />\n</head>');
   }
 
   // 2b. Inject RSS feed auto-discovery tag into <head>

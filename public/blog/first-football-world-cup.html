@@ -67,7 +67,7 @@ nav { display: none !important; position: absolute; top: 100%; left: 0; right: 0
 nav.open { display: flex !important; }
 
  h1 { font-size: 2.2rem; } h2 { font-size: 1.7rem; } .container { padding: 0 16px; } nav { gap: 12px; } nav a { font-size: 13px; } }
- 
+
 /* Hamburger menu — mobile */
 .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 1001; }
 .hamburger span { display: block; width: 22px; height: 2px; background: var(--text-primary, #e8edf5); margin: 5px 0; transition: all 0.3s; border-radius: 2px; }
@@ -217,12 +217,32 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 </script>
 <link rel="stylesheet" href="/consent.css">
 <link rel="stylesheet" href="/footer.css?v=1">
+<script data-wft-alt-noindex>
+(function () {
+  var p = location.pathname;
+  var q = location.search;
+  var alt = (q && (/^\/(?:analysis|converter)\.html$/.test(p) || p === '/')) ||
+    p === '/index.html' || p === '/predictions/in-play.html' ||
+    /^\/(?:ticket-builder|privacy|contact|terms)$/.test(p) ||
+    /^\/blog\/[^/.]+$/.test(p);
+  if (!alt) return;
+  var robots = document.querySelector('meta[name="robots"]');
+  if (!robots) {
+    robots = document.createElement('meta');
+    robots.name = 'robots';
+    document.head.appendChild(robots);
+  }
+  robots.setAttribute('content', 'noindex,follow');
+  var canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical) canonical.remove();
+})();
+</script>
 </head>
 <body>
  <header>
   <div class="header-content">
    <a href="/" class="logo"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a>
-   
+
    <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 <nav id="nav">
  <a href="/">Home</a>
@@ -234,6 +254,8 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <a href="/code-splitter.html">AI Code Splitter</a>
    <a href="/predictions/in-play">In-Play</a>
    <a href="/ticket-builder.html">AI SportyBet Code Builder</a>
+   <a href="/betpawa-builder.html">AI betPawa Code Builder</a>
+   <a href="/1xbet-builder.html">AI 1xBet Code Builder</a>
    <a href="/code-analyzer.html">AI Code Analyzer</a>
   </div>
  </details>
@@ -244,8 +266,8 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
  </span></nav>
   </div>
  </header>
-
- <div class="container">
+<div class="wft-ad-slot" data-ad-position="global_leaderboard" aria-label="Advertisement"></div>
+<div class="container">
   <p class="breadcrumb"><a href="/">Home</a> / <a href="/blog/">Blog</a> / The Story Behind the First Football World Cup</p>
 
   <h1>The Story Behind the First Football World Cup</h1>
@@ -339,9 +361,9 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
   <p>Jules Rimet's vision of a global football championship has been realized beyond anything he could have imagined in 1930. The World Cup is now a cultural phenomenon that transcends sport, bringing together billions of people across every continent.</p>
 
-    
-  
-  
+
+
+
 <div class="cta">
    <h3>Make Smarter Bets Today</h3>
    <p>Check our <a href="/">free daily football predictions</a> for every match of the season.</p>
@@ -353,7 +375,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
     <li><a href="/blog/oldest-football-clubs.html">The Oldest Football Clubs Still Playing Today</a></li>
     <li><a href="/blog/origin-of-offside-rule.html">The Origin of the Offside Rule</a></li>
     <li><a href="/blog/history-of-penalty-kick.html">The History of the Penalty Kick</a></li>
-   
+
     <li><a href="/blog/oldest-football-competition-in-the-world.html">The Oldest Football Competition in the World</a></li>
     <li><a href="/blog/most-watched-football-matches-history.html">The Most Watched Football Matches in History</a></li>
 </ul>
@@ -394,7 +416,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
     <li><a href="/predictions/1x2.html">1X2</a></li>
      <li><a href="/predictions/over-2-5.html">Over 2.5</a></li>
      <li><a href="/predictions/over-1-5.html">Over 1.5</a></li>
-     <li><a href="/predictions/under-2-5.html">Under 2.5</a></li>
      <li><a href="/predictions/highest-scoring-half.html">Highest Scoring Half</a></li>
     <li><a href="/predictions/btts.html">BTTS Yes</a></li>
     <li><a href="/predictions/btts-no.html">BTTS No</a></li>
@@ -422,6 +443,8 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
     <li><a href="/2-odds-of-the-day.html">2 Odds</a></li>
     <li><a href="/author-picks.html">H2H Picks</a></li>
     <li><a href="/ticket-builder.html">AI SportyBet Code Builder</a></li>
+    <li><a href="/betpawa-builder.html">AI betPawa Code Builder</a></li>
+    <li><a href="/1xbet-builder.html">AI 1xBet Code Builder</a></li>
     <li><a href="/converter.html">AI Code Converter</a></li>
     <li><a href="/code-splitter.html">AI Code Splitter</a></li>
     <li><a href="/code-merger.html">AI Code Merger</a></li>
@@ -460,10 +483,9 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
  <div style="text-align:center;padding:0 0 8px;"><div google-add-preferred-source-btn data-theme="dark"></div></div>
  </div>
 </footer>
- <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>
- <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HMGZMW9EDP');</script>
+
  <script src="/chat-widget.js?v=paused-20261103" async></script>
- <script src="/responsible-gambling.js"></script>
+ <script src="/responsible-gambling.js" defer></script>
 
 <script>
 document.getElementById('hamburger')?.addEventListener('click', function() {
@@ -475,7 +497,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
 
 <script src="/config.js"></script>
 <script src="/supabase-client.js"></script>
-<script src="/auth.js?v=20260801"></script>
+<script src="/auth.js?v=20261104"></script>
 <script>
 (function() {
   const saved = localStorage.getItem("wf-theme");
@@ -501,6 +523,8 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
 });
-</script><script src="/consent.js?v=2" defer></script>
+</script><script src="/consent.js?v=3" defer></script>
+
+<script src="/ads.js?v=20261122-cwv" defer></script>
 </body>
 </html>

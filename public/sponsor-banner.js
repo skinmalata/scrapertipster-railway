@@ -4,14 +4,13 @@
 // server-rendered matrix and league pages.
 //
 // Placement:
-//   1. Existing sponsored Bitmedia banner after the 3rd card on phones and
-//      after the 5th card on wider screens.
+//   1. A site ad slot after the 3rd card on phones and after the 5th card on
+//      wider screens. Bitmedia is no longer used.
 (function () {
-  var BITMEDIA_UNIT = '6ae8887bf30577b049694c23';
   var MARKER = '<div class="match-card fade-in"';
 
   function renderLegacySlot() {
-    return '<div class="wft-sponsor" data-ad-position="sponsored_match_card"><ins class="' + BITMEDIA_UNIT + '" style="display:inline-block;width:1px;height:1px;"></ins></div>' +
+    return '<div class="wft-ad-slot wft-sponsor" data-ad-position="sponsored_match_card" aria-label="Advertisement"></div>' +
       '<div class="wft-ad-slot" data-ad-position="in_content" aria-label="Advertisement"></div>';
   }
 

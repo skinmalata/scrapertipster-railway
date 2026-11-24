@@ -5,15 +5,9 @@
 <head>
 <script src="/analytics-events.js" defer></script>
 
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-HMGZMW9EDP"></script>
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-HMGZMW9EDP');
-</script>
+
  <meta charset="UTF-8">
- <meta name="bitmedia-site-verification" content="28cb5d6395ea086d915a377b96884fce" />
+
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
  <title>WinFulltime - Free Football Predictions Today | 1X2, O/U, BTTS</title>
@@ -219,6 +213,27 @@ gtag('config', 'G-HMGZMW9EDP');
 <link rel="alternate" type="application/rss+xml" title="WinFulltime Football Predictions RSS" href="/feed.xml">
 <script async src="https://news.google.com/swg/js/v1/publisher.js"></script>
 <link rel="stylesheet" href="/consent.css">
+<script data-wft-alt-noindex>
+(function () {
+  var p = location.pathname;
+  var q = location.search;
+  var alt = (q && (/^\/(?:analysis|converter)\.html$/.test(p) || p === '/')) ||
+    p === '/index.html' || p === '/predictions/in-play.html' ||
+    /^\/(?:ticket-builder|privacy|contact|terms)$/.test(p) ||
+    /^\/blog\/[^/.]+$/.test(p);
+  if (!alt) return;
+  var robots = document.querySelector('meta[name="robots"]');
+  if (!robots) {
+    robots = document.createElement('meta');
+    robots.name = 'robots';
+    document.head.appendChild(robots);
+  }
+  robots.setAttribute('content', 'noindex,follow');
+  var canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical) canonical.remove();
+})();
+</script>
+<link rel="stylesheet" href="/footer.css?v=1">
 </head>
 
 <body>
@@ -263,14 +278,8 @@ gtag('config', 'G-HMGZMW9EDP');
 </div>
 
 </header>
-
-
-
-
-
-
-
- <main class="container">
+<div class="wft-ad-slot" data-ad-position="global_leaderboard" aria-label="Advertisement"></div>
+<main class="container">
 
  <div class="hero">
 
@@ -281,7 +290,7 @@ gtag('config', 'G-HMGZMW9EDP');
  <p class="hero-date" id="currentDate"></p>
 
 </div> 
- 
+
 
   <div class="tabs-container" id="dayTabs"></div>
 
@@ -291,7 +300,6 @@ gtag('config', 'G-HMGZMW9EDP');
   <a href="/predictions/1x2" id="tab-1x2" class="tab-btn active">1X2</a>
   <a href="/predictions/over-1-5" id="tab-over15" class="tab-btn">Over 1.5</a>
   <a href="/predictions/over-2-5" id="tab-over25" class="tab-btn">Over 2.5</a>
-  <a href="/predictions/under-2-5" id="tab-under25" class="tab-btn">Under 2.5</a>
   <a href="/predictions/ht-ft" id="tab-htft" class="tab-btn">HT/FT</a>
   <a href="/predictions/gg2" id="tab-gg2" class="tab-btn">GG2+</a>
   <a href="/predictions/highest-scoring-half" id="tab-highest-scoring-half" class="tab-btn">Highest Scoring Half</a>
@@ -299,10 +307,10 @@ gtag('config', 'G-HMGZMW9EDP');
   <a href="/predictions/perfect-record" id="tab-perfect-record" class="tab-btn">Perfect Record</a>
   <a href="/predictions/btts" id="tab-btts" class="tab-btn">BTTS YES</a>
   <a href="/predictions/btts-no" id="tab-bttsno" class="tab-btn">BTTS NO</a>
-  <a href="/predictions/corners" id="tab-corners" class="tab-btn">Corners</a>
-  <a href="/predictions/cards" id="tab-cards" class="tab-btn">Cards</a>
-  <a href="/predictions/in-play" id="tab-in-play" class="tab-btn">In-Play</a>
+  <span id="tab-corners" class="tab-btn disabled" aria-disabled="true" title="Temporarily unavailable">Corners</span>
+  <span id="tab-cards" class="tab-btn disabled" aria-disabled="true" title="Temporarily unavailable">Cards</span>
   <a href="/author-picks.html" id="tab-author-picks" class="tab-btn">H2H Picks</a>
+  <a href="/predictions/in-play" id="tab-in-play" class="tab-btn">In-Play</a>
 </div>
 
 
@@ -1000,7 +1008,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
  baseDate.setHours(0, 0, 0, 0);
 
- 
+
 
  for (let i = -1; i <= 1; i++) {
 
@@ -1104,7 +1112,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
  if (tabBtn) tabBtn.classList.add('active');
 
- 
+
 
  const dayTabs = document.getElementById('dayTabs');
 
@@ -1118,7 +1126,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
  }
 
- 
+
 
  if (cat === 'unbeaten') {
 
@@ -1390,7 +1398,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
  const content = document.getElementById('content');
 
- 
+
 
  if (currentCategory === 'unbeaten') {
 
@@ -1493,11 +1501,11 @@ gtag('config', 'G-HMGZMW9EDP');
 
  console.log('Target date:', targetDateStr, 'Category:', currentCategory, 'Total matches:', matches.length);
 
- 
+
 
  filtered = matches.filter(m => m.date === targetDateStr);
 
- 
+
 
  console.log('Filtered matches:', filtered.length, 'Sample dates:', filtered.slice(0,3).map(m=>m.date));
 
@@ -1585,7 +1593,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
  const matchData = encodeURIComponent(JSON.stringify(match));
 
- 
+
 
  const isWinstreak = currentCategory === 'winstreak';
 
@@ -1912,7 +1920,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
  console.log('loadPredictions called, waiting...');
 
- 
+
 
  } catch (error) {
 
@@ -1940,7 +1948,6 @@ gtag('config', 'G-HMGZMW9EDP');
     <li><a href="/predictions/1x2.html">1X2</a></li>
      <li><a href="/predictions/over-2-5.html">Over 2.5</a></li>
      <li><a href="/predictions/over-1-5.html">Over 1.5</a></li>
-     <li><a href="/predictions/under-2-5.html">Under 2.5</a></li>
      <li><a href="/predictions/highest-scoring-half.html">Highest Scoring Half</a></li>
     <li><a href="/predictions/btts.html">BTTS Yes</a></li>
     <li><a href="/predictions/btts-no.html">BTTS No</a></li>
@@ -1968,6 +1975,8 @@ gtag('config', 'G-HMGZMW9EDP');
     <li><a href="/2-odds-of-the-day.html">2 Odds</a></li>
     <li><a href="/author-picks.html">H2H Picks</a></li>
     <li><a href="/ticket-builder.html">AI SportyBet Code Builder</a></li>
+    <li><a href="/betpawa-builder.html">AI betPawa Code Builder</a></li>
+    <li><a href="/1xbet-builder.html">AI 1xBet Code Builder</a></li>
     <li><a href="/converter.html">AI Code Converter</a></li>
     <li><a href="/code-splitter.html">AI Code Splitter</a></li>
     <li><a href="/code-merger.html">AI Code Merger</a></li>
@@ -2009,7 +2018,7 @@ gtag('config', 'G-HMGZMW9EDP');
 
 <script src="/config.js"></script>
 <script src="/supabase-client.js"></script>
-<script src="/auth.js?v=20260801"></script>
+<script src="/auth.js?v=20261104"></script>
 <script src="/chat-widget.js?v=paused-20261103" async></script>
 
 <script>
@@ -2051,14 +2060,18 @@ document.getElementById('hamburger')?.addEventListener('click', function() { thi
 
 
 
-<script src="/responsible-gambling.js"></script>
-<script src="/pwa.js?v=2"></script>
+<script src="/responsible-gambling.js" defer></script>
+<script src="/pwa.js?v=2" defer></script>
 
 <p class="featured-books-disclosure page-bottom">Advertising disclosure: links to bookmakers on this page are affiliate links &#8212; WinFulltime may earn a commission if you sign up, at no extra cost to you. 18+ &middot; T&amp;Cs apply &middot; Please gamble responsibly.</p>
 
 
 <script src="/vip-tab.js?v=20261027" defer></script>
-<script>if(window.addEventListener){window.addEventListener("authchange",function(){if(typeof renderMatches==="function") renderMatches();});}</script><script src="/consent.js?v=2" defer></script>
+<script>if(window.addEventListener){window.addEventListener("authchange",function(){if(typeof renderMatches==="function") renderMatches();});}</script><script src="/consent.js?v=3" defer></script>
+
+<script src="/player-shots-tab.js?v=20261018" defer></script>
+<script src="/builder-tabs.js?v=20261115b" defer></script>
+<script src="/ads.js?v=20261122-cwv" defer></script>
 </body>
 
 </html>

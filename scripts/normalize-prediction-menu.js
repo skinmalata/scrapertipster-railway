@@ -21,7 +21,6 @@ const CANONICAL = [
   ['/predictions/1x2', 'tab-1x2', '1X2'],
   ['/predictions/over-1-5', 'tab-over15', 'Over 1.5'],
   ['/predictions/over-2-5', 'tab-over25', 'Over 2.5'],
-  ['/predictions/under-2-5', 'tab-under25', 'Under 2.5'],
   ['/predictions/ht-ft', 'tab-htft', 'HT/FT'],
   ['/predictions/gg2', 'tab-gg2', 'GG2+'],
   ['/predictions/highest-scoring-half', 'tab-highest-scoring-half', 'Highest Scoring Half'],
@@ -82,8 +81,9 @@ for (const file of files) {
   // Anything unrecognised (e.g. the hand-written VIP tab on vip.html, which
   // carries an inline gradient) is preserved verbatim at the end.
   const knownHrefs = new Set(CANONICAL.concat(EXTRAS).map(([href]) => href));
+  const removedHrefs = new Set(['/predictions/under-2-5']);
   const wanted = CANONICAL.concat(EXTRAS.filter(([href]) => present.has(href)));
-  const unknown = items.filter((i) => !knownHrefs.has(i.href));
+  const unknown = items.filter((i) => !knownHrefs.has(i.href) && !removedHrefs.has(i.href));
 
   // Preserve the indent and line ending of the page's existing block.
   const eol = block.includes('\r\n') ? '\r\n' : '\n';
@@ -92,6 +92,9 @@ for (const file of files) {
   const containerId = (block.match(/id="(category(?:Links|Tabs))"/) || [])[1];
 
   const rendered = wanted.map(([href, id, label]) => {
+    if (href === '/predictions/corners' || href === '/predictions/cards') {
+      return `${indent}<span id="${id}" class="tab-btn disabled" aria-disabled="true" title="Temporarily unavailable">${label}</span>`;
+    }
     const cls = href === activeHref ? 'tab-btn active' : 'tab-btn';
     return `${indent}<a href="${href}" id="${id}" class="${cls}">${label}</a>`;
   });
@@ -105,7 +108,8 @@ for (const file of files) {
 
   // Safety guard: never lose a tab that was already on the page.
   const afterHrefs = new Set([...next.matchAll(ITEM_RE)].map((x) => x[1]));
-  const lost = [...present].filter((h) => !afterHrefs.has(h));
+  const intentionallyRemoved = new Set(['/predictions/under-2-5', '/predictions/corners', '/predictions/cards']);
+  const lost = [...present].filter((h) => !intentionallyRemoved.has(h) && !afterHrefs.has(h));
   if (lost.length) {
     console.error(`ABORT ${path.relative(ROOT, file)}: would drop ${lost.join(', ')}`);
     process.exitCode = 1;

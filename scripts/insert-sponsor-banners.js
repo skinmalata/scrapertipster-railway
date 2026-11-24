@@ -1,7 +1,7 @@
 'use strict';
 
 // Replace legacy 1win banners in committed static prediction grids with the
-// shared Bitmedia slot. Page generators use the same renderer going forward.
+// shared site ad slot. Page generators use the same renderer going forward.
 
 const fs = require('fs');
 const path = require('path');
@@ -66,7 +66,7 @@ function main() {
     const result = processFile(file, seed);
     if (result.inserted) {
       inserted += 1;
-      console.log(`[sponsor] ${result.reason === 'replaced 1win' ? 'Replaced 1win at ' : 'Added Bitmedia at '}${seed}`);
+      console.log(`[sponsor] ${result.reason === 'replaced 1win' ? 'Replaced 1win at ' : 'Added ad slot at '}${seed}`);
     } else {
       skipped += 1;
       skippedReasons[result.reason] = (skippedReasons[result.reason] || 0) + 1;

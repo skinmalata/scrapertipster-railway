@@ -321,7 +321,7 @@ footer { background: #1e2538; border-top: 1px solid rgba(255,255,255,0.06); padd
 
 
 
- 
+
 
 <!-- wf-layout-styles -->
 <style>
@@ -440,6 +440,26 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 <script async src="https://news.google.com/swg/js/v1/publisher.js"></script>
 <link rel="stylesheet" href="/consent.css">
 <link rel="stylesheet" href="/footer.css?v=1">
+<script data-wft-alt-noindex>
+(function () {
+  var p = location.pathname;
+  var q = location.search;
+  var alt = (q && (/^\/(?:analysis|converter)\.html$/.test(p) || p === '/')) ||
+    p === '/index.html' || p === '/predictions/in-play.html' ||
+    /^\/(?:ticket-builder|privacy|contact|terms)$/.test(p) ||
+    /^\/blog\/[^/.]+$/.test(p);
+  if (!alt) return;
+  var robots = document.querySelector('meta[name="robots"]');
+  if (!robots) {
+    robots = document.createElement('meta');
+    robots.name = 'robots';
+    document.head.appendChild(robots);
+  }
+  robots.setAttribute('content', 'noindex,follow');
+  var canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical) canonical.remove();
+})();
+</script>
 </head>
 
 <body>
@@ -448,7 +468,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
  <div class="logo">
  <a href="/"><img src="/winfulltimelogo.png" alt="WinFulltime" class="logo-icon" width="28" height="28">Win<span>Fulltime</span></a>
 </div>
- 
+
  <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 <nav id="nav">
  <a href="/">Home</a>
@@ -460,6 +480,8 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
    <a href="/code-splitter.html">AI Code Splitter</a>
    <a href="/predictions/in-play">In-Play</a>
    <a href="/ticket-builder.html">AI SportyBet Code Builder</a>
+   <a href="/betpawa-builder.html">AI betPawa Code Builder</a>
+   <a href="/1xbet-builder.html">AI 1xBet Code Builder</a>
    <a href="/code-analyzer.html">AI Code Analyzer</a>
   </div>
  </details>
@@ -470,8 +492,8 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
  </span></nav>
 </div>
 </header>
-
- <div class="container">
+<div class="wft-ad-slot" data-ad-position="global_leaderboard" aria-label="Advertisement"></div>
+<div class="container">
 
  <a href="/" class="back-btn">Back to Home</a>
 
@@ -930,7 +952,6 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
     <li><a href="/predictions/1x2.html">1X2</a></li>
      <li><a href="/predictions/over-2-5.html">Over 2.5</a></li>
      <li><a href="/predictions/over-1-5.html">Over 1.5</a></li>
-     <li><a href="/predictions/under-2-5.html">Under 2.5</a></li>
      <li><a href="/predictions/highest-scoring-half.html">Highest Scoring Half</a></li>
     <li><a href="/predictions/btts.html">BTTS Yes</a></li>
     <li><a href="/predictions/btts-no.html">BTTS No</a></li>
@@ -958,6 +979,8 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
     <li><a href="/2-odds-of-the-day.html">2 Odds</a></li>
     <li><a href="/author-picks.html">H2H Picks</a></li>
     <li><a href="/ticket-builder.html">AI SportyBet Code Builder</a></li>
+    <li><a href="/betpawa-builder.html">AI betPawa Code Builder</a></li>
+    <li><a href="/1xbet-builder.html">AI 1xBet Code Builder</a></li>
     <li><a href="/converter.html">AI Code Converter</a></li>
     <li><a href="/code-splitter.html">AI Code Splitter</a></li>
     <li><a href="/code-merger.html">AI Code Merger</a></li>
@@ -999,7 +1022,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
 
 
 <script src="/analysis-maps.js"></script>
-<script src="/responsible-gambling.js"></script>
+<script src="/responsible-gambling.js" defer></script>
 
 <script>
 document.getElementById('hamburger')?.addEventListener('click', function() {
@@ -1011,7 +1034,7 @@ document.getElementById('hamburger')?.addEventListener('click', function() {
 
 <script src="/config.js"></script>
 <script src="/supabase-client.js"></script>
-<script src="/auth.js?v=20260801"></script>
+<script src="/auth.js?v=20261104"></script>
 <script>
 (function() {
   const saved = localStorage.getItem("wf-theme");
@@ -1039,7 +1062,9 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 <script src="/1xbet-odds-widget.js" defer></script>
-<script src="/odds-comparison-widget.js" defer></script><script src="/consent.js?v=2" defer></script>
+<script src="/odds-comparison-widget.js" defer></script><script src="/consent.js?v=3" defer></script>
+
+<script src="/ads.js?v=20261122-cwv" defer></script>
 </body>
 
 </html>

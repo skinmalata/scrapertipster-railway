@@ -268,7 +268,13 @@ nav a.active::after {
  color: var(--text-primary);
  }
 
- .tab-btn.active {
+ .tab-btn.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+  }
+
+ .tab-btn.active {
  background: var(--accent-gradient);
  color: white;
  border-color: transparent;

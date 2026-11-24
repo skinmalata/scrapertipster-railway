@@ -18,10 +18,6 @@
 
   var API = (window.WFT_API || 'https://winfulltime-api.onrender.com') + '/api';
   var ADVERTISE_URL = '/advertise.html';
-  // Bottom sticky Bitmedia banner. Disabled; the slot stays hidden and the
-  // inert Bitmedia code is never activated on scroll.
-  var STICKY_ADS_ENABLED = false;
-  var BITMEDIA_JS_VERSION = '20261122';
 
   var POSITIONS = {
     global_leaderboard: { label: 'Global Leaderboard', w: 728, h: 90 },
@@ -122,83 +118,6 @@
     } catch (e) {}
   }
 
-  function loadBitmediaUnit(unit, unitId) {
-    if (!unit || unit.getAttribute('data-wft-bitmedia-loaded') === 'true') return;
-    unit.setAttribute('data-wft-bitmedia-loaded', 'true');
-    var hosts = ['cdn.bmcdn6.com'];
-    function loadHost(index) {
-      if (index >= hosts.length) return;
-      var script = document.createElement('script');
-      script.async = true;
-      script.src = 'https://' + hosts[index] + '/js/' + unitId + '.js?v=' + BITMEDIA_JS_VERSION;
-      script.onerror = function() {
-        script.remove();
-        loadHost(index + 1);
-      };
-      var first = document.getElementsByTagName('script')[0];
-      if (first && first.parentNode) first.parentNode.insertBefore(script, first);
-      else document.head.appendChild(script);
-    }
-    loadHost(0);
-  }
-
-  function scheduleEndOfContentFallback(slot, unit) {
-    if (!slot || !unit || slot.getAttribute('data-wft-endfill-watch') === 'true') return;
-    slot.setAttribute('data-wft-endfill-watch', 'true');
-    window.setTimeout(function () {
-      if (!document.documentElement.contains(slot) || slot.getAttribute('data-wft-endfill-done') === 'true') return;
-      var creatives = slot.querySelectorAll('iframe, img, video, object, embed');
-      for (var i = 0; i < creatives.length; i++) {
-        var rect = creatives[i].getBoundingClientRect();
-        if (rect.width > 2 && rect.height > 2) return;
-      }
-
-      // If Bitmedia has not rendered a creative, let the site ad pool fill the
-      // same reserved slot. That keeps the end-of-content placement visible.
-      slot.setAttribute('data-wft-endfill-done', 'true');
-      if (unit.parentNode) unit.parentNode.removeChild(unit);
-      var impressions = [];
-      processNode(slot, impressions);
-      trackImpressions(impressions);
-    }, 8000);
-  }
-
-  function activateStickyBitmediaCode(el) {
-    var inert = el.querySelector('script[data-wft-bitmedia-sticky]');
-    if (!inert || inert.getAttribute('data-wft-activated') === 'true') return;
-    var active = document.createElement('script');
-    active.type = 'text/javascript';
-    active.setAttribute('data-wft-activated', 'true');
-    active.textContent = inert.textContent;
-    inert.parentNode.replaceChild(active, inert);
-  }
-
-  function prepareStickyBitmedia(el, unit) {
-    if (!el || !unit || el.getAttribute('data-wft-sticky-ready') === 'true') return;
-    el.setAttribute('data-wft-sticky-ready', 'true');
-    var dismissed = false;
-    try { dismissed = window.sessionStorage.getItem('wft-bitmedia-sticky-dismissed') === '1'; } catch (e) {}
-    if (dismissed) return;
-
-    var close = el.querySelector('.wft-sticky-close');
-    if (close) close.addEventListener('click', function() {
-      dismissed = true;
-      el.hidden = true;
-      el.classList.remove('wft-sticky-visible');
-      try { window.sessionStorage.setItem('wft-bitmedia-sticky-dismissed', '1'); } catch (e) {}
-    });
-
-    function showAfterScroll() {
-      if (dismissed || window.scrollY < 400) return;
-      window.removeEventListener('scroll', showAfterScroll);
-      el.hidden = false;
-      el.classList.add('wft-sticky-visible');
-      activateStickyBitmediaCode(el);
-    }
-    window.addEventListener('scroll', showAfterScroll, { passive: true });
-    showAfterScroll();
-  }
-
   function processNode(el, impressions) {
     var key = el.getAttribute('data-ad-position');
     if (!key) return;
@@ -208,25 +127,6 @@
     if (pos.w && pos.h) {
       el.setAttribute('data-ad-ratio', '');
       el.style.setProperty('--wft-ad-ratio', pos.w + '/' + pos.h);
-    }
-
-    var bitmediaId = key === 'global_leaderboard' ? '6ae882436485fffa717939a1' :
-      (key === 'sponsored_match_card' ? '6ae8887bf30577b049694c23' :
-      (key === 'sticky_banner' ? '6ae8959ff30577b0496d401f' : ''));
-    if (bitmediaId) {
-      var units = el.getElementsByTagName('ins');
-      for (var unitIndex = 0; unitIndex < units.length; unitIndex++) {
-        if (units[unitIndex].className === bitmediaId) {
-          if (key === 'sticky_banner') {
-            if (!STICKY_ADS_ENABLED) return;
-            prepareStickyBitmedia(el, units[unitIndex]);
-          } else {
-            loadBitmediaUnit(units[unitIndex], bitmediaId);
-            if (key === 'end_of_content') scheduleEndOfContentFallback(el, units[unitIndex]);
-          }
-          return;
-        }
-      }
     }
 
     var list = cached && cached[key];

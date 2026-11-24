@@ -1,8 +1,7 @@
-// Reusable Bitmedia slots for generated prediction grids.
-const BITMEDIA_UNIT = '6ae8887bf30577b049694c23';
+// Reusable ad slots for generated prediction grids. Bitmedia is disabled.
 
-function renderSponsorBanner(seed) {
-  return '<div class="wft-sponsor" data-ad-position="sponsored_match_card"><ins class="' + BITMEDIA_UNIT + '" style="display:inline-block;width:1px;height:1px;"></ins></div>';
+function renderSponsorBanner() {
+  return '<div class="wft-ad-slot wft-sponsor" data-ad-position="sponsored_match_card" aria-label="Advertisement"></div>';
 }
 
 /**
@@ -23,7 +22,6 @@ function spliceSponsorBetweenCards(cards, seed) {
 }
 
 module.exports = {
-  BITMEDIA_UNIT,
   renderSponsorBanner,
   spliceSponsorBetweenCards
 };

@@ -799,12 +799,10 @@ ${relatedHtml(a.related)}
    <a href="/predictions/over-1-5">Over 1.5</a>
    <a href="/predictions/over-2-5">Over 2.5</a>
    <a href="/predictions/btts">BTTS Yes</a>
-   <a href="/predictions/btts-no">BTTS No</a>
-   <a href="/predictions/unbeaten">Unbeaten</a>
-   <a href="/predictions/corners">Corners</a>
-   <a href="/predictions/cards">Cards</a>
-   <a href="/advertise.html">Advertise</a>
-   <a href="/contact.html">Contact</a>
+    <a href="/predictions/btts-no">BTTS No</a>
+    <a href="/predictions/unbeaten">Unbeaten</a>
+    <a href="/advertise.html">Advertise</a>
+    <a href="/contact.html">Contact</a>
    <a href="/terms.html">Terms</a>
    <a href="/privacy.html">Privacy</a>
   </div>
