@@ -35,6 +35,27 @@ test('parses league, market and bare minimum odds', () => {
   assert.equal(result.intent.minOddsPerLeg, 1.5);
 });
 
+test('parses easy football markets without mixing btts sides', () => {
+  const under = chat.parseIntent('book 5 under 2.5 football matches');
+  assert.equal(under.recognized, true);
+  assert.deepEqual(under.intent.markets, ['under25']);
+  assert.equal(under.intent.numLegs, 5);
+
+  const no = chat.parseIntent('4 btts no matches min 1.30');
+  assert.deepEqual(no.intent.markets, ['bttsno']);
+  assert.equal(no.intent.minOddsPerLeg, 1.3);
+  assert.equal(no.intent.numLegs, 4);
+
+  const dc = chat.parseIntent('dc 12 premier league');
+  assert.deepEqual(dc.intent.markets, ['dc12']);
+  assert.deepEqual(dc.intent.leagues, ['premier league']);
+
+  const over = chat.parseIntent('over 3.5 target 6x');
+  assert.deepEqual(over.intent.markets, ['over35']);
+  assert.equal(over.intent.targetOdds, 6);
+  assert.equal(over.intent.numLegs, null);
+});
+
 test('does not confuse max odds with a match count', () => {
   const result = chat.parseIntent('min 3 max 2 football');
 
@@ -57,6 +78,16 @@ test('backend accepts valid chat filters', () => {
   assert.deepEqual(result.filters.markets, ['1x2']);
   assert.equal(result.filters.numLegs, 3);
   assert.equal(result.filters.straightWinsOnly, true);
+});
+
+test('backend accepts the easy market aliases', () => {
+  const result = validateSportyFilters({
+    sport: 'football',
+    markets: ['btts no', 'under 2 5', 'over 3 5', 'double chance 12']
+  });
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.filters.markets, ['bttsno', 'under25', 'over35', 'dc12']);
 });
 
 test('backend rejects unsupported sport/market combinations', () => {

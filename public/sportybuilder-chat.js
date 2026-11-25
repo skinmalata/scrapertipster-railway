@@ -18,13 +18,19 @@
 
   var HELP_TEXT = 'Try: "book 10 winning basketball matches with at least 2 odds each", ' +
     '"book 5 winning corner matches today", "football over 2.5 min odds 1.40 target 5", ' +
-    '"EPL and La Liga BTTS with min 1.50", or "basketball points over under 6x".';
+    '"EPL BTTS No with min 1.30", "under 2.5 football target 5x", ' +
+    '"dc 12 premier league", or "basketball points over under 6x".';
 
   var MARKET_PATTERNS = [
+    { market: 'over35', pattern: /\b(?:over|o)[\s-]*3\.5\b/i },
     { market: 'over25', pattern: /\b(?:over|o)[\s-]*2\.5\b/i },
     { market: 'over15', pattern: /\b(?:over|o)[\s-]*1\.5\b/i },
-    { market: '1x2', pattern: /\b(?:1\s*x\s*2|double\s+chance|match\s+(?:result|winner)|moneyline|dc|1x|x2)\b/i },
-    { market: 'btts', pattern: /\b(?:btts|both\s+teams?\s+(?:to\s+)?score|gg)\b/i },
+    { market: 'under25', pattern: /\b(?:under|u)[\s-]*2\.5\b/i },
+    { market: 'under15', pattern: /\b(?:under|u)[\s-]*1\.5\b/i },
+    { market: 'dc12', pattern: /\b(?:dc\s*12|double\s+chance\s*12|12\s+double\s+chance|home\s+or\s+away)\b/i },
+    { market: '1x2', pattern: /\b(?:1\s*x\s*2|double\s+chance(?!\s*12)|match\s+(?:result|winner)|moneyline|dc(?!\s*12)|1x|x2)\b/i },
+    { market: 'bttsno', pattern: /\b(?:btts\s*(?:no|ng)|ng|both\s+teams?\s+(?:not\s+to\s+score|to\s+fail\s+to\s+score))\b/i },
+    { market: 'btts', pattern: /\b(?:btts(?!\s*(?:no|ng))|both\s+teams?\s+(?:to\s+)?score(?!\s*(?:no|not))|gg(?!\s*(?:no|ng)))\b/i },
     { market: 'highestscoringhalf', pattern: /\b(?:highest\s+scoring\s+half|hsh|(?:1st|2nd|first|second)\s+half)\b/i },
     { market: 'dnb', pattern: /\b(?:draw\s+no\s+bet|dnb)\b/i },
     { market: 'corners', pattern: /\b(?:corners?|over\s+9\.5\s+corners?)\b/i },
@@ -33,7 +39,9 @@
 
   var MARKET_LABELS = {
     '1x2': '1X2 / moneyline', over15: 'Over 1.5', over25: 'Over 2.5',
-    btts: 'BTTS', highestscoringhalf: 'Highest scoring half', dnb: 'Draw no bet',
+    over35: 'Over 3.5', under15: 'Under 1.5', under25: 'Under 2.5',
+    btts: 'BTTS', bttsno: 'BTTS No / NG', dc12: 'Double Chance (12)',
+    highestscoringhalf: 'Highest scoring half', dnb: 'Draw no bet',
     corners: 'Corners', 'basketball-total': 'Basketball points'
   };
 
@@ -62,7 +70,7 @@
     { name: 'nba', pattern: /\bnba\b/i }
   ];
 
-  var COUNT_PATTERN = /\b(\d{1,2})\s+(?=(?:winning\s+|straight\s+)*(?:basketball|football|soccer|corner|corners?|btts|match(?:es)?|games?|legs?|picks?|selections?)\b)/i;
+  var COUNT_PATTERN = /\b(?<!\.)(\d{1,2})\s+(?=(?:winning\s+|straight\s+)*(?:basketball|football|soccer|corner|corners?|btts(?:\s*(?:no|ng))?|over|under|dc|double(?:\s+chance)?|match(?:es)?|games?|legs?|picks?|selections?)\b)/i;
   var TOTAL_MIN_PATTERNS = [
     /\b(?:min(?:imum)?|at\s+least)\s+total\s+odds?\s*(?:of|=|:|at)?\s*(\d+(?:\.\d+)?)\s*x?\b/i
   ];
@@ -85,7 +93,7 @@
     /\b(\d+(?:\.\d+)?)\s+odds?\b/i,
     /\b(\d+(?:\.\d+)?)\s*x\b/i
   ];
-  var STOP_AT = /\b(?:with|having|min(?:imum)?|max(?:imum)?|target|total\s+odds|odds?|only|please|give|build|generate|book|under|at\s+least|today|tomorrow)\b/i;
+  var STOP_AT = /\b(?:with|having|min(?:imum)?|max(?:imum)?|target|total\s+odds|odds?|only|please|give|build|generate|book|over|under|at\s+least|today|tomorrow)\b/i;
 
   function blankSpaces(length) {
     var out = '';
@@ -204,7 +212,8 @@
     var perLeg = intent.minOddsPerLeg;
     if (perLeg === null) {
       var odds = intent.markets.map(function (market) {
-        return ({ corners: 1.5, btts: 1.8, over15: 1.3, over25: 1.6, dnb: 1.5,
+        return ({ corners: 1.5, btts: 1.8, bttsno: 1.5, over15: 1.3, over25: 1.6,
+          over35: 2, under15: 1.3, under25: 1.35, dnb: 1.5, dc12: 1.35,
           highestscoringhalf: 1.8, '1x2': 1.5, 'basketball-total': 1.25 })[market] || 1.5;
       });
       perLeg = odds.length ? odds.reduce(function (a, b) { return a + b; }, 0) / odds.length : 1.5;
@@ -283,7 +292,8 @@
     }
     if (intent.sport === 'basketball') {
       var footballOnly = intent.markets.filter(function (m) {
-        return ['over15', 'over25', 'btts', 'highestscoringhalf', 'dnb', 'corners'].indexOf(m) !== -1;
+        return ['over15', 'over25', 'over35', 'under15', 'under25', 'btts', 'bttsno',
+          'dc12', 'highestscoringhalf', 'dnb', 'corners'].indexOf(m) !== -1;
       });
       if (footballOnly.length) errors.push('Football markets need football or all sports.');
     }

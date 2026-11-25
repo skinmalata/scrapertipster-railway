@@ -593,7 +593,12 @@ async function getEventMarkets(eventId, sport) {
 const SR_OUTCOME = { '1': '1', X: '2', '2': '3' };
 const DC_TIPS = { '1X': true, '12': true, X2: true };
 
-const OVER_TOTAL_BY_CATEGORY = { over15: '1.5', over25: '2.5' };
+const TOTAL_BY_CATEGORY = {
+  over15: { total: '1.5', side: 'over' }, under15: { total: '1.5', side: 'under' },
+  over25: { total: '2.5', side: 'over' }, under25: { total: '2.5', side: 'under' },
+  over35: { total: '3.5', side: 'over' }, under35: { total: '3.5', side: 'under' },
+  over45: { total: '4.5', side: 'over' }, under45: { total: '4.5', side: 'under' }
+};
 
 async function sportybetSelection(event, leg) {
   const category = String(leg.category || '').toLowerCase();
@@ -655,16 +660,19 @@ async function sportybetSelection(event, leg) {
     return { eventId: event.eventId, marketId: row.marketId, outcomeId: row.outcomeId, specifier: null };
   }
 
-  const total = OVER_TOTAL_BY_CATEGORY[category];
-  if (total) {
-    if (!/^over /i.test(tip)) throw unsupportedMarketError(leg, 'Only Over selections can be turned into a code for the Over/Under market.');
-    const specifier = 'total=' + total;
-    const markets = await getEventMarkets(event.eventId);
-    const row = markets.overUnder[specifier];
-    if (!row || !row.over) {
-      throw unsupportedMarketError(leg, 'Over ' + total + ' is not offered for "' + leg.match + '", so the code was not created.');
+  const totalRule = TOTAL_BY_CATEGORY[category];
+  if (totalRule) {
+    const expected = totalRule.side === 'over' ? /^over\s/i : /^under\s/i;
+    if (!expected.test(tip)) {
+      throw unsupportedMarketError(leg, 'Only ' + (totalRule.side === 'over' ? 'Over' : 'Under') + ' selections can be turned into a code for this Over/Under market.');
     }
-    return { eventId: event.eventId, marketId: row.over.marketId, outcomeId: row.over.outcomeId, specifier: row.over.specifier };
+    const specifier = 'total=' + totalRule.total;
+    const markets = await getEventMarkets(event.eventId);
+    const row = markets.overUnder[specifier] && markets.overUnder[specifier][totalRule.side];
+    if (!row) {
+      throw unsupportedMarketError(leg, totalRule.side + ' ' + totalRule.total + ' is not offered for "' + leg.match + '", so the code was not created.');
+    }
+    return { eventId: event.eventId, marketId: row.marketId, outcomeId: row.outcomeId, specifier: row.specifier };
   }
 
   // BTTS (Both Teams To Score / GG)
@@ -674,6 +682,22 @@ async function sportybetSelection(event, leg) {
     const markets = await getEventMarkets(event.eventId);
     const row = markets.btts && markets.btts[sideKey];
     if (!row) throw unsupportedMarketError(leg, 'GG/NG (Both Teams to Score) is not offered for "' + leg.match + '", so the code was not created.');
+    return { eventId: event.eventId, marketId: row.marketId, outcomeId: row.outcomeId, specifier: null };
+  }
+
+  // BTTS No / NG as a first-class category
+  if (category === 'bttsno' || category === 'btts-no') {
+    const markets = await getEventMarkets(event.eventId);
+    const row = markets.btts && markets.btts.no;
+    if (!row) throw unsupportedMarketError(leg, 'NG (Both Teams Not to Score) is not offered for "' + leg.match + '", so the code was not created.');
+    return { eventId: event.eventId, marketId: row.marketId, outcomeId: row.outcomeId, specifier: null };
+  }
+
+  // Double Chance 12 (home or away)
+  if (category === 'dc12') {
+    const markets = await getEventMarkets(event.eventId);
+    const row = markets.doubleChance && markets.doubleChance['12'];
+    if (!row) throw unsupportedMarketError(leg, 'Double Chance 12 is not offered for "' + leg.match + '", so the code was not created.');
     return { eventId: event.eventId, marketId: row.marketId, outcomeId: row.outcomeId, specifier: null };
   }
 

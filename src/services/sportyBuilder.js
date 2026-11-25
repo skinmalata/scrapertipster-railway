@@ -8,10 +8,14 @@ const { fetchTodayStreaks } = require('./h2hWinningStreaks');
 const { watDate } = require('./twoOddsOfDay');
 
 const SPORTYBUILDER_MARKETS = Object.freeze([
-  '1x2', 'over15', 'over25', 'btts', 'highestscoringhalf', 'dnb', 'corners', 'basketball-total'
+  '1x2', 'dc12', 'over15', 'over25', 'over35', 'under15', 'under25',
+  'btts', 'bttsno', 'highestscoringhalf', 'dnb', 'corners', 'basketball-total'
 ]);
-const FOOTBALL_ONLY_MARKETS = Object.freeze(['over15', 'over25', 'btts', 'highestscoringhalf', 'dnb', 'corners']);
-const HIGHER_ODDS_MARKETS = Object.freeze(['btts', 'highestscoringhalf', 'dnb', 'corners']);
+const FOOTBALL_ONLY_MARKETS = Object.freeze([
+  'dc12', 'over15', 'over25', 'over35', 'under15', 'under25',
+  'btts', 'bttsno', 'highestscoringhalf', 'dnb', 'corners'
+]);
+const HIGHER_ODDS_MARKETS = Object.freeze(['over35', 'bttsno', 'highestscoringhalf', 'corners']);
 const MIN_LEG_ODDS = 1.06;
 const MIN_FILTER_ODDS = 1.06;
 const MAX_FILTER_ODDS = 20;
@@ -120,9 +124,15 @@ function normaliseSportFilter(value) {
 const MARKET_ALIASES = {
   '1x2': '1x2', 'match result': '1x2', 'match winner': '1x2', 'double chance': '1x2',
   dc: '1x2', '1x': '1x2', x2: '1x2', moneyline: '1x2',
+  dc12: 'dc12', 'dc 12': 'dc12', 'double chance 12': 'dc12', 'home or away': 'dc12',
   over15: 'over15', 'over 1 5': 'over15', o15: 'over15',
   over25: 'over25', 'over 2 5': 'over25', o25: 'over25',
+  over35: 'over35', 'over 3 5': 'over35', o35: 'over35',
+  under15: 'under15', 'under 1 5': 'under15', u15: 'under15',
+  under25: 'under25', 'under 2 5': 'under25', u25: 'under25',
   btts: 'btts', 'btts yes': 'btts', 'both teams to score': 'btts', gg: 'btts',
+  bttsno: 'bttsno', 'btts no': 'bttsno', 'btts ng': 'bttsno', ng: 'bttsno',
+  'both teams not to score': 'bttsno', 'both teams to fail to score': 'bttsno',
   highestscoringhalf: 'highestscoringhalf', hsh: 'highestscoringhalf', 'highest scoring half': 'highestscoringhalf',
   dnb: 'dnb', 'draw no bet': 'dnb',
   corners: 'corners', corner: 'corners', 'over 9 5 corners': 'corners',
@@ -823,47 +833,243 @@ async function buildSportyCandidatePool(options = {}) {
     }
   }
 
-  // 7. Higher Odds Markets (target >= 5.0, or explicitly requested by chat filters):
-  // Integrates BTTS (Both Teams to Score) and Highest Scoring Half
-  if (targetOddsNum >= 5.0 || explicitMarkets.some(m => HIGHER_ODDS_MARKETS.includes(m))) {
-    // 7a. BTTS (Both Teams To Score) from predictions tab
-    const bttsList = predictions.bttsMatches || [];
-    for (const b of bttsList) {
-      if (!b || !b.match) continue;
-      const prob = Number(b.probability) || (b.probabilities && b.probabilities.bttsYes) || 0;
-      if (prob < 68) continue; // Only strong site predictions
+  // 7. Extra football markets that already have a SportyBet selection id.
+  // BTTS Yes/No, DNB, Under totals and Double Chance 12 are always available;
+  // Over 3.5 and Highest Scoring Half stay behind the higher-odds gate.
+  const bttsYesList = predictions.bttsMatches || [];
+  for (const b of bttsYesList) {
+    if (!b || !b.match) continue;
+    const prob = Number(b.probability) || (b.probabilities && b.probabilities.bttsYes) || 0;
+    if (prob < 68) continue;
 
-      const sides = b.match.split(/\s+(?:-|vs)\s+/i);
+    const sides = b.match.split(/\s+(?:-|vs)\s+/i);
+    if (sides.length !== 2) continue;
+    const sm = findSportyMatch(sportyByKey, sides[0], sides[1]);
+    if (!sm) continue;
+
+    const odds = estimatedOdds(prob / 100);
+    if (odds >= 1.45 && odds <= 2.10) {
+      addCandidate({
+        match: `${sm.home} - ${sm.away}`,
+        home: sm.home,
+        away: sm.away,
+        league: sm.league || b.league,
+        date: sm.date,
+        time: sm.time,
+        category: 'btts',
+        tip: 'BTTS YES',
+        odds: odds,
+        confidence: prob,
+        qualityScore: 82,
+        reason: `Site BTTS prediction (${prob}% model probability)`,
+        marketLabel: 'Both Teams to Score (Yes)'
+      });
+    }
+  }
+
+  const bttsNoList = predictions.bttsNoMatches || [];
+  for (const b of bttsNoList) {
+    if (!b || !b.match) continue;
+    const prob = Number(b.probability) || (b.probabilities && b.probabilities.bttsNo) || 0;
+    if (prob < 65) continue;
+
+    const sides = b.match.split(/\s+(?:-|vs)\s+/i);
+    if (sides.length !== 2) continue;
+    const sm = findSportyMatch(sportyByKey, sides[0], sides[1]);
+    if (!sm) continue;
+
+    const odds = Number(b.odds) || estimatedOdds(prob / 100);
+    if (odds >= 1.15 && odds <= 2.00) {
+      addCandidate({
+        match: `${sm.home} - ${sm.away}`,
+        home: sm.home,
+        away: sm.away,
+        league: sm.league || b.league,
+        date: sm.date,
+        time: sm.time,
+        category: 'bttsno',
+        tip: 'BTTS NO',
+        odds: odds,
+        confidence: prob,
+        qualityScore: 82,
+        reason: `Site BTTS No prediction (${prob}% model probability)`,
+        marketLabel: 'Both Teams Not to Score (No)'
+      });
+    }
+  }
+
+  const under25List = predictions.under25Matches || [];
+  for (const p of under25List) {
+    if (!p || !p.match) continue;
+    const prob = Number(p.probability) || (p.probabilities && p.probabilities.under25) || 0;
+    if (prob < 70) continue;
+
+    const sides = p.match.split(/\s+(?:-|vs)\s+/i);
+    if (sides.length !== 2) continue;
+    const sm = findSportyMatch(sportyByKey, sides[0], sides[1]);
+    if (!sm) continue;
+
+    const odds = Number(p.odds) || estimatedOdds(prob / 100);
+    if (odds >= 1.10 && odds <= 1.75) {
+      addCandidate({
+        match: `${sm.home} - ${sm.away}`,
+        home: sm.home,
+        away: sm.away,
+        league: sm.league || p.league,
+        date: sm.date,
+        time: sm.time,
+        category: 'under25',
+        tip: 'Under 2.5',
+        odds: odds,
+        confidence: prob,
+        qualityScore: 86,
+        reason: `Site Under 2.5 prediction (${prob}% model probability)`,
+        marketLabel: 'Under 2.5 Goals'
+      });
+    }
+  }
+
+  const under15List = predictions.over15Matches || [];
+  for (const p of under15List) {
+    if (!p || !p.match) continue;
+    const prob = Number(p.probabilities && p.probabilities.under15) || (100 - Number(p.probability)) || 0;
+    if (prob < 72) continue;
+
+    const sides = p.match.split(/\s+(?:-|vs)\s+/i);
+    if (sides.length !== 2) continue;
+    const sm = findSportyMatch(sportyByKey, sides[0], sides[1]);
+    if (!sm) continue;
+
+    const odds = estimatedOdds(prob / 100);
+    if (odds >= 1.10 && odds <= 1.60) {
+      addCandidate({
+        match: `${sm.home} - ${sm.away}`,
+        home: sm.home,
+        away: sm.away,
+        league: sm.league || p.league,
+        date: sm.date,
+        time: sm.time,
+        category: 'under15',
+        tip: 'Under 1.5',
+        odds: odds,
+        confidence: prob,
+        qualityScore: 90,
+        reason: `Site Under 1.5 prediction (${prob}% model probability)`,
+        marketLabel: 'Under 1.5 Goals'
+      });
+    }
+  }
+
+  for (const [key, sm] of sportyByKey.entries()) {
+    if (!sm || !sm.odds) continue;
+    const hOdds = Number(sm.odds['1']);
+    const aOdds = Number(sm.odds['2']);
+    if (!hOdds || !aOdds || hOdds > 2.10 || aOdds > 2.10) continue;
+    const dc12Odds = calculateDoubleChanceOdds(sm.odds, '12');
+    if (dc12Odds && dc12Odds >= 1.20 && dc12Odds <= 1.85) {
+      addCandidate({
+        match: `${sm.home} - ${sm.away}`,
+        home: sm.home,
+        away: sm.away,
+        league: sm.league,
+        date: sm.date,
+        time: sm.time,
+        category: 'dc12',
+        tip: '12',
+        odds: dc12Odds,
+        confidence: Math.round(Math.min(92, (1 / dc12Odds) * 100 + 12)),
+        qualityScore: 88,
+        reason: `Both sides priced strong — Double Chance 12 (${dc12Odds.toFixed(2)})`,
+        marketLabel: 'Double Chance (12)'
+      });
+    }
+  }
+
+  for (const [key, sm] of sportyByKey.entries()) {
+    if (!sm || !sm.odds) continue;
+    const hOdds = Number(sm.odds['1']);
+    const aOdds = Number(sm.odds['2']);
+    const dOdds = Number(sm.odds['X']);
+
+    if (hOdds && dOdds && hOdds >= 1.40 && hOdds <= 1.95) {
+      const dnbHome = Number((hOdds * (1 - 1 / dOdds)).toFixed(2));
+      if (dnbHome >= 1.20 && dnbHome <= 1.85) {
+        addCandidate({
+          match: `${sm.home} - ${sm.away}`,
+          home: sm.home,
+          away: sm.away,
+          league: sm.league,
+          date: sm.date,
+          time: sm.time,
+          category: 'dnb',
+          tip: 'Home (1)',
+          odds: dnbHome,
+          confidence: Math.round(Math.min(90, (1 / hOdds) * 100 + 8)),
+          qualityScore: 84,
+          reason: `Home DNB (Draw Refund) — 1X2 favorite (${hOdds.toFixed(2)}) with push protection`,
+          marketLabel: 'Draw No Bet (Home)'
+        });
+      }
+    } else if (aOdds && dOdds && aOdds >= 1.45 && aOdds <= 2.05) {
+      const dnbAway = Number((aOdds * (1 - 1 / dOdds)).toFixed(2));
+      if (dnbAway >= 1.20 && dnbAway <= 1.90) {
+        addCandidate({
+          match: `${sm.home} - ${sm.away}`,
+          home: sm.home,
+          away: sm.away,
+          league: sm.league,
+          date: sm.date,
+          time: sm.time,
+          category: 'dnb',
+          tip: 'Away (2)',
+          odds: dnbAway,
+          confidence: Math.round(Math.min(88, (1 / aOdds) * 100 + 8)),
+          qualityScore: 82,
+          reason: `Away DNB (Draw Refund) — 1X2 favorite (${aOdds.toFixed(2)}) with push protection`,
+          marketLabel: 'Draw No Bet (Away)'
+        });
+      }
+    }
+  }
+
+  // Higher-odds-only additions: Over 3.5, Highest Scoring Half and Corners.
+  if (targetOddsNum >= 5.0 || explicitMarkets.some(m => HIGHER_ODDS_MARKETS.includes(m))) {
+    const over35List = predictions.gg2PlusMatches || [];
+    for (const p of over35List) {
+      if (!p || !p.match) continue;
+      const prob = Number(p.probabilities && p.probabilities.over35) || 0;
+      if (prob < 55) continue;
+
+      const sides = p.match.split(/\s+(?:-|vs)\s+/i);
       if (sides.length !== 2) continue;
       const sm = findSportyMatch(sportyByKey, sides[0], sides[1]);
       if (!sm) continue;
 
       const odds = estimatedOdds(prob / 100);
-      if (odds >= 1.45 && odds <= 2.10) {
+      if (odds >= 1.45 && odds <= 2.30) {
         addCandidate({
           match: `${sm.home} - ${sm.away}`,
           home: sm.home,
           away: sm.away,
-          league: sm.league || b.league,
+          league: sm.league || p.league,
           date: sm.date,
           time: sm.time,
-          category: 'btts',
-          tip: 'BTTS YES',
+          category: 'over35',
+          tip: 'Over 3.5',
           odds: odds,
           confidence: prob,
-          qualityScore: 82, // Moderate quality score so it's included primarily for 5+ odds
-          reason: `Site BTTS prediction (${prob}% model probability)`,
-          marketLabel: 'Both Teams to Score (Yes)'
+          qualityScore: 80,
+          reason: `Site Over 3.5 prediction (${prob}% model probability)`,
+          marketLabel: 'Over 3.5 Goals'
         });
       }
     }
 
-    // 7b. Highest Scoring Half from Poisson race model
     const hshList = loadHshCache(today);
     for (const h of hshList) {
       if (!h || !h.home || !h.away || !h.hsh) continue;
       const prob = Math.round((h.hsh.prob || 0) * 100);
-      if (prob < 60) continue; // Must beat 60% probability floor
+      if (prob < 60) continue;
 
       const sm = findSportyMatch(sportyByKey, h.home, h.away);
       if (!sm) continue;
@@ -888,57 +1094,7 @@ async function buildSportyCandidatePool(options = {}) {
         });
       }
     }
-    // 7c. Draw No Bet (DNB) for higher odds
-    // Convert strong home/away favorites to DNB which gives higher odds than Double Chance while still refunding on draw
-    for (const [key, sm] of sportyByKey.entries()) {
-      if (!sm || !sm.odds) continue;
-      const hOdds = Number(sm.odds['1']);
-      const aOdds = Number(sm.odds['2']);
-      const dOdds = Number(sm.odds['X']);
 
-      if (hOdds && dOdds && hOdds >= 1.40 && hOdds <= 1.95) {
-        // Fair DNB odds: hOdds * (1 - 1/dOdds) roughly hOdds / (1 - hOdds/dOdds) or market price ~ 1.25 - 1.65
-        const dnbHome = Number((hOdds * (1 - 1 / dOdds)).toFixed(2));
-        if (dnbHome >= 1.20 && dnbHome <= 1.85) {
-          addCandidate({
-            match: `${sm.home} - ${sm.away}`,
-            home: sm.home,
-            away: sm.away,
-            league: sm.league,
-            date: sm.date,
-            time: sm.time,
-            category: 'dnb',
-            tip: 'Home (1)',
-            odds: dnbHome,
-            confidence: Math.round(Math.min(90, (1 / hOdds) * 100 + 8)),
-            qualityScore: 84,
-            reason: `Home DNB (Draw Refund) — 1X2 favorite (${hOdds.toFixed(2)}) with push protection`,
-            marketLabel: 'Draw No Bet (Home)'
-          });
-        }
-      } else if (aOdds && dOdds && aOdds >= 1.45 && aOdds <= 2.05) {
-        const dnbAway = Number((aOdds * (1 - 1 / dOdds)).toFixed(2));
-        if (dnbAway >= 1.20 && dnbAway <= 1.90) {
-          addCandidate({
-            match: `${sm.home} - ${sm.away}`,
-            home: sm.home,
-            away: sm.away,
-            league: sm.league,
-            date: sm.date,
-            time: sm.time,
-            category: 'dnb',
-            tip: 'Away (2)',
-            odds: dnbAway,
-            confidence: Math.round(Math.min(88, (1 / aOdds) * 100 + 8)),
-            qualityScore: 82,
-            reason: `Away DNB (Draw Refund) — 1X2 favorite (${aOdds.toFixed(2)}) with push protection`,
-            marketLabel: 'Draw No Bet (Away)'
-          });
-        }
-      }
-    }
-
-    // 7d. Corners from corners cache (Over corners)
     const cornersList = loadCornersCache();
     for (const c of cornersList) {
       if (!c || !c.match || !c.tip) continue;
