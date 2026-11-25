@@ -869,6 +869,19 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   cursor: pointer;
 }
 .builder-chat-reset:hover { color: #f8fafc; border-color: var(--border-strong); }
+.builder-chat-reset:disabled { opacity: 0.45; cursor: not-allowed; }
+.builder-chat-pro {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #e41e31, #b81424);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  vertical-align: middle;
+}
 .builder-chat-log {
   display: flex;
   flex-direction: column;
@@ -918,6 +931,7 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   cursor: pointer;
 }
 .builder-chat-suggestions button:hover { border-color: var(--accent); color: #fff; }
+.builder-chat-suggestions button:disabled { opacity: 0.45; cursor: not-allowed; }
 .builder-chat-form { display: flex; gap: 8px; }
 .builder-chat-form input {
   flex: 1;
@@ -925,12 +939,23 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: 10px;
-  color: #f8fafc;
+  color: #fff;
+  -webkit-text-fill-color: #fff;
+  caret-color: #fff;
   font-family: inherit;
   font-size: 13px;
   padding: 11px 12px;
 }
+.builder-chat-form input::placeholder { color: #cbd5e1; opacity: 1; }
+.builder-chat-form input:-webkit-autofill,
+.builder-chat-form input:-webkit-autofill:hover,
+.builder-chat-form input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #fff;
+  -webkit-box-shadow: 0 0 0 1000px var(--bg-elevated) inset;
+  caret-color: #fff;
+}
 .builder-chat-form input:focus { outline: none; border-color: var(--accent); }
+.builder-chat-form input:disabled { -webkit-text-fill-color: #94a3b8; color: #94a3b8; cursor: not-allowed; }
 .builder-chat-form button {
   background: linear-gradient(135deg, #e41e31, #b81424);
   border: none;
@@ -942,6 +967,29 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   cursor: pointer;
 }
 .builder-chat-form button:disabled { opacity: 0.55; cursor: not-allowed; }
+.builder-chat-progress { margin-top: 10px; }
+.builder-chat-progress[hidden] { display: none; }
+.builder-chat-progress-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+  color: #cbd5e1;
+  font-size: 11px;
+}
+.builder-chat-progress-track {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.builder-chat-progress-bar {
+  width: 0;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #e41e31, #ff6b81);
+  transition: width 0.35s ease;
+}
 .builder-chat-hint { margin: 9px 0 0; font-size: 11px; color: #64748b; line-height: 1.4; }
 @media (max-width: 520px) {
   .builder-chat-head { flex-direction: column; gap: 8px; }
@@ -1274,7 +1322,7 @@ body > header .hamburger { display: block; }
     <section class="builder-chat" aria-labelledby="builderChatTitle">
       <div class="builder-chat-head">
         <div>
-          <strong id="builderChatTitle" class="builder-chat-title">Ask the builder</strong>
+          <strong id="builderChatTitle" class="builder-chat-title">Chat with the Ai Builder <span class="builder-chat-pro">PRO</span></strong>
           <span class="builder-chat-subtitle">Describe the ticket you want in plain English and it will be booked below.</span>
         </div>
         <button type="button" id="btnChatReset" class="builder-chat-reset">Reset chat filters</button>
@@ -1290,6 +1338,15 @@ body > header .hamburger { display: block; }
         <input id="builderChatInput" type="text" maxlength="500" autocomplete="off" placeholder="e.g. book 10 winning basketball matches with at least 2 odds each" aria-label="Describe the ticket you want">
         <button id="btnChatSend" type="submit">Book it</button>
       </form>
+      <div id="builderChatProgress" class="builder-chat-progress" hidden>
+        <div class="builder-chat-progress-top">
+          <span id="builderChatProgressLabel">Booking your ticket…</span>
+          <span id="builderChatProgressPercent">0%</span>
+        </div>
+        <div class="builder-chat-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Chat booking progress">
+          <div id="builderChatProgressBar" class="builder-chat-progress-bar"></div>
+        </div>
+      </div>
       <p id="builderChatHint" class="builder-chat-hint">No chat filters applied — using the controls above.</p>
     </section>
   </div>
@@ -1483,6 +1540,14 @@ body > header .hamburger { display: block; }
   var chatSend = document.getElementById('btnChatSend');
   var chatHint = document.getElementById('builderChatHint');
   var chatReset = document.getElementById('btnChatReset');
+  var chatSuggestions = document.querySelectorAll('[data-chat-suggestion]');
+  var chatProgress = document.getElementById('builderChatProgress');
+  var chatProgressTrack = chatProgress ? chatProgress.querySelector('[role="progressbar"]') : null;
+  var chatProgressBar = document.getElementById('builderChatProgressBar');
+  var chatProgressLabel = document.getElementById('builderChatProgressLabel');
+  var chatProgressPercent = document.getElementById('builderChatProgressPercent');
+  var chatProgressTimer = null;
+  var chatProgressValue = 0;
   var chatParser = window.WFT && window.WFT.SportyBuilderChat ? window.WFT.SportyBuilderChat : null;
   var chatFilters = emptyChatFilters();
 
@@ -1527,8 +1592,59 @@ body > header .hamburger { display: block; }
     chatLog.scrollTop = chatLog.scrollHeight;
   }
 
+  function setChatProgress(value, label) {
+    if (!chatProgress) return;
+    var pct = Math.max(0, Math.min(100, Math.round(value)));
+    chatProgress.hidden = false;
+    if (chatProgressBar) chatProgressBar.style.width = pct + '%';
+    if (chatProgressLabel && label) chatProgressLabel.textContent = label;
+    if (chatProgressPercent) chatProgressPercent.textContent = pct + '%';
+    if (chatProgressTrack) chatProgressTrack.setAttribute('aria-valuenow', String(pct));
+  }
+
+  function startChatProgress() {
+    chatProgressValue = 10;
+    setChatProgress(chatProgressValue, 'Reading your request…');
+    if (chatProgressTimer) clearInterval(chatProgressTimer);
+    chatProgressTimer = setInterval(function() {
+      chatProgressValue = Math.min(88, chatProgressValue + (chatProgressValue < 45 ? 6 : 3));
+      setChatProgress(chatProgressValue, chatProgressValue < 45 ? 'Finding matches…' : 'Building SportyBet code…');
+    }, 900);
+  }
+
+  function finishChatProgress(success) {
+    if (chatProgressTimer) {
+      clearInterval(chatProgressTimer);
+      chatProgressTimer = null;
+    }
+    if (!chatProgress) return;
+    setChatProgress(100, success ? 'Ticket ready' : 'Booking stopped');
+    setTimeout(function() {
+      chatProgress.hidden = true;
+    }, success ? 900 : 1400);
+  }
+
+  function updateChatAccess() {
+    var pro = isUserPro();
+    var busy = isGenerating;
+    if (chatInput) {
+      chatInput.disabled = !pro || busy;
+      chatInput.placeholder = pro
+        ? 'e.g. book 10 winning basketball matches with at least 2 odds each'
+        : 'Upgrade to Pro to use chat booking';
+    }
+    if (chatSend) chatSend.disabled = !pro || busy;
+    if (chatReset) chatReset.disabled = !pro || busy;
+    chatSuggestions.forEach(function(btn) { btn.disabled = !pro || busy; });
+    updateChatHint();
+  }
+
   function updateChatHint() {
     if (!chatHint) return;
+    if (!isUserPro()) {
+      chatHint.textContent = 'Chat booking is a Pro feature. Upgrade at /pricing.html to use it.';
+      return;
+    }
     var bits = [];
     if (chatFilters.sport) bits.push(chatFilters.sport);
     if (chatFilters.markets.length) bits.push(chatFilters.markets.join(', '));
@@ -1661,6 +1777,7 @@ body > header .hamburger { display: block; }
     });
     slider.max = pro ? PRO_ODDS_LIMIT : FREE_ODDS_LIMIT;
     if (pro) hideProBanner();
+    updateChatAccess();
   }
 
   document.addEventListener('wft-pro-status', updateProState);
@@ -1687,14 +1804,18 @@ body > header .hamburger { display: block; }
 
     if (effectiveOdds > FREE_ODDS_LIMIT && !isUserPro()) {
       showProBanner();
-      if (fromChat) addChatMessage('bot', 'That target is above 5x, which is a Pro feature. Try fewer matches or lower odds, or upgrade at /pricing.html.', true);
+      if (fromChat) {
+        addChatMessage('bot', 'That target is above 5x, which is a Pro feature. Try fewer matches or lower odds, or upgrade at /pricing.html.', true);
+        finishChatProgress(false);
+      }
       return null;
     }
 
     isGenerating = true;
     btnGen.disabled = true;
     btnShuffle.disabled = true;
-    if (chatSend) chatSend.disabled = true;
+    updateChatAccess();
+    if (fromChat) setChatProgress(25, 'Finding matches…');
     var origGenHtml = btnGen.innerHTML;
     btnGen.innerHTML = '<span class="spinner"></span><span>Building SportyBet Code...</span>';
 
@@ -1745,6 +1866,7 @@ body > header .hamburger { display: block; }
         } catch (requestErr) {
           if (attempt === 0 && isRequestTimeout(requestErr)) {
             console.warn('SportyBet code request timed out; retrying once.');
+            if (fromChat) setChatProgress(55, 'Warming up the builder… retrying.');
             continue;
           }
           throw requestErr;
@@ -1753,7 +1875,10 @@ body > header .hamburger { display: block; }
 
       if (data && (data.code === 'PRO_REQUIRED' || data.__status === 403)) {
         showProBanner();
-        if (fromChat) addChatMessage('bot', 'Above 5x is a Pro feature. Upgrade at /pricing.html or lower the target odds.', true);
+        if (fromChat) {
+          addChatMessage('bot', 'Above 5x is a Pro feature. Upgrade at /pricing.html or lower the target odds.', true);
+          finishChatProgress(false);
+        }
         return null;
       }
 
@@ -1762,6 +1887,7 @@ body > header .hamburger { display: block; }
       }
 
       hideProBanner();
+      if (fromChat) setChatProgress(88, 'Creating SportyBet code…');
       renderTicket(data);
 
       if (Array.isArray(data.legs)) {
@@ -1770,6 +1896,7 @@ body > header .hamburger { display: block; }
 
       if (fromChat) {
         addChatMessage('bot', 'Booked ' + data.legCount + ' legs at ' + Number(data.totalOdds).toFixed(2) + 'x. SportyBet code: ' + data.code);
+        finishChatProgress(true);
       }
 
       return data;
@@ -1784,6 +1911,7 @@ body > header .hamburger { display: block; }
       }
       if (fromChat) {
         addChatMessage('bot', 'Could not book that: ' + message, true);
+        finishChatProgress(false);
       } else if (!message.toLowerCase().includes('pro')) {
         alert('Failed to generate ticket: ' + message + '. Please try again.');
       }
@@ -1792,7 +1920,7 @@ body > header .hamburger { display: block; }
       isGenerating = false;
       btnGen.disabled = false;
       btnShuffle.disabled = false;
-      if (chatSend) chatSend.disabled = false;
+      updateChatAccess();
       btnGen.innerHTML = origGenHtml;
     }
   }
@@ -1869,6 +1997,11 @@ body > header .hamburger { display: block; }
   }
 
   async function handleChatSubmit() {
+    if (!isUserPro()) {
+      showProBanner();
+      addChatMessage('bot', 'Chat booking is a Pro feature. Upgrade at /pricing.html to use it.', true);
+      return;
+    }
     if (isGenerating || !chatInput) return;
     var text = chatInput.value.trim();
     if (!text) return;
@@ -1904,6 +2037,7 @@ body > header .hamburger { display: block; }
 
     if (target != null) setOdds(target);
     addChatMessage('bot', 'Booking ' + result.summary + '…');
+    startChatProgress();
     await generateTicket(false, {
       source: 'chat',
       targetOdds: target,
@@ -1925,7 +2059,7 @@ body > header .hamburger { display: block; }
 
   if (chatReset) chatReset.addEventListener('click', resetChatFilters);
 
-  document.querySelectorAll('[data-chat-suggestion]').forEach(function(btn) {
+  chatSuggestions.forEach(function(btn) {
     btn.addEventListener('click', function() {
       chatInput.value = btn.getAttribute('data-chat-suggestion') || '';
       handleChatSubmit();
@@ -1933,7 +2067,7 @@ body > header .hamburger { display: block; }
   });
 
   addChatMessage('bot', 'Tell me what to book, e.g. “10 winning basketball matches with at least 2 odds each” or “5 corner matches today”.');
-  updateChatHint();
+  updateProState();
 
   btnGen.addEventListener('click', function() { generateTicket(false); });
   btnShuffle.addEventListener('click', function() { generateTicket(true); });
