@@ -1668,6 +1668,11 @@ body > header .hamburger { display: block; }
     window.WFT.onAuthReady(updateProState);
   }
 
+  function isRequestTimeout(err) {
+    var message = err && err.message ? String(err.message) : '';
+    return !!(err && (err.name === 'AbortError' || /timeout|timed out|aborted/i.test(message)));
+  }
+
   async function generateTicket(shuffle, options) {
     if (isGenerating) {
       if (options && options.source === 'chat') addChatMessage('bot', 'A ticket is already being built. Please wait a moment.');
@@ -1707,24 +1712,42 @@ body > header .hamburger { display: block; }
 
     try {
       var data;
-      if (window.WFT && typeof window.WFT.apiFetch === 'function') {
-        data = await window.WFT.apiFetch('/api/sportybuilder/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody)
-        });
-      } else {
+      var requestBodyJson = JSON.stringify(requestBody);
+      var requestTicket = function () {
+        if (window.WFT && typeof window.WFT.apiFetch === 'function') {
+          return window.WFT.apiFetch('/api/sportybuilder/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: requestBodyJson,
+            timeoutMs: 30000
+          });
+        }
         var apiBase = window.WFT_API || 'https://winfulltime-api.onrender.com';
-        var resp = await fetch(apiBase + '/api/sportybuilder/generate', {
+        return fetch(apiBase + '/api/sportybuilder/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody)
+          body: requestBodyJson
+        }).then(function (resp) {
+          return resp.text().then(function (text) {
+            try {
+              return JSON.parse(text);
+            } catch (parseErr) {
+              throw new Error('API server is updating. Please try again in a few moments.');
+            }
+          });
         });
-        var text = await resp.text();
+      };
+
+      for (var attempt = 0; attempt < 2; attempt++) {
         try {
-          data = JSON.parse(text);
-        } catch (parseErr) {
-          throw new Error('API server is updating. Please try again in a few moments.');
+          data = await requestTicket();
+          break;
+        } catch (requestErr) {
+          if (attempt === 0 && isRequestTimeout(requestErr)) {
+            console.warn('SportyBet code request timed out; retrying once.');
+            continue;
+          }
+          throw requestErr;
         }
       }
 
@@ -1753,7 +1776,9 @@ body > header .hamburger { display: block; }
 
     } catch (err) {
       console.error('AI SportyBet Code Builder error:', err);
-      var message = err && err.message ? err.message : 'Unknown error';
+      var message = isRequestTimeout(err)
+        ? 'The builder service is taking too long to respond. Please try again.'
+        : (err && err.message ? err.message : 'Unknown error');
       if (message.toLowerCase().includes('pro')) {
         showProBanner();
       }
