@@ -1,81 +1,19 @@
 {
   "success": true,
-  "date": "2026-11-24",
-  "updatedAt": "2026-11-24T09:27:51.842Z",
+  "date": "2026-11-25",
+  "updatedAt": "2026-11-25T11:15:44.859Z",
   "window": {
-    "yesterday": "2026-11-23",
-    "today": "2026-11-24",
-    "tomorrow": "2026-11-25"
+    "yesterday": "2026-11-24",
+    "today": "2026-11-25",
+    "tomorrow": "2026-11-26"
   },
   "source": "player-scoring-v1",
   "provider": "fotmob.com",
   "season": "2026/2027",
   "isNextMatchday": true,
-  "totalFixtures": 8,
+  "totalFixtures": 5,
   "totalPlayers": 500,
   "fixtures": [
-    {
-      "league": "English Premier League",
-      "date": "2026-11-23",
-      "time": "20:00",
-      "home": "Brentford",
-      "away": "Everton",
-      "match": "Brentford vs Everton",
-      "tips": [
-        {
-          "player": "Igor Thiago",
-          "team": "Brentford",
-          "side": "home",
-          "position": "",
-          "games": 10,
-          "shots": 21,
-          "goals": 2,
-          "xg": 4.1,
-          "spg": 2.1,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Kevin Schade",
-          "team": "Brentford",
-          "side": "home",
-          "position": "",
-          "games": 11,
-          "shots": 21,
-          "goals": 3,
-          "xg": 2.5,
-          "spg": 1.91,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Thierno Barry",
-          "team": "Everton",
-          "side": "away",
-          "position": "",
-          "games": 11,
-          "shots": 37,
-          "goals": 6,
-          "xg": 7.4,
-          "spg": 3.36,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
-        },
-        {
-          "player": "Kiernan Dewsbury-Hall",
-          "team": "Everton",
-          "side": "away",
-          "position": "",
-          "games": 11,
-          "shots": 26,
-          "goals": 3,
-          "xg": 1.8,
-          "spg": 2.36,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        }
-      ]
-    },
     {
       "league": "English Premier League",
       "date": "2026-11-27",
@@ -140,68 +78,6 @@
     },
     {
       "league": "La Liga",
-      "date": "2026-11-23",
-      "time": "20:00",
-      "home": "Levante",
-      "away": "Elche",
-      "match": "Levante vs Elche",
-      "tips": [
-        {
-          "player": "Roger Brugué",
-          "team": "Levante",
-          "side": "home",
-          "position": "",
-          "games": 12,
-          "shots": 29,
-          "goals": 5,
-          "xg": 4.4,
-          "spg": 2.42,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Adrián De La Fuente",
-          "team": "Levante",
-          "side": "home",
-          "position": "",
-          "games": 11,
-          "shots": 22,
-          "goals": 2,
-          "xg": 1,
-          "spg": 2,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Fer Niño",
-          "team": "Elche",
-          "side": "away",
-          "position": "",
-          "games": 13,
-          "shots": 22,
-          "goals": 6,
-          "xg": 4.6,
-          "spg": 1.69,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Lucas Cepeda",
-          "team": "Elche",
-          "side": "away",
-          "position": "",
-          "games": 13,
-          "shots": 20,
-          "goals": 0,
-          "xg": 0.8,
-          "spg": 1.54,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        }
-      ]
-    },
-    {
-      "league": "La Liga",
       "date": "2026-11-27",
       "time": "20:00",
       "home": "Levante",
@@ -231,68 +107,6 @@
           "goals": 2,
           "xg": 1,
           "spg": 2,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        }
-      ]
-    },
-    {
-      "league": "Serie A",
-      "date": "2026-11-23",
-      "time": "19:45",
-      "home": "Monza",
-      "away": "Fiorentina",
-      "match": "Monza vs Fiorentina",
-      "tips": [
-        {
-          "player": "Gustavo Varela",
-          "team": "Monza",
-          "side": "home",
-          "position": "",
-          "games": 11,
-          "shots": 32,
-          "goals": 11,
-          "xg": 6.8,
-          "spg": 2.91,
-          "line": 2.5,
-          "tip": "Over 2.5 shots"
-        },
-        {
-          "player": "Dany Mota",
-          "team": "Monza",
-          "side": "home",
-          "position": "",
-          "games": 9,
-          "shots": 15,
-          "goals": 0,
-          "xg": 1.8,
-          "spg": 1.67,
-          "line": 1.5,
-          "tip": "Over 1.5 shots"
-        },
-        {
-          "player": "Franco Mastantuono",
-          "team": "Fiorentina",
-          "side": "away",
-          "position": "",
-          "games": 12,
-          "shots": 46,
-          "goals": 4,
-          "xg": 3.7,
-          "spg": 3.83,
-          "line": 3.5,
-          "tip": "Over 3.5 shots"
-        },
-        {
-          "player": "Alieu Njie",
-          "team": "Fiorentina",
-          "side": "away",
-          "position": "",
-          "games": 11,
-          "shots": 21,
-          "goals": 3,
-          "xg": 3.1,
-          "spg": 1.91,
           "line": 1.5,
           "tip": "Over 1.5 shots"
         }
