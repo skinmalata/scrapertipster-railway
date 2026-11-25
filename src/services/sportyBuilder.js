@@ -16,6 +16,7 @@ const FOOTBALL_ONLY_MARKETS = Object.freeze([
   'btts', 'bttsno', 'highestscoringhalf', 'dnb', 'corners'
 ]);
 const HIGHER_ODDS_MARKETS = Object.freeze(['over35', 'bttsno', 'highestscoringhalf', 'corners']);
+const HSH_LOOKAHEAD_HOURS = 7 * 24;
 const MIN_LEG_ODDS = 1.06;
 const MIN_FILTER_ODDS = 1.06;
 const MAX_FILTER_ODDS = 20;
@@ -103,10 +104,10 @@ function hasKickedOff(dateStr, timeStr) {
   return k < lagosNowString();
 }
 
-function withinTargetWindow(dateStr, timeStr) {
+function withinTargetWindow(dateStr, timeStr, hours) {
   const k = kickoffString(dateStr, timeStr);
   if (!k) return true; // if time unknown, accept if date is today
-  return k >= lagosNowString() && k <= lagosDateTimeString(36);
+  return k >= lagosNowString() && k <= lagosDateTimeString(hours || 36);
 }
 
 function normaliseTeam(value) {
@@ -321,7 +322,10 @@ function loadHshCache(today) {
     if (fs.existsSync(cachePath)) {
       const data = JSON.parse(fs.readFileSync(cachePath, 'utf8')) || {};
       if (data && data.dates) {
-        return data.dates[today] || [];
+        return Object.keys(data.dates)
+          .filter(function (date) { return date >= today; })
+          .sort()
+          .reduce(function (all, date) { return all.concat(data.dates[date] || []); }, []);
       }
     }
   } catch (e) {}
@@ -399,15 +403,16 @@ async function buildSportyCandidatePool(options = {}) {
   // handled separately below (its teams and markets must not be cross-matched
   // with football predictions or website H2H/streak caches).
   const sportyByKey = new Map();
+  const hshSportyByKey = new Map();
   for (const m of sportyMatches) {
     if (!m || !m.home || !m.away) continue;
     if ((m.sport || 'football') !== 'football') continue;
     if (isInvalidFixture(m.home, m.away)) continue;
     if (hasKickedOff(m.date, m.time)) continue;
-    if (!withinTargetWindow(m.date, m.time)) continue;
 
     const key = matchKey(m.home, m.away);
-    sportyByKey.set(key, m);
+    if (withinTargetWindow(m.date, m.time)) sportyByKey.set(key, m);
+    if (withinTargetWindow(m.date, m.time, HSH_LOOKAHEAD_HOURS)) hshSportyByKey.set(key, m);
   }
 
   const h2hStreaks = await fetchTodayStreaks().catch(() => []);
@@ -1071,12 +1076,12 @@ async function buildSportyCandidatePool(options = {}) {
       const prob = Math.round((h.hsh.prob || 0) * 100);
       if (prob < 60) continue;
 
-      const sm = findSportyMatch(sportyByKey, h.home, h.away);
+      const sm = findSportyMatch(hshSportyByKey, h.home, h.away);
       if (!sm) continue;
 
       const tip = h.hsh.pick === '2H' ? '2nd Half' : '1st Half';
       const odds = estimatedOdds(h.hsh.prob);
-      if (odds >= 1.50 && odds <= 2.30) {
+      if (odds >= 1.20 && odds <= 2.30) {
         addCandidate({
           match: `${sm.home} - ${sm.away}`,
           home: sm.home,
@@ -1530,5 +1535,7 @@ module.exports = {
   findOptimalCombination,
   validateSportyFilters,
   matchesSportyFilters,
+  withinTargetWindow,
+  HSH_LOOKAHEAD_HOURS,
   SPORTYBUILDER_MARKETS
 };

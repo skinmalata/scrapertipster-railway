@@ -17,24 +17,25 @@
   var MAX_LEGS = 20;
 
   var HELP_TEXT = 'Try: "book 10 winning basketball matches with at least 2 odds each", ' +
-    '"book 5 winning corner matches today", "football over 2.5 min odds 1.40 target 5", ' +
-    '"EPL BTTS No with min 1.30", "under 2.5 football target 5x", ' +
+    '"give me five straight wins", "5 x over 2.5 football", ' +
+    '"both teams to score no with min 1.30", "EPL BTTS No with min 1.30", ' +
+    '"NBA moneyline accumulator odds 6", "under 2.5 football target 5x", ' +
     '"dc 12 premier league", or "basketball points over under 6x".';
 
   var MARKET_PATTERNS = [
-    { market: 'over35', pattern: /\b(?:over|o)[\s-]*3\.5\b/i },
-    { market: 'over25', pattern: /\b(?:over|o)[\s-]*2\.5\b/i },
-    { market: 'over15', pattern: /\b(?:over|o)[\s-]*1\.5\b/i },
-    { market: 'under25', pattern: /\b(?:under|u)[\s-]*2\.5\b/i },
-    { market: 'under15', pattern: /\b(?:under|u)[\s-]*1\.5\b/i },
+    { market: 'over35', pattern: /\b(?:over|o)[\s-]*3[.\s]*5\b/i },
+    { market: 'over25', pattern: /\b(?:over|o)[\s-]*2[.\s]*5\b/i },
+    { market: 'over15', pattern: /\b(?:over|o)[\s-]*1[.\s]*5\b/i },
+    { market: 'under25', pattern: /\b(?:under|u)[\s-]*2[.\s]*5\b/i },
+    { market: 'under15', pattern: /\b(?:under|u)[\s-]*1[.\s]*5\b/i },
     { market: 'dc12', pattern: /\b(?:dc\s*12|double\s+chance\s*12|12\s+double\s+chance|home\s+or\s+away)\b/i },
-    { market: '1x2', pattern: /\b(?:1\s*x\s*2|double\s+chance(?!\s*12)|match\s+(?:result|winner)|moneyline|dc(?!\s*12)|1x|x2)\b/i },
-    { market: 'bttsno', pattern: /\b(?:btts\s*(?:no|ng)|ng|both\s+teams?\s+(?:not\s+to\s+score|to\s+fail\s+to\s+score))\b/i },
-    { market: 'btts', pattern: /\b(?:btts(?!\s*(?:no|ng))|both\s+teams?\s+(?:to\s+)?score(?!\s*(?:no|not))|gg(?!\s*(?:no|ng)))\b/i },
-    { market: 'highestscoringhalf', pattern: /\b(?:highest\s+scoring\s+half|hsh|(?:1st|2nd|first|second)\s+half)\b/i },
+    { market: '1x2', pattern: /\b(?:1\s*x\s*2|match\s+(?:result|winner)|moneyline|(?:straight\s+)?wins?|to\s+win|dc(?!\s*12)|double\s+chance(?!\s*12)|1x|x2)\b/i },
+    { market: 'bttsno', pattern: /\b(?:btts\s*(?:no|ng)|ng|gg\s*(?:no|ng)|both\s+teams?\s+(?:to\s+score\s+(?:no|not)|not\s+to\s+score|to\s+fail\s+to\s+score)|both\s+teams?\s+score\s+(?:no|not))\b/i },
+    { market: 'btts', pattern: /\b(?:btts(?!\s*(?:no|ng))|btts\s+yes|both\s+teams?\s*(?:to\s+)?score(?!\s*(?:no|not))|both\s+to\s+score|gg(?!\s*(?:no|ng))|gg\s+yes)\b/i },
+    { market: 'highestscoringhalf', pattern: /\b(?:highest\s+scoring\s+half|highest\s+scoring\s+(?:1st|2nd|first|second)\s+half|hsh|(?:1st|2nd|first|second)\s+half(?!\s+(?:over|under|o|u)\b))\b/i },
     { market: 'dnb', pattern: /\b(?:draw\s+no\s+bet|dnb)\b/i },
-    { market: 'corners', pattern: /\b(?:corners?|over\s+9\.5\s+corners?)\b/i },
-    { market: 'basketball-total', pattern: /\b(?:(?:points?|totals?)\s+(?:over|under)|basketball\s+totals?|over\s*\/\s*under\s+points)\b/i }
+    { market: 'corners', pattern: /\b(?:corners?|over\s+9[.\s]*5\s+corners?)\b/i },
+    { market: 'basketball-total', pattern: /\b(?:(?:points?|totals?)\s+(?:over|under)|basketball\s+totals?|over\s*\/\s*under\s+points|(?:over|under)\s+\d+(?:\.\d+)?\s+points)\b/i }
   ];
 
   var MARKET_LABELS = {
@@ -70,7 +71,16 @@
     { name: 'nba', pattern: /\bnba\b/i }
   ];
 
-  var COUNT_PATTERN = /\b(?<!\.)(\d{1,2})\s+(?=(?:winning\s+|straight\s+)*(?:basketball|football|soccer|corner|corners?|btts(?:\s*(?:no|ng))?|over|under|dc|double(?:\s+chance)?|match(?:es)?|games?|legs?|picks?|selections?)\b)/i;
+  var COUNT_WORDS = {
+    two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9,
+    ten: 10, eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15,
+    sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19, twenty: 20
+  };
+  var COUNT_TARGET = '(?:winning\\s+|straight\\s+)*(?:basketball|football|soccer|footy|corner|corners?|btts(?:\\s*(?:no|ng))?|gg(?:\\s*(?:no|ng))?|over|under|o[\\s-]*[123][.\\s]*5|u[\\s-]*[123][.\\s]*5|dc|double(?:\\s+chance)?|highest(?:\\s+scoring)?|hsh|1\\s*x\\s*2|moneyline|match(?:es)?|games?|legs?|picks?|selections?|wins?)';
+  var COUNT_PATTERN = new RegExp('\\b(?<!\\.)(\\d{1,2})[\\s-]*(?:x[\\s-]*)?(?=' + COUNT_TARGET + '\\b)', 'i');
+  var COUNT_X_PATTERN = new RegExp('(?<!\\.)(\\d{1,2})[\\s-]*x[\\s-]*(?=' + COUNT_TARGET + '\\b)', 'i');
+  var COUNT_WORD_PATTERN = new RegExp('\\b(two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)\\b[\\s-]*(?:x[\\s-]*)?(?=' + COUNT_TARGET + '\\b)', 'i');
+  var SPACED_DECIMAL_PATTERN = /\b(over|under|o|u)[\s-]*([123])[\s-]+5\b/gi;
   var TOTAL_MIN_PATTERNS = [
     /\b(?:min(?:imum)?|at\s+least)\s+total\s+odds?\s*(?:of|=|:|at)?\s*(\d+(?:\.\d+)?)\s*x?\b/i
   ];
@@ -79,21 +89,25 @@
     /\bmin(?:imum)?\s*(?:odds?)?\s*[:=]\s*(\d+(?:\.\d+)?)\b/i,
     /\bmin(?:imum)?\s*[:=]?\s*(\d+(?:\.\d+)?)\b(?!\s*(?:legs?|matches?|games?))/i,
     /\b(?:at\s+least|from|above)\s+(\d+(?:\.\d+)?)\s*(?:x\s*)?odds?\b/i,
-    /\bodds?\s+(?:from|above)\s+(\d+(?:\.\d+)?)\b/i
+    /\bodds?\s+(?:from|above)\s+(\d+(?:\.\d+)?)\b/i,
+    /\bodds?\s+(?:at\s+least|no\s+less\s+than|greater\s+than|over)\s+(\d+(?:\.\d+)?)\b/i
   ];
   var MAX_PATTERNS = [
     /\bmax(?:imum)?\s*(?:leg\s+)?odds?\s*(?:of|=|:|at|<=)?\s*(\d+(?:\.\d+)?)\s*x?\b/i,
     /\bmax(?:imum)?\s*(?:odds?)?\s*[:=]\s*(\d+(?:\.\d+)?)\b/i,
     /\bmax(?:imum)?\s*[:=]?\s*(\d+(?:\.\d+)?)\b(?!\s*(?:legs?|matches?|games?))/i,
-    /\b(?:up\s+to|at\s+most|no\s+more\s+than|under)\s+(\d+(?:\.\d+)?)\s*(?:x\s*)?odds?\b/i
+    /\b(?:up\s+to|at\s+most|no\s+more\s+than|under)\s+(\d+(?:\.\d+)?)\s*(?:x\s*)?odds?\b/i,
+    /\bodds?\s+(?:at\s+most|no\s+more\s+than|less\s+than|under)\s+(\d+(?:\.\d+)?)\b/i
   ];
   var TARGET_PATTERNS = [
     /\b(?:target|total|aim\s+for|make)\s*(?:odds?)?\s*(?:of|=|:|at|to)?\s*(\d+(?:\.\d+)?)\s*x?\b/i,
+    /\b(?:accumulator|parlay|multi(?:plier)?|combined)\s*(?:odds?)?\s*(?:of|=|:|at|to)?\s*(\d+(?:\.\d+)?)\s*x?\b/i,
+    /\b(?:aim|reach|hit)\s*(?:for\s*)?(\d+(?:\.\d+)?)\s*x?\b/i,
     /\b(\d+(?:\.\d+)?)\s*x\s+odds?\b/i,
     /\b(\d+(?:\.\d+)?)\s+odds?\b/i,
     /\b(\d+(?:\.\d+)?)\s*x\b/i
   ];
-  var STOP_AT = /\b(?:with|having|min(?:imum)?|max(?:imum)?|target|total\s+odds|odds?|only|please|give|build|generate|book|over|under|at\s+least|today|tomorrow)\b/i;
+  var STOP_AT = /\b(?:with|having|min(?:imum)?|max(?:imum)?|target|total\s+odds|odds?|only|please|give|build|generate|book|over|under|at\s+least|today|tomorrow|matches?|games?|legs?|picks?|selections?)\b/i;
 
   function blankSpaces(length) {
     var out = '';
@@ -171,8 +185,8 @@
       excluded.push(/soccer/i.test(word) ? 'football' : word.toLowerCase());
       return blankSpaces(match.length);
     });
-    var football = /\b(?:football|soccer)\b/i.test(working);
-    var basketball = /\bbasketball\b/i.test(working);
+    var football = /\b(?:football|soccer|footy|epl|premier\s+league)\b/i.test(working);
+    var basketball = /\b(?:basketball|nba)\b/i.test(working);
     if (football && basketball) return 'all';
     if (basketball && !football) return 'basketball';
     if (football && !basketball) return 'football';
@@ -214,7 +228,7 @@
       var odds = intent.markets.map(function (market) {
         return ({ corners: 1.5, btts: 1.8, bttsno: 1.5, over15: 1.3, over25: 1.6,
           over35: 2, under15: 1.3, under25: 1.35, dnb: 1.5, dc12: 1.35,
-          highestscoringhalf: 1.8, '1x2': 1.5, 'basketball-total': 1.25 })[market] || 1.5;
+          highestscoringhalf: 1.3, '1x2': 1.5, 'basketball-total': 1.25 })[market] || 1.5;
       });
       perLeg = odds.length ? odds.reduce(function (a, b) { return a + b; }, 0) / odds.length : 1.5;
     }
@@ -240,6 +254,13 @@
     }
 
     var text = raw.toLowerCase();
+    text = text.replace(SPACED_DECIMAL_PATTERN, function (match, prefix, digit) {
+      return prefix + digit + '.5';
+    });
+    text = text.replace(COUNT_WORD_PATTERN, function (match, word) {
+      return String(COUNT_WORDS[word.toLowerCase()]);
+    });
+    text = text.replace(COUNT_X_PATTERN, '$1 ');
     var totalMin = extractFirst(TOTAL_MIN_PATTERNS, text);
     if (totalMin) text = removeOnce(text, totalMin.matched);
     var min = extractFirst(MIN_PATTERNS, text);

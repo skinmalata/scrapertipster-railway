@@ -56,6 +56,8 @@ const SPORTS = {
   }
 };
 const SPORT_NAMES = ['football', 'basketball'];
+const DETAIL_MARKET_GROUPS = Object.freeze(['Main']);
+const HSH_DETAIL_MARKET_GROUPS = Object.freeze(['Half']);
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const CACHE_MAX = 400;
@@ -578,13 +580,26 @@ function doubleChanceSign(desc) {
   return null;
 }
 
-async function getEventMarkets(eventId, sport) {
-  const cached = cacheGet(detailCache, eventId);
+function mergeEventMarkets(target, source) {
+  ['overUnder', 'moneyline', 'doubleChance', 'btts', 'highestScoringHalf', 'drawNoBet'].forEach(function (name) {
+    Object.assign(target[name], source[name]);
+  });
+  return target;
+}
+
+async function getEventMarkets(eventId, sport, groups) {
+  const groupList = groups && groups.length ? groups : DETAIL_MARKET_GROUPS;
+  const cacheKey = eventId + '::' + groupList.join(',');
+  const cached = cacheGet(detailCache, cacheKey);
   if (cached) return cached;
   const config = SPORTS[sport] || SPORTS.football;
-  const html = await getJson(config.detail + encodeURIComponent(eventId), sportradarHeaders('https://www.sportybet.com'), 20000);
-  const markets = parseEventMarkets(html, sport);
-  cacheSet(detailCache, eventId, markets);
+  const markets = parseEventMarkets('', sport);
+  for (const group of groupList) {
+    const url = config.detail.replace('marketGroupsName=Main', 'marketGroupsName=' + encodeURIComponent(group)) + encodeURIComponent(eventId);
+    const html = await getJson(url, sportradarHeaders('https://www.sportybet.com'), 20000);
+    mergeEventMarkets(markets, parseEventMarkets(html, sport));
+  }
+  cacheSet(detailCache, cacheKey, markets);
   return markets;
 }
 
@@ -707,7 +722,7 @@ async function sportybetSelection(event, leg) {
     if (/1st|1h|first/i.test(tip)) halfKey = '1H';
     else if (/2nd|2h|second/i.test(tip)) halfKey = '2H';
     else if (/equal|draw/i.test(tip)) halfKey = 'equal';
-    const markets = await getEventMarkets(event.eventId);
+    const markets = await getEventMarkets(event.eventId, event.sport, HSH_DETAIL_MARKET_GROUPS);
     const row = markets.highestScoringHalf && markets.highestScoringHalf[halfKey];
     if (!row) throw unsupportedMarketError(leg, 'Highest Scoring Half is not offered for "' + leg.match + '", so the code was not created.');
     return { eventId: event.eventId, marketId: row.marketId, outcomeId: row.outcomeId, specifier: null };

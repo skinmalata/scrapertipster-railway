@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const chat = require('../public/sportybuilder-chat.js');
-const { validateSportyFilters, matchesSportyFilters } = require('../src/services/sportyBuilder.js');
+const { validateSportyFilters, matchesSportyFilters, withinTargetWindow, HSH_LOOKAHEAD_HOURS } = require('../src/services/sportyBuilder.js');
 
 test('parses winning basketball request with minimum odds', () => {
   const result = chat.parseIntent('book 10 winning basketball matches with at least 2 odds each');
@@ -63,6 +63,78 @@ test('does not confuse max odds with a match count', () => {
   assert.equal(result.intent.minOddsPerLeg, 3);
   assert.equal(result.intent.maxOddsPerLeg, 2);
   assert.match(result.errors.join(' '), /Maximum odds per leg must be greater/);
+});
+
+test('uses realistic target odds for highest scoring half legs', () => {
+  const result = chat.parseIntent('5 highest scoring half matches');
+
+  assert.deepEqual(result.errors, []);
+  assert.deepEqual(result.intent.markets, ['highestscoringhalf']);
+  assert.equal(result.intent.numLegs, 5);
+  assert.equal(result.intent.suggestedTargetOdds, 3.71);
+});
+
+test('parses natural count phrasings without mistaking them for target odds', () => {
+  const straight = chat.parseIntent('give me five straight wins with min 1.40');
+  assert.equal(straight.intent.numLegs, 5);
+  assert.deepEqual(straight.intent.markets, ['1x2']);
+  assert.equal(straight.intent.straightWinsOnly, true);
+  assert.equal(straight.intent.minOddsPerLeg, 1.4);
+
+  const accumulator = chat.parseIntent('3 x over 2.5 football');
+  assert.equal(accumulator.intent.numLegs, 3);
+  assert.deepEqual(accumulator.intent.markets, ['over25']);
+  assert.equal(accumulator.intent.targetOdds, null);
+
+  const legs = chat.parseIntent('4-leg btts no');
+  assert.equal(legs.intent.numLegs, 4);
+  assert.deepEqual(legs.intent.markets, ['bttsno']);
+
+  const oneXTwo = chat.parseIntent('5 x 1x2 football');
+  assert.equal(oneXTwo.intent.numLegs, 5);
+  assert.deepEqual(oneXTwo.intent.markets, ['1x2']);
+  assert.equal(oneXTwo.intent.targetOdds, null);
+});
+
+test('parses btts no aliases and spaced total lines', () => {
+  const phrase = chat.parseIntent('both teams to score no with min 1.30');
+  assert.deepEqual(phrase.intent.markets, ['bttsno']);
+  assert.equal(phrase.intent.minOddsPerLeg, 1.3);
+
+  const alias = chat.parseIntent('bttsng football');
+  assert.deepEqual(alias.intent.markets, ['bttsno']);
+
+  const totals = chat.parseIntent('o2 5 and u1 5 football');
+  assert.deepEqual(totals.intent.markets, ['over25', 'under15']);
+  assert.equal(totals.intent.numLegs, null);
+});
+
+test('parses natural odds phrasing, NBA shorthand and half qualifiers', () => {
+  const odds = chat.parseIntent('odds at least 1.5 and odds at most 3 football');
+  assert.equal(odds.intent.minOddsPerLeg, 1.5);
+  assert.equal(odds.intent.maxOddsPerLeg, 3);
+
+  const nba = chat.parseIntent('NBA moneyline accumulator odds 6 five legs');
+  assert.equal(nba.intent.sport, 'basketball');
+  assert.deepEqual(nba.intent.markets, ['1x2']);
+  assert.equal(nba.intent.numLegs, 5);
+  assert.equal(nba.intent.targetOdds, 6);
+
+  const half = chat.parseIntent('2nd half over 1.5 football');
+  assert.deepEqual(half.intent.markets, ['over15']);
+});
+
+test('highest scoring half fixtures use a longer lookahead than the default window', () => {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Africa/Lagos', hour12: false,
+    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+  }).formatToParts(new Date(Date.now() + 48 * 3600 * 1000));
+  const value = type => parts.find(p => p.type === type).value;
+  const date = `${value('year')}-${value('month')}-${value('day')}`;
+  const time = `${value('hour') === '24' ? '00' : value('hour')}:${value('minute')}`;
+
+  assert.equal(withinTargetWindow(date, time), false);
+  assert.equal(withinTargetWindow(date, time, HSH_LOOKAHEAD_HOURS), true);
 });
 
 test('backend accepts valid chat filters', () => {
