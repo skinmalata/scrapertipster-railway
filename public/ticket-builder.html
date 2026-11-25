@@ -832,6 +832,122 @@ body > header nav .wft-auth-account:hover { color: #fff; opacity: 0.92; }
   .tabs-container { gap: 6px; }
   .tabs-container .tab-btn { padding: 10px 12px; font-size: 12px; }
 }
+
+.builder-chat {
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.builder-chat-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.builder-chat-title {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: #f8fafc;
+}
+.builder-chat-subtitle {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #94a3b8;
+}
+.builder-chat-reset {
+  flex: 0 0 auto;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: #94a3b8;
+  font-size: 12px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.builder-chat-reset:hover { color: #f8fafc; border-color: var(--border-strong); }
+.builder-chat-log {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.builder-chat-msg {
+  max-width: 92%;
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.builder-chat-msg.bot {
+  align-self: flex-start;
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+}
+.builder-chat-msg.user {
+  align-self: flex-end;
+  color: #fff;
+  background: linear-gradient(135deg, #e41e31, #b81424);
+}
+.builder-chat-msg.error { border-color: rgba(228, 30, 49, 0.7); }
+.builder-chat-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.builder-chat-suggestions button {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: #cbd5e1;
+  font-size: 11px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.builder-chat-suggestions button:hover { border-color: var(--accent); color: #fff; }
+.builder-chat-form { display: flex; gap: 8px; }
+.builder-chat-form input {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: #f8fafc;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 11px 12px;
+}
+.builder-chat-form input:focus { outline: none; border-color: var(--accent); }
+.builder-chat-form button {
+  background: linear-gradient(135deg, #e41e31, #b81424);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 18px;
+  cursor: pointer;
+}
+.builder-chat-form button:disabled { opacity: 0.55; cursor: not-allowed; }
+.builder-chat-hint { margin: 9px 0 0; font-size: 11px; color: #64748b; line-height: 1.4; }
+@media (max-width: 520px) {
+  .builder-chat-head { flex-direction: column; gap: 8px; }
+  .builder-chat-form { flex-direction: column; }
+  .builder-chat-form button { padding: 11px 18px; }
+}
 </style>
 <link rel="alternate" type="application/rss+xml" title="WinFulltime Football Predictions RSS" href="/feed.xml">
 <script async src="https://news.google.com/swg/js/v1/publisher.js"></script>
@@ -1154,6 +1270,28 @@ body > header .hamburger { display: block; }
         <span>Shuffle</span>
       </button>
     </div>
+
+    <section class="builder-chat" aria-labelledby="builderChatTitle">
+      <div class="builder-chat-head">
+        <div>
+          <strong id="builderChatTitle" class="builder-chat-title">Ask the builder</strong>
+          <span class="builder-chat-subtitle">Describe the ticket you want in plain English and it will be booked below.</span>
+        </div>
+        <button type="button" id="btnChatReset" class="builder-chat-reset">Reset chat filters</button>
+      </div>
+      <div id="builderChatLog" class="builder-chat-log" role="log" aria-live="polite" aria-relevant="additions"></div>
+      <div class="builder-chat-suggestions" aria-label="Example requests">
+        <button type="button" data-chat-suggestion="book 10 winning basketball matches with at least 2 odds each">10 winning basketball matches</button>
+        <button type="button" data-chat-suggestion="book 5 winning corner matches today">5 corner matches</button>
+        <button type="button" data-chat-suggestion="football over 2.5, min odds 1.40, target 5x">Over 2.5 + min odds</button>
+        <button type="button" data-chat-suggestion="EPL and La Liga BTTS with min 1.50">EPL + La Liga BTTS</button>
+      </div>
+      <form id="builderChatForm" class="builder-chat-form">
+        <input id="builderChatInput" type="text" maxlength="500" autocomplete="off" placeholder="e.g. book 10 winning basketball matches with at least 2 odds each" aria-label="Describe the ticket you want">
+        <button id="btnChatSend" type="submit">Book it</button>
+      </form>
+      <p id="builderChatHint" class="builder-chat-hint">No chat filters applied — using the controls above.</p>
+    </section>
   </div>
 
   <!-- Results Section -->
@@ -1314,6 +1452,7 @@ body > header .hamburger { display: block; }
 <script src="/config.js"></script>
 <script src="/supabase-client.js"></script>
 <script src="/auth.js?v=20261104"></script>
+<script src="/sportybuilder-chat.js"></script>
 
 <script>
 (function() {
@@ -1338,6 +1477,26 @@ body > header .hamburger { display: block; }
   var toast = document.getElementById('toast');
   var proBanner = document.getElementById('proUpgradeBanner');
   var btnDismissProBanner = document.getElementById('btnDismissProBanner');
+  var chatLog = document.getElementById('builderChatLog');
+  var chatForm = document.getElementById('builderChatForm');
+  var chatInput = document.getElementById('builderChatInput');
+  var chatSend = document.getElementById('btnChatSend');
+  var chatHint = document.getElementById('builderChatHint');
+  var chatReset = document.getElementById('btnChatReset');
+  var chatParser = window.WFT && window.WFT.SportyBuilderChat ? window.WFT.SportyBuilderChat : null;
+  var chatFilters = emptyChatFilters();
+
+  function emptyChatFilters() {
+    return {
+      sport: null,
+      markets: [],
+      leagues: [],
+      minOddsPerLeg: null,
+      maxOddsPerLeg: null,
+      numLegs: null,
+      straightWinsOnly: false
+    };
+  }
 
   function isUserPro() {
     if (window.WFT && typeof window.WFT.getUser === 'function') {
@@ -1356,6 +1515,57 @@ body > header .hamburger { display: block; }
 
   function hideProBanner() {
     if (proBanner) proBanner.style.display = 'none';
+  }
+
+  function addChatMessage(role, message, isError) {
+    if (!chatLog) return;
+    var el = document.createElement('div');
+    el.className = 'builder-chat-msg ' + role + (isError ? ' error' : '');
+    el.textContent = message;
+    chatLog.appendChild(el);
+    while (chatLog.children.length > 60) chatLog.removeChild(chatLog.firstChild);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  function updateChatHint() {
+    if (!chatHint) return;
+    var bits = [];
+    if (chatFilters.sport) bits.push(chatFilters.sport);
+    if (chatFilters.markets.length) bits.push(chatFilters.markets.join(', '));
+    if (chatFilters.leagues.length) bits.push(chatFilters.leagues.join(', '));
+    if (chatFilters.numLegs !== null) bits.push(chatFilters.numLegs + ' matches');
+    if (chatFilters.minOddsPerLeg !== null) bits.push('min ' + chatFilters.minOddsPerLeg.toFixed(2));
+    if (chatFilters.maxOddsPerLeg !== null) bits.push('max ' + chatFilters.maxOddsPerLeg.toFixed(2));
+    if (chatFilters.straightWinsOnly) bits.push('straight wins');
+    chatHint.textContent = bits.length
+      ? 'Chat filters: ' + bits.join(' | ') + '. Use Reset to clear.'
+      : 'No chat filters applied — using the controls above.';
+  }
+
+  function applyChatIntent(intent) {
+    if (intent.sport) {
+      chatFilters.sport = intent.sport;
+      selectedSport = intent.sport;
+      sportPills.forEach(function(p) {
+        p.classList.toggle('active', (p.getAttribute('data-sport') || 'all') === selectedSport);
+      });
+    }
+    if (intent.markets.length) chatFilters.markets = intent.markets.slice();
+    if (intent.leagues.length) chatFilters.leagues = intent.leagues.slice();
+    if (intent.minOddsPerLeg !== null) chatFilters.minOddsPerLeg = intent.minOddsPerLeg;
+    if (intent.maxOddsPerLeg !== null) chatFilters.maxOddsPerLeg = intent.maxOddsPerLeg;
+    if (intent.numLegs !== null) chatFilters.numLegs = intent.numLegs;
+    chatFilters.straightWinsOnly = intent.straightWinsOnly;
+    updateChatHint();
+  }
+
+  function resetChatFilters() {
+    chatFilters = emptyChatFilters();
+    sportPills.forEach(function(p) {
+      p.classList.toggle('active', (p.getAttribute('data-sport') || 'all') === selectedSport);
+    });
+    updateChatHint();
+    addChatMessage('bot', 'Chat filters cleared. The controls above will be used again.');
   }
 
   if (btnDismissProBanner) {
@@ -1458,19 +1668,42 @@ body > header .hamburger { display: block; }
     window.WFT.onAuthReady(updateProState);
   }
 
-  async function generateTicket(shuffle) {
-    if (isGenerating) return;
+  async function generateTicket(shuffle, options) {
+    if (isGenerating) {
+      if (options && options.source === 'chat') addChatMessage('bot', 'A ticket is already being built. Please wait a moment.');
+      return null;
+    }
 
-    if (currentOdds > FREE_ODDS_LIMIT && !isUserPro()) {
+    var opts = options || {};
+    var fromChat = opts.source === 'chat';
+    var effectiveOdds = opts.targetOdds != null ? opts.targetOdds : currentOdds;
+    var activeFilters = fromChat ? (opts.filters || chatFilters) : emptyChatFilters();
+    var effectiveSport = fromChat ? (opts.sport || activeFilters.sport || selectedSport) : selectedSport;
+
+    if (effectiveOdds > FREE_ODDS_LIMIT && !isUserPro()) {
       showProBanner();
-      return;
+      if (fromChat) addChatMessage('bot', 'That target is above 5x, which is a Pro feature. Try fewer matches or lower odds, or upgrade at /pricing.html.', true);
+      return null;
     }
 
     isGenerating = true;
     btnGen.disabled = true;
     btnShuffle.disabled = true;
+    if (chatSend) chatSend.disabled = true;
     var origGenHtml = btnGen.innerHTML;
     btnGen.innerHTML = '<span class="spinner"></span><span>Building SportyBet Code...</span>';
+
+    var requestBody = {
+      targetOdds: effectiveOdds,
+      sport: effectiveSport,
+      markets: activeFilters.markets || [],
+      leagues: activeFilters.leagues || [],
+      minOddsPerLeg: activeFilters.minOddsPerLeg != null ? activeFilters.minOddsPerLeg : undefined,
+      maxOddsPerLeg: activeFilters.maxOddsPerLeg != null ? activeFilters.maxOddsPerLeg : undefined,
+      numLegs: activeFilters.numLegs != null ? activeFilters.numLegs : undefined,
+      straightWinsOnly: !!activeFilters.straightWinsOnly,
+      avoidMatches: shuffle ? previousMatches : []
+    };
 
     try {
       var data;
@@ -1478,22 +1711,14 @@ body > header .hamburger { display: block; }
         data = await window.WFT.apiFetch('/api/sportybuilder/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            targetOdds: currentOdds,
-            sport: selectedSport,
-            avoidMatches: shuffle ? previousMatches : []
-          })
+          body: JSON.stringify(requestBody)
         });
       } else {
         var apiBase = window.WFT_API || 'https://winfulltime-api.onrender.com';
         var resp = await fetch(apiBase + '/api/sportybuilder/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            targetOdds: currentOdds,
-            sport: selectedSport,
-            avoidMatches: shuffle ? previousMatches : []
-          })
+          body: JSON.stringify(requestBody)
         });
         var text = await resp.text();
         try {
@@ -1505,7 +1730,8 @@ body > header .hamburger { display: block; }
 
       if (data && (data.code === 'PRO_REQUIRED' || data.__status === 403)) {
         showProBanner();
-        return;
+        if (fromChat) addChatMessage('bot', 'Above 5x is a Pro feature. Upgrade at /pricing.html or lower the target odds.', true);
+        return null;
       }
 
       if (!data || !data.success) {
@@ -1513,26 +1739,35 @@ body > header .hamburger { display: block; }
       }
 
       hideProBanner();
-
-      // Display the ticket
       renderTicket(data);
 
-      // Record matches to avoid for variety on next shuffle/generation
       if (Array.isArray(data.legs)) {
         previousMatches = data.legs.map(function(l) { return l.match; });
       }
 
+      if (fromChat) {
+        addChatMessage('bot', 'Booked ' + data.legCount + ' legs at ' + Number(data.totalOdds).toFixed(2) + 'x. SportyBet code: ' + data.code);
+      }
+
+      return data;
+
     } catch (err) {
       console.error('AI SportyBet Code Builder error:', err);
-      if (err.message && err.message.toLowerCase().includes('pro')) {
+      var message = err && err.message ? err.message : 'Unknown error';
+      if (message.toLowerCase().includes('pro')) {
         showProBanner();
-      } else {
-        alert('Failed to generate ticket: ' + err.message + '. Please try again.');
       }
+      if (fromChat) {
+        addChatMessage('bot', 'Could not book that: ' + message, true);
+      } else if (!message.toLowerCase().includes('pro')) {
+        alert('Failed to generate ticket: ' + message + '. Please try again.');
+      }
+      return null;
     } finally {
       isGenerating = false;
       btnGen.disabled = false;
       btnShuffle.disabled = false;
+      if (chatSend) chatSend.disabled = false;
       btnGen.innerHTML = origGenHtml;
     }
   }
@@ -1607,6 +1842,73 @@ body > header .hamburger { display: block; }
       toast.classList.remove('show');
     }, 2500);
   }
+
+  async function handleChatSubmit() {
+    if (isGenerating || !chatInput) return;
+    var text = chatInput.value.trim();
+    if (!text) return;
+
+    chatInput.value = '';
+    addChatMessage('user', text);
+
+    if (!chatParser) {
+      addChatMessage('bot', 'Chat is unavailable right now. Please refresh the page and try again.', true);
+      return;
+    }
+
+    var result = chatParser.parseIntent(text);
+    if (result.errors.length) {
+      result.errors.forEach(function(err) { addChatMessage('bot', err, true); });
+      addChatMessage('bot', result.help);
+      return;
+    }
+    if (!result.recognized) {
+      addChatMessage('bot', "I didn't understand that ticket request. " + result.help);
+      return;
+    }
+
+    result.warnings.forEach(function(warning) { addChatMessage('bot', warning); });
+    applyChatIntent(result.intent);
+
+    var target = result.intent.targetOdds != null ? result.intent.targetOdds : result.intent.suggestedTargetOdds;
+    if (target != null && target > FREE_ODDS_LIMIT && !isUserPro()) {
+      showProBanner();
+      addChatMessage('bot', 'That would need about ' + target.toFixed(2) + 'x, above the 5x free limit. Try fewer matches or lower odds, or upgrade at /pricing.html.', true);
+      return;
+    }
+
+    if (target != null) setOdds(target);
+    addChatMessage('bot', 'Booking ' + result.summary + '…');
+    await generateTicket(false, {
+      source: 'chat',
+      targetOdds: target,
+      sport: activeChatSport(),
+      filters: chatFilters
+    });
+  }
+
+  function activeChatSport() {
+    return chatFilters.sport || selectedSport;
+  }
+
+  if (chatForm) {
+    chatForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      handleChatSubmit();
+    });
+  }
+
+  if (chatReset) chatReset.addEventListener('click', resetChatFilters);
+
+  document.querySelectorAll('[data-chat-suggestion]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      chatInput.value = btn.getAttribute('data-chat-suggestion') || '';
+      handleChatSubmit();
+    });
+  });
+
+  addChatMessage('bot', 'Tell me what to book, e.g. “10 winning basketball matches with at least 2 odds each” or “5 corner matches today”.');
+  updateChatHint();
 
   btnGen.addEventListener('click', function() { generateTicket(false); });
   btnShuffle.addEventListener('click', function() { generateTicket(true); });

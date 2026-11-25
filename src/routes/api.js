@@ -1972,13 +1972,37 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
 // Free tier code builders generate up to 5.0 odds; higher targets require Pro.
 var FREE_CODE_BUILDER_MAX_ODDS = 5.0;
 
+// Code generation calls the SportyBet API, so cap it per IP in addition to the
+// global site limiter. Normal UI usage (preview plus a few shuffles) stays well
+// under this ceiling.
+var codeBuilderLimiter = enquiryRateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many code requests. Please slow down.' }
+});
+
 // POST /api/sportybuilder/generate — AI SportyBet Code Builder: auto SportyBet code for 2–50 odds
-router.post('/sportybuilder/generate', optionalAuth, async function (req, res) {
+router.post('/sportybuilder/generate', optionalAuth, codeBuilderLimiter, async function (req, res) {
   try {
     var body = req.body || {};
+    var { generateSportyTicket, validateSportyFilters } = require('../services/sportyBuilder');
+    var validation = validateSportyFilters({
+      sport: body.sport,
+      markets: body.markets,
+      leagues: body.leagues,
+      minOddsPerLeg: body.minOddsPerLeg,
+      maxOddsPerLeg: body.maxOddsPerLeg,
+      numLegs: body.numLegs,
+      straightWinsOnly: body.straightWinsOnly
+    });
+    if (!validation.ok) {
+      return res.status(400).json({ success: false, error: validation.errors.join(' '), code: 'INVALID_FILTERS' });
+    }
+    var filters = validation.filters;
     var targetOdds = Math.min(50.0, Math.max(2.0, parseFloat(body.targetOdds) || 3.0));
     var avoidMatches = Array.isArray(body.avoidMatches) ? body.avoidMatches.slice(0, 20) : [];
-    var sport = body.sport === 'football' || body.sport === 'basketball' ? body.sport : 'all';
 
     // Gating: Only Pro / VIP members can select more than 5 odds
     var isPro = await resolveIsPro(req);
@@ -1992,14 +2016,25 @@ router.post('/sportybuilder/generate', optionalAuth, async function (req, res) {
       });
     }
 
-    var { generateSportyTicket } = require('../services/sportyBuilder');
-    var result = await generateSportyTicket({ targetOdds: targetOdds, avoidMatches: avoidMatches, sport: sport });
+    var result = await generateSportyTicket({
+      targetOdds: targetOdds,
+      avoidMatches: avoidMatches,
+      sport: filters.sport,
+      markets: filters.markets,
+      leagues: filters.leagues,
+      minOddsPerLeg: filters.minOddsPerLeg,
+      maxOddsPerLeg: filters.maxOddsPerLeg,
+      numLegs: filters.numLegs,
+      straightWinsOnly: filters.straightWinsOnly
+    });
     result.isPro = isPro;
     res.json(result);
   } catch (e) {
     console.error('[sportybuilder] Error:', e.message);
     console.error('[sportybuilder] Stack:', e.stack);
-    res.status(500).json({ success: false, error: e.message || 'Failed to generate SportyBet ticket' });
+    var message = e.message || '';
+    var clientError = /^(Unsupported market|League names|Minimum odds per leg|Maximum odds per leg|Number of matches|Basketball points totals|Football markets|Straight wins|.*would exceed the 50x|Not enough upcoming|Only \d+ distinct)/.test(message);
+    res.status(clientError ? 400 : 500).json({ success: false, error: message || 'Failed to generate SportyBet ticket' });
   }
 });
 

@@ -7,6 +7,17 @@ const { createCodeFromLegs } = require('./bookingCodes/converter');
 const { fetchTodayStreaks } = require('./h2hWinningStreaks');
 const { watDate } = require('./twoOddsOfDay');
 
+const SPORTYBUILDER_MARKETS = Object.freeze([
+  '1x2', 'over15', 'over25', 'btts', 'highestscoringhalf', 'dnb', 'corners', 'basketball-total'
+]);
+const FOOTBALL_ONLY_MARKETS = Object.freeze(['over15', 'over25', 'btts', 'highestscoringhalf', 'dnb', 'corners']);
+const HIGHER_ODDS_MARKETS = Object.freeze(['btts', 'highestscoringhalf', 'dnb', 'corners']);
+const MIN_LEG_ODDS = 1.06;
+const MIN_FILTER_ODDS = 1.06;
+const MAX_FILTER_ODDS = 20;
+const MAX_FILTER_ITEMS = 8;
+const MAX_LEAGUE_LENGTH = 60;
+
 function estimatedOdds(prob) {
   const p = Math.max(0.01, Math.min(0.95, prob));
   return Number((1 / p * 0.95).toFixed(2));
@@ -104,6 +115,121 @@ function normaliseTeam(value) {
 function normaliseSportFilter(value) {
   const sport = String(value || '').toLowerCase().trim();
   return sport === 'football' || sport === 'basketball' ? sport : 'all';
+}
+
+const MARKET_ALIASES = {
+  '1x2': '1x2', 'match result': '1x2', 'match winner': '1x2', 'double chance': '1x2',
+  dc: '1x2', '1x': '1x2', x2: '1x2', moneyline: '1x2',
+  over15: 'over15', 'over 1 5': 'over15', o15: 'over15',
+  over25: 'over25', 'over 2 5': 'over25', o25: 'over25',
+  btts: 'btts', 'btts yes': 'btts', 'both teams to score': 'btts', gg: 'btts',
+  highestscoringhalf: 'highestscoringhalf', hsh: 'highestscoringhalf', 'highest scoring half': 'highestscoringhalf',
+  dnb: 'dnb', 'draw no bet': 'dnb',
+  corners: 'corners', corner: 'corners', 'over 9 5 corners': 'corners',
+  'basketball-total': 'basketball-total', 'basketball total': 'basketball-total', 'points total': 'basketball-total'
+};
+
+function normaliseFilterText(value) {
+  return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+function normaliseFilterList(value, maxItems) {
+  if (value === undefined || value === null) return [];
+  const raw = Array.isArray(value) ? value : String(value).split(',');
+  const seen = new Set();
+  const result = [];
+  for (const entry of raw) {
+    if (result.length >= maxItems) break;
+    const normalised = normaliseFilterText(entry);
+    if (!normalised || seen.has(normalised)) continue;
+    seen.add(normalised);
+    result.push(normalised);
+  }
+  return result;
+}
+
+function optionalOdds(value) {
+  if (value === undefined || value === null || value === '') return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : NaN;
+}
+
+function validateSportyFilters(input) {
+  const options = input || {};
+  const errors = [];
+  const sport = normaliseSportFilter(options.sport);
+
+  const markets = [];
+  for (const entry of normaliseFilterList(options.markets, MAX_FILTER_ITEMS)) {
+    const key = entry.replace(/\s+/g, ' ');
+    const canonical = MARKET_ALIASES[key] || (SPORTYBUILDER_MARKETS.includes(entry.replace(/\s+/g, '-')) ? entry.replace(/\s+/g, '-') : null);
+    if (!canonical) errors.push(`Unsupported market: ${key}.`);
+    else if (!markets.includes(canonical)) markets.push(canonical);
+  }
+
+  const leagues = normaliseFilterList(options.leagues, MAX_FILTER_ITEMS);
+  for (const league of leagues) {
+    if (league.length > MAX_LEAGUE_LENGTH) errors.push('League names must be 60 characters or fewer.');
+  }
+
+  const minOddsPerLeg = optionalOdds(options.minOddsPerLeg);
+  const maxOddsPerLeg = optionalOdds(options.maxOddsPerLeg);
+  if (minOddsPerLeg !== null && (minOddsPerLeg < MIN_FILTER_ODDS || minOddsPerLeg > MAX_FILTER_ODDS)) {
+    errors.push(`Minimum odds per leg must be between ${MIN_FILTER_ODDS.toFixed(2)} and ${MAX_FILTER_ODDS}.`);
+  }
+  if (maxOddsPerLeg !== null && (maxOddsPerLeg < MIN_FILTER_ODDS || maxOddsPerLeg > MAX_FILTER_ODDS)) {
+    errors.push(`Maximum odds per leg must be between ${MIN_FILTER_ODDS.toFixed(2)} and ${MAX_FILTER_ODDS}.`);
+  }
+  if (minOddsPerLeg !== null && Number.isFinite(minOddsPerLeg) &&
+      maxOddsPerLeg !== null && Number.isFinite(maxOddsPerLeg) && maxOddsPerLeg <= minOddsPerLeg) {
+    errors.push('Maximum odds per leg must be greater than minimum odds per leg.');
+  }
+
+  let numLegs = null;
+  if (options.numLegs !== undefined && options.numLegs !== null && options.numLegs !== '') {
+    numLegs = Number(options.numLegs);
+    if (!Number.isInteger(numLegs) || numLegs < 2 || numLegs > 20) errors.push('Number of matches must be a whole number between 2 and 20.');
+  }
+
+  const straightWinsOnly = options.straightWinsOnly === true;
+
+  if (sport === 'football' && markets.includes('basketball-total')) {
+    errors.push('Basketball points totals need basketball or all sports.');
+  }
+  if (sport === 'basketball') {
+    const footballOnly = markets.filter(m => FOOTBALL_ONLY_MARKETS.includes(m));
+    if (footballOnly.length) errors.push('Football markets need football or all sports.');
+  }
+  if (straightWinsOnly && markets.length && markets.every(m => m === 'basketball-total')) {
+    errors.push('Straight wins are not available on basketball points totals.');
+  }
+  if (numLegs !== null && Number.isInteger(numLegs) && minOddsPerLeg !== null &&
+      Number.isFinite(minOddsPerLeg) && Math.pow(minOddsPerLeg, numLegs) > 50) {
+    errors.push(`${numLegs} legs at ${minOddsPerLeg.toFixed(2)} odds each would exceed the 50x ticket limit. Lower the leg count or the minimum odds.`);
+  }
+
+  return {
+    ok: errors.length === 0,
+    errors,
+    filters: { sport, markets, leagues, minOddsPerLeg, maxOddsPerLeg, numLegs, straightWinsOnly }
+  };
+}
+
+function matchesSportyFilters(candidate, filters) {
+  if (!filters) return true;
+  if (filters.markets && filters.markets.length && !filters.markets.includes(candidate.category)) return false;
+  if (filters.leagues && filters.leagues.length) {
+    const league = normaliseFilterText(candidate.league);
+    if (!filters.leagues.some(l => league === l || league.indexOf(l) !== -1)) return false;
+  }
+  const odds = Number(candidate.odds);
+  if (filters.minOddsPerLeg !== null && Number.isFinite(filters.minOddsPerLeg) && odds < filters.minOddsPerLeg) return false;
+  if (filters.maxOddsPerLeg !== null && Number.isFinite(filters.maxOddsPerLeg) && odds > filters.maxOddsPerLeg) return false;
+  if (filters.straightWinsOnly) {
+    if (candidate.category === 'basketball-total') return false;
+    if (candidate.category === '1x2' && candidate.tip !== '1' && candidate.tip !== '2') return false;
+  }
+  return true;
 }
 
 const TEAM_ALIASES = {
@@ -243,7 +369,8 @@ function findSportyMatch(sportyByKey, home, away) {
  */
 async function buildSportyCandidatePool(options = {}) {
   const today = options.date || watDate();
-  const sportFilter = normaliseSportFilter(options.sport);
+  const filters = validateSportyFilters(options).filters;
+  const sportFilter = filters.sport;
   const wantFootball = sportFilter === 'all' || sportFilter === 'football';
   const wantBasketball = sportFilter === 'all' || sportFilter === 'basketball';
   const matchRequests = [];
@@ -297,12 +424,21 @@ async function buildSportyCandidatePool(options = {}) {
   const seenPicks = new Set();
 
   const targetOddsNum = parseFloat(options.targetOdds) || 2.0;
-  const minLegOdds = 1.06;
-  const maxLegOdds = targetOddsNum >= 20 ? 2.80 : targetOddsNum >= 10 ? 2.40 : targetOddsNum >= 5 ? 2.10 : 1.80;
+  const explicitMarkets = filters.markets || [];
+  const hasExplicitMarkets = explicitMarkets.length > 0;
+  const hasMinOdds = filters.minOddsPerLeg !== null;
+  const minLegOdds = hasMinOdds ? Math.max(MIN_LEG_ODDS, filters.minOddsPerLeg) : MIN_LEG_ODDS;
+  const defaultMaxLegOdds = targetOddsNum >= 20 ? 2.80 : targetOddsNum >= 10 ? 2.40 : targetOddsNum >= 5 ? 2.10 : 1.80;
+  const maxLegOdds = filters.maxOddsPerLeg !== null
+    ? Math.min(Math.max(defaultMaxLegOdds, minLegOdds), filters.maxOddsPerLeg)
+    : Math.max(defaultMaxLegOdds, hasMinOdds ? Math.min(MAX_FILTER_ODDS, minLegOdds + 1.5) : defaultMaxLegOdds);
+  const relaxedMaxLegOdds = Math.max(maxLegOdds, 2.60);
 
   function addCandidate(c) {
     if (!c || !c.match || !c.tip || !c.odds) return;
-    if (c.odds < minLegOdds || c.odds > maxLegOdds) return;
+    const relaxHigherMarket = hasExplicitMarkets && explicitMarkets.includes(c.category) && HIGHER_ODDS_MARKETS.includes(c.category);
+    const ceiling = relaxHigherMarket ? relaxedMaxLegOdds : maxLegOdds;
+    if (c.odds < minLegOdds || c.odds > ceiling) return;
     const uid = `${matchKey(c.home, c.away)}|${c.category}|${c.tip}`;
     if (seenPicks.has(uid)) return;
     seenPicks.add(uid);
@@ -687,9 +823,9 @@ async function buildSportyCandidatePool(options = {}) {
     }
   }
 
-  // 7. Higher Odds Markets (Target Odds >= 5.0 only):
+  // 7. Higher Odds Markets (target >= 5.0, or explicitly requested by chat filters):
   // Integrates BTTS (Both Teams to Score) and Highest Scoring Half
-  if (targetOddsNum >= 5.0) {
+  if (targetOddsNum >= 5.0 || explicitMarkets.some(m => HIGHER_ODDS_MARKETS.includes(m))) {
     // 7a. BTTS (Both Teams To Score) from predictions tab
     const bttsList = predictions.bttsMatches || [];
     for (const b of bttsList) {
@@ -836,13 +972,14 @@ async function buildSportyCandidatePool(options = {}) {
   }
 
   // 8. Basketball — moneyline (1X2) and points Over/Under. Basketball has no
-  // draw, so only the two moneyline sides are offered. Short prices are the
-  // strongest signal available: 1.20-1.30 implies roughly 77-83% probability.
-  // Nothing shorter than 1.20 is admitted, for moneyline or points totals.
-  // The exact Sportradar selection ids are carried through so the booking code
-  // is minted on the very same line the tip was scored against.
-  const BASKETBALL_MIN_ODDS = 1.20;
-  const BASKETBALL_MAX_ODDS = 1.30;
+  // draw, so only the two moneyline sides are offered. By default only short
+  // prices are admitted; when the chat asks for higher minimum odds the price
+  // band widens and pick'em favouritism is no longer required. The exact
+  // Sportradar selection ids are carried through so the booking code is minted
+  // on the very same line the tip was scored against.
+  const BASKETBALL_MIN_ODDS = Math.max(1.20, minLegOdds);
+  const BASKETBALL_MAX_ODDS = Math.min(MAX_FILTER_ODDS, Math.max(1.30, maxLegOdds));
+  const allowHigherBasketballOdds = minLegOdds > 1.30;
   const basketballPool = basketballMatches.filter(function (m) {
     return m && m.home && m.away && !isInvalidFixture(m.home, m.away) &&
       !hasKickedOff(m.date, m.time) && withinTargetWindow(m.date, m.time);
@@ -862,7 +999,7 @@ async function buildSportyCandidatePool(options = {}) {
       if (!price || price < BASKETBALL_MIN_ODDS || price > BASKETBALL_MAX_ODDS) continue;
       const rival = sides.find(function (s) { return s !== side; });
       const rivalOdds = rival && rival.price && Number(rival.price.odds);
-      if (rivalOdds && rivalOdds < 2.40) continue;
+      if (!allowHigherBasketballOdds && rivalOdds && rivalOdds < 2.40) continue;
       addCandidate({
         match: matchName, home: sm.home, away: sm.away, league: sm.league || 'Basketball',
         date: sm.date, time: sm.time,
@@ -875,8 +1012,8 @@ async function buildSportyCandidatePool(options = {}) {
           specifier: null
         },
         confidence: Math.min(88, Math.round(100 / price)),
-        qualityScore: 97,
-        reason: `Basketball moneyline favourite (${price.toFixed(2)} — ${Math.round(100 / price)}% implied probability)`,
+        qualityScore: price > 1.50 ? 78 : 97,
+        reason: `Basketball moneyline ${price > 1.50 ? 'selection' : 'favourite'} (${price.toFixed(2)} — ${Math.round(100 / price)}% implied probability)`,
         marketLabel: `Basketball Moneyline (${side.label})`
       });
     }
@@ -914,12 +1051,13 @@ async function buildSportyCandidatePool(options = {}) {
     }
   }
 
-  return candidates;
+  return candidates.filter(c => matchesSportyFilters(c, filters));
 }
 
 /**
- * Finds the optimal combination of 2 to 5 candidates closest to targetOdds (2.0 to 10.0).
- * Supports avoidMatches and stochastic sampling so multiple generations give varied tickets!
+ * Finds the optimal combination of candidates closest to targetOdds.
+ * Supports avoidMatches, an exact requested leg count, and stochastic sampling
+ * so multiple generations give varied tickets.
  */
 function findOptimalCombination(candidates, targetOdds, options = {}) {
   // AI SportyBet Code Builder asks for at least one basketball leg whenever the pool has
@@ -966,8 +1104,9 @@ function findOptimalCombination(candidates, targetOdds, options = {}) {
 
   const minAcceptable = Math.max(1.80, targetOdds * 0.82);
   const maxAcceptable = Math.min(60.00, targetOdds * 1.22);
-  const minLegs = 2;
-  const maxLegs = targetOdds <= 3.0 ? 5 : targetOdds <= 5.0 ? 7 : targetOdds <= 10.0 ? 10 : targetOdds <= 25.0 ? 15 : 20;
+  const requestedLegs = Number.isInteger(options.numLegs) && options.numLegs >= 2 && options.numLegs <= 20 ? options.numLegs : null;
+  const minLegs = requestedLegs || 2;
+  const maxLegs = requestedLegs || (targetOdds <= 3.0 ? 5 : targetOdds <= 5.0 ? 7 : targetOdds <= 10.0 ? 10 : targetOdds <= 25.0 ? 15 : 20);
 
   let bestCombo = null;
   let minDiff = Infinity;
@@ -1025,27 +1164,31 @@ function findOptimalCombination(candidates, targetOdds, options = {}) {
     for (const c of uniquePerFixture) {
       if (greedy.length >= maxLegs) break;
       if (greedy.indexOf(c) !== -1) continue;
-      if (accum * c.odds <= targetOdds * 1.18) {
-        greedy.push(c);
-        accum *= c.odds;
-        if (accum >= targetOdds * 0.85 && (!requireBasketball || greedy.some(function (l) { return l.sport === 'basketball'; }))) {
-          bestCombo = greedy.slice();
-          break;
-        }
+      if (!requestedLegs && accum * c.odds > targetOdds * 1.18) continue;
+      greedy.push(c);
+      accum *= c.odds;
+      if (greedy.length >= maxLegs) {
+        bestCombo = greedy.slice();
+        break;
+      }
+      if (!requestedLegs && accum >= targetOdds * 0.85 &&
+          (!requireBasketball || greedy.some(function (l) { return l.sport === 'basketball'; }))) {
+        bestCombo = greedy.slice();
+        break;
       }
     }
-    if (greedy.length >= 2 && (!bestCombo || bestCombo.length < 2) &&
-        (!requireBasketball || greedy.some(function (l) { return l.sport === 'basketball'; }))) {
-      bestCombo = greedy;
-    }
+    const greedyComplete = greedy.length >= 2 && (!requestedLegs || greedy.length === requestedLegs) &&
+      (!requireBasketball || greedy.some(function (l) { return l.sport === 'basketball'; }));
+    if (greedyComplete && (!bestCombo || bestCombo.length < 2)) bestCombo = greedy;
   }
 
   // Whatever is available: if still null, return the closest valid candidate set
-  if ((!bestCombo || bestCombo.length < 2) && closestAnywhere && closestAnywhere.length >= 2) {
+  if ((!bestCombo || bestCombo.length < 2) && closestAnywhere && closestAnywhere.length >= 2 &&
+      (!requestedLegs || closestAnywhere.length === requestedLegs)) {
     bestCombo = closestAnywhere;
   }
 
-  // Fallback: take top 2 to 3 available matches geared towards selection
+  // Fallback: take the leading fixtures, honouring an exact leg count when requested
   if (!bestCombo || bestCombo.length < 2) {
     if (uniquePerFixture.length >= 2) {
       let pool = uniquePerFixture;
@@ -1053,7 +1196,8 @@ function findOptimalCombination(candidates, targetOdds, options = {}) {
         const firstBasketball = pool.find(function (c) { return c.sport === 'basketball'; });
         if (firstBasketball) pool = [firstBasketball].concat(pool.filter(function (c) { return c !== firstBasketball; }));
       }
-      bestCombo = pool.slice(0, Math.min(pool.length, targetOdds > 5 ? 4 : 2));
+      const fallbackSize = requestedLegs ? requestedLegs : Math.min(pool.length, targetOdds > 5 ? 4 : 2);
+      if (pool.length >= fallbackSize) bestCombo = pool.slice(0, fallbackSize);
     }
   }
 
@@ -1069,15 +1213,33 @@ async function generateSportyTicket(options = {}) {
   if (!Number.isFinite(targetOdds) || targetOdds < 2.0) targetOdds = 2.0;
   if (targetOdds > 50.0) targetOdds = 50.0;
 
-  const sport = normaliseSportFilter(options.sport);
+  const validation = validateSportyFilters(options);
+  if (!validation.ok) throw new Error(validation.errors.join(' '));
+  const filters = validation.filters;
+  const sport = filters.sport;
   const avoidMatches = Array.isArray(options.avoidMatches) ? options.avoidMatches : [];
-  const allCandidates = await buildSportyCandidatePool({ date: options.date, targetOdds: targetOdds, sport: sport });
+  const allCandidates = await buildSportyCandidatePool({
+    date: options.date, targetOdds: targetOdds, sport: sport,
+    markets: filters.markets, leagues: filters.leagues,
+    minOddsPerLeg: filters.minOddsPerLeg, maxOddsPerLeg: filters.maxOddsPerLeg,
+    straightWinsOnly: filters.straightWinsOnly
+  });
 
-  const poolError = sport === 'all'
-    ? 'Not enough upcoming matches found in the 24-hour window. Please try again shortly as more matches are priced.'
-    : `Not enough upcoming ${sport} matches found in the 24-hour window. Please try again shortly as more matches are priced.`;
+  const requestedLegs = filters.numLegs;
+  const scopeLabel = filters.markets.length ? filters.markets.join(', ') : sport;
+  const poolError = requestedLegs
+    ? `Not enough upcoming ${scopeLabel} matches to build ${requestedLegs} legs. Try fewer matches or wider filters.`
+    : sport === 'all'
+      ? 'Not enough upcoming matches found in the 24-hour window. Please try again shortly as more matches are priced.'
+      : `Not enough upcoming ${sport} matches found in the 24-hour window. Please try again shortly as more matches are priced.`;
   if (allCandidates.length < 2) {
     throw new Error(poolError);
+  }
+  if (requestedLegs) {
+    const uniqueFixtures = new Set(allCandidates.map(c => matchKey(c.home, c.away)));
+    if (uniqueFixtures.size < requestedLegs) {
+      throw new Error(`Only ${uniqueFixtures.size} distinct ${scopeLabel} matches are available for ${requestedLegs} legs. Try fewer matches or wider filters.`);
+    }
   }
   const hasBasketball = allCandidates.some(function (c) { return c.sport === 'basketball'; });
 
@@ -1120,7 +1282,8 @@ async function generateSportyTicket(options = {}) {
     // rejectedLegs accumulates any legs SportyBet API rejects across retries.
     chosenLegs = findOptimalCombination(candidates, targetOdds, {
       avoidMatches: rejectedLegs,
-      requireBasketball: requireBasketball
+      requireBasketball: requireBasketball,
+      numLegs: requestedLegs
     });
 
     if (!chosenLegs || chosenLegs.length < 2) {
@@ -1128,7 +1291,8 @@ async function generateSportyTicket(options = {}) {
       if (candidates !== allCandidates) {
         chosenLegs = findOptimalCombination(allCandidates, targetOdds, {
           avoidMatches: rejectedLegs,
-          requireBasketball: requireBasketball
+          requireBasketball: requireBasketball,
+          numLegs: requestedLegs
         });
       }
     }
@@ -1175,6 +1339,15 @@ async function generateSportyTicket(options = {}) {
     totalOdds: finalTotalOdds,
     targetOdds: targetOdds,
     sport: sport,
+    filters: {
+      sport: sport,
+      markets: filters.markets,
+      leagues: filters.leagues,
+      minOddsPerLeg: filters.minOddsPerLeg,
+      maxOddsPerLeg: filters.maxOddsPerLeg,
+      numLegs: requestedLegs,
+      straightWinsOnly: filters.straightWinsOnly
+    },
     legCount: chosenLegs.length,
     legs: chosenLegs.map(l => ({
       match: l.match,
@@ -1198,5 +1371,8 @@ async function generateSportyTicket(options = {}) {
 module.exports = {
   generateSportyTicket,
   buildSportyCandidatePool,
-  findOptimalCombination
+  findOptimalCombination,
+  validateSportyFilters,
+  matchesSportyFilters,
+  SPORTYBUILDER_MARKETS
 };

@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node --expose-gc --max-old-space-size=384 server.js",
     "dev": "node --expose-gc --max-old-space-size=384 server.js",
+    "test": "node --test scripts/sportybuilder-chat.test.js",
     "build:css": "tailwindcss -i ./src/styles.css -o ./public/styles.css --minify",
     "watch:css": "tailwindcss -i ./src/styles.css -o ./public/styles.css --watch",
     "generate-pins": "node scripts/generate-daily-pins.js",
