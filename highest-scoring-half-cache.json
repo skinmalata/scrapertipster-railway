@@ -70,39 +70,6 @@
     ],
     "2026-11-27": [
       {
-        "matchId": "2492124",
-        "home": "Groningen",
-        "away": "Willem II Tilburg",
-        "league": "Nl1",
-        "leagueName": "Eredivisie",
-        "country": "Netherlands",
-        "time": "",
-        "probs": {
-          "home": 57,
-          "draw": 25,
-          "away": 18
-        },
-        "avgGoals": 3.73,
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.761,
-          "margin": 0.663,
-          "firstHalfShare": 0.25,
-          "firstHalfExp": 0.93,
-          "secondHalfExp": 2.8,
-          "p1": 0.098,
-          "p2": 0.761,
-          "tie": 0.141,
-          "fitErr": 0.00482,
-          "totalExp": 3.73,
-          "referenceFirstHalfProb": 0.39,
-          "referenceDrawProb": 0.45,
-          "referenceSecondHalfProb": 0.16,
-          "reason": "Expected 3.7 goals, split 0.9 in the 1st half vs 2.8 in the 2nd. The 2nd half wins the half race 76% of the time, 66% clear of the other half."
-        }
-      },
-      {
         "matchId": "2494665",
         "home": "Ittihad Jeddah",
         "away": "Neom SC",
@@ -534,6 +501,39 @@
         }
       },
       {
+        "matchId": "2493645",
+        "home": "Vissel Kobe",
+        "away": "JEF United Chiba",
+        "league": "Jp1",
+        "leagueName": "J1 League",
+        "country": "Japan",
+        "time": "",
+        "probs": {
+          "home": 43,
+          "draw": 32,
+          "away": 25
+        },
+        "avgGoals": 3.07,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.719,
+          "margin": 0.611,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.77,
+          "secondHalfExp": 2.3,
+          "p1": 0.108,
+          "p2": 0.719,
+          "tie": 0.173,
+          "fitErr": 0.03836,
+          "totalExp": 3.07,
+          "referenceFirstHalfProb": 0.15,
+          "referenceDrawProb": 0.59,
+          "referenceSecondHalfProb": 0.26,
+          "reason": "Expected 3.1 goals, split 0.8 in the 1st half vs 2.3 in the 2nd. The 2nd half wins the half race 72% of the time, 61% clear of the other half."
+        }
+      },
+      {
         "matchId": "2523640",
         "home": "Köln",
         "away": "SV Elversberg",
@@ -796,43 +796,10 @@
           "referenceSecondHalfProb": 0.21,
           "reason": "Expected 2.3 goals, split 0.7 in the 1st half vs 1.6 in the 2nd. The 2nd half wins the half race 59% of the time, 42% clear of the other half."
         }
-      },
-      {
-        "matchId": "2495659",
-        "home": "Leeds United",
-        "away": "Coventry City",
-        "league": "EPL",
-        "leagueName": "Premier League",
-        "country": "England",
-        "time": "",
-        "probs": {
-          "home": 54,
-          "draw": 28,
-          "away": 18
-        },
-        "avgGoals": 2.44,
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.559,
-          "margin": 0.366,
-          "firstHalfShare": 0.34,
-          "firstHalfExp": 0.83,
-          "secondHalfExp": 1.61,
-          "p1": 0.193,
-          "p2": 0.559,
-          "tie": 0.249,
-          "fitErr": 0.02331,
-          "totalExp": 2.44,
-          "referenceFirstHalfProb": 0.32,
-          "referenceDrawProb": 0.45,
-          "referenceSecondHalfProb": 0.23,
-          "reason": "Expected 2.4 goals, split 0.8 in the 1st half vs 1.6 in the 2nd. The 2nd half wins the half race 56% of the time, 37% clear of the other half."
-        }
       }
     ]
   },
-  "lastFetch": "2026-11-27T04:51:26.078Z",
+  "lastFetch": "2026-11-27T12:36:09.822Z",
   "meta": {
     "minProb": 0.55,
     "maxPicks": 12,
