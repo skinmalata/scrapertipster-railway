@@ -10,6 +10,11 @@ function chatId() {
   return process.env.TELEGRAM_CHAT_ID;
 }
 
+function codeAnnouncementsEnabled() {
+  const value = process.env.TELEGRAM_CODE_ANNOUNCEMENTS;
+  return value !== undefined && /^(1|true|yes|on)$/i.test(String(value));
+}
+
 function normalizeCountry(value) {
   const raw = String(value || '').trim();
   if (!raw || raw.length > 60 || /[\r\n]/.test(raw)) return '';
@@ -32,6 +37,7 @@ async function deliver(text, label) {
 }
 
 async function announceConversion(conv) {
+  if (!codeAnnouncementsEnabled()) return undefined;
   if (!conv || !conv.code) return undefined;
   const country = normalizeCountry(conv.country);
   if (!country) return undefined;
@@ -65,6 +71,7 @@ async function announceConversion(conv) {
 // A split produces several codes, so every one of them is posted back to the
 // channel — the split point is the whole point of the tool.
 async function announceSplit(conv) {
+  if (!codeAnnouncementsEnabled()) return undefined;
   if (!conv || !Array.isArray(conv.parts) || !conv.parts.length) return undefined;
   const country = normalizeCountry(conv.country);
   if (!country) return undefined;
@@ -95,6 +102,7 @@ async function announceSplit(conv) {
 // Merged codes collapse several slips into one, so the single new code and what
 // went into it are both worth posting.
 async function announceMerge(conv) {
+  if (!codeAnnouncementsEnabled()) return undefined;
   if (!conv || !conv.code) return undefined;
   const country = normalizeCountry(conv.country);
   if (!country) return undefined;
