@@ -257,7 +257,7 @@
  <nav id="nav">
  <a href="/" class="active">Home</a>
  <details class="nav-dropdown">
-  <summary>Winning Tools<span class="nav-caret" aria-hidden="true"></span></summary>
+  <summary>Betting Tools<span class="nav-caret" aria-hidden="true"></span></summary>
   <div class="nav-dropdown-menu">
    <a href="/converter.html">AI Code Converter</a>
    <a href="/code-merger.html">AI Code Merger</a>
@@ -594,6 +594,7 @@
 <script>
 (function() {
   var FREE_ODDS_LIMIT = 5.0;
+  var SPORTY_REQUEST_TIMEOUT_MS = 120000;
   var selectedOdds = 3.0;
   var prevMatches = [];
   var busy = false;
@@ -610,6 +611,11 @@
       return !!(u && (u.isPro || u.isAdmin));
     }
     return false;
+  }
+
+  function isRetriableSportyError(err) {
+    var message = err && err.message ? String(err.message) : '';
+    return !!(err && (err.name === 'AbortError' || /timeout|timed out|aborted|failed to fetch|fetch failed|network|load failed|service updating|temporarily unavailable/i.test(message)));
   }
 
   function showProNotice(odds) {
@@ -676,28 +682,46 @@
 
     try {
       var data;
-      if (window.WFT && typeof window.WFT.apiFetch === 'function') {
-        data = await window.WFT.apiFetch('/api/sportybuilder/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            targetOdds: selectedOdds,
-            avoidMatches: shuffle ? prevMatches : []
-          })
-        });
-      } else {
+      var requestBody = JSON.stringify({
+        targetOdds: selectedOdds,
+        avoidMatches: shuffle ? prevMatches : []
+      });
+      var requestTicket = function () {
+        if (window.WFT && typeof window.WFT.apiFetch === 'function') {
+          return window.WFT.apiFetch('/api/sportybuilder/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: requestBody,
+            timeoutMs: SPORTY_REQUEST_TIMEOUT_MS
+          });
+        }
         var apiBase = window.WFT_API || 'https://winfulltime-api.onrender.com';
-        var res = await fetch(apiBase + '/api/sportybuilder/generate', {
+        return fetch(apiBase + '/api/sportybuilder/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            targetOdds: selectedOdds,
-            avoidMatches: shuffle ? prevMatches : []
-          })
+          body: requestBody
+        }).then(function (res) {
+          return res.text().then(function (text) {
+            try { return JSON.parse(text); } catch (e) {
+              throw new Error('Service updating. Please retry shortly.');
+            }
+          });
         });
-        var text = await res.text();
-        try { data = JSON.parse(text); } catch (e) {
-          throw new Error('Service updating. Please retry shortly.');
+      };
+
+      for (var attempt = 0; attempt < 2; attempt++) {
+        try {
+          data = await requestTicket();
+          if (data && Number(data.__status) >= 500) {
+            throw new Error('Builder service is temporarily unavailable');
+          }
+          break;
+        } catch (requestErr) {
+          if (attempt === 0 && isRetriableSportyError(requestErr)) {
+            console.warn('SportyBet code request failed; retrying once.', requestErr);
+            continue;
+          }
+          throw requestErr;
         }
       }
 
@@ -720,7 +744,10 @@
       if (err.message && err.message.toLowerCase().includes('pro')) {
         showProNotice(selectedOdds);
       } else {
-        resBox.innerHTML = '<div style="padding:12px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;font-size:13px;color:#fca5a5;text-align:center;">' + (err.message || 'Error generating ticket') + '</div>';
+        var message = isRetriableSportyError(err)
+          ? 'The builder service is taking too long to respond. Please try again.'
+          : (err.message || 'Error generating ticket');
+        resBox.innerHTML = '<div style="padding:12px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;font-size:13px;color:#fca5a5;text-align:center;">' + message + '</div>';
       }
     } finally {
       busy = false;

@@ -1,5 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const chat = require('../public/sportybuilder-chat.js');
 const { validateSportyFilters, matchesSportyFilters, withinTargetWindow, HSH_LOOKAHEAD_HOURS } = require('../src/services/sportyBuilder.js');
@@ -197,4 +199,16 @@ test('matchesSportyFilters enforces straight wins and minimum odds', () => {
   assert.equal(matchesSportyFilters(homeWin, filters), true);
   assert.equal(matchesSportyFilters(doubleChance, filters), false);
   assert.equal(matchesSportyFilters(lowOdds, filters), false);
+});
+
+test('sporty builder pages wait for slow generation and retry network failures', () => {
+  for (const file of ['public/index.html', 'public/ticket-builder.html']) {
+    const html = fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
+
+    assert.match(html, /SPORTY_REQUEST_TIMEOUT_MS\s*=\s*120000/);
+    assert.match(html, /timeoutMs:\s*SPORTY_REQUEST_TIMEOUT_MS/);
+    assert.match(html, /attempt < 2/);
+    assert.match(html, /failed to fetch/i);
+    assert.match(html, /temporarily unavailable/i);
+  }
 });

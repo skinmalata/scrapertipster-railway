@@ -1207,7 +1207,7 @@ body > header .hamburger { display: block; }
     <nav id="nav">
  <a href="/">Home</a>
  <details class="nav-dropdown">
-  <summary class="active">Winning Tools<span class="nav-caret" aria-hidden="true"></span></summary>
+  <summary class="active">Betting Tools<span class="nav-caret" aria-hidden="true"></span></summary>
   <div class="nav-dropdown-menu">
    <a href="/converter.html">AI Code Converter</a>
    <a href="/code-merger.html">AI Code Merger</a>
@@ -1520,6 +1520,7 @@ body > header .hamburger { display: block; }
 (function() {
   var FREE_ODDS_LIMIT = 5.0;
   var PRO_ODDS_LIMIT = 50.0;
+  var SPORTY_REQUEST_TIMEOUT_MS = 120000;
   var currentOdds = 3.0;
   var selectedSport = 'all';
   var previousMatches = [];
@@ -1795,6 +1796,11 @@ body > header .hamburger { display: block; }
     return !!(err && (err.name === 'AbortError' || /timeout|timed out|aborted/i.test(message)));
   }
 
+  function isRetriableRequestError(err) {
+    var message = err && err.message ? String(err.message) : '';
+    return isRequestTimeout(err) || /failed to fetch|fetch failed|network|load failed|service updating|temporarily unavailable/i.test(message);
+  }
+
   async function generateTicket(shuffle, options) {
     if (isGenerating) {
       if (options && options.source === 'chat') addChatMessage('bot', 'A ticket is already being built. Please wait a moment.');
@@ -1845,7 +1851,7 @@ body > header .hamburger { display: block; }
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: requestBodyJson,
-            timeoutMs: 30000
+            timeoutMs: SPORTY_REQUEST_TIMEOUT_MS
           });
         }
         var apiBase = window.WFT_API || 'https://winfulltime-api.onrender.com';
@@ -1867,10 +1873,13 @@ body > header .hamburger { display: block; }
       for (var attempt = 0; attempt < 2; attempt++) {
         try {
           data = await requestTicket();
+          if (data && Number(data.__status) >= 500) {
+            throw new Error('Builder service is temporarily unavailable');
+          }
           break;
         } catch (requestErr) {
-          if (attempt === 0 && isRequestTimeout(requestErr)) {
-            console.warn('SportyBet code request timed out; retrying once.');
+          if (attempt === 0 && isRetriableRequestError(requestErr)) {
+            console.warn('SportyBet code request failed; retrying once.', requestErr);
             if (fromChat) setChatProgress(55, 'Warming up the builder… retrying.');
             continue;
           }
@@ -1908,7 +1917,7 @@ body > header .hamburger { display: block; }
 
     } catch (err) {
       console.error('AI SportyBet Code Builder error:', err);
-      var message = isRequestTimeout(err)
+      var message = isRetriableRequestError(err)
         ? 'The builder service is taking too long to respond. Please try again.'
         : (err && err.message ? err.message : 'Unknown error');
       if (message.toLowerCase().includes('pro')) {

@@ -5,12 +5,6 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const fs = require('fs');
 const path = require('path');
-const axios = require('axios');
-const apiRoutes = require('./src/routes/api');
-const chatRoutes = require('./src/routes/chat');
-const bookingCodeRoutes = require('./src/routes/bookingCodes');
-const { router: pushRoutes, subscriptions: pushSubscriptions } = require('./src/routes/push');
-const { sendDailyPredictionsNotification } = require('./src/services/pushNotifications');
 const { applyLayout, staticWithLayout } = require('./src/templates/layout');
 const { forceRestartIfMemoryCritical, startMemoryWatchdog } = require('./src/services/memoryGuard');
 
@@ -39,35 +33,45 @@ const YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@winfulltime/videos';
 let youtubeVideosCache = { videos: [], lastFetched: null };
 const YOUTUBE_CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
-let scraperService;
+let scraperService = null;
 let predictionsCache = null;
-try {
-  scraperService = require('./src/services/scraper');
-  console.log('Preloading predictions cache...');
-  predictionsCache = scraperService.loadCachedPredictions();
-  if (predictionsCache) {
-    console.log('Cache preloaded successfully, matches:', predictionsCache.matches?.length);
-  } else {
-    console.log('No cache found, will fetch on first request');
-  }
-} catch (e) {
-  console.log('Scraper service will load lazily:', e.message);
-}
+let predictionsCacheLoaded = false;
 
 function getScraperService() {
-  if (!scraperService) {
-    scraperService = require('./src/services/scraper');
-  }
+  if (!scraperService) scraperService = require('./src/services/scraper');
   return scraperService;
 }
 
 function getPredictionsCache() {
+  if (!predictionsCacheLoaded) {
+    predictionsCache = getScraperService().loadCachedPredictions();
+    predictionsCacheLoaded = true;
+  }
   return predictionsCache;
 }
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 app.set('trust proxy', 1);
+
+let apiRuntime = null;
+function getApiRuntime() {
+  if (!apiRuntime) {
+    apiRuntime = {
+      api: require('./src/routes/api'),
+      chat: require('./src/routes/chat'),
+      bookingCodes: require('./src/routes/bookingCodes'),
+      push: require('./src/routes/push')
+    };
+  }
+  return apiRuntime;
+}
+
+let pushNotifications = null;
+function getPushNotifications() {
+  if (!pushNotifications) pushNotifications = require('./src/services/pushNotifications');
+  return pushNotifications;
+}
 
 // Liveness probe for Render (render.yaml -> healthCheckPath). Registered ahead
 // of every other middleware on purpose: it does no disk, network or cache work,
@@ -462,10 +466,22 @@ app.use('/api', function (req, res, next) {
 });
 
 // API Routes (optional local/dev API — production site is GitHub Pages)
-app.use('/api', apiRoutes);
-app.use('/api', chatRoutes);
-app.use('/api', bookingCodeRoutes);
-app.use('/api', pushRoutes);
+app.use('/api', function (req, res, next) {
+  if (req.path === '/health') return next();
+  try {
+    var runtime = getApiRuntime();
+    var layers = [runtime.api, runtime.chat, runtime.bookingCodes, runtime.push.router];
+    var index = 0;
+    function runLayer(err) {
+      if (err) return next(err);
+      if (index >= layers.length) return next();
+      layers[index++](req, res, runLayer);
+    }
+    runLayer();
+  } catch (e) {
+    next(e);
+  }
+});
 
 // RSS Feed
 const RSS_FEED_ARTICLES_FILE = path.join(__dirname, 'articles-manifest.json');
@@ -609,6 +625,7 @@ app.get('/api/youtube-videos', async (req, res) => {
   }
 
   try {
+    const axios = require('axios');
     const response = await axios.get(`https://www.googleapis.com/youtube/v3/search`, {
       params: {
         key: YOUTUBE_API_KEY,
@@ -655,9 +672,12 @@ app.get('/blog/:slug', (req, res, next) => {
 });
 
 // FotMob live scraping + API-Football stats — replaces Forebet (Cloudflare blocked axios on Render).
-const { startLiveScrapeLoop, getCachedLive } = require('./src/services/scrapeLive');
+let liveScrapeService = null;
+function getLiveScrapeService() {
+  if (!liveScrapeService) liveScrapeService = require('./src/services/scrapeLive');
+  return liveScrapeService;
+}
 const { buildGoldenTips } = require('./src/services/goldenOpportunities');
-const { buildGiantPool } = require('./src/services/authorPicks');
 const { startTelegramBot } = require('./src/services/telegramBot');
 const { startMastodonBot } = require('./src/services/mastodonBot');
 
@@ -713,6 +733,7 @@ async function refreshAuthorPicks() {
   forceRestartIfMemoryCritical();
   try {
     console.log('[author-picks] Building H2H Picks pool...');
+    const { buildGiantPool } = require('./src/services/authorPicks');
     const result = await buildGiantPool();
     console.log('[author-picks] Ready:', result.analyzedFixtures, 'analyzed of', result.totalFixtures, 'fixtures');
   } catch (e) {
@@ -768,20 +789,23 @@ async function refreshCornersAndCards() {
 // immediately, so it should not be the job that gets starved by an abort in
 // front of it. When the process died on the 384MB heap it happened before this
 // ran, which left no file on disk and sent every page view into a fresh crawl.
-runHeavyExclusive(refreshAuthorPicks)
-  .then(function () { return runHeavyExclusive(refreshPreMatchPredictions); })
-  .then(function () { return runHeavyExclusive(refreshCornersAndCards); })
-  .then(function () {
-    // Warm the booking-code schedule index (287 per-league pages) so the
-    // converter's first request does not have to wait for a cold build, and
-    // warm the 1xBet index and H2H streak cache so builders and converters respond immediately.
-    const { warmEventIndex } = require('./src/services/bookingCodes/resolver');
-    warmEventIndex();
-    require('./src/services/bookingCodes/1xbet').getXbetIndex().catch(function (e) {});
-    require('./src/services/h2hWinningStreaks').fetchTodayStreaks().catch(function (e) {});
-  })
-  .then(function () { startLiveScrapeLoop(); })
-  .catch(function (e) { console.error('[boot] Heavy job chain failed:', e.message); });
+function startBootJobs() {
+  runHeavyExclusive(refreshAuthorPicks)
+    .then(function () { return runHeavyExclusive(refreshPreMatchPredictions); })
+    .then(function () { return runHeavyExclusive(refreshCornersAndCards); })
+    .then(function () {
+      // Warm the booking-code schedule index (287 per-league pages) so the
+      // converter's first request does not have to wait for a cold build, and
+      // warm the 1xBet index and H2H streak cache so builders and converters respond immediately.
+      const { warmEventIndex } = require('./src/services/bookingCodes/resolver');
+      warmEventIndex();
+      require('./src/services/bookingCodes/1xbet').getXbetIndex().catch(function (e) {});
+      require('./src/services/h2hWinningStreaks').fetchTodayStreaks().catch(function (e) {});
+    })
+    .then(function () { getLiveScrapeService().startLiveScrapeLoop(); })
+    .catch(function (e) { console.error('[boot] Heavy job chain failed:', e.message); });
+}
+setTimeout(startBootJobs, 5000);
 
 // Refresh pre-match predictions every 12h (serialized against other heavy jobs).
 setInterval(function () {
@@ -799,7 +823,7 @@ setInterval(function () {
 }, 6 * 60 * 60 * 1000);
 
 function getLiveTipsFromCache() {
-  var liveData = getCachedLive();
+  var liveData = getLiveScrapeService().getCachedLive();
   if (!liveData || !liveData.matches || !liveData.matches.length) return [];
   return buildGoldenTips(liveData);
 }
@@ -825,10 +849,12 @@ function scheduleDailyPushNotification() {
   const delay = target.getTime() - now.getTime();
   console.log('[push] Next daily notification in', Math.round(delay / 1000 / 60), 'minutes');
   setTimeout(function runPush() {
-    sendDailyPredictionsNotification(pushSubscriptions)
+    var push = getPushNotifications();
+    var subscriptions = getApiRuntime().push.subscriptions;
+    push.sendDailyPredictionsNotification(subscriptions)
       .catch(function (e) { console.error('[push] Daily notification failed:', e.message); });
     setInterval(function () {
-      sendDailyPredictionsNotification(pushSubscriptions)
+      push.sendDailyPredictionsNotification(subscriptions)
         .catch(function (e) { console.error('[push] Daily notification failed:', e.message); });
     }, 24 * 60 * 60 * 1000);
   }, delay);

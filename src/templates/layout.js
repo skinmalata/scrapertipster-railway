@@ -14,7 +14,7 @@ const ONEXBET_TOOL_BUTTON = '<a class="streak-btn tool-1xbet" href="/1xbet-build
 const NAV_LINKS = [
   { href: '/', label: 'Home', match: (p) => p === '/' || p === '/index.html' },
   {
-    label: 'Winning Tools',
+    label: 'Betting Tools',
     children: [
       { href: '/converter.html', label: 'AI Code Converter', match: (p) => p.startsWith('/converter') },
       { href: '/code-merger.html', label: 'AI Code Merger', match: (p) => p.startsWith('/code-merger') },
