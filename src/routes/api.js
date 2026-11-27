@@ -1973,6 +1973,7 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
 var FREE_CODE_BUILDER_MAX_ODDS = 5.0;
 
 var SPORTY_CHAT_ENABLED = false;
+var SPORTYBUILDER_ENABLED = false;
 
 function isSportyChatRequest(body) {
   if (body.source === 'chat') return true;
@@ -1999,6 +2000,13 @@ var codeBuilderLimiter = enquiryRateLimit({
 
 // POST /api/sportybuilder/generate — AI SportyBet Code Builder: auto SportyBet code for 2–50 odds
 router.post('/sportybuilder/generate', optionalAuth, codeBuilderLimiter, async function (req, res) {
+  if (!SPORTYBUILDER_ENABLED) {
+    return res.status(503).json({
+      success: false,
+      error: 'SportyBet code builder is temporarily unavailable.',
+      code: 'SPORTYBUILDER_DISABLED'
+    });
+  }
   try {
     var body = req.body || {};
     if (!SPORTY_CHAT_ENABLED && isSportyChatRequest(body)) {

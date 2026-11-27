@@ -595,6 +595,7 @@
 (function() {
   var FREE_ODDS_LIMIT = 5.0;
   var SPORTY_REQUEST_TIMEOUT_MS = 120000;
+  var SPORTYBUILDER_ENABLED = false;
   var selectedOdds = 3.0;
   var prevMatches = [];
   var busy = false;
@@ -604,6 +605,14 @@
   var btnGen = document.getElementById('shbGenerate');
   var btnShuf = document.getElementById('shbShuffle');
   var resBox = document.getElementById('shbResult');
+
+  if (!SPORTYBUILDER_ENABLED) {
+    if (btnGen) btnGen.disabled = true;
+    if (btnShuf) btnShuf.disabled = true;
+    if (resBox) {
+      resBox.innerHTML = '<div style="padding:12px;background:rgba(251,191,36,0.10);border:1px solid rgba(251,191,36,0.35);border-radius:8px;font-size:13px;color:#fde68a;text-align:center;">The AI SportyBet Code Builder is temporarily unavailable while we investigate a service issue.</div>';
+    }
+  }
 
   function isUserPro() {
     if (window.WFT && typeof window.WFT.getUser === 'function') {
@@ -665,6 +674,7 @@
   }
 
   async function runSporty(shuffle) {
+    if (!SPORTYBUILDER_ENABLED) return;
     if (!clickAuthorized) return;
     clickAuthorized = false;
     if (busy) return;

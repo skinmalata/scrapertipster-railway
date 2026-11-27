@@ -1526,6 +1526,7 @@ body > header .hamburger { display: block; }
   var previousMatches = [];
   var isGenerating = false;
   var SPORTY_CHAT_ENABLED = false;
+  var SPORTYBUILDER_ENABLED = false;
 
   var pills = document.querySelectorAll('.odds-pill');
   var sportPills = document.querySelectorAll('.sport-pill');
@@ -1561,6 +1562,17 @@ body > header .hamburger { display: block; }
   if (!SPORTY_CHAT_ENABLED) {
     var chatSection = document.querySelector('.builder-chat');
     if (chatSection) chatSection.style.display = 'none';
+  }
+
+  if (!SPORTYBUILDER_ENABLED) {
+    if (btnGen) btnGen.disabled = true;
+    if (btnShuffle) btnShuffle.disabled = true;
+    var notice = document.createElement('div');
+    notice.setAttribute('role', 'status');
+    notice.style.cssText = 'margin:0 0 16px;padding:12px 14px;border:1px solid rgba(251,191,36,0.35);border-radius:10px;background:rgba(251,191,36,0.10);color:#fde68a;font-size:13px;line-height:1.5;text-align:center;';
+    notice.textContent = 'The AI SportyBet Code Builder is temporarily unavailable while we investigate a service issue. The 1xBet and betPawa builders remain available.';
+    var actions = document.querySelector('.action-buttons');
+    if (actions && actions.parentNode) actions.parentNode.insertBefore(notice, actions);
   }
 
   function emptyChatFilters() {
@@ -1809,6 +1821,7 @@ body > header .hamburger { display: block; }
   }
 
   async function generateTicket(shuffle, options) {
+    if (!SPORTYBUILDER_ENABLED) return null;
     if (isGenerating) {
       if (options && options.source === 'chat') addChatMessage('bot', 'A ticket is already being built. Please wait a moment.');
       return null;
