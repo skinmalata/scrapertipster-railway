@@ -1972,6 +1972,20 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
 // Free tier code builders generate up to 5.0 odds; higher targets require Pro.
 var FREE_CODE_BUILDER_MAX_ODDS = 5.0;
 
+var SPORTY_CHAT_ENABLED = false;
+
+function isSportyChatRequest(body) {
+  if (body.source === 'chat') return true;
+  var fields = ['markets', 'leagues', 'minOddsPerLeg', 'maxOddsPerLeg', 'numLegs', 'straightWinsOnly'];
+  return fields.some(function (field) {
+    var value = body[field];
+    if (value === undefined || value === null || value === '') return false;
+    if (Array.isArray(value)) return value.length > 0;
+    if (typeof value === 'boolean') return value;
+    return true;
+  });
+}
+
 // Code generation calls the SportyBet API, so cap it per IP in addition to the
 // global site limiter. Normal UI usage (preview plus a few shuffles) stays well
 // under this ceiling.
@@ -1987,6 +2001,13 @@ var codeBuilderLimiter = enquiryRateLimit({
 router.post('/sportybuilder/generate', optionalAuth, codeBuilderLimiter, async function (req, res) {
   try {
     var body = req.body || {};
+    if (!SPORTY_CHAT_ENABLED && isSportyChatRequest(body)) {
+      return res.status(403).json({
+        success: false,
+        error: 'Chat ticket booking is temporarily unavailable. Use the controls above to build a ticket.',
+        code: 'CHAT_DISABLED'
+      });
+    }
     var { generateSportyTicket, validateSportyFilters } = require('../services/sportyBuilder');
     var validation = validateSportyFilters({
       sport: body.sport,

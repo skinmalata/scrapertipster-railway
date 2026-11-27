@@ -1525,6 +1525,7 @@ body > header .hamburger { display: block; }
   var selectedSport = 'all';
   var previousMatches = [];
   var isGenerating = false;
+  var SPORTY_CHAT_ENABLED = false;
 
   var pills = document.querySelectorAll('.odds-pill');
   var sportPills = document.querySelectorAll('.sport-pill');
@@ -1556,6 +1557,11 @@ body > header .hamburger { display: block; }
   var chatProgressValue = 0;
   var chatParser = window.WFT && window.WFT.SportyBuilderChat ? window.WFT.SportyBuilderChat : null;
   var chatFilters = emptyChatFilters();
+
+  if (!SPORTY_CHAT_ENABLED) {
+    var chatSection = document.querySelector('.builder-chat');
+    if (chatSection) chatSection.style.display = 'none';
+  }
 
   function emptyChatFilters() {
     return {
@@ -1631,6 +1637,7 @@ body > header .hamburger { display: block; }
   }
 
   function updateChatAccess() {
+    if (!SPORTY_CHAT_ENABLED) return;
     var pro = isUserPro();
     var busy = isGenerating;
     if (chatInput) {
@@ -1646,7 +1653,7 @@ body > header .hamburger { display: block; }
   }
 
   function updateChatHint() {
-    if (!chatHint) return;
+    if (!SPORTY_CHAT_ENABLED || !chatHint) return;
     if (!isUserPro()) {
       chatHint.textContent = 'Chat booking is a Pro feature. Upgrade at /pricing.html to use it.';
       return;
@@ -1831,6 +1838,7 @@ body > header .hamburger { display: block; }
     btnGen.innerHTML = '<span class="spinner"></span><span>Building SportyBet Code...</span>';
 
     var requestBody = {
+      source: opts.source,
       targetOdds: effectiveOdds,
       sport: effectiveSport,
       markets: activeFilters.markets || [],
@@ -2011,6 +2019,7 @@ body > header .hamburger { display: block; }
   }
 
   async function handleChatSubmit() {
+    if (!SPORTY_CHAT_ENABLED) return;
     if (!isUserPro()) {
       showProBanner();
       addChatMessage('bot', 'Chat booking is a Pro feature. Upgrade at /pricing.html to use it.', true);
@@ -2064,23 +2073,26 @@ body > header .hamburger { display: block; }
     return chatFilters.sport || selectedSport;
   }
 
-  if (chatForm) {
-    chatForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      handleChatSubmit();
+  if (SPORTY_CHAT_ENABLED) {
+    if (chatForm) {
+      chatForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleChatSubmit();
+      });
+    }
+
+    if (chatReset) chatReset.addEventListener('click', resetChatFilters);
+
+    chatSuggestions.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        chatInput.value = btn.getAttribute('data-chat-suggestion') || '';
+        handleChatSubmit();
+      });
     });
+
+    addChatMessage('bot', 'Tell me what to book, e.g. “10 winning basketball matches with at least 2 odds each” or “5 corner matches today”.');
   }
 
-  if (chatReset) chatReset.addEventListener('click', resetChatFilters);
-
-  chatSuggestions.forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      chatInput.value = btn.getAttribute('data-chat-suggestion') || '';
-      handleChatSubmit();
-    });
-  });
-
-  addChatMessage('bot', 'Tell me what to book, e.g. “10 winning basketball matches with at least 2 odds each” or “5 corner matches today”.');
   updateProState();
 
   btnGen.addEventListener('click', function() { generateTicket(false); });
