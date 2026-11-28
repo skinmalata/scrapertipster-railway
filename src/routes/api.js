@@ -1973,7 +1973,7 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
 var FREE_CODE_BUILDER_MAX_ODDS = 5.0;
 
 var SPORTY_CHAT_ENABLED = false;
-var SPORTYBUILDER_ENABLED = false;
+var SPORTYBUILDER_ENABLED = true;
 
 function isSportyChatRequest(body) {
   if (body.source === 'chat') return true;

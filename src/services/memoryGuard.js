@@ -40,8 +40,6 @@ function forceRestartIfMemoryCritical() {
       process.exit(0);
     }
     console.log('[memory] Recovered after GC to ' + memAfter + 'MB; continuing.');
-  } else if (memMB >= SOFT_HEAP_MB) {
-    reclaimMemory();
   }
 }
 

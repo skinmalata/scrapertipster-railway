@@ -7,6 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const { applyLayout, staticWithLayout } = require('./src/templates/layout');
 const { forceRestartIfMemoryCritical, startMemoryWatchdog } = require('./src/services/memoryGuard');
+const HEALTH_ONLY_MODE = process.env.HEALTH_ONLY_MODE === '1' || process.env.HEALTH_ONLY_MODE === 'true';
 
 // On small Render instances Node's heap limit is auto-tuned close to the
 // container ceiling; crossing it aborts the process (SIGABRT → exit 134),
@@ -693,6 +694,13 @@ function runHeavyExclusive(job) {
   return run;
 }
 
+const HEAVY_JOBS_START_DELAY_MS = parseInt(process.env.HEAVY_JOBS_START_DELAY_MS || '60000', 10);
+const HEAVY_JOB_STAGGER_MS = parseInt(process.env.HEAVY_JOB_STAGGER_MS || '30000', 10);
+
+function waitForNextHeavyJob() {
+  return new Promise(function (resolve) { setTimeout(resolve, HEAVY_JOB_STAGGER_MS); });
+}
+
 function heapMB() {
   try {
     return Math.round(process.memoryUsage().heapUsed / 1024 / 1024);
@@ -790,55 +798,61 @@ async function refreshCornersAndCards() {
 // front of it. When the process died on the 384MB heap it happened before this
 // ran, which left no file on disk and sent every page view into a fresh crawl.
 function startBootJobs() {
+  if (HEALTH_ONLY_MODE) return;
+
   runHeavyExclusive(refreshAuthorPicks)
+    .then(waitForNextHeavyJob)
     .then(function () { return runHeavyExclusive(refreshPreMatchPredictions); })
+    .then(waitForNextHeavyJob)
     .then(function () { return runHeavyExclusive(refreshCornersAndCards); })
+    .then(waitForNextHeavyJob)
     .then(function () {
-      // Warm the booking-code schedule index (287 per-league pages) so the
-      // converter's first request does not have to wait for a cold build, and
-      // warm the 1xBet index and H2H streak cache so builders and converters respond immediately.
-      const { warmEventIndex } = require('./src/services/bookingCodes/resolver');
-      warmEventIndex();
-      require('./src/services/bookingCodes/1xbet').getXbetIndex().catch(function (e) {});
-      require('./src/services/h2hWinningStreaks').fetchTodayStreaks().catch(function (e) {});
+      return runHeavyExclusive(async function () {
+        const { warmEventIndex } = require('./src/services/bookingCodes/resolver');
+        await warmEventIndex().catch(function (e) {
+          console.error('[boot] Event index warm failed:', e.message);
+        });
+        await waitForNextHeavyJob();
+        await require('./src/services/bookingCodes/1xbet').getXbetIndex().catch(function (e) {
+          console.error('[boot] 1xBet index warm failed:', e.message);
+        });
+        await waitForNextHeavyJob();
+        await require('./src/services/h2hWinningStreaks').fetchTodayStreaks().catch(function (e) {
+          console.error('[boot] H2H streak warm failed:', e.message);
+        });
+      });
     })
+    .then(waitForNextHeavyJob)
     .then(function () { getLiveScrapeService().startLiveScrapeLoop(); })
     .catch(function (e) { console.error('[boot] Heavy job chain failed:', e.message); });
 }
-setTimeout(startBootJobs, 5000);
 
-// Refresh pre-match predictions every 12h (serialized against other heavy jobs).
-setInterval(function () {
-  runHeavyExclusive(refreshPreMatchPredictions);
-}, 12 * 60 * 60 * 1000);
+if (HEALTH_ONLY_MODE) {
+  console.log('[boot] HEALTH_ONLY_MODE enabled; heavy jobs, timers and bots are disabled.');
+} else {
+  setTimeout(startBootJobs, HEAVY_JOBS_START_DELAY_MS);
 
-// Refresh corners/cards every 6h (serialized against other heavy jobs).
-setInterval(function () {
-  runHeavyExclusive(refreshCornersAndCards);
-}, 6 * 60 * 60 * 1000);
+  // Refresh pre-match predictions every 12h (serialized against other heavy jobs).
+  setInterval(function () {
+    runHeavyExclusive(refreshPreMatchPredictions);
+  }, 12 * 60 * 60 * 1000);
 
-// Refresh H2H Picks every 6h (serialized against other heavy jobs).
-setInterval(function () {
-  runHeavyExclusive(refreshAuthorPicks);
-}, 6 * 60 * 60 * 1000);
+  // Refresh corners/cards every 6h (serialized against other heavy jobs).
+  setInterval(function () {
+    runHeavyExclusive(refreshCornersAndCards);
+  }, 6 * 60 * 60 * 1000);
+
+  // Refresh H2H Picks every 6h (serialized against other heavy jobs).
+  setInterval(function () {
+    runHeavyExclusive(refreshAuthorPicks);
+  }, 6 * 60 * 60 * 1000);
+}
 
 function getLiveTipsFromCache() {
   var liveData = getLiveScrapeService().getCachedLive();
   if (!liveData || !liveData.matches || !liveData.matches.length) return [];
   return buildGoldenTips(liveData);
 }
-
-startTelegramBot(
-  getLiveTipsFromCache,
-  process.env.TELEGRAM_BOT_TOKEN,
-  process.env.TELEGRAM_CHAT_ID
-);
-
-startMastodonBot(
-  getLiveTipsFromCache,
-  process.env.MASTODON_INSTANCE_URL || 'https://flipboard.social',
-  process.env.MASTODON_ACCESS_TOKEN
-);
 
 // Daily push notification — 12:00 PM WAT (11:00 UTC)
 function scheduleDailyPushNotification() {
@@ -859,7 +873,21 @@ function scheduleDailyPushNotification() {
     }, 24 * 60 * 60 * 1000);
   }, delay);
 }
-scheduleDailyPushNotification();
+if (!HEALTH_ONLY_MODE) {
+  startTelegramBot(
+    getLiveTipsFromCache,
+    process.env.TELEGRAM_BOT_TOKEN,
+    process.env.TELEGRAM_CHAT_ID
+  );
+
+  startMastodonBot(
+    getLiveTipsFromCache,
+    process.env.MASTODON_INSTANCE_URL || 'https://flipboard.social',
+    process.env.MASTODON_ACCESS_TOKEN
+  );
+
+  scheduleDailyPushNotification();
+}
 
 const HOST = process.env.HOST || '0.0.0.0';
 

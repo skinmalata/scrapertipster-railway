@@ -72,13 +72,13 @@ const LEAGUE_REFRESH_MS = 20 * 60 * 1000;
 // That keeps the doubled upstream traffic (~2 requests per league) down to a
 // sustained load close to the original 1X2-only schedule.
 const OU_REFRESH_MS = 60 * 60 * 1000;
-const LEAGUE_CONCURRENCY = 16;
+const LEAGUE_CONCURRENCY = parseInt(process.env.EVENT_INDEX_CONCURRENCY || '6', 10);
 const NEAR_DAYS = 3;
 // Basketball alternate totals only need a bounded slice of the upcoming fixtures:
 // reading detail pages for every league would double a cold-index build for legs
 // that are far outside the builder's 36-hour window anyway.
 const BASKETBALL_DETAIL_LIMIT = 60;
-const BASKETBALL_DETAIL_CONCURRENCY = 10;
+const BASKETBALL_DETAIL_CONCURRENCY = parseInt(process.env.BASKETBALL_DETAIL_CONCURRENCY || '4', 10);
 
 let eventIndexCache = null;
 let eventIndexAt = 0;
@@ -837,7 +837,7 @@ async function resolveLeg(leg, bookmaker) {
 // request needs it. Called at server boot; safe to call again (getEventIndex
 // deduplicates concurrent builds).
 function warmEventIndex() {
-  getEventIndex().catch(function (e) {
+  return getEventIndex().catch(function (e) {
     console.error('[resolver] warm event index failed:', e.message);
   });
 }
