@@ -1,73 +1,5 @@
 {
   "dates": {
-    "2026-11-26": [
-      {
-        "matchId": "2565326",
-        "home": "Ind Santa Fe",
-        "away": "Once Caldas",
-        "league": "Co1",
-        "leagueName": "Primera A",
-        "country": "Colombia",
-        "time": "",
-        "probs": {
-          "home": 31,
-          "draw": 39,
-          "away": 30
-        },
-        "avgGoals": 2.3,
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.654,
-          "margin": 0.535,
-          "firstHalfShare": 0.25,
-          "firstHalfExp": 0.57,
-          "secondHalfExp": 1.72,
-          "p1": 0.119,
-          "p2": 0.654,
-          "tie": 0.227,
-          "fitErr": 0.00626,
-          "totalExp": 2.3,
-          "referenceFirstHalfProb": 0.19,
-          "referenceDrawProb": 0.67,
-          "referenceSecondHalfProb": 0.14,
-          "reason": "Expected 2.3 goals, split 0.6 in the 1st half vs 1.7 in the 2nd. The 2nd half wins the half race 65% of the time, 54% clear of the other half."
-        }
-      },
-      {
-        "matchId": "2565327",
-        "home": "Atlético Nacional",
-        "away": "Ind Medellin",
-        "league": "Co1",
-        "leagueName": "Primera A",
-        "country": "Colombia",
-        "time": "",
-        "probs": {
-          "home": 43,
-          "draw": 21,
-          "away": 36
-        },
-        "avgGoals": 2.94,
-        "hsh": {
-          "pick": "2H",
-          "label": "2nd Half",
-          "prob": 0.62,
-          "margin": 0.45,
-          "firstHalfShare": 0.32,
-          "firstHalfExp": 0.94,
-          "secondHalfExp": 2,
-          "p1": 0.17,
-          "p2": 0.62,
-          "tie": 0.21,
-          "fitErr": 0.00092,
-          "totalExp": 2.94,
-          "referenceFirstHalfProb": 0.31,
-          "referenceDrawProb": 0.48,
-          "referenceSecondHalfProb": 0.21,
-          "reason": "Expected 2.9 goals, split 0.9 in the 1st half vs 2.0 in the 2nd. The 2nd half wins the half race 62% of the time, 45% clear of the other half."
-        }
-      }
-    ],
     "2026-11-27": [
       {
         "matchId": "2494665",
@@ -501,6 +433,39 @@
         }
       },
       {
+        "matchId": "2559737",
+        "home": "CC Mariners",
+        "away": "Auckland",
+        "league": "Au1",
+        "leagueName": "A-League",
+        "country": "Australia",
+        "time": "",
+        "probs": {
+          "home": 23,
+          "draw": 56,
+          "away": 21
+        },
+        "avgGoals": 3.2,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.728,
+          "margin": 0.622,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.8,
+          "secondHalfExp": 2.4,
+          "p1": 0.106,
+          "p2": 0.728,
+          "tie": 0.166,
+          "fitErr": 0.00217,
+          "totalExp": 3.2,
+          "referenceFirstHalfProb": 0.22,
+          "referenceDrawProb": 0.53,
+          "referenceSecondHalfProb": 0.26,
+          "reason": "Expected 3.2 goals, split 0.8 in the 1st half vs 2.4 in the 2nd. The 2nd half wins the half race 73% of the time, 62% clear of the other half."
+        }
+      },
+      {
         "matchId": "2493645",
         "home": "Vissel Kobe",
         "away": "JEF United Chiba",
@@ -531,6 +496,39 @@
           "referenceDrawProb": 0.59,
           "referenceSecondHalfProb": 0.26,
           "reason": "Expected 3.1 goals, split 0.8 in the 1st half vs 2.3 in the 2nd. The 2nd half wins the half race 72% of the time, 61% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2566056",
+        "home": "Bayswater City",
+        "away": "Sydney United",
+        "league": "Au2",
+        "leagueName": "Australian Championship",
+        "country": "Australia",
+        "time": "",
+        "probs": {
+          "home": 41,
+          "draw": 32,
+          "away": 28
+        },
+        "avgGoals": 2.88,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.705,
+          "margin": 0.594,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.72,
+          "secondHalfExp": 2.16,
+          "p1": 0.111,
+          "p2": 0.705,
+          "tie": 0.184,
+          "fitErr": 0.00903,
+          "totalExp": 2.88,
+          "referenceFirstHalfProb": 0.2,
+          "referenceDrawProb": 0.57,
+          "referenceSecondHalfProb": 0.23,
+          "reason": "Expected 2.9 goals, split 0.7 in the 1st half vs 2.2 in the 2nd. The 2nd half wins the half race 71% of the time, 59% clear of the other half."
         }
       },
       {
@@ -730,76 +728,410 @@
           "referenceSecondHalfProb": 0.18,
           "reason": "Expected 3.0 goals, split 0.9 in the 1st half vs 2.1 in the 2nd. The 2nd half wins the half race 64% of the time, 48% clear of the other half."
         }
+      }
+    ],
+    "2026-11-29": [
+      {
+        "matchId": "2496611",
+        "home": "Sassuolo",
+        "away": "Napoli",
+        "league": "It1",
+        "leagueName": "Serie A",
+        "country": "Italy",
+        "time": "",
+        "probs": {
+          "home": 22,
+          "draw": 28,
+          "away": 50
+        },
+        "avgGoals": 3.78,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.763,
+          "margin": 0.666,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.94,
+          "secondHalfExp": 2.83,
+          "p1": 0.097,
+          "p2": 0.763,
+          "tie": 0.139,
+          "fitErr": 0.02384,
+          "totalExp": 3.78,
+          "referenceFirstHalfProb": 0.1,
+          "referenceDrawProb": 0.59,
+          "referenceSecondHalfProb": 0.31,
+          "reason": "Expected 3.8 goals, split 0.9 in the 1st half vs 2.8 in the 2nd. The 2nd half wins the half race 76% of the time, 67% clear of the other half."
+        }
       },
       {
-        "matchId": "2523645",
-        "home": "Stuttgart",
-        "away": "Eintracht Frankfurt",
+        "matchId": "2419879",
+        "home": "Colo Colo",
+        "away": "La Serena",
+        "league": "Cl1",
+        "leagueName": "Primera Division",
+        "country": "Chile",
+        "time": "",
+        "probs": {
+          "home": 47,
+          "draw": 30,
+          "away": 24
+        },
+        "avgGoals": 3.56,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.751,
+          "margin": 0.65,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.89,
+          "secondHalfExp": 2.67,
+          "p1": 0.101,
+          "p2": 0.751,
+          "tie": 0.148,
+          "fitErr": 0.01905,
+          "totalExp": 3.56,
+          "referenceFirstHalfProb": 0.25,
+          "referenceDrawProb": 0.57,
+          "referenceSecondHalfProb": 0.19,
+          "reason": "Expected 3.6 goals, split 0.9 in the 1st half vs 2.7 in the 2nd. The 2nd half wins the half race 75% of the time, 65% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2509462",
+        "home": "Cadiz",
+        "away": "Córdoba",
+        "league": "Es2",
+        "leagueName": "Segunda Division",
+        "country": "Spain",
+        "time": "",
+        "probs": {
+          "home": 26,
+          "draw": 32,
+          "away": 42
+        },
+        "avgGoals": 3.52,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.749,
+          "margin": 0.647,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.88,
+          "secondHalfExp": 2.64,
+          "p1": 0.101,
+          "p2": 0.749,
+          "tie": 0.15,
+          "fitErr": 0.00415,
+          "totalExp": 3.52,
+          "referenceFirstHalfProb": 0.13,
+          "referenceDrawProb": 0.51,
+          "referenceSecondHalfProb": 0.36,
+          "reason": "Expected 3.5 goals, split 0.9 in the 1st half vs 2.6 in the 2nd. The 2nd half wins the half race 75% of the time, 65% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2496612",
+        "home": "Roma",
+        "away": "Monza",
+        "league": "It1",
+        "leagueName": "Serie A",
+        "country": "Italy",
+        "time": "",
+        "probs": {
+          "home": 73,
+          "draw": 19,
+          "away": 9
+        },
+        "avgGoals": 3.42,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.742,
+          "margin": 0.64,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.85,
+          "secondHalfExp": 2.56,
+          "p1": 0.103,
+          "p2": 0.742,
+          "tie": 0.155,
+          "fitErr": 0.02017,
+          "totalExp": 3.42,
+          "referenceFirstHalfProb": 0.43,
+          "referenceDrawProb": 0.42,
+          "referenceSecondHalfProb": 0.16,
+          "reason": "Expected 3.4 goals, split 0.9 in the 1st half vs 2.6 in the 2nd. The 2nd half wins the half race 74% of the time, 64% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2565502",
+        "home": "Deportivo Madryn",
+        "away": "Gimnasia Jujuy",
+        "league": "Ar2",
+        "leagueName": "Nacional B",
+        "country": "Argentina",
+        "time": "",
+        "probs": {
+          "home": 46,
+          "draw": 26,
+          "away": 28
+        },
+        "avgGoals": 2.75,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.695,
+          "margin": 0.582,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.69,
+          "secondHalfExp": 2.06,
+          "p1": 0.113,
+          "p2": 0.695,
+          "tie": 0.192,
+          "fitErr": 0.01087,
+          "totalExp": 2.75,
+          "referenceFirstHalfProb": 0.31,
+          "referenceDrawProb": 0.61,
+          "referenceSecondHalfProb": 0.07,
+          "reason": "Expected 2.8 goals, split 0.7 in the 1st half vs 2.1 in the 2nd. The 2nd half wins the half race 69% of the time, 58% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2496281",
+        "home": "Toulouse",
+        "away": "Rennes",
+        "league": "Fr1",
+        "leagueName": "Ligue 1",
+        "country": "France",
+        "time": "",
+        "probs": {
+          "home": 37,
+          "draw": 32,
+          "away": 30
+        },
+        "avgGoals": 2.99,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.623,
+          "margin": 0.453,
+          "firstHalfShare": 0.32,
+          "firstHalfExp": 0.96,
+          "secondHalfExp": 2.03,
+          "p1": 0.17,
+          "p2": 0.623,
+          "tie": 0.207,
+          "fitErr": 0.00139,
+          "totalExp": 2.99,
+          "referenceFirstHalfProb": 0.32,
+          "referenceDrawProb": 0.48,
+          "referenceSecondHalfProb": 0.2,
+          "reason": "Expected 3.0 goals, split 1.0 in the 1st half vs 2.0 in the 2nd. The 2nd half wins the half race 62% of the time, 45% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2492122",
+        "home": "Fortuna Sittard",
+        "away": "Heerenveen",
+        "league": "Nl1",
+        "leagueName": "Eredivisie",
+        "country": "Netherlands",
+        "time": "",
+        "probs": {
+          "home": 19,
+          "draw": 31,
+          "away": 50
+        },
+        "avgGoals": 3.4,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.619,
+          "margin": 0.434,
+          "firstHalfShare": 0.34,
+          "firstHalfExp": 1.16,
+          "secondHalfExp": 2.24,
+          "p1": 0.186,
+          "p2": 0.619,
+          "tie": 0.195,
+          "fitErr": 0.03256,
+          "totalExp": 3.4,
+          "referenceFirstHalfProb": 0.28,
+          "referenceDrawProb": 0.35,
+          "referenceSecondHalfProb": 0.37,
+          "reason": "Expected 3.4 goals, split 1.2 in the 1st half vs 2.2 in the 2nd. The 2nd half wins the half race 62% of the time, 43% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2523646",
+        "home": "Borussia Dortmund",
+        "away": "Bayer Leverkusen",
         "league": "De1",
         "leagueName": "Bundesliga",
         "country": "Germany",
         "time": "",
         "probs": {
-          "home": 34,
-          "draw": 34,
-          "away": 32
+          "home": 45,
+          "draw": 26,
+          "away": 28
         },
-        "avgGoals": 3.09,
+        "avgGoals": 2.8,
         "hsh": {
           "pick": "2H",
           "label": "2nd Half",
-          "prob": 0.629,
-          "margin": 0.461,
-          "firstHalfShare": 0.32,
-          "firstHalfExp": 0.99,
-          "secondHalfExp": 2.1,
-          "p1": 0.169,
-          "p2": 0.629,
-          "tie": 0.202,
-          "fitErr": 0.00047,
-          "totalExp": 3.09,
-          "referenceFirstHalfProb": 0.29,
-          "referenceDrawProb": 0.47,
-          "referenceSecondHalfProb": 0.24,
-          "reason": "Expected 3.1 goals, split 1.0 in the 1st half vs 2.1 in the 2nd. The 2nd half wins the half race 63% of the time, 46% clear of the other half."
+          "prob": 0.571,
+          "margin": 0.37,
+          "firstHalfShare": 0.35,
+          "firstHalfExp": 0.98,
+          "secondHalfExp": 1.82,
+          "p1": 0.201,
+          "p2": 0.571,
+          "tie": 0.228,
+          "fitErr": 0.02018,
+          "totalExp": 2.8,
+          "referenceFirstHalfProb": 0.26,
+          "referenceDrawProb": 0.44,
+          "referenceSecondHalfProb": 0.3,
+          "reason": "Expected 2.8 goals, split 1.0 in the 1st half vs 1.8 in the 2nd. The 2nd half wins the half race 57% of the time, 37% clear of the other half."
+        }
+      }
+    ],
+    "2026-11-30": [
+      {
+        "matchId": "2438571",
+        "home": "Lillestrom SK",
+        "away": "HamKam",
+        "league": "No1",
+        "leagueName": "Eliteserien",
+        "country": "Norway",
+        "time": "",
+        "probs": {
+          "home": 48,
+          "draw": 32,
+          "away": 20
+        },
+        "avgGoals": 3.58,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.685,
+          "margin": 0.542,
+          "firstHalfShare": 0.3,
+          "firstHalfExp": 1.07,
+          "secondHalfExp": 2.51,
+          "p1": 0.143,
+          "p2": 0.685,
+          "tie": 0.171,
+          "fitErr": 0.00951,
+          "totalExp": 3.58,
+          "referenceFirstHalfProb": 0.38,
+          "referenceDrawProb": 0.4,
+          "referenceSecondHalfProb": 0.22,
+          "reason": "Expected 3.6 goals, split 1.1 in the 1st half vs 2.5 in the 2nd. The 2nd half wins the half race 69% of the time, 54% clear of the other half."
         }
       },
       {
-        "matchId": "2563109",
-        "home": "FC Seoul",
-        "away": "Daejeon Citizen",
-        "league": "Kr1",
-        "leagueName": "K League 1",
-        "country": "South Korea",
+        "matchId": "2566230",
+        "home": "Ind Medellin",
+        "away": "Once Caldas",
+        "league": "Co1",
+        "leagueName": "Primera A",
+        "country": "Colombia",
         "time": "",
         "probs": {
-          "home": 31,
-          "draw": 28,
-          "away": 41
+          "home": 33,
+          "draw": 37,
+          "away": 31
         },
-        "avgGoals": 2.34,
+        "avgGoals": 2.28,
         "hsh": {
           "pick": "2H",
           "label": "2nd Half",
-          "prob": 0.587,
-          "margin": 0.421,
+          "prob": 0.652,
+          "margin": 0.533,
+          "firstHalfShare": 0.25,
+          "firstHalfExp": 0.57,
+          "secondHalfExp": 1.71,
+          "p1": 0.119,
+          "p2": 0.652,
+          "tie": 0.229,
+          "fitErr": 0.0001,
+          "totalExp": 2.28,
+          "referenceFirstHalfProb": 0.2,
+          "referenceDrawProb": 0.62,
+          "referenceSecondHalfProb": 0.18,
+          "reason": "Expected 2.3 goals, split 0.6 in the 1st half vs 1.7 in the 2nd. The 2nd half wins the half race 65% of the time, 53% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2565849",
+        "home": "Cruz Azul",
+        "away": "Club León",
+        "league": "Mx1",
+        "leagueName": "Liga MX",
+        "country": "Mexico",
+        "time": "",
+        "probs": {
+          "home": 42,
+          "draw": 35,
+          "away": 22
+        },
+        "avgGoals": 2.79,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.623,
+          "margin": 0.46,
           "firstHalfShare": 0.31,
-          "firstHalfExp": 0.73,
-          "secondHalfExp": 1.61,
-          "p1": 0.166,
-          "p2": 0.587,
-          "tie": 0.247,
-          "fitErr": 0.00651,
-          "totalExp": 2.34,
-          "referenceFirstHalfProb": 0.25,
-          "referenceDrawProb": 0.54,
-          "referenceSecondHalfProb": 0.21,
-          "reason": "Expected 2.3 goals, split 0.7 in the 1st half vs 1.6 in the 2nd. The 2nd half wins the half race 59% of the time, 42% clear of the other half."
+          "firstHalfExp": 0.86,
+          "secondHalfExp": 1.93,
+          "p1": 0.162,
+          "p2": 0.623,
+          "tie": 0.215,
+          "fitErr": 0.0328,
+          "totalExp": 2.79,
+          "referenceFirstHalfProb": 0.24,
+          "referenceDrawProb": 0.46,
+          "referenceSecondHalfProb": 0.3,
+          "reason": "Expected 2.8 goals, split 0.9 in the 1st half vs 1.9 in the 2nd. The 2nd half wins the half race 62% of the time, 46% clear of the other half."
+        }
+      },
+      {
+        "matchId": "2494348",
+        "home": "SL Benfica",
+        "away": "FC Famalicão",
+        "league": "Pt1",
+        "leagueName": "Liga Portugal",
+        "country": "Portugal",
+        "time": "",
+        "probs": {
+          "home": 51,
+          "draw": 24,
+          "away": 25
+        },
+        "avgGoals": 2.63,
+        "hsh": {
+          "pick": "2H",
+          "label": "2nd Half",
+          "prob": 0.611,
+          "margin": 0.447,
+          "firstHalfShare": 0.31,
+          "firstHalfExp": 0.82,
+          "secondHalfExp": 1.81,
+          "p1": 0.164,
+          "p2": 0.611,
+          "tie": 0.225,
+          "fitErr": 0.00306,
+          "totalExp": 2.63,
+          "referenceFirstHalfProb": 0.31,
+          "referenceDrawProb": 0.5,
+          "referenceSecondHalfProb": 0.19,
+          "reason": "Expected 2.6 goals, split 0.8 in the 1st half vs 1.8 in the 2nd. The 2nd half wins the half race 61% of the time, 45% clear of the other half."
         }
       }
     ]
   },
-  "lastFetch": "2026-11-27T12:36:09.822Z",
+  "lastFetch": "2026-11-28T08:31:46.375Z",
   "meta": {
     "minProb": 0.55,
     "maxPicks": 12,
