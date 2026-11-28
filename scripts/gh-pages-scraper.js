@@ -52,58 +52,128 @@ function trailingFormCount(value, letter) {
   return count;
 }
 
+function perfectRowKey(row) {
+  return String((row && row.date) || '') + '|' + String((row && row.match) || '').toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function addPerfectRow(rows, row, overwrite) {
+  if (!row || !row.date || !row.match || !isPerfectForm(row.perfectForm)) return;
+  const key = perfectRowKey(row);
+  const index = rows.findIndex(function (existing) { return perfectRowKey(existing) === key; });
+  if (index >= 0) {
+    if (overwrite) rows[index] = row;
+    return;
+  }
+  rows.push(row);
+}
+
+function loadCuratedPerfectRows() {
+  const curatedFile = path.join(__dirname, 'perfect-record-curated.json');
+  if (!fs.existsSync(curatedFile)) return [];
+
+  let curated;
+  try {
+    curated = JSON.parse(fs.readFileSync(curatedFile, 'utf8'));
+  } catch (e) {
+    console.warn('[perfect-record] Could not load curated matches:', e.message);
+    return [];
+  }
+
+  return (curated.matches || []).map(function (entry) {
+    const home = String(entry.home || '').trim();
+    const away = String(entry.away || '').trim();
+    const perfectTeam = String(entry.perfectTeam || '').trim();
+    const form = formLastFive(entry.form || 'WWWWW');
+    const homeMatch = normalizeTeam(home) === normalizeTeam(perfectTeam);
+    const awayMatch = normalizeTeam(away) === normalizeTeam(perfectTeam);
+    if (!entry.date || !home || !away || !perfectTeam || !isPerfectForm(form) || (!homeMatch && !awayMatch)) return null;
+
+    return {
+      id: entry.id || 'perfect-' + String(entry.date + '-' + home + '-' + away).replace(/[^a-z0-9]+/gi, '-').toLowerCase(),
+      date: entry.date,
+      time: entry.time || '',
+      league: entry.league || '',
+      country: entry.country || '',
+      match: home + ' - ' + away,
+      tip: 'Perfect Record: ' + perfectTeam,
+      probability: 100,
+      description: entry.description || (perfectTeam + ' won all 5 of its last 5 matches (' + form + ').'),
+      perfectTeam: perfectTeam,
+      perfectForm: form,
+      perfectTeams: [{ side: homeMatch ? 'home' : 'away', team: perfectTeam, form: form }],
+      sources: entry.sources || [],
+      market: 'perfect-record'
+    };
+  }).filter(Boolean);
+}
+
 function buildPerfectRecordMatches(dataDir) {
   const vipFile = path.join(process.cwd(), 'forebet-vip-cache.json');
   const predFile = path.join(dataDir, 'predictions.json');
-  if (!fs.existsSync(vipFile) || !fs.existsSync(predFile)) return 0;
+  if (!fs.existsSync(predFile)) return 0;
 
-  const vip = JSON.parse(fs.readFileSync(vipFile, 'utf8'));
   const predictions = JSON.parse(fs.readFileSync(predFile, 'utf8'));
-  // A legacy cache has no Forebet form scan yet. Keep the last built rows
-  // instead of emptying the tab before the scraper publishes perfectDates.
-  if (!vip.perfectDates) return (predictions.perfectRecordMatches || []).length;
   const rows = [];
-  const seen = new Set();
+  const curatedRows = loadCuratedPerfectRows();
+  const curatedDates = new Set(curatedRows.map(function (row) { return row.date; }));
+  let vip = null;
+  if (fs.existsSync(vipFile)) {
+    try {
+      vip = JSON.parse(fs.readFileSync(vipFile, 'utf8'));
+    } catch (e) {
+      console.warn('[perfect-record] Could not load Forebet VIP cache:', e.message);
+    }
+  }
 
-  // Forebet detail-page form scans are the only source of truth here. The
-  // gated VIP pick list is model-curated and must never define recent form.
-  const perfectDates = vip.perfectDates;
-  Object.keys(perfectDates).forEach(function (date) {
-    (perfectDates[date] || []).forEach(function (pick) {
-      if (!pick) return;
-      const form = pick.form || ((pick.detail && pick.detail.form) || {});
-      const home = String(pick.home || '').trim();
-      const away = String(pick.away || '').trim();
-      const candidates = [
-        { side: 'home', team: home, form: form.homeForm || form.home },
-        { side: 'away', team: away, form: form.awayForm || form.away }
-      ].filter(function (c) { return c.team && isPerfectForm(c.form); });
-      if (!candidates.length || !home || !away) return;
+  if (!vip || !vip.perfectDates) {
+    (predictions.perfectRecordMatches || []).forEach(function (row) {
+      if (curatedDates.has(row.date)) return;
+      addPerfectRow(rows, row, false);
+    });
+  } else {
+    Object.keys(vip.perfectDates).forEach(function (date) {
+      if (curatedDates.has(date)) return;
+      (vip.perfectDates[date] || []).forEach(function (pick) {
+        if (!pick) return;
+        const form = pick.form || ((pick.detail && pick.detail.form) || {});
+        const home = String(pick.home || '').trim();
+        const away = String(pick.away || '').trim();
+        const candidates = [
+          { side: 'home', team: home, form: form.homeForm || form.home },
+          { side: 'away', team: away, form: form.awayForm || form.away }
+        ].filter(function (c) { return c.team && isPerfectForm(c.form); });
+        if (!candidates.length || !home || !away) return;
 
-      const key = date + '|' + home + '|' + away;
-      if (seen.has(key)) return;
-      seen.add(key);
-
-      const best = candidates[0];
-      const lastFive = formLastFive(best.form);
-      rows.push({
-        id: 'perfect-' + String(pick.matchId || key.replace(/[^a-z0-9]+/gi, '-')),
-        date: date,
-        time: pick.time || '',
-        league: pick.leagueName || pick.league || '',
-        country: pick.country || '',
-        match: home + ' - ' + away,
-        tip: 'Perfect Record: ' + best.team,
-        probability: 100,
-        description: best.team + ' won all 5 of its last 5 matches (' + lastFive + ').',
-        perfectTeam: best.team,
-        perfectForm: lastFive,
-        perfectTeams: candidates.map(function (c) {
-          return { side: c.side, team: c.team, form: formLastFive(c.form) };
-        }),
-        market: 'perfect-record'
+        const best = candidates[0];
+        const lastFive = formLastFive(best.form);
+        addPerfectRow(rows, {
+          id: 'perfect-' + String(pick.matchId || (date + '|' + home + '|' + away).replace(/[^a-z0-9]+/gi, '-')),
+          date: date,
+          time: pick.time || '',
+          league: pick.leagueName || pick.league || '',
+          country: pick.country || '',
+          match: home + ' - ' + away,
+          tip: 'Perfect Record: ' + best.team,
+          probability: 100,
+          description: best.team + ' won all 5 of its last 5 matches (' + lastFive + ').',
+          perfectTeam: best.team,
+          perfectForm: lastFive,
+          perfectTeams: candidates.map(function (c) {
+            return { side: c.side, team: c.team, form: formLastFive(c.form) };
+          }),
+          market: 'perfect-record'
+        }, false);
       });
     });
+  }
+
+  curatedRows.forEach(function (row) {
+    addPerfectRow(rows, row, true);
+  });
+
+  rows.sort(function (a, b) {
+    const dateCompare = String(a.date).localeCompare(String(b.date));
+    return dateCompare || String(a.time).localeCompare(String(b.time));
   });
 
   predictions.perfectRecordMatches = rows;
