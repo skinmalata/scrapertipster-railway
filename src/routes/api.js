@@ -25,6 +25,7 @@ const { fetchTodayStreaks } = require('../services/h2hWinningStreaks');
 const { findMatchingResult } = require('../utils/helpers');
 const { lagosDate } = require('../utils/dates');
 const { FREE_VISIBLE, applyLimits } = require('../utils/limits');
+const { HEAVY_SCRAPES_ENABLED } = require('../services/runtimeMode');
 const { getOddsComparison } = require('../services/oddsComparison');
 const { optionalAuth, requireAuth, requirePro: requireProMiddleware, requireAdmin, logAdminAction } = require('../middleware/auth');
 const payment = require('../services/payment');
@@ -313,6 +314,7 @@ function vipPredictionData() {
 // fresh matches. The load*Cache helpers keep returning stale data by design, so
 // freshness is checked against the cache's own date field.
 async function refreshCornersAndCardsIfStale() {
+  if (!HEAVY_SCRAPES_ENABLED) return;
   const today = lagosDate(0);
 
   const corners = getScraperService().loadCornersCache();
@@ -334,6 +336,36 @@ async function refreshCornersAndCardsIfStale() {
       console.error('[API] Cards refresh failed:', e.message);
     }
   }
+}
+
+function emptyPredictionData(error) {
+  return {
+    success: true,
+    dates: [],
+    matches: [],
+    over15Matches: [],
+    over25Matches: [],
+    under25Matches: [],
+    bttsMatches: [],
+    winstreakMatches: [],
+    losestreakMatches: [],
+    drawstreakMatches: [],
+    perfectRecordMatches: [],
+    teamToScoreMatches: [],
+    teamToScore2PlusMatches: [],
+    cardsMatches: [],
+    cornersMatches: [],
+    totalMatches: 0,
+    totalOver15: 0,
+    totalOver25: 0,
+    totalUnder25: 0,
+    totalBtts: 0,
+    totalWinstreak: 0,
+    totalLosestreak: 0,
+    totalDrawstreak: 0,
+    totalPerfectRecord: 0,
+    error: error
+  };
 }
 
 router.get('/predictions', optionalAuth, async (req, res) => {
@@ -370,53 +402,33 @@ router.get('/predictions', optionalAuth, async (req, res) => {
       console.log('[API] Serving from full-predictions snapshot');
       data = snapshot;
     } else if (cached && cached.isStale) {
-      console.log('[API] Cache is stale, triggering background refresh...');
-      // Fire and forget - serve stale data but refresh in background
-      setImmediate(async () => {
-        try {
-          await getScraperService().fetchPredictions();
-          console.log('[API] Background refresh completed');
-        } catch (e) {
-          console.error('[API] Background refresh failed:', e.message);
-        }
-      });
+      if (HEAVY_SCRAPES_ENABLED) {
+        console.log('[API] Cache is stale, triggering background refresh...');
+        setImmediate(async () => {
+          try {
+            await getScraperService().fetchPredictions();
+            console.log('[API] Background refresh completed');
+          } catch (e) {
+            console.error('[API] Background refresh failed:', e.message);
+          }
+        });
+      } else {
+        console.log('[API] Cache is stale; thin web mode will not refresh it.');
+      }
       delete cached.isStale;
       data = cached;
     } else if (cached) {
       console.log('[API] Serving from preloaded cache');
       data = cached;
+    } else if (!HEAVY_SCRAPES_ENABLED) {
+      console.log('[API] Thin web mode: no prediction cache available');
+      return res.json(emptyPredictionData('Data temporarily unavailable'));
     } else {
       try {
         data = await getScraperService().fetchPredictions();
       } catch (scraperError) {
         console.error('Scraper error:', scraperError.message);
-        return res.json({
-          success: true,
-          dates: [],
-          matches: [],
-          over15Matches: [],
-          over25Matches: [],
-          under25Matches: [],
-          bttsMatches: [],
-          winstreakMatches: [],
-          losestreakMatches: [],
-          drawstreakMatches: [],
-          perfectRecordMatches: [],
-          teamToScoreMatches: [],
-          teamToScore2PlusMatches: [],
-          cardsMatches: [],
-          cornersMatches: [],
-          totalMatches: 0,
-          totalOver15: 0,
-          totalOver25: 0,
-          totalUnder25: 0,
-          totalBtts: 0,
-          totalWinstreak: 0,
-          totalLosestreak: 0,
-          totalDrawstreak: 0,
-          totalPerfectRecord: 0,
-          error: 'Data temporarily unavailable'
-        });
+        return res.json(emptyPredictionData('Data temporarily unavailable'));
       }
     }
     
@@ -650,6 +662,10 @@ router.get('/predictions', optionalAuth, async (req, res) => {
 });
 
 router.get('/refresh', requireAdmin, async (req, res) => {
+  if (!HEAVY_SCRAPES_ENABLED) {
+    return res.json({ success: false, message: 'Refresh is disabled in thin web mode' });
+  }
+
   if (isRefreshing) {
     return res.json({ success: false, message: 'Refresh already in progress' });
   }
@@ -675,6 +691,10 @@ router.post('/ai-summary', async (req, res) => {
 router.get('/corners', async (req, res) => {
   try {
     let cornersData = getScraperService().loadCornersCache();
+
+    if (!HEAVY_SCRAPES_ENABLED) {
+      return res.json(cornersData || { success: true, totalMatches: 0, matches: [] });
+    }
     
     if (cornersData) {
       const now = Date.now();
@@ -779,6 +799,10 @@ router.get('/news', async (req, res) => {
 router.get('/cards', async (req, res) => {
   try {
     let cardsData = getScraperService().loadCardsCache();
+
+    if (!HEAVY_SCRAPES_ENABLED) {
+      return res.json(cardsData || { success: true, totalMatches: 0, matches: [] });
+    }
     
     if (cardsData) {
       const now = Date.now();
@@ -1068,6 +1092,7 @@ let twoOddsRefreshPending = null;
 let twoOddsRefreshLastAttempt = 0;
 const TWO_ODDS_REFRESH_COOLDOWN_MS = 30 * 60 * 1000;
 function triggerTwoOddsBackgroundRefresh() {
+  if (!HEAVY_SCRAPES_ENABLED) return null;
   const now = Date.now();
   if (twoOddsRefreshPending) return twoOddsRefreshPending;
   if (now - twoOddsRefreshLastAttempt < TWO_ODDS_REFRESH_COOLDOWN_MS) return null;
@@ -1894,7 +1919,7 @@ router.post('/ticket-builder/generate', optionalAuth, async function (req, res) 
       }, []);
     } catch (e) { predictions.playerShotsMatches = []; }
     var oddsResponse = null; // API-Football removed: buildTicket falls back to model estimates.
-    var h2hMatches = await fetchTodayStreaks();
+    var h2hMatches = HEAVY_SCRAPES_ENABLED ? await fetchTodayStreaks() : [];
 
     // Merge recommended H2H home/away winners into the 1X2 candidate pool.
     // Their nested tip object is converted to the plain 1/2 selection expected
@@ -2317,7 +2342,9 @@ router.get('/best-picks', optionalAuth, async function (req, res) {
     // from Render, includes both win and unbeaten streaks), fall back to the
     // CI/CDN h2h file which only carries unbeaten data.
     var liveStreakMatches = [];
-    try { liveStreakMatches = await fetchTodayStreaks(); } catch (e) {}
+    if (HEAVY_SCRAPES_ENABLED) {
+      try { liveStreakMatches = await fetchTodayStreaks(); } catch (e) {}
+    }
 
     ['winStreak', 'unbeaten'].forEach(function(streakType) {
       var label = streakType === 'winStreak' ? 'Win Streak' : 'Unbeaten';
@@ -2634,7 +2661,29 @@ async function resolveIsPro(req) {
 // the server, matching the other gated markets).
 router.get('/author-picks', optionalAuth, async function (req, res) {
   try {
-    var data = await buildGiantPool();
+    var data;
+    if (HEAVY_SCRAPES_ENABLED) {
+      data = await buildGiantPool();
+    } else {
+      var files = [
+        path.join(DATA_ROOT, 'author-picks', lagosDate(0).replace(/-/g, '') + '.json'),
+        path.join(__dirname, '../../data/author-picks-public.json'),
+        path.join(__dirname, '../../public/data/author-picks.json')
+      ];
+      for (var i = 0; i < files.length; i++) {
+        try {
+          if (fs.existsSync(files[i])) {
+            data = JSON.parse(fs.readFileSync(files[i], 'utf8'));
+            break;
+          }
+        } catch (e) {
+          console.error('[author-picks] Failed to read cached pool:', e.message);
+        }
+      }
+      if (!data) {
+        data = { matches: [], totalFixtures: 0, analyzedFixtures: 0, generatedAt: null, stale: true, poolDate: lagosDate(0) };
+      }
+    }
     var matches = data.matches || [];
     var isPro = await resolveIsPro(req);
     var freeVisible = matches.length;

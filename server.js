@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const { applyLayout, staticWithLayout } = require('./src/templates/layout');
 const { forceRestartIfMemoryCritical, startMemoryWatchdog } = require('./src/services/memoryGuard');
-const HEALTH_ONLY_MODE = process.env.HEALTH_ONLY_MODE === '1' || process.env.HEALTH_ONLY_MODE === 'true';
+const { HEALTH_ONLY_MODE, HEAVY_SCRAPES_ENABLED, BACKGROUND_WORKERS_ENABLED } = require('./src/services/runtimeMode');
 
 // On small Render instances Node's heap limit is auto-tuned close to the
 // container ceiling; crossing it aborts the process (SIGABRT → exit 134),
@@ -798,7 +798,7 @@ async function refreshCornersAndCards() {
 // front of it. When the process died on the 384MB heap it happened before this
 // ran, which left no file on disk and sent every page view into a fresh crawl.
 function startBootJobs() {
-  if (HEALTH_ONLY_MODE) return;
+  if (!HEAVY_SCRAPES_ENABLED) return;
 
   runHeavyExclusive(refreshAuthorPicks)
     .then(waitForNextHeavyJob)
@@ -828,7 +828,12 @@ function startBootJobs() {
 }
 
 if (HEALTH_ONLY_MODE) {
-  console.log('[boot] HEALTH_ONLY_MODE enabled; heavy jobs, timers and bots are disabled.');
+  console.log('[boot] HEALTH_ONLY_MODE enabled; heavy jobs, timers, workers and bots are disabled.');
+} else if (!HEAVY_SCRAPES_ENABLED) {
+  console.log('[boot] Thin web mode enabled; scheduled scrapes and index warming are disabled.');
+  setTimeout(function () {
+    getLiveScrapeService().startLiveScrapeLoop();
+  }, HEAVY_JOBS_START_DELAY_MS);
 } else {
   setTimeout(startBootJobs, HEAVY_JOBS_START_DELAY_MS);
 
@@ -873,7 +878,7 @@ function scheduleDailyPushNotification() {
     }, 24 * 60 * 60 * 1000);
   }, delay);
 }
-if (!HEALTH_ONLY_MODE) {
+if (BACKGROUND_WORKERS_ENABLED) {
   startTelegramBot(
     getLiveTipsFromCache,
     process.env.TELEGRAM_BOT_TOKEN,

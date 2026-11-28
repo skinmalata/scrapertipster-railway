@@ -10,6 +10,7 @@ const path = require('path');
 const { buildGiantPool } = require('../src/services/authorPicks');
 
 const OUT = path.join(__dirname, '..', 'public', 'data', 'author-picks.json');
+const OUT_COMMITTED = path.join(__dirname, '..', 'data', 'author-picks-public.json');
 
 async function main() {
   const started = Date.now();
@@ -41,17 +42,20 @@ async function main() {
   });
 
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
+  fs.mkdirSync(path.dirname(OUT_COMMITTED), { recursive: true });
 
   // Write-then-rename: a failure mid-write must not leave a truncated file in
   // the deploy artifact, which would replace a good seed with a broken one.
-  const tmp = OUT + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(payload));
-  fs.renameSync(tmp, OUT);
+  [OUT, OUT_COMMITTED].forEach(function (target) {
+    const tmp = target + '.tmp';
+    fs.writeFileSync(tmp, JSON.stringify(payload));
+    fs.renameSync(tmp, target);
+  });
 
   const bytes = fs.statSync(OUT).size;
   console.log('[prewarm] published ' + matches.length + ' of ' + allMatches.length + ' picks -> ' +
-    path.relative(process.cwd(), OUT) + ' (' + Math.round(bytes / 1024) +
-    ' KB, ' + (Date.now() - started) + 'ms)');
+    path.relative(process.cwd(), OUT) + ' and ' + path.relative(process.cwd(), OUT_COMMITTED) +
+    ' (' + Math.round(bytes / 1024) + ' KB, ' + (Date.now() - started) + 'ms)');
 }
 
 main().catch(function (e) {

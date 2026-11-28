@@ -13,6 +13,10 @@ services:
       mountPath: /var/data
       sizeGB: 1
     envVars:
+      - key: THIN_WEB
+        value: "1"
+      - key: HEAVY_SCRAPES_ENABLED
+        value: "0"
       - key: LIVE_TIP_HISTORY_FILE
         value: /var/data/live-tip-history.json
       - key: CONVERTER_RECENT_FILE

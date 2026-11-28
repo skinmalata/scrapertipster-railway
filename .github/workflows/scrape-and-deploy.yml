@@ -107,6 +107,10 @@ jobs:
       - name: Run scraper
         run: node scripts/gh-pages-scraper.js
 
+      - name: Prewarm author-picks snapshot for offline fallback
+        continue-on-error: true
+        run: node scripts/prewarm-author-picks.js
+
       # Best-effort bookkeeping: two runs triggered close together both check
       # out their own head SHA and both rewrite these three files, so the
       # second one's pull/push can lose the race. That must never be able to
@@ -117,6 +121,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/analysis-archive.json data/analysis-expired.json data/team-registry.json data/h2h-registry.json data/full-predictions.json
+          if [ -f data/author-picks-public.json ]; then
+            git add data/author-picks-public.json
+          fi
           if git diff --cached --quiet; then
             echo "No archive changes to commit"
           else
@@ -139,13 +146,6 @@ jobs:
       # pages are never submitted.
       - name: Refresh sitemap after redirect stubs
         run: node scripts/update-sitemap.js
-
-      # Publish the H2H pool to the same origin as the site. author-picks.html
-      # reads this only when the Render API cannot be reached, so a failure here
-      # must never block the deploy -- the last committed copy stays in place.
-      - name: Prewarm author-picks snapshot for offline fallback
-        continue-on-error: true
-        run: node scripts/prewarm-author-picks.js
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
