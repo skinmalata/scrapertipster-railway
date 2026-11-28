@@ -13,6 +13,7 @@ const CACHE_TTL_MS = 5 * 60 * 1000;
 const resultCache = new Map();
 const TIP_ALIASES = { '1': '1', X: 'X', '2': '2', '1X': '1X', X2: 'X2', '12': '12' };
 const TIP_PRIORITY = { '1': 0, '2': 0, X: 1, '1X': 2, X2: 2, '12': 2 };
+const OVER_SOURCES = { over15: '1.5', over25: '2.5' };
 
 function readJson(file) {
   try {
@@ -77,6 +78,12 @@ function matchName(row) {
 }
 
 function rowsForSource(source) {
+  if (OVER_SOURCES[source]) {
+    const data = readJson(PREDICTIONS_FILE) || {};
+    const key = source === 'over15' ? 'over15Matches' : 'over25Matches';
+    return Array.isArray(data[key]) ? data[key].slice() : [];
+  }
+
   if (source === 'perfect-record') {
     const curated = readJson(CURATED_FILE);
     const rows = curated && Array.isArray(curated.matches) ? curated.matches.slice() : [];
@@ -110,6 +117,19 @@ function buildLeg(row, source) {
   const name = matchName(row);
   if (!name) return null;
 
+  if (OVER_SOURCES[source]) {
+    const tipText = String((row && row.tip) || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    if (tipText !== 'over ' + OVER_SOURCES[source]) return null;
+    return {
+      match: name,
+      tip: 'Over ' + OVER_SOURCES[source],
+      category: source,
+      league: String((row && row.league) || ''),
+      date: String((row && row.date) || ''),
+      sport: 'football'
+    };
+  }
+
   let tip = null;
   if (source === 'perfect-record') {
     const parts = name.split(/\s+-\s+/);
@@ -141,7 +161,9 @@ async function generatePageSportybetCode(input) {
   const body = input || {};
   let source = String(body.source || '1x2').toLowerCase();
   if (source === 'homepage') source = 'home';
-  if (source !== 'home' && source !== '1x2' && source !== 'perfect-record') {
+  if (source === 'over-1-5' || source === 'over-15' || source === 'over-1-5.html') source = 'over15';
+  if (source === 'over-2-5' || source === 'over-25' || source === 'over-2-5.html') source = 'over25';
+  if (source !== 'home' && source !== '1x2' && source !== 'perfect-record' && !OVER_SOURCES[source]) {
     throw serviceError('Unknown page source.', 'INVALID_SOURCE', 400);
   }
 

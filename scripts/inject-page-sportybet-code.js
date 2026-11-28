@@ -12,6 +12,7 @@ const CACHE_FILE = path.join(PUBLIC_DIR, 'data', 'page-sportybet-code-cache.json
 const SCRIPT_TAG = '<script src="/page-sportybet-code.js?v=2" defer></script>';
 const START = '<span data-wft-page-code-start></span>';
 const END = '<span data-wft-page-code-end></span>';
+const PAGE_MARKETS = { '1x2': '1x2', 'over-1-5': 'over15', 'over-2-5': 'over25' };
 
 function escapeHtml(value) {
   return String(value == null ? '' : value)
@@ -112,21 +113,21 @@ function renderCard(data) {
 }
 
 function widgetBlock(meta, data) {
-  return '\n' + START + '\n<div class="wft-page-code"' + attrs(meta) + '>' + renderCard(data) + '</div>\n' + END + '\n';
+  return START + '\n<div class="wft-page-code"' + attrs(meta) + '>' + renderCard(data) + '</div>\n' + END;
 }
 
 function placeBlock(html, block) {
-  const sentinel = /<span data-wft-page-code-start><\/span>[\s\S]*?<span data-wft-page-code-end><\/span>\n?/;
-  if (sentinel.test(html)) return html.replace(sentinel, block);
+  const sentinel = /(?:^|\n)(?:[ \t]*\r?\n)*[ \t]*<span data-wft-page-code-start><\/span>[\s\S]*?<span data-wft-page-code-end><\/span>(?:[ \t]*\r?\n)*/;
+  if (sentinel.test(html)) return html.replace(sentinel, '\n\n' + block + '\n');
 
-  const oldHolder = /<div class="wft-page-code" data-page-sportybet-code[^>]*>[\s\S]*?<\/div>\n?/;
-  if (oldHolder.test(html)) return html.replace(oldHolder, block);
+  const oldHolder = /(?:^|\n)(?:[ \t]*\r?\n)*[ \t]*<div class="wft-page-code" data-page-sportybet-code[^>]*>[\s\S]*?<\/div>(?:[ \t]*\r?\n)*/;
+  if (oldHolder.test(html)) return html.replace(oldHolder, '\n\n' + block + '\n');
 
   const mainIndex = html.indexOf('</main>');
   const bodyIndex = html.indexOf('</body>');
   const insertIndex = mainIndex >= 0 ? mainIndex : bodyIndex;
   if (insertIndex < 0) return null;
-  return html.slice(0, insertIndex) + block + html.slice(insertIndex);
+  return html.slice(0, insertIndex) + '\n\n' + block + '\n' + html.slice(insertIndex);
 }
 
 async function inject(file, meta, codeCache) {
@@ -173,19 +174,18 @@ function walk(dir, out) {
 function predictionMeta(file) {
   const rel = path.relative(PUBLIC_DIR, file).split(path.sep).join('/');
   const parts = rel.split('/');
-  if (parts[parts.length - 1] !== 'index.html' || !parts.includes('1x2')) return null;
+  if (parts[parts.length - 1] !== 'index.html') return null;
+  const marketPart = parts.find(function (part) { return PAGE_MARKETS[part]; });
+  if (!marketPart) return null;
   if (fs.existsSync(path.join(path.dirname(file), '.redirect-stub'))) return null;
 
-  const meta = { source: '1x2' };
+  const meta = { source: PAGE_MARKETS[marketPart] };
   const dateIndex = parts.indexOf('date');
   if (dateIndex >= 0 && /^\d{4}-\d{2}-\d{2}$/.test(parts[dateIndex + 1] || '')) {
     meta.date = parts[dateIndex + 1];
   }
 
-  const leagueIndex = parts.indexOf('league');
-  if (leagueIndex >= 0 && parts[leagueIndex + 1] && parts[leagueIndex + 1] !== '1x2') {
-    meta.league = parts[leagueIndex + 1];
-  } else if (parts[0] === 'predictions' && parts.length >= 4 && parts[2] === '1x2') {
+  if (parts[0] === 'predictions' && parts.length >= 4 && parts[2] === marketPart) {
     meta.league = parts[1];
   }
   return meta;
@@ -198,7 +198,9 @@ async function main() {
   const pages = [
     { file: path.join(PUBLIC_DIR, 'index.html'), meta: { source: 'home' } },
     { file: path.join(PUBLIC_DIR, 'predictions', 'perfect-record.html'), meta: { source: 'perfect-record', date: curatedDate() } },
-    { file: path.join(PUBLIC_DIR, 'predictions', '1x2.html'), meta: { source: '1x2' } }
+    { file: path.join(PUBLIC_DIR, 'predictions', '1x2.html'), meta: { source: '1x2' } },
+    { file: path.join(PUBLIC_DIR, 'predictions', 'over-1-5.html'), meta: { source: 'over15' } },
+    { file: path.join(PUBLIC_DIR, 'predictions', 'over-2-5.html'), meta: { source: 'over25' } }
   ];
 
   for (const page of pages) {
