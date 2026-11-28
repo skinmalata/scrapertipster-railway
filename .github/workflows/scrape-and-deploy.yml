@@ -76,6 +76,7 @@ jobs:
             public/h2h
             public/teams
             public/predictions
+            public/data/page-sportybet-code-cache.json
           key: generated-pages-${{ github.run_id }}
           restore-keys: |
             generated-pages-
@@ -126,6 +127,9 @@ jobs:
 
       - name: Bake shared nav/footer layout into static pages
         run: node scripts/bake-layout.js
+
+      - name: Inject page SportyBet code widgets
+        run: node scripts/inject-page-sportybet-code.js
 
       - name: Emit redirect stubs for legacy/missing URLs
         run: node scripts/generate-redirects.js
